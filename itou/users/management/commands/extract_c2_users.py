@@ -97,10 +97,8 @@ class Command(BaseCommand):
     def serialize_institution_memberships(self):
         institution_csv_rows = []
 
-        institution_memberships = (
-            InstitutionMembership.objects.active()
-            .select_related("user", "institution")
-            .filter(institution__kind__in=self.target_institution_kinds)
+        institution_memberships = InstitutionMembership.objects.select_related("user", "institution").filter(
+            institution__kind__in=self.target_institution_kinds
         )
 
         for membership in institution_memberships:
@@ -118,10 +116,8 @@ class Command(BaseCommand):
     def serialize_prescriber_memberships(self):
         organization_csv_rows = []
 
-        prescriber_memberships = (
-            PrescriberMembership.objects.active()
-            .select_related("user", "organization")
-            .filter(organization__kind__in=self.target_prescriber_org_kinds)
+        prescriber_memberships = PrescriberMembership.objects.select_related("user", "organization").filter(
+            organization__kind__in=self.target_prescriber_org_kinds
         )
 
         for membership in prescriber_memberships:
@@ -133,10 +129,8 @@ class Command(BaseCommand):
     def serialize_siae_memberships(self):
         siae_csv_rows = []
 
-        siae_memberships = (
-            CompanyMembership.objects.active()
-            .select_related("user", "company")
-            .filter(company__kind__in=CompanyKind.siae_kinds())
+        siae_memberships = CompanyMembership.objects.select_related("user", "company").filter(
+            company__kind__in=CompanyKind.siae_kinds()
         )
 
         for membership in siae_memberships:

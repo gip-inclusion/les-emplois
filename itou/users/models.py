@@ -599,9 +599,9 @@ class User(AbstractUser, AddressMixin):
     def is_prescriber_with_authorized_org_memberships(self):
         return (
             self.is_prescriber
-            and self.prescribermembership_set.active()
-            .filter(organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED)
-            .exists()
+            and self.prescribermembership_set.filter(
+                organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
+            ).exists()
         )
 
     @property
@@ -625,13 +625,10 @@ class User(AbstractUser, AddressMixin):
         or in grace period, with a minimum of database queries.
         """
         # Unfortunately we need two queries here, no solution was found to combine both
-        # `company_set.active_or_in_grace_period()` and `companymembership_set.active()` in a single query.
+        # `company_set.active_or_in_grace_period()` and `companymembership_set` in a single query.
         user_company_set_pks = self.company_set.active_or_in_grace_period().values_list("pk", flat=True)
         memberships = (
-            self.companymembership_set.active()
-            .select_related("company")
-            .filter(company__pk__in=user_company_set_pks)
-            .all()
+            self.companymembership_set.select_related("company").filter(company__pk__in=user_company_set_pks).all()
         )
         return memberships
 

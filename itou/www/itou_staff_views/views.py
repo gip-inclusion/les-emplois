@@ -186,8 +186,8 @@ def export_ft_api_rejections(request):
 @check_user(lambda user: user.is_staff)
 @permission_required("users.export_cta")
 def export_cta(request):
-    employees_qs = CompanyMembership.objects.active().select_related("company", "user")
-    prescribers_qs = PrescriberMembership.objects.active().select_related("organization", "user")
+    employees_qs = CompanyMembership.objects.select_related("company", "user")
+    prescribers_qs = PrescriberMembership.objects.select_related("organization", "user")
 
     def content():
         yield cta_export_spec.keys()

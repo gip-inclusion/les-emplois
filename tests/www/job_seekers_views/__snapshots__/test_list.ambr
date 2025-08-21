@@ -712,8 +712,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
@@ -1354,7 +1354,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({
@@ -1730,8 +1733,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
@@ -2363,7 +2366,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({

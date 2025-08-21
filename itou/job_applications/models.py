@@ -161,9 +161,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
 class JobApplicationQuerySet(models.QuerySet):
     def is_active_company_member(self, user):
-        return self.filter(
-            Exists(CompanyMembership.objects.active().filter(user=user, company=OuterRef("to_company")))
-        )
+        return self.filter(Exists(CompanyMembership.objects.filter(user=user, company=OuterRef("to_company"))))
 
     def pending(self):
         return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)

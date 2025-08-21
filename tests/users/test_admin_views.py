@@ -8,6 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
+from itou.companies.models import CompanyMembership
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
@@ -309,7 +310,7 @@ def test_free_sso_email_ic(admin_client):
     assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
     employer.refresh_from_db()
     assert employer.is_active is False
-    assert employer.companymembership_set.get().is_active is False
+    assert CompanyMembership.include_inactive.get(user=employer).is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
     assert not employer.emailaddress_set.exists()
@@ -350,7 +351,7 @@ def test_free_sso_email_proconnect(admin_client):
     assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
     employer.refresh_from_db()
     assert employer.is_active is False
-    assert employer.companymembership_set.get().is_active is False
+    assert CompanyMembership.include_inactive.get(user=employer).is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
     assert not employer.emailaddress_set.exists()

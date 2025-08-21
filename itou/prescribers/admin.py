@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.admin import CreatedOrUpdatedByMixin, ItouGISMixin, PkSupportRemarkInline
 from itou.utils.apis.exceptions import GeocodingDataError
 
@@ -93,7 +93,9 @@ class PrescriberOrganizationMembersInline(MembersInline):
         # A few organizations have more than 250 members, which causes the form
         # to have more than 1000 fields (the limit set in DATA_UPLOAD_MAX_NUMBER_FIELDS)
         # we believe that with 200+ members, there's no need to ask the support team to manually add a member
-        return not bool(obj and obj.memberships.count() > self.MEMBERSHIP_RO_LIMIT)
+        return not bool(
+            obj and PrescriberMembership.include_inactive.filter(organization=obj).count() > self.MEMBERSHIP_RO_LIMIT
+        )
 
 
 @admin.register(PrescriberOrganization)

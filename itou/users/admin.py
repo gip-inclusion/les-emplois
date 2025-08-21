@@ -1,10 +1,13 @@
 import logging
 import uuid
+from collections.abc import Callable
 from pprint import pformat
+from typing import NamedTuple
 
 from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
+from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
@@ -83,7 +86,19 @@ class DisabledNotificationsMixin:
         return "Aucune"
 
 
-class CompanyMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, ItouTabularInline):
+class MembershipInlineMixin:
+    def get_queryset(self, request):
+        queryset = self.model.include_inactive.all()
+        if not self.has_view_or_change_permission(request):
+            queryset = queryset.none()
+        else:
+            ordering = self.get_ordering(request)
+            if ordering:
+                queryset = queryset.order_by(*ordering)
+        return queryset
+
+
+class CompanyMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, MembershipInlineMixin, ItouTabularInline):
     model = CompanyMembership
     extra = 0
     readonly_fields = (
@@ -105,7 +120,7 @@ class CompanyMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, ItouTab
         return get_structure_view_link(obj.company)
 
 
-class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, ItouTabularInline):
+class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, MembershipInlineMixin, ItouTabularInline):
     model = PrescriberMembership
     extra = 0
     readonly_fields = (
@@ -125,7 +140,7 @@ class PrescriberMembershipInline(ReadonlyMixin, DisabledNotificationsMixin, Itou
         return get_structure_view_link(obj.organization)
 
 
-class InstitutionMembershipInline(ReadonlyMixin, ItouTabularInline):
+class InstitutionMembershipInline(ReadonlyMixin, MembershipInlineMixin, ItouTabularInline):
     model = InstitutionMembership
     extra = 0
     readonly_fields = (
@@ -418,8 +433,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         user.username = f"old_{user.username}"
         user.is_active = False
         user.save(update_fields=("email", "username", "is_active"))
-        user.prescribermembership_set.update(is_active=False)
-        user.companymembership_set.update(is_active=False)
+        PrescriberMembership.include_inactive.filter(user=user).update(is_active=False)
+        CompanyMembership.include_inactive.filter(user=user).update(is_active=False)
 
         messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
 
@@ -561,28 +576,50 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             return tuple(inlines)
         inlines.insert(0, EmailAddressInline)
 
+        class ConditionalInline(NamedTuple):
+            has_related_objs: Callable[[models.User], bool]
+            inline_class: InlineModelAdmin
+            strict: bool
+
+        sent_applications_inline = ConditionalInline(
+            lambda user: user.job_applications_sent.all(), SentJobApplicationInline, True
+        )
         conditional_inlines = {
-            "is_employer": {
-                "companymembership_set": CompanyMembershipInline,
-                "job_applications_sent": SentJobApplicationInline,
-            },
-            "is_prescriber": {
-                "prescribermembership_set": PrescriberMembershipInline,
-                "job_applications_sent": SentJobApplicationInline,
-            },
-            "is_labor_inspector": {"institutionmembership_set": InstitutionMembershipInline},
-            "is_job_seeker": {
-                "eligibility_diagnoses": EligibilityDiagnosisInline,
-                "geiq_eligibility_diagnoses": GEIQEligibilityDiagnosisInline,
-                "approvals": ApprovalInline,
-                "job_applications": JobApplicationInline,
-            },
+            "is_employer": [
+                ConditionalInline(
+                    lambda user: CompanyMembership.include_inactive.filter(user=user),
+                    CompanyMembershipInline,
+                    False,
+                ),
+                sent_applications_inline,
+            ],
+            "is_prescriber": [
+                ConditionalInline(
+                    lambda user: PrescriberMembership.include_inactive.filter(user=user),
+                    PrescriberMembershipInline,
+                    False,
+                ),
+                sent_applications_inline,
+            ],
+            "is_labor_inspector": [
+                ConditionalInline(
+                    lambda user: InstitutionMembership.include_inactive.filter(user=user),
+                    InstitutionMembershipInline,
+                    False,
+                ),
+            ],
+            "is_job_seeker": [
+                ConditionalInline(lambda user: user.eligibility_diagnoses.all(), EligibilityDiagnosisInline, False),
+                ConditionalInline(
+                    lambda user: user.geiq_eligibility_diagnoses.all(), GEIQEligibilityDiagnosisInline, False
+                ),
+                ConditionalInline(lambda user: user.approvals.all(), ApprovalInline, False),
+                ConditionalInline(lambda user: user.job_applications.all(), JobApplicationInline, True),
+            ],
         }
-        strict_fields = {"job_applications", "job_applications_sent"}
         for check, related_fields in conditional_inlines.items():
-            for field_name, inline_class in related_fields.items():
-                is_strict = field_name in strict_fields
-                if getattr(obj, check) or (not is_strict and getattr(obj, field_name).all()):
+            for has_related_objs, inline_class, is_strict in related_fields:
+                if getattr(obj, check) or (not is_strict and has_related_objs(obj)):
                     inlines.insert(-1, inline_class)
 
         return tuple(inlines)
@@ -725,15 +762,14 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             elif obj.is_labor_inspector:
                 memberships = obj.institutionmembership_set.all()
             for membership in memberships:
-                if membership.is_active or membership.is_admin:
-                    add_support_remark_to_obj(
-                        obj,
-                        f"Désactivation de {membership} suite à la désactivation de l'utilisateur : "
-                        f"is_active={membership.is_active} is_admin={membership.is_admin}",
-                    )
-                    membership.is_active = False
-                    membership.is_admin = False
-                    membership.save()
+                add_support_remark_to_obj(
+                    obj,
+                    f"Désactivation de {membership} suite à la désactivation de l'utilisateur : "
+                    f"is_active={membership.is_active} is_admin={membership.is_admin}",
+                )
+                membership.is_active = False
+                membership.is_admin = False
+                membership.save()
         super().save_model(request, obj, form, change)
         if obj.identity_provider == IdentityProvider.DJANGO and "email" in form.changed_data:
             deleted, _details = EmailAddress.objects.filter(user=obj).delete()

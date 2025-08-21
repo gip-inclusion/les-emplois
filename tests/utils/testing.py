@@ -32,7 +32,6 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
@@ -455,6 +454,8 @@ def get_response_for_middlewaremixin(request):
 
 
 def get_request(user):
+    from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
+
     factory = RequestFactory()
     request = factory.get("/")
     request.user = user

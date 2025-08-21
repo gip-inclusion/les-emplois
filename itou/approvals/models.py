@@ -22,6 +22,7 @@ from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies import enums as companies_enums
+from itou.companies.models import CompanyMembership
 from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
@@ -1533,7 +1534,12 @@ class CommonProlongation(models.Model):
             raise ValidationError("L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif")
 
         # declared_by and declared_by_siae coherence
-        if self.declared_by and not self.declared_by_siae.members.filter(pk=self.declared_by.pk).exists():
+        if (
+            self.declared_by_id
+            and not CompanyMembership.include_inactive.filter(
+                company_id=self.declared_by_siae_id, user_id=self.declared_by_id
+            ).exists()
+        ):
             raise ValidationError(
                 "Le déclarant doit être un membre de la SIAE du déclarant. "
                 f"Déclarant: {self.declared_by_id}, SIAE: {self.declared_by_siae_id}."

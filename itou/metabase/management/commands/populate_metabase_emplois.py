@@ -155,20 +155,20 @@ class Command(BaseCommand):
             )
             .annotate(
                 active_memberships_count=(
-                    CompanyMembership.objects.active()
+                    CompanyMembership.objects.all()
                     .filter(company=OuterRef("pk"))
                     .values("company")
                     .annotate(count=Count("*"))
                     .values("count")[:1]
                 ),
                 first_membership_join_date=(
-                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    CompanyMembership.include_inactive.filter(company=OuterRef("pk"))
                     .values("company")
                     .annotate(min=Min("joined_at"))
                     .values("min")[:1]
                 ),
                 last_login_date=(
-                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    CompanyMembership.include_inactive.filter(company=OuterRef("pk"))
                     .values("company")
                     .annotate(max=Max("user__last_login"))
                     .values("max")[:1]
@@ -320,20 +320,20 @@ class Command(BaseCommand):
                 accepted_job_applications_count=accepted_job_applications_count,
                 last_job_application_creation_date=last_job_application_creation_date,
                 active_memberships_count=(
-                    PrescriberMembership.objects.active()
+                    PrescriberMembership.objects.all()
                     .filter(organization=OuterRef("pk"))
                     .values("organization")
                     .annotate(count=Count("*"))
                     .values("count")[:1]
                 ),
                 first_membership_join_date=(
-                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    PrescriberMembership.include_inactive.filter(organization=OuterRef("pk"))
                     .values("organization")
                     .annotate(min=Min("joined_at"))
                     .values("min")[:1]
                 ),
                 last_login_date=(
-                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    PrescriberMembership.include_inactive.filter(organization=OuterRef("pk"))
                     .values("organization")
                     .annotate(max=Max("user__last_login"))
                     .values("max")[:1]
@@ -606,9 +606,9 @@ class Command(BaseCommand):
         populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_memberships(self):
-        siae_queryset = CompanyMembership.objects.active()
-        prescriber_queryset = PrescriberMembership.objects.active()
-        institution_queryset = InstitutionMembership.objects.active()
+        siae_queryset = CompanyMembership.objects.all()
+        prescriber_queryset = PrescriberMembership.objects.all()
+        institution_queryset = InstitutionMembership.objects.all()
 
         populate_table(
             memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]

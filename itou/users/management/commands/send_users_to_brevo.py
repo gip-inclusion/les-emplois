@@ -112,7 +112,6 @@ class Command(BaseCommand):
                 Exists(
                     CompanyMembership.objects.filter(
                         user_id=OuterRef("pk"),
-                        is_active=True,
                         company__kind__in=CompanyKind.siae_kinds(),
                     )
                 )
@@ -126,7 +125,6 @@ class Command(BaseCommand):
         all_prescribers = professional_qs.filter(kind=UserKind.PRESCRIBER)
         authorized_prescriber_memberships = PrescriberMembership.objects.filter(
             user_id=OuterRef("pk"),
-            is_active=True,
             organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED,
         )
         prescribers = list(all_prescribers.filter(Exists(authorized_prescriber_memberships)))

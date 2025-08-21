@@ -1,4 +1,6 @@
+from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 
 
@@ -32,9 +34,11 @@ def build_iae_diag_post_data(author, job_seeker, with_administrative_criteria=Tr
         "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
     }
     if author.kind == UserKind.EMPLOYER:
-        post_data["author_siae"] = author.companymembership_set.get().company_id
+        post_data["author_siae"] = CompanyMembership.include_inactive.get(user=author).company_id
     elif author.kind == UserKind.PRESCRIBER:
-        post_data["author_prescriber_organization"] = author.prescribermembership_set.get().organization_id
+        post_data["author_prescriber_organization"] = PrescriberMembership.include_inactive.get(
+            user=author
+        ).organization_id
 
     if with_administrative_criteria:
         post_data |= {
@@ -72,9 +76,11 @@ def build_geiq_diag_post_data(author, job_seeker, with_administrative_criteria=T
         "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
     }
     if author.kind == UserKind.EMPLOYER:
-        post_data["author_geiq"] = author.companymembership_set.get().company_id
+        post_data["author_geiq"] = CompanyMembership.include_inactive.get(user=author).company_id
     elif author.kind == UserKind.PRESCRIBER:
-        post_data["author_prescriber_organization"] = author.prescribermembership_set.get().organization_id
+        post_data["author_prescriber_organization"] = PrescriberMembership.include_inactive.get(
+            user=author
+        ).organization_id
 
     if with_administrative_criteria:
         post_data |= {

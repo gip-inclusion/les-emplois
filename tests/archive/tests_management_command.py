@@ -1473,10 +1473,10 @@ class TestAnonymizeProfessionalManagementCommand:
         assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
             name="deleted_anonymized_professionals"
         )
-        assert not CompanyMembership.objects.filter(user=to_delete_employer).exists()
-        assert not InstitutionMembership.objects.filter(user=to_delete_anonymized_labor_inspector).exists()
-        assert CompanyMembership.objects.filter(user=anonymized_employer, is_active=False).exists()
-        assert PrescriberMembership.objects.filter(user=prescriber, is_active=False).exists()
+        assert not CompanyMembership.include_inactive.filter(user=to_delete_employer).exists()
+        assert not InstitutionMembership.include_inactive.filter(user=to_delete_anonymized_labor_inspector).exists()
+        assert CompanyMembership.include_inactive.filter(user=anonymized_employer, is_active=False).exists()
+        assert PrescriberMembership.include_inactive.filter(user=prescriber, is_active=False).exists()
 
         assert respx_mock.calls.call_count == 2
         assert "Anonymized professionals after grace period, count: 4" in caplog.messages

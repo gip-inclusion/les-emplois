@@ -39,8 +39,9 @@ class Command(BaseCommand):
             ).send()
             colleagues_to_notify = [
                 membership.user
-                for membership in PrescriberMembership.objects.active()
-                .filter(organization=prolongation_request.prescriber_organization)
+                for membership in PrescriberMembership.objects.filter(
+                    organization=prolongation_request.prescriber_organization
+                )
                 .exclude(user=prolongation_request.assigned_to)
                 .select_related("user")
                 # Limit to the last 10 active colleagues, admins take precedence over regular members.
