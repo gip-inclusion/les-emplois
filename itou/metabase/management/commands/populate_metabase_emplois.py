@@ -24,7 +24,7 @@ from collections import OrderedDict
 import tenacity
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, F, Max, Prefetch, Q
+from django.db.models import Count, F, Max, OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
@@ -319,10 +319,6 @@ class Command(BaseCommand):
                     ),
                     to_attr="last_eligibility_diagnosis",
                 ),
-                Prefetch(
-                    "job_applications",
-                    queryset=JobApplication.objects.select_related("to_company"),
-                ),
             )
             .annotate(
                 eligibility_diagnoses_count=Count("eligibility_diagnoses", distinct=True),
@@ -332,12 +328,18 @@ class Command(BaseCommand):
                     filter=Q(job_applications__state=JobApplicationState.ACCEPTED),
                     distinct=True,
                 ),
+                last_hiring_company_kind=Subquery(
+                    JobApplication.objects.accepted()
+                    .filter(job_seeker=OuterRef("pk"))
+                    .values("to_company__kind")
+                    .order_by("-created_at")[:1]
+                ),
             )
             .all()
         )
         job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers_table, batch_size=5_000, querysets=[queryset])
+        populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
