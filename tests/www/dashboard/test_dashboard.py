@@ -214,10 +214,13 @@ class TestDashboardView:
         JobApplicationFactory(to_company=company, archived_at=timezone.now())
         JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED)
         JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED, archived_at=timezone.now())
+        JobApplicationFactory(to_company=company, state=JobApplicationState.POOL)
+        JobApplicationFactory(to_company=company, state=JobApplicationState.POOL, archived_at=timezone.now())
         client.force_login(company.members.get())
         response = client.get(reverse("dashboard:index"))
         todo_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
         postponed_url = reverse("apply:list_for_siae") + "?states=postponed"
+        pool_url = reverse("apply:list_for_siae") + "?states=pool"
         assertContains(
             response,
             # Archived job application is ignored.
@@ -251,6 +254,26 @@ class TestDashboardView:
                    data-matomo-option="voir-liste-candidatures-En attente">
                     <i class="ri-time-line ri-lg fw-normal" aria-hidden="true"></i>
                     <span>En attente</span>
+                </a>
+                <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
+            </li>
+            """,
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            # Archived job application is ignored.
+            f"""
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{pool_url}"
+                   class="btn-link btn-ico"
+                   data-matomo-event="true"
+                   data-matomo-category="employeurs"
+                   data-matomo-action="clic"
+                   data-matomo-option="voir-liste-candidatures-Vivier">
+                    <i class="ri-folder-user-line ri-lg fw-normal" aria-hidden="true"></i>
+                    <span>Vivier</span>
                 </a>
                 <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
             </li>
