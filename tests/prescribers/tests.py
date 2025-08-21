@@ -23,6 +23,7 @@ from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.models import User
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
@@ -1018,6 +1019,54 @@ def test_admin_too_many_memberships(admin_client, mocker):
     mocker.patch("itou.prescribers.admin.PrescriberOrganizationMembersInline.MEMBERSHIP_RO_LIMIT", 1)
     response = admin_client.get(change_url)
     assertNotContains(response, membership_form_field_id)
+
+
+def test_reactivate_member(admin_client, caplog):
+    organization = PrescriberOrganizationWithMembershipFactory()
+    membership = organization.memberships.first()
+    admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+    organization.deactivate_membership(membership, updated_by=admin_user)
+    change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
+
+    response = admin_client.get(change_url)
+    assertContains(response, membership.user.get_full_name())
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "id": organization.id,
+            "siret": organization.siret,
+            "kind": organization.kind.value,
+            "name": organization.name,
+            "phone": organization.phone,
+            "email": organization.email,
+            "code_safir_poleAemploi": "",
+            "description": organization.description,
+            "address_line_1": organization.address_line_1,
+            "address_line_2": organization.address_line_2,
+            "post_code": organization.post_code,
+            "city": organization.city,
+            "department": organization.department,
+            "coords": "",
+            "memberships-TOTAL_FORMS": "1",
+            "memberships-INITIAL_FORMS": "1",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-id": membership.pk,
+            "memberships-0-organization": organization.pk,
+            "memberships-0-user": membership.user.pk,
+            "memberships-0-is_active": "on",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url)
+    assert membership.user in organization.members.all()
+    assert (
+        f"Reactivating prescribers.PrescriberMembership of organization_id={organization.pk} "
+        f"for user_id={membership.user_id} is_admin=False." in caplog.messages
+    )
 
 
 def test_prescriber_kinds_are_alphabetically_sorted():
