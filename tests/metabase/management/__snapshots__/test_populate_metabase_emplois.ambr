@@ -4728,43 +4728,17 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 49,
+    'num_queries': 48,
     'queries': list([
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'get_active_companies_pks[metabase/tables/utils.py]',
+          'populate_table[metabase/db.py]',
           'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
-      dict({
-        'origin': list([
-          'get_active_companies_pks[metabase/tables/utils.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id" AS "pk"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1)))
-          ORDER BY RANDOM() ASC
-        ''',
       }),
       dict({
         'origin': list([
@@ -4777,8 +4751,22 @@
           SELECT COUNT(*) AS "__count"
           FROM "job_applications_jobapplication"
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s))
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))))
         ''',
       }),
       dict({
@@ -5176,8 +5164,22 @@
           LEFT OUTER JOIN "companies_company" T4 ON ("job_applications_jobapplication"."sender_company_id" = T4."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s))
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))))
           ORDER BY "job_applications_jobapplication"."created_at" DESC
         ''',
       }),
@@ -5334,8 +5336,22 @@
           FROM "job_applications_jobapplication_selected_jobs"
           INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s))
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))))
         ''',
       }),
       dict({
@@ -5421,8 +5437,22 @@
           FROM "job_applications_jobapplication_selected_jobs"
           INNER JOIN "job_applications_jobapplication" ON ("job_applications_jobapplication_selected_jobs"."jobapplication_id" = "job_applications_jobapplication"."id")
           WHERE (NOT ("job_applications_jobapplication"."origin" = %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s,
-                                                                           %s))
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -5526,43 +5556,17 @@
 # ---
 # name: test_populate_job_descriptions
   dict({
-    'num_queries': 34,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
-          'get_active_companies_pks[metabase/tables/utils.py]',
+          'populate_table[metabase/db.py]',
           'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
-      }),
-      dict({
-        'origin': list([
-          'get_active_companies_pks[metabase/tables/utils.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_company"."id" AS "pk"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1)))
-          ORDER BY RANDOM() ASC
-        ''',
       }),
       dict({
         'origin': list([
@@ -5577,7 +5581,22 @@
             (SELECT "companies_jobdescription"."id" AS "col1"
              FROM "companies_jobdescription"
              LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
-             WHERE "companies_jobdescription"."company_id" IN (%s)
+             WHERE "companies_jobdescription"."company_id" IN
+                 (SELECT V0."id"
+                  FROM "companies_company" V0
+                  WHERE (NOT (V0."siret" = %s)
+                         AND (NOT (V0."kind" IN (%s,
+                                                 %s,
+                                                 %s,
+                                                 %s,
+                                                 %s))
+                              OR V0."source" = %s
+                              OR EXISTS
+                                (SELECT %s AS "a"
+                                 FROM "companies_siaeconvention" U0
+                                 WHERE (U0."id" = (V0."convention_id")
+                                        AND U0."is_active")
+                                 LIMIT 1))))
              GROUP BY 1) subquery
         ''',
       }),
@@ -5860,7 +5879,22 @@
           LEFT OUTER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
-          WHERE "companies_jobdescription"."company_id" IN (%s)
+          WHERE "companies_jobdescription"."company_id" IN
+              (SELECT V0."id"
+               FROM "companies_company" V0
+               WHERE (NOT (V0."siret" = %s)
+                      AND (NOT (V0."kind" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s,
+                                              %s))
+                           OR V0."source" = %s
+                           OR EXISTS
+                             (SELECT %s AS "a"
+                              FROM "companies_siaeconvention" U0
+                              WHERE (U0."id" = (V0."convention_id")
+                                     AND U0."is_active")
+                              LIMIT 1))))
           GROUP BY "companies_jobdescription"."id",
                    "jobs_appellation"."code",
                    "jobs_rome"."code",
@@ -7348,7 +7382,7 @@
 # ---
 # name: test_populate_organizations
   dict({
-    'num_queries': 47,
+    'num_queries': 48,
     'queries': list([
       dict({
         'origin': list([
@@ -7712,8 +7746,6 @@
       }),
       dict({
         'origin': list([
-          'get_active_companies_pks[metabase/tables/utils.py]',
-          '_get_ja_sent_by_prescribers_without_org[metabase/tables/organizations.py]',
           'get_org_job_applications_count[metabase/tables/organizations.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
@@ -7722,22 +7754,61 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "companies_company"."id" AS "pk"
-          FROM "companies_company"
-          WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
-                      OR "companies_company"."source" = %s
-                      OR EXISTS
-                        (SELECT %s AS "a"
-                         FROM "companies_siaeconvention" U0
-                         WHERE (U0."id" = ("companies_company"."convention_id")
-                                AND U0."is_active")
-                         LIMIT 1)))
-          ORDER BY RANDOM() ASC
+          SELECT COUNT(*) AS "__count"
+          FROM "job_applications_jobapplication"
+          WHERE ("job_applications_jobapplication"."sender_kind" = %s
+                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1))))
+                 AND NOT ("job_applications_jobapplication"."origin" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_org_accepted_job_applications_count[metabase/tables/organizations.py]',
+          'inject_chunk[metabase/db.py]',
+          'populate_table[metabase/db.py]',
+          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "job_applications_jobapplication"
+          WHERE ("job_applications_jobapplication"."sender_kind" = %s
+                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL
+                 AND "job_applications_jobapplication"."to_company_id" IN
+                   (SELECT V0."id"
+                    FROM "companies_company" V0
+                    WHERE (NOT (V0."siret" = %s)
+                           AND (NOT (V0."kind" IN (%s,
+                                                   %s,
+                                                   %s,
+                                                   %s,
+                                                   %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1))))
+                 AND NOT ("job_applications_jobapplication"."origin" = %s)
+                 AND "job_applications_jobapplication"."state" = %s)
         ''',
       }),
       dict({
