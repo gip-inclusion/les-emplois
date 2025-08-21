@@ -5806,6 +5806,14 @@
                               </label>
                           </div>
                       </li>
+                      <li>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_states_8" name="states" type="checkbox" value="pool"/>
+                              <label class="form-check-label" for="id_states_8">
+                                  Vivier de candidatures
+                              </label>
+                          </div>
+                      </li>
                   </ul>
               </div>
           </fieldset>
@@ -6052,6 +6060,14 @@
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
                               <label class="form-check-label" for="id_states_6">
                                   Embauché ailleurs
+                              </label>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="pool"/>
+                              <label class="form-check-label" for="id_states_7">
+                                  Vivier de candidatures
                               </label>
                           </div>
                       </li>
@@ -6375,6 +6391,14 @@
                               <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
                               <label class="form-check-label" for="id_states_6">
                                   Embauché ailleurs
+                              </label>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="pool"/>
+                              <label class="form-check-label" for="id_states_7">
+                                  Vivier de candidatures
                               </label>
                           </div>
                       </li>

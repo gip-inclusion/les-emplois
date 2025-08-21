@@ -16,6 +16,7 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
         JobApplicationState.CANCELLED: "bg-primary",
         JobApplicationState.NEW: "bg-info",
         JobApplicationState.OBSOLETE: "bg-primary",
+        JobApplicationState.POOL: "bg-accent-01 text-white",
         JobApplicationState.POSTPONED: "bg-accent-03 text-primary",
         JobApplicationState.PRIOR_TO_HIRE: "bg-accent-02 text-primary",
         JobApplicationState.PROCESSING: "bg-accent-03 text-primary",
@@ -27,7 +28,8 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
     ]
     if hx_swap_oob:
         attrs.append('hx-swap-oob="true"')
-    badge = f"<span {' '.join(attrs)}>{job_application.get_state_display()}</span>"
+    label = job_application.get_state_display() if job_application.state != JobApplicationState.POOL else "Vivier"
+    badge = f"<span {' '.join(attrs)}>{label}</span>"
     if job_application.archived_at:
         badge = f"""{badge}
             <span class="badge rounded-pill {extra_classes} bg-light text-primary"

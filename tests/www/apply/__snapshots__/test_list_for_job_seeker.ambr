@@ -86,6 +86,14 @@
                               </label>
                           </div>
                       </li>
+                      <li>
+                          <div class="form-check">
+                              <input class="form-check-input" id="id_states_8" name="states" type="checkbox" value="pool"/>
+                              <label class="form-check-label" for="id_states_8">
+                                  Vivier de candidatures
+                              </label>
+                          </div>
+                      </li>
                   </ul>
               </div>
           </fieldset>
