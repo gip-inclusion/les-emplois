@@ -1540,6 +1540,8 @@
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
                  AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."company_id" IN (%s))
           ORDER BY RANDOM() ASC
         ''',
@@ -1563,7 +1565,10 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE "companies_companymembership"."company_id" IN (%s)
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" IN (%s))
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -7508,6 +7513,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active")
         ''',
       }),
@@ -7523,6 +7530,8 @@
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active")
         ''',
       }),
@@ -7538,6 +7547,8 @@
           FROM "institutions_institutionmembership"
           INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "institutions_institutionmembership"."is_active")
         ''',
       }),
@@ -7647,6 +7658,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active")
           ORDER BY 1 ASC
         ''',
@@ -7664,6 +7677,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."id" >= %s)
           ORDER BY 1 ASC
@@ -7692,6 +7707,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."id" >= %s)
           ORDER BY "companies_companymembership"."id" ASC
@@ -7738,6 +7755,8 @@
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY 1 ASC
         ''',
@@ -7755,6 +7774,8 @@
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."id" >= %s)
           ORDER BY 1 ASC
@@ -7783,6 +7804,8 @@
           FROM "prescribers_prescribermembership"
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."id" >= %s)
           ORDER BY "prescribers_prescribermembership"."id" ASC
@@ -7829,6 +7852,8 @@
           FROM "institutions_institutionmembership"
           INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "institutions_institutionmembership"."is_active")
           ORDER BY 1 ASC
         ''',
@@ -7846,6 +7871,8 @@
           FROM "institutions_institutionmembership"
           INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."id" >= %s)
           ORDER BY 1 ASC
@@ -7874,6 +7901,8 @@
           FROM "institutions_institutionmembership"
           INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "institutions_institutionmembership"."is_active"
                  AND "institutions_institutionmembership"."id" >= %s)
           ORDER BY "institutions_institutionmembership"."id" ASC
@@ -8552,6 +8581,8 @@
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."organization_id" IN (%s,
                                                                               %s))
           ORDER BY RANDOM() ASC
@@ -8628,8 +8659,11 @@
                  "prescribers_prescribermembership"."organization_id",
                  "prescribers_prescribermembership"."updated_by_id"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" IN (%s,
-                                                                         %s)
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" IN (%s,
+                                                                              %s))
           ORDER BY RANDOM() ASC
         ''',
       }),

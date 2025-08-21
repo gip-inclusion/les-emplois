@@ -16,9 +16,11 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
@@ -37,9 +39,11 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
@@ -144,9 +148,11 @@
           WHERE "companies_companymembership"."id" IN
               (SELECT U0."id"
                FROM "companies_companymembership" U0
-               INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-               WHERE (U0."company_id" = %s
-                      AND U2."is_active"
+               INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+               WHERE (U1."is_active"
+                      AND U0."is_active"
+                      AND U0."company_id" = %s
+                      AND U1."is_active"
                       AND U0."is_active"))
           ORDER BY RANDOM() ASC
         ''',
@@ -204,6 +210,8 @@
           FROM "companies_companymembership"
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."company_id" = %s)
           ORDER BY RANDOM() ASC

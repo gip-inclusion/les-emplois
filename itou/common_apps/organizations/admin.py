@@ -6,9 +6,19 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline
 
 
 class MembersInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, acting_user, **kwargs):
+    def __init__(self, *args, acting_user, queryset, **kwargs):
         self.acting_user = acting_user
-        return super().__init__(*args, **kwargs)
+        return super().__init__(
+            *args,
+            queryset=self.model.include_inactive.all(),
+            **kwargs,
+        )
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        # BaseModelFormSet uses the default manager, which excludes inactive users.
+        # https://github.com/django/django/blob/f11fb107662662f53a6ec45bbd36a06c6c4c05ea/django/forms/models.py#L1003
+        form.fields[self.model._meta.pk.name].queryset = self.queryset
 
     def _handle_save(self, form):
         if form.instance.pk:
