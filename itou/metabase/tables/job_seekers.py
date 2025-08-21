@@ -4,7 +4,7 @@ from functools import partial
 from django.utils import timezone
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -45,10 +45,7 @@ def get_user_signup_kind(user):
 
 
 def get_latest_diagnosis(job_seeker):
-    assert job_seeker.is_job_seeker
-    if job_seeker.eligibility_diagnoses_count == 0:
-        return None
-    return job_seeker.last_eligibility_diagnosis[0]
+    return job_seeker.last_eligibility_diagnosis[0] if job_seeker.last_eligibility_diagnosis else None
 
 
 def get_latest_diagnosis_author_sub_kind(job_seeker):
@@ -79,28 +76,6 @@ def get_latest_diagnosis_author_display_name(job_seeker):
         elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             return latest_diagnosis.author_prescriber_organization.display_name
     return None
-
-
-def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
-    """
-    Count criteria of given level for the latest diagnosis of
-    given job seeker.
-    """
-    latest_diagnosis = get_latest_diagnosis(job_seeker)
-    if latest_diagnosis:
-        if level == AdministrativeCriteriaLevel.LEVEL_1:
-            return latest_diagnosis.level_1_count
-        if level == AdministrativeCriteriaLevel.LEVEL_2:
-            return latest_diagnosis.level_2_count
-    return None
-
-
-def get_latest_diagnosis_level1_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_1)
-
-
-def get_latest_diagnosis_level2_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_2)
 
 
 def get_latest_diagnosis_criteria(job_seeker, criteria_id):
@@ -328,10 +303,8 @@ def get_table():
                 "type": "integer",
                 "comment": "ID auteur diagnostic si prescripteur",
                 "fn": lambda o: (
-                    get_latest_diagnosis(o).author_prescriber_organization.id
-                    if get_latest_diagnosis(o)
-                    and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
-                    and get_latest_diagnosis(o).author_prescriber_organization
+                    get_latest_diagnosis(o).author_prescriber_organization_id
+                    if get_latest_diagnosis(o) and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
                     else None
                 ),
             },
@@ -340,10 +313,8 @@ def get_table():
                 "type": "integer",
                 "comment": "ID auteur diagnostic si employeur",
                 "fn": lambda o: (
-                    get_latest_diagnosis(o).author_siae.id
-                    if get_latest_diagnosis(o)
-                    and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
-                    and get_latest_diagnosis(o).author_siae
+                    get_latest_diagnosis(o).author_siae_id
+                    if get_latest_diagnosis(o) and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
                     else None
                 ),
             },
@@ -379,13 +350,13 @@ def get_table():
                 "name": "total_critères_niveau_1",
                 "type": "integer",
                 "comment": "Total critères de niveau 1 du dernier diagnostic",
-                "fn": get_latest_diagnosis_level1_criteria,
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "level_1_count", None),
             },
             {
                 "name": "total_critères_niveau_2",
                 "type": "integer",
                 "comment": "Total critères de niveau 2 du dernier diagnostic",
-                "fn": get_latest_diagnosis_level2_criteria,
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "level_2_count", None),
             },
         ]
     )

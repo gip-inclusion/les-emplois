@@ -34,7 +34,7 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMEN
 from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
@@ -303,7 +303,18 @@ class Command(BaseCommand):
                             "author_prescriber_organization",
                             "author_siae",
                         )
-                        .prefetch_related("selected_administrative_criteria")
+                        .prefetch_related(
+                            Prefetch(
+                                "selected_administrative_criteria",
+                                SelectedAdministrativeCriteria.objects.only(
+                                    "administrative_criteria_id",
+                                    "eligibility_diagnosis_id",
+                                    "certified",
+                                    "certified_at",
+                                    "certification_period",
+                                ),
+                            ),
+                        )
                         .annotate(
                             level_1_count=Count(
                                 "administrative_criteria",
@@ -314,6 +325,19 @@ class Command(BaseCommand):
                                 filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
                             ),
                             criteria_ids=ArrayAgg("administrative_criteria__pk"),
+                        )
+                        .only(
+                            "created_at",
+                            "expires_at",
+                            "author_kind",
+                            "author_prescriber_organization_id",
+                            "author_siae_id",
+                            "author_siae__kind",  # get_latest_diagnosis_author_sub_kind
+                            "author_prescriber_organization__kind",  # get_latest_diagnosis_author_sub_kind
+                            "author_siae__brand",  # get_latest_diagnosis_author_display_name
+                            "author_siae__name",  # get_latest_diagnosis_author_display_name
+                            "author_prescriber_organization__name",  # get_latest_diagnosis_author_display_name
+                            "job_seeker_id",  # Origin unknown, seems needed by the ORM somehow
                         )
                         .order_by("-created_at")[:1]
                     ),
@@ -335,11 +359,26 @@ class Command(BaseCommand):
                     .order_by("-created_at")[:1]
                 ),
             )
+            .only(
+                "jobseeker_profile__nir",
+                "jobseeker_profile__birthdate",  # get_user_age_in_years
+                "date_joined",
+                "created_by__kind",  # get_user_signup_kind
+                "created_by__is_staff",  # get_user_signup_kind
+                "identity_provider",
+                "jobseeker_profile__pole_emploi_id",
+                "last_login",
+                "first_login",
+                "post_code",  # get_post_code_column
+                "department",  # get_department_and_region_columns
+                "coords",  # get_job_seeker_qpv_info
+                "geocoding_score",  # get_job_seeker_qpv_info
+            )
             .all()
         )
         job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers_table, batch_size=10_000, querysets=[queryset])
+        populate_table(job_seekers_table, batch_size=20_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
