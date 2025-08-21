@@ -1035,7 +1035,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1053,6 +1053,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1112,7 +1119,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1130,6 +1137,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1186,7 +1200,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          2
+                          3
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1205,6 +1219,13 @@
                           </i>
                           <span>
                               Mettre en attente
+                          </span>
+                      </a>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
@@ -1263,7 +1284,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1281,6 +1302,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1340,7 +1368,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1358,6 +1386,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1376,6 +1411,87 @@
                               </span>
                           </button>
                       </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessTemplates.test_details_template_for_state_pool
+  '''
+  <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_[PK of JobApplication]">
+      <h2 class="visually-hidden">
+          Actions rapides
+      </h2>
+      <div class="form-row align-items-center gx-3">
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+                  <i aria-hidden="true" class="ri-check-line fw-medium">
+                  </i>
+                  <span>
+                      Accepter
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg-auto">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
+                  <i aria-hidden="true" class="ri-close-line fw-medium">
+                  </i>
+                  <span>
+                      Décliner
+                  </span>
+              </a>
+          </div>
+          <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+              <div class="dropdown">
+                  <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                      Autres actions
+                      <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                          2
+                      </span>
+                  </button>
+                  <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                      <form action="/apply/[PK of JobApplication]/siae/process" class="js-prevent-multiple-submit" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                              <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                              </i>
+                              <span>
+                                  Étudier
+                              </span>
+                          </button>
+                      </form>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/[PK of JobApplication]/siae/postpone">
+                          <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Mettre en attente
+                          </span>
+                      </a>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </button>
+                      <hr class="dropdown-divider m-0"/>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                          <i class="ri-arrow-left-right-line me-2">
+                          </i>
+                          <span>
+                              Transférer vers
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Archiver
+                          </span>
+                      </button>
                   </div>
               </div>
           </div>
@@ -1414,7 +1530,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          0
+                          1
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1432,6 +1548,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1485,7 +1608,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          0
+                          1
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1503,6 +1626,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </a>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1574,6 +1704,13 @@
                               Mettre en attente
                           </span>
                       </a>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </button>
                       <hr class="dropdown-divider m-0"/>
                       <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1627,7 +1764,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1643,6 +1780,13 @@
                           </i>
                           <span>
                               Mettre en attente
+                          </span>
+                      </a>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
@@ -1698,7 +1842,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1714,6 +1858,13 @@
                           </i>
                           <span>
                               Mettre en attente
+                          </span>
+                      </a>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
@@ -1788,6 +1939,13 @@
                           </i>
                           <span>
                               Mettre en attente
+                          </span>
+                      </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
                           </span>
                       </button>
                       <hr class="dropdown-divider m-0"/>
@@ -1867,6 +2025,13 @@
                               Mettre en attente
                           </span>
                       </button>
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
+                          </span>
+                      </button>
                       <hr class="dropdown-divider m-0"/>
                       <a class="btn justify-content-start dropdown-item" href="/apply/[PK of JobApplication]/siae/external-transfer/1" id="transfer_to_button">
                           <i class="ri-arrow-left-right-line me-2">
@@ -1923,7 +2088,7 @@
                   <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
                       Autres actions
                       <span class="badge badge-base rounded-pill bg-info text-white ms-2">
-                          1
+                          2
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
@@ -1939,6 +2104,13 @@
                           </i>
                           <span>
                               Mettre en attente
+                          </span>
+                      </a>
+                      <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/[PK of JobApplication]/siae/add-to-pool">
+                          <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                          </i>
+                          <span>
+                              Ajouter au vivier
                           </span>
                       </a>
                       <hr class="dropdown-divider m-0"/>
