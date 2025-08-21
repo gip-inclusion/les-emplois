@@ -15,6 +15,7 @@ def job_application_state_badge(job_application, *, hx_swap_oob=False, extra_cla
         JobApplicationState.CANCELLED: "bg-primary",
         JobApplicationState.NEW: "bg-info",
         JobApplicationState.OBSOLETE: "bg-primary",
+        JobApplicationState.POOL: "bg-accent-01 text-white",
         JobApplicationState.POSTPONED: "bg-accent-03 text-primary",
         JobApplicationState.PRIOR_TO_HIRE: "bg-accent-02 text-primary",
         JobApplicationState.PROCESSING: "bg-accent-03 text-primary",
