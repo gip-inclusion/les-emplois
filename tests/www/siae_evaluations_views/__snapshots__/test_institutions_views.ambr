@@ -97,8 +97,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
@@ -545,8 +545,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
@@ -1008,8 +1008,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
@@ -1598,8 +1598,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
@@ -1937,8 +1937,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
@@ -2278,8 +2278,8 @@
                  "institutions_institution"."kind"
           FROM "institutions_institutionmembership"
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
-          WHERE ("institutions_institutionmembership"."user_id" = %s
-                 AND "institutions_institutionmembership"."is_active")
+          WHERE ("institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),

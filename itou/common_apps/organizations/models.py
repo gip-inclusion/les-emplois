@@ -21,7 +21,7 @@ class OrganizationQuerySet(models.QuerySet):
 
     def prefetch_active_memberships(self):
         membership_model = self.model.members.through
-        qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
+        qs = membership_model.objects.select_related("user").order_by("-is_admin", "joined_at")
         return self.prefetch_related(Prefetch("memberships", queryset=qs))
 
 
@@ -98,10 +98,10 @@ class OrganizationAbstract(models.Model):
 
     def add_or_activate_membership(self, user, *, force_admin=None):
         membership_model = self.members.through
-        is_only_active_member = not self.memberships.active().exists()
+        is_only_active_member = not self.memberships.exists()
         should_be_admin = is_only_active_member if force_admin is None else force_admin
         try:
-            membership = self.memberships.get(user=user)
+            membership = membership_model.include_inactive.get(user=user, **{self.members.source_field_name: self})
         except membership_model.DoesNotExist:
             membership = self.memberships.create(user=user, is_admin=should_be_admin)
             action = "Creating"
@@ -175,12 +175,12 @@ class OrganizationAbstract(models.Model):
 
     @property
     def active_members(self):
-        memberships = self.memberships.active()
+        memberships = self.memberships.all()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def active_admin_members(self):
-        memberships = self.memberships.active_admin()
+        memberships = self.memberships.admin()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
@@ -270,6 +270,11 @@ class MembershipQuerySet(models.QuerySet):
         return user_field.related_model.objects.filter(**{f"{remote_field_lookup}__in": memberships})
 
 
+class ActiveMembershipManager(models.Manager.from_queryset(MembershipQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().active()
+
+
 class MembershipAbstract(models.Model):
     """
     Abstract class to handle memberships.
@@ -299,7 +304,8 @@ class MembershipAbstract(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
-    objects = MembershipQuerySet.as_manager()
+    objects = ActiveMembershipManager()
+    include_inactive = MembershipQuerySet.as_manager()
 
     class Meta:
         abstract = True

@@ -77,8 +77,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),

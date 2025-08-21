@@ -23,6 +23,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
@@ -137,7 +138,10 @@ def switch_stalled_status(request, public_id):
 @check_user(lambda user: user.is_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if list_organization:
-        if not request.current_organization or not request.current_organization.memberships.count() > 1:
+        if (
+            not request.current_organization
+            or not PrescriberMembership.include_inactive.filter(organization=request.current_organization).count() > 1
+        ):
             raise Http404
         job_seekers_ids = list(
             User.objects.linked_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)

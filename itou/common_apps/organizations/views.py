@@ -27,8 +27,7 @@ class BaseMemberList(UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         return (
-            self.organization.memberships.active()
-            .select_related("user")
+            self.organization.memberships.select_related("user")
             .all()
             .order_by("user__first_name", "user__last_name", "pk")
         )

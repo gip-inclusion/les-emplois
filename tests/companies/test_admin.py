@@ -441,7 +441,7 @@ class TestTransferCompanyData:
         assertContains(response, "Choisissez les objets à transférer")
 
         if value_in_from_company is not None:
-            assertContains(response, str(from_company.memberships.get(user=user)))
+            assertContains(response, str(CompanyMembership.include_inactive.get(company=from_company, user=user)))
 
             response = admin_client.post(
                 transfer_url,
@@ -463,11 +463,11 @@ class TestTransferCompanyData:
 
         if value_in_to_company is None or value_in_from_company is None:
             # Real transfer, membership in from_company is moved
-            assert from_company.memberships.count() == 0
+            assert CompanyMembership.include_inactive.filter(company=from_company).count() == 0
         else:
-            assert from_company.memberships.count() == 1
-        assert to_company.memberships.count() == 1
-        assert getattr(to_company.memberships.first(), field) is expected
+            assert CompanyMembership.include_inactive.filter(company=from_company).count() == 1
+        membership = CompanyMembership.include_inactive.get(company=to_company)
+        assert getattr(membership, field) is expected
 
 
 class TestJobDescriptionAdmin:
