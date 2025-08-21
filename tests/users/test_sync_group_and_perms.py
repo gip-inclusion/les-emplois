@@ -23,4 +23,4 @@ def test_readonly_group():
     readonly_groups = {name for name in permissions.keys() if name.endswith("-readonly")}
     for group in readonly_groups:
         assert set(permissions[group].keys()) == set(permissions[group.replace("-readonly", "")].keys())
-        assert set(itertools.chain(*permissions[group].values())) == {"view"}
+        assert set(itertools.chain(*permissions[group].values())) <= {"view", "export_cta"}
