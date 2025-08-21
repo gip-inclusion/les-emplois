@@ -135,7 +135,7 @@ def get_post_code_to_insee_cities_map():
     Load once and for all this ~35k items dataset in memory.
     """
     post_code_to_insee_cities_map = defaultdict(list)
-    for city in City.objects.all():
+    for city in City.objects.only("post_codes", "code_insee", "name"):
         for post_code in city.post_codes:
             post_code_to_insee_cities_map[post_code].append(city)
     return post_code_to_insee_cities_map
