@@ -1,8 +1,10 @@
 {% load buttons_form %}
 {% load django_bootstrap5 %}
 {% load enums %}
+{% load job_seekers %}
 {% load matomo %}
 {% load str_filters %}
+
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
@@ -18,6 +20,7 @@
 
         {% if form_user_address or form_personal_data or form_birth_place %}<h2>Candidat</h2>{% endif %}
 
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
         {% if form_personal_data %}
             {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
             {% if form_personal_data.pole_emploi_id_error %}{{ form_personal_data.pole_emploi_id_error }}{% endif %}
@@ -36,10 +39,12 @@
             {% bootstrap_field form_personal_data.birth_country %}
         {% endif %}
 
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
         {% if form_birth_place %}
             {% bootstrap_form form_birth_place %}
         {% endif %}
 
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
         {% if form_user_address %}
             {% bootstrap_field form_user_address.address_for_autocomplete %}
             {% bootstrap_field form_user_address.address_line_1 %}
@@ -52,7 +57,8 @@
             {% bootstrap_field form_user_address.fill_mode %}
         {% endif %}
 
-        <hr>
+        {% if form_user_address or form_personal_data or form_birth_place %}<hr>{% endif %}
+
         <h2>Contrat</h2>
         {% bootstrap_form_errors form_accept type="non_fields" %}
 
@@ -74,6 +80,9 @@
         {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form_accept.answer %}
 
-        {% itou_buttons_form primary_label="Valider l'embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information reset_url=back_url %}
+        {% comment %}legacy. temporary tag to manage compatibility between 'apply:contract_for_hire' and 'apply:hire_confirmation'{% endcomment %}
+        {% cannot_validate_application job_seeker is_subject_to_eligibility_rules|default:False eligibility_diagnosis|default:False form_user_address|default:False form_personal_data|default:False form_birth_place|default:False as primary_disabled %}
+
+        {% itou_buttons_form primary_label="Valider l'embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information primary_disabled=primary_disabled reset_url=back_url %}
     </form>
 </div>

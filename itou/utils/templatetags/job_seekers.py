@@ -48,3 +48,25 @@ def has_not_required_personal_infos_for_hire(user):
         return True
 
     return False
+
+
+# legacy. temporary tag to manage compatibility between 'apply:contract_for_hire' and 'apply:hire_confirmation'
+@register.simple_tag
+def cannot_validate_application(
+    job_seeker,
+    is_subject_to_eligibility_rules,
+    eligibility_diagnosis,
+    form_user_address,
+    form_personal_data,
+    form_birth_place,
+):
+    if form_user_address or form_personal_data or form_birth_place:
+        # legacy view 'apply:hire_confirmation'
+        return False
+
+    if has_not_required_personal_infos_for_hire(job_seeker) or (
+        is_subject_to_eligibility_rules and not job_seeker.has_valid_approval and not eligibility_diagnosis
+    ):
+        return True
+
+    return False
