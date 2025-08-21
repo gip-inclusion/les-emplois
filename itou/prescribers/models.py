@@ -40,7 +40,7 @@ class PrescriberOrganizationQuerySet(OrganizationQuerySet):
 
     def with_has_active_members(self):
         return self.annotate(
-            has_active_members=Exists(PrescriberMembership.objects.active().filter(organization=OuterRef("pk")))
+            has_active_members=Exists(PrescriberMembership.objects.filter(organization=OuterRef("pk")))
         )
 
 

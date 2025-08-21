@@ -34,11 +34,9 @@ class EmailNotification(BaseNotification):
             and (self.user.is_prescriber or self.user.is_employer)
         ):
             if self.user.is_prescriber:
-                memberships = (
-                    PrescriberMembership.objects.active().filter(organization=self.structure).select_related("user")
-                )
+                memberships = PrescriberMembership.objects.filter(organization=self.structure).select_related("user")
             elif self.user.is_employer:
-                memberships = CompanyMembership.objects.active().filter(company=self.structure).select_related("user")
+                memberships = CompanyMembership.objects.filter(company=self.structure).select_related("user")
             members = [m.user for m in memberships]
             if self.user not in members:
                 admins = [m.user for m in memberships if m.is_admin]

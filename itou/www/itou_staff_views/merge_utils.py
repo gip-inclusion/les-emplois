@@ -57,11 +57,11 @@ def update_membership(from_user_membership, to_user_membership):
 
 
 def handle_membership(model, from_user, to_user, org_field_name=None):
-    from_user_memberships = model.objects.filter(user=from_user)
+    from_user_memberships = model.include_inactive.filter(user=from_user)
     updated_pks = []
     moved_pks = []
     for from_user_membership in from_user_memberships:
-        if to_user_membership := model.objects.filter(
+        if to_user_membership := model.include_inactive.filter(
             **{org_field_name: getattr(from_user_membership, org_field_name).pk, "user": to_user}
         ).first():
             updated_pks.append(to_user_membership.pk)
