@@ -205,7 +205,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
         job_description = JobDescriptionFactory(company=job_application.to_company)
         city = City.objects.order_by("?").first()
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -249,7 +249,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
         job_description = JobDescriptionFactory(company=job_application.to_company)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -287,7 +287,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
 
         # with a SIAE
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI, state="processing")
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -321,7 +321,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data |= {"hired_job": job_description.pk}
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         client.force_login(job_application.to_company.members.first())
         response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
@@ -343,7 +343,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
     def test_specific_iae_mentions_in_accept_form(self, client):
         def _response(kind):
             job_application = JobApplicationFactory(to_company__kind=kind, state="processing")
-            url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+            url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
             client.force_login(job_application.to_company.members.first())
             response = client.get(url_accept)

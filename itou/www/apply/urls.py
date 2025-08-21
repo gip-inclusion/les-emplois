@@ -159,6 +159,14 @@ urlpatterns = [
         name="refuse",
     ),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
+    # simplified view. `only_accept_form` to be removed in early september 2025
+    path(
+        "<uuid:job_application_id>/siae/accept-contract",
+        process_views.AcceptView.as_view(),
+        name="accept-contract",
+        kwargs={"only_accept_form": True},
+    ),
+    # legacy view. to be removed in early september 2025
     path("<uuid:job_application_id>/siae/accept", process_views.AcceptView.as_view(), name="accept"),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
     path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),

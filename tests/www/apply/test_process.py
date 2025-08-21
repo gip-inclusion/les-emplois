@@ -1505,7 +1505,7 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        next_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
@@ -1576,7 +1576,9 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url})
+        url = reverse(
+            "apply:accept-contract", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url}
+        )
         assertRedirects(response, url)
 
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
@@ -2105,7 +2107,7 @@ class TestProcessAcceptViews:
 
     def accept_job_application(self, client, job_application, post_data=None, assert_successful=True, next_url=None):
         """
-        This is not a test. It's a shortcut to process "apply:accept" view steps:
+        This is not a test. It's a shortcut to process "apply:accept-contract" view steps:
         - GET
         - POST: show the confirmation modal
         - POST: hide the modal and redirect to the next url.
@@ -2114,7 +2116,7 @@ class TestProcessAcceptViews:
         If not provided, a new one will be created and linked to the given job application.
         """
         url_accept = reverse(
-            "apply:accept",
+            "apply:accept-contract",
             kwargs={"job_application_id": job_application.pk},
             query={"next_url": next_url} if next_url else None,
         )
@@ -2246,7 +2248,7 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
         assertContains(response, "Postes ouverts au recrutement")
@@ -2295,14 +2297,14 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}))
 
         # Check optgroup labels
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=True)
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
@@ -2312,7 +2314,7 @@ class TestProcessAcceptViews:
         # Inactive job description must also appear in select
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
         with assertSnapshotQueries(snapshot(name="accept view SQL queries")):
-            response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+            response = client.get(reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
@@ -2324,7 +2326,7 @@ class TestProcessAcceptViews:
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}))
         assertNotContains(response, "Postes ouverts au recrutement")
         assertNotContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
@@ -2434,7 +2436,7 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept, follow=True)
         assertRedirects(
             response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -2617,7 +2619,7 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
         assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is disabled
@@ -2658,7 +2660,7 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
         assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is not disabled
@@ -2752,7 +2754,7 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
         assertContains(response, "Confirmation de l’embauche")
         # Check that the NIR field is initially disabled
@@ -2782,7 +2784,7 @@ class TestProcessAcceptViews:
         jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         employer = self.company.members.first()
         client.force_login(employer)
@@ -2851,7 +2853,7 @@ class TestProcessAcceptViews:
         to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
             administrative_criteria__kind__in=criteria_kind
         )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -2941,7 +2943,7 @@ class TestProcessAcceptViews:
             administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
         ).all()
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -3008,7 +3010,7 @@ class TestProcessAcceptViews:
             selected_jobs=company.jobs.all(),
             to_company=company,
         )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -3115,7 +3117,7 @@ class TestProcessAcceptViews:
         post_data["birth_country"] = Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk
         del post_data["birth_place"]
         response = client.post(
-            reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
+            reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}),
             headers={"hx-request": "true"},
             data=post_data,
         )
@@ -3151,7 +3153,7 @@ class TestProcessAcceptViews:
         post_data = self._accept_view_post_data(job_application=job_application)
         post_data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
         response = client.post(
-            reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
+            reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk}),
             headers={"hx-request": "true"},
             data=post_data,
         )
@@ -3191,7 +3193,7 @@ class TestProcessAcceptViews:
         )
         client.force_login(self.company.members.get())
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
         assertContains(
             response,
@@ -3238,7 +3240,7 @@ class TestProcessAcceptViews:
         )
         client.force_login(self.company.members.get())
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept)
         assertContains(
             response,
@@ -3687,7 +3689,7 @@ def test_accept_button(client):
         state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=CompanyKind.GEIQ,
     )
-    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    accept_url = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
     DIRECT_ACCEPT_BUTTON = (
         f'<a href="{accept_url}" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" '
         'data-matomo-event="true" data-matomo-category="candidature" '
@@ -4223,7 +4225,7 @@ def test_htmx_reload_contract_type_and_options(client):
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
-    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    accept_url = reverse("apply:accept-contract", kwargs={"job_application_id": job_application.pk})
     data = {
         "guidance_days": "1",
         "contract_type": ContractType.PROFESSIONAL_TRAINING,
