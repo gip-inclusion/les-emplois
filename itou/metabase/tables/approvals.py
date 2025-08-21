@@ -5,11 +5,11 @@ from django.conf import settings
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_column_from_field,
     get_department_and_region_columns,
-    get_hiring_company,
     get_model_field,
     hash_content,
 )
@@ -25,23 +25,27 @@ def get_code_safir_to_pe_org():
     # PoleEmploiApproval.pe_structure_code a foreign key.
     return {
         org.code_safir_pole_emploi: org
-        for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).all()
+        for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).only(
+            "code_safir_pole_emploi", "department"
+        )
     }
 
 
+@functools.cache
+def get_companies_map():
+    return {c.pk: c for c in Company.objects.only("kind", "siret", "name", "brand", "department")}
+
+
 def get_company_from_approval(approval):
-    if isinstance(approval, PoleEmploiApproval):
+    if isinstance(approval, PoleEmploiApproval) or not approval.last_hiring_company_pk:
         return None
-    assert isinstance(approval, Approval)
-    return get_hiring_company(approval.user)
+    return get_companies_map()[approval.last_hiring_company_pk]
 
 
 def get_company_or_pe_org_from_approval(approval):
     if isinstance(approval, Approval):
         return get_company_from_approval(approval)
-    assert isinstance(approval, PoleEmploiApproval)
-    code_safir = approval.pe_structure_code
-    pe_org = get_code_safir_to_pe_org().get(code_safir)
+    pe_org = get_code_safir_to_pe_org().get(approval.pe_structure_code)
     return pe_org
 
 

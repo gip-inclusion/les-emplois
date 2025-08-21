@@ -214,7 +214,7 @@ def test_populate_job_seekers(snapshot):
     )
     user_3_selected_criteria.save()
     # Older accepted job_application with no eligibility diagnosis
-    # Allow to check get_hiring_company()
+    # Allow to check last_hiring_company_pk
     JobApplicationFactory(
         job_seeker=user_3,
         with_approval=True,

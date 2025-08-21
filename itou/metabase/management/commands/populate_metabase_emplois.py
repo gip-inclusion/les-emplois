@@ -470,12 +470,30 @@ class Command(BaseCommand):
         We can link PoleEmploiApproval back to its PrescriberOrganization via
         the SAFIR code.
         """
-        queryset1 = Approval.objects.prefetch_related(
-            "user", "user__job_applications", "user__job_applications__to_company"
-        ).all()
+        only_fields = {
+            "number",  # get_approval_type
+            "start_at",
+            "end_at",
+        }
+        queryset1 = (
+            Approval.objects.select_related("user")
+            .annotate(
+                last_hiring_company_pk=(
+                    JobApplication.objects.accepted()
+                    .filter(job_seeker=OuterRef("user"))
+                    .values("to_company")
+                    .order_by("-created_at")[:1]
+                )
+            )
+            .only(
+                *only_fields,
+                "user_id",
+                "origin",
+            )
+        )
         queryset2 = PoleEmploiApproval.objects.filter(
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
-        ).all()
+        ).only(*only_fields, "pe_structure_code")
 
         populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset1, queryset2])
 

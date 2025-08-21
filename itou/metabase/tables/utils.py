@@ -2,7 +2,6 @@ import difflib
 import functools
 import hashlib
 from collections import defaultdict
-from operator import attrgetter
 
 import unidecode
 from django.conf import settings
@@ -28,7 +27,6 @@ from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, AddressMixin
 from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
-from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User
 
 
@@ -102,23 +100,6 @@ def get_first_membership_join_date(memberships):
     # We have to do all this in python to benefit from prefetch_related.
     if len(memberships) >= 1:
         return min(m.joined_at for m in memberships)
-    return None
-
-
-def get_hiring_company(job_seeker):
-    """
-    Ideally the job_seeker would have a unique hiring so that we can
-    properly link the approval back to the company. However we already
-    have many job_seekers with two or more hirings. In this case
-    we consider the latest hiring, which is an ugly workaround
-    around the fact that we do not have a proper approval=>siae
-    link yet.
-    """
-    assert job_seeker.is_job_seeker
-    hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationState.ACCEPTED]
-    if hirings:
-        latest_hiring = max(hirings, key=attrgetter("created_at"))
-        return latest_hiring.to_company
     return None
 
 
