@@ -235,7 +235,7 @@ class Command(BaseCommand):
         """
         active_user_created_job_applications_filter = Q(
             ~Q(jobapplication__origin=Origin.PE_APPROVAL)
-            & Q(jobapplication__to_company_id__in=get_active_companies_pks())
+            & Q(jobapplication__to_company_id__in=Company.objects.active())
         )
         job_applications_count = Count(
             "jobapplication",
@@ -260,23 +260,47 @@ class Command(BaseCommand):
             filter=active_user_created_job_applications_filter,
         )
         queryset = (
-            PrescriberOrganization.objects.prefetch_related(
-                Prefetch(
-                    "memberships",
-                    queryset=PrescriberMembership.objects.active(),
-                    to_attr="active_memberships",
-                ),
-                "members",
-                "memberships",
-            )
-            .select_related("insee_city")
+            PrescriberOrganization.objects.select_related("insee_city")
             .annotate(
                 job_applications_count=job_applications_count,
                 accepted_job_applications_count=accepted_job_applications_count,
                 last_job_application_creation_date=last_job_application_creation_date,
-                # Don't try counting members or getting first join date, It's way too long
+                active_memberships_count=(
+                    PrescriberMembership.objects.active()
+                    .filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                first_membership_join_date=(
+                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(min=Min("joined_at"))
+                    .values("min")[:1]
+                ),
+                last_login_date=(
+                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(max=Max("user__last_login"))
+                    .values("max")[:1]
+                ),
             )
-            .all()
+            .only(
+                "siret",
+                "name",
+                "kind",
+                "authorization_status",
+                "address_line_1",  # get_address_columns
+                "address_line_2",  # get_address_columns
+                "post_code",  # get_post_code_column
+                "insee_city__code_insee",  # get_code_commune
+                "city",  # get_address_columns
+                "coords",  # get_address_columns
+                "department",  # get_department_and_region_columns
+                "code_safir_pole_emploi",
+                "members__last_login",  # get_establishment_last_login_date_column
+                "is_brsa",
+            )
         )
 
         populate_table(

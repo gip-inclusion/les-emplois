@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.metabase.tables.utils import (
@@ -5,9 +7,6 @@ from itou.metabase.tables.utils import (
     get_active_companies_pks,
     get_address_columns,
     get_choice,
-    get_establishment_is_active_column,
-    get_establishment_last_login_date_column,
-    get_first_membership_join_date,
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -27,7 +26,7 @@ ORG_OF_PRESCRIBERS_WITHOUT_ORG = PrescriberOrganization(
 
 def get_org_first_join_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        return get_first_membership_join_date(memberships=org.memberships)
+        return org.first_membership_join_date
     return None
 
 
@@ -35,7 +34,7 @@ def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
         return User.objects.filter(kind=UserKind.PRESCRIBER, prescribermembership=None).count()
-    return len(org.active_memberships)
+    return org.active_memberships_count or 0
 
 
 def _get_ja_sent_by_prescribers_without_org():
@@ -136,9 +135,27 @@ TABLE.add_columns(
     ]
 )
 
-TABLE.add_columns(get_establishment_last_login_date_column())
+TABLE.add_columns(
+    [
+        {
+            "name": "date_dernière_connexion",
+            "type": "date",
+            "comment": "Date de dernière connexion utilisateur",
+            "fn": lambda o: getattr(o, "last_login_date", None),
+        },
+        {
+            "name": "active",
+            "type": "boolean",
+            "comment": "Dernière connexion dans les 7 jours",
+            "fn": lambda o: bool(
+                getattr(o, "last_login_date", None) > timezone.now() - timezone.timedelta(days=7)
+                if getattr(o, "last_login_date", None)
+                else None
+            ),
+        },
+    ]
+)
 
-TABLE.add_columns(get_establishment_is_active_column())
 
 TABLE.add_columns(
     [
