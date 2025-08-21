@@ -541,8 +541,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -684,6 +684,8 @@
              FROM "companies_companymembership" U0
              INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
              WHERE (U1."is_active"
+                    AND U0."is_active"
+                    AND U1."is_active"
                     AND U0."is_active"
                     AND U0."company_id" = ("companies_company"."id"))
              LIMIT 1) AS "has_active_members"
@@ -1166,9 +1168,11 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
@@ -1365,12 +1369,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1656,8 +1662,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -1871,8 +1877,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -2006,7 +2012,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({
@@ -2180,8 +2189,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -2256,7 +2265,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -2385,8 +2397,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -2503,7 +2515,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -2587,8 +2602,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -2855,8 +2870,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -3097,12 +3112,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -3247,8 +3264,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -3430,12 +3447,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -3535,8 +3554,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -3760,12 +3779,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -3882,8 +3903,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -4097,8 +4118,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -4232,7 +4253,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({
@@ -4406,8 +4430,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -4482,7 +4506,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -4611,8 +4638,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -4729,7 +4756,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -4813,8 +4843,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -5081,8 +5111,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -5323,12 +5353,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -5473,8 +5505,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -5656,12 +5688,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -5761,8 +5795,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -5986,12 +6020,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -6108,8 +6144,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -6323,8 +6359,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -6458,7 +6494,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({
@@ -6632,8 +6671,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -6708,7 +6747,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -6837,8 +6879,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -6955,7 +6997,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -7039,8 +7084,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -7307,8 +7352,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -7549,12 +7594,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -7699,8 +7746,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -7882,12 +7929,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -7987,8 +8036,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -8212,12 +8261,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -8334,8 +8385,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -8549,8 +8600,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -8684,7 +8735,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
       dict({
@@ -8858,8 +8912,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -8934,7 +8988,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -9063,8 +9120,8 @@
                  "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescribermembership"
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."user_id" = %s
-                 AND "prescribers_prescribermembership"."is_active")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."created_at" ASC
         ''',
       }),
@@ -9181,7 +9238,10 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."organization_id" = %s)
         ''',
       }),
     ]),
@@ -9265,8 +9325,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -9533,8 +9593,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -9775,12 +9835,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -9925,8 +9987,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -10108,12 +10170,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -10213,8 +10277,8 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE ("companies_companymembership"."user_id" = %s
-                 AND "companies_companymembership"."is_active")
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY "companies_companymembership"."created_at" ASC
         ''',
       }),
@@ -10438,12 +10502,14 @@
           WHERE ("companies_companymembership"."id" IN
                    (SELECT U0."id"
                     FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U2 ON (U0."user_id" = U2."id")
-                    WHERE (U0."company_id" = %s
-                           AND U2."is_active"
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U1."is_active"
                            AND U0."is_active"
                            AND U0."is_admin"
-                           AND U2."is_active"))
+                           AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',

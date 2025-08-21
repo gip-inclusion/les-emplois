@@ -165,6 +165,8 @@
           INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
           INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
           WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "companies_companymembership"."is_active")
           ORDER BY RANDOM() ASC
         ''',
@@ -253,6 +255,8 @@
           INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active")
           ORDER BY RANDOM() ASC
         ''',

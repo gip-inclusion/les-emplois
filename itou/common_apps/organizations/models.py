@@ -101,7 +101,7 @@ class OrganizationAbstract(models.Model):
         is_only_active_member = not self.memberships.active().exists()
         should_be_admin = is_only_active_member if force_admin is None else force_admin
         try:
-            membership = self.memberships.get(user=user)
+            membership = membership_model.include_inactive.get(user=user, **{self.members.source_field_name: self})
         except membership_model.DoesNotExist:
             membership = self.memberships.create(user=user, is_admin=should_be_admin)
             action = "Creating"
@@ -269,6 +269,11 @@ class MembershipQuerySet(models.QuerySet):
         return user_field.related_model.objects.filter(**{f"{remote_field_lookup}__in": memberships})
 
 
+class ActiveMembershipManager(models.Manager.from_queryset(MembershipQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().active()
+
+
 class MembershipAbstract(models.Model):
     """
     Abstract class to handle memberships.
@@ -298,7 +303,8 @@ class MembershipAbstract(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
-    objects = MembershipQuerySet.as_manager()
+    objects = ActiveMembershipManager()
+    include_inactive = MembershipQuerySet.as_manager()
 
     class Meta:
         abstract = True

@@ -418,8 +418,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         user.username = f"old_{user.username}"
         user.is_active = False
         user.save(update_fields=("email", "username", "is_active"))
-        user.prescribermembership_set.update(is_active=False)
-        user.companymembership_set.update(is_active=False)
+        PrescriberMembership.include_inactive.filter(user=user).update(is_active=False)
+        CompanyMembership.include_inactive.filter(user=user).update(is_active=False)
 
         messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
 
@@ -724,15 +724,14 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             elif obj.is_labor_inspector:
                 memberships = obj.institutionmembership_set.all()
             for membership in memberships:
-                if membership.is_active or membership.is_admin:
-                    add_support_remark_to_obj(
-                        obj,
-                        f"Désactivation de {membership} suite à la désactivation de l'utilisateur : "
-                        f"is_active={membership.is_active} is_admin={membership.is_admin}",
-                    )
-                    membership.is_active = False
-                    membership.is_admin = False
-                    membership.save()
+                add_support_remark_to_obj(
+                    obj,
+                    f"Désactivation de {membership} suite à la désactivation de l'utilisateur : "
+                    f"is_active={membership.is_active} is_admin={membership.is_admin}",
+                )
+                membership.is_active = False
+                membership.is_admin = False
+                membership.save()
         super().save_model(request, obj, form, change)
         if obj.identity_provider == IdentityProvider.DJANGO and "email" in form.changed_data:
             deleted, _details = EmailAddress.objects.filter(user=obj).delete()
