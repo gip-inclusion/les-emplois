@@ -34,6 +34,7 @@ from itou.utils.perms.utils import can_edit_personal_information, can_view_perso
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
+    AddToPoolForm,
     AnswerForm,
     JobApplicationInternalTransferForm,
     PriorActionForm,
@@ -159,6 +160,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
 
 def get_siae_actions_context(request, job_application):
     can_accept = job_application.accept.is_available()
+    can_add_to_pool = job_application.add_to_pool.is_available()
     can_archive = job_application.can_be_archived
     can_process = job_application.process.is_available()
     can_postpone = job_application.postpone.is_available()
@@ -168,6 +170,7 @@ def get_siae_actions_context(request, job_application):
     can_unarchive = job_application.archived_at is not None
     return {
         "can_accept": can_accept,
+        "can_add_to_pool": can_add_to_pool,
         "can_archive": can_archive,
         "can_process": can_process,
         "can_postpone": can_postpone,
@@ -179,7 +182,7 @@ def get_siae_actions_context(request, job_application):
         if can_transfer_internal
         else None,
         "other_actions_count": sum(
-            [can_process, can_postpone, can_archive, can_transfer_internal or can_transfer_external]
+            [can_add_to_pool, can_process, can_postpone, can_archive, can_transfer_internal or can_transfer_external]
         ),
     }
 
@@ -418,6 +421,47 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         "job_application": job_application,
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "matomo_custom_title": "Candidature différée",
+    }
+    return render(request, template_name, context)
+
+
+DEFAULT_ADD_TO_POOL_ANSWER = """Votre candidature a retenu toute notre attention. \
+Malheureusement, nous n’avons plus de poste disponible pour le moment. \
+Toutefois, nous l’avons conservée dans notre base de candidatures. \
+Ainsi, si une opportunité se présente, elle pourra être réexaminée et, le cas échéant, retenue.
+Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapidement une opportunité qui vous \
+correspond."""
+
+
+@check_user(lambda user: user.is_employer)
+def add_to_pool(request, job_application_id, template_name="apply/process_add_to_pool.html"):
+    queryset = JobApplication.objects.is_active_company_member(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    form = AddToPoolForm(initial={"answer": DEFAULT_ADD_TO_POOL_ANSWER}, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        try:
+            # After each successful transition, a save() is performed by django-xworkflows.
+            job_application.answer = form.cleaned_data["answer"]
+            job_application.add_to_pool(user=request.user)
+            toast_title = "Candidature ajoutée au vivier"
+            toast_message = (
+                f"La candidature de {job_application.job_seeker.get_full_name()} a bien été ajoutée au vivier."
+            )
+
+            messages.success(request, f"{toast_title}||{toast_message}", extra_tags="toast")
+        except xwf_models.InvalidTransitionError:
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
+
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "form": form,
+        "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
+        "matomo_custom_title": "Ajout de candidature au vivier",
     }
     return render(request, template_name, context)
 
