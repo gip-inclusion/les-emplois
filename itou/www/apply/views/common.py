@@ -30,6 +30,8 @@ from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForG
 
 class BaseAcceptView(UserPassesTestMixin, TemplateView):
     template_name = None
+    # simplified view. `only_accept_form` to be removed in early september 2025
+    only_accept_form = False
 
     def test_func(self):
         return self.request.user.is_employer
@@ -43,7 +45,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
     def get_forms(self):
         forms = {}
 
-        if self.company.is_subject_to_eligibility_rules:
+        if self.company.is_subject_to_eligibility_rules and not self.only_accept_form:
             # Info that will be used to search for an existing Pôle emploi approval.
             forms["personal_data"] = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
@@ -51,7 +53,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                 back_url=self.request.get_full_path(),
             )
             forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
-        elif self.company.kind == CompanyKind.GEIQ:
+        elif self.company.kind == CompanyKind.GEIQ and not self.only_accept_form:
             if self.geiq_eligibility_diagnosis and self.geiq_eligibility_diagnosis.criteria_can_be_certified():
                 forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
                     instance=self.job_seeker.jobseeker_profile,
