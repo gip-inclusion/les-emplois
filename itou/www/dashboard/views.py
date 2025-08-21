@@ -83,6 +83,12 @@ def _employer_dashboard_context(request):
             "icon": "ri-time-line",
             "badge": "bg-info-lighter",
         },
+        {
+            "name": "Vivier",
+            "states": [JobApplicationState.POOL],
+            "icon": "ri-folder-user-line",
+            "badge": "bg-info-lighter",
+        },
     ]
     job_applications = current_org.job_applications_received.filter(archived_at=None).values("state").all()
     for category in job_applications_categories:
