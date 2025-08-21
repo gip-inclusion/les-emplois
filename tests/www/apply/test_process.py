@@ -1338,6 +1338,106 @@ class TestProcessViews:
         # Trying to access step 2 without providing data for step 1 redirects to step 1
         assertRedirects(response, refusal_reason_url)
 
+    def test_add_to_pool_from_prescriber(self, client, subtests):
+        states = [
+            job_applications_enums.JobApplicationState.NEW,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.POSTPONED,
+        ]
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+
+        for state in states:
+            with subtests.test(state=state.label):
+                job_application = JobApplicationFactory(
+                    job_seeker=job_seeker,
+                    to_company=company,
+                    sent_by_authorized_prescriber_organisation=True,
+                    state=state,
+                )
+                employer = job_application.to_company.members.first()
+                client.force_login(employer)
+
+                url = reverse("apply:add_to_pool", kwargs={"job_application_id": job_application.pk})
+                response = client.get(url)
+                assert response.status_code == 200
+
+                post_data = {"answer": "On vous rappellera."}
+                response = client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                assert job_application.state.is_pool
+
+    def test_add_to_pool_from_job_seeker(self, client, subtests):
+        states = [
+            job_applications_enums.JobApplicationState.NEW,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.POSTPONED,
+        ]
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+
+        for state in states:
+            with subtests.test(state=state.label):
+                job_application = JobApplicationFactory(
+                    job_seeker=job_seeker,
+                    to_company=company,
+                    sender_kind=SenderKind.JOB_SEEKER,
+                    sender=job_seeker,
+                    state=state,
+                )
+                employer = job_application.to_company.members.first()
+                client.force_login(employer)
+
+                url = reverse("apply:add_to_pool", kwargs={"job_application_id": job_application.pk})
+                response = client.get(url)
+                assert response.status_code == 200
+
+                post_data = {"answer": "On vous rappellera."}
+                response = client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                assert job_application.state.is_pool
+
+    def test_add_to_pool_from_employer_orienter(self, client, subtests):
+        states = [
+            job_applications_enums.JobApplicationState.NEW,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.POSTPONED,
+        ]
+
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+
+        for state in states:
+            with subtests.test(state=state.label):
+                job_application = JobApplicationFactory(
+                    job_seeker=job_seeker,
+                    to_company=company,
+                    sent_by_another_employer=True,
+                    state=state,
+                )
+                employer = job_application.to_company.members.first()
+                client.force_login(employer)
+
+                url = reverse("apply:add_to_pool", kwargs={"job_application_id": job_application.pk})
+                response = client.get(url)
+                assert response.status_code == 200
+
+                post_data = {"answer": "On vous rappellera."}
+                response = client.post(url, data=post_data)
+                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                assertRedirects(response, next_url)
+
+                job_application = JobApplication.objects.get(pk=job_application.pk)
+                assert job_application.state.is_pool
+
     def test_postpone_from_prescriber(self, client, snapshot, mailoutbox, subtests):
         """Ensure that the `postpone` transition is triggered."""
 
@@ -3309,6 +3409,11 @@ class TestProcessTemplates:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
         self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
+        self.job_application.save()
+        self.compare_to_snapshot(client, snapshot)
+
+    def test_details_template_for_state_pool(self, client, snapshot):
+        self.job_application.state = job_applications_enums.JobApplicationState.POOL
         self.job_application.save()
         self.compare_to_snapshot(client, snapshot)
 
