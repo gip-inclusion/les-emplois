@@ -685,8 +685,6 @@
              INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
              WHERE (U1."is_active"
                     AND U0."is_active"
-                    AND U1."is_active"
-                    AND U0."is_active"
                     AND U0."company_id" = ("companies_company"."id"))
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
@@ -1171,9 +1169,7 @@
                     INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
                     WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"))
+                           AND U0."company_id" = %s))
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
@@ -1373,8 +1369,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -3116,8 +3110,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -3451,8 +3443,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -3783,8 +3773,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -5357,8 +5345,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -5692,8 +5678,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -6024,8 +6008,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -7598,8 +7580,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -7933,8 +7913,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -8265,8 +8243,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -9839,8 +9815,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -10174,8 +10148,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -10506,8 +10478,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)

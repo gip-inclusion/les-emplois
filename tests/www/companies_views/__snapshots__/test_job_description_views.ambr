@@ -847,8 +847,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -894,8 +892,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)

@@ -21,7 +21,7 @@ class OrganizationQuerySet(models.QuerySet):
 
     def prefetch_active_memberships(self):
         membership_model = self.model.members.through
-        qs = membership_model.objects.active().select_related("user").order_by("-is_admin", "joined_at")
+        qs = membership_model.objects.select_related("user").order_by("-is_admin", "joined_at")
         return self.prefetch_related(Prefetch("memberships", queryset=qs))
 
 
@@ -98,7 +98,7 @@ class OrganizationAbstract(models.Model):
 
     def add_or_activate_membership(self, user, *, force_admin=None):
         membership_model = self.members.through
-        is_only_active_member = not self.memberships.active().exists()
+        is_only_active_member = not self.memberships.exists()
         should_be_admin = is_only_active_member if force_admin is None else force_admin
         try:
             membership = membership_model.include_inactive.get(user=user, **{self.members.source_field_name: self})
@@ -174,12 +174,12 @@ class OrganizationAbstract(models.Model):
 
     @property
     def active_members(self):
-        memberships = self.memberships.active()
+        memberships = self.memberships.all()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
     def active_admin_members(self):
-        memberships = self.memberships.active_admin()
+        memberships = self.memberships.admin()
         return MembershipQuerySet.to_users_qs(memberships=memberships)
 
     @property
