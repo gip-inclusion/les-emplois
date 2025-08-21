@@ -15,13 +15,16 @@
 {% endblock %}
 
 {% block content_extend %}
-    <div class="c-box my-4">
-        <h2>Candidat</h2>
-        <hr>
-        {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
+    {% if form_user_address or form_personal_data or form_birth_place %}
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
+        <div class="c-box my-4">
+            <h2>Candidat</h2>
+            <hr>
+            {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
 
-        {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=company eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False itou_help_center_url=ITOU_HELP_CENTER_URL %}
-    </div>
+            {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=company eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False itou_help_center_url=ITOU_HELP_CENTER_URL %}
+        </div>
+    {% endif %}
     {% include "apply/includes/accept_section.html" %}
 {% endblock %}
 
