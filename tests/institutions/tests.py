@@ -10,6 +10,7 @@ from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRed
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.invitations.models import LaborInspectorInvitation
+from itou.users.models import User
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -266,6 +267,46 @@ def test_add_admin(admin_client, caplog, mailoutbox):
         f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
         f"for user_id={labor_inspector.pk} is_admin=True."
     ) in caplog.messages
+
+
+def test_reactivate_member(admin_client, caplog):
+    institution = InstitutionWithMembershipFactory(department="")
+    membership = institution.memberships.first()
+    admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+    institution.deactivate_membership(membership, updated_by=admin_user)
+    change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
+
+    response = admin_client.get(change_url)
+    assertContains(response, membership.user.get_full_name())
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "kind": institution.kind.value,
+            "name": institution.name,
+            "address_line_1": institution.address_line_1,
+            "address_line_2": institution.address_line_2,
+            "post_code": institution.post_code,
+            "city": institution.city,
+            "department": institution.department,
+            "coords": "",
+            "memberships-TOTAL_FORMS": "1",
+            "memberships-INITIAL_FORMS": "1",
+            "memberships-MIN_NUM_FORMS": "0",
+            "memberships-MAX_NUM_FORMS": "1000",
+            "memberships-0-id": membership.pk,
+            "memberships-0-institution": institution.pk,
+            "memberships-0-user": membership.user.pk,
+            "memberships-0-is_active": "on",
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url)
+    assert membership.user in institution.members.all()
+    assert (
+        f"Reactivating institutions.InstitutionMembership of organization_id={institution.pk} "
+        f"for user_id={membership.user_id} is_admin=False." in caplog.messages
+    )
 
 
 @pytest.mark.parametrize(
