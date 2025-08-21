@@ -57,7 +57,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 if not sender.is_prescriber:
                     raise ValidationError("Émetteur du mauvais type.")
                 # Request organization only if prescriber is actively linked to an organization
-                if sender_prescriber_organization is None and sender.prescribermembership_set.active().exists():
+                if sender_prescriber_organization is None and sender.prescribermembership_set.exists():
                     raise ValidationError("Organisation du prescripteur émettrice manquante.")
             else:
                 raise ValidationError("Émetteur prescripteur manquant.")

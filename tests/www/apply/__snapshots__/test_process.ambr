@@ -345,8 +345,6 @@
                     INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
                     WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
                            AND U0."user_id" = %s)
                     LIMIT 1)
@@ -964,8 +962,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -2850,8 +2846,6 @@
                     INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
                     WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
                            AND U0."user_id" = %s)
                     LIMIT 1)
@@ -2996,8 +2990,6 @@
           WHERE ("users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."user_id" = %s
-                 AND "users_user"."is_active"
-                 AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."organization_id" = %s)
           LIMIT 1
         ''',
@@ -3045,8 +3037,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
@@ -4093,8 +4083,6 @@
                     INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
                     WHERE (U1."is_active"
                            AND U0."is_active"
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
                            AND U0."user_id" = %s)
                     LIMIT 1)
@@ -4239,8 +4227,6 @@
           WHERE ("users_user"."is_active"
                  AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."user_id" = %s
-                 AND "users_user"."is_active"
-                 AND "prescribers_prescribermembership"."is_active"
                  AND "prescribers_prescribermembership"."organization_id" = %s)
           LIMIT 1
         ''',
@@ -4288,8 +4274,6 @@
                     WHERE (U1."is_active"
                            AND U0."is_active"
                            AND U0."company_id" = %s
-                           AND U1."is_active"
-                           AND U0."is_active"
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)

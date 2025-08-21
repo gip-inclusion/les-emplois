@@ -143,7 +143,7 @@ class Command(BaseCommand):
                 "members",
                 Prefetch(
                     "memberships",
-                    queryset=CompanyMembership.objects.active(),
+                    queryset=CompanyMembership.objects.all(),
                     to_attr="active_memberships",
                 ),
                 "memberships",
@@ -263,7 +263,7 @@ class Command(BaseCommand):
             PrescriberOrganization.objects.prefetch_related(
                 Prefetch(
                     "memberships",
-                    queryset=PrescriberMembership.objects.active(),
+                    queryset=PrescriberMembership.objects.all(),
                     to_attr="active_memberships",
                 ),
                 "members",
@@ -458,9 +458,9 @@ class Command(BaseCommand):
         populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_memberships(self):
-        siae_queryset = CompanyMembership.objects.active()
-        prescriber_queryset = PrescriberMembership.objects.active()
-        institution_queryset = InstitutionMembership.objects.active()
+        siae_queryset = CompanyMembership.objects.all()
+        prescriber_queryset = PrescriberMembership.objects.all()
+        institution_queryset = InstitutionMembership.objects.all()
 
         populate_table(
             memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
