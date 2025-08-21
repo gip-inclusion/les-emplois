@@ -23,6 +23,4 @@ Ce lien expirera dans 14 jours. Dès votre arrivée sur le site, vous serez invi
 
 Pour en savoir plus sur la Plateforme de l’inclusion et ses services, vous pouvez vous rendre sur https://inclusion.gouv.fr/gps-usagers.
 
-Si ce compte a été créé par quelqu’un qui ne vous accompagne pas dans vos démarches, vous pouvez demander sa suppression en remplissant ce formulaire : https://tally.so/r/nGyqWO.
-
 {% endblock body %}
