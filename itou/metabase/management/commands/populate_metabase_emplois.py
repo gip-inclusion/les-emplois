@@ -24,7 +24,7 @@ from collections import OrderedDict
 import tenacity
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, F, Max, OuterRef, Prefetch, Q, Subquery
+from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
@@ -38,7 +38,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.db import populate_table
@@ -389,43 +389,68 @@ class Command(BaseCommand):
             JobApplication.objects.select_related(
                 "to_company", "sender", "sender_company", "sender_prescriber_organization"
             )
-            .prefetch_related("logs")
+            .exclude(origin=Origin.PE_APPROVAL)
+            .filter(to_company_id__in=get_active_companies_pks())
+            .annotate(
+                transition_accepted_date=JobApplicationTransitionLog.objects.filter(
+                    job_application=OuterRef("pk"),
+                    transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+                )
+                .values("job_application")
+                .annotate(first_timestamp=Min("timestamp"))
+                .values("first_timestamp"),
+                time_spent_from_new_to_processing=Subquery(
+                    JobApplicationTransitionLog.objects.filter(
+                        job_application=OuterRef("pk"),
+                        transition=JobApplicationWorkflow.TRANSITION_PROCESS,
+                    )
+                    .values("job_application")
+                    .annotate(first_timestamp=Min("timestamp"))
+                    .values("first_timestamp")
+                )
+                - F("created_at"),
+                time_spent_from_new_to_accepted_or_refused=Subquery(
+                    JobApplicationTransitionLog.objects.filter(
+                        job_application=OuterRef("pk"),
+                        to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED],
+                    )
+                    .values("job_application")
+                    .annotate(first_timestamp=Min("timestamp"))
+                    .values("first_timestamp")
+                )
+                - F("created_at"),
+            )
             .only(
-                "pk",
-                "created_at",
-                "processed_at",
                 "archived_at",
+                "refusal_reason",
+                "created_at",
                 "hiring_start_at",
-                "origin",
-                "sender_kind",
-                "sender_company_id",
-                "sender_company__kind",
-                "sender_prescriber_organization__kind",
-                "sender_prescriber_organization__name",
-                "sender_prescriber_organization__code_safir_pole_emploi",
-                "sender_prescriber_organization__authorization_status",
-                "sender__last_name",
-                "sender__first_name",
+                "processed_at",
                 "state",
+                "sender_kind",  # get_job_application_origin
+                "sender_prescriber_organization__authorization_status",  # get_job_application_origin
+                "sender_company__kind",  # get_job_application_detailed_origin
+                "sender_prescriber_organization__kind",  # get_job_application_detailed_origin
+                "sender_company_id",
+                "origin",
                 "refusal_reason",
                 "job_seeker_id",
                 "to_company_id",
                 "to_company__kind",
-                "to_company__brand",
-                "to_company__name",
-                "to_company__department",
-                "approval_id",
+                "to_company__brand",  # Company.display_name
+                "to_company__name",  # Company.display_name
+                "to_company__department",  # get_department_and_region_columns
+                "sender_prescriber_organization__name",  # get_ja_sender_organization_name
+                "sender_prescriber_organization__code_safir_pole_emploi",  # get_ja_sender_organization_safir
+                "sender__last_name",  # get_ja_sender_full_name_if_pe_or_spip
+                "sender__first_name",  # get_ja_sender_full_name_if_pe_or_spip
                 "approval_delivery_mode",
                 "contract_type",
-                "refusal_reason",
                 "resume_id",
             )
-            .exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_companies_pks())
-            .all()
         )
 
-        populate_table(job_applications.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(job_applications.TABLE, batch_size=20_000, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
