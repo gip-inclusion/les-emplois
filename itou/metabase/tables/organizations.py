@@ -1,10 +1,10 @@
 from django.utils import timezone
 
+from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.metabase.tables.utils import (
     MetabaseTable,
-    get_active_companies_pks,
     get_address_columns,
     get_choice,
 )
@@ -39,7 +39,7 @@ def get_org_members_count(org):
 
 def _get_ja_sent_by_prescribers_without_org():
     return JobApplication.objects.filter(
-        to_company_id__in=get_active_companies_pks(),
+        to_company_id__in=Company.objects.active(),
         sender_kind=SenderKind.PRESCRIBER,
         sender_prescriber_organization=None,
     ).exclude(origin=Origin.PE_APPROVAL)

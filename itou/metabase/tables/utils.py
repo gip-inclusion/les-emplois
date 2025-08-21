@@ -24,7 +24,6 @@ from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, AddressMixin
-from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
 from itou.users.models import User
@@ -274,18 +273,6 @@ def get_establishment_is_active_column():
 @functools.cache
 def get_ai_stock_job_seeker_pks():
     return set(Approval.objects.filter(origin=Origin.AI_STOCK).values_list("user_id", flat=True))
-
-
-@functools.cache
-def get_active_companies_pks():
-    """
-    Load once and for all the list of all active company pks in memory and reuse them multiple times in various
-    queries to avoid additional joins of the SiaeConvention model and the non-trivial use of the
-    `Company.objects.active()` queryset on a related model of a queryset on another model. This is a set of less
-    than 10k integers thus should not use much memory. The end result being both simpler code
-    and better performance.
-    """
-    return set(Company.objects.active().values_list("pk", flat=True))
 
 
 @functools.cache

@@ -66,7 +66,6 @@ from itou.metabase.tables import (
     suspensions,
     users,
 )
-from itou.metabase.tables.utils import get_active_companies_pks
 from itou.metabase.utils import build_dbt_daily
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -221,7 +220,7 @@ class Command(BaseCommand):
                 "company",
                 "appellation__rome",
             )
-            .filter(company_id__in=get_active_companies_pks())
+            .filter(company_id__in=Company.objects.active())
             .with_job_applications_count()
             .all()
         )
@@ -414,7 +413,7 @@ class Command(BaseCommand):
                 "to_company", "sender", "sender_company", "sender_prescriber_organization"
             )
             .exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_companies_pks())
+            .filter(to_company_id__in=Company.objects.active())
             .annotate(
                 transition_accepted_date=JobApplicationTransitionLog.objects.filter(
                     job_application=OuterRef("pk"),
@@ -482,7 +481,7 @@ class Command(BaseCommand):
         """
         queryset = JobApplication.selected_jobs.through.objects.exclude(
             jobapplication__origin=Origin.PE_APPROVAL
-        ).filter(jobapplication__to_company_id__in=get_active_companies_pks())
+        ).filter(jobapplication__to_company_id__in=Company.objects.active())
 
         populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
 
