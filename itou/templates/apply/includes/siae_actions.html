@@ -91,6 +91,23 @@
                                 <span>Mettre en attente</span>
                             </button>
                         {% endif %}
+                        {% if can_add_to_pool %}
+                            <a href="{% url 'apply:add_to_pool' job_application_id=job_application.id %}" class="btn justify-content-start dropdown-item" {% matomo_event "candidature" "clic" "add_application_to_pool" %}>
+                                <i class="ri-folder-user-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Ajouter au vivier</span>
+                            </a>
+                        {% else %}
+                            <button type="button"
+                                    class="btn justify-content-start dropdown-item"
+                                    disabled
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="c-box--action-tooltip"
+                                    data-bs-title="Seule une candidature au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peut être ajoutée au vivier.">
+                                <i class="ri-folder-user-line fw-medium me-2" aria-hidden="true"></i>
+                                <span>Ajouter au vivier</span>
+                            </button>
+                        {% endif %}
                         <hr class="dropdown-divider m-0">
                         {% if can_transfer_internal %}
                             <button type="button" class="btn justify-content-start dropdown-item" id="transfer_to_button" aria-haspopup="true" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal">

@@ -220,6 +220,16 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
         self.fields["prescriber_answer"].label = label
 
 
+class AddToPoolForm(forms.Form):
+    answer = forms.CharField(
+        label="Commentaire envoyé au candidat",
+        widget=forms.Textarea(),
+        help_text="Une copie sera envoyée au prescripteur ou à l’orienteur s’il y en a un.",
+        strip=True,
+        required=False,
+    )
+
+
 class AnswerForm(forms.Form):
     """
     Allow a company to add an answer message when postponing.

@@ -1,0 +1,38 @@
+{% extends "apply/process_base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load str_filters %}
+
+{% block title %}
+    Ajouter la candidature de {{ job_application.job_seeker.get_full_name }} au vivier
+    {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Ajouter la candidature de {{ job_application.job_seeker.get_full_name }} au vivier</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content_extend %}
+    <div class="c-form mb-3 mb-md-4">
+        <h2>Réponse au candidat</h2>
+        <p>
+            En ajoutant cette candidature au vivier, elle ne sera pas automatiquement refusée après deux mois.
+            Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer le candidat de l’avancement de sa candidature.
+        </p>
+        <form method="post" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {% bootstrap_form form alert_error_type="all" %}
+
+            {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
+            {% itou_buttons_form primary_label="Ajouter au vivier" reset_url=reset_url show_mandatory_fields_mention=False matomo_category="candidature" matomo_action="submit" matomo_name="add_application_to_pool_confirmation" %}
+
+        </form>
+    </div>
+{% endblock %}
