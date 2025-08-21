@@ -15,6 +15,7 @@ class JobApplicationState(models.TextChoices):
     CANCELLED = "cancelled", "Embauche annulée"
     # When a job application is accepted, all other job seeker's pending applications become obsolete.
     OBSOLETE = "obsolete", "Embauché ailleurs"
+    POOL = "pool", "Vivier de candidatures"
 
 
 ARCHIVABLE_JOB_APPLICATION_STATES = [
