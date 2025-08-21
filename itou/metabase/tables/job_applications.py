@@ -1,5 +1,4 @@
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
 from itou.prescribers.enums import PrescriberOrganizationKind
 
@@ -66,46 +65,6 @@ def get_ja_sender_full_name_if_pe_or_spip(ja):
     org = ja.sender_prescriber_organization
     if org and org.kind in [PrescriberOrganizationKind.FT, PrescriberOrganizationKind.SPIP]:
         return f"{ja.sender.last_name.upper()} {ja.sender.first_name}"
-    return None
-
-
-def _get_ja_time_spent_in_transition(ja, logs):
-    # Some job applications have duplicate transitions.
-    # E.g. job application id:4db81292-ff51-4950-a8dc-cf7c9f94c67e
-    # has 2 almost identical "refuse" transitions.
-    # In which case we consider any of the duplicates.
-    if len(logs) >= 1:
-        new_timestamp = ja.created_at
-        transition_timestamp = logs[0].timestamp
-        assert transition_timestamp > new_timestamp
-        time_spent_in_transition = transition_timestamp - new_timestamp
-        return time_spent_in_transition
-    return None
-
-
-def get_ja_time_spent_from_new_to_processing(ja):
-    # Find the new=>processing transition log.
-    # We have to do all this in python to benefit from prefetch_related.
-    logs = [log for log in ja.logs.all() if log.transition == JobApplicationWorkflow.TRANSITION_PROCESS]
-    return _get_ja_time_spent_in_transition(ja, logs)
-
-
-def get_ja_time_spent_from_new_to_accepted_or_refused(ja):
-    # Find the *=>accepted or *=>refused transition log.
-    # We have to do all this in python to benefit from prefetch_related.
-    logs = [
-        log for log in ja.logs.all() if log.to_state in [JobApplicationState.ACCEPTED, JobApplicationState.REFUSED]
-    ]
-    return _get_ja_time_spent_in_transition(ja, logs)
-
-
-def get_ja_hiring_date(ja):
-    # We have to do all this in python to benefit from prefetch_related.
-    logs = [log for log in ja.logs.all() if log.transition == JobApplicationWorkflow.TRANSITION_ACCEPT]
-    # Job applications can be accepted more than once (e.g. 401b0ee1-d977-4338-b436-77839a9ed12c).
-    if len(logs) >= 1:
-        transition_timestamp = logs[0].timestamp
-        return transition_timestamp
     return None
 
 
@@ -190,7 +149,7 @@ TABLE.add_columns(
             "comment": (
                 "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
             ),
-            "fn": get_ja_time_spent_from_new_to_processing,
+            "fn": lambda o: o.time_spent_from_new_to_processing,
         },
         {
             "name": "délai_de_réponse",
@@ -199,7 +158,7 @@ TABLE.add_columns(
                 "Temps écoulé rétroactivement de état nouveau à état accepté"
                 " ou refusé si la candidature est passée par ces états"
             ),
-            "fn": get_ja_time_spent_from_new_to_accepted_or_refused,
+            "fn": lambda o: o.time_spent_from_new_to_accepted_or_refused,
         },
         {
             "name": "motif_de_refus",
@@ -278,7 +237,7 @@ TABLE.add_columns(
             "name": "date_embauche",
             "type": "date",
             "comment": "Date embauche le cas échéant",
-            "fn": get_ja_hiring_date,
+            "fn": lambda o: o.transition_accepted_date,
         },
         {
             "name": "injection_ai",

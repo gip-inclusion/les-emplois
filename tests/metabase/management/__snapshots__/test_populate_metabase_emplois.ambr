@@ -4849,7 +4849,7 @@
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 50,
+    'num_queries': 49,
     'queries': list([
       dict({
         'origin': list([
@@ -5253,11 +5253,29 @@
                  "job_applications_jobapplication"."refusal_reason",
                  "job_applications_jobapplication"."hiring_start_at",
                  "job_applications_jobapplication"."origin",
-                 "job_applications_jobapplication"."approval_id",
                  "job_applications_jobapplication"."approval_delivery_mode",
                  "job_applications_jobapplication"."created_at",
                  "job_applications_jobapplication"."processed_at",
                  "job_applications_jobapplication"."contract_type",
+          
+            (SELECT MIN(U0."timestamp") AS "first_timestamp"
+             FROM "job_applications_jobapplicationtransitionlog" U0
+             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
+                    AND U0."transition" = %s)
+             GROUP BY U0."job_application_id") AS "transition_accepted_date",
+                 (
+                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
+                     FROM "job_applications_jobapplicationtransitionlog" U0
+                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
+                            AND U0."transition" = %s)
+                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_processing",
+                 (
+                    (SELECT MIN(U0."timestamp") AS "first_timestamp"
+                     FROM "job_applications_jobapplicationtransitionlog" U0
+                     WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
+                            AND U0."to_state" IN (%s,
+                                                  %s))
+                     GROUP BY U0."job_application_id") - "job_applications_jobapplication"."created_at") AS "time_spent_from_new_to_accepted_or_refused",
                  "users_user"."id",
                  "users_user"."first_name",
                  "users_user"."last_name",
@@ -5282,27 +5300,6 @@
                  AND "job_applications_jobapplication"."to_company_id" IN (%s,
                                                                            %s))
           ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplicationtransitionlog"."id",
-                 "job_applications_jobapplicationtransitionlog"."transition",
-                 "job_applications_jobapplicationtransitionlog"."from_state",
-                 "job_applications_jobapplicationtransitionlog"."to_state",
-                 "job_applications_jobapplicationtransitionlog"."timestamp",
-                 "job_applications_jobapplicationtransitionlog"."job_application_id",
-                 "job_applications_jobapplicationtransitionlog"."user_id",
-                 "job_applications_jobapplicationtransitionlog"."target_company_id"
-          FROM "job_applications_jobapplicationtransitionlog"
-          WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" IN (%s)
-          ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" DESC
         ''',
       }),
       dict({
