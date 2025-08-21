@@ -8,6 +8,7 @@
     'view_jobapplicationtransitionlog',
     'view_prescriberorganization',
     'view_jobseekerprofile',
+    'export_cta',
     'view_user',
   ])
 # ---
@@ -93,6 +94,7 @@
     'view_sanctions',
     'view_jobseekerprofile',
     'view_nirmodificationrequest',
+    'export_cta',
     'view_user',
     'view_pksupportremark',
     'view_uuidsupportremark',
@@ -271,6 +273,7 @@
     'view_jobapplicationtransitionlog',
     'view_prescribermembership',
     'view_prescriberorganization',
+    'export_cta',
     'view_user',
   ])
 # ---
