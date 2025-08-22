@@ -397,7 +397,7 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
-            "apply:hire_confirmation",
+            "apply:hire_contract_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
             response = client.get(url)
@@ -453,7 +453,7 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
-            "apply:hire_confirmation",
+            "apply:hire_contract_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
             response = client.get(url)
@@ -468,7 +468,7 @@ class TestHire:
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:iae_eligibility_for_hire",
-            "apply:hire_confirmation",
+            "apply:hire_contract_confirmation",
         ):
             url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
             response = client.get(url)
@@ -3007,7 +3007,7 @@ class TestDirectHireFullProcess:
             },
         )
 
-        next_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        next_url = reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
@@ -3139,7 +3139,7 @@ class TestDirectHireFullProcess:
         geiq_criteria_url = reverse(
             "apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        confirmation_url = reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session_name})
 
         response = client.get(geiq_eligibility_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
@@ -5069,7 +5069,7 @@ class TestCheckPreviousApplicationsForHireView:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {})
 
         url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
-        next_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+        next_url = reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
         assertRedirects(response, next_url)
 
@@ -5095,7 +5095,9 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response, reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+        )
 
     def test_job_seeker_with_valid_diagnosis(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -5103,7 +5105,9 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response, reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+        )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -5131,7 +5135,9 @@ class TestEligibilityForHire:
                 f"{criterion3.key}": "on",
             },
         )
-        assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response, reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+        )
         assert self.job_seeker.has_valid_diagnosis(for_siae=company)
 
 
@@ -5154,7 +5160,9 @@ class TestGEIQEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response, reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+        )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
@@ -5181,7 +5189,7 @@ class TestGEIQEligibilityForHire:
                 "back_url": reverse(
                     "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}
                 ),
-                "next_url": reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+                "next_url": reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             },
         )
         assertRedirects(
@@ -5200,7 +5208,9 @@ class TestGEIQEligibilityForHire:
                 "proof_of_eligibility": "on",
             },
         )
-        assertRedirects(response, reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response, reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+        )
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
 
 
@@ -5230,7 +5240,9 @@ class TestHireConfirmation:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         with assertSnapshotQueries(snapshot(name="view queries")):
-            response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+            response = client.get(
+                reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name})
+            )
         assertContains(response, "Déclarer l’embauche de Clara SION")
         assertContains(response, "Éligible à l’IAE")
 
@@ -5254,7 +5266,7 @@ class TestHireConfirmation:
             "address_for_autocomplete": "0",
         }
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             data=post_data,
             headers={"hx-request": "true"},
         )
@@ -5264,7 +5276,7 @@ class TestHireConfirmation:
         )
         post_data = post_data | {"confirmed": "True"}
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             headers={"hx-request": "true"},
             data=post_data,
         )
@@ -5315,7 +5327,7 @@ class TestHireConfirmation:
             "address_for_autocomplete": "0",
         }
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}), data=post_data
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}), data=post_data
         )
         assert response.status_code == 200
         assertFormError(
@@ -5332,7 +5344,7 @@ class TestHireConfirmation:
         client.force_login(company.members.get())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
-        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}))
         assertContains(response, "Déclarer l’embauche de Clara SION")
         assertContains(response, "PASS IAE valide")
 
@@ -5357,7 +5369,7 @@ class TestHireConfirmation:
             "confirmed": "True",
         }
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             data=post_data,
             headers={"hx-request": "true"},
         )
@@ -5386,7 +5398,7 @@ class TestHireConfirmation:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
-        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        response = client.get(reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}))
         assertContains(response, "Déclarer l’embauche de Clara SION")
         assertContains(response, "Éligibilité GEIQ confirmée")
 
@@ -5410,7 +5422,7 @@ class TestHireConfirmation:
             "qualification_level": QualificationLevel.LEVEL_4,
         }
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             data=post_data,
             headers={"hx-request": "true"},
         )
@@ -5420,7 +5432,7 @@ class TestHireConfirmation:
         )
         post_data = post_data | {"confirmed": "True"}
         response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
+            reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": apply_session.name}),
             headers={"hx-request": "true"},
             data=post_data,
         )

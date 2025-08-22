@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessAcceptViews.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 17,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -845,25 +845,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'AcceptView.get_forms[www/apply/views/common.py]',
-          'AcceptView.get_context_data[www/apply/views/common.py]',
-          'AcceptView.dispatch[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'AcceptView.get_forms[www/apply/views/common.py]',
           'AcceptView.get_context_data[www/apply/views/common.py]',
@@ -968,27 +949,6 @@
           LIMIT 1
         ''',
       }),
-      dict({
-        'origin': list([
-          'SimpleNode[apply/includes/job_application_accept_form.html]',
-          'IfNode[apply/includes/job_application_accept_form.html]',
-          'IncludeNode[apply/includes/accept_section.html]',
-          'IncludeNode[apply/process_accept.html]',
-          'BlockNode[apply/process_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept.html]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          ORDER BY "asp_country"."name" ASC
-        ''',
-      }),
     ]),
   })
 # ---
@@ -1087,7 +1047,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept-contract">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1315,7 +1275,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept-contract">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1463,7 +1423,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept-contract">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1824,7 +1784,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/accept-contract">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
