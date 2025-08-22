@@ -78,7 +78,7 @@ def organization_merge_into(from_id, to_id, *, wet_run):
     logger.info("| Job applications: %s", job_applications.count())
 
     # Move users not already present in organization destination
-    members = prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).exclude(
+    members = prescribers_models.PrescriberMembership.include_inactive.filter(organization_id=from_id).exclude(
         user__in=users_models.User.objects.filter(prescribermembership__organization_id=to_id)
     )
     logger.info("| Members: %s", members.count())

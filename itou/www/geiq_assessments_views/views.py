@@ -296,11 +296,9 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
             )
             institution_members = {
                 membership.user
-                for membership in InstitutionMembership.objects.active()
-                .filter(
+                for membership in InstitutionMembership.objects.filter(
                     institution__in=[link.institution_id for link in assessment.institution_links.all()],
-                )
-                .select_related("user")
+                ).select_related("user")
             }
             for member in institution_members:
                 AssessmentSubmittedForLaborInspectorNotification(member, assessment=assessment).send()
@@ -853,12 +851,10 @@ def assessment_details_for_institution(
                 # Reviewed by a DDETS
                 dreets_members = {
                     membership.user
-                    for membership in InstitutionMembership.objects.active()
-                    .filter(
+                    for membership in InstitutionMembership.objects.filter(
                         institution__kind=InstitutionKind.DREETS_GEIQ,
                         institution__assessment_links__assessment=assessment,
-                    )
-                    .select_related("user")
+                    ).select_related("user")
                 }
                 for member in dreets_members:
                     AssessmentReviewedForDREETSLaborInspectorNotification(member, assessment=assessment).send()

@@ -68,6 +68,7 @@ TRANSFER_SPECS = {
     },
     TransferField.MEMBERSHIPS: {
         "related_model": models.CompanyMembership,
+        "related_model_manager": "include_inactive",
         "related_model_field": "company",
         "upsert": {
             "key": {"user", "company"},
@@ -115,7 +116,8 @@ assert set(TRANSFER_SPECS) == set(TransferField)
 
 
 def get_transfer_queryset(from_company, to_company, spec):
-    queryset = spec["related_model"].objects.filter(**{spec["related_model_field"]: from_company})
+    manager = getattr(spec["related_model"], spec.get("related_model_manager", "objects"))
+    queryset = manager.filter(**{spec["related_model_field"]: from_company})
     if (to_filter := spec.get("to_filter")) is not None and to_company:
         queryset = to_filter(queryset, to_company)
     return queryset
@@ -204,9 +206,8 @@ def transfer_company_data(
                         if not isinstance(e.__cause__, UniqueViolation):
                             raise
 
-                        to_item = spec["related_model"].objects.get(
-                            **{field: getattr(item, field) for field in spec["upsert"]["key"]}
-                        )
+                        manager = getattr(spec["related_model"], spec.get("related_model_manager", "objects"))
+                        to_item = manager.get(**{field: getattr(item, field) for field in spec["upsert"]["key"]})
                         for field, merge_function in spec["upsert"]["fields"].items():
                             final_value = merge_function(
                                 getattr(item, field),

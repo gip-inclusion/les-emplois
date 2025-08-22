@@ -217,7 +217,10 @@
                  "companies_companymembership"."company_id",
                  "companies_companymembership"."updated_by_id"
           FROM "companies_companymembership"
-          WHERE "companies_companymembership"."user_id" = %s
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -236,7 +239,10 @@
                  "institutions_institutionmembership"."institution_id",
                  "institutions_institutionmembership"."updated_by_id"
           FROM "institutions_institutionmembership"
-          WHERE "institutions_institutionmembership"."user_id" = %s
+          INNER JOIN "users_user" ON ("institutions_institutionmembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "institutions_institutionmembership"."is_active"
+                 AND "institutions_institutionmembership"."user_id" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -410,8 +416,11 @@
                  T3."upcoming_deletion_notified_at",
                  T3."allow_next_sso_sub_update"
           FROM "prescribers_prescribermembership"
+          INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
           LEFT OUTER JOIN "users_user" T3 ON ("prescribers_prescribermembership"."updated_by_id" = T3."id")
-          WHERE "prescribers_prescribermembership"."user_id" = %s
+          WHERE ("users_user"."is_active"
+                 AND "prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
           ORDER BY "prescribers_prescribermembership"."id" ASC
         ''',
       }),

@@ -49,13 +49,11 @@ class AssessmentReviewedForGeiqNotification(EmailNotification):
         assessment = self.context["assessment"]
         cc_users = {
             membership.user
-            for membership in InstitutionMembership.objects.active()
-            .filter(
+            for membership in InstitutionMembership.objects.filter(
                 institution__in=AssessmentInstitutionLink.objects.filter(
                     assessment=assessment, with_convention=True
                 ).values_list("institution", flat=True),
-            )
-            .select_related("user")
+            ).select_related("user")
         }
         # TODO: handle case where more than 50 CC users are found (cf Mailjet limit)
         email_message.cc = sorted(cc_user.email for cc_user in cc_users)
