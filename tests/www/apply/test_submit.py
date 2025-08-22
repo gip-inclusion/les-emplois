@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.template.defaultfilters import date, time
 from django.urls import resolve, reverse
-from django.utils import formats, timezone
+from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import (
@@ -2745,7 +2745,7 @@ class TestDirectHireFullProcess:
         )
 
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
-    @freeze_time()
+    @freeze_time("2025-08-22")
     def test_hire_as_company(self, client, snapshot):
         """Apply as company (and create new job seeker)"""
 
@@ -2978,10 +2978,7 @@ class TestDirectHireFullProcess:
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
         soup = parse_response_to_soup(response, selector=".personal-infos")
-        content = str(soup).replace(
-            f"Mis à jour le {formats.date_format(timezone.localdate(), 'j F Y')}", "Mis à jour le DD mm YYYY"
-        )
-        assert content == snapshot(name="personal-infos")
+        assert str(soup) == snapshot(name="personal-infos")
 
         response = client.post(next_url)
 
