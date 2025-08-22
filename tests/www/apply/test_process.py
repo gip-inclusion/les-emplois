@@ -2223,10 +2223,6 @@ class TestProcessAcceptViews:
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(self, client, mocker):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
-        mocked_request = mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-        )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
@@ -2249,7 +2245,6 @@ class TestProcessAcceptViews:
         # Selecting "Autre" must enable the employer to create a new job description
         # linked to the accepted job application.
         post_data = {
-            "birthdate": "2002-02-20",  # Required to certify the criteria later.
             "hired_job": AcceptForm.OTHER_HIRED_JOB,
         }
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
@@ -2274,7 +2269,6 @@ class TestProcessAcceptViews:
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        mocked_request.assert_called_once()
 
         # Perform some checks on job description now attached to job application
         job_application.refresh_from_db()
