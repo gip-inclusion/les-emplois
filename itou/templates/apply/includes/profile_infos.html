@@ -56,22 +56,25 @@
                 </span>
             {% endif %}
         </li>
-        <li>
-            <small>Commune de naissance</small>
-            {% if profile.birth_place %}
-                <strong>{{ profile.birth_place|title }}</strong>
-            {% else %}
-                <span class="text-warning fst-italic flex-grow-1 flex-md-grow-0">
-                    <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
-                    À renseigner obligatoirement si le pays est "France"
-                </span>
-            {% endif %}
-        </li>
+        {% if show_birth_place|default:False %}
+            <li>
+
+                <small>Commune de naissance</small>
+                {% if profile.birth_place %}
+                    <strong>{{ profile.birth_place|title }}</strong>
+                {% else %}
+                    <span class="text-warning fst-italic flex-grow-1 flex-md-grow-0">
+                        <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
+                        À renseigner obligatoirement si le pays est "France"
+                    </span>
+                {% endif %}
+            </li>
+        {% endif %}
         <li>
             <small>Numéro de sécurité sociale</small>
             {% if profile.nir %}
                 <strong>{{ profile.nir|format_nir }}</strong>
-                {% include 'includes/copy_to_clipboard.html' with content=profile.nir css_classes="btn-link" only_icon=True %}
+                {% comment %}NIR copy button removed 20250822{% endcomment %}
             {% elif profile.lack_of_nir_reason %}
                 <strong>{{ profile.get_lack_of_nir_reason_display }}</strong>
             {% else %}

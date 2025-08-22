@@ -4972,7 +4972,6 @@ class TestCheckJobSeekerInformationsForHire:
                     "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
                     "jobseeker_profile__lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
                     "jobseeker_profile__education_level": "",
-                    "last_checked_at": timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
                 },
                 id="job_seeker_with_few_datas",
             ),
@@ -4990,23 +4989,25 @@ class TestCheckJobSeekerInformationsForHire:
                     "jobseeker_profile__rsa_allocation_since": AllocationDuration.MORE_THAN_24_MONTHS,
                     "jobseeker_profile__ass_allocation_since": AllocationDuration.FROM_6_TO_11_MONTHS,
                     "jobseeker_profile__aah_allocation_since": AllocationDuration.LESS_THAN_6_MONTHS,
-                    "last_checked_at": timezone.make_aware(datetime.datetime(2024, 12, 12, 12, 0, 0)),
                 },
                 id="job_seeker_with_all_datas",
             ),
-            # vincentporte, need to test EITI fields
+            pytest.param(
+                {"for_snapshot": True, "jobseeker_profile__birth_country_id": 126},
+                id="job_seeker_not_born_in_france",
+            ),
         ],
     )
     def test_company(self, client, job_seeker_kwargs, snapshot):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-
         job_seeker_kwargs["jobseeker_profile__birth_place"] = (
             Commune.objects.by_insee_code_and_period("59183", datetime.date(1990, 1, 1))
             if job_seeker_kwargs.get("born_in_france")
             else None
         )
-        job_seeker = JobSeekerFactory(**job_seeker_kwargs)
-
+        job_seeker = JobSeekerFactory(
+            last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)), **job_seeker_kwargs
+        )
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})
         url_check_infos = reverse(

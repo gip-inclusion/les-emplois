@@ -50,6 +50,10 @@ from itou.www.job_seekers_views.forms import (
 logger = logging.getLogger(__name__)
 
 
+def show_birth_place(jobseeker_profile):
+    return not jobseeker_profile.birth_country or jobseeker_profile.birth_country.code == "100"
+
+
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
@@ -874,7 +878,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            "show_birth_place": show_birth_place(self.profile),
+        }
 
 
 class UpdateJobSeekerStartView(View):
@@ -1257,6 +1265,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
             "next_url": reverse(
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
+            "show_birth_place": show_birth_place(self.job_seeker.jobseeker_profile),
         }
 
 
