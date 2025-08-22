@@ -1200,7 +1200,11 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         return self.job_seeker_session.get("config").get("from_url")
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            "show_birth_place": show_birth_place(self.profile),
+        }
 
 
 class CheckJobSeekerInformations(ApplicationBaseView):
