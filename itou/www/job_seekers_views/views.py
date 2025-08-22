@@ -1287,6 +1287,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
             ),
             "show_birth_place": show_birth_place(self.job_seeker.jobseeker_profile),
             "other_infos": get_jobseeker_profile_infos_to_display(self.job_seeker.jobseeker_profile),
+            "allow_modify_job_seeker": True,
         }
 
 
