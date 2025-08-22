@@ -50,6 +50,22 @@ from itou.www.job_seekers_views.forms import (
 logger = logging.getLogger(__name__)
 
 
+def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
+    other_infos_keys = [
+        "resourceless",
+        "unemployed_since",
+        "rqth_employee",
+        "oeth_employee",
+        "rsa_allocation_since",
+        "ass_allocation_since",
+        "aah_allocation_since",
+    ]
+    return {
+        "show_birth_place": not jobseeker_profile.birth_country or jobseeker_profile.birth_country.code == "100",
+        "other_infos": [key for key in other_infos_keys if getattr(jobseeker_profile, key, False)],
+    }
+
+
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
@@ -874,7 +890,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            **jobseeker_personal_infos_display_kwargs(self.profile),
+        }
 
 
 class UpdateJobSeekerStartView(View):
@@ -1192,7 +1212,11 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         return self.job_seeker_session.get("config").get("from_url")
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
+        return super().get_context_data(**kwargs) | {
+            "profile": self.profile,
+            "progress": "80",
+            **jobseeker_personal_infos_display_kwargs(self.profile),
+        }
 
 
 class CheckJobSeekerInformations(ApplicationBaseView):
@@ -1257,6 +1281,8 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
             "next_url": reverse(
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
+            **jobseeker_personal_infos_display_kwargs(self.job_seeker.jobseeker_profile),
+            "allow_modify_job_seeker": True,
         }
 
 
