@@ -157,51 +157,34 @@
                 <i class="text-disabled">Non renseigné</i>
             {% endif %}
         </li>
-        {% comment %} TODO fix this {% endcomment %}
-        <li>
-            <small>Autres</small>
-        </li>
-        {% if profile.resourceless %}
+
+        {% for item in other_infos %}
             <li>
-                <small>&nbsp;</small>
-                <strong>Sans ressources</strong>
+                {% if forloop.first %}
+                    <small>Autres</small>
+                {% else %}
+                    <small class="me-0"></small>
+                {% endif %}
+                {% if item == "resourceless" %}
+                    <strong>Sans ressources</strong>
+                {% elif item == "unemployed_since" %}
+                    <strong>Sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</strong>
+                {% elif item == "rqth_employee" %}
+                    <strong>Titulaire de la RQTH</strong>
+                {% elif item == "oeth_employee" %}
+                    <strong>Bénéficiaire de la loi handicap (OETH)</strong>
+                {% elif item == "rsa_allocation_since" %}
+                    <strong>Bénéficiaire du RSA depuis {{ profile.get_rsa_allocation_since_display|lower }}</strong>
+                {% elif item == "ass_allocation_since" %}
+                    <strong>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</strong>
+                {% elif item == "aah_allocation_since" %}
+                    <strong>Bénéficiaire de l'AAH depuis {{ profile.get_aah_allocation_since_display|lower }}</strong>
+                {% endif %}
             </li>
-        {% endif %}
-        {% if profile.unemployed_since %}
+        {% empty %}
             <li>
-                <small>&nbsp;</small>
-                <strong>Sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</strong>
+                <small>Autres</small>
             </li>
-        {% endif %}
-        {% if profile.rqth_employee %}
-            <li>
-                <small>&nbsp;</small>
-                <strong>Titulaire de la RQTH</strong>
-            </li>
-        {% endif %}
-        {% if profile.oeth_employee %}
-            <li>
-                <small>&nbsp;</small>
-                <strong>Bénéficiaire de la loi handicap (OETH)</strong>
-            </li>
-        {% endif %}
-        {% if profile.rsa_allocation_since %}
-            <li>
-                <small>&nbsp;</small>
-                <strong>Bénéficiaire du RSA depuis {{ profile.get_rsa_allocation_since_display|lower }}</strong>
-            </li>
-        {% endif %}
-        {% if profile.ass_allocation_since %}
-            <li>
-                <small>&nbsp;</small>
-                <strong>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</strong>
-            </li>
-        {% endif %}
-        {% if profile.aah_allocation_since %}
-            <li>
-                <small>&nbsp;</small>
-                <strong>Bénéficiaire de l'AAH depuis {{ profile.get_aah_allocation_since_display|lower }}</strong>
-            </li>
-        {% endif %}
+        {% endfor %}
     </ul>
 </div>

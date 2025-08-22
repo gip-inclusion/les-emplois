@@ -463,6 +463,25 @@
   
   '''
 # ---
+# name: TestCheckJobSeekerInformationsForHire.t
+                  
+                      <strong>Bénéficiaire de l'ASS depuis de 6 à 11 mois</strong>
+                  
+              </li>
+          
+              <li>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Bénéficiaire de l'AAH depuis moins de 6 mois</strong>
+                  
+              </li>
+          
+      </ul>
+  </div>
+  '''
+# ---
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_not_born_in_france][personal-infos]
   '''
   <div class="personal-infos">
@@ -584,16 +603,11 @@
                   <strong>Formation de niveau BAC</strong>
               
           </li>
+  
           
-          <li>
-              <small>Autres</small>
-          </li>
-          
-          
-          
-          
-          
-          
+              <li>
+                  <small>Autres</small>
+              </li>
           
       </ul>
   </div>
@@ -733,50 +747,69 @@
                   <strong>Formation de niveau BAC</strong>
               
           </li>
-          
-          <li>
-              <small>Autres</small>
-          </li>
+  
           
               <li>
-                  <small> </small>
-                  <strong>Sans ressources</strong>
+                  
+                      <small>Autres</small>
+                  
+                  
+                      <strong>Sans ressources</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Sans emploi depuis de 12 à 23 mois</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Sans emploi depuis de 12 à 23 mois</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Titulaire de la RQTH</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Titulaire de la RQTH</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Bénéficiaire de la loi handicap (OETH)</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Bénéficiaire de la loi handicap (OETH)</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Bénéficiaire du RSA depuis 24 mois et plus</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Bénéficiaire du RSA depuis 24 mois et plus</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Bénéficiaire de l'ASS depuis de 6 à 11 mois</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Bénéficiaire de l'ASS depuis de 6 à 11 mois</strong>
+                  
               </li>
           
-          
               <li>
-                  <small> </small>
-                  <strong>Bénéficiaire de l'AAH depuis moins de 6 mois</strong>
+                  
+                      <small class="me-0"></small>
+                  
+                  
+                      <strong>Bénéficiaire de l'AAH depuis moins de 6 mois</strong>
+                  
               </li>
           
       </ul>
@@ -911,16 +944,11 @@
                   <i class="text-disabled">Non renseigné</i>
               
           </li>
+  
           
-          <li>
-              <small>Autres</small>
-          </li>
-          
-          
-          
-          
-          
-          
+              <li>
+                  <small>Autres</small>
+              </li>
           
       </ul>
   </div>
@@ -1060,16 +1088,11 @@
                   <strong>Formation de niveau BAC</strong>
               
           </li>
+  
           
-          <li>
-              <small>Autres</small>
-          </li>
-          
-          
-          
-          
-          
-          
+              <li>
+                  <small>Autres</small>
+              </li>
           
       </ul>
   </div>
@@ -1197,16 +1220,11 @@
                   <strong>Formation de niveau BAC</strong>
               
           </li>
+  
           
-          <li>
-              <small>Autres</small>
-          </li>
-          
-          
-          
-          
-          
-          
+              <li>
+                  <small>Autres</small>
+              </li>
           
       </ul>
   </div>

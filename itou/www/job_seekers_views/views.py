@@ -54,6 +54,20 @@ def show_birth_place(jobseeker_profile):
     return not jobseeker_profile.birth_country or jobseeker_profile.birth_country.code == "100"
 
 
+def get_jobseeker_profile_infos_to_display(jobseeker_profile):
+    keys = [
+        "resourceless",
+        "unemployed_since",
+        "rqth_employee",
+        "oeth_employee",
+        "rsa_allocation_since",
+        "ass_allocation_since",
+        "aah_allocation_since",
+    ]
+
+    return [key for key in keys if getattr(jobseeker_profile, key, False)]
+
+
 class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     model = User
     queryset = User.objects.select_related("jobseeker_profile").filter(kind=UserKind.JOB_SEEKER)
@@ -882,6 +896,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "profile": self.profile,
             "progress": "80",
             "show_birth_place": show_birth_place(self.profile),
+            "other_infos": get_jobseeker_profile_infos_to_display(self.profile),
         }
 
 
@@ -1204,6 +1219,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             "profile": self.profile,
             "progress": "80",
             "show_birth_place": show_birth_place(self.profile),
+            "other_infos": get_jobseeker_profile_infos_to_display(self.profile),
         }
 
 
@@ -1270,6 +1286,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
             "show_birth_place": show_birth_place(self.job_seeker.jobseeker_profile),
+            "other_infos": get_jobseeker_profile_infos_to_display(self.job_seeker.jobseeker_profile),
         }
 
 
