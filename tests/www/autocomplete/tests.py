@@ -102,7 +102,7 @@ class TestJobsAutocomplete:
 
 class TestSelect2CitiesAutocomplete:
     def test_autocomplete(self, client):
-        cities = create_test_cities(["01", "75", "93"], num_per_department=20)
+        cities = create_test_cities(["01", "75", "93"])
         city_slug_to_pk = {city.slug: city.pk for city in cities}
 
         url = reverse("autocomplete:cities")
@@ -199,7 +199,7 @@ class TestSelect2CitiesAutocomplete:
         assert response.json() == {"results": []}
 
     def test_queryset_is_ordered_before_truncation(self, client):
-        cities = create_test_cities(["01", "02", "54", "57", "62", "75", "93"], num_per_department=20)
+        cities = create_test_cities(["01", "02", "54", "57", "62", "75", "93"])
         city_slug_to_pk = {city.slug: city.pk for city in cities}
         response = client.get(reverse("autocomplete:cities"), {"term": "e"})
         assert response.status_code == 200
