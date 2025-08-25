@@ -255,6 +255,290 @@ class TestBatchArchive:
         )
 
 
+class TestBatchAddToPool:
+    FAKE_ANSWER = "Lorem ipsum added to poolum"
+
+    def test_invalid_access(self, client):
+        addable_app = JobApplicationFactory(state=JobApplicationState.PROCESSING)
+        assert addable_app.add_to_pool.is_available()
+        for user in [addable_app.job_seeker, addable_app.sender, LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            response = client.post(
+                reverse("apply:batch_add_to_pool"),
+                data={"answer": self.FAKE_ANSWER, "application_ids": [addable_app.pk]},
+            )
+            assert response.status_code == 403
+
+    def test_no_next_url(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+        assert addable_app.add_to_pool.is_available()
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool"), data={"answer": self.FAKE_ANSWER, "application_ids": [addable_app.pk]}
+        )
+        assert response.status_code == 404
+
+    def test_single_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING)
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={
+                "answer": self.FAKE_ANSWER,
+                "application_ids": [addable_app.pk],
+            },
+        )
+        assertRedirects(response, next_url)
+        addable_app.refresh_from_db()
+        assert addable_app.state == JobApplicationState.POOL
+        assert addable_app.answer == self.FAKE_ANSWER
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "La candidature a bien été ajoutée au vivier.", extra_tags="toast")],
+        )
+
+    def test_multiple_apps(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        addable_apps = JobApplicationFactory.create_batch(2, to_company=company, state=JobApplicationState.PROCESSING)
+
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={
+                "answer": self.FAKE_ANSWER,
+                "application_ids": [addable_app.pk for addable_app in addable_apps],
+            },
+        )
+        # Check that next_url parameter is honored
+        assertRedirects(response, next_url)
+        for addable_app in addable_apps:
+            addable_app.refresh_from_db()
+            assert addable_app.state == JobApplicationState.POOL
+            assert addable_app.answer == self.FAKE_ANSWER
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS, "2 candidatures ont bien été ajoutées au vivier.", extra_tags="toast"
+                )
+            ],
+        )
+
+    def test_sent_application(self, client):
+        addable_app = JobApplicationFactory(sent_by_another_employer=True, state=JobApplicationState.PROCESSING)
+        assert addable_app.add_to_pool.is_available()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(addable_app.sender)
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={"answer": self.FAKE_ANSWER, "application_ids": [addable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        addable_app.refresh_from_db()
+        assert addable_app.state == JobApplicationState.PROCESSING
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_unexisting_app(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={"answer": self.FAKE_ANSWER, "application_ids": [uuid.uuid4()]},
+        )
+        assertRedirects(response, next_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Une candidature sélectionnée n’existe plus ou a été transférée.",
+                ),
+            ],
+        )
+
+    def test_missing_answer(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        addable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING, answer="")
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={"answer": "", "application_ids": [addable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        addable_app.refresh_from_db()
+        assert addable_app.state == JobApplicationState.POOL
+        assert addable_app.answer == ""
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "La candidature a bien été ajoutée au vivier.", extra_tags="toast")],
+        )
+
+    def test_unaddable(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
+        client.force_login(employer)
+
+        unaddable_app = JobApplicationFactory(
+            job_seeker__first_name="John",
+            job_seeker__last_name="Rambo",
+            to_company=company,
+            state=JobApplicationState.REFUSED,
+        )
+        assert not unaddable_app.add_to_pool.is_available()
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={"answer": self.FAKE_ANSWER, "application_ids": [unaddable_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        unaddable_app.refresh_from_db()
+        assert unaddable_app.state == JobApplicationState.REFUSED
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La candidature de John RAMBO n’a pas pu être ajoutée dans le vivier car elle est au statut "
+                        "« Candidature déclinée »."
+                    ),
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_already_added_to_pool(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        next_url = reverse("apply:list_for_siae", query={"state": "POOL"})
+        client.force_login(employer)
+
+        added_app = JobApplicationFactory(
+            job_seeker__first_name="Jean",
+            job_seeker__last_name="Bond",
+            to_company=company,
+            state=JobApplicationState.POOL,
+            answer="An existing answer",
+        )
+        assert not added_app.add_to_pool.is_available()
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={"answer": self.FAKE_ANSWER, "application_ids": [added_app.pk]},
+        )
+        assertRedirects(response, next_url)
+        added_app.refresh_from_db()
+        assert added_app.state == JobApplicationState.POOL
+        assert added_app.answer != self.FAKE_ANSWER
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND est déjà dans le vivier.",
+                    extra_tags="toast",
+                ),
+            ],
+        )
+
+    def test_mishmash(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        client.force_login(employer)
+
+        apps = [
+            # 2 addable applications:
+            JobApplicationFactory(to_company=company, state=JobApplicationState.NEW),
+            JobApplicationFactory(to_company=company, state=JobApplicationState.PROCESSING),
+            # 1 unaddable application:
+            JobApplicationFactory(
+                job_seeker__first_name="John",
+                job_seeker__last_name="Rambo",
+                to_company=company,
+                state=JobApplicationState.REFUSED,
+            ),
+            # 1 already added application:
+            JobApplicationFactory(
+                job_seeker__first_name="Jean",
+                job_seeker__last_name="Bond",
+                to_company=company,
+                state=JobApplicationState.POOL,
+            ),
+        ]
+        next_url = reverse("apply:list_for_siae", query={"start_date": "1970-01-01"})
+
+        response = client.post(
+            reverse("apply:batch_add_to_pool", query={"next_url": next_url}),
+            data={
+                "answer": self.FAKE_ANSWER,
+                "application_ids": [app.pk for app in apps] + [uuid.uuid4(), uuid.uuid4()],
+            },
+        )
+        # Check that next_url parameter is honored
+        assertRedirects(response, next_url)
+        # 2 postponable apps have been successfully archived despite all the error messages
+        apps[0].refresh_from_db()
+        assert apps[0].state == JobApplicationState.POOL
+        assert apps[0].answer == self.FAKE_ANSWER
+        apps[1].refresh_from_db()
+        assert apps[1].state == JobApplicationState.POOL
+        assert apps[1].answer == self.FAKE_ANSWER
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "2 candidatures sélectionnées n’existent plus ou ont été transférées.",
+                ),
+                messages.Message(
+                    messages.WARNING,
+                    "La candidature de Jean BOND est déjà dans le vivier.",
+                    extra_tags="toast",
+                ),
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La candidature de John RAMBO n’a pas pu être ajoutée dans le vivier car elle est au statut "
+                        "« Candidature déclinée »."
+                    ),
+                    extra_tags="toast",
+                ),
+                messages.Message(
+                    messages.SUCCESS, "2 candidatures ont bien été ajoutées au vivier.", extra_tags="toast"
+                ),
+            ],
+        )
+
+
 class TestBatchPostpone:
     FAKE_ANSWER = "Lorem ipsum postponed"
 
