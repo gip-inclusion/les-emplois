@@ -92,6 +92,7 @@
     'view_sanctions',
     'view_jobseekerprofile',
     'view_nirmodificationrequest',
+    'export_cta',
     'view_user',
     'view_pksupportremark',
     'view_uuidsupportremark',

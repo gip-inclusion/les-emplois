@@ -1,9 +1,10 @@
-import itertools
+from collections import defaultdict
 
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 
 from itou.users.management.commands import sync_group_and_perms
+from itou.users.models import User
 
 
 def test_command(snapshot, caplog):
@@ -19,8 +20,18 @@ def test_command(snapshot, caplog):
 
 
 def test_readonly_group():
+    READ_ONLY_ALLOWED_ACTIONS = defaultdict(
+        dict,
+        {
+            "itou-admin-readonly": {
+                User: sync_group_and_perms.PERMS_EXPORT_CTA,
+            },
+        },
+    )
     permissions = sync_group_and_perms.get_permissions_dict()
     readonly_groups = {name for name in permissions.keys() if name.endswith("-readonly")}
     for group in readonly_groups:
         assert set(permissions[group].keys()) == set(permissions[group.replace("-readonly", "")].keys())
-        assert set(itertools.chain(*permissions[group].values())) == {"view"}
+        for model, perms in permissions[group].items():
+            expected_perms = {"view"} | READ_ONLY_ALLOWED_ACTIONS[group].get(model, set())
+            assert perms == expected_perms
