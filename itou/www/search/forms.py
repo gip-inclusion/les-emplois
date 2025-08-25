@@ -14,6 +14,7 @@ from itou.common_apps.address.departments import (
 from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
 from itou.jobs.models import ROME_DOMAINS
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
+from itou.www.search.models import SavedSearch
 
 
 class SiaeSearchForm(forms.Form):
@@ -162,3 +163,33 @@ class PrescriberSearchForm(forms.Form):
         if not distance:
             distance = self.fields["distance"].initial
         return distance
+
+
+class NewSavedSearchForm(forms.ModelForm):
+    class Meta:
+        model = SavedSearch
+        fields = ["name", "city", "distance", "company_kinds", "departments", "contract_types", "domains"]
+        labels = {"name": "Nom de cette recherche"}
+        widgets = {
+            "city": forms.HiddenInput,
+            "distance": forms.HiddenInput,
+            "company_kinds": forms.HiddenInput,
+            "departments": forms.HiddenInput,
+            "contract_types": forms.HiddenInput,
+            "domains": forms.HiddenInput,
+        }
+
+    def __init__(
+        self,
+        *args,
+        user,
+        **kwargs,
+    ):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        saved_search = super().save(commit=False)
+        saved_search.user = self.user
+        saved_search.save()
+        return saved_search

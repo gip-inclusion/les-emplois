@@ -13,13 +13,12 @@ class SavedSearch(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="utilisateur", on_delete=models.CASCADE)
     name = models.CharField(max_length=50, verbose_name="nom de la recherche")
-    search_kind = models.CharField(choices=SEARCH_KINDS, verbose_name="type de recherche")
     city = models.ForeignKey(City, verbose_name="ville", on_delete=models.SET_NULL, null=True)
     distance = models.IntegerField(verbose_name="distance", null=True)
     company_kinds = ArrayField(
         base_field=models.CharField(choices=CompanyKind.choices), verbose_name="types de structure", null=True
     )
-    department = ArrayField(
+    departments = ArrayField(
         base_field=models.CharField(choices=DEPARTMENTS.items()), verbose_name="départements", null=True
     )
     # TODO: arrondissement

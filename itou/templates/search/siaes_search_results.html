@@ -16,9 +16,15 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
             <h1>Rechercher un emploi inclusif</h1>
+        {% endfragment %}
+        {% fragment as c_title__cta %}
+            <button class="btn btn-lg btn-secondary btn-ico" type="button" data-bs-toggle="modal" data-bs-target="#newSavedSearchModal">
+                <i class="ri-star-line fw-medium" aria-hidden="true"></i>
+                <span>Enregistrer cette recherche</span>
+            </button>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -37,6 +43,10 @@
 
 {% block content %}
     {% include "search/includes/siaes_search_content.html" %}
+{% endblock %}
+
+{% block modals %}
+    {% include "search/includes/new_saved_search_modal.html" with new_saved_search_form=new_saved_search_form csrf_token=csrf_token only %}
 {% endblock %}
 
 {% block script %}

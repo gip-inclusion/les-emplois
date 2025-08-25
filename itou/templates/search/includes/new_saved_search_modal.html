@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+<div class="modal fade" id="newSavedSearchModal" tabindex="-1" aria-labelledby="newSavedSearchModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <form hx-post="{% url "search:add_saved_search" %}" hx-target="#newSavedSearchModal" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="newSavedSearchModalLabel">Enregistrer cette recherche</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Enregistrez cette recherche afin de la retrouver facilement depuis votre tableau de bord.</p>
+                    {% bootstrap_form new_saved_search_form alert_error_type="all" %}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
