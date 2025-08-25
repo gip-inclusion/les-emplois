@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2025-08-25
+
+### Ajouté
+
+- [Prescripteur : Ajout d'un bandeau d’alerte pour une enquête Maze](https://github.com/gip-inclusion/les-emplois/pull/6709)
+
+### Modifié
+
+- [Admin : Empêcher la modification directe de la date de fin d’un PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/6484)
+- [Admin : Enrichir les fiches salarié avec les détails de l’entreprise](https://github.com/gip-inclusion/les-emplois/pull/6603)
+- [Candidature : Modification de la vue tableau pour clarifier le statut IAE et les critères d'éligibilité](https://github.com/gip-inclusion/les-emplois/pull/6699)
+- [Contrôle a posteriori : Mise à jour d'une mention relative aux justificatifs](https://github.com/gip-inclusion/les-emplois/pull/6723)
+- [FranceConnect : Améliorations de l'affichage](https://github.com/gip-inclusion/les-emplois/pull/6721)
+- [FranceConnect : Gestion des cas d'erreur pour le passage à la version 2](https://github.com/gip-inclusion/les-emplois/pull/6724)
+- [Interface : Correction des écrans de connexion candidat et prescripteur](https://github.com/gip-inclusion/les-emplois/pull/6722)
+- [Interface : Placer le badge d'archivage après le badge du statut de candidature](https://github.com/gip-inclusion/les-emplois/pull/6707)
+- [Vie privée : Retrait d'une mention RGPD incomprise causant beaucoup de demandes au support](https://github.com/gip-inclusion/les-emplois/pull/6733)
+
+### Tech
+
+- [Tech : Modification de `User.__str__`](https://github.com/gip-inclusion/les-emplois/pull/6259)
+
 ## 2025-08-18
 
 ### Ajouté
