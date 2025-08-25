@@ -253,8 +253,8 @@ class TestSelect2CitiesAutocomplete:
                 {"id": city_slug_to_pk["saint-jean-de-gonville-01"], "text": "Saint-Jean-de-Gonville (01)"},
                 {"id": city_slug_to_pk["acquin-westbecourt-62"], "text": "Acquin-Westbécourt (62)"},
                 {"id": city_slug_to_pk["bainville-sur-madon-54"], "text": "Bainville-sur-Madon (54)"},
+                {"id": city_slug_to_pk["dainville-62"], "text": "Dainville (62)"},
                 {"id": city_slug_to_pk["la-courneuve-93"], "text": "La Courneuve (93)"},
-                {"id": city_slug_to_pk["paris-10e-arrondissement-75"], "text": "Paris 10e Arrondissement (75)"},
             ]
         }
 

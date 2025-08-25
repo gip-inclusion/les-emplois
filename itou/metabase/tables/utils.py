@@ -1,7 +1,10 @@
+import difflib
 import functools
 import hashlib
+from collections import defaultdict
 from operator import attrgetter
 
+import unidecode
 from django.conf import settings
 from django.db.models import JSONField
 from django.db.models.fields import (
@@ -146,15 +149,15 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
 # structures_v0.code_commune nor organisations.code_commune
 # because one post_code can actually have *several* insee_codes (╯°□°)╯︵ ┻━┻
 @functools.cache
-def get_post_code_to_insee_code_map():
+def get_post_code_to_insee_cities_map():
     """
     Load once and for all this ~35k items dataset in memory.
     """
-    post_code_to_insee_code_map = {}
+    post_code_to_insee_cities_map = defaultdict(list)
     for city in City.objects.all():
         for post_code in city.post_codes:
-            post_code_to_insee_code_map[post_code] = city.code_insee
-    return post_code_to_insee_code_map
+            post_code_to_insee_cities_map[post_code].append(city)
+    return post_code_to_insee_cities_map
 
 
 # FIXME @dejafait drop this as soon as data analysts no longer use
@@ -163,7 +166,15 @@ def get_post_code_to_insee_code_map():
 def get_code_commune(obj: AddressMixin):
     if obj.insee_city:
         return obj.insee_city.code_insee
-    return get_post_code_to_insee_code_map().get(obj.post_code)
+    cities = get_post_code_to_insee_cities_map().get(obj.post_code)
+    if not cities:
+        return None
+    if len(cities) == 1:
+        return cities[0].code_insee
+
+    possibilities = {unidecode.unidecode(city.name).lower(): city for city in cities}
+    matches = difflib.get_close_matches(unidecode.unidecode(obj.city).lower(), possibilities, n=1, cutoff=0.0)
+    return possibilities[matches[0]].code_insee
 
 
 @functools.cache

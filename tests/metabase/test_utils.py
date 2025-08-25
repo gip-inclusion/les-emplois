@@ -1,6 +1,10 @@
+import pytest
+
 from itou.geo.utils import coords_to_geometry
-from itou.metabase.tables.utils import get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
+from itou.metabase.tables.utils import get_code_commune, get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
+from tests.cities.factories import create_test_cities
 from tests.geo.factories import QPVFactory, ZRRFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -34,3 +38,23 @@ def test_get_zrr_status_for_insee_code_not_in_zrr():
 def test_get_zrr_status_for_insee_code_partially_in_zrr():
     partially_in_zrr = ZRRFactory(partially_in_zrr=True)
     assert get_zrr_status_for_insee_code(partially_in_zrr.insee_code) == "Partiellement classée en ZRR"
+
+
+@pytest.mark.parametrize(
+    "post_code,city,expected_code_insee",
+    [
+        # Proper case
+        ("62000", "Arras", "62041"),
+        ("62000", "Dainville", "62263"),
+        # All uppercase
+        ("73000", "CHAMBERY", "73065"),
+        ("73000", "SONNAZ", "73288"),
+        # Districts
+        ("75001", "Paris 1er Arrondissement", "75101"),
+        ("75001", "PARIS", "75056"),
+    ],
+)
+def test_get_code_commune(post_code, city, expected_code_insee):
+    create_test_cities(selected_departments=[post_code[:2]])
+    organization = PrescriberOrganizationFactory.build(insee_city=None, post_code=post_code, city=city)
+    assert get_code_commune(organization) == expected_code_insee
