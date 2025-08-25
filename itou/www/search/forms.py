@@ -14,10 +14,10 @@ from itou.common_apps.address.departments import (
 from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
 from itou.jobs.models import ROME_DOMAINS
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
+from itou.www.search.models import DISTANCE_CHOICES
 
 
 class SiaeSearchForm(forms.Form):
-    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 25
 
     KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
@@ -124,7 +124,6 @@ class JobDescriptionSearchForm(SiaeSearchForm):
 
 
 class PrescriberSearchForm(forms.Form):
-    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 5
 
     distance = forms.ChoiceField(
