@@ -110,6 +110,9 @@
 # name: test_job_application_state_badge_processing[obsolete]
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-primary">Embauché ailleurs</span>'
 # ---
+# name: test_job_application_state_badge_processing[pool]
+  '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-01 text-white">Vivier</span>'
+# ---
 # name: test_job_application_state_badge_processing[postponed]
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-accent-03 text-primary">Candidature en attente</span>'
 # ---

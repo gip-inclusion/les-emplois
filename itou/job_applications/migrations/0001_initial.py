@@ -47,6 +47,7 @@ class Migration(migrations.Migration):
                                 "refused",
                                 "cancelled",
                                 "obsolete",
+                                "pool",
                             ],
                         ),
                     ),
