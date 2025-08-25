@@ -2277,6 +2277,93 @@
 # name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[transfer message]
   'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
+# name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  
+  Commentaire de l’employeur :
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_job_seeker_subject]
+  '[DEV] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+# ---
+# name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_body]
+  '''
+  Bonjour,
+  
+  La candidature de Jane DOE au sein de la structure EI Acme inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  
+  Commentaire de l’employeur :
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_subject]
+  '[DEV] Candidature de Jane DOE ajoutée au vivier par EI Acme inc.'
+# ---
+# name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  
+  Commentaire de l’employeur :
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_subject]
+  '[DEV] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+# ---
+# name: TestProcessViews.test_add_to_pool_from_prescriber[add_to_pool_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProcessViews.test_add_to_pool_from_prescriber[add_to_pool_email_to_job_seeker_subject]
+  '[DEV] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+# ---
+# name: TestProcessViews.test_add_to_pool_from_prescriber[add_to_pool_email_to_proxy_body]
+  '''
+  Bonjour,
+  
+  La candidature de Jane DOE au sein de la structure EI Acme inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestProcessViews.test_add_to_pool_from_prescriber[add_to_pool_email_to_proxy_subject]
+  '[DEV] Candidature de Jane DOE ajoutée au vivier par EI Acme inc.'
+# ---
 # name: TestProcessViews.test_details_for_company_from_approval[copy_public_id]
   '''
   <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">

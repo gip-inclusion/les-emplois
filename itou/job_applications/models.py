@@ -1147,6 +1147,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
 
     @xwf_models.transition()
+    def add_to_pool(self, *, user):
+        # Send notification.
+        self.notifications_add_to_pool_for_job_seeker.send()
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_add_to_pool_for_proxy.send()
+
+    @xwf_models.transition()
     def postpone(self, *, user):
         # Send notification.
         self.notifications_postpone_for_job_seeker.send()
@@ -1250,6 +1257,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def notifications_postpone_for_job_seeker(self):
         return job_application_notifications.JobApplicationPostponedForJobSeekerNotification(
+            self.job_seeker,
+            job_application=self,
+        )
+
+    @property
+    def notifications_add_to_pool_for_proxy(self):
+        return job_application_notifications.JobApplicationAddedToPoolForProxyNotification(
+            self.sender,
+            self.sender_prescriber_organization or self.sender_company,
+            job_application=self,
+        )
+
+    @property
+    def notifications_add_to_pool_for_job_seeker(self):
+        return job_application_notifications.JobApplicationAddedToPoolForJobSeekerNotification(
             self.job_seeker,
             job_application=self,
         )

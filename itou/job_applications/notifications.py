@@ -40,6 +40,26 @@ class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotifi
 
 
 @notifications_registry.register
+class JobApplicationAddedToPoolForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when added to pool"""
+
+    name = "Ajout de candidature au vivier"
+    category = NotificationCategory.JOB_APPLICATION
+    subject_template = "apply/email/add_to_pool_for_job_seeker_subject.txt"
+    body_template = "apply/email/add_to_pool_for_job_seeker_body.txt"
+
+
+@notifications_registry.register
+class JobApplicationAddedToPoolForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when added to pool"""
+
+    name = "Ajout au vivier d’une candidature envoyée"
+    category = NotificationCategory.JOB_APPLICATION
+    subject_template = "apply/email/add_to_pool_for_proxy_subject.txt"
+    body_template = "apply/email/add_to_pool_for_proxy_body.txt"
+
+
+@notifications_registry.register
 class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when postponed"""
 
