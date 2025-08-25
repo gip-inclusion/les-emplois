@@ -24,13 +24,14 @@ from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ArchivedChoices,
+    BatchAddToPoolForm,
     BatchPostponeForm,
     CompanyFilterJobApplicationsForm,
     FilterJobApplicationsForm,
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
 )
-from itou.www.apply.views.process_views import _get_geiq_eligibility_diagnosis
+from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER, _get_geiq_eligibility_diagnosis
 from itou.www.stats.utils import can_view_stats_ft
 
 
@@ -429,6 +430,7 @@ def list_for_siae_actions(request):
         return response
     can_archive = any(job_application.can_be_archived for job_application in selected_job_applications)
     can_unarchive = any(job_application.archived_at is not None for job_application in selected_job_applications)
+    can_add_to_pool = all(job_application.add_to_pool.is_available() for job_application in selected_job_applications)
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)
     can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
@@ -446,26 +448,37 @@ def list_for_siae_actions(request):
         selected_job_applications[0].geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(
             selected_job_applications[0], only_prescriber=False
         )
+    job_seeker_nb = len(set(job_application.job_seeker_id for job_application in selected_job_applications))
+    prescriber_nb = len(
+        set(
+            job_application.sender_id
+            for job_application in selected_job_applications
+            if job_application.is_sent_by_proxy and job_application.sender_company_id != job_application.to_company_id
+        )
+    )
     context = {
         "display_batch_actions": bool(selected_job_applications),
         "selected_nb": len(selected_job_applications),
         "selected_application_ids": [job_app.pk for job_app in selected_job_applications],
+        "job_seeker_nb": job_seeker_nb,
         "can_accept": can_accept,
         "cannot_accept_reason": cannot_accept_reason,
         "can_archive": can_archive,
         "can_unarchive": can_unarchive,
+        "can_add_to_pool": can_add_to_pool,
         "can_process": can_process,
         "can_postpone": can_postpone,
         "can_refuse": can_refuse,
         "can_transfer": can_transfer,
         "enable_transfer": enable_transfer,
-        "other_actions_count": sum([can_process, can_postpone, can_archive, can_transfer]),
+        "other_actions_count": sum([can_add_to_pool, can_process, can_postpone, can_archive, can_transfer]),
+        "add_to_pool_form": BatchAddToPoolForm(
+            job_seeker_nb=job_seeker_nb,
+            prescriber_nb=prescriber_nb,
+            initial={"answer": DEFAULT_ADD_TO_POOL_ANSWER},
+        ),
         "transfer_form": JobApplicationInternalTransferForm(request, job_app_count=selected_nb),
-        "postpone_form": BatchPostponeForm(
-            job_seeker_nb=len(set(job_application.job_seeker_id for job_application in selected_job_applications))
-        )
-        if can_postpone
-        else None,
+        "postpone_form": BatchPostponeForm(job_seeker_nb=job_seeker_nb) if can_postpone else None,
         "list_url": get_safe_url(request, "list_url", fallback_url=reverse("apply:list_for_siae")),
         "acceptable_job_application": selected_job_applications[0] if can_accept else None,
     }

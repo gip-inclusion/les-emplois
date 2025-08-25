@@ -6608,6 +6608,123 @@
   
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_add_to_pool[active add to pool button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-target="#add_to_pool_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-add-to-pool-applications-open-modal" type="button">
+      <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+      </i>
+      <span>
+          Ajouter au vivier
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_add_to_pool[inactive add to pool button]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature », « À l’étude », « En attente », « Embauché ailleurs » et « Embauche annulée » peuvent être ajoutées au vivier." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+      </i>
+      <span>
+          Ajouter au vivier
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_add_to_pool[modal with 1 addable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="add_to_pool_modal_title" class="modal" id="add_to_pool_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="add_to_pool_modal_title">
+                      Ajouter 1 candidature au vivier
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <form action="/apply/company/batch/add-to-pool?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-body">
+                      <p>
+                          En ajoutant cette candidature au vivier, elle ne sera pas automatiquement refusée après deux mois.
+                                          Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer le candidat de l’avancement de sa candidature.
+                      </p>
+                      <div class="form-group">
+                          <label class="form-label" for="id_answer">
+                              Commentaire envoyé au candidat
+                          </label>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" rows="10">Votre candidature a retenu toute notre attention. Malheureusement, nous n’avons plus de poste disponible pour le moment. Toutefois, nous l’avons conservée dans notre base de candidatures. Ainsi, si une opportunité se présente, elle pourra être réexaminée et, le cas échéant, retenue.
+  Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapidement une opportunité qui vous correspond.</textarea>
+                          <div class="form-text" id="id_answer_helptext">
+                              Une copie sera envoyée au prescripteur/orienteur.
+                          </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-add_to_pool-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_add_to_pool[modal with 2 addable applications]
+  '''
+  <div aria-hidden="true" aria-labelledby="add_to_pool_modal_title" class="modal" id="add_to_pool_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title" id="add_to_pool_modal_title">
+                      Ajouter 2 candidatures au vivier
+                  </h2>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <form action="/apply/company/batch/add-to-pool?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+                  <div class="modal-body">
+                      <p>
+                          En ajoutant ces candidatures au vivier, elles ne seront pas automatiquement refusées après deux mois.
+                                          Toutefois, nous vous invitons à les traiter dans un délai raisonnable afin d’informer les candidats de l’avancement de leurs candidatures.
+                      </p>
+                      <div class="form-group">
+                          <label class="form-label" for="id_answer">
+                              Commentaire envoyé aux 2 candidats
+                          </label>
+                          <textarea aria-describedby="id_answer_helptext" class="form-control" cols="40" id="id_answer" name="answer" rows="10">Votre candidature a retenu toute notre attention. Malheureusement, nous n’avons plus de poste disponible pour le moment. Toutefois, nous l’avons conservée dans notre base de candidatures. Ainsi, si une opportunité se présente, elle pourra être réexaminée et, le cas échéant, retenue.
+  Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapidement une opportunité qui vous correspond.</textarea>
+                          <div class="form-text" id="id_answer_helptext">
+                              Une copie sera envoyée aux prescripteurs/orienteurs.
+                          </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+                      <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-add_to_pool-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_list_for_siae_select_applications_batch_archive[active archive button]
   '''
   <button class="btn justify-content-start dropdown-item" data-bs-target="#archive_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-archive-applications-open-modal" type="button">

@@ -989,6 +989,29 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
         self.fields["choice"].widget.attrs.update({"hx-trigger": "change", "hx-post": hx_post_url})
 
 
+class BatchAddToPoolForm(forms.Form):
+    answer = forms.CharField(
+        label="Commentaire envoyé aux candidats",
+        widget=forms.Textarea(),
+        help_text="Une copie sera envoyée aux prescripteurs/orienteurs.",
+        required=False,
+        strip=True,
+    )
+
+    def __init__(self, *args, job_seeker_nb=None, prescriber_nb=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if job_seeker_nb is not None:
+            self.fields["answer"].label = (
+                f"Commentaire envoyé aux {job_seeker_nb} candidats"
+                if job_seeker_nb > 1
+                else "Commentaire envoyé au candidat"
+            )
+        if prescriber_nb == 0:
+            self.fields["answer"].help_text = ""
+        elif prescriber_nb == 1:
+            self.fields["answer"].help_text = "Une copie sera envoyée au prescripteur/orienteur."
+
+
 class BatchPostponeForm(AnswerForm):
     def __init__(self, *args, job_seeker_nb, **kwargs):
         super().__init__(*args, **kwargs)
