@@ -7,7 +7,7 @@ from django.contrib.gis.geos import GEOSGeometry, Point
 from itou.cities.models import City
 
 
-def create_test_cities(selected_departments, num_per_department=None):
+def create_test_cities(selected_departments, *, num_per_department=None):
     department_map = {dpt: [] for dpt in selected_departments}
     current_dir = pathlib.Path(__file__).parent.resolve()
     with open(current_dir / "sample-cities.csv", encoding="utf-8") as f:
@@ -15,7 +15,7 @@ def create_test_cities(selected_departments, num_per_department=None):
             current_dpt = line["department"]
             if current_dpt not in selected_departments:
                 continue
-            if len(department_map[current_dpt]) >= num_per_department:
+            if num_per_department is not None and len(department_map[current_dpt]) >= num_per_department:
                 continue
             line["post_codes"] = json.loads(line["post_codes"].replace("'", '"'))
             line["coords"] = GEOSGeometry(f"{line['coords']}")

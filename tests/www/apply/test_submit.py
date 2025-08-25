@@ -1660,8 +1660,7 @@ class TestApplyAsAuthorizedPrescriber:
 class TestApplyAsPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
-        cities = create_test_cities(["67"], num_per_department=10)
-        self.city = cities[0]
+        [self.city] = create_test_cities(["67"], num_per_department=1)
         settings.API_BAN_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
