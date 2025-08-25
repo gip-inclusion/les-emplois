@@ -1383,7 +1383,7 @@ class TestProcessViews:
         # Trying to access step 2 without providing data for step 1 redirects to step 1
         assertRedirects(response, refusal_reason_url)
 
-    def test_add_to_pool_from_prescriber(self, client):
+    def test_add_to_pool_from_prescriber(self, client, snapshot, mailoutbox):
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_ADDED_TO_POOL_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
@@ -1410,7 +1410,15 @@ class TestProcessViews:
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_pool
 
-    def test_add_to_pool_from_job_seeker(self, client):
+        [mail_to_job_seeker, mail_to_prescriber] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="add_to_pool_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="add_to_pool_email_to_job_seeker_body")
+        assert mail_to_prescriber.to == [job_application.sender.email]
+        assert mail_to_prescriber.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
+        assert mail_to_prescriber.body == snapshot(name="add_to_pool_email_to_proxy_body")
+
+    def test_add_to_pool_from_job_seeker(self, client, snapshot, mailoutbox):
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_ADDED_TO_POOL_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
@@ -1438,7 +1446,12 @@ class TestProcessViews:
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_pool
 
-    def test_add_to_pool_from_employer_orienter(self, client):
+        [mail_to_job_seeker] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="add_to_pool_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="add_to_pool_email_to_job_seeker_body")
+
+    def test_add_to_pool_from_employer_orienter(self, client, snapshot, mailoutbox):
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_ADDED_TO_POOL_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
@@ -1464,6 +1477,14 @@ class TestProcessViews:
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_pool
+
+        [mail_to_job_seeker, mail_to_other_employer] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="add_to_pool_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="add_to_pool_email_to_job_seeker_body")
+        assert mail_to_other_employer.to == [job_application.sender.email]
+        assert mail_to_other_employer.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
+        assert mail_to_other_employer.body == snapshot(name="add_to_pool_email_to_proxy_body")
 
     def test_postpone_from_prescriber(self, client, snapshot, mailoutbox, subtests):
         """Ensure that the `postpone` transition is triggered."""

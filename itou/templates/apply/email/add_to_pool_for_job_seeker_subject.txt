@@ -1,0 +1,1 @@
+Votre candidature a été ajoutée au vivier de l’entreprise {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }}
