@@ -76,5 +76,421 @@
     },
     "model": "eligibility.eligibilitydiagnosis",
     "pk": 23
+  },
+  {
+    "fields": {
+      "author": 6,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 3850,
+      "created_at": "2025-06-11T13:25:33.675Z",
+      "expires_at": "2025-09-11",
+      "job_seeker": 93
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T12:07:37.097Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 2
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T12:43:54.006Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 95
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-24T12:53:00.377Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 96
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-24T12:59:38.880Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 97
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-24T13:06:49.326Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 98
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T13:25:17.185Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 99
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "author": 4,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 2653,
+      "created_at": "2025-07-24T13:45:31.861Z",
+      "expires_at": "2025-10-24",
+      "job_seeker": 8
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T13:50:54.572Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 100
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T13:55:24.924Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 101
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T13:59:11.247Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 102
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T14:01:39.116Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 103
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 35
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T14:05:52.483Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 104
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 36
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-24T14:09:27.743Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 105
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 37
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-24T14:28:07.559Z",
+      "expires_at": "2026-01-24",
+      "job_seeker": 108
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 38
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-28T08:56:06.043Z",
+      "expires_at": "2026-01-28",
+      "job_seeker": 113
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 39
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-28T08:58:49.013Z",
+      "expires_at": "2026-01-28",
+      "job_seeker": 114
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 40
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-28T09:01:33.517Z",
+      "expires_at": "2026-01-28",
+      "job_seeker": 115
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 41
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-28T09:04:40.053Z",
+      "expires_at": "2025-07-28",
+      "job_seeker": 116
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 42
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-28T09:04:57.848Z",
+      "expires_at": "2026-01-28",
+      "job_seeker": 116
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 43
+  },
+  {
+    "fields": {
+      "author": 6,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 3852,
+      "created_at": "2025-07-28T09:10:08.804Z",
+      "expires_at": "2025-10-28",
+      "job_seeker": 111
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 44
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1003,
+      "author_siae": null,
+      "created_at": "2025-07-28T09:37:12.049Z",
+      "expires_at": "2026-01-28",
+      "job_seeker": 117
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 45
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T07:08:32.067Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 118
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 46
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T07:14:20.558Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 119
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 47
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T07:21:23.602Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 120
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 48
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T07:37:25.876Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 121
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 49
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T08:11:02.550Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 122
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 50
+  },
+  {
+    "fields": {
+      "author": 6,
+      "author_kind": "employer",
+      "author_prescriber_organization": null,
+      "author_siae": 3850,
+      "created_at": "2025-07-31T08:49:12.619Z",
+      "expires_at": "2025-10-31",
+      "job_seeker": 123
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 51
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 115,
+      "author_siae": null,
+      "created_at": "2025-07-31T09:05:54.833Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 71
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 52
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1004,
+      "author_siae": null,
+      "created_at": "2025-07-31T13:28:49.526Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 124
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 53
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1004,
+      "author_siae": null,
+      "created_at": "2025-07-31T13:33:30.454Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 125
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 54
+  },
+  {
+    "fields": {
+      "author": 3,
+      "author_kind": "prescriber",
+      "author_prescriber_organization": 1004,
+      "author_siae": null,
+      "created_at": "2025-07-31T13:45:50.024Z",
+      "expires_at": "2026-01-31",
+      "job_seeker": 126
+    },
+    "model": "eligibility.eligibilitydiagnosis",
+    "pk": 55
   }
 ]
