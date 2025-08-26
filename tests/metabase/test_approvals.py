@@ -3,7 +3,7 @@ from tests.approvals.factories import ApprovalFactory
 
 
 def test_hashed_approval_number(settings):
-    settings.METABASE_HASH_SALT = "foobar2000"
+    settings.PILOTAGE_DATA_HASH_SALT = "foobar2000"
 
     approval = ApprovalFactory(number="XXXXX2012369")
 

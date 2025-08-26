@@ -330,7 +330,7 @@ def get_qpv_job_seeker_pks():
 
 
 def hash_content(content):
-    return hashlib.sha256(f"{content}{settings.METABASE_HASH_SALT}".encode()).hexdigest()
+    return hashlib.sha256(f"{content}{settings.PILOTAGE_DATA_HASH_SALT}".encode()).hexdigest()
 
 
 def get_common_prolongation_columns(model):
