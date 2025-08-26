@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get_model_field
 
@@ -13,7 +15,7 @@ GroupsTable.add_columns(
             "name": "department",
             "type": "text",
             "comment": "Département du bénéficiaire",
-            "fn": lambda o: o.beneficiary_department,
+            "fn": attrgetter("beneficiary_department"),
         },
     ]
 )

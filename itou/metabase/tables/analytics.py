@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.analytics.models import DatumCode
 from itou.metabase.tables.utils import MetabaseTable
 
@@ -13,19 +15,19 @@ AnalyticsTable.add_columns(
             "name": "type",
             "type": "varchar",
             "comment": "Type de mesure",
-            "fn": lambda o: o.code,
+            "fn": attrgetter("code"),
         },
         {
             "name": "date",
             "type": "varchar",
             "comment": "Date associée à la mesure",
-            "fn": lambda o: o.bucket,
+            "fn": attrgetter("bucket"),
         },
         {
             "name": "value",
             "type": "integer",
             "comment": "Valeur de la mesure",
-            "fn": lambda o: o.value,
+            "fn": attrgetter("value"),
         },
         {"name": "type_detail", "type": "varchar", "comment": "Type détaillé", "fn": lambda o: DATUM_CHOICES[o.code]},
     ]
@@ -34,11 +36,11 @@ AnalyticsTable.add_columns(
 DashboardVisitTable = MetabaseTable(name="c1_private_dashboard_visits_v0")
 DashboardVisitTable.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID du point de mesure", "fn": lambda o: o.pk},
+        {"name": "id", "type": "integer", "comment": "ID du point de mesure", "fn": attrgetter("pk")},
         {
             "name": "measured_at",
             "type": "timestamp with time zone",  # which is UTC
-            "fn": lambda o: o.measured_at,
+            "fn": attrgetter("measured_at"),
             "comment": "Date associée à la mesure",
         },
         {
@@ -51,43 +53,43 @@ DashboardVisitTable.add_columns(
             "name": "department",
             "type": "varchar",
             "comment": "Département",
-            "fn": lambda o: o.department,
+            "fn": attrgetter("department"),
         },
         {
             "name": "region",
             "type": "varchar",
             "comment": "Région",
-            "fn": lambda o: o.region,
+            "fn": attrgetter("region"),
         },
         {
             "name": "current_company_id",
             "type": "integer",
             "comment": "ID entreprise courante",
-            "fn": lambda o: o.current_company_id,
+            "fn": attrgetter("current_company_id"),
         },
         {
             "name": "current_prescriber_organization_id",
             "type": "integer",
             "comment": "ID organisation prescriptrice courante",
-            "fn": lambda o: o.current_prescriber_organization_id,
+            "fn": attrgetter("current_prescriber_organization_id"),
         },
         {
             "name": "current_institution_id",
             "type": "integer",
             "comment": "ID institution courante",
-            "fn": lambda o: o.current_institution_id,
+            "fn": attrgetter("current_institution_id"),
         },
         {
             "name": "user_kind",
             "type": "varchar",
             "comment": "Type utilisateur",
-            "fn": lambda o: o.user_kind,
+            "fn": attrgetter("user_kind"),
         },
         {
             "name": "user_id",
             "type": "integer",
             "comment": "ID utilisateur",
-            "fn": lambda o: o.user_id,
+            "fn": attrgetter("user_id"),
         },
     ]
 )

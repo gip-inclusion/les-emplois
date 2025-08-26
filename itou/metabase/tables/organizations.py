@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
@@ -68,14 +70,14 @@ def get_org_last_job_application_creation_date(org):
 TABLE = MetabaseTable(name="organisations_v0")
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
-        {"name": "siret", "type": "varchar", "comment": "SIRET organisation", "fn": lambda o: o.siret},
-        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": lambda o: o.display_name},
+        {"name": "id", "type": "integer", "comment": "ID organisation", "fn": attrgetter("id")},
+        {"name": "siret", "type": "varchar", "comment": "SIRET organisation", "fn": attrgetter("siret")},
+        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": attrgetter("display_name")},
         {
             "name": "type",
             "type": "varchar",
             "comment": "Type organisation (abrégé)",
-            "fn": lambda o: o.kind,
+            "fn": attrgetter("kind"),
         },
         {
             "name": "type_complet",
@@ -87,7 +89,7 @@ TABLE.add_columns(
             "name": "habilitée",
             "type": "boolean",
             "comment": "Organisation habilitée",
-            "fn": lambda o: o.is_authorized,
+            "fn": attrgetter("is_authorized"),
         },
     ]
 )
@@ -106,7 +108,7 @@ TABLE.add_columns(
             "name": "code_safir",
             "type": "varchar",
             "comment": "Code SAFIR Pôle emploi",
-            "fn": lambda o: o.code_safir_pole_emploi,
+            "fn": attrgetter("code_safir_pole_emploi"),
         },
         {
             "name": "total_membres",
@@ -145,7 +147,7 @@ TABLE.add_columns(
             "name": "brsa",
             "type": "boolean",
             "comment": "Organisation conventionnée pour le suivi des BRSA",
-            "fn": lambda o: o.is_brsa,
+            "fn": attrgetter("is_brsa"),
         },
     ]
 )

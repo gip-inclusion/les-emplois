@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get_model_field
 from itou.siae_evaluations.models import EvaluatedSiae
 
@@ -12,7 +14,7 @@ TABLE.add_columns(
             "name": "état",
             "type": "varchar",
             "comment": "Etat du contrôle de la structure",
-            "fn": lambda o: o.state,
+            "fn": attrgetter("state"),
         },
         get_column_from_field(get_model_field(EvaluatedSiae, "reviewed_at"), name="date_contrôle"),
         get_column_from_field(get_model_field(EvaluatedSiae, "final_reviewed_at"), name="date_définitive_contrôle"),

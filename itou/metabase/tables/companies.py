@@ -15,14 +15,14 @@ from itou.metabase.tables.utils import (
 TABLE = MetabaseTable(name="structures_v0")
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID de la structure", "fn": lambda o: o.id},
+        {"name": "id", "type": "integer", "comment": "ID de la structure", "fn": attrgetter("id")},
         {
             "name": "id_asp",
             "type": "integer",
             "comment": "ID de la structure ASP correspondante",
             "fn": lambda o: o.convention.asp_id if o.convention else None,
         },
-        {"name": "nom", "type": "varchar", "comment": "Nom de la structure", "fn": lambda o: o.display_name},
+        {"name": "nom", "type": "varchar", "comment": "Nom de la structure", "fn": attrgetter("display_name")},
         {
             "name": "nom_complet",
             "type": "varchar",
@@ -33,15 +33,15 @@ TABLE.add_columns(
             "name": "description",
             "type": "varchar",
             "comment": "Description de la structure",
-            "fn": lambda o: o.description,
+            "fn": attrgetter("description"),
         },
         {
             "name": "type",
             "type": "varchar",
             "comment": "Type de structure (EI, ETTI, ACI, GEIQ etc..)",
-            "fn": lambda o: o.kind,
+            "fn": attrgetter("kind"),
         },
-        {"name": "siret", "type": "varchar", "comment": "SIRET de la structure", "fn": lambda o: o.siret},
+        {"name": "siret", "type": "varchar", "comment": "SIRET de la structure", "fn": attrgetter("siret")},
         {
             "name": "source",
             "type": "varchar",
@@ -55,7 +55,7 @@ TABLE.add_columns(
             "name": "convergence_france",
             "type": "boolean",
             "comment": "Convergence France (contrats PHC et CVG)",
-            "fn": lambda o: o.is_aci_convergence,
+            "fn": attrgetter("is_aci_convergence"),
         },
     ]
 )
@@ -83,19 +83,19 @@ TABLE.add_columns(
             "name": "total_candidatures",
             "type": "integer",
             "comment": "Nombre de candidatures dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures,
+            "fn": attrgetter("total_candidatures"),
         },
         {
             "name": "total_candidatures_30j",
             "type": "integer",
             "comment": "Nombre de candidatures dans les 30 jours glissants dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures_30j,
+            "fn": attrgetter("total_candidatures_30j"),
         },
         {
             "name": "total_embauches",
             "type": "integer",
             "comment": "Nombre de candidatures en état accepté dont la structure est destinataire",
-            "fn": lambda o: o.total_embauches,
+            "fn": attrgetter("total_embauches"),
         },
         {
             "name": "total_embauches_30j",
@@ -103,7 +103,7 @@ TABLE.add_columns(
             "comment": (
                 "Nombre de candidatures en état accepté dans les 30 jours glissants dont la structure est destinataire"
             ),
-            "fn": lambda o: o.total_embauches_30j,
+            "fn": attrgetter("total_embauches_30j"),
         },
         {
             "name": "taux_conversion_30j",
@@ -120,31 +120,31 @@ TABLE.add_columns(
             "name": "total_auto_prescriptions",
             "type": "integer",
             "comment": "Nombre de candidatures de source employeur dont la structure est destinataire",
-            "fn": lambda o: o.total_auto_prescriptions,
+            "fn": attrgetter("total_auto_prescriptions"),
         },
         {
             "name": "total_candidatures_autonomes",
             "type": "integer",
             "comment": "Nombre de candidatures de source candidat dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures_autonomes,
+            "fn": attrgetter("total_candidatures_autonomes"),
         },
         {
             "name": "total_candidatures_via_prescripteur",
             "type": "integer",
             "comment": "Nombre de candidatures de source prescripteur dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures_prescripteur,
+            "fn": attrgetter("total_candidatures_prescripteur"),
         },
         {
             "name": "total_candidatures_non_traitées",
             "type": "integer",
             "comment": "Nombre de candidatures en état nouveau dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures_non_traitees,
+            "fn": attrgetter("total_candidatures_non_traitees"),
         },
         {
             "name": "total_candidatures_en_étude",
             "type": "integer",
             "comment": "Nombre de candidatures en état étude dont la structure est destinataire",
-            "fn": lambda o: o.total_candidatures_en_cours,
+            "fn": attrgetter("total_candidatures_en_cours"),
         },
     ]
 )
@@ -158,7 +158,7 @@ TABLE.add_columns(
             "name": "date_dernière_évolution_candidature",
             "type": "date",
             "comment": "Date de dernière évolution candidature sauf passage obsolète",
-            "fn": lambda o: o.last_job_application_transition_date,
+            "fn": attrgetter("last_job_application_transition_date"),
         },
         {
             "name": "total_fiches_de_poste_actives",

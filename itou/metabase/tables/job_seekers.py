@@ -1,5 +1,6 @@
 from datetime import timedelta
 from functools import partial
+from operator import attrgetter
 
 from django.utils import timezone
 
@@ -177,7 +178,7 @@ def get_table():
                 "name": "id",
                 "type": "integer",
                 "comment": "ID C1 du candidat",
-                "fn": lambda o: o.pk,
+                "fn": attrgetter("pk"),
             },
             {
                 "name": "hash_nir",
@@ -208,7 +209,7 @@ def get_table():
                 "name": "date_inscription",
                 "type": "date",
                 "comment": "Date inscription du candidat",
-                "fn": lambda o: o.date_joined,
+                "fn": attrgetter("date_joined"),
             },
             {
                 "name": "type_inscription",
@@ -232,13 +233,13 @@ def get_table():
                 "name": "date_dernière_connexion",
                 "type": "date",
                 "comment": "Date de dernière connexion au service du candidat",
-                "fn": lambda o: o.last_login,
+                "fn": attrgetter("last_login"),
             },
             {
                 "name": "date_premiere_connexion",
                 "type": "date",
                 "comment": "Date de première connexion",
-                "fn": lambda o: o.first_login,
+                "fn": attrgetter("first_login"),
             },
             {
                 "name": "actif",
@@ -265,20 +266,20 @@ def get_table():
                 "name": "total_candidatures",
                 "type": "integer",
                 "comment": "Nombre de candidatures",
-                "fn": lambda o: o.job_applications_count,
+                "fn": attrgetter("job_applications_count"),
             },
             {
                 "name": "total_embauches",
                 "type": "integer",
                 "comment": "Nombre de candidatures de type accepté",
                 # We have to do all this in python to benefit from prefetch_related.
-                "fn": lambda o: o.accepted_job_applications_count,
+                "fn": attrgetter("accepted_job_applications_count"),
             },
             {
                 "name": "total_diagnostics",
                 "type": "integer",
                 "comment": "Nombre de diagnostics",
-                "fn": lambda o: o.eligibility_diagnoses_count,
+                "fn": attrgetter("eligibility_diagnoses_count"),
             },
             {
                 "name": "date_diagnostic",
@@ -344,7 +345,7 @@ def get_table():
                 "name": "type_structure_dernière_embauche",
                 "type": "varchar",
                 "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-                "fn": lambda o: o.last_hiring_company_kind,
+                "fn": attrgetter("last_hiring_company_kind"),
             },
             {
                 "name": "total_critères_niveau_1",
