@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
@@ -7,6 +5,8 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
     get_choice,
+    get_establishment_is_active_column,
+    get_establishment_last_login_date_column,
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -135,26 +135,8 @@ TABLE.add_columns(
     ]
 )
 
-TABLE.add_columns(
-    [
-        {
-            "name": "date_dernière_connexion",
-            "type": "date",
-            "comment": "Date de dernière connexion utilisateur",
-            "fn": lambda o: getattr(o, "last_login_date", None),
-        },
-        {
-            "name": "active",
-            "type": "boolean",
-            "comment": "Dernière connexion dans les 7 jours",
-            "fn": lambda o: bool(
-                getattr(o, "last_login_date", None) > timezone.now() - timezone.timedelta(days=7)
-                if getattr(o, "last_login_date", None)
-                else None
-            ),
-        },
-    ]
-)
+TABLE.add_columns(get_establishment_last_login_date_column())
+TABLE.add_columns(get_establishment_is_active_column())
 
 
 TABLE.add_columns(
