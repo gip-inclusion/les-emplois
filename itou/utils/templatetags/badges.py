@@ -1,4 +1,5 @@
 from django import template
+from django.template.loader import get_template
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import ApprovalStatus
@@ -112,3 +113,15 @@ def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=Fals
             <i class="ri-error-warning-line" aria-hidden="true"></i>
             Éligibilité GEIQ non confirmée
         </span>""")
+
+
+@register.simple_tag
+def certified_badge(selected_criterion):
+    if not selected_criterion.administrative_criteria.is_certifiable:
+        return ""
+
+    if selected_criterion.certified:
+        template = "eligibility/includes/badge_certified.html"
+    else:
+        template = "eligibility/includes/badge_not_certified.html"
+    return get_template(template).render({"extra_classes": "ms-3"})
