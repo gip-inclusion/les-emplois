@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from cryptography.fernet import Fernet
 from django.contrib.gis.geos import Point
 from django.core import management
 from django.db import connection, transaction
@@ -133,7 +134,9 @@ def test_populate_analytics(snapshot):
 # return datetime.date objects that are not equal...
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_job_seekers(snapshot):
+def test_populate_job_seekers(snapshot, settings):
+    settings.PILOTAGE_DATA_SECRET_KEY = Fernet.generate_key().decode()
+
     QPVFactory(code="QP075019")
 
     # Importing this file makes a query so we need to do it inside a test
@@ -236,10 +239,16 @@ def test_populate_job_seekers(snapshot):
         cursor.execute("SELECT * FROM candidats_v0 ORDER BY id")
         rows = dictfetchall(cursor)
 
+    # Fernet encryption is non-determinist so we decrypt the data here and compare it below
+    for row in rows:
+        row["_nir_chiffré"] = Fernet(settings.PILOTAGE_DATA_SECRET_KEY).decrypt(row["nir_chiffré"].encode()).decode()
+        del row["nir_chiffré"]
+
     assert rows == [
         {
             "id": user_1.pk,
             "hash_nir": "28e41a0abf44151d54b9006aa6308d71d15284f7cc83a200b8fc6a9ffdf58352",
+            "_nir_chiffré": user_1.jobseeker_profile.nir,
             "sexe_selon_nir": "Homme",
             "annee_naissance_selon_nir": 79,
             "mois_naissance_selon_nir": 3,
@@ -303,6 +312,7 @@ def test_populate_job_seekers(snapshot):
         {
             "id": user_2.pk,
             "hash_nir": "d4d74522c83e8371e4ccafa994a70bb802b59d8e143177cf048e71c9b9d2e34a",
+            "_nir_chiffré": user_2.jobseeker_profile.nir,
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 71,
             "mois_naissance_selon_nir": 4,
@@ -366,6 +376,7 @@ def test_populate_job_seekers(snapshot):
         {
             "id": user_3.pk,
             "hash_nir": "2eb53772722d3026b539173c62ba7adc1756e5ab1f03b95ce4026c27d177bd34",
+            "_nir_chiffré": user_3.jobseeker_profile.nir,
             "sexe_selon_nir": "Femme",
             "annee_naissance_selon_nir": 97,
             "mois_naissance_selon_nir": 1,

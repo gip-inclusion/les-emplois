@@ -9,6 +9,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
     MetabaseTable,
+    encrypt_content,
     get_ai_stock_job_seeker_pks,
     get_choice,
     get_column_from_field,
@@ -183,6 +184,12 @@ def get_table():
                 "type": "varchar",
                 "comment": "Version obfusquée du NIR",
                 "fn": lambda o: hash_content(o.jobseeker_profile.nir) if o.jobseeker_profile.nir else None,
+            },
+            {
+                "name": "nir_chiffré",
+                "type": "text",
+                "comment": "Version chiffrée du NIR",
+                "fn": lambda o: encrypt_content(o.jobseeker_profile.nir) if o.jobseeker_profile.nir else None,
             },
             {
                 "name": "sexe_selon_nir",

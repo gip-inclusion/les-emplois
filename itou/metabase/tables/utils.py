@@ -5,6 +5,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 import unidecode
+from cryptography.fernet import Fernet
 from django.conf import settings
 from django.db.models import JSONField
 from django.db.models.fields import (
@@ -281,6 +282,10 @@ def get_qpv_job_seeker_pks():
 
 def hash_content(content):
     return hashlib.sha256(f"{content}{settings.PILOTAGE_DATA_HASH_SALT}".encode()).hexdigest()
+
+
+def encrypt_content(content):
+    return Fernet(settings.PILOTAGE_DATA_SECRET_KEY).encrypt(str(content).encode()).decode()
 
 
 def get_common_prolongation_columns(model):
