@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.metabase.tables.utils import MetabaseTable
 
 
@@ -8,13 +10,13 @@ TABLE.add_columns(
             "name": "id_fiche_de_poste",
             "type": "integer",
             "comment": "ID fiche de poste",
-            "fn": lambda o: o.jobdescription_id,
+            "fn": attrgetter("jobdescription_id"),
         },
         {
             "name": "id_candidature",
             "type": "uuid",
             "comment": "ID de la candidature",
-            "fn": lambda o: o.jobapplication_id,
+            "fn": attrgetter("jobapplication_id"),
         },
     ]
 )

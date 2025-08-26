@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -75,7 +77,7 @@ TABLE.add_columns(
             "name": "id",
             "type": "uuid",
             "comment": "ID C1 de la candidature",
-            "fn": lambda o: o.pk,
+            "fn": attrgetter("pk"),
         },
         {
             "name": "candidature_archivee",
@@ -93,19 +95,19 @@ TABLE.add_columns(
             "name": "date_candidature",
             "type": "date",
             "comment": "Date de la candidature",
-            "fn": lambda o: o.created_at,
+            "fn": attrgetter("created_at"),
         },
         {
             "name": "date_début_contrat",
             "type": "date",
             "comment": "Date de début du contrat",
-            "fn": lambda o: o.hiring_start_at,
+            "fn": attrgetter("hiring_start_at"),
         },
         {
             "name": "date_traitement",
             "type": "date",
             "comment": "Date de dernier traitement de la candidature",
-            "fn": lambda o: o.processed_at,
+            "fn": attrgetter("processed_at"),
         },
         {
             "name": "état",
@@ -132,7 +134,7 @@ TABLE.add_columns(
             "name": "origine_id_structure",
             "type": "integer",
             "comment": "ID de la structure d'origine de la candidature",
-            "fn": lambda o: o.sender_company_id,
+            "fn": attrgetter("sender_company_id"),
         },
         {
             "name": "parcours_de_création",
@@ -141,7 +143,7 @@ TABLE.add_columns(
                 "Parcours de création de la candidature "
                 "(Normale, reprise de stock AI, import agrément PE, action support...)"
             ),
-            "fn": lambda o: o.origin,
+            "fn": attrgetter("origin"),
         },
         {
             "name": "délai_prise_en_compte",
@@ -149,7 +151,7 @@ TABLE.add_columns(
             "comment": (
                 "Temps écoulé rétroactivement de état nouveau à état étude si la candidature est passée par ces états"
             ),
-            "fn": lambda o: o.time_spent_from_new_to_processing,
+            "fn": attrgetter("time_spent_from_new_to_processing"),
         },
         {
             "name": "délai_de_réponse",
@@ -158,7 +160,7 @@ TABLE.add_columns(
                 "Temps écoulé rétroactivement de état nouveau à état accepté"
                 " ou refusé si la candidature est passée par ces états"
             ),
-            "fn": lambda o: o.time_spent_from_new_to_accepted_or_refused,
+            "fn": attrgetter("time_spent_from_new_to_accepted_or_refused"),
         },
         {
             "name": "motif_de_refus",
@@ -170,25 +172,25 @@ TABLE.add_columns(
             "name": "id_candidat",
             "type": "integer",
             "comment": "ID C1 du candidat",
-            "fn": lambda o: o.job_seeker_id,
+            "fn": attrgetter("job_seeker_id"),
         },
         {
             "name": "id_structure",
             "type": "integer",
             "comment": "ID de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_company_id,
+            "fn": attrgetter("to_company_id"),
         },
         {
             "name": "type_structure",
             "type": "varchar",
             "comment": "Type de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_company.kind,
+            "fn": attrgetter("to_company.kind"),
         },
         {
             "name": "nom_structure",
             "type": "varchar",
             "comment": "Nom de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_company.display_name,
+            "fn": attrgetter("to_company.display_name"),
         },
         {
             "name": "nom_complet_structure",
@@ -203,7 +205,7 @@ TABLE.add_columns(
     get_department_and_region_columns(
         name_suffix="_structure",
         comment_suffix=" de la structure destinaire de la candidature",
-        custom_fn=lambda o: o.to_company,
+        custom_fn=attrgetter("to_company"),
     )
 )
 
@@ -237,7 +239,7 @@ TABLE.add_columns(
             "name": "date_embauche",
             "type": "date",
             "comment": "Date embauche le cas échéant",
-            "fn": lambda o: o.transition_accepted_date,
+            "fn": attrgetter("transition_accepted_date"),
         },
         {
             "name": "injection_ai",

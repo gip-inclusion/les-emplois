@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.metabase.tables.utils import MetabaseTable, get_zrr_status_for_insee_code
 
 
@@ -8,25 +10,25 @@ TABLE.add_columns(
             "name": "nom",
             "type": "varchar",
             "comment": "Nom",
-            "fn": lambda o: o.name,
+            "fn": attrgetter("name"),
         },
         {
             "name": "code_insee",
             "type": "varchar",
             "comment": "Code INSEE",
-            "fn": lambda o: o.code_insee,
+            "fn": attrgetter("code_insee"),
         },
         {
             "name": "latitude",
             "type": "double precision",
             "comment": "Latitude",
-            "fn": lambda o: o.latitude,
+            "fn": attrgetter("latitude"),
         },
         {
             "name": "longitude",
             "type": "double precision",
             "comment": "Longitude",
-            "fn": lambda o: o.longitude,
+            "fn": attrgetter("longitude"),
         },
         {
             "name": "statut_zrr",

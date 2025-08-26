@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.metabase.tables.utils import MetabaseTable
 
 
@@ -8,13 +10,13 @@ TABLE.add_columns(
             "name": "code_rome",
             "type": "varchar",
             "comment": "Code ROME",
-            "fn": lambda o: o.code,
+            "fn": attrgetter("code"),
         },
         {
             "name": "description_code_rome",
             "type": "varchar",
             "comment": "Description du code ROME",
-            "fn": lambda o: o.name,
+            "fn": attrgetter("name"),
         },
     ]
 )

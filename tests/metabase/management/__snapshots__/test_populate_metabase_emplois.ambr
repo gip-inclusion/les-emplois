@@ -3417,7 +3417,6 @@
         'origin': list([
           'EvaluatedSiae.evaluation_is_final[siae_evaluations/models.py]',
           'EvaluatedSiae.state[siae_evaluations/models.py]',
-          '<lambda>[metabase/tables/evaluated_siaes.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',

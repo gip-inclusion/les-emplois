@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.metabase.tables.utils import MetabaseTable, get_department_and_region_columns
 
 
@@ -5,45 +7,50 @@ TABLE = MetabaseTable(name="fiches_de_poste")
 
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID de la fiche de poste", "fn": lambda o: o.id},
+        {"name": "id", "type": "integer", "comment": "ID de la fiche de poste", "fn": attrgetter("id")},
         {
             "name": "code_rome",
             "type": "varchar",
             "comment": "Code ROME de la fiche de poste",
-            "fn": lambda o: o.appellation.rome.code,
+            "fn": attrgetter("appellation.rome.code"),
         },
         {
             "name": "nom_rome",
             "type": "varchar",
             "comment": "Nom du ROME de la fiche de poste",
-            "fn": lambda o: o.appellation.rome.name,
+            "fn": attrgetter("appellation.rome.name"),
         },
         {
             "name": "recrutement_ouvert",
             "type": "boolean",
             "comment": "Recrutement ouvert à ce jour",
-            "fn": lambda o: o.is_active,
+            "fn": attrgetter("is_active"),
         },
         {
             "name": "type_contrat",
             "type": "varchar",
             "comment": "Type de contrat proposé",
-            "fn": lambda o: o.contract_type,
+            "fn": attrgetter("contract_type"),
         },
-        {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": lambda o: o.company.id},
-        {"name": "type_employeur", "type": "varchar", "comment": "Type employeur", "fn": lambda o: o.company.kind},
-        {"name": "siret_employeur", "type": "varchar", "comment": "SIRET employeur", "fn": lambda o: o.company.siret},
+        {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": attrgetter("company.id")},
+        {"name": "type_employeur", "type": "varchar", "comment": "Type employeur", "fn": attrgetter("company.kind")},
+        {
+            "name": "siret_employeur",
+            "type": "varchar",
+            "comment": "SIRET employeur",
+            "fn": attrgetter("company.siret"),
+        },
         {
             "name": "nom_employeur",
             "type": "varchar",
             "comment": "Nom employeur",
-            "fn": lambda o: o.company.display_name,
+            "fn": attrgetter("company.display_name"),
         },
         {
             "name": "mises_a_jour_champs",
             "type": "jsonb",
             "comment": "historique des mises à jour sur le modèle",
-            "fn": lambda o: o.field_history,
+            "fn": attrgetter("field_history"),
         },
     ]
 )
@@ -52,7 +59,7 @@ TABLE.add_columns(
     get_department_and_region_columns(
         name_suffix="_employeur",
         comment_suffix=" employeur",
-        custom_fn=lambda o: o.company,
+        custom_fn=attrgetter("company"),
     )
 )
 
@@ -62,19 +69,19 @@ TABLE.add_columns(
             "name": "total_candidatures",
             "type": "integer",
             "comment": "Total de candidatures reçues",
-            "fn": lambda o: o.job_applications_count,
+            "fn": attrgetter("job_applications_count"),
         },
         {
             "name": "date_création",
             "type": "date",
             "comment": "Date de création",
-            "fn": lambda o: o.created_at,
+            "fn": attrgetter("created_at"),
         },
         {
             "name": "date_dernière_modification",
             "type": "date",
             "comment": "Date de dernière modification",
-            "fn": lambda o: o.updated_at,
+            "fn": attrgetter("updated_at"),
         },
     ]
 )

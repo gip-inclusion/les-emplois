@@ -2,6 +2,7 @@ import difflib
 import functools
 import hashlib
 from collections import defaultdict
+from operator import attrgetter
 
 import unidecode
 from django.conf import settings
@@ -84,7 +85,7 @@ def get_column_from_field(field, name):
         "name": name,
         "type": get_field_type_from_field(field),
         "comment": str(field.verbose_name),  # Force str() to handle _() lazyness
-        "fn": lambda o: getattr(o, field_name),
+        "fn": attrgetter(field_name),
     }
 
 
