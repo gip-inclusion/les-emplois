@@ -25,11 +25,11 @@ class MetabaseDatabaseCursor:
 
     def __enter__(self):
         self.connection = psycopg.connect(
-            host=settings.METABASE_HOST,
-            port=settings.METABASE_PORT,
-            dbname=settings.METABASE_DATABASE,
-            user=settings.METABASE_USER,
-            password=settings.METABASE_PASSWORD,
+            host=settings.PILOTAGE_DATASTORE_DB_HOST,
+            port=settings.PILOTAGE_DATASTORE_DB_PORT,
+            dbname=settings.PILOTAGE_DATASTORE_DB_DATABASE,
+            user=settings.PILOTAGE_DATASTORE_DB_USER,
+            password=settings.PILOTAGE_DATASTORE_DB_PASSWORD,
             keepalives=1,
             keepalives_idle=30,
             keepalives_interval=5,

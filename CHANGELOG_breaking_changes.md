@@ -1,5 +1,10 @@
 # Journal des changements techniques majeurs
 
+## 2025-08-26
+
+- Changement de préfixe (`METABASE_*` -> `PILOTAGE_DATA*`.) pour les
+  variables de configuration liées au Pilotage.
+
 ## 2025-06-10
 
 - Suppression de django-extensions et de sa commande `shell_plus` maintenant
