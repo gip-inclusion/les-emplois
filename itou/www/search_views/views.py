@@ -7,6 +7,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
@@ -19,7 +20,12 @@ from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
+from itou.www.search_views.forms import (
+    JobDescriptionSearchForm,
+    NewSavedSearchForm,
+    PrescriberSearchForm,
+    SiaeSearchForm,
+)
 
 
 # INSEE codes for the french cities that do have districts.
@@ -149,11 +155,25 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         results_and_counts = self.get_results_page_and_counts(siaes, job_descriptions)
 
+        new_saved_search_form = NewSavedSearchForm(
+            user=self.request.user,
+            initial={
+                "name": city,
+                "city": city,
+                "distance": distance,
+                "company_kinds": kinds,
+                "departments": departments,
+            },
+        )
+
         context = {
             "form": form,
+            "new_saved_search_form": new_saved_search_form,
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
             "city": city,
             "distance": distance,
+            "company_kinds": kinds,
+            "departments": departments,
             "filters_query_string": urlencode(
                 {
                     "city": city.slug,
@@ -324,3 +344,14 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
         context,
     )
+
+
+@require_POST
+def add_saved_search(request, template_name="search/includes/new_saved_search_modal.html"):
+    form = NewSavedSearchForm(user=request.user, data=request.POST)
+    context = {"new_saved_search_form": form}
+
+    if form.is_valid():
+        form.save()
+
+    return render(request, template_name, context)

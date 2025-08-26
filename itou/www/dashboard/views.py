@@ -42,7 +42,7 @@ from itou.www.dashboard.forms import (
     EditUserNotificationForm,
 )
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
-from itou.www.search.forms import SiaeSearchForm
+from itou.www.search_views.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 from itou.www.stats.utils import get_stats_for_institution
 
