@@ -479,18 +479,10 @@ PRO_CONNECT_FT_IDP_HINT = os.getenv("PRO_CONNECT_FT_IDP_HINT")
 
 TALLY_URL = os.getenv("TALLY_URL")
 
-PILOTAGE_DATASTORE_DB_HOST = os.getenv("PILOTAGE_DATASTORE_DB_HOST")
-PILOTAGE_DATASTORE_DB_PORT = os.getenv("PILOTAGE_DATASTORE_DB_PORT")
-PILOTAGE_DATASTORE_DB_DATABASE = os.getenv("PILOTAGE_DATASTORE_DB_DATABASE")
-PILOTAGE_DATASTORE_DB_USER = os.getenv("PILOTAGE_DATASTORE_DB_USER")
-PILOTAGE_DATASTORE_DB_PASSWORD = os.getenv("PILOTAGE_DATASTORE_DB_PASSWORD")
-
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
 METABASE_API_KEY = os.getenv("METABASE_API_KEY")
-
-PILOTAGE_DATA_HASH_SALT = os.getenv("PILOTAGE_DATA_HASH_SALT")
 
 ASP_ITOU_PREFIX = "99999"
 
@@ -665,12 +657,6 @@ AWS_S3_CLIENT_CONFIG = Config(
     response_checksum_validation="when_required",
 )
 
-# S3 store for communicating with the Pilotage.
-PILOTAGE_DATASTORE_S3_ENDPOINT_URL = os.getenv("PILOTAGE_DATASTORE_S3_ENDPOINT_URL")
-PILOTAGE_DATASTORE_S3_ACCESS_KEY = os.getenv("PILOTAGE_DATASTORE_S3_ACCESS_KEY")
-PILOTAGE_DATASTORE_S3_SECRET_KEY = os.getenv("PILOTAGE_DATASTORE_S3_SECRET_KEY")
-PILOTAGE_DATASTORE_S3_BUCKET_NAME = os.getenv("PILOTAGE_DATASTORE_S3_BUCKET_NAME")
-
 # The maximum amount of memory (in bytes) a file can take up before being rolled over into a temporary file on disk.
 # Picked 5 MB, the max size for a resume. Keep it fast for files under that size, and avoid filling up the RAM.
 AWS_S3_MAX_MEMORY_SIZE = 5 * 1024 * 1024
@@ -833,9 +819,24 @@ BREVO_API_URL = "https://api.brevo.com/v3"
 
 # Pilotage
 # ------------------------------------------------------------------------------
-
 PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
 PILOTAGE_SLACK_WEBHOOK_URL = os.getenv("PILOTAGE_SLACK_WEBHOOK_URL")
+
+# Shared secrets
+PILOTAGE_DATA_HASH_SALT = os.getenv("PILOTAGE_DATA_HASH_SALT")
+
+# PostgreSQL database for communicating with the Pilotage.
+PILOTAGE_DATASTORE_DB_HOST = os.getenv("PILOTAGE_DATASTORE_DB_HOST")
+PILOTAGE_DATASTORE_DB_PORT = os.getenv("PILOTAGE_DATASTORE_DB_PORT")
+PILOTAGE_DATASTORE_DB_DATABASE = os.getenv("PILOTAGE_DATASTORE_DB_DATABASE")
+PILOTAGE_DATASTORE_DB_USER = os.getenv("PILOTAGE_DATASTORE_DB_USER")
+PILOTAGE_DATASTORE_DB_PASSWORD = os.getenv("PILOTAGE_DATASTORE_DB_PASSWORD")
+
+# S3 store for communicating with the Pilotage.
+PILOTAGE_DATASTORE_S3_ENDPOINT_URL = os.getenv("PILOTAGE_DATASTORE_S3_ENDPOINT_URL")
+PILOTAGE_DATASTORE_S3_ACCESS_KEY = os.getenv("PILOTAGE_DATASTORE_S3_ACCESS_KEY")
+PILOTAGE_DATASTORE_S3_SECRET_KEY = os.getenv("PILOTAGE_DATASTORE_S3_SECRET_KEY")
+PILOTAGE_DATASTORE_S3_BUCKET_NAME = os.getenv("PILOTAGE_DATASTORE_S3_BUCKET_NAME")
 
 # Github
 API_GITHUB_BASE_URL = "https://api.github.com"
