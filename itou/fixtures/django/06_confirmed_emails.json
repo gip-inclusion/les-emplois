@@ -141,16 +141,6 @@
   },
   {
     "fields": {
-      "email": "adrien.monk@faux123.com",
-      "primary": true,
-      "user": 15,
-      "verified": true
-    },
-    "model": "account.emailaddress",
-    "pk": 15
-  },
-  {
-    "fields": {
       "email": "test+ea@inclusion.gouv.fr",
       "primary": true,
       "user": 16,
@@ -181,7 +171,7 @@
   },
   {
     "fields": {
-      "email": "vchevallier-benoit@example.org",
+      "email": "demo.emplois+26@inclusion.gouv.fr",
       "primary": true,
       "user": 26,
       "verified": true
@@ -268,5 +258,55 @@
     },
     "model": "account.emailaddress",
     "pk": 27
+  },
+  {
+    "fields": {
+      "email": "contact.gps+samira@inclusion.gouv.fr",
+      "primary": true,
+      "user": 90,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "email": "contact.gps+stephane@inclusion.gouv.fr",
+      "primary": true,
+      "user": 91,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "email": "contact.gps+melissa@inclusion.gouv.fr",
+      "primary": true,
+      "user": 92,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "email": "contact.gps+nadia@inclusion.gouv.fr",
+      "primary": true,
+      "user": 93,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "email": "demo.emplois+15@inclusion.gouv.fr",
+      "primary": true,
+      "user": 15,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 44
   }
 ]

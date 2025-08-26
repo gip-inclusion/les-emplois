@@ -48,7 +48,7 @@
       "follow_up_group": 3,
       "is_active": true,
       "is_referent_certified": false,
-      "last_contact_at": "2024-06-12T00:00:00Z",
+      "last_contact_at": "2025-07-31T13:46:54.964Z",
       "member": 3,
       "reason": "",
       "started_at": "2024-06-12"
@@ -143,7 +143,7 @@
       "follow_up_group": 6,
       "is_active": true,
       "is_referent_certified": false,
-      "last_contact_at": "2024-06-12T00:00:00Z",
+      "last_contact_at": "2025-07-28T09:39:44.209Z",
       "member": 6,
       "reason": "",
       "started_at": "2024-06-12"
@@ -188,5 +188,974 @@
     },
     "model": "gps.followupgroupmembership",
     "pk": 10
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-06-11T13:22:28Z",
+      "created_in_bulk": false,
+      "creator": 1,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 8,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-06-11T13:22:28Z",
+      "member": 90,
+      "reason": "",
+      "started_at": "2025-01-05"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-06-11T13:23:01Z",
+      "created_in_bulk": false,
+      "creator": 1,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 8,
+      "is_active": true,
+      "is_referent_certified": true,
+      "last_contact_at": "2025-06-11T13:23:01Z",
+      "member": 92,
+      "reason": "",
+      "started_at": "2025-03-12"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-06-11T13:23:33Z",
+      "created_in_bulk": false,
+      "creator": 1,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 8,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-06-11T13:23:33Z",
+      "member": 91,
+      "reason": "démarches : allocations, déménagement",
+      "started_at": "2025-02-27"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-06-11T13:25:04.227Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 8,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-06-11T13:25:52.252Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-06-11"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:07:37.102Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 1,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T12:08:39.657Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:10:22.773Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 1,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T12:10:22.773Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:36:56.423Z",
+      "created_in_bulk": false,
+      "creator": 7,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 9,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T12:39:15.316Z",
+      "member": 7,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:43:41.437Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 10,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:32:18.173Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:52:29.835Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 11,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T09:08:45.022Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T12:59:22.530Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 12,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:01:09.159Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:06:15.892Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 13,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T08:18:16.080Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:24:59.494Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 14,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:26:42.605Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:29:08.455Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 15,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:29:49.461Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:45:31.874Z",
+      "created_in_bulk": false,
+      "creator": 4,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 16,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:46:54.912Z",
+      "member": 4,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:50:36.575Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 17,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:51:31.328Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:55:08.272Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 18,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:56:25.361Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T13:58:55.654Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 19,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T13:59:29.770Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:01:26.259Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 20,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:01:56.410Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:05:41.394Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 21,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:06:20.272Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:09:06.437Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 22,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:09:57.871Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:19:00.907Z",
+      "created_in_bulk": false,
+      "creator": 7,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 23,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:19:36.065Z",
+      "member": 7,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:23:00.982Z",
+      "created_in_bulk": false,
+      "creator": 7,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 24,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:23:15.685Z",
+      "member": 7,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:27:52.089Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 25,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:31:28.838Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:30:01.749Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 10,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:30:01.749Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:32:01.632Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 25,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:32:01.632Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 35
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:34:25.025Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 26,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:34:33.140Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 36
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:35:40.433Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 13,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:35:40.433Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 37
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-24T14:36:16.100Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 20,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-24T14:36:16.100Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-24"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 38
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T08:45:22.129Z",
+      "created_in_bulk": false,
+      "creator": 7,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 27,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T08:46:12.226Z",
+      "member": 7,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 39
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T08:49:23.332Z",
+      "created_in_bulk": false,
+      "creator": 7,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 28,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T08:50:45.124Z",
+      "member": 7,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 40
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T08:52:47.350Z",
+      "created_in_bulk": false,
+      "creator": 5,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 29,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T08:53:06.238Z",
+      "member": 5,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 41
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T08:55:55.617Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 30,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T08:56:18.344Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 42
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T08:58:37.698Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 31,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T08:59:05.571Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 43
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:01:28.906Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 32,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:01:45.229Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 44
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:04:30.157Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 33,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:05:09.550Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 45
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:10:08.942Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 28,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:10:25.778Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 46
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:11:38.940Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 19,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:11:38.940Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 47
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:21:53.232Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 22,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:21:53.232Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 48
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:27:08.518Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 21,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T08:45:38.426Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 49
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-28T09:37:03.526Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 34,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-28T09:37:26.064Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-28"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 50
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T07:08:16.383Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 35,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T07:11:22.683Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 51
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T07:14:06.642Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 36,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T07:14:53.136Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 52
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T07:18:28.327Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 37,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T07:21:42.172Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 53
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T07:37:15.033Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 38,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T07:37:43.291Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 54
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T08:10:49.164Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 39,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T08:11:22.196Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 55
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T08:25:25.094Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 14,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T08:25:25.094Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 56
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T08:48:53.321Z",
+      "created_in_bulk": false,
+      "creator": 6,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 40,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T08:49:35.469Z",
+      "member": 6,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 57
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T09:05:54.835Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 41,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T09:06:07.609Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 58
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T13:28:31.305Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 42,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T13:29:11.382Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 59
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T13:33:14.113Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 43,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T13:33:43.357Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 60
+  },
+  {
+    "fields": {
+      "can_view_personal_information": false,
+      "created_at": "2025-07-31T13:45:37.901Z",
+      "created_in_bulk": false,
+      "creator": 3,
+      "end_reason": null,
+      "ended_at": null,
+      "follow_up_group": 44,
+      "is_active": true,
+      "is_referent_certified": false,
+      "last_contact_at": "2025-07-31T13:46:07.683Z",
+      "member": 3,
+      "reason": "",
+      "started_at": "2025-07-31"
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 61
   }
 ]
