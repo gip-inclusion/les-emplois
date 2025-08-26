@@ -29,6 +29,7 @@
     'view_jobseekerprofile',
     'add_user',
     'change_user',
+    'export_cta',
     'hijack',
     'view_user',
   ])
