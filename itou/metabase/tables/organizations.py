@@ -7,8 +7,10 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_address_columns,
     get_choice,
+    get_column_from_field,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
+    get_model_field,
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -70,15 +72,12 @@ def get_org_last_job_application_creation_date(org):
 TABLE = MetabaseTable(name="organisations_v0")
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID organisation", "fn": attrgetter("id")},
-        {"name": "siret", "type": "varchar", "comment": "SIRET organisation", "fn": attrgetter("siret")},
+        get_column_from_field(get_model_field(PrescriberOrganization, "pk"), name="id"),
+        get_column_from_field(get_model_field(PrescriberOrganization, "siret"), name="siret"),
         {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": attrgetter("display_name")},
-        {
-            "name": "type",
-            "type": "varchar",
-            "comment": "Type organisation (abrégé)",
-            "fn": attrgetter("kind"),
-        },
+        get_column_from_field(
+            get_model_field(PrescriberOrganization, "kind"), name="type", comment="Type organisation (abrégé)"
+        ),
         {
             "name": "type_complet",
             "type": "varchar",
@@ -104,12 +103,7 @@ TABLE.add_columns(
             "comment": "Date inscription du premier compte prescripteur",
             "fn": get_org_first_join_date,
         },
-        {
-            "name": "code_safir",
-            "type": "varchar",
-            "comment": "Code SAFIR Pôle emploi",
-            "fn": attrgetter("code_safir_pole_emploi"),
-        },
+        get_column_from_field(get_model_field(PrescriberOrganization, "code_safir_pole_emploi"), name="code_safir"),
         {
             "name": "total_membres",
             "type": "integer",
@@ -143,11 +137,6 @@ TABLE.add_columns(get_establishment_is_active_column())
 
 TABLE.add_columns(
     [
-        {
-            "name": "brsa",
-            "type": "boolean",
-            "comment": "Organisation conventionnée pour le suivi des BRSA",
-            "fn": attrgetter("is_brsa"),
-        },
+        get_column_from_field(get_model_field(PrescriberOrganization, "is_brsa"), name="brsa"),
     ]
 )

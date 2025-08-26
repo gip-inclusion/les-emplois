@@ -13,7 +13,7 @@ from django.db.models.fields import (
     CharField,
     DateField,
     DateTimeField,
-    PositiveIntegerField,
+    IntegerField,
     TextField,
     UUIDField,
 )
@@ -46,6 +46,8 @@ class MetabaseTable:
 
 
 def get_model_field(model, name):
+    if name == "pk":
+        return model._meta.pk
     return model._meta.get_field(name)
 
 
@@ -54,7 +56,7 @@ def get_field_type_from_field(field):
         return "varchar"
     if isinstance(field, TextField):
         return "text"
-    if isinstance(field, PositiveIntegerField):
+    if isinstance(field, IntegerField):
         return "integer"
     if isinstance(field, AutoField) and field.name == "id":
         return "integer"
@@ -74,18 +76,15 @@ def get_field_type_from_field(field):
     raise ValueError("Unexpected field type")
 
 
-def get_column_from_field(field, name):
+def get_column_from_field(field, name, *, comment=None, field_type=None):
     """
     Guess column configuration for simple fields with no subtlety.
     """
-    field_name = field.name
-    if isinstance(field, ForeignKey):
-        field_name += "_id"
     return {
         "name": name,
-        "type": get_field_type_from_field(field),
-        "comment": str(field.verbose_name),  # Force str() to handle _() lazyness
-        "fn": attrgetter(field_name),
+        "type": field_type or get_field_type_from_field(field),
+        "comment": comment or str(field.verbose_name),  # Force str() to handle _() lazyness
+        "fn": attrgetter(f"{field.name}_id" if isinstance(field, ForeignKey) else field.name),
     }
 
 
@@ -286,7 +285,7 @@ def hash_content(content):
 
 def get_common_prolongation_columns(model):
     return [
-        get_column_from_field(get_model_field(model, "id"), name="id"),
+        get_column_from_field(get_model_field(model, "pk"), name="id"),
         get_column_from_field(get_model_field(model, "approval"), name="id_pass_agrément"),
         get_column_from_field(get_model_field(model, "start_at"), name="date_début"),
         get_column_from_field(get_model_field(model, "end_at"), name="date_fin"),

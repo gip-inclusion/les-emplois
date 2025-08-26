@@ -15,7 +15,7 @@ from itou.metabase.tables.utils import (
 TABLE = MetabaseTable(name="structures_v0")
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID de la structure", "fn": attrgetter("id")},
+        get_column_from_field(get_model_field(Company, "pk"), name="id"),
         {
             "name": "id_asp",
             "type": "integer",
@@ -29,19 +29,9 @@ TABLE.add_columns(
             "comment": "Nom complet de la structure avec type et ID",
             "fn": lambda o: f"{o.kind} - ID {o.id} - {o.display_name}",
         },
-        {
-            "name": "description",
-            "type": "varchar",
-            "comment": "Description de la structure",
-            "fn": attrgetter("description"),
-        },
-        {
-            "name": "type",
-            "type": "varchar",
-            "comment": "Type de structure (EI, ETTI, ACI, GEIQ etc..)",
-            "fn": attrgetter("kind"),
-        },
-        {"name": "siret", "type": "varchar", "comment": "SIRET de la structure", "fn": attrgetter("siret")},
+        get_column_from_field(get_model_field(Company, "description"), name="description"),
+        get_column_from_field(get_model_field(Company, "kind"), name="type"),
+        get_column_from_field(get_model_field(Company, "siret"), name="siret"),
         {
             "name": "source",
             "type": "varchar",

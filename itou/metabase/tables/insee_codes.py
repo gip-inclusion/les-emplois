@@ -1,23 +1,19 @@
 from operator import attrgetter
 
-from itou.metabase.tables.utils import MetabaseTable, get_zrr_status_for_insee_code
+from itou.cities.models import City
+from itou.metabase.tables.utils import (
+    MetabaseTable,
+    get_column_from_field,
+    get_model_field,
+    get_zrr_status_for_insee_code,
+)
 
 
 TABLE = MetabaseTable(name="communes")
 TABLE.add_columns(
     [
-        {
-            "name": "nom",
-            "type": "varchar",
-            "comment": "Nom",
-            "fn": attrgetter("name"),
-        },
-        {
-            "name": "code_insee",
-            "type": "varchar",
-            "comment": "Code INSEE",
-            "fn": attrgetter("code_insee"),
-        },
+        get_column_from_field(get_model_field(City, "name"), name="nom"),
+        get_column_from_field(get_model_field(City, "code_insee"), name="code_insee"),
         {
             "name": "latitude",
             "type": "double precision",

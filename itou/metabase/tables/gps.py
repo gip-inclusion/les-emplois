@@ -7,7 +7,7 @@ from itou.metabase.tables.utils import MetabaseTable, get_column_from_field, get
 GroupsTable = MetabaseTable(name="gps_groups_v1")
 GroupsTable.add_columns(
     [
-        get_column_from_field(get_model_field(FollowUpGroup, "id"), "id"),
+        get_column_from_field(get_model_field(FollowUpGroup, "pk"), "id"),
         get_column_from_field(get_model_field(FollowUpGroup, "created_at"), "created_at"),
         get_column_from_field(get_model_field(FollowUpGroup, "updated_at"), "updated_at"),
         get_column_from_field(get_model_field(FollowUpGroup, "created_in_bulk"), "created_in_bulk"),
@@ -24,7 +24,7 @@ GroupsTable.add_columns(
 MembershipsTable = MetabaseTable(name="gps_membres_v1")
 MembershipsTable.add_columns(
     [
-        get_column_from_field(get_model_field(FollowUpGroupMembership, "id"), "id"),
+        get_column_from_field(get_model_field(FollowUpGroupMembership, "pk"), "id"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "follow_up_group_id"), "group_id"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "created_at"), "created_at"),
         get_column_from_field(get_model_field(FollowUpGroupMembership, "updated_at"), "updated_at"),

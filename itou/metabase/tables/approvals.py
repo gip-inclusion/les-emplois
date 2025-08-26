@@ -1,6 +1,5 @@
 import functools
 from datetime import datetime
-from operator import attrgetter
 
 from django.conf import settings
 
@@ -74,10 +73,10 @@ def get_approval_type(approval):
 TABLE = MetabaseTable(name="pass_agréments")
 TABLE.add_columns(
     [
-        get_column_from_field(get_model_field(Approval, "id"), name="id"),
+        get_column_from_field(get_model_field(Approval, "pk"), name="id"),
         {"name": "type", "type": "varchar", "comment": "Type", "fn": get_approval_type},
-        {"name": "date_début", "type": "date", "comment": "Date de début", "fn": attrgetter("start_at")},
-        {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": attrgetter("end_at")},
+        get_column_from_field(get_model_field(Approval, "start_at"), name="date_début", field_type="date"),
+        get_column_from_field(get_model_field(Approval, "end_at"), name="date_fin", field_type="date"),
         {"name": "durée", "type": "interval", "comment": "Durée", "fn": lambda o: o.end_at - o.start_at},
         {
             "name": "id_candidat",
