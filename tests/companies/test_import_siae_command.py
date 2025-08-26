@@ -285,7 +285,7 @@ class TestImportSiaeManagementCommands:
         ]
 
 
-@override_settings(METABASE_HASH_SALT="foobar2000")
+@override_settings(PILOTAGE_DATA_HASH_SALT="foobar2000")
 def test_hashed_approval_number():
     df = pd.DataFrame(data={"salarie_agrement": ["999992012369", None, ""]})
     anonymize_fluxiae_df(df)
