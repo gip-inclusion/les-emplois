@@ -412,7 +412,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+                "apply:hire_contract_confirmation", kwargs={"session_uuid": self.apply_session.name}
             )
         else:
             view_name = "apply:application_jobs"
@@ -744,7 +744,7 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": self.apply_session.name})
 
     def get_cancel_url(self):
         return reverse(
@@ -773,7 +773,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_contract_confirmation", kwargs={"session_uuid": self.apply_session.name})
 
     def get_back_url(self):
         return reverse(
@@ -794,8 +794,11 @@ class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGE
 class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
     template_name = "apply/submit/hire_confirmation.html"
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, only_accept_form=None, **kwargs):
         self.job_application = None
+        # simplified view. `only_accept_form` to be removed in early september 2025
+        if only_accept_form is not None:
+            self.only_accept_form = only_accept_form
         return super().setup(request, *args, **kwargs)
 
     def clean_session(self):
