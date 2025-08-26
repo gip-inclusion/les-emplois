@@ -137,17 +137,54 @@ class Command(BaseCommand):
             Company.objects.active()
             .select_related("convention", "insee_city")
             .prefetch_related(
-                Prefetch("convention__siaes", queryset=Company.objects.select_related("insee_city")),
-                "job_description_through",
-                "members",
                 Prefetch(
-                    "memberships",
-                    queryset=CompanyMembership.objects.active(),
-                    to_attr="active_memberships",
+                    "convention__siaes",
+                    queryset=Company.objects.select_related("insee_city").only(
+                        "source",  # Company.canonical_company
+                        "convention",  # Company.canonical_company
+                        "siret",  # is_aci_convergence
+                        "address_line_1",  # get_address_columns
+                        "address_line_2",  # get_address_columns
+                        "post_code",  # get_post_code_column
+                        "insee_city__code_insee",  # get_code_commune
+                        "city",  # get_address_columns
+                        "coords",  # get_address_columns
+                        "department",  # get_department_and_region_columns
+                    ),
                 ),
-                "memberships",
             )
             .annotate(
+                active_memberships_count=(
+                    CompanyMembership.objects.active()
+                    .filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                first_membership_join_date=(
+                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(min=Min("joined_at"))
+                    .values("min")[:1]
+                ),
+                last_login_date=(
+                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(max=Max("user__last_login"))
+                    .values("max")[:1]
+                ),
+                job_descriptions_active_count=(
+                    JobDescription.objects.filter(company=OuterRef("pk"), is_active=True)
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                job_descriptions_inactive_count=(
+                    JobDescription.objects.filter(company=OuterRef("pk"), is_active=False)
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
                     filter=~Q(job_applications_received__logs__to_state=JobApplicationState.OBSOLETE),
@@ -207,9 +244,27 @@ class Command(BaseCommand):
                     filter=Q(job_applications_received__state=JobApplicationState.PROCESSING),
                     distinct=True,
                 ),
-                # Don't try counting members or getting first join date, It's way too long
             )
-            .all()
+            .only(
+                "convention",
+                "convention__asp_id",
+                "kind",
+                "brand",  # Company.display_name
+                "name",  # Company.display_name
+                "description",
+                "siret",
+                "source",
+                "naf",
+                "email",
+                "auth_email",
+                "address_line_1",  # get_address_columns
+                "address_line_2",  # get_address_columns
+                "post_code",  # get_post_code_column
+                "insee_city__code_insee",  # get_code_commune
+                "city",  # get_address_columns
+                "coords",  # get_address_columns
+                "department",  # get_department_and_region_columns
+            )
         )
 
         populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])

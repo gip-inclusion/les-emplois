@@ -94,14 +94,6 @@ def get_choice(choices, key):
     return dict(choices)[key]
 
 
-def get_first_membership_join_date(memberships):
-    memberships = list(memberships.all())
-    # We have to do all this in python to benefit from prefetch_related.
-    if len(memberships) >= 1:
-        return min(m.joined_at for m in memberships)
-    return None
-
-
 def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
@@ -240,11 +232,7 @@ def get_establishment_last_login_date_column():
             "name": "date_dernière_connexion",
             "type": "date",
             "comment": "Date de dernière connexion utilisateur",
-            "fn": lambda o: (
-                max([u.last_login for u in o.members.all() if u.last_login], default=None)
-                if o.members.exists()
-                else None
-            ),
+            "fn": lambda o: getattr(o, "last_login_date", None),
         },
     ]
 
@@ -255,16 +243,10 @@ def get_establishment_is_active_column():
             "name": "active",
             "type": "boolean",
             "comment": "Dernière connexion dans les 7 jours",
-            "fn": lambda o: (
-                any(
-                    [
-                        u.last_login > timezone.now() - timezone.timedelta(days=7)
-                        for u in o.members.all()
-                        if u.last_login
-                    ]
-                )
-                if o.members.exists()
-                else False
+            "fn": lambda o: bool(
+                getattr(o, "last_login_date", None) > timezone.now() - timezone.timedelta(days=7)
+                if getattr(o, "last_login_date", None)
+                else None
             ),
         },
     ]

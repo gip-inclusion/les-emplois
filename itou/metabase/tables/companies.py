@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -6,7 +8,6 @@ from itou.metabase.tables.utils import (
     get_column_from_field,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
-    get_first_membership_join_date,
     get_model_field,
 )
 
@@ -70,13 +71,13 @@ TABLE.add_columns(
             "name": "date_inscription",
             "type": "date",
             "comment": "Date inscription du premier compte employeur",
-            "fn": lambda o: get_first_membership_join_date(o.memberships),
+            "fn": attrgetter("first_membership_join_date"),
         },
         {
             "name": "total_membres",
             "type": "integer",
             "comment": "Nombre de comptes employeur rattachés à la structure",
-            "fn": lambda o: len(o.active_memberships),
+            "fn": lambda o: o.active_memberships_count or 0,
         },
         {
             "name": "total_candidatures",
@@ -149,7 +150,6 @@ TABLE.add_columns(
 )
 
 TABLE.add_columns(get_establishment_last_login_date_column())
-
 TABLE.add_columns(get_establishment_is_active_column())
 
 TABLE.add_columns(
@@ -164,13 +164,13 @@ TABLE.add_columns(
             "name": "total_fiches_de_poste_actives",
             "type": "integer",
             "comment": "Nombre de fiches de poste actives de la structure",
-            "fn": lambda o: len([jd for jd in o.job_description_through.all() if jd.is_active]),
+            "fn": lambda o: o.job_descriptions_active_count or 0,
         },
         {
             "name": "total_fiches_de_poste_inactives",
             "type": "integer",
             "comment": "Nombre de fiches de poste inactives de la structure",
-            "fn": lambda o: len([jd for jd in o.job_description_through.all() if not jd.is_active]),
+            "fn": lambda o: o.job_descriptions_inactive_count or 0,
         },
     ]
 )
