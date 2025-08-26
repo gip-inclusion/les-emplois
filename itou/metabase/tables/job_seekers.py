@@ -11,12 +11,15 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
     get_choice,
+    get_column_from_field,
     get_department_and_region_columns,
+    get_model_field,
     get_post_code_column,
     get_qpv_job_seeker_pks,
     hash_content,
 )
 from itou.users.enums import IdentityProvider
+from itou.users.models import User
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -174,12 +177,7 @@ def get_table():
 
     job_seekers_table.add_columns(
         [
-            {
-                "name": "id",
-                "type": "integer",
-                "comment": "ID C1 du candidat",
-                "fn": attrgetter("pk"),
-            },
+            get_column_from_field(get_model_field(User, "pk"), name="id", comment="ID C1 du candidat"),
             {
                 "name": "hash_nir",
                 "type": "varchar",
@@ -205,12 +203,7 @@ def get_table():
                 "fn": get_birth_month_from_nir,
             },
             {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
-            {
-                "name": "date_inscription",
-                "type": "date",
-                "comment": "Date inscription du candidat",
-                "fn": attrgetter("date_joined"),
-            },
+            get_column_from_field(get_model_field(User, "date_joined"), name="date_inscription", field_type="date"),
             {
                 "name": "type_inscription",
                 "type": "varchar",
@@ -229,18 +222,12 @@ def get_table():
                 "comment": "Le candidat a un identifiant PE",
                 "fn": lambda o: o.jobseeker_profile.pole_emploi_id != "",
             },
-            {
-                "name": "date_dernière_connexion",
-                "type": "date",
-                "comment": "Date de dernière connexion au service du candidat",
-                "fn": attrgetter("last_login"),
-            },
-            {
-                "name": "date_premiere_connexion",
-                "type": "date",
-                "comment": "Date de première connexion",
-                "fn": attrgetter("first_login"),
-            },
+            get_column_from_field(
+                get_model_field(User, "last_login"), name="date_dernière_connexion", field_type="date"
+            ),
+            get_column_from_field(
+                get_model_field(User, "first_login"), name="date_premiere_connexion", field_type="date"
+            ),
             {
                 "name": "actif",
                 "type": "boolean",

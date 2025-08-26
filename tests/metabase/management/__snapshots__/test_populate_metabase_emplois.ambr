@@ -43,7 +43,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_c1_analytics_v0" ("id" varchar,"type" varchar,"date" varchar,"value" integer,"type_detail" varchar,"date_mise_à_jour_metabase" date)',
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_c1_analytics_v0" ("id" varchar,"type" text,"date" text,"value" integer,"type_detail" varchar,"date_mise_à_jour_metabase" date)',
       }),
       dict({
         'origin': list([
@@ -265,7 +265,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_c1_private_dashboard_visits_v0" ("id" integer,"measured_at" timestamp WITH TIME ZONE,
-                                                                                                                            "dashboard_id" varchar,"department" varchar,"region" varchar,"current_company_id" integer,"current_prescriber_organization_id" integer,"current_institution_id" integer,"user_kind" varchar,"user_id" integer,"date_mise_à_jour_metabase" date)
+                                                                                                                            "dashboard_id" varchar,"department" varchar,"region" text,"current_company_id" integer,"current_prescriber_organization_id" integer,"current_institution_id" integer,"user_kind" text,"user_id" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -285,7 +285,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."id" IS \'ID du point de mesure\'',
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."id" IS \'ID\'',
       }),
       dict({
         'origin': list([
@@ -312,7 +312,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."department" IS \'Département\'',
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."department" IS \'département\'',
       }),
       dict({
         'origin': list([
@@ -321,7 +321,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."region" IS \'Région\'',
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."region" IS \'région\'',
       }),
       dict({
         'origin': list([
@@ -357,7 +357,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."user_kind" IS \'Type utilisateur\'',
+        'sql': 'COMMENT ON COLUMN "z_new_c1_private_dashboard_visits_v0"."user_kind" IS \'type d\'\'utilisateur\'',
       }),
       dict({
         'origin': list([
@@ -609,7 +609,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_pass_agréments"."date_début" IS \'Date de début\'',
+        'sql': 'COMMENT ON COLUMN "z_new_pass_agréments"."date_début" IS \'date de début\'',
       }),
       dict({
         'origin': list([
@@ -618,7 +618,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_pass_agréments"."date_fin" IS \'Date de fin\'',
+        'sql': 'COMMENT ON COLUMN "z_new_pass_agréments"."date_fin" IS \'date de fin\'',
       }),
       dict({
         'origin': list([
@@ -1087,7 +1087,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_structures_v0" ("id" integer,"id_asp" integer,"nom" varchar,"nom_complet" varchar,"description" varchar,"type" varchar,"siret" varchar,"source" varchar,"code_naf" varchar,"email_public" varchar,"email_authentification" varchar,"convergence_france" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"adresse_ligne_1_c1" varchar,"adresse_ligne_2_c1" varchar,"code_postal_c1" varchar,"code_commune_c1" varchar,"ville_c1" varchar,"longitude_c1" double precision,"latitude_c1" double precision,"département_c1" varchar,"nom_département_c1" varchar,"région_c1" varchar,"date_inscription" date,"total_membres" integer,"total_candidatures" integer,"total_candidatures_30j" integer,"total_embauches" integer,"total_embauches_30j" integer,"taux_conversion_30j" double precision,"total_auto_prescriptions" integer,"total_candidatures_autonomes" integer,"total_candidatures_via_prescripteur" integer,"total_candidatures_non_traitées" integer,"total_candidatures_en_étude" integer,"date_dernière_connexion" date,"active" integer,"date_dernière_évolution_candidature" date,"total_fiches_de_poste_actives" integer,"total_fiches_de_poste_inactives" integer,"date_mise_à_jour_metabase" date)',
+        'sql': 'CREATE TABLE IF NOT EXISTS "z_new_structures_v0" ("id" integer,"id_asp" integer,"nom" varchar,"nom_complet" varchar,"description" text,"type" varchar,"siret" varchar,"source" varchar,"code_naf" varchar,"email_public" varchar,"email_authentification" varchar,"convergence_france" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"adresse_ligne_1_c1" varchar,"adresse_ligne_2_c1" varchar,"code_postal_c1" varchar,"code_commune_c1" varchar,"ville_c1" varchar,"longitude_c1" double precision,"latitude_c1" double precision,"département_c1" varchar,"nom_département_c1" varchar,"région_c1" varchar,"date_inscription" date,"total_membres" integer,"total_candidatures" integer,"total_candidatures_30j" integer,"total_embauches" integer,"total_embauches_30j" integer,"taux_conversion_30j" double precision,"total_auto_prescriptions" integer,"total_candidatures_autonomes" integer,"total_candidatures_via_prescripteur" integer,"total_candidatures_non_traitées" integer,"total_candidatures_en_étude" integer,"date_dernière_connexion" date,"active" integer,"date_dernière_évolution_candidature" date,"total_fiches_de_poste_actives" integer,"total_fiches_de_poste_inactives" integer,"date_mise_à_jour_metabase" date)',
       }),
       dict({
         'origin': list([
@@ -1106,7 +1106,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."id" IS \'ID de la structure\'',
+        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."id" IS \'ID\'',
       }),
       dict({
         'origin': list([
@@ -1142,7 +1142,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."description" IS \'Description de la structure\'',
+        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."description" IS \'description\'',
       }),
       dict({
         'origin': list([
@@ -1151,7 +1151,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."type" IS \'Type de structure (EI, ETTI, ACI, GEIQ etc..)\'',
+        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."type" IS \'type\'',
       }),
       dict({
         'origin': list([
@@ -1160,7 +1160,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."siret" IS \'SIRET de la structure\'',
+        'sql': 'COMMENT ON COLUMN "z_new_structures_v0"."siret" IS \'siret\'',
       }),
       dict({
         'origin': list([
@@ -4687,7 +4687,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id" IS \'ID C1 de la candidature\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id" IS \'id\'',
       }),
       dict({
         'origin': list([
@@ -4714,7 +4714,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_candidature" IS \'Date de la candidature\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_candidature" IS \'date de création\'',
       }),
       dict({
         'origin': list([
@@ -4723,7 +4723,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_début_contrat" IS \'Date de début du contrat\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_début_contrat" IS \'date de début du contrat\'',
       }),
       dict({
         'origin': list([
@@ -4732,7 +4732,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_traitement" IS \'Date de dernier traitement de la candidature\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."date_traitement" IS \'date de traitement\'',
       }),
       dict({
         'origin': list([
@@ -4768,7 +4768,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."origine_id_structure" IS \'ID de la structure d\'\'origine de la candidature\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."origine_id_structure" IS \'entreprise émettrice\'',
       }),
       dict({
         'origin': list([
@@ -4813,7 +4813,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id_candidat" IS \'ID C1 du candidat\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id_candidat" IS \'demandeur d\'\'emploi\'',
       }),
       dict({
         'origin': list([
@@ -4822,7 +4822,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id_structure" IS \'ID de la structure destinaire de la candidature\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidatures"."id_structure" IS \'entreprise destinataire\'',
       }),
       dict({
         'origin': list([
@@ -5545,7 +5545,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."recrutement_ouvert" IS \'Recrutement ouvert à ce jour\'',
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."recrutement_ouvert" IS \'recrutement ouvert\'',
       }),
       dict({
         'origin': list([
@@ -5554,7 +5554,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."type_contrat" IS \'Type de contrat proposé\'',
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."type_contrat" IS \'type de contrat\'',
       }),
       dict({
         'origin': list([
@@ -5644,7 +5644,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."date_création" IS \'Date de création\'',
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."date_création" IS \'date de création\'',
       }),
       dict({
         'origin': list([
@@ -5653,7 +5653,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."date_dernière_modification" IS \'Date de dernière modification\'',
+        'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste"."date_dernière_modification" IS \'date de modification\'',
       }),
       dict({
         'origin': list([
@@ -6051,7 +6051,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_inscription" IS \'Date inscription du candidat\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_inscription" IS \'date d’inscription\'',
       }),
       dict({
         'origin': list([
@@ -6087,7 +6087,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_dernière_connexion" IS \'Date de dernière connexion au service du candidat\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_dernière_connexion" IS \'dernière connexion\'',
       }),
       dict({
         'origin': list([
@@ -6096,7 +6096,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_premiere_connexion" IS \'Date de première connexion\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."date_premiere_connexion" IS \'date de première connexion\'',
       }),
       dict({
         'origin': list([
@@ -7349,7 +7349,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."id" IS \'ID organisation\'',
+        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."id" IS \'ID\'',
       }),
       dict({
         'origin': list([
@@ -7358,7 +7358,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."siret" IS \'SIRET organisation\'',
+        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."siret" IS \'siret\'',
       }),
       dict({
         'origin': list([
@@ -7502,7 +7502,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."code_safir" IS \'Code SAFIR Pôle emploi\'',
+        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."code_safir" IS \'code Safir\'',
       }),
       dict({
         'origin': list([
@@ -7565,7 +7565,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."brsa" IS \'Organisation conventionnée pour le suivi des BRSA\'',
+        'sql': 'COMMENT ON COLUMN "z_new_organisations_v0"."brsa" IS \'conventionné pour le suivi des BRSA\'',
       }),
       dict({
         'origin': list([

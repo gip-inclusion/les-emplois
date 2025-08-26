@@ -1,7 +1,14 @@
 from operator import attrgetter
 
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
+from itou.job_applications.models import JobApplication
+from itou.metabase.tables.utils import (
+    MetabaseTable,
+    get_choice,
+    get_column_from_field,
+    get_department_and_region_columns,
+    get_model_field,
+)
 from itou.prescribers.enums import PrescriberOrganizationKind
 
 
@@ -73,12 +80,7 @@ def get_ja_sender_full_name_if_pe_or_spip(ja):
 TABLE = MetabaseTable(name="candidatures")
 TABLE.add_columns(
     [
-        {
-            "name": "id",
-            "type": "uuid",
-            "comment": "ID C1 de la candidature",
-            "fn": attrgetter("pk"),
-        },
+        get_column_from_field(get_model_field(JobApplication, "pk"), name="id"),
         {
             "name": "candidature_archivee",
             "type": "boolean",
@@ -91,24 +93,15 @@ TABLE.add_columns(
             "comment": "Candidature automatiquement refusée car en attente depuis plus de 2 mois",
             "fn": lambda o: bool(o.refusal_reason == RefusalReason.AUTO),
         },
-        {
-            "name": "date_candidature",
-            "type": "date",
-            "comment": "Date de la candidature",
-            "fn": attrgetter("created_at"),
-        },
-        {
-            "name": "date_début_contrat",
-            "type": "date",
-            "comment": "Date de début du contrat",
-            "fn": attrgetter("hiring_start_at"),
-        },
-        {
-            "name": "date_traitement",
-            "type": "date",
-            "comment": "Date de dernier traitement de la candidature",
-            "fn": attrgetter("processed_at"),
-        },
+        get_column_from_field(
+            get_model_field(JobApplication, "created_at"), name="date_candidature", field_type="date"
+        ),
+        get_column_from_field(
+            get_model_field(JobApplication, "hiring_start_at"), name="date_début_contrat", field_type="date"
+        ),
+        get_column_from_field(
+            get_model_field(JobApplication, "processed_at"), name="date_traitement", field_type="date"
+        ),
         {
             "name": "état",
             "type": "varchar",
@@ -130,21 +123,15 @@ TABLE.add_columns(
             ),
             "fn": get_job_application_detailed_origin,
         },
-        {
-            "name": "origine_id_structure",
-            "type": "integer",
-            "comment": "ID de la structure d'origine de la candidature",
-            "fn": attrgetter("sender_company_id"),
-        },
-        {
-            "name": "parcours_de_création",
-            "type": "varchar",
-            "comment": (
-                "Parcours de création de la candidature "
-                "(Normale, reprise de stock AI, import agrément PE, action support...)"
+        get_column_from_field(get_model_field(JobApplication, "sender_company"), name="origine_id_structure"),
+        get_column_from_field(
+            get_model_field(JobApplication, "origin"),
+            name="parcours_de_création",
+            comment=(
+                "Parcours de création de la candidature"
+                " (Normale, reprise de stock AI, import agrément PE, action support...)"
             ),
-            "fn": attrgetter("origin"),
-        },
+        ),
         {
             "name": "délai_prise_en_compte",
             "type": "interval",
@@ -168,18 +155,8 @@ TABLE.add_columns(
             "comment": "Motif de refus de la candidature",
             "fn": lambda o: str(o.refusal_reason) if o.refusal_reason != "" else None,
         },
-        {
-            "name": "id_candidat",
-            "type": "integer",
-            "comment": "ID C1 du candidat",
-            "fn": attrgetter("job_seeker_id"),
-        },
-        {
-            "name": "id_structure",
-            "type": "integer",
-            "comment": "ID de la structure destinaire de la candidature",
-            "fn": attrgetter("to_company_id"),
-        },
+        get_column_from_field(get_model_field(JobApplication, "job_seeker"), name="id_candidat"),
+        get_column_from_field(get_model_field(JobApplication, "to_company"), name="id_structure"),
         {
             "name": "type_structure",
             "type": "varchar",
