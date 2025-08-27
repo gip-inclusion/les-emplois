@@ -29,9 +29,8 @@ from itou.utils.urls import get_absolute_url
 logger = logging.getLogger(__name__)
 
 
-def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags=""):
-    if request:
-        messages.error(request, error_msg, extra_tags)
+def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
+    messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
@@ -129,19 +128,19 @@ def france_connect_callback(request):
     )
     if response.status_code != 200:
         error_msg = "Impossible d'obtenir les informations utilisateur de FranceConnect."
-        return _redirect_to_job_seeker_login_on_error(error_msg)
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
         user_data = json.loads(response.content)
     except json.decoder.JSONDecodeError:
         error_msg = "Impossible de décoder les informations utilisateur."
-        return _redirect_to_job_seeker_login_on_error(error_msg)
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from FranceConnect, we need that to match a user later on
         error_msg = "Le paramètre « sub » n'a pas été retourné par FranceConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
         logger.error(error_msg)
-        return _redirect_to_job_seeker_login_on_error(error_msg)
+        return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     fc_user_data = FranceConnectUserData.from_user_info(user_data)
 
