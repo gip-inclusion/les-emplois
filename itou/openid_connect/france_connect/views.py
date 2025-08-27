@@ -143,7 +143,6 @@ def france_connect_callback(request):
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "v2" in url:
-        logger.info("got JWS token: %s", response.content)
         user_data = jwt.decode(
             response.content,
             key=jwt.api_jwk.PyJWK(get_es256_key()).key,
@@ -224,6 +223,10 @@ def france_connect_logout(request):
         "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home")),
     }
-    url = constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
+    url = (
+        constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
+        if "v2" not in constants.FRANCE_CONNECT_ENDPOINT_USERINFO
+        else constants.FRANCE_CONNECT_ENDPOINT_LOGOUT_V2
+    )
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)
