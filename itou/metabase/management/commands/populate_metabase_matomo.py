@@ -2,7 +2,7 @@ import concurrent
 import csv
 import datetime
 import io
-import threading
+import logging
 import urllib
 from dataclasses import dataclass
 
@@ -20,12 +20,7 @@ from itou.utils.date import monday_of_the_week
 from itou.utils.slack import send_slack_message
 
 
-lock = threading.Lock()
-
-
-def threadsafe_print(s):
-    with lock:
-        print(s, flush=True)
+logger = logging.getLogger(__name__)
 
 
 def log_retry_attempt(retry_state):
@@ -33,7 +28,7 @@ def log_retry_attempt(retry_state):
         outcome = retry_state.outcome.result()
     except Exception as e:
         outcome = str(e)
-    threadsafe_print(f"attempt={retry_state.attempt_number} failed with outcome={outcome}")
+    logger.info("attempt=%s failed with outcome=%s", retry_state.attempt_number, outcome)
 
 
 # Matomo might be a little tingly sometimes, let's give it retries.
@@ -136,59 +131,57 @@ class MatomoFetchOptions:
     extra_columns: dict
 
 
-def get_matomo_dashboard(at: datetime.datetime, options: MatomoFetchOptions):
-    base_options = MATOMO_OPTIONS | {
-        "date": f"{at}",
-        "token_auth": settings.MATOMO_AUTH_TOKEN,
-    }
-    segment = options.api_options.get("segment")
-    if segment:
-        key, value = segment.split("==")
-        options.api_options["segment"] = f"{key}=={urllib.parse.quote(value, safe='')}"
-    threadsafe_print(f"\t> fetching date={at} dashboard='{options.dashboard_name}' {key}={value}")
-    column_names = None
-    results = []
-    for row in matomo_api_call(base_options | options.api_options):
-        if all(x in ["0", "0s", "0%", None] for x in row.values()):
-            threadsafe_print(f"\t! empty matomo values for date={at} dashboard={options.dashboard_name}")
-            continue
-        row["Date"] = at
-        row["Tableau de bord"] = options.dashboard_name
-        for extra_col, extra_value in options.extra_columns.items():
-            row[extra_col] = extra_value
-        if not column_names:
-            column_names = list(row.keys())
-        results.append(list(row.values()))
-    return column_names, results
-
-
-def multiget_matomo_dashboards(at: datetime.datetime, dashboard_options: list[MatomoFetchOptions]):
-    all_rows = []
-    column_names = None
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        futures = [
-            executor.submit(
-                get_matomo_dashboard,
-                at,
-                options,
-            )
-            for options in dashboard_options
-        ]
-        for future in concurrent.futures.as_completed(futures, timeout=60 * 60 * 3):  # 3h max for all dashboards
-            cols, rows = future.result()
-            if not cols or not rows:
-                continue
-            # redefine column_names every time, they should always be the same
-            column_names = cols
-            all_rows += rows
-    return column_names, all_rows
-
-
 class Command(BaseCommand):
     help = "Fetches dashboards from matomo and inserts them monday by monday in Metabase in its raw version"
 
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+
+    def get_matomo_dashboard(self, at: datetime.datetime, options: MatomoFetchOptions):
+        base_options = MATOMO_OPTIONS | {
+            "date": f"{at}",
+            "token_auth": settings.MATOMO_AUTH_TOKEN,
+        }
+        segment = options.api_options.get("segment")
+        if segment:
+            key, value = segment.split("==")
+            options.api_options["segment"] = f"{key}=={urllib.parse.quote(value, safe='')}"
+        self.logger.info("\t> fetching date=%s dashboard=%s %s=%s", at, options.dashboard_name, key, value)
+        column_names = None
+        results = []
+        for row in matomo_api_call(base_options | options.api_options):
+            if all(x in ["0", "0s", "0%", None] for x in row.values()):
+                self.logger.info("\t! empty matomo values for date=%s dashboard=%s", at, options.dashboard_name)
+                continue
+            row["Date"] = at
+            row["Tableau de bord"] = options.dashboard_name
+            for extra_col, extra_value in options.extra_columns.items():
+                row[extra_col] = extra_value
+            if not column_names:
+                column_names = list(row.keys())
+            results.append(list(row.values()))
+        return column_names, results
+
+    def multiget_matomo_dashboards(self, at: datetime.datetime, dashboard_options: list[MatomoFetchOptions]):
+        all_rows = []
+        column_names = None
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(
+                    self.get_matomo_dashboard,
+                    at,
+                    options,
+                )
+                for options in dashboard_options
+            ]
+            for future in concurrent.futures.as_completed(futures, timeout=60 * 60 * 3):  # 3h max for all dashboards
+                cols, rows = future.result()
+                if not cols or not rows:
+                    continue
+                # redefine column_names every time, they should always be the same
+                column_names = cols
+                all_rows += rows
+        return column_names, all_rows
 
     @monitor(
         monitor_slug="populate-metabase-matomo",
@@ -217,8 +210,8 @@ class Command(BaseCommand):
                 )
             )
 
-        threadsafe_print(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
-        column_names, all_rows = multiget_matomo_dashboards(last_week_monday, api_call_options)
+        self.logger.info("> about to fetch count=%s public dashboards from Matomo.", len(api_call_options))
+        column_names, all_rows = self.multiget_matomo_dashboards(last_week_monday, api_call_options)
         if wet_run and column_names:
             send_slack_message(
                 ":rocket: Démarrage de la mise à jour des données Matomo", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
