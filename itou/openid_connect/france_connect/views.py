@@ -106,6 +106,7 @@ def france_connect_callback(request):
 
     if response.status_code != 200:
         error_msg = "Impossible d'obtenir le jeton de FranceConnect."
+        logger.error("FranceConnect token request failed with status %s", response.status_code)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     # Contains access_token, token_type, expires_in, id_token
@@ -114,6 +115,7 @@ def france_connect_callback(request):
     access_token = token_data.get("access_token")
     if not access_token:
         error_msg = "Aucun champ « access_token » dans la réponse FranceConnect, impossible de vous authentifier"
+        logger.error("FranceConnect token request returned no access token")
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     # A token has been provided so it's time to fetch associated user infos
@@ -128,18 +130,20 @@ def france_connect_callback(request):
     )
     if response.status_code != 200:
         error_msg = "Impossible d'obtenir les informations utilisateur de FranceConnect."
+        logger.error("FranceConnect userinfo request failed with status %s", response.status_code)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
         user_data = json.loads(response.content)
     except json.decoder.JSONDecodeError:
         error_msg = "Impossible de décoder les informations utilisateur."
+        logger.error("FranceConnect userinfo response is not a valid JSON")
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from FranceConnect, we need that to match a user later on
         error_msg = "Le paramètre « sub » n'a pas été retourné par FranceConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
-        logger.error(error_msg)
+        logger.error("FranceConnect userinfo response has no 'sub' field")
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     fc_user_data = FranceConnectUserData.from_user_info(user_data)
@@ -149,16 +153,20 @@ def france_connect_callback(request):
         user, _ = fc_user_data.create_or_update_user()
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
+        logger.info("FranceConnect login attempt with invalid user kind: %s", e.user.kind)
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))
     except MultipleSubSameEmailException as e:
+        logger.info("FranceConnect multiple subs with same email")
         return _redirect_to_job_seeker_login_on_error(
             e.format_message_html(IdentityProvider.FRANCE_CONNECT), request=request
         )
     except EmailInUseException as e:
+        logger.info("User should be using another login method")
         return redirect_with_error_sso_email_conflict_on_registration(
             request, e.user, IdentityProvider.FRANCE_CONNECT.label
         )
     except MultipleUsersFoundException as e:
+        logger.info("Email conflict detected")
         return _redirect_to_job_seeker_login_on_error(
             "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
             f"{e.users[0].email} et {e.users[1].email}. "
