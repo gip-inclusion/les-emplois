@@ -2,6 +2,7 @@ import json
 import logging
 
 import httpx
+import jwt
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -32,6 +33,18 @@ logger = logging.getLogger(__name__)
 def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
     messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("login:job_seeker"))
+
+
+def is_version_2():
+    return "v2" in settings.FRANCE_CONNECT_BASE_URL
+
+
+def get_es256_key():
+    jwks = httpx.get(constants.FRANCE_CONNECT_ENDPOINT_JWKS, timeout=5)
+    es256_keys = [key for key in jwks.json()["keys"] if key["alg"] == "ES256"]
+    if not es256_keys:
+        raise ValueError("No ES256 key found in FranceConnect JWKS")
+    return es256_keys[0]
 
 
 @login_not_required
@@ -133,12 +146,22 @@ def france_connect_callback(request):
         logger.error("FranceConnect userinfo request failed with status %s", response.status_code)
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
-    try:
-        user_data = json.loads(response.content)
-    except json.decoder.JSONDecodeError:
-        error_msg = "Impossible de décoder les informations utilisateur."
-        logger.error("FranceConnect userinfo response is not a valid JSON")
-        return _redirect_to_job_seeker_login_on_error(error_msg, request)
+    if is_version_2():
+        user_data = jwt.decode(
+            response.content,
+            key=jwt.api_jwk.PyJWK(get_es256_key()).key,
+            algorithms=["ES256"],
+            audience=settings.FRANCE_CONNECT_CLIENT_ID,
+            # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed
+            options={"verify_iat": False},
+        )
+    else:
+        try:
+            user_data = json.loads(response.content)
+        except json.decoder.JSONDecodeError:
+            error_msg = "Impossible de décoder les informations utilisateur."
+            logger.error("FranceConnect userinfo response is not a valid JSON")
+            return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     if "sub" not in user_data:
         # 'sub' is the unique identifier from FranceConnect, we need that to match a user later on
@@ -204,6 +227,6 @@ def france_connect_logout(request):
         "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home")),
     }
-    url = constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
+    url = constants.FRANCE_CONNECT_ENDPOINT_LOGOUT_V2 if is_version_2() else constants.FRANCE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)

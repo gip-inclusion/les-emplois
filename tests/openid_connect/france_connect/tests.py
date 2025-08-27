@@ -1,9 +1,16 @@
+import base64
 import datetime
+import hashlib
 import random
+import time
 
 import httpx
+import jwt
 import pytest
 import respx
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.utils import int_to_bytes
+from django.conf import settings
 from django.contrib import auth, messages
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -41,18 +48,92 @@ FC_USERINFO = {
     "sub": "b6048e95bb134ec5b1d1e1fa69f287172e91722b9354d637a1bcf2ebb0fd2ef5v1",
 }
 
+FC_USERINFO_V2 = {
+    "gender": "female",
+    "given_name": "Angela Claire Louise",
+    "given_name_array": ["Angela", "Claire", "Louise"],
+    "family_name": "DUBOIS",
+    "email": "wossewodda-3728@yopmail.com",
+    "birthdate": "1962-08-24",
+    "sub": "d303068c700ea93405ae193550a7d99be03744c08be08901e8e1c180869b2f54v1",
+}
+
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(client, expected_route="dashboard:index"):
-    # No session is created with France Connect in contrary to Inclusion Connect
-    # so there's no use to go through france_connect:authorize
+    # No session is created with France Connect so there's no use to go through france_connect:authorize
 
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.FRANCE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_info = FC_USERINFO.copy()
     respx.get(constants.FRANCE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
+
+    state = FranceConnectState.save_state()
+    url = reverse("france_connect:callback")
+    response = client.get(url, data={"code": "123", "state": state}, follow=True)
+    assertRedirects(response, reverse(expected_route))
+    return response
+
+
+# Make sure this decorator is before test definition, not here.
+# @respx.mock
+def mock_oauth_dance_v2(client, expected_route="dashboard:index"):
+    # No session is created with France Connect in contrary to Inclusion Connect
+    # so there's no use to go through france_connect:authorize
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    public_key_numbers = private_key.public_key().public_numbers()
+    jwk_json = {
+        "keys": [
+            {
+                "kty": "EC",
+                "use": "sig",
+                "kid": "pkcs11:ES256:hsm",
+                "alg": "ES256",
+                "crv": "P-256",
+                "x": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.x, 32)).decode().rstrip("="),
+                "y": base64.urlsafe_b64encode(int_to_bytes(public_key_numbers.y, 32)).decode().rstrip("="),
+            }
+        ]
+    }
+    respx.get(constants.FRANCE_CONNECT_ENDPOINT_JWKS).mock(return_value=httpx.Response(200, json=jwk_json))
+
+    now = int(time.time())
+    access_token = "aw9EMEBXYME57xmj-ZZYPPC9yxSRfK-A3MPCL56zysd"
+    access_token_hash = hashlib.sha256(access_token.encode()).digest()
+    common_jwt_content = {
+        "sub": FC_USERINFO_V2["sub"],
+        "aud": settings.FRANCE_CONNECT_CLIENT_ID,
+        "exp": now + 60,
+        "iat": now,
+        "iss": "https://fcp-low.sbx.dev-franceconnect.fr/api/v2",
+    }
+
+    id_token_content = {
+        "auth_time": now,
+        "acr": "eidas1",
+        "nonce": "test_nonce_123",
+        "at_hash": base64.urlsafe_b64encode(access_token_hash[:16]).decode().rstrip("="),
+        **common_jwt_content,
+    }
+    id_token = jwt.encode(id_token_content, private_key, algorithm="ES256", headers={"kid": "pkcs11:ES256:hsm"})
+
+    token_json = {
+        "access_token": access_token,
+        "expires_in": 60,
+        "id_token": id_token,
+        "scope": "openid gender given_name family_name email birthdate",
+        "token_type": "Bearer",
+    }
+    respx.post(constants.FRANCE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+    user_data = {
+        **FC_USERINFO_V2,
+        **common_jwt_content,
+    }
+    user_response = jwt.encode(user_data, private_key, algorithm="ES256", headers={"kid": "pkcs11:ES256:hsm"})
+    respx.get(constants.FRANCE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, content=user_response))
 
     state = FranceConnectState.save_state()
     url = reverse("france_connect:callback")
@@ -406,12 +487,35 @@ class TestFranceConnect:
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     @respx.mock
+    def test_callback_v2(self, client, settings):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
+        assert User.objects.count() == 1
+        user = User.objects.get(email=FC_USERINFO_V2["email"])
+        assert user.first_name == FC_USERINFO_V2["given_name"]
+        assert user.last_name == FC_USERINFO_V2["family_name"]
+        assert user.username == FC_USERINFO_V2["sub"]
+        assert user.has_sso_provider
+        assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+
+    @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
             mock_oauth_dance(client, expected_route=f"login:{kind}")
+            user.delete()
+
+    @respx.mock
+    def test_callback_redirect_on_invalid_kind_exception_v2(self, client, settings):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+
+        for kind in UserKind.professionals():
+            user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
+            mock_oauth_dance_v2(client, expected_route=f"login:{kind}")
             user.delete()
 
     @respx.mock
@@ -422,6 +526,17 @@ class TestFranceConnect:
 
         # Test redirection and modal content
         response = mock_oauth_dance(client, expected_route="signup:choose_user_kind")
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
+    @respx.mock
+    def test_callback_redirect_on_email_in_use_exception_v2(self, client, settings, snapshot):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        # EmailInUseException raised by the email conflict
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
+
+        # Test redirection and modal content
+        response = mock_oauth_dance_v2(client, expected_route="signup:choose_user_kind")
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
     @respx.mock
@@ -452,6 +567,37 @@ class TestFranceConnect:
         user.refresh_from_db()
         assert user.allow_next_sso_sub_update is False
 
+    @respx.mock
+    def test_callback_redirect_on_sub_conflict_v2(self, client, settings, snapshot):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        user = JobSeekerFactory(
+            username="another_sub", email=fc_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT
+        )
+
+        # Test redirection and modal content
+        response = mock_oauth_dance_v2(client, expected_route="login:job_seeker")
+        assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
+
+        # If we force the update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
+        assert user.username == fc_user_data.username
+
+        # If we allow the update again, but the sub does change, we still disable allow_next_sso_sub_update
+        user.allow_next_sso_sub_update = True
+        user.save()
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
+        assertMessages(response, [])
+        user.refresh_from_db()
+        assert user.allow_next_sso_sub_update is False
+
     def test_logout_no_id_token(self, client):
         url = reverse("france_connect:logout")
         response = client.get(url + "?")
@@ -467,6 +613,16 @@ class TestFranceConnect:
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)
 
+    def test_logout_v2(self, client, settings):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        url = reverse("france_connect:logout")
+        response = client.get(url, data={"id_token": "123", "state": "some_state"})
+        expected_url = (
+            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT_V2}?id_token_hint=123&state=some_state&"
+            "post_logout_redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
+        )
+        assertRedirects(response, expected_url, fetch_redirect_response=False)
+
     @respx.mock
     def test_django_account_logout_from_fc(self, client):
         """
@@ -474,6 +630,30 @@ class TestFranceConnect:
         he should be logged out too from IC.
         """
         response = mock_oauth_dance(client, expected_route="dashboard:index")
+        assert auth.get_user(client).is_authenticated
+        logout_url = reverse("account_logout")
+        assertContains(response, logout_url)
+        assert client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)
+
+        response = client.post(logout_url)
+        expected_redirection = reverse("france_connect:logout")
+        # For simplicity, exclude GET params. They are tested elsewhere anyway..
+        assert response.url.startswith(expected_redirection)
+
+        response = client.get(response.url)
+        # The following redirection is tested in self.test_logout_with_redirection
+        assert response.status_code == 302
+        assert not auth.get_user(client).is_authenticated
+
+    @respx.mock
+    def test_django_account_logout_from_fc_v2(self, client, settings):
+        """
+        When ac IC user wants to log out from his local account,
+        he should be logged out too from IC.
+        """
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
