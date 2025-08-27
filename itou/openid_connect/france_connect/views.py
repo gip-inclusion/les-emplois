@@ -46,7 +46,7 @@ def france_connect_authorize(request):
         "redirect_uri": redirect_uri,
         "scope": constants.FRANCE_CONNECT_SCOPES,
         "state": state,
-        "nonce": crypto.get_random_string(length=12),
+        "nonce": crypto.get_random_string(length=32),
         "acr_values": "eidas1",
     }
     url = constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE
