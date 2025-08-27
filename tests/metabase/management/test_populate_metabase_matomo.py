@@ -54,10 +54,10 @@ def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
     with pytest.raises(tenacity.RetryError):
-        management.call_command("populate_metabase_matomo", wet_run=True)
+        # Use pool_size=1 for stable output
+        management.call_command("populate_metabase_matomo", wet_run=True, pool_size=1)
 
-    # sort the output because it's random (ThreadPoolExecutor)
-    assert sorted(caplog.messages[:-1]) == snapshot(name="retry output")
+    assert caplog.messages[:-1] == snapshot(name="retry output")
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.populate_metabase_matomo failed in"
     )
@@ -96,10 +96,11 @@ def test_matomo_empty_output(respx_mock, caplog, snapshot):
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_EMPTY_CONTENT}".encode("utf-16"),
     )
-    management.call_command("populate_metabase_matomo", wet_run=True)
 
-    # sort the output because it's random (ThreadPoolExecutor)
-    assert sorted(caplog.messages[:-1]) == snapshot(name="empty output")
+    # Use pool_size=1 for stable output
+    management.call_command("populate_metabase_matomo", wet_run=True, pool_size=1)
+
+    assert caplog.messages[:-1] == snapshot(name="empty output")
     assert caplog.messages[-1].startswith(
         "Management command itou.metabase.management.commands.populate_metabase_matomo succeeded in"
     )
