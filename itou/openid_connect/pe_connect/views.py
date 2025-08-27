@@ -33,9 +33,8 @@ from itou.utils.urls import add_url_params, get_absolute_url
 logger = logging.getLogger(__name__)
 
 
-def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags=""):
-    if request:
-        messages.error(request, error_msg, extra_tags)
+def _redirect_to_job_seeker_login_on_error(error_msg, request, extra_tags=""):
+    messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
