@@ -136,6 +136,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+        parser.add_argument("--pool-size", dest="pool_size", type=int, default=2)
 
     def get_matomo_dashboard(self, at: datetime.datetime, options: MatomoFetchOptions):
         base_options = MATOMO_OPTIONS | {
@@ -162,10 +163,12 @@ class Command(BaseCommand):
             results.append(list(row.values()))
         return column_names, results
 
-    def multiget_matomo_dashboards(self, at: datetime.datetime, dashboard_options: list[MatomoFetchOptions]):
+    def multiget_matomo_dashboards(
+        self, at: datetime.datetime, dashboard_options: list[MatomoFetchOptions], *, pool_size=2
+    ):
         all_rows = []
         column_names = None
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=pool_size) as executor:
             futures = [
                 executor.submit(
                     self.get_matomo_dashboard,
@@ -194,7 +197,7 @@ class Command(BaseCommand):
             "timezone": "UTC",
         },
     )
-    def handle(self, *, wet_run, **options):
+    def handle(self, *, wet_run, pool_size, **options):
         last_week_monday = monday_of_the_week() - datetime.timedelta(days=7)
 
         api_call_options = []
@@ -211,7 +214,9 @@ class Command(BaseCommand):
             )
 
         self.logger.info("> about to fetch count=%s public dashboards from Matomo.", len(api_call_options))
-        column_names, all_rows = self.multiget_matomo_dashboards(last_week_monday, api_call_options)
+        column_names, all_rows = self.multiget_matomo_dashboards(
+            last_week_monday, api_call_options, pool_size=pool_size
+        )
         if wet_run and column_names:
             send_slack_message(
                 ":rocket: Démarrage de la mise à jour des données Matomo", url=settings.PILOTAGE_SLACK_WEBHOOK_URL
