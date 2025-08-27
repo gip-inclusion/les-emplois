@@ -46,7 +46,7 @@ MATOMO_ONLINE_CONTENT = (
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_retry(monkeypatch, respx_mock, capsys, snapshot):
+def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
     monkeypatch.setattr("tenacity.wait_fixed", lambda _a: None)
 
     respx_mock.get("/index.php").respond(
@@ -55,9 +55,12 @@ def test_matomo_retry(monkeypatch, respx_mock, capsys, snapshot):
     )
     with pytest.raises(tenacity.RetryError):
         management.call_command("populate_metabase_matomo", wet_run=True)
-    stdout, _ = capsys.readouterr()
+
     # sort the output because it's random (ThreadPoolExecutor)
-    assert sorted(stdout.splitlines()) == snapshot(name="retry output")
+    assert sorted(caplog.messages[:-1]) == snapshot(name="retry output")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.metabase.management.commands.populate_metabase_matomo failed in"
+    )
 
 
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar", AIRFLOW_BASE_URL="https://airfl.ow")
@@ -87,13 +90,16 @@ def test_matomo_populate_public(respx_mock, snapshot):
 @pytest.mark.respx(base_url="https://mato.mo")
 @pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
-def test_matomo_empty_output(respx_mock, capsys, snapshot):
+def test_matomo_empty_output(respx_mock, caplog, snapshot):
     MATOMO_ONLINE_EMPTY_CONTENT = "0," * 56 + "0"
     respx_mock.get("/index.php").respond(
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_EMPTY_CONTENT}".encode("utf-16"),
     )
     management.call_command("populate_metabase_matomo", wet_run=True)
-    stdout, _ = capsys.readouterr()
+
     # sort the output because it's random (ThreadPoolExecutor)
-    assert sorted(stdout.splitlines()) == snapshot(name="empty output")
+    assert sorted(caplog.messages[:-1]) == snapshot(name="empty output")
+    assert caplog.messages[-1].startswith(
+        "Management command itou.metabase.management.commands.populate_metabase_matomo succeeded in"
+    )
