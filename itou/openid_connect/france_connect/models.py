@@ -3,11 +3,14 @@ import datetime
 from typing import ClassVar
 
 from itou.openid_connect.models import OIDConnectState, OIDConnectUserData
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider, Title, UserKind
 
 
 class FranceConnectState(OIDConnectState):
     pass
+
+
+TITLE_MAP = {"male": Title.M, "female": Title.MME}
 
 
 @dataclasses.dataclass
@@ -20,6 +23,7 @@ class FranceConnectUserData(OIDConnectUserData):
     post_code: str | None = None
     city: str | None = None
     kind: UserKind = UserKind.JOB_SEEKER
+    title: str | None = None
     identity_provider: IdentityProvider = IdentityProvider.FRANCE_CONNECT
     allowed_identity_provider_migration: ClassVar[tuple[IdentityProvider]] = ()
 
@@ -44,4 +48,6 @@ class FranceConnectUserData(OIDConnectUserData):
                     "post_code": user_info["address"].get("postal_code"),
                     "city": user_info["address"].get("locality"),
                 }
+        if "gender" in user_info and (gender := user_info.get("gender")) in TITLE_MAP:
+            attrs |= {"title": TITLE_MAP[gender]}
         return attrs

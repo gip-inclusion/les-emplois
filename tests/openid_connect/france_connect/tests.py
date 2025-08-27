@@ -15,7 +15,7 @@ from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.models import User
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
@@ -128,6 +128,7 @@ class TestFranceConnect:
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
+        assert user.title == Title.MME
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
@@ -143,6 +144,7 @@ class TestFranceConnect:
             "given_name": "",
             "family_name": "",
             "birthdate": "",
+            "gender": "",
             "phone_number": "",
             "address": {
                 "street_address": "",
@@ -154,6 +156,7 @@ class TestFranceConnect:
         user, created = fc_user_data.create_or_update_user()
         assert created
         assert not user.first_name
+        assert not user.title
         assert not user.post_code
         assert not user.jobseeker_profile.birthdate
         assert not user.phone
@@ -196,6 +199,7 @@ class TestFranceConnect:
             username=fc_user_data.username,
             last_name="will_be_forgotten",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
+            title=Title.M,
         )
         user, created = fc_user_data.create_or_update_user()
         assert not created
@@ -203,6 +207,7 @@ class TestFranceConnect:
         assert user.first_name == FC_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+        assert user.title == Title.MME
 
     def test_create_django_user_with_already_existing_fc_id_but_from_other_sso(self):
         """
@@ -235,6 +240,7 @@ class TestFranceConnect:
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
+            title=Title.M,
         )
         IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, certified=True)
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
@@ -251,7 +257,7 @@ class TestFranceConnect:
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.kind == UserKind.JOB_SEEKER
         assert (
-            f"Not updating fields birthdate, first_name, last_name on job seeker pk={job_seeker.pk} "
+            f"Not updating fields birthdate, first_name, last_name, title on job seeker pk={job_seeker.pk} "
             "because their identity has been certified." in caplog.messages
         )
 
@@ -390,8 +396,7 @@ class TestFranceConnect:
 
     @respx.mock
     def test_callback(self, client):
-        # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, expected_route="dashboard:index")
         assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
@@ -468,8 +473,7 @@ class TestFranceConnect:
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        # New created job seeker has no title and is redirected to complete its infos
-        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
+        response = mock_oauth_dance(client, expected_route="dashboard:index")
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
