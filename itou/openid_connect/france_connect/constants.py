@@ -1,7 +1,7 @@
 from django.conf import settings
 
 
-FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate birthplace birthcountry"
+FRANCE_CONNECT_SCOPES = "openid gender given_name family_name email birthdate"
 
 FRANCE_CONNECT_ENDPOINT_AUTHORIZE = f"{settings.FRANCE_CONNECT_BASE_URL}/authorize"
 FRANCE_CONNECT_ENDPOINT_TOKEN = f"{settings.FRANCE_CONNECT_BASE_URL}/token"
