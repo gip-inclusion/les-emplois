@@ -1,0 +1,59 @@
+[
+  {
+    "fields": {
+      "address": "6 Boulevard Saint-Denis, Paris, 75010",
+      "canceled_at": null,
+      "company": 3850,
+      "duration": "00:45:00",
+      "is_collective": false,
+      "location": "590dbe73-7034-4353-8030-ba3016d531e7",
+      "max_participants": null,
+      "rdv_insertion_id": 2213,
+      "reason": "Entretien d'embauche",
+      "reason_category": "siae_interview",
+      "start_at": "2026-09-15T08:30:00Z",
+      "status": "unknown",
+      "total_participants": 1
+    },
+    "model": "rdv_insertion.appointment",
+    "pk": "04371a30-c4c1-4bb1-948d-b2a29b8bf880"
+  },
+  {
+    "fields": {
+      "address": "6 Boulevard Saint-Denis, Paris, 75010",
+      "canceled_at": "2025-08-27T10:21:21Z",
+      "company": 3850,
+      "duration": "00:45:00",
+      "is_collective": false,
+      "location": "590dbe73-7034-4353-8030-ba3016d531e7",
+      "max_participants": null,
+      "rdv_insertion_id": 2211,
+      "reason": "Entretien d'embauche",
+      "reason_category": "siae_interview",
+      "start_at": "2025-09-02T08:30:00Z",
+      "status": "excused",
+      "total_participants": 0
+    },
+    "model": "rdv_insertion.appointment",
+    "pk": "3841f142-2e77-4d61-887a-8ab046e9a66e"
+  },
+  {
+    "fields": {
+      "address": "6 Boulevard Saint-Denis, Paris, 75010",
+      "canceled_at": "2025-08-27T10:24:38Z",
+      "company": 3850,
+      "duration": "00:45:00",
+      "is_collective": false,
+      "location": "590dbe73-7034-4353-8030-ba3016d531e7",
+      "max_participants": null,
+      "rdv_insertion_id": 2212,
+      "reason": "Entretien d'embauche",
+      "reason_category": "siae_interview",
+      "start_at": "2025-08-27T10:15:00Z",
+      "status": "seen",
+      "total_participants": 0
+    },
+    "model": "rdv_insertion.appointment",
+    "pk": "628f4b21-c2bb-4b41-b982-b3b040f31a66"
+  }
+]

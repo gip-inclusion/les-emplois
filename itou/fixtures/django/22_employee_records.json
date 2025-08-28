@@ -78,7 +78,7 @@
       "processed_as_duplicate": false,
       "processed_at": null,
       "siret": "99999999999994",
-      "status": "REJECTED"
+      "status": "DISABLED"
     },
     "model": "employee_record.employeerecord",
     "pk": 4
