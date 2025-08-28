@@ -24,12 +24,10 @@ $(document).ready(function () {
       return;
     }
 
-    const htmxModalControl = new bootstrap.Modal(`#${evt.detail.id}`);
-
     if (evt.detail.action === "show") {
-      htmxModalControl.show();
+      new bootstrap.Modal(`#${evt.detail.id}`).show();
     } else {
-      htmxModalControl.hide();
+      bootstrap.Modal.getInstance(`#${evt.detail.id}`).hide();
     }
   });
 });
