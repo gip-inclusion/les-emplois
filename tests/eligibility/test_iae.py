@@ -451,6 +451,7 @@ def test_certifiable(AdministrativeCriteriaClass):
         assert not criterion.is_certifiable
 
 
+@pytest.mark.usefixtures("api_particulier_settings")
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
@@ -514,6 +515,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
 
 
 @freeze_time("2024-09-12T00:00:00Z")
+@pytest.mark.usefixtures("api_particulier_settings")
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory,identity_certifiers,expected,response_status,response",
     [

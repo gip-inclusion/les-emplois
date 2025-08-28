@@ -58,7 +58,7 @@ class HTTPXFilter(logging.Filter):
             # In the future, we might want to parametrize this filter but YAGNI
 
             if isinstance(arg, httpx.URL):
-                if str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
+                if settings.API_PARTICULIER_BASE_URL and str(arg).startswith(settings.API_PARTICULIER_BASE_URL):
                     redacted_params = [(key, "_REDACTED_") for key, _value in arg.params.multi_items()]
                     arg = arg.copy_with(params=redacted_params)
                 elif str(arg).startswith(f"{settings.BREVO_API_URL}/contacts/"):

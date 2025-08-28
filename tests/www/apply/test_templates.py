@@ -281,6 +281,7 @@ class TestIAEEligibilityDetail:
         assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
         assert "Le diagnostic d'éligibilité IAE de ce candidat a expiré" in rendered
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
         mocker.patch(
@@ -342,6 +343,7 @@ class TestGEIQEligibilityDetail:
             job_application.save()
         return job_application
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     @freeze_time("2024-10-04")
     def test_nominal_case(self, mocker):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
@@ -359,6 +361,7 @@ class TestGEIQEligibilityDetail:
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
         certified_help_text = "En savoir plus sur les badges de certification"

@@ -28,6 +28,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
         pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
     ],
 )
+@pytest.mark.usefixtures("api_particulier_settings")
 class TestCertifyCriteria:
     @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
     @freeze_time("2025-01-06")
