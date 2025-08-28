@@ -29,27 +29,27 @@ def employers_accounts_tag():
     return [
         {
             "title": "ETTI",
-            "email": "test+etti@inclusion.gouv.fr",
+            "email": "demo.emplois+etti@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "EI",
-            "email": "test+ei@inclusion.gouv.fr",
+            "email": "demo.emplois+ei@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "GEIQ",
-            "email": "test+geiq@inclusion.gouv.fr",
+            "email": "demo.emplois+geiq@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "EA",
-            "email": "test+ea@inclusion.gouv.fr",
+            "email": "demo.emplois+ea@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "AI",
-            "email": "test+ai@inclusion.gouv.fr",
+            "email": "demo.emplois+ai@inclusion.gouv.fr",
             "action_url": action_url,
         },
     ]
@@ -61,17 +61,17 @@ def prescribers_accounts_tag():
     return [
         {
             "title": "Prescripteur habilité",
-            "email": "test+prescripteur@inclusion.gouv.fr",
+            "email": "demo.emplois+prescripteur@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "Orienteur",
-            "email": "test+orienteur@inclusion.gouv.fr",
+            "email": "demo.emplois+orienteur@inclusion.gouv.fr",
             "action_url": action_url,
         },
         {
             "title": "Orienteur seul sans organisation",
-            "email": "test+orienteur-solo@inclusion.gouv.fr",
+            "email": "demo.emplois+orienteur-solo@inclusion.gouv.fr",
             "action_url": action_url,
         },
     ]
@@ -79,7 +79,7 @@ def prescribers_accounts_tag():
 
 @register.simple_tag
 def job_seekers_accounts_tag():
-    user_email = "test+de@inclusion.gouv.fr"
+    user_email = "demo.emplois+de@inclusion.gouv.fr"
     try:
         user_public_id = User.objects.get(kind=UserKind.JOB_SEEKER, email=user_email).public_id
     except User.DoesNotExist:
