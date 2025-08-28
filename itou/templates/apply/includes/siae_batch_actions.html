@@ -45,7 +45,7 @@
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
                             data-bs-custom-class="c-box--action-tooltip"
-                            data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « En attente » peuvent être déclinées.">
+                            data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %}, « En attente » et « Vivier » peuvent être déclinées.">
                         <i class="ri-close-line" aria-hidden="true"></i>
                         <span>Décliner</span>
                     </button>
@@ -74,7 +74,7 @@
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     data-bs-custom-class="c-box--action-tooltip"
-                                    data-bs-title="Seules les candidatures au statut « Nouvelle candidature » peuvent être mises à l’étude.">
+                                    data-bs-title="Seules les candidatures au statut « Nouvelle candidature » et « Vivier » peuvent être mises à l’étude.">
                                 <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
                                 <span>Étudier</span>
                             </button>
@@ -95,7 +95,7 @@
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     data-bs-custom-class="c-box--action-tooltip"
-                                    data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %} ou « Action préalable à l’embauche »{% endif %} peuvent être mises en liste d’attente.">
+                                    data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude »{% if request.current_organization.kind == CompanyKind.GEIQ %}, « Action préalable à l’embauche »{% endif %} et « Vivier » peuvent être mises en liste d’attente.">
                                 <i class="ri-history-line fw-medium me-2" aria-hidden="true"></i>
                                 <span>Mettre en attente</span>
                             </button>
