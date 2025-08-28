@@ -6725,7 +6725,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button as GEIQ]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » ou « Action préalable à l’embauche » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude », « Action préalable à l’embauche » et « Vivier » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
@@ -6737,7 +6737,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_postpone[inactive postpone button]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » ou « À l’étude » et « Vivier » peuvent être mises en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
@@ -6844,7 +6844,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_process[inactive process button]
   '''
-  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » peuvent être mises à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle candidature » et « Vivier » peuvent être mises à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-history-line fw-medium me-2">
       </i>
       <span>
@@ -6947,7 +6947,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button as GEIQ]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche » et « En attente » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « Action préalable à l’embauche », « En attente » et « Vivier » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-close-line">
       </i>
       <span>
@@ -6959,7 +6959,7 @@
 # ---
 # name: test_list_for_siae_select_applications_batch_refuse[inactive refuse button]
   '''
-  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude » et « En attente » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Nouvelle », « À l’étude », « En attente » et « Vivier » peuvent être déclinées." data-bs-toggle="tooltip" disabled="" type="button">
       <i aria-hidden="true" class="ri-close-line">
       </i>
       <span>

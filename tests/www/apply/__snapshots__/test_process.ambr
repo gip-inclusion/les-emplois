@@ -1039,14 +1039,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1116,14 +1116,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1267,14 +1267,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1344,14 +1344,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1418,14 +1418,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1489,14 +1489,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1560,7 +1560,7 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
@@ -1631,7 +1631,7 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
@@ -1702,7 +1702,7 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
@@ -1776,14 +1776,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1853,14 +1853,14 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
                               Étudier
                           </span>
                       </button>
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « À l’étude » et « Vivier » peut être mise en liste d’attente." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-history-line fw-medium me-2">
                           </i>
                           <span>
@@ -1927,7 +1927,7 @@
                       </span>
                   </button>
                   <div aria-labelledby="other_actions" class="dropdown-menu w-100">
-                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
+                      <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seule une candidature au statut « Nouvelle candidature » et « Vivier » peut être mise à l’étude." data-bs-toggle="tooltip" disabled="" type="button">
                           <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
                           </i>
                           <span>
