@@ -53,7 +53,7 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     )
     respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
 
-    eligibility_diagnosis.certify_criteria()
+    certify_criteria(eligibility_diagnosis)
 
     assert len(respx_mock.calls) == 1
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through

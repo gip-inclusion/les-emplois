@@ -1,13 +1,11 @@
 import datetime
 from functools import partial
-from unittest import mock
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
-from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import (
@@ -18,6 +16,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.eligibility.tasks import certify_criteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
 from itou.users.enums import IdentityCertificationAuthorities
@@ -496,7 +495,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
-    eligibility_diagnosis.certify_criteria()
+    certify_criteria(eligibility_diagnosis)
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.get(
@@ -510,36 +509,10 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
     with freeze_time("2025-10-15"):
-        eligibility_diagnosis.certify_criteria()
+        certify_criteria(eligibility_diagnosis)
     updated_certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert updated_certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
     assert updated_certification.certified_at > certification.certified_at
-
-
-@pytest.mark.parametrize(
-    "async_mode_only, certify_criteria_called, async_certify_criteria_called, side_effect",
-    [
-        pytest.param(True, False, True, None, id="async_mode_only"),
-        pytest.param(False, True, False, None, id="sync_mode_only"),
-        pytest.param(False, True, True, RetryTask, id="sync_mode_with_retry_task"),
-    ],
-)
-@freeze_time("2024-09-12")
-def test_eligibility_diagnosis_certify_criteria_retry_on_error(
-    settings, async_mode_only, certify_criteria_called, async_certify_criteria_called, side_effect
-):
-    eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
-        certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA]
-    )
-
-    settings.CERTIFY_CRITERIA_ASYNC_MODE_ONLY = async_mode_only
-    with (
-        mock.patch("itou.eligibility.models.common.certify_criteria", side_effect=side_effect) as sync_mock,
-        mock.patch("itou.eligibility.models.common.async_certify_criteria") as async_mock,
-    ):
-        eligibility_diagnosis.certify_criteria()
-        assert sync_mock.called is certify_criteria_called
-        assert async_mock.called is async_certify_criteria_called
 
 
 @pytest.mark.parametrize(
@@ -564,7 +537,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         certifiable=True,
         criteria_kinds=[AdministrativeCriteriaKind.RSA],
     )
-    eligibility_diagnosis.certify_criteria()
+    certify_criteria(eligibility_diagnosis)
     assert len(respx_mock.calls) == 0
     jobseeker_profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile)
     assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
@@ -665,7 +638,7 @@ def test_selected_administrative_criteria_certified(
         response_status, json=response
     )
 
-    eligibility_diagnosis.certify_criteria()
+    certify_criteria(eligibility_diagnosis)
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.filter(
