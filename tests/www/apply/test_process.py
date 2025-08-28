@@ -2375,6 +2375,7 @@ class TestProcessAcceptViews:
         assert job_application.hiring_end_at is None
         assert job_application.state.is_accepted
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(self, client, mocker):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
@@ -2974,6 +2975,7 @@ class TestProcessAcceptViews:
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
@@ -3063,6 +3065,7 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
+    @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):

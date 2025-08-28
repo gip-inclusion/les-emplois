@@ -772,6 +772,12 @@ def github_respx_mock_fixture(respx_mock):
     return start, respx_mock.route(headers=headers, method="GET", params=params, url=url).respond(json=resp_json)
 
 
+@pytest.fixture
+def api_particulier_settings(settings):
+    settings.API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/api/"
+    settings.API_PARTICULIER_TOKEN = "test"
+
+
 @pytest.fixture(name="pro_connect")
 def setup_pro_connect():
     # this import requirest the settings to be loaded so we con't put it with the others
