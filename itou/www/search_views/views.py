@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
@@ -16,7 +17,9 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
+from itou.search.models import SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
@@ -56,6 +59,9 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         return self.post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        saved_searches = (
+            SavedSearch.objects.filter(user=self.request.user) if self.request.user.is_authenticated else None
+        )
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
@@ -65,6 +71,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "job_descriptions_count": 0,
             "siaes_count": 0,
             "results_page": [],
+            "saved_searches": saved_searches,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
@@ -158,12 +165,15 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         new_saved_search_form = NewSavedSearchForm(
             user=self.request.user,
             initial={
-                "name": city,
+                "name": city.name,
                 "city": city,
                 "distance": distance,
-                "company_kinds": kinds,
+                "kinds": kinds,
+                "contract_types": contract_types,
                 "departments": departments,
+                "domains": domains,
             },
+            prefix="saved_search",
         )
 
         context = {
@@ -172,12 +182,11 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
             "city": city,
             "distance": distance,
-            "company_kinds": kinds,
             "departments": departments,
             "filters_query_string": urlencode(
                 {
                     "city": city.slug,
-                    "city_name": str(city),
+                    "city_name": str(city),  # FIXME Ewen: is it used?
                     "distance": distance,
                     "kinds": kinds,
                     "contract_types": contract_types,
@@ -347,11 +356,20 @@ def search_prescribers_results(request, template_name="search/prescribers_search
 
 
 @require_POST
-def add_saved_search(request, template_name="search/includes/new_saved_search_modal.html"):
-    form = NewSavedSearchForm(user=request.user, data=request.POST)
-    context = {"new_saved_search_form": form}
+def add_saved_search(request):
+    form = NewSavedSearchForm(user=request.user, data=request.POST, prefix="saved_search")
+    context = {"form": form}
 
+    headers = {}
     if form.is_valid():
         form.save()
+        saved_searches = SavedSearch.objects.filter(user=request.user)
+        context |= {"saved_searches": saved_searches}
+        headers |= hx_trigger_modal_control("newSavedSearchModal", "hide")
 
-    return render(request, template_name, context)
+    return TemplateResponse(
+        request=request,
+        template="search/includes/new_saved_search_modal_content.html",
+        context=context,
+        headers=headers,
+    )

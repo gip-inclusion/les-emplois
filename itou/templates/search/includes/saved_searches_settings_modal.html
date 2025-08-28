@@ -1,0 +1,14 @@
+{% load django_bootstrap5 %}
+<div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <form hx-post="{% url "search:add_saved_search" %}" hx-target="#savedSearchesSettingsModal" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </form>
+    </div>
+</div>
