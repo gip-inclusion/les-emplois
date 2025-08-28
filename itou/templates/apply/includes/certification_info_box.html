@@ -2,40 +2,56 @@
     {% if diagnosis.criteria_can_be_certified %}
         <div class="c-info my-4">
             <button class="c-info__summary" data-bs-toggle="collapse" data-bs-target="#collapse-certif-help-text" aria-expanded="true" aria-controls="collapse-certif-help-text">
-                <span>Pourquoi certains critères peuvent-ils être certifiés ?</span>
+                <span>En savoir plus sur les badges de certification</span>
             </button>
             <div class="c-info__detail collapse" id="collapse-certif-help-text">
                 <p>
                     Nous développons progressivement nos connexions avec les
                     différents services de l’État qui fournissent les justificatifs
                     correspondant aux critères administratifs. Après interrogation
-                    du système d’information de l’État, deux types de badges
+                    du système d’information de l’État, plusieurs types de badges
                     peuvent être affichés :
                 </p>
                 <dl class="my-3 ms-3">
-                    <dt>Certifié</dt>
+                    <dt>{% include "eligibility/includes/badge_certified.html" only %}</dt>
                     <dd>
                         Aucune action n’est nécessaire.
                     </dd>
-                    <dt>Non certifié</dt>
+                    <dt>{% include "eligibility/includes/badge_not_certified.html" only %}</dt>
                     <dd>
-                        Nous n’avons pas trouvé d’information permettant de
-                        valider ce critère administratif.
+                        Ce critère n’est pas reconnu par les services de l’État
+                        pour cette personne à ce jour.
+                    </dd>
+                    <dt>{% include "eligibility/includes/badge_certification_in_progress.html" only %}</dt>
+                    <dd>
+                        La vérification de ce critère est en cours.
+                    </dd>
+                    <dt>{% include "eligibility/includes/badge_certification_error.html" only %}</dt>
+                    <dd>
+                        Ce critère n’a pas pu être certifié (profil utilisateur
+                        incomplet, utilisateur introuvable, erreur serveur).
                     </dd>
                 </dl>
                 <p>
-                    <strong>
-                        Lorsqu’un critère n’est pas certifié dans le cadre d’une
-                        auto-prescription, nous recommandons à l’employeur de
-                        récupérer et conserver une copie du justificatif
-                        administratif.
-                    </strong>
-                    Pour rappel, les critères déclarés par les prescripteurs habilités ne nécessitent aucun justificatif.
+                    Si aucun badge n’apparaît, cela signifie que la
+                    vérification de ce critère n’est pas encore disponible.
                 </p>
                 <p>
-                    L’absence de badge signifie que nous ne sommes pas encore en
-                    mesure d’interroger le système d’information de l’État pour ce
-                    critère.
+                    Pour rappel :
+                    <ul>
+                        <li>
+                            les critères déclarés par les prescripteurs
+                            habilités ne nécessitent aucun justificatif.
+                        </li>
+                        <li>
+                            <strong>
+                                Lorsqu’un critère n’est pas certifié dans le
+                                cadre d’une auto-prescription, l’employeur doit
+                                donc récupérer et conserver une copie du
+                                justificatif administratif.
+                            </strong>
+                        </li>
+                    </ul>
                 </p>
                 <p class="mb-0">
                     Retrouvez le détail des conditions dans

@@ -122,6 +122,10 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
             certified=False,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
         )
+        criteria_certification_error = factory.Trait(
+            certified=None,
+            certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+        )
 
     eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
     administrative_criteria = factory.Iterator(models.AdministrativeCriteria.objects.certifiable())
