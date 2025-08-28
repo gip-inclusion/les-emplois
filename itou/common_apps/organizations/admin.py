@@ -6,13 +6,9 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline
 
 
 class MembersInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, acting_user, queryset, **kwargs):
+    def __init__(self, *args, acting_user, **kwargs):
         self.acting_user = acting_user
-        return super().__init__(
-            *args,
-            queryset=self.model.include_inactive.all(),
-            **kwargs,
-        )
+        return super().__init__(*args, **kwargs)
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
@@ -67,6 +63,13 @@ class MembersInline(ItouTabularInline):
     readonly_fields = ("created_at", "updated_at", "updated_by", "joined_at")
     ordering = ("user__last_name", "user__first_name", "joined_at")
     formset = MembersInlineFormSet
+
+    def get_queryset(self, request):
+        queryset = self.model.include_inactive.all()
+        ordering = self.get_ordering(request)
+        if ordering:
+            queryset = queryset.order_by(*ordering)
+        return queryset
 
     def has_delete_permission(self, *args, **kwargs):
         return False
