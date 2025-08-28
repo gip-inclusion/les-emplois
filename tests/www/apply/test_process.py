@@ -327,7 +327,7 @@ class TestProcessViews:
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__created_at=created_at,
             eligibility_diagnosis__expires_at=expires_at,
-            certified=True,
+            criteria_certified=True,
         )
         eligibility_diagnosis = selected_criteria.eligibility_diagnosis
         job_application = JobApplicationFactory(
@@ -521,7 +521,7 @@ class TestProcessViews:
         certified_crit = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__from_employer=False,
             eligibility_diagnosis__from_prescriber=True,
-            certified=True,
+            criteria_certified=True,
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
@@ -3180,7 +3180,7 @@ class TestProcessAcceptViews:
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__author_siae=self.company,
-            certified=True,
+            criteria_certified=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -3227,7 +3227,7 @@ class TestProcessAcceptViews:
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__author_siae=self.company,
-            certified=True,
+            criteria_certified=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

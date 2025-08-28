@@ -479,7 +479,7 @@ class TestEvaluationCampaignManager:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis_id=certified_job_app.eligibility_diagnosis_id,
             administrative_criteria=rsa,
-            certified=True,
+            criteria_certified=True,
         )
         now = timezone.now()
         evaluation_campaign.populate(now)
@@ -514,7 +514,7 @@ class TestEvaluationCampaignManager:
             IAESelectedAdministrativeCriteriaFactory(
                 eligibility_diagnosis_id=job_app.eligibility_diagnosis_id,
                 administrative_criteria=rsa,
-                certified=True,
+                criteria_certified=True,
             )
         now = timezone.now()
         with django_capture_on_commit_callbacks(execute=True):

@@ -555,7 +555,7 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
             eligibility_diagnosis__job_seeker__certifiable=True,
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
-            certified=True,
+            criteria_certified=True,
         )
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 

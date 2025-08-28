@@ -199,7 +199,7 @@ class TestPoleEmploiConnect:
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, certified=True)
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
         user, created = peamu_user_data.create_or_update_user()
         assert created is False

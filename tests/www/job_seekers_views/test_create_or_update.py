@@ -1153,7 +1153,7 @@ class TestUpdateForSender:
         )
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
-            certified=False,
+            criteria_not_certified=True,
         )
 
         client.force_login(user)
