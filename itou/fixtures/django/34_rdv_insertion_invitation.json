@@ -1,0 +1,24 @@
+[
+  {
+    "fields": {
+      "delivered_at": "2025-08-27T09:58:17Z",
+      "invitation_request": "37faf0e0-8605-462b-a4dc-f47439babcf5",
+      "rdv_insertion_id": 7580,
+      "status": "delivered",
+      "type": "sms"
+    },
+    "model": "rdv_insertion.invitation",
+    "pk": "8ec8d67d-5f4d-4f3e-ab4e-cfbf4940849f"
+  },
+  {
+    "fields": {
+      "delivered_at": "2025-08-27T09:58:14Z",
+      "invitation_request": "37faf0e0-8605-462b-a4dc-f47439babcf5",
+      "rdv_insertion_id": 7581,
+      "status": "opened",
+      "type": "email"
+    },
+    "model": "rdv_insertion.invitation",
+    "pk": "a1ccf00f-40c0-4d6a-b7cc-a65acbc9a1b9"
+  }
+]

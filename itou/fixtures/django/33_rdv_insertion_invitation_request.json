@@ -1,0 +1,67 @@
+[
+  {
+    "fields": {
+      "api_response": {
+        "invitations": [
+          {
+            "clicked": false,
+            "created_at": "2025-08-27T11:58:11.610+02:00",
+            "delivered_at": null,
+            "delivery_status": null,
+            "expires_at": null,
+            "format": "sms",
+            "id": 7580,
+            "motif_category": {
+              "id": 16,
+              "name": "Entretien SIAE",
+              "short_name": "siae_interview"
+            },
+            "rdv_with_referents": false
+          },
+          {
+            "clicked": false,
+            "created_at": "2025-08-27T11:58:12.572+02:00",
+            "delivered_at": null,
+            "delivery_status": null,
+            "expires_at": null,
+            "format": "email",
+            "id": 7581,
+            "motif_category": {
+              "id": 16,
+              "name": "Entretien SIAE",
+              "short_name": "siae_interview"
+            },
+            "rdv_with_referents": false
+          }
+        ],
+        "success": true,
+        "user": {
+          "address": "Route des Plages, 64500 Saint-Jean-de-Luz",
+          "affiliation_number": null,
+          "birth_date": "1990-03-13",
+          "birth_name": null,
+          "created_at": "2025-08-27T11:58:10.631+02:00",
+          "email": "demo.emplois+de@inclusion.gouv.fr",
+          "first_name": "Jacques",
+          "france_travail_id": null,
+          "id": 5664,
+          "last_name": "Henry",
+          "phone_number": "+33644678998",
+          "rdv_solidarites_user_id": 9033,
+          "referents": [],
+          "rights_opening_date": null,
+          "role": "demandeur",
+          "tags": [],
+          "title": "monsieur",
+          "uid": null
+        }
+      },
+      "company": 3850,
+      "job_seeker": 2,
+      "rdv_insertion_user_id": 5664,
+      "reason_category": "siae_interview"
+    },
+    "model": "rdv_insertion.invitationrequest",
+    "pk": "37faf0e0-8605-462b-a4dc-f47439babcf5"
+  }
+]
