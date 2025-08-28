@@ -54,7 +54,7 @@ from tests.utils.testing import assertSnapshotQueries
 @freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_analytics():
+def test_populate_analytics(snapshot):
     date_maj = timezone.localdate() + datetime.timedelta(days=-1)
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
@@ -63,7 +63,9 @@ def test_populate_analytics():
     stats1 = StatsDashboardVisitFactory()
     stats2 = StatsDashboardVisitFactory()
 
-    management.call_command("populate_metabase_emplois", mode="analytics")
+    with assertSnapshotQueries(snapshot):
+        management.call_command("populate_metabase_emplois", mode="analytics")
+
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM c1_analytics_v0 ORDER BY date")
         rows = cursor.fetchall()
@@ -95,7 +97,7 @@ def test_populate_analytics():
         ]
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM c1_private_dashboard_visits_v0 ORDER BY measured_at")
+        cursor.execute("SELECT * FROM c1_private_dashboard_visits_v0 ORDER BY measured_at, id")
         rows = cursor.fetchall()
         assert rows == [
             (
@@ -212,7 +214,7 @@ def test_populate_job_seekers(snapshot):
     )
     user_3_selected_criteria.save()
     # Older accepted job_application with no eligibility diagnosis
-    # Allow to check get_hiring_company()
+    # Allow to check last_hiring_company_pk
     JobApplicationFactory(
         job_seeker=user_3,
         with_approval=True,
@@ -1174,90 +1176,91 @@ def test_populate_organizations(snapshot):
 
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM organisations_v0 ORDER BY id")
-        rows = cursor.fetchall()
-        assert rows == [
-            (
-                -1,
-                None,
-                "Regroupement des prescripteurs sans organisation",
-                None,
-                None,
-                0,
-                "",
-                "",
-                "",
-                None,
-                "",
-                None,
-                None,
-                "",
-                None,
-                None,
-                None,
-                None,
-                0,
-                0,
-                0,
-                None,
-                None,
-                0,
-                0,
-                datetime.date(2023, 2, 1),
-            ),
-            (
-                first_organisation.pk,
-                first_organisation.siret,
-                first_organisation.name,
-                "FT",
-                "France Travail",
-                1,
-                "",
-                "",
-                "59473",
-                None,
-                "",
-                None,
-                None,
-                "59",
-                "59 - Nord",
-                "Hauts-de-France",
-                datetime.date(2023, 2, 2),
-                None,
-                2,
-                0,
-                0,
-                None,
-                None,
-                0,
-                0,
-                datetime.date(2023, 2, 1),
-            ),
-            (
-                second_organisation.pk,
-                second_organisation.siret,
-                second_organisation.name,
-                "FT",
-                "France Travail",
-                1,
-                "",
-                "",
-                "63020",
-                None,
-                "",
-                None,
-                None,
-                "63",
-                "63 - Puy-de-Dôme",
-                "Auvergne-Rhône-Alpes",
-                None,
-                None,
-                0,
-                0,
-                0,
-                None,
-                None,
-                0,
-                0,
-                datetime.date(2023, 2, 1),
-            ),
-        ]
+        rows = dictfetchall(cursor)
+
+    assert rows == [
+        {
+            "id": -1,
+            "siret": None,
+            "nom": "Regroupement des prescripteurs sans organisation",
+            "type": None,
+            "type_complet": None,
+            "habilitée": 0,
+            "adresse_ligne_1": "",
+            "adresse_ligne_2": "",
+            "code_postal": "",
+            "code_commune": None,
+            "ville": "",
+            "longitude": None,
+            "latitude": None,
+            "département": "",
+            "nom_département": None,
+            "région": None,
+            "date_inscription": None,
+            "code_safir": None,
+            "total_membres": 0,
+            "total_candidatures": 0,
+            "total_embauches": 0,
+            "date_dernière_candidature": None,
+            "date_dernière_connexion": None,
+            "active": 0,
+            "brsa": 0,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+        },
+        {
+            "id": first_organisation.pk,
+            "siret": first_organisation.siret,
+            "nom": first_organisation.name,
+            "type": "FT",
+            "type_complet": "France Travail",
+            "habilitée": 1,
+            "adresse_ligne_1": "",
+            "adresse_ligne_2": "",
+            "code_postal": "59473",
+            "code_commune": None,
+            "ville": "",
+            "longitude": None,
+            "latitude": None,
+            "département": "59",
+            "nom_département": "59 - Nord",
+            "région": "Hauts-de-France",
+            "date_inscription": datetime.date(2023, 2, 2),
+            "code_safir": None,
+            "total_membres": 2,
+            "total_candidatures": 0,
+            "total_embauches": 0,
+            "date_dernière_candidature": None,
+            "date_dernière_connexion": None,
+            "active": 0,
+            "brsa": 0,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+        },
+        {
+            "id": second_organisation.pk,
+            "siret": second_organisation.siret,
+            "nom": second_organisation.name,
+            "type": "FT",
+            "type_complet": "France Travail",
+            "habilitée": 1,
+            "adresse_ligne_1": "",
+            "adresse_ligne_2": "",
+            "code_postal": "63020",
+            "code_commune": None,
+            "ville": "",
+            "longitude": None,
+            "latitude": None,
+            "département": "63",
+            "nom_département": "63 - Puy-de-Dôme",
+            "région": "Auvergne-Rhône-Alpes",
+            "date_inscription": None,
+            "code_safir": None,
+            "total_membres": 0,
+            "total_candidatures": 0,
+            "total_embauches": 0,
+            "date_dernière_candidature": None,
+            "date_dernière_connexion": None,
+            "active": 0,
+            "brsa": 0,
+            "date_mise_à_jour_metabase": datetime.date(2023, 2, 1),
+        },
+    ]

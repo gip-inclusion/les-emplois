@@ -1,22 +1,25 @@
 from datetime import timedelta
 from functools import partial
+from operator import attrgetter
 
 from django.utils import timezone
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_ai_stock_job_seeker_pks,
     get_choice,
+    get_column_from_field,
     get_department_and_region_columns,
-    get_hiring_company,
+    get_model_field,
     get_post_code_column,
     get_qpv_job_seeker_pks,
     hash_content,
 )
 from itou.users.enums import IdentityProvider
+from itou.users.models import User
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -46,10 +49,7 @@ def get_user_signup_kind(user):
 
 
 def get_latest_diagnosis(job_seeker):
-    assert job_seeker.is_job_seeker
-    if job_seeker.eligibility_diagnoses_count == 0:
-        return None
-    return job_seeker.last_eligibility_diagnosis[0]
+    return job_seeker.last_eligibility_diagnosis[0] if job_seeker.last_eligibility_diagnosis else None
 
 
 def get_latest_diagnosis_author_sub_kind(job_seeker):
@@ -80,28 +80,6 @@ def get_latest_diagnosis_author_display_name(job_seeker):
         elif latest_diagnosis.author_kind == AuthorKind.PRESCRIBER and latest_diagnosis.author_prescriber_organization:
             return latest_diagnosis.author_prescriber_organization.display_name
     return None
-
-
-def _get_latest_diagnosis_criteria_by_level(job_seeker, level):
-    """
-    Count criteria of given level for the latest diagnosis of
-    given job seeker.
-    """
-    latest_diagnosis = get_latest_diagnosis(job_seeker)
-    if latest_diagnosis:
-        if level == AdministrativeCriteriaLevel.LEVEL_1:
-            return latest_diagnosis.level_1_count
-        if level == AdministrativeCriteriaLevel.LEVEL_2:
-            return latest_diagnosis.level_2_count
-    return None
-
-
-def get_latest_diagnosis_level1_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_1)
-
-
-def get_latest_diagnosis_level2_criteria(job_seeker):
-    return _get_latest_diagnosis_criteria_by_level(job_seeker=job_seeker, level=AdministrativeCriteriaLevel.LEVEL_2)
 
 
 def get_latest_diagnosis_criteria(job_seeker, criteria_id):
@@ -199,12 +177,7 @@ def get_table():
 
     job_seekers_table.add_columns(
         [
-            {
-                "name": "id",
-                "type": "integer",
-                "comment": "ID C1 du candidat",
-                "fn": lambda o: o.pk,
-            },
+            get_column_from_field(get_model_field(User, "pk"), name="id", comment="ID C1 du candidat"),
             {
                 "name": "hash_nir",
                 "type": "varchar",
@@ -230,12 +203,7 @@ def get_table():
                 "fn": get_birth_month_from_nir,
             },
             {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
-            {
-                "name": "date_inscription",
-                "type": "date",
-                "comment": "Date inscription du candidat",
-                "fn": lambda o: o.date_joined,
-            },
+            get_column_from_field(get_model_field(User, "date_joined"), name="date_inscription", field_type="date"),
             {
                 "name": "type_inscription",
                 "type": "varchar",
@@ -254,18 +222,12 @@ def get_table():
                 "comment": "Le candidat a un identifiant PE",
                 "fn": lambda o: o.jobseeker_profile.pole_emploi_id != "",
             },
-            {
-                "name": "date_dernière_connexion",
-                "type": "date",
-                "comment": "Date de dernière connexion au service du candidat",
-                "fn": lambda o: o.last_login,
-            },
-            {
-                "name": "date_premiere_connexion",
-                "type": "date",
-                "comment": "Date de première connexion",
-                "fn": lambda o: o.first_login,
-            },
+            get_column_from_field(
+                get_model_field(User, "last_login"), name="date_dernière_connexion", field_type="date"
+            ),
+            get_column_from_field(
+                get_model_field(User, "first_login"), name="date_premiere_connexion", field_type="date"
+            ),
             {
                 "name": "actif",
                 "type": "boolean",
@@ -291,20 +253,20 @@ def get_table():
                 "name": "total_candidatures",
                 "type": "integer",
                 "comment": "Nombre de candidatures",
-                "fn": lambda o: o.job_applications_count,
+                "fn": attrgetter("job_applications_count"),
             },
             {
                 "name": "total_embauches",
                 "type": "integer",
                 "comment": "Nombre de candidatures de type accepté",
                 # We have to do all this in python to benefit from prefetch_related.
-                "fn": lambda o: o.accepted_job_applications_count,
+                "fn": attrgetter("accepted_job_applications_count"),
             },
             {
                 "name": "total_diagnostics",
                 "type": "integer",
                 "comment": "Nombre de diagnostics",
-                "fn": lambda o: o.eligibility_diagnoses_count,
+                "fn": attrgetter("eligibility_diagnoses_count"),
             },
             {
                 "name": "date_diagnostic",
@@ -329,10 +291,8 @@ def get_table():
                 "type": "integer",
                 "comment": "ID auteur diagnostic si prescripteur",
                 "fn": lambda o: (
-                    get_latest_diagnosis(o).author_prescriber_organization.id
-                    if get_latest_diagnosis(o)
-                    and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
-                    and get_latest_diagnosis(o).author_prescriber_organization
+                    get_latest_diagnosis(o).author_prescriber_organization_id
+                    if get_latest_diagnosis(o) and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
                     else None
                 ),
             },
@@ -341,10 +301,8 @@ def get_table():
                 "type": "integer",
                 "comment": "ID auteur diagnostic si employeur",
                 "fn": lambda o: (
-                    get_latest_diagnosis(o).author_siae.id
-                    if get_latest_diagnosis(o)
-                    and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
-                    and get_latest_diagnosis(o).author_siae
+                    get_latest_diagnosis(o).author_siae_id
+                    if get_latest_diagnosis(o) and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
                     else None
                 ),
             },
@@ -374,19 +332,19 @@ def get_table():
                 "name": "type_structure_dernière_embauche",
                 "type": "varchar",
                 "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-                "fn": lambda o: get_hiring_company(o).kind if get_hiring_company(o) else None,
+                "fn": attrgetter("last_hiring_company_kind"),
             },
             {
                 "name": "total_critères_niveau_1",
                 "type": "integer",
                 "comment": "Total critères de niveau 1 du dernier diagnostic",
-                "fn": get_latest_diagnosis_level1_criteria,
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "level_1_count", None),
             },
             {
                 "name": "total_critères_niveau_2",
                 "type": "integer",
                 "comment": "Total critères de niveau 2 du dernier diagnostic",
-                "fn": get_latest_diagnosis_level2_criteria,
+                "fn": lambda o: getattr(get_latest_diagnosis(o), "level_2_count", None),
             },
         ]
     )

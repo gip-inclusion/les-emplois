@@ -5,7 +5,7 @@ from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 TABLE = MetabaseTable(name="cap_critères_iae")
 TABLE.add_columns(
     [
-        get_column_from_field(get_model_field(EvaluatedAdministrativeCriteria, "id"), name="id"),
+        get_column_from_field(get_model_field(EvaluatedAdministrativeCriteria, "pk"), name="id"),
         get_column_from_field(
             get_model_field(EvaluatedAdministrativeCriteria, "administrative_criteria"), name="id_critère_iae"
         ),

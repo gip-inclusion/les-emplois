@@ -1,13 +1,16 @@
+from operator import attrgetter
+
+from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.metabase.tables.utils import (
     MetabaseTable,
-    get_active_companies_pks,
     get_address_columns,
     get_choice,
+    get_column_from_field,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
-    get_first_membership_join_date,
+    get_model_field,
 )
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
@@ -27,7 +30,7 @@ ORG_OF_PRESCRIBERS_WITHOUT_ORG = PrescriberOrganization(
 
 def get_org_first_join_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        return get_first_membership_join_date(memberships=org.memberships)
+        return org.first_membership_join_date
     return None
 
 
@@ -35,12 +38,12 @@ def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
         return User.objects.filter(kind=UserKind.PRESCRIBER, prescribermembership=None).count()
-    return len(org.active_memberships)
+    return org.active_memberships_count or 0
 
 
 def _get_ja_sent_by_prescribers_without_org():
     return JobApplication.objects.filter(
-        to_company_id__in=get_active_companies_pks(),
+        to_company_id__in=Company.objects.active(),
         sender_kind=SenderKind.PRESCRIBER,
         sender_prescriber_organization=None,
     ).exclude(origin=Origin.PE_APPROVAL)
@@ -69,15 +72,12 @@ def get_org_last_job_application_creation_date(org):
 TABLE = MetabaseTable(name="organisations_v0")
 TABLE.add_columns(
     [
-        {"name": "id", "type": "integer", "comment": "ID organisation", "fn": lambda o: o.id},
-        {"name": "siret", "type": "varchar", "comment": "SIRET organisation", "fn": lambda o: o.siret},
-        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": lambda o: o.display_name},
-        {
-            "name": "type",
-            "type": "varchar",
-            "comment": "Type organisation (abrégé)",
-            "fn": lambda o: o.kind,
-        },
+        get_column_from_field(get_model_field(PrescriberOrganization, "pk"), name="id"),
+        get_column_from_field(get_model_field(PrescriberOrganization, "siret"), name="siret"),
+        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "fn": attrgetter("display_name")},
+        get_column_from_field(
+            get_model_field(PrescriberOrganization, "kind"), name="type", comment="Type organisation (abrégé)"
+        ),
         {
             "name": "type_complet",
             "type": "varchar",
@@ -88,7 +88,7 @@ TABLE.add_columns(
             "name": "habilitée",
             "type": "boolean",
             "comment": "Organisation habilitée",
-            "fn": lambda o: o.is_authorized,
+            "fn": attrgetter("is_authorized"),
         },
     ]
 )
@@ -103,12 +103,7 @@ TABLE.add_columns(
             "comment": "Date inscription du premier compte prescripteur",
             "fn": get_org_first_join_date,
         },
-        {
-            "name": "code_safir",
-            "type": "varchar",
-            "comment": "Code SAFIR Pôle emploi",
-            "fn": lambda o: o.code_safir_pole_emploi,
-        },
+        get_column_from_field(get_model_field(PrescriberOrganization, "code_safir_pole_emploi"), name="code_safir"),
         {
             "name": "total_membres",
             "type": "integer",
@@ -137,16 +132,11 @@ TABLE.add_columns(
 )
 
 TABLE.add_columns(get_establishment_last_login_date_column())
-
 TABLE.add_columns(get_establishment_is_active_column())
+
 
 TABLE.add_columns(
     [
-        {
-            "name": "brsa",
-            "type": "boolean",
-            "comment": "Organisation conventionnée pour le suivi des BRSA",
-            "fn": lambda o: o.is_brsa,
-        },
+        get_column_from_field(get_model_field(PrescriberOrganization, "is_brsa"), name="brsa"),
     ]
 )

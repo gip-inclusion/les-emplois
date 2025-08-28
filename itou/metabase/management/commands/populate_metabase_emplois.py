@@ -24,7 +24,7 @@ from collections import OrderedDict
 import tenacity
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, F, Max, Prefetch, Q
+from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
@@ -34,11 +34,11 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMEN
 from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.db import populate_table
@@ -66,7 +66,6 @@ from itou.metabase.tables import (
     suspensions,
     users,
 )
-from itou.metabase.tables.utils import get_active_companies_pks
 from itou.metabase.utils import build_dbt_daily
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -138,17 +137,54 @@ class Command(BaseCommand):
             Company.objects.active()
             .select_related("convention", "insee_city")
             .prefetch_related(
-                Prefetch("convention__siaes", queryset=Company.objects.select_related("insee_city")),
-                "job_description_through",
-                "members",
                 Prefetch(
-                    "memberships",
-                    queryset=CompanyMembership.objects.active(),
-                    to_attr="active_memberships",
+                    "convention__siaes",
+                    queryset=Company.objects.select_related("insee_city").only(
+                        "source",  # Company.canonical_company
+                        "convention",  # Company.canonical_company
+                        "siret",  # is_aci_convergence
+                        "address_line_1",  # get_address_columns
+                        "address_line_2",  # get_address_columns
+                        "post_code",  # get_post_code_column
+                        "insee_city__code_insee",  # get_code_commune
+                        "city",  # get_address_columns
+                        "coords",  # get_address_columns
+                        "department",  # get_department_and_region_columns
+                    ),
                 ),
-                "memberships",
             )
             .annotate(
+                active_memberships_count=(
+                    CompanyMembership.objects.active()
+                    .filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                first_membership_join_date=(
+                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(min=Min("joined_at"))
+                    .values("min")[:1]
+                ),
+                last_login_date=(
+                    CompanyMembership.objects.filter(company=OuterRef("pk"))
+                    .values("company")
+                    .annotate(max=Max("user__last_login"))
+                    .values("max")[:1]
+                ),
+                job_descriptions_active_count=(
+                    JobDescription.objects.filter(company=OuterRef("pk"), is_active=True)
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                job_descriptions_inactive_count=(
+                    JobDescription.objects.filter(company=OuterRef("pk"), is_active=False)
+                    .values("company")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
                     filter=~Q(job_applications_received__logs__to_state=JobApplicationState.OBSOLETE),
@@ -208,12 +244,30 @@ class Command(BaseCommand):
                     filter=Q(job_applications_received__state=JobApplicationState.PROCESSING),
                     distinct=True,
                 ),
-                # Don't try counting members or getting first join date, It's way too long
             )
-            .all()
+            .only(
+                "convention",
+                "convention__asp_id",
+                "kind",
+                "brand",  # Company.display_name
+                "name",  # Company.display_name
+                "description",
+                "siret",
+                "source",
+                "naf",
+                "email",
+                "auth_email",
+                "address_line_1",  # get_address_columns
+                "address_line_2",  # get_address_columns
+                "post_code",  # get_post_code_column
+                "insee_city__code_insee",  # get_code_commune
+                "city",  # get_address_columns
+                "coords",  # get_address_columns
+                "department",  # get_department_and_region_columns
+            )
         )
 
-        populate_table(companies.TABLE, batch_size=200, querysets=[queryset])
+        populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -221,11 +275,11 @@ class Command(BaseCommand):
                 "company",
                 "appellation__rome",
             )
-            .filter(company_id__in=get_active_companies_pks())
+            .filter(company_id__in=Company.objects.active())
             .with_job_applications_count()
             .all()
         )
-        populate_table(job_descriptions.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(job_descriptions.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -235,7 +289,7 @@ class Command(BaseCommand):
         """
         active_user_created_job_applications_filter = Q(
             ~Q(jobapplication__origin=Origin.PE_APPROVAL)
-            & Q(jobapplication__to_company_id__in=get_active_companies_pks())
+            & Q(jobapplication__to_company_id__in=Company.objects.active())
         )
         job_applications_count = Count(
             "jobapplication",
@@ -260,28 +314,52 @@ class Command(BaseCommand):
             filter=active_user_created_job_applications_filter,
         )
         queryset = (
-            PrescriberOrganization.objects.prefetch_related(
-                Prefetch(
-                    "memberships",
-                    queryset=PrescriberMembership.objects.active(),
-                    to_attr="active_memberships",
-                ),
-                "members",
-                "memberships",
-            )
-            .select_related("insee_city")
+            PrescriberOrganization.objects.select_related("insee_city")
             .annotate(
                 job_applications_count=job_applications_count,
                 accepted_job_applications_count=accepted_job_applications_count,
                 last_job_application_creation_date=last_job_application_creation_date,
-                # Don't try counting members or getting first join date, It's way too long
+                active_memberships_count=(
+                    PrescriberMembership.objects.active()
+                    .filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(count=Count("*"))
+                    .values("count")[:1]
+                ),
+                first_membership_join_date=(
+                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(min=Min("joined_at"))
+                    .values("min")[:1]
+                ),
+                last_login_date=(
+                    PrescriberMembership.objects.filter(organization=OuterRef("pk"))
+                    .values("organization")
+                    .annotate(max=Max("user__last_login"))
+                    .values("max")[:1]
+                ),
             )
-            .all()
+            .only(
+                "siret",
+                "name",
+                "kind",
+                "authorization_status",
+                "address_line_1",  # get_address_columns
+                "address_line_2",  # get_address_columns
+                "post_code",  # get_post_code_column
+                "insee_city__code_insee",  # get_code_commune
+                "city",  # get_address_columns
+                "coords",  # get_address_columns
+                "department",  # get_department_and_region_columns
+                "code_safir_pole_emploi",
+                "members__last_login",  # get_establishment_last_login_date_column
+                "is_brsa",
+            )
         )
 
         populate_table(
             organizations.TABLE,
-            batch_size=100,
+            batch_size=10_000,
             querysets=[queryset],
             extra_object=organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
         )
@@ -303,7 +381,18 @@ class Command(BaseCommand):
                             "author_prescriber_organization",
                             "author_siae",
                         )
-                        .prefetch_related("selected_administrative_criteria")
+                        .prefetch_related(
+                            Prefetch(
+                                "selected_administrative_criteria",
+                                SelectedAdministrativeCriteria.objects.only(
+                                    "administrative_criteria_id",
+                                    "eligibility_diagnosis_id",
+                                    "certified",
+                                    "certified_at",
+                                    "certification_period",
+                                ),
+                            ),
+                        )
                         .annotate(
                             level_1_count=Count(
                                 "administrative_criteria",
@@ -315,13 +404,22 @@ class Command(BaseCommand):
                             ),
                             criteria_ids=ArrayAgg("administrative_criteria__pk"),
                         )
+                        .only(
+                            "created_at",
+                            "expires_at",
+                            "author_kind",
+                            "author_prescriber_organization_id",
+                            "author_siae_id",
+                            "author_siae__kind",  # get_latest_diagnosis_author_sub_kind
+                            "author_prescriber_organization__kind",  # get_latest_diagnosis_author_sub_kind
+                            "author_siae__brand",  # get_latest_diagnosis_author_display_name
+                            "author_siae__name",  # get_latest_diagnosis_author_display_name
+                            "author_prescriber_organization__name",  # get_latest_diagnosis_author_display_name
+                            "job_seeker_id",  # Origin unknown, seems needed by the ORM somehow
+                        )
                         .order_by("-created_at")[:1]
                     ),
                     to_attr="last_eligibility_diagnosis",
-                ),
-                Prefetch(
-                    "job_applications",
-                    queryset=JobApplication.objects.select_related("to_company"),
                 ),
             )
             .annotate(
@@ -332,12 +430,33 @@ class Command(BaseCommand):
                     filter=Q(job_applications__state=JobApplicationState.ACCEPTED),
                     distinct=True,
                 ),
+                last_hiring_company_kind=Subquery(
+                    JobApplication.objects.accepted()
+                    .filter(job_seeker=OuterRef("pk"))
+                    .values("to_company__kind")
+                    .order_by("-created_at")[:1]
+                ),
+            )
+            .only(
+                "jobseeker_profile__nir",
+                "jobseeker_profile__birthdate",  # get_user_age_in_years
+                "date_joined",
+                "created_by__kind",  # get_user_signup_kind
+                "created_by__is_staff",  # get_user_signup_kind
+                "identity_provider",
+                "jobseeker_profile__pole_emploi_id",
+                "last_login",
+                "first_login",
+                "post_code",  # get_post_code_column
+                "department",  # get_department_and_region_columns
+                "coords",  # get_job_seeker_qpv_info
+                "geocoding_score",  # get_job_seeker_qpv_info
             )
             .all()
         )
         job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers_table, batch_size=5_000, querysets=[queryset])
+        populate_table(job_seekers_table, batch_size=20_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
@@ -348,56 +467,78 @@ class Command(BaseCommand):
             JobApplication.objects.select_related(
                 "to_company", "sender", "sender_company", "sender_prescriber_organization"
             )
-            .prefetch_related("logs")
+            .exclude(origin=Origin.PE_APPROVAL)
+            .filter(to_company_id__in=Company.objects.active())
+            .annotate(
+                transition_accepted_date=JobApplicationTransitionLog.objects.filter(
+                    job_application=OuterRef("pk"),
+                    transition=JobApplicationWorkflow.TRANSITION_ACCEPT,
+                )
+                .values("job_application")
+                .annotate(first_timestamp=Min("timestamp"))
+                .values("first_timestamp"),
+                time_spent_from_new_to_processing=Subquery(
+                    JobApplicationTransitionLog.objects.filter(
+                        job_application=OuterRef("pk"),
+                        transition=JobApplicationWorkflow.TRANSITION_PROCESS,
+                    )
+                    .values("job_application")
+                    .annotate(first_timestamp=Min("timestamp"))
+                    .values("first_timestamp")
+                )
+                - F("created_at"),
+                time_spent_from_new_to_accepted_or_refused=Subquery(
+                    JobApplicationTransitionLog.objects.filter(
+                        job_application=OuterRef("pk"),
+                        to_state__in=[JobApplicationState.ACCEPTED, JobApplicationState.REFUSED],
+                    )
+                    .values("job_application")
+                    .annotate(first_timestamp=Min("timestamp"))
+                    .values("first_timestamp")
+                )
+                - F("created_at"),
+            )
             .only(
-                "pk",
-                "created_at",
-                "processed_at",
                 "archived_at",
+                "refusal_reason",
+                "created_at",
                 "hiring_start_at",
-                "origin",
-                "sender_kind",
-                "sender_company_id",
-                "sender_company__kind",
-                "sender_prescriber_organization__kind",
-                "sender_prescriber_organization__name",
-                "sender_prescriber_organization__code_safir_pole_emploi",
-                "sender_prescriber_organization__authorization_status",
-                "sender__last_name",
-                "sender__first_name",
+                "processed_at",
                 "state",
+                "sender_kind",  # get_job_application_origin
+                "sender_prescriber_organization__authorization_status",  # get_job_application_origin
+                "sender_company__kind",  # get_job_application_detailed_origin
+                "sender_prescriber_organization__kind",  # get_job_application_detailed_origin
+                "sender_company_id",
+                "origin",
                 "refusal_reason",
                 "job_seeker_id",
                 "to_company_id",
                 "to_company__kind",
-                "to_company__brand",
-                "to_company__name",
-                "to_company__department",
-                "approval_id",
+                "to_company__brand",  # Company.display_name
+                "to_company__name",  # Company.display_name
+                "to_company__department",  # get_department_and_region_columns
+                "sender_prescriber_organization__name",  # get_ja_sender_organization_name
+                "sender_prescriber_organization__code_safir_pole_emploi",  # get_ja_sender_organization_safir
+                "sender__last_name",  # get_ja_sender_full_name_if_pe_or_spip
+                "sender__first_name",  # get_ja_sender_full_name_if_pe_or_spip
                 "approval_delivery_mode",
                 "contract_type",
-                "refusal_reason",
                 "resume_id",
             )
-            .exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_companies_pks())
-            .all()
         )
 
-        populate_table(job_applications.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(job_applications.TABLE, batch_size=20_000, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
         Populate associations between job applications and job descriptions.
         """
-        queryset = (
-            JobApplication.objects.exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_companies_pks())
-            .exclude(selected_jobs=None)
-            .values("pk", "selected_jobs__id")
-        )
+        queryset = JobApplication.selected_jobs.through.objects.exclude(
+            jobapplication__origin=Origin.PE_APPROVAL
+        ).filter(jobapplication__to_company_id__in=Company.objects.active())
 
-        populate_table(selected_jobs.TABLE, batch_size=10_000, querysets=[queryset])
+        populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_approvals(self):
         """
@@ -407,14 +548,32 @@ class Command(BaseCommand):
         We can link PoleEmploiApproval back to its PrescriberOrganization via
         the SAFIR code.
         """
-        queryset1 = Approval.objects.prefetch_related(
-            "user", "user__job_applications", "user__job_applications__to_company"
-        ).all()
+        only_fields = {
+            "number",  # get_approval_type
+            "start_at",
+            "end_at",
+        }
+        queryset1 = (
+            Approval.objects.select_related("user")
+            .annotate(
+                last_hiring_company_pk=(
+                    JobApplication.objects.accepted()
+                    .filter(job_seeker=OuterRef("user"))
+                    .values("to_company")
+                    .order_by("-created_at")[:1]
+                )
+            )
+            .only(
+                *only_fields,
+                "user_id",
+                "origin",
+            )
+        )
         queryset2 = PoleEmploiApproval.objects.filter(
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
-        ).all()
+        ).only(*only_fields, "pe_structure_code")
 
-        populate_table(approvals.TABLE, batch_size=5_000, querysets=[queryset1, queryset2])
+        populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset1, queryset2])
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()

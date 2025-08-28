@@ -3,7 +3,9 @@ Helper methods for manipulating tables used by the populate_metabase_emplois scr
 """
 
 import copy
+import functools
 import gc
+import itertools
 import logging
 import time
 
@@ -12,7 +14,7 @@ from django.conf import settings
 from django.utils import timezone
 from psycopg import sql
 
-from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_int, convert_datetime_to_local_date
+from itou.metabase.utils import convert_boolean_to_int, convert_datetime_to_local_date
 
 
 logger = logging.getLogger(__name__)
@@ -141,9 +143,9 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     for c in table.columns:
         if c["type"] == "boolean":
             c["type"] = "integer"
-            c["fn"] = compose(convert_boolean_to_int, c["fn"])
+            c["fn"] = functools.partial(convert_boolean_to_int, c["fn"])
         if c["type"] == "date":
-            c["fn"] = compose(convert_datetime_to_local_date, c["fn"])
+            c["fn"] = functools.partial(convert_datetime_to_local_date, c["fn"])
 
     logger.info("Injecting %i rows with %i columns into %r", total_rows, len(table.columns), table_name)
 
@@ -189,10 +191,12 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # Insert rows by batch of batch_size.
             # A bigger number makes the script faster until a certain point,
             # but it also increases RAM usage.
-            for chunk_qs in chunked_queryset(queryset, chunk_size=batch_size):
+            queryset_start_time = time.perf_counter()
+            for chunk in itertools.batched(queryset.iterator(chunk_size=batch_size), batch_size):
                 chunk_start_time = time.perf_counter()
-                inject_chunk(table_columns=table.columns, chunk=chunk_qs, new_table_name=new_table_name)
-                written_rows += chunk_qs.count()
+                logger.info("%r: chunk created in %0.2f seconds", table_name, chunk_start_time - queryset_start_time)
+                inject_chunk(table_columns=table.columns, chunk=chunk, new_table_name=new_table_name)
+                written_rows += len(chunk)
                 logger.info(
                     "%r: %i of %i rows written in %0.2f seconds",
                     table_name,
@@ -200,6 +204,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                     total_rows,
                     time.perf_counter() - chunk_start_time,
                 )
+                queryset_start_time = time.perf_counter()
 
             # Trigger garbage collection to optimize memory use.
             gc.collect()

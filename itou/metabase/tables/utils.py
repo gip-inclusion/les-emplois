@@ -13,7 +13,7 @@ from django.db.models.fields import (
     CharField,
     DateField,
     DateTimeField,
-    PositiveIntegerField,
+    IntegerField,
     TextField,
     UUIDField,
 )
@@ -25,10 +25,8 @@ from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, AddressMixin
-from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
-from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User
 
 
@@ -48,6 +46,8 @@ class MetabaseTable:
 
 
 def get_model_field(model, name):
+    if name == "pk":
+        return model._meta.pk
     return model._meta.get_field(name)
 
 
@@ -56,7 +56,7 @@ def get_field_type_from_field(field):
         return "varchar"
     if isinstance(field, TextField):
         return "text"
-    if isinstance(field, PositiveIntegerField):
+    if isinstance(field, IntegerField):
         return "integer"
     if isinstance(field, AutoField) and field.name == "id":
         return "integer"
@@ -76,18 +76,15 @@ def get_field_type_from_field(field):
     raise ValueError("Unexpected field type")
 
 
-def get_column_from_field(field, name):
+def get_column_from_field(field, name, *, comment=None, field_type=None):
     """
     Guess column configuration for simple fields with no subtlety.
     """
-    field_name = field.name
-    if isinstance(field, ForeignKey):
-        field_name += "_id"
     return {
         "name": name,
-        "type": get_field_type_from_field(field),
-        "comment": str(field.verbose_name),  # Force str() to handle _() lazyness
-        "fn": lambda o: getattr(o, field_name),
+        "type": field_type or get_field_type_from_field(field),
+        "comment": comment or str(field.verbose_name),  # Force str() to handle _() lazyness
+        "fn": attrgetter(f"{field.name}_id" if isinstance(field, ForeignKey) else field.name),
     }
 
 
@@ -95,31 +92,6 @@ def get_choice(choices, key):
     if key is None:
         return None
     return dict(choices)[key]
-
-
-def get_first_membership_join_date(memberships):
-    memberships = list(memberships.all())
-    # We have to do all this in python to benefit from prefetch_related.
-    if len(memberships) >= 1:
-        return min(m.joined_at for m in memberships)
-    return None
-
-
-def get_hiring_company(job_seeker):
-    """
-    Ideally the job_seeker would have a unique hiring so that we can
-    properly link the approval back to the company. However we already
-    have many job_seekers with two or more hirings. In this case
-    we consider the latest hiring, which is an ugly workaround
-    around the fact that we do not have a proper approval=>siae
-    link yet.
-    """
-    assert job_seeker.is_job_seeker
-    hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationState.ACCEPTED]
-    if hirings:
-        latest_hiring = max(hirings, key=attrgetter("created_at"))
-        return latest_hiring.to_company
-    return None
 
 
 def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
@@ -154,7 +126,7 @@ def get_post_code_to_insee_cities_map():
     Load once and for all this ~35k items dataset in memory.
     """
     post_code_to_insee_cities_map = defaultdict(list)
-    for city in City.objects.all():
+    for city in City.objects.only("post_codes", "code_insee", "name"):
         for post_code in city.post_codes:
             post_code_to_insee_cities_map[post_code].append(city)
     return post_code_to_insee_cities_map
@@ -260,11 +232,7 @@ def get_establishment_last_login_date_column():
             "name": "date_dernière_connexion",
             "type": "date",
             "comment": "Date de dernière connexion utilisateur",
-            "fn": lambda o: (
-                max([u.last_login for u in o.members.all() if u.last_login], default=None)
-                if o.members.exists()
-                else None
-            ),
+            "fn": lambda o: getattr(o, "last_login_date", None),
         },
     ]
 
@@ -275,16 +243,10 @@ def get_establishment_is_active_column():
             "name": "active",
             "type": "boolean",
             "comment": "Dernière connexion dans les 7 jours",
-            "fn": lambda o: (
-                any(
-                    [
-                        u.last_login > timezone.now() - timezone.timedelta(days=7)
-                        for u in o.members.all()
-                        if u.last_login
-                    ]
-                )
-                if o.members.exists()
-                else False
+            "fn": lambda o: bool(
+                getattr(o, "last_login_date", None) > timezone.now() - timezone.timedelta(days=7)
+                if getattr(o, "last_login_date", None)
+                else None
             ),
         },
     ]
@@ -293,18 +255,6 @@ def get_establishment_is_active_column():
 @functools.cache
 def get_ai_stock_job_seeker_pks():
     return set(Approval.objects.filter(origin=Origin.AI_STOCK).values_list("user_id", flat=True))
-
-
-@functools.cache
-def get_active_companies_pks():
-    """
-    Load once and for all the list of all active company pks in memory and reuse them multiple times in various
-    queries to avoid additional joins of the SiaeConvention model and the non-trivial use of the
-    `Company.objects.active()` queryset on a related model of a queryset on another model. This is a set of less
-    than 10k integers thus should not use much memory. The end result being both simpler code
-    and better performance.
-    """
-    return set(Company.objects.active().values_list("pk", flat=True))
 
 
 @functools.cache
@@ -335,7 +285,7 @@ def hash_content(content):
 
 def get_common_prolongation_columns(model):
     return [
-        get_column_from_field(get_model_field(model, "id"), name="id"),
+        get_column_from_field(get_model_field(model, "pk"), name="id"),
         get_column_from_field(get_model_field(model, "approval"), name="id_pass_agrément"),
         get_column_from_field(get_model_field(model, "start_at"), name="date_début"),
         get_column_from_field(get_model_field(model, "end_at"), name="date_fin"),
