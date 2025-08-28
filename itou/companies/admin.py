@@ -125,7 +125,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
         )
 
     change_form_template = "admin/companies/change_company_form.html"
-    list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
+    list_display = ("pk", "siret", "kind", "name", "department", "source", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     fieldsets = (
