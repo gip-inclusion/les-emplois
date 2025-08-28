@@ -11,7 +11,7 @@
   },
   {
     "fields": {
-      "email": "test+de@inclusion.gouv.fr",
+      "email": "demo.emplois+de@inclusion.gouv.fr",
       "primary": true,
       "user": 2,
       "verified": true
@@ -21,7 +21,7 @@
   },
   {
     "fields": {
-      "email": "test+prescripteur@inclusion.gouv.fr",
+      "email": "demo.emplois+prescripteur@inclusion.gouv.fr",
       "primary": true,
       "user": 3,
       "verified": true
@@ -31,7 +31,7 @@
   },
   {
     "fields": {
-      "email": "test+etti@inclusion.gouv.fr",
+      "email": "demo.emplois+etti@inclusion.gouv.fr",
       "primary": true,
       "user": 4,
       "verified": true
@@ -41,7 +41,7 @@
   },
   {
     "fields": {
-      "email": "test+orienteur-solo@inclusion.gouv.fr",
+      "email": "demo.emplois+orienteur-solo@inclusion.gouv.fr",
       "primary": true,
       "user": 5,
       "verified": true
@@ -51,7 +51,7 @@
   },
   {
     "fields": {
-      "email": "test+ei@inclusion.gouv.fr",
+      "email": "demo.emplois+ei@inclusion.gouv.fr",
       "primary": true,
       "user": 6,
       "verified": true
@@ -61,7 +61,7 @@
   },
   {
     "fields": {
-      "email": "test+orienteur@inclusion.gouv.fr",
+      "email": "demo.emplois+orienteur@inclusion.gouv.fr",
       "primary": true,
       "user": 7,
       "verified": true
@@ -71,7 +71,7 @@
   },
   {
     "fields": {
-      "email": "test+de-proxy@inclusion.gouv.fr",
+      "email": "demo.emplois+de-proxy@inclusion.gouv.fr",
       "primary": true,
       "user": 8,
       "verified": true
@@ -81,7 +81,7 @@
   },
   {
     "fields": {
-      "email": "test+geiq@inclusion.gouv.fr",
+      "email": "demo.emplois+geiq@inclusion.gouv.fr",
       "primary": true,
       "user": 9,
       "verified": true
@@ -141,7 +141,7 @@
   },
   {
     "fields": {
-      "email": "test+ea@inclusion.gouv.fr",
+      "email": "demo.emplois+ea@inclusion.gouv.fr",
       "primary": true,
       "user": 16,
       "verified": true
@@ -151,7 +151,7 @@
   },
   {
     "fields": {
-      "email": "test+dreets@inclusion.gouv.fr",
+      "email": "demo.emplois+dreets@inclusion.gouv.fr",
       "primary": true,
       "user": 24,
       "verified": true
@@ -161,7 +161,7 @@
   },
   {
     "fields": {
-      "email": "test+ai@inclusion.gouv.fr",
+      "email": "demo.emplois+ai@inclusion.gouv.fr",
       "primary": true,
       "user": 25,
       "verified": true
@@ -181,7 +181,7 @@
   },
   {
     "fields": {
-      "email": "test+ddets@inclusion.gouv.fr",
+      "email": "demo.emplois+ddets@inclusion.gouv.fr",
       "primary": true,
       "user": 27,
       "verified": true
@@ -191,7 +191,7 @@
   },
   {
     "fields": {
-      "email": "test+cap@inclusion.gouv.fr",
+      "email": "demo.emplois+cap@inclusion.gouv.fr",
       "primary": true,
       "user": 28,
       "verified": true
@@ -201,7 +201,7 @@
   },
   {
     "fields": {
-      "email": "test+institution@inclusion.gouv.fr",
+      "email": "demo.emplois+institution@inclusion.gouv.fr",
       "primary": true,
       "user": 29,
       "verified": true
@@ -211,7 +211,7 @@
   },
   {
     "fields": {
-      "email": "test+de1@inclusion.gouv.fr",
+      "email": "demo.emplois+de1@inclusion.gouv.fr",
       "primary": false,
       "user": 68,
       "verified": false
@@ -221,7 +221,7 @@
   },
   {
     "fields": {
-      "email": "test+de2@inclusion.gouv.fr",
+      "email": "demo.emplois+de2@inclusion.gouv.fr",
       "primary": false,
       "user": 69,
       "verified": false
@@ -231,7 +231,7 @@
   },
   {
     "fields": {
-      "email": "test+de3@inclusion.gouv.fr",
+      "email": "demo.emplois+de3@inclusion.gouv.fr",
       "primary": false,
       "user": 70,
       "verified": false
@@ -241,7 +241,7 @@
   },
   {
     "fields": {
-      "email": "test+de4@inclusion.gouv.fr",
+      "email": "demo.emplois+de4@inclusion.gouv.fr",
       "primary": false,
       "user": 71,
       "verified": false
@@ -251,7 +251,7 @@
   },
   {
     "fields": {
-      "email": "test+degeiq@inclusion.gouv.fr",
+      "email": "demo.emplois+degeiq@inclusion.gouv.fr",
       "primary": false,
       "user": 89,
       "verified": false
