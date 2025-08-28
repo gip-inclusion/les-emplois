@@ -13,6 +13,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.models.iae import AdministrativeCriteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
+from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
@@ -105,6 +106,22 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
     class Meta:
         model = models.SelectedAdministrativeCriteria
         skip_postgeneration_save = True
+
+    class Params:
+        criteria_certified = factory.Trait(
+            certified=True,
+            certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+            certification_period=factory.LazyAttribute(
+                lambda obj: InclusiveDateRange(
+                    obj.eligibility_diagnosis.created_at,
+                    obj.eligibility_diagnosis.expires_at,
+                )
+            ),
+        )
+        criteria_not_certified = factory.Trait(
+            certified=False,
+            certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+        )
 
     eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
     administrative_criteria = factory.Iterator(models.AdministrativeCriteria.objects.certifiable())

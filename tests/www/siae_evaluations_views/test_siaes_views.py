@@ -562,7 +562,7 @@ class TestSiaeJobApplicationListView:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis=eligibility_diagnosis,
             administrative_criteria=rsa,
-            certified=True,
+            criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
             with_approval=True,
@@ -1428,7 +1428,7 @@ class TestSiaeEvaluatedSiaeDetailView:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis=eligibility_diagnosis,
             administrative_criteria=rsa,
-            certified=True,
+            criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
             with_approval=True,
@@ -1518,7 +1518,7 @@ class TestSiaeEvaluatedJobApplicationView:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis=eligibility_diagnosis,
             administrative_criteria=rsa,
-            certified=True,
+            criteria_certified=True,
         )
         certified_job_app = JobApplicationFactory(
             with_approval=True,

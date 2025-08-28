@@ -242,7 +242,7 @@ class TestFranceConnect:
             born_in_france=True,
             title=Title.M,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, certified=True)
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user, created = fc_user_data.create_or_update_user()
         assert created is False

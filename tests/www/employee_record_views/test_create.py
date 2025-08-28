@@ -300,7 +300,10 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         )
 
     def test_accept_personal_data_readonly_with_certified_criteria(self, client):
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=self.job_seeker, certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=self.job_seeker,
+            criteria_certified=True,
+        )
         client.force_login(self.user)
         response = client.get(self.url)
         assertContains(

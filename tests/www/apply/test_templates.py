@@ -4,6 +4,7 @@ import random
 import pytest
 from django.template import Context
 from django.test.client import RequestFactory
+from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertInHTML, assertNotInHTML
@@ -421,6 +422,7 @@ class TestCertifiedBadge:
         )
         criterion = diagnosis.selected_administrative_criteria.get()
         criterion.certified = is_certified
+        criterion.certified_at = timezone.now()
 
         rendered = self._render(
             request={"user": {"is_employer": employer}, "from_authorized_prescriber": authorized_prescriber},

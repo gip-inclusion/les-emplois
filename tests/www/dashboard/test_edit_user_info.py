@@ -586,10 +586,7 @@ class TestEditUserInfoView:
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
         )
-        IAESelectedAdministrativeCriteriaFactory(
-            eligibility_diagnosis__job_seeker=job_seeker,
-            certified=True,
-        )
+        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
         client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
