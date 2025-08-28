@@ -1,9 +1,7 @@
-from collections import defaultdict
-
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from django.db.models import Exists, F, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
@@ -101,40 +99,47 @@ class Command(BaseCommand):
             User.objects.filter(id__in=[user.id for user in users])
             .filter(**related_objects_to_check)
             .annotate(has_membership_in_authorized_organization=Exists(has_membership_in_authorized_organization_sqs))
+            .prefetch_related(
+                Prefetch(
+                    "companymembership_set",
+                    to_attr="prefetched_companymemberships",
+                    queryset=CompanyMembership.include_inactive.all(),
+                ),
+                Prefetch(
+                    "prescribermembership_set",
+                    to_attr="prefetched_prescribermemberships",
+                    queryset=PrescriberMembership.include_inactive.all(),
+                ),
+                Prefetch(
+                    "institutionmembership_set",
+                    to_attr="prefetched_institutionmemberships",
+                    queryset=InstitutionMembership.include_inactive.all(),
+                ),
+            )
+        )
+
+    def make_anonymized_professional(self, user):
+        memberships = [
+            *user.prefetched_companymemberships,
+            *user.prefetched_institutionmemberships,
+            *user.prefetched_prescribermemberships,
+        ]
+        return AnonymizedProfessional(
+            date_joined=get_year_month_or_none(user.date_joined),
+            first_login=get_year_month_or_none(user.first_login),
+            last_login=get_year_month_or_none(user.last_login),
+            department=user.department,
+            title=user.title,
+            kind=user.kind,
+            number_of_memberships=len(memberships),
+            number_of_active_memberships=sum(m.is_active for m in memberships),
+            number_of_memberships_as_administrator=sum(m.is_admin for m in memberships),
+            had_memberships_in_authorized_organization=user.has_membership_in_authorized_organization,
+            identity_provider=user.identity_provider,
         )
 
     def anonymize_and_delete_professionals(self, users):
-        company_memberships = defaultdict(list)
-        for m in CompanyMembership.include_inactive.filter(user__in=users):
-            company_memberships[m.user_id].append(m)
-        institution_memberships = defaultdict(list)
-        for m in InstitutionMembership.include_inactive.filter(user__in=users):
-            institution_memberships[m.user_id].append(m)
-        prescriber_memberships = defaultdict(list)
-        for m in PrescriberMembership.include_inactive.filter(user__in=users):
-            prescriber_memberships[m.user_id].append(m)
-
-        def make_anonymized_professional(user):
-            memberships = [
-                *company_memberships[user.pk],
-                *institution_memberships[user.pk],
-                *prescriber_memberships[user.pk],
-            ]
-            return AnonymizedProfessional(
-                date_joined=get_year_month_or_none(user.date_joined),
-                first_login=get_year_month_or_none(user.first_login),
-                last_login=get_year_month_or_none(user.last_login),
-                department=user.department,
-                title=user.title,
-                kind=user.kind,
-                number_of_memberships=len(memberships),
-                number_of_active_memberships=sum(m.is_active for m in memberships),
-                number_of_memberships_as_administrator=sum(m.is_admin for m in memberships),
-                had_memberships_in_authorized_organization=user.has_membership_in_authorized_organization,
-                identity_provider=user.identity_provider,
-            )
-
-        AnonymizedProfessional.objects.bulk_create([make_anonymized_professional(user) for user in users])
+        AnonymizedProfessional.objects.bulk_create([self.make_anonymized_professional(user) for user in users])
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
     def anonymize_professionals_without_deletion(self, users):

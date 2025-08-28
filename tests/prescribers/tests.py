@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -948,7 +949,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
     assert "Un administrateur vous a retiré d'une structure" in email.body
     assert email.to == [membership.user.email]
     assert (
-        f"User {admin_client.session['_auth_user_id']} deactivated prescribers.PrescriberMembership "
+        f"User {get_user(admin_client).pk} deactivated prescribers.PrescriberMembership "
         f"of organization_id={organization.pk} for user_id={membership.user_id} is_admin=True."
     ) in caplog.messages
 

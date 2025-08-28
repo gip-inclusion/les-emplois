@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -129,7 +130,7 @@ class TestCompanyAdmin:
         assert "Un administrateur vous a retiré d'une structure" in email.body
         assert email.to == [membership.user.email]
         assert (
-            f"User {admin_client.session['_auth_user_id']} deactivated companies.CompanyMembership "
+            f"User {get_user(admin_client).pk} deactivated companies.CompanyMembership "
             f"of organization_id={company.pk} for user_id={membership.user_id} is_admin=True."
         ) in caplog.messages
 
@@ -184,7 +185,7 @@ class TestCompanyAdmin:
     def test_reactivate_member(self, admin_client, caplog):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
-        admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+        admin_user = User.objects.get(pk=get_user(admin_client).pk)
         company.deactivate_membership(membership, updated_by=admin_user)
         change_url = reverse("admin:companies_company_change", args=[company.pk])
 
