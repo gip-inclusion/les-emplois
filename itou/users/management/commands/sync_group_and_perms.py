@@ -17,6 +17,9 @@ PERMS_EXPORT_CTA = {"export_cta"}
 PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS = {"handle_manual_approval_requests"}
 PERMS_MERGE_USERS = {"merge_users"}
 
+# Authorized permissions for readonly groups
+PERMS_READONLY = PERMS_READ | PERMS_EXPORT_CTA
+
 
 def get_permissions_dict():
     # lazy-import necessary models. Better than using string since we can then use introspection
@@ -117,7 +120,7 @@ def get_permissions_dict():
         job_applications_models.JobApplication: PERMS_READ,
         job_applications_models.JobApplicationTransitionLog: PERMS_READ,
         prescribers_models.PrescriberOrganization: PERMS_READ,
-        users_models.User: PERMS_ADD | PERMS_HIJACK,
+        users_models.User: PERMS_ADD | PERMS_HIJACK | PERMS_EXPORT_CTA,
         users_models.JobSeekerProfile: PERMS_EDIT,
     }
     group_pilotage_admin_permissions = {
@@ -140,11 +143,17 @@ def get_permissions_dict():
 
     return {
         "itou-admin": {**group_itou_admin_permissions},
-        "itou-admin-readonly": {**{model: PERMS_READ for model in group_itou_admin_permissions}},
+        "itou-admin-readonly": {
+            **{model: perms & PERMS_READONLY for model, perms in group_itou_admin_permissions.items()}
+        },
         "gps-admin": {**group_gps_admin_permissions},
-        "gps-admin-readonly": {**{model: PERMS_READ for model in group_gps_admin_permissions}},
+        "gps-admin-readonly": {
+            **{model: perms & PERMS_READONLY for model, perms in group_gps_admin_permissions.items()}
+        },
         "pilotage-admin": {**group_pilotage_admin_permissions},
-        "pilotage-admin-readonly": {**{model: PERMS_READ for model in group_pilotage_admin_permissions}},
+        "pilotage-admin-readonly": {
+            **{model: perms & PERMS_READONLY for model, perms in group_pilotage_admin_permissions.items()}
+        },
         "rdvi": {
             companies_models.Company: PERMS_READ,
             companies_models.CompanyMembership: PERMS_READ,
