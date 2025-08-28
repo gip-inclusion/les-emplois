@@ -4,6 +4,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
@@ -302,7 +303,7 @@ class TestApprovalAdmin:
             content_type=approval_content_type,
             object_id=approval.pk,
         ).get()
-        user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+        user = User.objects.get(pk=get_user(admin_client).pk)
         assert support_remark.remark == f"2025-08-21 : PASS IAE clôturé par {user.get_full_name()}."
 
     @freeze_time()
