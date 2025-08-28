@@ -52,7 +52,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:09Z",
       "department": "64",
-      "email": "test+de@inclusion.gouv.fr",
+      "email": "demo.emplois+de@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-24T08:41:44.939Z",
       "first_name": "Jacques",
@@ -76,7 +76,7 @@
       "title": "M",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+de@inclusion.gouv.fr"
+      "username": "demo.emplois+de@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 2
@@ -93,7 +93,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:57Z",
       "department": "",
-      "email": "test+prescripteur@inclusion.gouv.fr",
+      "email": "demo.emplois+prescripteur@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-23T13:48:28.334Z",
       "first_name": "André",
@@ -117,7 +117,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+prescripteur@inclusion.gouv.fr"
+      "username": "demo.emplois+prescripteur@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 3
@@ -134,7 +134,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:43:26Z",
       "department": "",
-      "email": "test+etti@inclusion.gouv.fr",
+      "email": "demo.emplois+etti@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-24T08:42:00.314Z",
       "first_name": "Daphnée",
@@ -158,7 +158,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+etti@inclusion.gouv.fr"
+      "username": "demo.emplois+etti@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 4
@@ -175,7 +175,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:44:15Z",
       "department": "",
-      "email": "test+orienteur-solo@inclusion.gouv.fr",
+      "email": "demo.emplois+orienteur-solo@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-23T13:49:42.876Z",
       "first_name": "Emmanuelle",
@@ -199,7 +199,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+orienteur-solo@inclusion.gouv.fr"
+      "username": "demo.emplois+orienteur-solo@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 5
@@ -216,7 +216,7 @@
       "created_by": null,
       "date_joined": "2020-04-09T13:36:52Z",
       "department": "",
-      "email": "test+ei@inclusion.gouv.fr",
+      "email": "demo.emplois+ei@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-06-11T13:28:51.998Z",
       "first_name": "Victor",
@@ -240,7 +240,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+ei@inclusion.gouv.fr"
+      "username": "demo.emplois+ei@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 6
@@ -257,7 +257,7 @@
       "created_by": null,
       "date_joined": "2020-04-09T13:48:41Z",
       "department": "",
-      "email": "test+orienteur@inclusion.gouv.fr",
+      "email": "demo.emplois+orienteur@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-23T13:49:36.552Z",
       "first_name": "Olivier",
@@ -281,7 +281,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+orienteur@inclusion.gouv.fr"
+      "username": "demo.emplois+orienteur@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 7
@@ -298,7 +298,7 @@
       "created_by": 3,
       "date_joined": "2020-04-09T14:06:40Z",
       "department": "37",
-      "email": "test+de-proxy@inclusion.gouv.fr",
+      "email": "demo.emplois+de-proxy@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Sylvie",
@@ -322,7 +322,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+de-proxy@inclusion.gouv.fr"
+      "username": "demo.emplois+de-proxy@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 8
@@ -339,7 +339,7 @@
       "created_by": null,
       "date_joined": "2020-04-14T16:10:12Z",
       "department": "",
-      "email": "test+geiq@inclusion.gouv.fr",
+      "email": "demo.emplois+geiq@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-06-11T13:29:18.887Z",
       "first_name": "Laura",
@@ -363,7 +363,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+geiq@inclusion.gouv.fr"
+      "username": "demo.emplois+geiq@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 9
@@ -626,7 +626,7 @@
       "created_by": null,
       "date_joined": "2021-02-22T15:02:19Z",
       "department": "",
-      "email": "test+ea@inclusion.gouv.fr",
+      "email": "demo.emplois+ea@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Alphonse",
@@ -872,7 +872,7 @@
       "created_by": null,
       "date_joined": "2021-07-13T15:33:29Z",
       "department": "",
-      "email": "test+dreets@inclusion.gouv.fr",
+      "email": "demo.emplois+dreets@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Joseph",
@@ -896,7 +896,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+dreets@inclusion.gouv.fr"
+      "username": "demo.emplois+dreets@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 24
@@ -913,7 +913,7 @@
       "created_by": null,
       "date_joined": "2021-11-23T13:43:26Z",
       "department": "",
-      "email": "test+ai@inclusion.gouv.fr",
+      "email": "demo.emplois+ai@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": "2025-07-31T08:41:22.469Z",
       "first_name": "Jean-Claude",
@@ -937,7 +937,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+ai@inclusion.gouv.fr"
+      "username": "demo.emplois+ai@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 25
@@ -995,7 +995,7 @@
       "created_by": null,
       "date_joined": "2023-06-02T09:35:44.525Z",
       "department": "",
-      "email": "test+ddets@inclusion.gouv.fr",
+      "email": "demo.emplois+ddets@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Georges",
@@ -1019,7 +1019,7 @@
       "title": "",
       "upcoming_deletion_notified_at": null,
       "user_permissions": [],
-      "username": "test+ddets@inclusion.gouv.fr"
+      "username": "demo.emplois+ddets@inclusion.gouv.fr"
     },
     "model": "users.user",
     "pk": 27
@@ -1036,7 +1036,7 @@
       "created_by": null,
       "date_joined": "2023-06-21T13:49:22.935Z",
       "department": "",
-      "email": "test+cap@inclusion.gouv.fr",
+      "email": "demo.emplois+cap@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Georges",
@@ -1077,7 +1077,7 @@
       "created_by": null,
       "date_joined": "2023-06-21T13:49:22.935Z",
       "department": "",
-      "email": "test+institution@inclusion.gouv.fr",
+      "email": "demo.emplois+institution@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Gustave",
@@ -1159,7 +1159,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:57Z",
       "department": "",
-      "email": "test+prescripteur1@inclusion.gouv.fr",
+      "email": "demo.emplois+prescripteur1@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Barnabé",
@@ -1200,7 +1200,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:57Z",
       "department": "",
-      "email": "test+prescripteur2@inclusion.gouv.fr",
+      "email": "demo.emplois+prescripteur2@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Marie-Jeanne",
@@ -1241,7 +1241,7 @@
       "created_by": null,
       "date_joined": "2019-09-30T13:42:57Z",
       "department": "",
-      "email": "test+prescripteur3@inclusion.gouv.fr",
+      "email": "demo.emplois+prescripteur3@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Salma",
@@ -1282,7 +1282,7 @@
       "created_by": 65,
       "date_joined": "2025-02-20T13:32:13Z",
       "department": "29",
-      "email": "test+de1@inclusion.gouv.fr",
+      "email": "demo.emplois+de1@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Gabriel",
@@ -1323,7 +1323,7 @@
       "created_by": 65,
       "date_joined": "2025-02-20T13:34:05Z",
       "department": "56",
-      "email": "test+de2@inclusion.gouv.fr",
+      "email": "demo.emplois+de2@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Guillemette",
@@ -1364,7 +1364,7 @@
       "created_by": null,
       "date_joined": "2025-02-20T13:36:16Z",
       "department": "22",
-      "email": "test+de3@inclusion.gouv.fr",
+      "email": "demo.emplois+de3@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Elizabeth",
@@ -1405,7 +1405,7 @@
       "created_by": null,
       "date_joined": "2025-02-20T13:39:04Z",
       "department": "29",
-      "email": "test+de4@inclusion.gouv.fr",
+      "email": "demo.emplois+de4@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Maryvonne",
@@ -1446,7 +1446,7 @@
       "created_by": 9,
       "date_joined": "2025-05-27T12:58:59.289Z",
       "department": "67",
-      "email": "test+degeiq@inclusion.gouv.fr",
+      "email": "demo.emplois+degeiq@inclusion.gouv.fr",
       "external_data_source_history": null,
       "first_login": null,
       "first_name": "Jean",
