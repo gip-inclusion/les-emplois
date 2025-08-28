@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -129,7 +130,7 @@ class TestCompanyAdmin:
         assert "Un administrateur vous a retiré d'une structure" in email.body
         assert email.to == [membership.user.email]
         assert (
-            f"User {admin_client.session['_auth_user_id']} deactivated companies.CompanyMembership "
+            f"User {get_user(admin_client).pk} deactivated companies.CompanyMembership "
             f"of organization_id={company.pk} for user_id={membership.user_id} is_admin=True."
         ) in caplog.messages
 
@@ -184,7 +185,7 @@ class TestCompanyAdmin:
     def test_reactivate_member(self, admin_client, caplog):
         company = CompanyFactory(with_membership=True)
         membership = company.memberships.first()
-        admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+        admin_user = User.objects.get(pk=get_user(admin_client).pk)
         company.deactivate_membership(membership, updated_by=admin_user)
         change_url = reverse("admin:companies_company_change", args=[company.pk])
 
@@ -440,7 +441,7 @@ class TestTransferCompanyData:
         assertContains(response, "Choisissez les objets à transférer")
 
         if value_in_from_company is not None:
-            assertContains(response, str(from_company.memberships.get(user=user)))
+            assertContains(response, str(CompanyMembership.include_inactive.get(company=from_company, user=user)))
 
             response = admin_client.post(
                 transfer_url,
@@ -462,11 +463,11 @@ class TestTransferCompanyData:
 
         if value_in_to_company is None or value_in_from_company is None:
             # Real transfer, membership in from_company is moved
-            assert from_company.memberships.count() == 0
+            assert CompanyMembership.include_inactive.filter(company=from_company).count() == 0
         else:
-            assert from_company.memberships.count() == 1
-        assert to_company.memberships.count() == 1
-        assert getattr(to_company.memberships.first(), field) is expected
+            assert CompanyMembership.include_inactive.filter(company=from_company).count() == 1
+        membership = CompanyMembership.include_inactive.get(company=to_company)
+        assert getattr(membership, field) is expected
 
 
 class TestJobDescriptionAdmin:

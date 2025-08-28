@@ -1091,8 +1091,11 @@
                  EXISTS
             (SELECT %s AS "a"
              FROM "prescribers_prescribermembership" U0
-             INNER JOIN "prescribers_prescriberorganization" U1 ON (U0."organization_id" = U1."id")
-             WHERE (U1."authorization_status" = %s
+             INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+             INNER JOIN "prescribers_prescriberorganization" U2 ON (U0."organization_id" = U2."id")
+             WHERE (U1."is_active"
+                    AND U0."is_active"
+                    AND U2."authorization_status" = %s
                     AND U0."user_id" = ("users_user"."id"))
              LIMIT 1) AS "has_membership_in_authorized_organization"
           FROM "users_user"
@@ -1218,37 +1221,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "institutions_institutionmembership"."id",
-                 "institutions_institutionmembership"."user_id",
-                 "institutions_institutionmembership"."joined_at",
-                 "institutions_institutionmembership"."is_admin",
-                 "institutions_institutionmembership"."is_active",
-                 "institutions_institutionmembership"."created_at",
-                 "institutions_institutionmembership"."updated_at",
-                 "institutions_institutionmembership"."institution_id",
-                 "institutions_institutionmembership"."updated_by_id"
-          FROM "institutions_institutionmembership"
-          WHERE "institutions_institutionmembership"."user_id" IN (%s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s,
-                                                                   %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
           SELECT "prescribers_prescribermembership"."id",
                  "prescribers_prescribermembership"."user_id",
                  "prescribers_prescribermembership"."joined_at",
@@ -1268,6 +1240,37 @@
                                                                  %s,
                                                                  %s,
                                                                  %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.get_users_to_anonymize_and_delete[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "institutions_institutionmembership"."id",
+                 "institutions_institutionmembership"."user_id",
+                 "institutions_institutionmembership"."joined_at",
+                 "institutions_institutionmembership"."is_admin",
+                 "institutions_institutionmembership"."is_active",
+                 "institutions_institutionmembership"."created_at",
+                 "institutions_institutionmembership"."updated_at",
+                 "institutions_institutionmembership"."institution_id",
+                 "institutions_institutionmembership"."updated_by_id"
+          FROM "institutions_institutionmembership"
+          WHERE "institutions_institutionmembership"."user_id" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
