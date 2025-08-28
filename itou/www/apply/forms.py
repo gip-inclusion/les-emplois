@@ -220,6 +220,16 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
         self.fields["prescriber_answer"].label = label
 
 
+class AddToPoolForm(forms.Form):
+    answer = forms.CharField(
+        label="Commentaire envoyé au candidat",
+        widget=forms.Textarea(),
+        help_text="Une copie sera envoyée au prescripteur ou à l’orienteur s’il y en a un.",
+        strip=True,
+        required=False,
+    )
+
+
 class AnswerForm(forms.Form):
     """
     Allow a company to add an answer message when postponing.
@@ -977,6 +987,25 @@ class CheckJobSeekerGEIQEligibilityForm(forms.Form):
     def __init__(self, hx_post_url, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["choice"].widget.attrs.update({"hx-trigger": "change", "hx-post": hx_post_url})
+
+
+class BatchAddToPoolForm(forms.Form):
+    answer = forms.CharField(
+        label="Commentaire envoyé aux candidats",
+        widget=forms.Textarea(),
+        help_text="Une copie sera envoyée aux prescripteurs/orienteurs s’il y en a.",
+        required=False,
+        strip=True,
+    )
+
+    def __init__(self, *args, job_seeker_nb, **kwargs):
+        super().__init__(*args, **kwargs)
+        if job_seeker_nb is not None:
+            self.fields["answer"].label = (
+                f"Commentaire envoyé aux {job_seeker_nb} candidats"
+                if job_seeker_nb > 1
+                else "Commentaire envoyé au candidat"
+            )
 
 
 class BatchPostponeForm(AnswerForm):

@@ -54,6 +54,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_PROCESS = "process"
     TRANSITION_POSTPONE = "postpone"
     TRANSITION_ACCEPT = "accept"
+    TRANSITION_ADD_TO_POOL = "add_to_pool"
     TRANSITION_MOVE_TO_PRIOR_TO_HIRE = "move_to_prior_to_hire"
     TRANSITION_CANCEL_PRIOR_TO_HIRE = "cancel_prior_to_hire"
     TRANSITION_REFUSE = "refuse"
@@ -67,6 +68,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_PROCESS, "Étudier la candidature"),
         (TRANSITION_POSTPONE, "Reporter la candidature"),
         (TRANSITION_ACCEPT, "Accepter la candidature"),
+        (TRANSITION_ADD_TO_POOL, "Ajouter au vivier"),
         (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, "Passer en pré-embauche"),
         (TRANSITION_CANCEL_PRIOR_TO_HIRE, "Annuler la pré-embauche"),
         (TRANSITION_REFUSE, "Décliner la candidature"),
@@ -79,6 +81,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
     CAN_BE_ACCEPTED_STATES = [
         JobApplicationState.NEW,
+        JobApplicationState.POOL,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.PRIOR_TO_HIRE,
@@ -86,9 +89,17 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.REFUSED,
         JobApplicationState.CANCELLED,
     ]
+    CAN_BE_ADDED_TO_POOL_STATES = [
+        JobApplicationState.NEW,
+        JobApplicationState.PROCESSING,
+        JobApplicationState.POSTPONED,
+        JobApplicationState.CANCELLED,
+        JobApplicationState.OBSOLETE,
+    ]
     CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
     CAN_BE_REFUSED_STATES = [
         JobApplicationState.NEW,
+        JobApplicationState.POOL,
         JobApplicationState.PROCESSING,
         JobApplicationState.PRIOR_TO_HIRE,
         JobApplicationState.POSTPONED,
@@ -109,14 +120,16 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     ]
     CAN_BE_POSTPONED_STATES = [
         JobApplicationState.NEW,
+        JobApplicationState.POOL,
         JobApplicationState.PROCESSING,
         JobApplicationState.PRIOR_TO_HIRE,
     ]
 
     transitions = (
-        (TRANSITION_PROCESS, JobApplicationState.NEW, JobApplicationState.PROCESSING),
+        (TRANSITION_PROCESS, [JobApplicationState.NEW, JobApplicationState.POOL], JobApplicationState.PROCESSING),
         (TRANSITION_POSTPONE, CAN_BE_POSTPONED_STATES, JobApplicationState.POSTPONED),
         (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, JobApplicationState.ACCEPTED),
+        (TRANSITION_ADD_TO_POOL, CAN_BE_ADDED_TO_POOL_STATES, JobApplicationState.POOL),
         (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, JobApplicationState.PRIOR_TO_HIRE),
         (TRANSITION_CANCEL_PRIOR_TO_HIRE, [JobApplicationState.PRIOR_TO_HIRE], JobApplicationState.PROCESSING),
         (TRANSITION_REFUSE, CAN_BE_REFUSED_STATES, JobApplicationState.REFUSED),
@@ -968,6 +981,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.processed_at = timezone.now()
 
     @before_transition(
+        JobApplicationWorkflow.TRANSITION_ADD_TO_POOL,
         JobApplicationWorkflow.TRANSITION_PROCESS,
         JobApplicationWorkflow.TRANSITION_POSTPONE,
         JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
@@ -982,6 +996,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         JobApplicationWorkflow.TRANSITION_PROCESS,
         JobApplicationWorkflow.TRANSITION_POSTPONE,
         JobApplicationWorkflow.TRANSITION_ACCEPT,
+        JobApplicationWorkflow.TRANSITION_ADD_TO_POOL,
         JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
         JobApplicationWorkflow.TRANSITION_CANCEL_PRIOR_TO_HIRE,
         JobApplicationWorkflow.TRANSITION_REFUSE,
@@ -1128,6 +1143,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
 
     @xwf_models.transition()
+    def add_to_pool(self, *, user):
+        # Send notification.
+        self.notifications_add_to_pool_for_job_seeker.send()
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_add_to_pool_for_proxy.send()
+
+    @xwf_models.transition()
     def postpone(self, *, user):
         # Send notification.
         self.notifications_postpone_for_job_seeker.send()
@@ -1231,6 +1253,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def notifications_postpone_for_job_seeker(self):
         return job_application_notifications.JobApplicationPostponedForJobSeekerNotification(
+            self.job_seeker,
+            job_application=self,
+        )
+
+    @property
+    def notifications_add_to_pool_for_proxy(self):
+        return job_application_notifications.JobApplicationAddedToPoolForProxyNotification(
+            self.sender,
+            self.sender_prescriber_organization or self.sender_company,
+            job_application=self,
+        )
+
+    @property
+    def notifications_add_to_pool_for_job_seeker(self):
+        return job_application_notifications.JobApplicationAddedToPoolForJobSeekerNotification(
             self.job_seeker,
             job_application=self,
         )

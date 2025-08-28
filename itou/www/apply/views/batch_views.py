@@ -20,6 +20,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
+    BatchAddToPoolForm,
     BatchPostponeForm,
     JobApplicationInternalTransferForm,
     JobApplicationRefusalJobSeekerAnswerForm,
@@ -199,6 +200,71 @@ def postpone(request):
             request.user.pk,
             postponed_nb,
             ",".join(str(app_uid) for app_uid in postponed_ids),
+        )
+    return HttpResponseRedirect(next_url)
+
+
+@check_user(lambda user: user.is_employer)
+@require_POST
+def add_to_pool(request):
+    next_url = get_safe_url(request, "next_url")
+    if next_url is None:
+        # This is somewhat extreme but will force developpers to always provide a proper next_url
+        raise Http404
+    applications = _get_and_lock_received_applications(request, request.POST.getlist("application_ids"))
+
+    form = BatchAddToPoolForm(job_seeker_nb=None, data=request.POST)
+
+    if not form.is_valid():
+        # This is unlikely since the form is quite simple and the answer field is not required
+        messages.error(request, "Les candidatures n’ont pas pu être mises dans le vivier.")
+        logger.error(
+            "user=%s tried to batch add to pool %s applications but the form wasn't valid",
+            request.user.pk,
+            len(applications),
+        )
+    else:
+        added_to_pool_ids = []
+        for job_application in applications:
+            if job_application.state == JobApplicationState.POOL:
+                messages.warning(
+                    request,
+                    f"La candidature de {job_application.job_seeker.get_full_name()} est déjà dans le vivier.",
+                    extra_tags="toast",
+                )
+                continue
+            try:
+                # After each successful transition, a save() is performed by django-xworkflows.
+                job_application.answer = form.cleaned_data["answer"]
+                job_application.add_to_pool(user=request.user)
+            except xwf_models.InvalidTransitionError:
+                messages.error(
+                    request,
+                    (
+                        f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être ajoutée dans "
+                        f"le vivier car elle est au statut « {job_application.get_state_display()} »."
+                    ),
+                    extra_tags="toast",
+                )
+            else:
+                added_to_pool_ids.append(job_application.pk)
+
+        added_nb = len(added_to_pool_ids)
+        if added_nb:
+            messages.success(
+                request,
+                (
+                    f"{added_nb} candidatures ont bien été ajoutées au vivier."
+                    if added_nb > 1
+                    else "La candidature a bien été ajoutée au vivier."
+                ),
+                extra_tags="toast",
+            )
+        logger.info(
+            "user=%s batch added %s applications to pool: %s",
+            request.user.pk,
+            added_nb,
+            ",".join(str(app_uid) for app_uid in added_to_pool_ids),
         )
     return HttpResponseRedirect(next_url)
 

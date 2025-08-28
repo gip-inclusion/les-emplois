@@ -1848,6 +1848,8 @@ def test_job_application_transitions(transition, from_state):
             JobApplicationState.ACCEPTED,
             # Employer waits for a prior action before to establish an employment relationship.
             JobApplicationState.PRIOR_TO_HIRE,
+            # Pool application cannot be archived.
+            JobApplicationState.POOL,
         )
     ],
 )

@@ -68,6 +68,44 @@
                 </div>
             </div>
         {% endif %}
+        {% if can_add_to_pool %}
+            <div id="add_to_pool_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="add_to_pool_modal_title" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="add_to_pool_modal_title">
+                                Ajouter {{ selected_nb }} candidature{{ selected_nb|pluralizefr }} au vivier
+                            </h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <form method="post" action="{% url 'apply:batch_add_to_pool' %}?next_url={{ list_url|urlencode }}">
+                            <div class="modal-body">
+                                <p>
+                                    {% if selected_nb > 1 %}
+                                        En ajoutant ces candidatures au vivier, elles ne seront pas automatiquement refusées après deux mois.
+                                        Toutefois, nous vous invitons à les traiter dans un délai raisonnable afin d’informer {{ job_seeker_nb|pluralizefr:"le candidat de l’avancement de ses candidatures,les candidats de l’avancement de leurs candidatures" }}.
+                                    {% else %}
+                                        En ajoutant cette candidature au vivier, elle ne sera pas automatiquement refusée après deux mois.
+                                        Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer le candidat de l’avancement de sa candidature.
+                                    {% endif %}
+                                </p>
+                                {% bootstrap_form add_to_pool_form alert_error_type="all" %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                                {% csrf_token %}
+                                {% for application_id in selected_application_ids %}
+                                    <input type="hidden" name="application_ids" value="{{ application_id }}" />
+                                {% endfor %}
+                                <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-add_to_pool-applications-submit" %}>
+                                    Confirmer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {% if can_archive %}
             <div id="archive_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="archive_modal_title" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">

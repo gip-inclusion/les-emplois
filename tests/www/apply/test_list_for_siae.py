@@ -1470,6 +1470,106 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         assert simulated_page.find(id="transfer_confirmation_modal") is None
 
 
+def test_list_for_siae_select_applications_batch_add_to_pool(client, snapshot):
+    MODAL_ID = "add_to_pool_confirmation_modal"
+
+    company = CompanyFactory(with_membership=True)
+    employer = company.members.first()
+
+    addable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+    )
+    assert addable_app_1.add_to_pool.is_available()
+    addable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.POSTPONED,
+    )
+    assert addable_app_2.add_to_pool.is_available()
+    added_app = JobApplicationFactory(to_company=company, state=JobApplicationState.POOL, archived_at=timezone.now())
+    assert not added_app.add_to_pool.is_available()
+
+    unaddable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.REFUSED)
+    assert not unaddable_app.add_to_pool.is_available()
+
+    client.force_login(employer)
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_add_to_pool_modal():
+        return simulated_page.find(id=MODAL_ID)
+
+    def get_add_to_pool_button():
+        addable_buttons = [
+            button
+            for button in simulated_page.find(id="batch-action-box").find_all("button")
+            if button.text.strip() == "Ajouter au vivier"
+        ]
+        if not addable_buttons:
+            return None
+        [addable_button] = addable_buttons
+        return addable_button
+
+    assert get_add_to_pool_modal() is None
+    assert get_add_to_pool_button() is None
+
+    # Select 1 addable application
+    simulate_applications_selection([addable_app_1.pk])
+    add_to_pool_button = get_add_to_pool_button()
+    assert add_to_pool_button is not None
+    assert add_to_pool_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(add_to_pool_button) == snapshot(name="active add to pool button")
+
+    modal = get_add_to_pool_modal()
+    assert pretty_indented(modal) == snapshot(name="modal with 1 addable application")
+    # Check that the next_url is correctly transmitted
+    modal_form_action = urlsplit(modal.find("form")["action"])
+    assert modal_form_action.path == reverse("apply:batch_add_to_pool")
+    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+
+    # Select 2 addable applications
+    simulate_applications_selection([addable_app_1.pk, addable_app_2.pk])
+    add_to_pool_button = get_add_to_pool_button()
+    assert add_to_pool_button is not None
+    assert add_to_pool_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(add_to_pool_button) == snapshot(name="active add to pool button")
+    assert pretty_indented(get_add_to_pool_modal()) == snapshot(name="modal with 2 addable applications")
+
+    # Test with unaddable batches
+    for app_list in [
+        [added_app.pk],
+        [unaddable_app.pk],
+        [added_app.pk, addable_app_1.pk],
+        [unaddable_app.pk, addable_app_2.pk],
+    ]:
+        simulate_applications_selection(app_list)
+        # No modal & linked button
+        assert get_add_to_pool_modal() is None
+        add_to_pool_button = get_add_to_pool_button()
+        assert pretty_indented(add_to_pool_button) == snapshot(name="inactive add to pool button")
+
+
 def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     MODAL_ID = "postpone_confirmation_modal"
 
