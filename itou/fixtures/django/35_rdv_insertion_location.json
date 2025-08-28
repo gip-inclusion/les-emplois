@@ -1,0 +1,12 @@
+[
+  {
+    "fields": {
+      "address": "6 Boulevard Saint-Denis, Paris, 75010",
+      "name": "Vitamine T",
+      "phone_number": "",
+      "rdv_solidarites_id": 1026
+    },
+    "model": "rdv_insertion.location",
+    "pk": "590dbe73-7034-4353-8030-ba3016d531e7"
+  }
+]

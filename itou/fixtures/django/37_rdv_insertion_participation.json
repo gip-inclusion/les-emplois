@@ -1,0 +1,35 @@
+[
+  {
+    "fields": {
+      "appointment": "628f4b21-c2bb-4b41-b982-b3b040f31a66",
+      "job_seeker": 2,
+      "rdv_insertion_id": 2132,
+      "rdv_insertion_user_id": 5664,
+      "status": "seen"
+    },
+    "model": "rdv_insertion.participation",
+    "pk": "19c680a7-f012-4408-8503-cc20a841bc88"
+  },
+  {
+    "fields": {
+      "appointment": "04371a30-c4c1-4bb1-948d-b2a29b8bf880",
+      "job_seeker": 2,
+      "rdv_insertion_id": 2133,
+      "rdv_insertion_user_id": 5664,
+      "status": "unknown"
+    },
+    "model": "rdv_insertion.participation",
+    "pk": "40df01a2-470d-4cf1-9ea9-0dad6525e8da"
+  },
+  {
+    "fields": {
+      "appointment": "3841f142-2e77-4d61-887a-8ab046e9a66e",
+      "job_seeker": 2,
+      "rdv_insertion_id": 2131,
+      "rdv_insertion_user_id": 5664,
+      "status": "excused"
+    },
+    "model": "rdv_insertion.participation",
+    "pk": "dbab3142-230e-4be6-a853-bf4b887a3efa"
+  }
+]
