@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center">
         <span>{{ criterion.administrative_criteria.name }}</span>
         {% if request.user.is_employer or request.from_authorized_prescriber %}
-            {% certified_badge criterion %}
+            {% criterion_certification_badge criterion %}
         {% endif %}
     </div>
 </li>

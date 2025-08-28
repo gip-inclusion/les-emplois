@@ -80,7 +80,11 @@ from tests.utils.testing import (
     parse_response_to_soup,
     pretty_indented,
 )
-from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML
+from tests.www.eligibility_views.utils import (
+    CERTIFICATION_ERROR_BADGE_HTML,
+    CERTIFIED_BADGE_HTML,
+    IN_PROGRESS_BADGE_HTML,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -537,6 +541,47 @@ class TestProcessViews:
             )
         )
         assertContains(response, CERTIFIED_BADGE_HTML, html=True, count=1)
+
+    def test_details_for_prescriber_certifiable_criteria(self, client):
+        certifiable_crit = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__from_employer=False,
+            eligibility_diagnosis__from_prescriber=True,
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        prescriber = job_application.sender_prescriber_organization.members.get()
+
+        client.force_login(prescriber)
+        response = client.get(
+            reverse(
+                "apply:details_for_prescriber",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        assertContains(response, IN_PROGRESS_BADGE_HTML, html=True, count=1)
+
+    def test_details_for_prescriber_certification_error(self, client):
+        certifiable_crit = IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__from_employer=False,
+            eligibility_diagnosis__from_prescriber=True,
+            criteria_certification_error=True,
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        prescriber = job_application.sender_prescriber_organization.members.get()
+
+        client.force_login(prescriber)
+        response = client.get(
+            reverse(
+                "apply:details_for_prescriber",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        assertContains(response, CERTIFICATION_ERROR_BADGE_HTML, html=True, count=1)
 
     def test_details_for_prescriber_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
