@@ -1024,7 +1024,7 @@ def test_admin_too_many_memberships(admin_client, mocker):
 def test_reactivate_member(admin_client, caplog):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
-    admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+    admin_user = User.objects.get(pk=get_user(admin_client).pk)
     organization.deactivate_membership(membership, updated_by=admin_user)
     change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
 
