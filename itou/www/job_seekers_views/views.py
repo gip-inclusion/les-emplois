@@ -298,6 +298,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         self.auto_prescription_process = None
         self.standalone_creation = None
         self.is_gps = False
+        self.job_seeker = None
 
     def setup(self, request, *args, hire_process=False, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -368,6 +369,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             "auto_prescription_process": self.auto_prescription_process,
             "standalone_creation": self.standalone_creation,
             "is_gps": self.is_gps,
+            "job_seeker": self.job_seeker,
         }
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
