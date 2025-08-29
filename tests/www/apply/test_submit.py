@@ -912,7 +912,6 @@ class TestApplyAsJobSeeker:
         assert JobApplication.objects.exists() is False
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 class TestApplyAsAuthorizedPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
@@ -1689,7 +1688,6 @@ class TestApplyAsPrescriber:
         )
 
     @pytest.mark.usefixtures("temporary_bucket")
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -2056,7 +2054,6 @@ class TestApplyAsPrescriber:
         )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 class TestApplyAsPrescriberNirExceptions:
     """
     The following normal use cases are tested in tests above:
@@ -2602,7 +2599,6 @@ class TestApplyAsCompany:
         ).exists()
 
     @pytest.mark.usefixtures("temporary_bucket")
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_employer(self, client, pdf_file):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         employer = company.members.first()
@@ -2619,7 +2615,6 @@ class TestApplyAsCompany:
         self._test_apply_as_company(client, employer, company, dummy_job_seeker, pdf_file)
 
     @pytest.mark.usefixtures("temporary_bucket")
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_apply_as_another_employer(self, client, pdf_file):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
         employer = EmployerFactory(with_company=True)
@@ -2666,7 +2661,6 @@ class TestApplyAsCompany:
             ),
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
         # It's unlikely to happen
         membership = CompanyMembershipFactory()
@@ -2742,7 +2736,6 @@ class TestDirectHireFullProcess:
             status_code=403,
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     @freeze_time()
     def test_hire_as_company(self, client):
         """Apply as company (and create new job seeker)"""
@@ -4219,7 +4212,6 @@ class TestUpdateJobSeekerStep3View:
         )
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_detect_existing_job_seeker(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
     reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -4795,7 +4787,6 @@ class TestCheckPreviousApplicationsView:
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 class TestFindJobSeekerForHireView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
