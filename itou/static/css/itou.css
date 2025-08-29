@@ -229,8 +229,8 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 
 .itou-france-connect {
     display: inline-block;
-    height: 60px !important;
-    width: 230px;
+    height: 56px !important;
+    width: 209px;
     margin: auto;
     /*margin-bottom: 8px;*/
     background-image: url(../img/franceconnect-bouton.svg);
