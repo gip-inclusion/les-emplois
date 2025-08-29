@@ -3,17 +3,21 @@
 {% if is_gps|default:False %}
     Enregistrer un nouveau bénéficiaire
 {% elif hire_process %}
-    {% if job_seeker %}
+    {% if job_seeker|default:None %}
         Déclarer l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
     {% else %}
         Déclarer une embauche
     {% endif %}
 {% elif auto_prescription_process %}
     Enregistrer une candidature
-    {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+    {% if job_seeker|default:None %}
+        pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+    {% endif %}
 {% elif prescription_process %}
     Postuler
-    {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+    {% if job_seeker|default:None %}
+        pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+    {% endif %}
 {% elif standalone_creation|default:False %}
     Créer un compte candidat
 {% else %}
