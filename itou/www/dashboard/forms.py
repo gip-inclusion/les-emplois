@@ -22,7 +22,7 @@ class SSOReadonlyMixin:
             # When a user has logged in with a SSO other than PEAMU
             # it should see the field but most should be disabled
             # (that’s a requirement on FranceConnect’s side).
-            disabled_fields = ["first_name", "last_name", "email", "birthdate"]
+            disabled_fields = ["first_name", "last_name", "email", "birthdate", "title"]
             for name in self.fields.keys():
                 if name in disabled_fields:
                     self.fields[name].disabled = True
