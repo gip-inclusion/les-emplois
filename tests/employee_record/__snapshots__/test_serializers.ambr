@@ -877,26 +877,6 @@
     'sufPassIae': None,
   })
 # ---
-# name: test_update_notification_use_static_serializers_on_missing_fields[birth_place-None-personnePhysique]
-  ReturnDict({
-    'civilite': 'MME',
-    'codeComInsee': dict({
-      'codeComInsee': None,
-      'codeDpt': '099',
-    }),
-    'codeGroupePays': '3',
-    'codeInseePays': '102',
-    'dateNaissance': '01/01/1990',
-    'idItou': 'a08dbdb523633cfc59dfdb297307a1',
-    'nomNaissance': None,
-    'nomUsage': 'DOE',
-    'passDateDeb': '01/01/2000',
-    'passDateFin': '01/01/3000',
-    'passIae': '999999999999',
-    'prenom': 'JANE',
-    'sufPassIae': None,
-  })
-# ---
 # name: test_update_notification_use_static_serializers_on_missing_fields[education_level--situationSalarie]
   ReturnDict({
     'cotisationsTI': None,

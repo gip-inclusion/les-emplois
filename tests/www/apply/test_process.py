@@ -3395,20 +3395,14 @@ class TestProcessAcceptViews:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
     @freeze_time("2025-06-06")
-    @pytest.mark.parametrize(
-        "get_birth_country_id",
-        (
-            pytest.param(lambda: None, id="no_country"),
-            pytest.param(lambda: Country.FRANCE_ID, id="country_france"),
-        ),
-    )
-    def test_certified_criteria_birth_fields_not_readonly_if_empty(self, client, get_birth_country_id):
+    def test_certified_criteria_birth_fields_not_readonly_if_empty(self, client):
         birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
 
         job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
-            jobseeker_profile__birth_country_id=get_birth_country_id(),
+            jobseeker_profile__birth_place=None,
+            jobseeker_profile__birth_country=None,
         )
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,

@@ -183,6 +183,18 @@ class JobSeekerFactory(UserFactory):
             born_in_france=True,
         )
         born_in_france = factory.Trait(
+            with_birth_place=True,
+            jobseeker_profile__birth_country=factory.LazyAttribute(
+                lambda _: Country.objects.get(pk=Country.FRANCE_ID)
+            ),
+        )
+        born_outside_france = factory.Trait(
+            jobseeker_profile__birth_place=None,
+            jobseeker_profile__birth_country=factory.LazyAttribute(
+                lambda _: Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
+            ),
+        )
+        with_birth_place = factory.Trait(
             jobseeker_profile__birth_place=factory.LazyAttribute(
                 lambda instance: Commune.objects.order_by("?")
                 .filter(
@@ -190,15 +202,7 @@ class JobSeekerFactory(UserFactory):
                     end_date__gte=instance.birthdate,
                 )
                 .first(),
-            ),
-            jobseeker_profile__birth_country=factory.LazyAttribute(
-                lambda _: Country.objects.get(pk=Country.FRANCE_ID)
-            ),
-        )
-        born_outside_france = factory.Trait(
-            jobseeker_profile__birth_country=factory.LazyAttribute(
-                lambda _: Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
-            ),
+            )
         )
         with_pole_emploi_id = factory.Trait(
             jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),

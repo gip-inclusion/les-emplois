@@ -325,7 +325,7 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         is_missing_required_fields = not all(
             [
                 getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
-                for field in {"birth_country", "birth_place"}
+                for field in {"birth_country"}
             ]
         )
         if is_missing_required_fields:
