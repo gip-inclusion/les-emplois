@@ -126,6 +126,26 @@ def france_connect_callback(request):
     # Contains access_token, token_type, expires_in, id_token
     token_data = response.json()
 
+    es_256_key = get_es256_key() if is_version_2() else None
+    if is_version_2():
+        try:
+            id_token_content = jwt.decode(
+                token_data["id_token"],
+                key=jwt.api_jwk.PyJWK(es_256_key).key,
+                algorithms=["ES256"],
+                audience=settings.FRANCE_CONNECT_CLIENT_ID,
+                # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed
+                options={"verify_iat": False},
+            )
+        except jwt.PyJWTError as e:
+            error_msg = "Le jeton d’authentification de FranceConnect est invalide."
+            logger.error("FranceConnect id_token decode error: %s", e)
+            return _redirect_to_job_seeker_login_on_error(error_msg, request)
+        if id_token_content.get("nonce") != fc_state.nonce:
+            error_msg = "Le jeton d’authentification de FranceConnect est invalide."
+            logger.error("FranceConnect id_token nonce mismatch")
+            return _redirect_to_job_seeker_login_on_error(error_msg, request)
+
     access_token = token_data.get("access_token")
     if not access_token:
         error_msg = "Aucun champ « access_token » dans la réponse FranceConnect, impossible de vous authentifier"
@@ -150,7 +170,7 @@ def france_connect_callback(request):
     if is_version_2():
         user_data = jwt.decode(
             response.content,
-            key=jwt.api_jwk.PyJWK(get_es256_key()).key,
+            key=jwt.api_jwk.PyJWK(es_256_key).key,
             algorithms=["ES256"],
             audience=settings.FRANCE_CONNECT_CLIENT_ID,
             # TODO: Remove once https://github.com/jpadilla/pyjwt/issues/939 is fixed

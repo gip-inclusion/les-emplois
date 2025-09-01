@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import random
 import time
+import uuid
 
 import httpx
 import jwt
@@ -79,9 +80,10 @@ def mock_oauth_dance(client, expected_route="dashboard:index"):
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
-def mock_oauth_dance_v2(client, expected_route="dashboard:index"):
+def mock_oauth_dance_v2(client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True):
     # No session is created with France Connect in contrary to Inclusion Connect
     # so there's no use to go through france_connect:authorize
+    id_token_nonce = str(uuid.uuid4())
     private_key = ec.generate_private_key(ec.SECP256R1())
     public_key_numbers = private_key.public_key().public_numbers()
     jwk_json = {
@@ -113,7 +115,7 @@ def mock_oauth_dance_v2(client, expected_route="dashboard:index"):
     id_token_content = {
         "auth_time": now,
         "acr": "eidas1",
-        "nonce": "test_nonce_123",
+        "nonce": id_token_nonce,
         "at_hash": base64.urlsafe_b64encode(access_token_hash[:16]).decode().rstrip("="),
         **common_jwt_content,
     }
@@ -122,7 +124,7 @@ def mock_oauth_dance_v2(client, expected_route="dashboard:index"):
     token_json = {
         "access_token": access_token,
         "expires_in": 60,
-        "id_token": id_token,
+        "id_token": id_token if valid_id_token else "invalid_id_token",
         "scope": "openid gender given_name family_name email birthdate",
         "token_type": "Bearer",
     }
@@ -135,7 +137,7 @@ def mock_oauth_dance_v2(client, expected_route="dashboard:index"):
     user_response = jwt.encode(user_data, private_key, algorithm="ES256", headers={"kid": "pkcs11:ES256:hsm"})
     respx.get(constants.FRANCE_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, content=user_response))
 
-    state = FranceConnectState.save_state()
+    state = FranceConnectState.save_state(nonce=id_token_nonce if matching_nonces else "other_nonce")
     url = reverse("france_connect:callback")
     response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
@@ -502,6 +504,38 @@ class TestFranceConnect:
         assert user.username == FC_USERINFO_V2["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
+
+    @respx.mock
+    def test_callback_mismatched_nonce_v2(self, client, settings):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance_v2(client, expected_route="login:job_seeker", matching_nonces=False)
+        assert User.objects.count() == 0
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Le jeton d’authentification de FranceConnect est invalide.",
+                )
+            ],
+        )
+
+    @respx.mock
+    def test_callback_invalid_id_token_v2(self, client, settings):
+        settings.FRANCE_CONNECT_BASE_URL += "/v2"
+        # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
+        response = mock_oauth_dance_v2(client, expected_route="login:job_seeker", valid_id_token=False)
+        assert User.objects.count() == 0
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Le jeton d’authentification de FranceConnect est invalide.",
+                )
+            ],
+        )
 
     @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
