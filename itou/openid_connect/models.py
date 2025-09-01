@@ -66,6 +66,7 @@ class OIDConnectState(models.Model):
     used_at = models.DateTimeField(verbose_name="date d'utilisation", null=True)
     # Length used in call to get_random_string()
     state = models.CharField(max_length=12, unique=True)
+    nonce = models.CharField(unique=True, null=True)  # TODO(xfernandez): remove null=True in a few weeks
 
     objects = OIDConnectQuerySet.as_manager()
 
