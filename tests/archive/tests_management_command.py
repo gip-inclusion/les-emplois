@@ -1471,6 +1471,36 @@ class TestAnonymizeProfessionalManagementCommand:
         assert "Anonymized professionals after grace period, count: 4" in caplog.messages
         assert "Included in this count: 2 to delete, 2 to remove from contact" in caplog.messages
 
+    def test_anonymize_professional_had_membership_in_authorized_organization(
+        self, django_capture_on_commit_callbacks, caplog, respx_mock
+    ):
+        membership = PrescriberMembershipFactory(
+            user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+            user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+            organization__authorized=True,
+        )
+        prescriber = membership.user
+        # The related object prevents deletion.
+        job_application = JobApplicationFactory(sender=prescriber)
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
+
+        caplog.clear()
+        # Related objects are deleted, the prescriber can be deleted.
+        job_application.delete()
+        job_application.eligibility_diagnosis.delete()
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
+        assert respx_mock.calls.call_count == 1
+
+        # Even though the prescriber membership was inactive because the first
+        # anonymize_professional deactivated the user, it is still accounted
+        # for when deleting the user account.
+        anonymized_prescriber = AnonymizedProfessional.objects.get()
+        assert anonymized_prescriber.had_memberships_in_authorized_organization is True
+
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(
         self, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot, respx_mock
