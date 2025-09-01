@@ -126,13 +126,13 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                         and self.eligibility_diagnosis.criteria_can_be_certified()
                         and settings.API_PARTICULIER_TOKEN
                     ):
-                        self.eligibility_diagnosis.certify_criteria()
+                        self.eligibility_diagnosis.schedule_certification()
                 if form_user_address := forms.get("user_address"):
                     form_user_address.save()
                 if form_birth_place := forms.get("birth_place"):
                     form_birth_place.save()
                     if settings.API_PARTICULIER_TOKEN:
-                        self.geiq_eligibility_diagnosis.certify_criteria()
+                        self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = forms["accept"].save(commit=False)
                 if creating:

@@ -98,7 +98,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         else:
             return SenderKind(self.sender_kind).label
 
-    def certify_criteria(self):
+    def schedule_certification(self):
         async_certify_criteria(self._meta.model_name, self.pk)
 
 
