@@ -16,7 +16,7 @@
   
   '''
 # ---
-# name: test_send_back_dropdown[without_birth_country]
+# name: test_send_back_dropdown[without_birth_country_nor_birth_place]
   '''
   <button class="btn  dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" aria-controls="sendBackRecordDropDown-[Pk of EmployeeRecord]">
       Renvoyer cette fiche salarié
