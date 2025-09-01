@@ -9,7 +9,7 @@ from tests.utils.testing import load_template
     "factory_kwargs",
     [
         pytest.param({}, id="with_complete_profile"),
-        pytest.param({"birth_country": None}, id="without_birth_country"),
+        pytest.param({"birth_country": None, "birth_place": None}, id="without_birth_country_nor_birth_place"),
         pytest.param({"with_hexa_address": None}, id="without_hexa_address"),
     ],
 )

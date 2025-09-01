@@ -11,6 +11,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.asp.models import Commune
 from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
@@ -420,6 +421,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
         "profile": {
             "nir": "",
             "birth_country": 91,
+            "birth_place": Commune.objects.by_insee_code_and_period("64483", datetime.date(2000, 1, 1)).pk,
             "birthdate": datetime.date(2000, 1, 1),
             "lack_of_nir_reason": "TEMPORARY_NUMBER",
             "education_level": "00",

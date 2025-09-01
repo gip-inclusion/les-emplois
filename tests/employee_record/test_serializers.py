@@ -180,7 +180,6 @@ class TestEmployeeRecordUpdateNotificationSerializer:
     "field,value,key",
     [
         ("birth_country", None, "personnePhysique"),
-        ("birth_place", None, "personnePhysique"),
         ("hexa_lane_type", "", "adresse"),
         ("hexa_lane_name", "", "adresse"),
         ("hexa_post_code", "", "adresse"),
@@ -191,6 +190,8 @@ class TestEmployeeRecordUpdateNotificationSerializer:
 def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
     notification = EmployeeRecordUpdateNotificationFactory(
         employee_record__job_application__for_snapshot=True,
+        employee_record__job_application__job_seeker__born_outside_france=True,
+        employee_record__job_application__job_seeker__jobseeker_profile__birth_place=None,
         **{f"employee_record__job_application__job_seeker__jobseeker_profile__{field}": value},
     )
 
