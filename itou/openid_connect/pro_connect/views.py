@@ -68,7 +68,8 @@ def _redirect_to_login_page_on_error(error_msg=None, request=None):
 
 def _generate_pro_params_from_session(pc_data):
     redirect_uri = get_absolute_url(reverse("pro_connect:callback"))
-    state = ProConnectState.save_state(data=pc_data)
+    nonce = crypto.get_random_string(length=12)
+    state = ProConnectState.save_state(data=pc_data, nonce=nonce)
     data = {
         "response_type": "code",
         "client_id": constants.PRO_CONNECT_CLIENT_ID,
@@ -76,7 +77,7 @@ def _generate_pro_params_from_session(pc_data):
         "acr_values": "eidas1",
         "scope": constants.PRO_CONNECT_SCOPES,
         "state": state,
-        "nonce": crypto.get_random_string(length=12),
+        "nonce": nonce,
     }
     if pc_data.get("channel") == ProConnectChannel.MAP_CONSEILLER:
         data["idp_hint"] = constants.PRO_CONNECT_FT_IDP_HINT

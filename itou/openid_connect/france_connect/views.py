@@ -52,14 +52,15 @@ def france_connect_authorize(request):
     # The redirect_uri should be defined in the FC settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/franceconnect/callback"
     redirect_uri = get_absolute_url(reverse("france_connect:callback"))
-    state = FranceConnectState.save_state()
+    nonce = crypto.get_random_string(32)
+    state = FranceConnectState.save_state(nonce=nonce)
     data = {
         "response_type": "code",
         "client_id": settings.FRANCE_CONNECT_CLIENT_ID,
         "redirect_uri": redirect_uri,
         "scope": constants.FRANCE_CONNECT_SCOPES,
         "state": state,
-        "nonce": crypto.get_random_string(length=32),
+        "nonce": nonce,
         "acr_values": "eidas1",
     }
     url = constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE

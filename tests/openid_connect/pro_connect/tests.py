@@ -281,7 +281,9 @@ class TestProConnectAuthorizeView:
         url = f"{pro_connect.authorize_url}?user_kind={UserKind.PRESCRIBER}"
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
-        assert constants.PRO_CONNECT_SESSION_KEY in client.session
+        pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
+        assert pc_state.nonce is not None
+        assert f"nonce={pc_state.nonce}" in response.url
 
     def test_authorize_endpoint_for_registration(self, client, pro_connect):
         url = reverse("pro_connect:authorize")
@@ -291,7 +293,9 @@ class TestProConnectAuthorizeView:
         url = f"{pro_connect.authorize_url}?user_kind={UserKind.PRESCRIBER}&register=true"
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
-        assert constants.PRO_CONNECT_SESSION_KEY in client.session
+        pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
+        assert pc_state.nonce is not None
+        assert f"nonce={pc_state.nonce}" in response.url
 
     def test_authorize_endpoint_with_params(self, client, pro_connect):
         email = "porthos@touspourun.com"
@@ -301,6 +305,8 @@ class TestProConnectAuthorizeView:
         assert f"login_hint={quote(email)}" in response.url
         pc_state = ProConnectState.get_from_state(client.session[constants.PRO_CONNECT_SESSION_KEY]["state"])
         assert pc_state.data["user_email"] == email
+        assert pc_state.nonce is not None
+        assert f"nonce={pc_state.nonce}" in response.url
 
     def test_authorize_check_user_kind(self, client, pro_connect, subtests):
         forbidden_user_kinds = [UserKind.ITOU_STAFF, UserKind.LABOR_INSPECTOR, UserKind.JOB_SEEKER]

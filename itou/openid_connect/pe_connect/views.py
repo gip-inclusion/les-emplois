@@ -43,14 +43,15 @@ def pe_connect_authorize(request):
     # The redirect_uri should be defined in the PEAMU settings to be allowed
     # NB: the integration platform allows "http://127.0.0.1:8000/pe_connect/callback"
     redirect_uri = get_absolute_url(reverse("pe_connect:callback"))
-    state = PoleEmploiConnectState.save_state()
+    nonce = crypto.get_random_string(12)
+    state = PoleEmploiConnectState.save_state(nonce=nonce)
     data = {
         "response_type": "code",
         "client_id": settings.API_ESD["KEY"],
         "redirect_uri": redirect_uri,
         "scope": constants.PE_CONNECT_SCOPES,
         "state": state,
-        "nonce": crypto.get_random_string(length=12),
+        "nonce": nonce,
         "realm": "/individu",  # PEAMU specificity
     }
     url = constants.PE_CONNECT_ENDPOINT_AUTHORIZE
