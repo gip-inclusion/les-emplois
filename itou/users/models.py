@@ -1122,6 +1122,21 @@ class JobSeekerProfile(models.Model):
                     "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
                 ),
             ),
+            # We can't traverse relation in CHECK constraint so we need to use an hardcoded PK
+            models.CheckConstraint(
+                condition=(
+                    Q(birth_country=None, birth_place=None)
+                    | Q(birth_country__isnull=False, birth_country_id=Country.FRANCE_ID, birth_place__isnull=False)
+                    | Q(
+                        ~Q(birth_country__isnull=False, birth_country_id=Country.FRANCE_ID),
+                        Q(birth_place__isnull=True),
+                    )
+                ),
+                name="jobseekerprofile_birth_country_and_place",
+                violation_error_message=(
+                    "La commune de naissance ne doit être spécifiée que quand le pays de naissance est la France."
+                ),
+            ),
             models.UniqueConstraint(
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",
