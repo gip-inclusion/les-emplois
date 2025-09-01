@@ -641,7 +641,7 @@ class TestEditUserInfoView:
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
         post_data = {
             "email": "bob@saintclar.net",
-            "title": "M",
+            "title": "MME",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": birthdate.isoformat(),
@@ -660,6 +660,7 @@ class TestEditUserInfoView:
         # Ensure that the job seeker cannot update data retrieved from the SSO here.
         assert user.first_name != post_data["first_name"]
         assert user.last_name != post_data["last_name"]
+        assert user.title != post_data["title"]
         assert user.jobseeker_profile.birthdate != birthdate
         assert user.email != post_data["email"]
 
