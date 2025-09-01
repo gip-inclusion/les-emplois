@@ -187,6 +187,10 @@ class TestFranceConnect:
         response = client.get(url, follow=False)
         # Don't use assertRedirects to avoid fetch
         assert response.url.startswith(constants.FRANCE_CONNECT_ENDPOINT_AUTHORIZE)
+        fc_state = FranceConnectState.objects.last()
+        assert f"state={fc_state.state}" in response.url
+        assert fc_state.nonce is not None
+        assert f"nonce={fc_state.nonce}" in response.url
 
     def test_create_django_user(self):
         """

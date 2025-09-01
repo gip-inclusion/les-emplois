@@ -125,6 +125,10 @@ class TestPoleEmploiConnect:
         url = reverse("pe_connect:authorize")
         response = client.get(url, follow=False)
         assert response.url.startswith(constants.PE_CONNECT_ENDPOINT_AUTHORIZE)
+        pec_state = PoleEmploiConnectState.objects.last()
+        assert f"state={pec_state.state}" in response.url
+        assert pec_state.nonce is not None
+        assert f"nonce={pec_state.nonce}" in response.url
 
     def test_create_user(self):
         """
