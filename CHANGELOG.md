@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 2025-09-01
+
+### Modifié
+
+- [FranceConnect: récupération du genre de l'utilisateur](https://github.com/gip-inclusion/les-emplois/pull/6753)
+
 ## 2025-08-25
 
 ### Ajouté
