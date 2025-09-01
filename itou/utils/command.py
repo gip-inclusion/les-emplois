@@ -101,14 +101,16 @@ def dry_runnable(func):
             if args and args[0] and isinstance(args[0], LoggedCommandMixin)
             else logging.getLogger(func.__module__)
         )
-        with transaction.atomic():
-            if not wet_run:
+
+        if not wet_run:
+            with transaction.atomic():
                 logger.info("Command launched with wet_run=%s", wet_run)
-            func(*args, **kwargs)
-            if not wet_run:
+                func(*args, **kwargs)
                 with connection.cursor() as cursor:
                     cursor.execute("SET CONSTRAINTS ALL IMMEDIATE;")
                 transaction.set_rollback(True)
                 logger.info("Setting transaction to be rollback as wet_run=%s", wet_run)
+        else:
+            func(*args, **kwargs)
 
     return wrapper
