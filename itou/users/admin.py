@@ -490,10 +490,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         "department",
                         "city",
                         "address_in_qpv",
-                        "kind",
                         "created_by",
-                        "identity_provider",
-                        "jobseeker_profile_link",
                         "disabled_notifications",
                         "follow_up_groups_or_members",
                         "external_data_source_history_formatted",
@@ -503,7 +500,13 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         )
 
         assert fieldsets[0] == (None, {"fields": ("username", "password")})
-        fieldsets[0] = (None, {"fields": ("username", "public_id", "password")})
+        fieldsets[0] = (None, {"fields": ("username", "public_id", "password", "identity_provider")})
+
+        assert fieldsets[1] == ("Informations personnelles", {"fields": ("first_name", "last_name", "email")})
+        fieldsets[1] = (
+            "Informations personnelles",
+            {"fields": ("first_name", "last_name", "email", "kind", "jobseeker_profile_link")},
+        )
 
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
         assert "last_login" in fieldsets[-2][1]["fields"]
@@ -522,9 +525,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
         if obj and obj.identity_provider != IdentityProvider.DJANGO:
             # Add allow_next_sso_sub_update just after identity_provider
-            assert fieldsets[-1][0] == "Informations"
-            identity_provider_index = fieldsets[-1][1]["fields"].index("identity_provider")
-            fieldsets[-1][1]["fields"].insert(identity_provider_index + 1, "allow_next_sso_sub_update")
+            fieldsets[0][1]["fields"] += ("allow_next_sso_sub_update",)
 
         return fieldsets
 
