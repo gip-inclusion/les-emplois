@@ -14,13 +14,6 @@
 
         {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request itou_help_center_url=itou_help_center_url only %}
 
-    {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
-        <hr class="my-4">
-        <h3>Critères d'éligibilité</h3>
-        <p>
-            Validés par <span class="fw-bold">France Travail</span>.
-        </p>
-
     {% elif expired_eligibility_diagnosis %}
         <hr class="my-4">
         <h3>Éligibilité à l'IAE</h3>

@@ -566,25 +566,6 @@ class User(AbstractUser, AddressMixin):
             return None
         return approval
 
-    @cached_property
-    def latest_pe_approval(self):
-        from itou.approvals.models import PoleEmploiApproval
-
-        if not self.is_job_seeker:
-            return None
-
-        approval_numbers = self.approvals.all().values_list("number", flat=True)
-
-        pe_approval = (
-            PoleEmploiApproval.objects.find_for(self)
-            .exclude(number__in=approval_numbers)
-            .order_by("-end_at", "start_at")
-            .first()
-        )
-        if pe_approval and pe_approval.waiting_period_has_elapsed:
-            return None
-        return pe_approval
-
     @property
     def has_valid_approval(self):
         return self.latest_approval and self.latest_approval.is_valid()

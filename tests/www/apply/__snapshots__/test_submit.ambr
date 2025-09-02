@@ -466,7 +466,7 @@
 # ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
-    'num_queries': 29,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -919,108 +919,6 @@
       }),
       dict({
         'origin': list([
-          'PoleEmploiApprovalManagerFromCommonApprovalQuerySet.find_for[approvals/models.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_approval[users/models.py]',
-          'User.has_latest_approval_in_waiting_period[users/models.py]',
-          'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          '_check_job_seeker_approval[www/apply/views/submit_views.py]',
-          'HireConfirmationView.setup[www/apply/views/submit_views.py]',
-          'HireConfirmationView.setup[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."ft_gps_id",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."are_allocation_since",
-                 "users_jobseekerprofile"."activity_bonus_since",
-                 "users_jobseekerprofile"."cape_freelance",
-                 "users_jobseekerprofile"."cesa_freelance",
-                 "users_jobseekerprofile"."actor_met_for_business_creation",
-                 "users_jobseekerprofile"."mean_monthly_income_before_process",
-                 "users_jobseekerprofile"."eiti_contributions",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
-                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
-                 "users_jobseekerprofile"."is_stalled",
-                 "users_jobseekerprofile"."is_not_stalled_anymore",
-                 "users_jobseekerprofile"."fields_history"
-          FROM "users_jobseekerprofile"
-          WHERE "users_jobseekerprofile"."user_id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'User.latest_pe_approval[users/models.py]',
-          'User.latest_approval[users/models.py]',
-          'User.has_latest_approval_in_waiting_period[users/models.py]',
-          'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          '_check_job_seeker_approval[www/apply/views/submit_views.py]',
-          'HireConfirmationView.setup[www/apply/views/submit_views.py]',
-          'HireConfirmationView.setup[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."created_at",
-                 "approvals_poleemploiapproval"."pe_notification_status",
-                 "approvals_poleemploiapproval"."pe_notification_time",
-                 "approvals_poleemploiapproval"."pe_notification_endpoint",
-                 "approvals_poleemploiapproval"."pe_notification_exit_code",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number",
-                 "approvals_poleemploiapproval"."pole_emploi_id",
-                 "approvals_poleemploiapproval"."first_name",
-                 "approvals_poleemploiapproval"."last_name",
-                 "approvals_poleemploiapproval"."birth_name",
-                 "approvals_poleemploiapproval"."birthdate",
-                 "approvals_poleemploiapproval"."nir",
-                 "approvals_poleemploiapproval"."ntt_nia",
-                 "approvals_poleemploiapproval"."siae_siret",
-                 "approvals_poleemploiapproval"."siae_kind"
-          FROM "approvals_poleemploiapproval"
-          WHERE (("approvals_poleemploiapproval"."nir" = %s
-                  OR ("approvals_poleemploiapproval"."birthdate" = %s
-                      AND "approvals_poleemploiapproval"."pole_emploi_id" = %s))
-                 AND NOT ("approvals_poleemploiapproval"."number" IN
-                            (SELECT U0."number" AS "number"
-                             FROM "approvals_approval" U0
-                             WHERE U0."user_id" = %s)))
-          ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
-                   "approvals_poleemploiapproval"."start_at" ASC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'HireConfirmationView.setup[www/apply/views/submit_views.py]',
@@ -1189,6 +1087,66 @@
                  AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
           ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          'HireConfirmationView.get_forms[www/apply/views/common.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/common.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."fields_history"
+          FROM "users_jobseekerprofile"
+          WHERE "users_jobseekerprofile"."user_id" = %s
+          LIMIT 21
         ''',
       }),
       dict({
