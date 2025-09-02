@@ -950,7 +950,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
 
     assert membership.user not in organization.active_admin_members
     [email] = mailoutbox
-    assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
+    assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject
     assert "Un administrateur vous a retiré d'une structure" in email.body
     assert email.to == [membership.user.email]
     assert (

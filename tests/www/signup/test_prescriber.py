@@ -141,7 +141,7 @@ class TestPrescriberSignup:
         assert user.company_set.count() == 0
 
         [email] = mailoutbox
-        assert email.subject == "[DEV] Votre rôle d’administrateur"
+        assert email.subject == "[TEST] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
@@ -219,7 +219,7 @@ class TestPrescriberSignup:
         # Check email has been sent to support (validation/refusal of authorisation needed).
         [authorization_email, administrator_email] = mailoutbox
         assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
-        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
+        assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, pro_connect):
@@ -300,7 +300,7 @@ class TestPrescriberSignup:
         assert "- Nom : CENTRE COMMUNAL D'ACTION SOCIALE" in body_lines
         assert f"- ID : {org.pk}" in body_lines
         assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
-        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
+        assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, pro_connect):
@@ -394,7 +394,7 @@ class TestPrescriberSignup:
         # Check email has been sent to support (validation/refusal of authorisation needed).
         [authorization_email, administrator_email] = mailoutbox
         assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
-        assert administrator_email.subject == "[DEV] Votre rôle d’administrateur"
+        assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
     @respx.mock
     def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, pro_connect):
@@ -477,7 +477,7 @@ class TestPrescriberSignup:
         assert membership.is_admin
 
         [email] = mailoutbox
-        assert email.subject == "[DEV] Votre rôle d’administrateur"
+        assert email.subject == "[TEST] Votre rôle d’administrateur"
 
     def test_create_user_prescriber_with_existing_siren_other_department(self, client):
         """

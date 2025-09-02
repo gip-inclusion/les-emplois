@@ -2389,7 +2389,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2398,8 +2398,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "    RDV le lundi 8 à 15h à la DDETS\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -2445,7 +2445,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2457,8 +2457,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "1 janvier 2023 et jusqu’au 1 février 2023.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -2803,7 +2803,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2816,8 +2816,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "1 janvier 2023.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -2917,7 +2917,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2932,8 +2932,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "et jusqu’au 1 juin 2023.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -3073,7 +3073,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3088,8 +3088,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "et jusqu’au 1 juin 2023.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -3134,7 +3134,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3147,8 +3147,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "    Chat trop vorace.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -3191,7 +3191,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanction"
+        assert email.subject == "[TEST] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3200,8 +3200,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "Chat trop mignon.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )
@@ -3250,7 +3250,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[DEV] Notification de sanctions"
+        assert email.subject == "[TEST] Notification de sanctions"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3277,8 +3277,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             "    Chat trop vorace.\n\n"
             "Cordialement,\n\n"
             "---\n"
-            "[DEV] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [DEV]\n"
+            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
+            "merci de ne pas en tenir compte [TEST]\n"
             "Les emplois de l'inclusion\n"
             "http://localhost:8000/"
         )

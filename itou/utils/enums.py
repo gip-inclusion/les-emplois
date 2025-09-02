@@ -6,4 +6,5 @@ class ItouEnvironment(enum.StrEnum):
     DEMO = "DEMO"
     PENTEST = "PENTEST"
     REVIEW_APP = "REVIEW-APP"
+    TEST = "TEST"
     DEV = "DEV"

@@ -3,7 +3,7 @@ import os
 from itou.utils.enums import ItouEnvironment
 
 
-ITOU_ENVIRONMENT = ItouEnvironment.DEV
+ITOU_ENVIRONMENT = ItouEnvironment.TEST
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
 # Inject default redis settings

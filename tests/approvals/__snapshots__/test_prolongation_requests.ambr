@@ -64,11 +64,11 @@
   - Orientation vers un autre type de SIAE
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit[subject]
-  '[DEV] Relance - Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Relance - Demande de prolongation du PASS IAE de Jane DOE'
 # ---

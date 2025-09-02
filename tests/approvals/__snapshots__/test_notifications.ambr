@@ -44,13 +44,13 @@
   - Orientation vers un autre type de SIAE
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_created[subject]
-  '[DEV] Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Demande de prolongation du PASS IAE de Jane DOE'
 # ---
 # name: test_prolongation_request_created_reminder[body]
   '''
@@ -103,13 +103,13 @@
   - Orientation vers un autre type de SIAE
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_created_reminder[subject]
-  '[DEV] Relance - Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Relance - Demande de prolongation du PASS IAE de Jane DOE'
 # ---
 # name: test_prolongation_request_denied_employer[body]
   '''
@@ -138,13 +138,13 @@
   Vous pouvez consulter la date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_denied_employer[subject]
-  '[DEV] Prolongation du PASS IAE de Jane DOE refusée'
+  '[TEST] Prolongation du PASS IAE de Jane DOE refusée'
 # ---
 # name: test_prolongation_request_denied_jobseeker[body]
   '''
@@ -171,13 +171,13 @@
   Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_denied_jobseeker[subject]
-  '[DEV] Prolongation de votre PASS IAE refusée'
+  '[TEST] Prolongation de votre PASS IAE refusée'
 # ---
 # name: test_prolongation_request_granted_employer[body]
   '''
@@ -192,13 +192,13 @@
   Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_granted_employer[subject]
-  '[DEV] Prolongation du PASS IAE de Jane DOE acceptée'
+  '[TEST] Prolongation du PASS IAE de Jane DOE acceptée'
 # ---
 # name: test_prolongation_request_granted_jobseeker[body]
   '''
@@ -211,11 +211,11 @@
   Vous pouvez consulter la nouvelle date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
   
   ---
-  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
   Les emplois de l'inclusion
   http://localhost:8000/
   '''
 # ---
 # name: test_prolongation_request_granted_jobseeker[subject]
-  '[DEV] Prolongation de votre PASS IAE acceptée'
+  '[TEST] Prolongation de votre PASS IAE acceptée'
 # ---

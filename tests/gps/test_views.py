@@ -1725,7 +1725,7 @@ class TestJoinGroupFromNir:
         [mail] = mailoutbox
         assert mail.to == [new_job_seeker.email]
         assert mail.from_email == settings.GPS_CONTACT_EMAIL
-        assert mail.subject == "[DEV] Création de votre compte sur la Plateforme de l’inclusion"
+        assert mail.subject == "[TEST] Création de votre compte sur la Plateforme de l’inclusion"
         assert "Un compte à votre nom vient d’être créé par" in mail.body
 
 
@@ -1948,7 +1948,7 @@ class TestJoinGroupFromNameAndEmail:
         [mail] = mailoutbox
         assert mail.to == [new_job_seeker.email]
         assert mail.from_email == settings.GPS_CONTACT_EMAIL
-        assert mail.subject == "[DEV] Création de votre compte sur la Plateforme de l’inclusion"
+        assert mail.subject == "[TEST] Création de votre compte sur la Plateforme de l’inclusion"
         assert "Un compte à votre nom vient d’être créé par" in mail.body
 
     def test_full_match_with_advanced_features(self, client, snapshot, caplog):

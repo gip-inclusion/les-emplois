@@ -349,7 +349,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
             assert (
-                f"[DEV] Validation du bilan d’exécution de la structure {assessment.label_geiq_name}" == email.subject
+                f"[TEST] Validation du bilan d’exécution de la structure {assessment.label_geiq_name}" == email.subject
             )
             assert email.to[0] == dreets_membership.user.email
             assert email.body == snapshot(name="body of mail sent to DREETS members")
@@ -371,7 +371,7 @@ class TestAssessmentDetailsForInstitutionView:
             assert len(mailoutbox) == 1
             email = mailoutbox[0]
             assert (
-                f"[DEV] Résultat du contrôle effectué sur votre bilan d’exécution {assessment.label_geiq_name}"
+                f"[TEST] Résultat du contrôle effectué sur votre bilan d’exécution {assessment.label_geiq_name}"
                 == email.subject
             )
             assert email.to[0] == geiq_membership.user.email

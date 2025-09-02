@@ -7,7 +7,7 @@ def assert_set_admin_role_creation(user, organization, mailoutbox):
 
     # The admin should receive a valid email
     [email] = mailoutbox
-    assert "[DEV] Votre rôle d’administrateur" == email.subject
+    assert "[TEST] Votre rôle d’administrateur" == email.subject
     assert (
         "Vous avez désormais le statut d’administrateur sur l’espace professionnel de "
         f"votre organisation {organization.name} ({organization.kind})"
@@ -37,6 +37,6 @@ def assert_set_admin_role_removal(user, organization, mailoutbox):
 
     # The admin should receive a valid email
     [email] = mailoutbox
-    assert f"[DEV] [Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
+    assert f"[TEST] [Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
     assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
     assert email.to[0] == user.email
