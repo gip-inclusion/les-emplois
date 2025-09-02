@@ -621,10 +621,6 @@ class User(AbstractUser, AddressMixin):
     def has_latest_common_approval_in_waiting_period(self):
         return self.latest_common_approval and not self.latest_common_approval.is_valid()
 
-    @property
-    def has_no_common_approval(self):
-        return not self.latest_approval and not self.latest_pe_approval
-
     def new_approval_blocked_by_waiting_period(self, siae, sender_prescriber_organization):
         """
         Don’t create approvals for users whose approval recently ended,
