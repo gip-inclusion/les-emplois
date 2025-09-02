@@ -1065,7 +1065,6 @@
       dict({
         'origin': list([
           'User.latest_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
           'IfNode[dashboard/includes/job_seeker_approval_card.html]',
           'IncludeNode[dashboard/dashboard.html]',
           'IfNode[dashboard/dashboard.html]',
