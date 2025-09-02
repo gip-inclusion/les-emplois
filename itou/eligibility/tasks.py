@@ -4,6 +4,7 @@ from json import JSONDecodeError
 
 import httpx
 from django.apps import apps
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from huey.contrib.djhuey import on_commit_task
@@ -13,6 +14,7 @@ from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
+from itou.utils.enums import ItouEnvironment
 from itou.utils.types import InclusiveDateRange
 
 
@@ -20,6 +22,12 @@ logger = logging.getLogger("APIParticulierClient")
 
 
 def certify_criteria(eligibility_diagnosis):
+    if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
+        logging.info(
+            "API particulier is not configured in %s, certify_criteria was skipped.",
+            settings.ITOU_ENVIRONMENT,
+        )
+        return
     job_seeker = eligibility_diagnosis.job_seeker
     if not api_particulier.has_required_info(job_seeker):
         logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
