@@ -2,12 +2,16 @@ import pgtrigger
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
-from itou.employee_record.enums import Status
-from itou.utils.templatetags.format_filters import format_approval_number, format_siret
+from itou.employee_record.enums import NotificationStatus, Status
+from itou.employee_record.models import EmployeeRecordTransition
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
-from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
+from tests.employee_record.factories import (
+    EmployeeRecordTransitionLogFactory,
+    EmployeeRecordUpdateNotificationFactory,
+    EmployeeRecordWithProfileFactory,
+)
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -46,55 +50,42 @@ class TestSummaryEmployeeRecords:
             html=True,
         )
 
-    def test_asp_batch_file_infos(self, client):
-        HORODATAGE = "Horodatage ASP"
+    def test_technical_infos(self, client, snapshot):
+        self.employee_record.siret = "10000000000002"
+        self.employee_record.approval_number = "999991122222"
+        self.employee_record.save()
+
         client.force_login(self.user)
         response = client.get(self.url)
-        assertNotContains(response, HORODATAGE)
-
-        self.employee_record.ready()
-        self.employee_record.wait_for_asp_response(file="RIAE_FS_20210410130000.json", line_number=1, archive=None)
-
-        response = client.get(self.url)
-        assertContains(response, HORODATAGE)
-        assertContains(
-            response,
-            """
-            <li>
-            <small>Création</small>
-            <strong>RIAE_FS_20210410130000</strong>
-            </li>
-            """,
-            html=True,
+        assert pretty_indented(parse_response_to_soup(response, "#technical-infos")) == snapshot(
+            name="without timestamps"
         )
 
         EmployeeRecordUpdateNotificationFactory(
-            employee_record=self.employee_record, asp_batch_file="RIAE_FS_20210510130000.json"
+            employee_record=self.employee_record,
+            asp_batch_file="RIAE_FS_20210701120000.json",
+            status=NotificationStatus.PROCESSED,
         )
-        response = client.get(self.url)
-        assertContains(response, HORODATAGE)
-        assertContains(
-            response,
-            """
-            <li>
-            <small>Création</small>
-            <strong>RIAE_FS_20210410130000</strong>
-            </li>
-            <li>
-            <small>Modification</small>
-            <strong>RIAE_FS_20210510130000</strong>
-            </li>
-            """,
-            html=True,
+        EmployeeRecordUpdateNotificationFactory(
+            employee_record=self.employee_record,
+            asp_batch_file="RIAE_FS_20241021110000.json",
+            status=NotificationStatus.PROCESSED,
+        )
+        EmployeeRecordTransitionLogFactory(
+            employee_record=self.employee_record,
+            transition=EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+            asp_batch_file="RIAE_FS_20210510130000.json",
+        )
+        EmployeeRecordTransitionLogFactory(
+            employee_record=self.employee_record,
+            transition=EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
+            asp_batch_file="RIAE_FS_20220111000000.json",
         )
 
-    def test_technical_infos(self, client):
-        client.force_login(self.user)
         response = client.get(self.url)
-
-        assertContains(response, format_approval_number(self.employee_record.approval_number))
-        assertContains(response, format_siret(self.employee_record.siret))
-        assertContains(response, self.employee_record.asp_measure)
+        assert pretty_indented(parse_response_to_soup(response, "#technical-infos")) == snapshot(
+            name="with timestamps"
+        )
 
     def get_title_section_soup(self, response):
         return parse_response_to_soup(

@@ -379,3 +379,107 @@
   
   '''
 # ---
+# name: TestSummaryEmployeeRecords.test_technical_infos[with timestamps]
+  '''
+  <div class="c-box bg-info-lightest border-info mb-3 mb-md-4" id="technical-infos">
+      <ul class="list-data">
+          <li>
+              <small>
+                  PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      11
+                  </span>
+                  <span class="ms-1">
+                      22222
+                  </span>
+              </strong>
+          </li>
+          <li>
+              <small>
+                  SIRET (mesure)
+              </small>
+              <strong>
+                  100 000 000 00002 (EI_DC)
+              </strong>
+          </li>
+      </ul>
+      <hr class="my-3"/>
+      <p class="mb-0">
+          Horodatage ASP
+      </p>
+      <ul class="list-data">
+          <li>
+              <small>
+                  Mouvement de modification le 21/10/2024 à 11:00
+              </small>
+              <strong>
+                  RIAE_FS_20241021110000
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Mouvement de création le 11/01/2022 à 00:00
+              </small>
+              <strong>
+                  RIAE_FS_20220111000000
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Mouvement de modification le 01/07/2021 à 12:00
+              </small>
+              <strong>
+                  RIAE_FS_20210701120000
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Mouvement de création le 10/05/2021 à 13:00
+              </small>
+              <strong>
+                  RIAE_FS_20210510130000
+              </strong>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestSummaryEmployeeRecords.test_technical_infos[without timestamps]
+  '''
+  <div class="c-box bg-info-lightest border-info mb-3 mb-md-4" id="technical-infos">
+      <ul class="list-data">
+          <li>
+              <small>
+                  PASS IAE
+              </small>
+              <strong>
+                  <span>
+                      99999
+                  </span>
+                  <span class="ms-1">
+                      11
+                  </span>
+                  <span class="ms-1">
+                      22222
+                  </span>
+              </strong>
+          </li>
+          <li>
+              <small>
+                  SIRET (mesure)
+              </small>
+              <strong>
+                  100 000 000 00002 (EI_DC)
+              </strong>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---

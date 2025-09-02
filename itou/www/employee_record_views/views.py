@@ -1,4 +1,6 @@
 import enum
+from datetime import datetime
+from operator import itemgetter
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -16,7 +18,7 @@ from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileModelForm
@@ -519,6 +521,10 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     return render(request, template_name, context)
 
 
+def get_asp_batch_file_timestamp(asp_batch_file):
+    return datetime.strptime(asp_batch_file[8:22], "%Y%m%d%H%M%S")
+
+
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
     siae = get_current_company_or_404(request)
 
@@ -531,8 +537,23 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
+    creations = [
+        ("Mouvement de création", asp_batch_file, get_asp_batch_file_timestamp(asp_batch_file))
+        for asp_batch_file in employee_record.logs.filter(
+            transition=EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE
+        ).values_list("asp_batch_file", flat=True)
+    ]
+    changes = [
+        ("Mouvement de modification", asp_batch_file, get_asp_batch_file_timestamp(asp_batch_file))
+        for asp_batch_file in employee_record.update_notifications.exclude(status=Status.NEW).values_list(
+            "asp_batch_file", flat=True
+        )
+    ]
+    updates = sorted(creations + changes, key=itemgetter(1), reverse=True)
+
     context = {
         "employee_record": employee_record,
+        "updates": updates,
         "matomo_custom_title": "Détail fiche salarié ASP",
         "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("employee_record_views:list")),
     }
