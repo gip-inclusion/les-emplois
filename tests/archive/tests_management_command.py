@@ -56,6 +56,7 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
+from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
@@ -939,7 +940,7 @@ class TestAnonymizeJobseekersManagementCommand:
             user__public_id=uuid4(),
         )
 
-        # approval with eligibility diag, prolongation, suspension and accepted job application
+        # approval with eligibility diag, prolongation, suspension, accepted job application and employee record
         approval_with_few_datas = ApprovalFactory(
             origin_sender_kind=SenderKind.PRESCRIBER,
             origin_prescriber_organization_kind=PrescriberOrganizationKind.CCAS,
@@ -955,17 +956,17 @@ class TestAnonymizeJobseekersManagementCommand:
         SuspensionFactory(
             approval=approval_with_few_datas, start_at=datetime.date(2020, 5, 17), end_at=datetime.date(2020, 6, 10)
         )
-        JobApplicationFactory(
-            job_seeker=approval_with_few_datas.user,
-            approval=approval_with_few_datas,
-            eligibility_diagnosis=approval_with_few_datas.eligibility_diagnosis,
-            created_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
-            processed_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
-            to_company__department=76,
-            to_company__naf="4567A",
-            to_company__kind=CompanyKind.EI,
-            state=JobApplicationState.ACCEPTED,
-            hiring_start_at=datetime.date(2023, 2, 2),
+        EmployeeRecordFactory(
+            job_application__job_seeker=approval_with_few_datas.user,
+            job_application__approval=approval_with_few_datas,
+            job_application__eligibility_diagnosis=approval_with_few_datas.eligibility_diagnosis,
+            job_application__created_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
+            job_application__processed_at=timezone.make_aware(datetime.datetime(2023, 2, 16)),
+            job_application__to_company__department=76,
+            job_application__to_company__naf="4567A",
+            job_application__to_company__kind=CompanyKind.EI,
+            job_application__state=JobApplicationState.ACCEPTED,
+            job_application__hiring_start_at=datetime.date(2023, 2, 2),
         )
 
         # approval with 3 prolongations, 2 suspensions and 2 job applications
