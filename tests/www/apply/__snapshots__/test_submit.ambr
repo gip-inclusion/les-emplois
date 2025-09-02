@@ -543,7 +543,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1658,7 +1658,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1873,7 +1873,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -2182,7 +2182,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -2387,7 +2387,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -2589,7 +2589,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -2857,7 +2857,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3249,7 +3249,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3537,7 +3537,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3884,7 +3884,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -4099,7 +4099,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -4408,7 +4408,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -4613,7 +4613,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -4815,7 +4815,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5083,7 +5083,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5475,7 +5475,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -5763,7 +5763,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -6110,7 +6110,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -6325,7 +6325,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -6634,7 +6634,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -6839,7 +6839,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -7041,7 +7041,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -7309,7 +7309,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -7701,7 +7701,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -7989,7 +7989,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8336,7 +8336,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -8551,7 +8551,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -8860,7 +8860,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -9065,7 +9065,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -9267,7 +9267,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -9535,7 +9535,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -9927,7 +9927,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -10215,7 +10215,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

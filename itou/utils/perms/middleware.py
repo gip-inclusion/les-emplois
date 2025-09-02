@@ -71,7 +71,7 @@ class ItouCurrentOrganizationMiddleware:
                         really_active_memberships.append(membership)
                 # If there is no current company, we want to default to the first active one
                 # (and preferably not one in grace period)
-                really_active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.created_at))
+                really_active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.joined_at))
 
                 (
                     request.organizations,
@@ -94,7 +94,7 @@ class ItouCurrentOrganizationMiddleware:
             elif user.is_prescriber:
                 active_memberships = list(
                     user.prescribermembership_set.filter(is_active=True)
-                    .order_by("created_at")
+                    .order_by("joined_at")
                     .select_related("organization")
                 )
                 if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
@@ -118,7 +118,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
                     user.institutionmembership_set.filter(is_active=True)
-                    .order_by("created_at")
+                    .order_by("joined_at")
                     .select_related("institution"),
                     "institution",
                     request.session,

@@ -843,7 +843,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
@@ -1182,7 +1182,7 @@
           INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
           WHERE ("prescribers_prescribermembership"."user_id" = %s
                  AND "prescribers_prescribermembership"."is_active")
-          ORDER BY "prescribers_prescribermembership"."created_at" ASC
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
         ''',
       }),
       dict({
