@@ -140,6 +140,7 @@
                              WHERE (U1."user_id" IS NULL
                                     AND U0."id" = ("companies_company"."id"))
                              LIMIT 1))
+                 AND "companies_companymembership"."is_active"
                  AND "companies_companymembership"."is_admin"
                  AND "users_user"."is_active")
         ''',
