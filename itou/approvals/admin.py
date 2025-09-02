@@ -721,40 +721,6 @@ class ProlongationAdmin(ProlongationCommonAdmin):
         return obj.request is not None
 
 
-@admin.register(models.PoleEmploiApproval)
-class PoleEmploiApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
-    list_display = (
-        "pk",
-        "pole_emploi_id",
-        "number",
-        "first_name",
-        "last_name",
-        "birth_name",
-        "birthdate",
-        "start_at",
-        "end_at",
-        "is_valid",
-        "created_at",
-    )
-    search_fields = (
-        "pk",
-        "pole_emploi_id",
-        "nir",
-        "number",
-        "first_name__unaccent",
-        "last_name__unaccent",
-        "birth_name",
-    )
-    show_full_result_count = False
-
-    list_filter = (IsValidFilter,)
-    date_hierarchy = "birthdate"
-
-    @admin.display(boolean=True, description="en cours de validité")
-    def is_valid(self, obj):
-        return obj.is_valid()
-
-
 @admin.register(models.CancelledApproval)
 class CancelledApprovalAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = (
