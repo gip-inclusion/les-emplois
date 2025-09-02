@@ -256,8 +256,9 @@ class TestCompanyModel:
         assert 0 == company.members.count()
         admin_user = EmployerFactory()
         company.add_or_activate_membership(admin_user)
-        assert 1 == company.memberships.count()
-        assert company.memberships.get(user=admin_user).is_admin
+        membership = company.memberships.get()
+        assert membership.is_admin is True
+        assert membership.is_active is True
         assert (
             f"Expired 0 invitations to companies.Company {company.pk} for user_id={admin_user.pk}." in caplog.messages
         )
@@ -279,7 +280,9 @@ class TestCompanyModel:
         invit_other = EmployerInvitationFactory(email=other_user.email)
         company.add_or_activate_membership(other_user)
         assert 2 == company.memberships.count()
-        assert not company.memberships.get(user=other_user).is_admin
+        membership = company.memberships.get(user=other_user)
+        assert membership.is_admin is False
+        assert membership.is_active is True
         assert (
             f"Expired 2 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
@@ -308,8 +311,9 @@ class TestCompanyModel:
         company.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = EmployerInvitationFactory(email=other_user.email, company=company, sender=admin_user)
         company.add_or_activate_membership(other_user)
-        assert company.memberships.get(user=other_user).is_active
-        assert company.memberships.get(user=other_user).is_admin is False
+        membership = company.memberships.get(user=other_user)
+        assert membership.is_admin is False
+        assert membership.is_active is True
         assert (
             f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )

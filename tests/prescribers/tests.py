@@ -181,8 +181,9 @@ class TestPrescriberOrganizationModel:
         assert 0 == org.members.count()
         admin_user = PrescriberFactory()
         org.add_or_activate_membership(admin_user)
-        assert 1 == org.memberships.count()
-        assert org.memberships.get(user=admin_user).is_admin
+        membership = org.memberships.get()
+        assert membership.is_admin is True
+        assert membership.is_active is True
         assert (
             f"Expired 0 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={admin_user.pk}."
         ) in caplog.messages
@@ -204,7 +205,9 @@ class TestPrescriberOrganizationModel:
         invit_other = PrescriberWithOrgInvitationFactory(email=other_user.email)
         org.add_or_activate_membership(other_user)
         assert 2 == org.memberships.count()
-        assert not org.memberships.get(user=other_user).is_admin
+        membership = org.memberships.get(user=other_user)
+        assert membership.is_admin is False
+        assert membership.is_active is True
         assert (
             f"Expired 2 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
         ) in caplog.messages
@@ -233,8 +236,9 @@ class TestPrescriberOrganizationModel:
         org.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = PrescriberWithOrgInvitationFactory(email=other_user.email, organization=org, sender=admin_user)
         org.add_or_activate_membership(other_user)
-        assert org.memberships.get(user=other_user).is_active
-        assert org.memberships.get(user=other_user).is_admin is False
+        membership = org.memberships.get(user=other_user)
+        assert membership.is_active is True
+        assert membership.is_admin is False
         assert (
             f"Expired 1 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
         ) in caplog.messages
