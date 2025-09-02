@@ -235,10 +235,12 @@ class TestPrescriberOrganizationModel:
 
         org.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = PrescriberWithOrgInvitationFactory(email=other_user.email, organization=org, sender=admin_user)
+        before_joining_again = timezone.now()
         org.add_or_activate_membership(other_user)
         membership = org.memberships.get(user=other_user)
         assert membership.is_active is True
         assert membership.is_admin is False
+        assert membership.joined_at > before_joining_again
         assert (
             f"Expired 1 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
         ) in caplog.messages

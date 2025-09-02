@@ -109,7 +109,8 @@ class OrganizationAbstract(models.Model):
             action = "Reactivating"
             membership.is_active = True
             membership.is_admin = should_be_admin
-            membership.save(update_fields=["is_active", "is_admin", "updated_at"])
+            membership.joined_at = timezone.now()
+            membership.save(update_fields=["is_active", "is_admin", "joined_at", "updated_at"])
         self.expire_invitations(user)
         logger.info(
             "%(action)s %(membership)s of organization_id=%(organization_id)d "
