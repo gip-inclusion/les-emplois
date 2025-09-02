@@ -59,8 +59,9 @@ class TestInstitutionModel:
         assert 0 == institution.members.count()
         admin_user = LaborInspectorFactory()
         institution.add_or_activate_membership(admin_user)
-        assert 1 == institution.memberships.count()
-        assert institution.memberships.get(user=admin_user).is_admin
+        membership = institution.memberships.get()
+        assert membership.is_admin is True
+        assert membership.is_active is True
         assert (
             f"Expired 0 invitations to institutions.Institution {institution.pk} for user_id={admin_user.pk}."
             in caplog.messages
@@ -83,8 +84,9 @@ class TestInstitutionModel:
         invit_other = LaborInspectorInvitationFactory(email=other_user.email)
         institution.add_or_activate_membership(other_user)
         assert 2 == institution.memberships.count()
-        assert not institution.memberships.get(user=other_user).is_admin
-        assert institution.memberships.get(user=other_user).is_active
+        membership = institution.memberships.get(user=other_user)
+        assert membership.is_admin is False
+        assert membership.is_active is True
         assert (
             f"Expired 2 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
         ) in caplog.messages
@@ -113,8 +115,9 @@ class TestInstitutionModel:
         institution.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = LaborInspectorInvitationFactory(email=other_user.email, institution=institution, sender=admin_user)
         institution.add_or_activate_membership(other_user)
-        assert institution.memberships.get(user=other_user).is_active
-        assert institution.memberships.get(user=other_user).is_admin is False
+        membership = institution.memberships.get(user=other_user)
+        assert membership.is_admin is False
+        assert membership.is_active is True
         assert (
             f"Expired 1 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
             in caplog.messages
