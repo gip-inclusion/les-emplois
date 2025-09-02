@@ -1,7 +1,7 @@
 {% load approvals %}
 
 <div class="col mb-3 mb-md-5">
-    {% if not user.latest_common_approval %}
+    {% if not user.latest_approval %}
         <div class="c-box bg-warning-lightest border-warning h-100 d-flex flex-column">
             <div class="mb-3 mb-md-4">
                 <span class="badge badge-base rounded-pill bg-warning text-white">
@@ -20,6 +20,6 @@
             </a>
         </div>
     {% else %}
-        {% approval_details_box approval=user.latest_common_approval version='job_seeker_dashboard' request=request extra_classes="h-100" %}
+        {% approval_details_box approval=user.latest_approval version='job_seeker_dashboard' request=request extra_classes="h-100" %}
     {% endif %}
 </div>

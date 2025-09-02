@@ -633,7 +633,7 @@ class TestApprovalModel:
         user = job_application.job_seeker
         approval = job_application.approval
 
-        assert user.latest_common_approval == approval
+        assert user.latest_approval == approval
         assert job_application.approval == approval
         assertQuerySetEqual(Approval.objects.all(), [approval])
 

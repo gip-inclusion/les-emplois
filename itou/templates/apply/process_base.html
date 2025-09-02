@@ -90,10 +90,10 @@
                             {% if request.user.is_employer %}
                                 {# Employers need to know the expiration date of an approval #}
                                 {# to decide whether they may accept a job application or not. #}
-                                {% with common_approval=job_application.job_seeker.latest_common_approval %}
-                                    {% if common_approval %}
-                                        {% if common_approval.is_valid or job_application.state.is_accepted %}
-                                            {% approval_details_box approval=common_approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
+                                {% with approval=job_application.job_seeker.latest_approval %}
+                                    {% if approval %}
+                                        {% if approval.is_valid or job_application.state.is_accepted %}
+                                            {% approval_details_box approval=approval version='box' request=request extra_classes='mb-3 mb-md-4' %}
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}

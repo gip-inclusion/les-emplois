@@ -1742,7 +1742,7 @@
         'origin': list([
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
+          'User.latest_approval[users/models.py]',
           '_serialize_job_application[job_applications/export.py]',
           '_job_applications_serializer[job_applications/export.py]',
           'serialize_queryset_by_batch[<site-packages>/xlsx_streaming/streaming.py]',
@@ -1922,7 +1922,7 @@
         'origin': list([
           'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
           'User.latest_pe_approval[users/models.py]',
-          'User.latest_common_approval[users/models.py]',
+          'User.latest_approval[users/models.py]',
           '_serialize_job_application[job_applications/export.py]',
           '_job_applications_serializer[job_applications/export.py]',
           'serialize_queryset_by_batch[<site-packages>/xlsx_streaming/streaming.py]',
