@@ -24,6 +24,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
@@ -386,6 +387,7 @@ class Command(BaseCommand):
 
     def _delete_jobapplications_with_related_objects(self, jobapplications):
         resume_pks = list(File.objects.filter(jobapplication__in=jobapplications).values_list("pk", flat=True))
+        EmployeeRecord.objects.filter(job_application__in=jobapplications).delete()
         jobapplications.delete()
         File.objects.filter(pk__in=resume_pks).delete()
 
