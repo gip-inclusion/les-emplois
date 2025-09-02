@@ -1624,7 +1624,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2232,21 +2232,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
-          'ExtendsNode[approvals/details.html]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
       }),
       dict({
         'origin': list([
@@ -3952,7 +3937,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as prescriber]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -4560,21 +4545,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/base_details.html]',
-          'ExtendsNode[approvals/details.html]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
       }),
       dict({
         'origin': list([

@@ -605,7 +605,7 @@
 # ---
 # name: test_multiple.1
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -1345,22 +1345,6 @@
       }),
       dict({
         'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/list.html]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
           'IfNode[job_seekers_views/list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
@@ -1639,7 +1623,7 @@
 # ---
 # name: test_multiple_with_job_seekers_created_by_organization.1
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1756,17 +1740,6 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
       }),
       dict({
         'origin': list([
@@ -2377,22 +2350,6 @@
                                                    %s,
                                                    %s)
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[job_seekers_views/list.html]',
-          'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({
