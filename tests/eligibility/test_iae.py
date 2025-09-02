@@ -26,7 +26,7 @@ from itou.utils.mocks.api_particulier import (
     ResponseKind,
 )
 from itou.utils.types import InclusiveDateRange
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -81,37 +81,7 @@ class TestEligibilityDiagnosisManager:
         assert has_considered_valid
         assert last_for_job_seeker == diagnosis
 
-    def test_pole_emploi_diagnosis(self):
-        PoleEmploiApprovalFactory(
-            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=self.job_seeker.jobseeker_profile.birthdate,
-        )
-        has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
-        last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
-        last_for_job_seeker = EligibilityDiagnosis.objects.last_for_job_seeker(job_seeker=self.job_seeker)
-        assert not has_considered_valid  # Valid PoleEmploiApproval are now ignored
-        assert last_considered_valid is None
-        assert last_expired is None
-        assert last_for_job_seeker is None
-
-    def test_expired_pole_emploi_diagnosis(self):
-        end_at = timezone.localdate() - relativedelta(years=2)
-        start_at = end_at - relativedelta(years=2)
-        PoleEmploiApprovalFactory(
-            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=self.job_seeker.jobseeker_profile.birthdate,
-            start_at=start_at,
-            end_at=end_at,
-        )
-        has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
-        last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
-        last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
-        assert not has_considered_valid
-        assert last_considered_valid is None
-        assert last_expired is None
-
-    def test_expired_itou_diagnosis(self):
+    def test_expired_diagnosis(self):
         expired_diagnosis = IAEEligibilityDiagnosisFactory(
             from_prescriber=True, job_seeker=self.job_seeker, expired=True
         )
@@ -128,7 +98,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired is not None
         assert last_for_job_seeker == expired_diagnosis
 
-    def test_expired_itou_diagnosis_with_ongoing_approval(self):
+    def test_expired_diagnosis_with_ongoing_approval(self):
         expired_diagnosis = IAEEligibilityDiagnosisFactory(
             from_prescriber=True, job_seeker=self.job_seeker, expired=True
         )
@@ -146,7 +116,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired is None
         assert last_for_job_seeker == expired_diagnosis
 
-    def test_itou_diagnosis_by_siae(self):
+    def test_diagnosis_by_siae(self):
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -188,7 +158,7 @@ class TestEligibilityDiagnosisManager:
         last_for_job_seeker = EligibilityDiagnosis.objects.last_for_job_seeker(job_seeker=diagnosis.job_seeker)
         assert last_for_job_seeker != diagnosis  # (the returned diagnosis is the one that lead to a PASS).
 
-    def test_itou_diagnosis_by_prescriber(self):
+    def test_diagnosis_by_prescriber(self):
         company = CompanyFactory(with_membership=True)
         prescriber_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # From siae perspective.
@@ -210,7 +180,7 @@ class TestEligibilityDiagnosisManager:
         )
         assert last_for_job_seeker == prescriber_diagnosis
 
-    def test_itou_diagnosis_both_siae_and_prescriber(self):
+    def test_diagnosis_both_siae_and_prescriber(self):
         company = CompanyFactory(with_membership=True)
         prescriber_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # From `siae` perspective.
@@ -229,7 +199,7 @@ class TestEligibilityDiagnosisManager:
         last_for_job_seeker = EligibilityDiagnosis.objects.last_for_job_seeker(job_seeker=self.job_seeker)
         assert last_for_job_seeker == prescriber_diagnosis
 
-    def test_expired_itou_diagnosis_by_another_siae(self):
+    def test_expired_diagnosis_by_another_siae(self):
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
         expired_diagnosis = IAEEligibilityDiagnosisFactory(
@@ -244,7 +214,7 @@ class TestEligibilityDiagnosisManager:
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker, for_siae=company_2)
         assert last_expired is None
 
-    def test_itou_diagnosis_one_valid_other_expired(self):
+    def test_diagnosis_one_valid_other_expired(self):
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker, expired=True)
         valid_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
@@ -255,7 +225,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired is None
         assert last_for_job_seeker == valid_diagnosis
 
-    def test_itou_diagnosis_one_valid_other_expired_same_siae(self):
+    def test_diagnosis_one_valid_other_expired_same_siae(self):
         company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
@@ -275,7 +245,7 @@ class TestEligibilityDiagnosisManager:
         )
         assert last_considered_valid == new_diag
 
-    def test_itou_diagnosis_expired_uses_the_most_recent(self):
+    def test_diagnosis_expired_uses_the_most_recent(self):
         date_6m = (
             timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS) - relativedelta(day=1)
         )

@@ -73,12 +73,11 @@ def approval_state_badge(
     }[approval_state]
     if icon_extra_classes:
         icon_class = f"{icon_class} {icon_extra_classes}"
-    approval_type = "PASS IAE" if approval.is_pass_iae else "Agrément"
     return mark_safe(
         f"""\
             <span class="badge {span_extra_classes} rounded-pill {span_class}">
                 <i class="{icon_class}" aria-hidden="true"></i>
-                {approval_type} {approval_state.label.lower()}
+                PASS IAE {approval_state.label.lower()}
             </span>"""
     )
 

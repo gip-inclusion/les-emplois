@@ -19,7 +19,7 @@ Arguments:
     </div>
     <ul class="list-data">
         <li>
-            <small>Numéro {{ approval.is_pass_iae|yesno:"de PASS IAE,d’agrément" }}</small>
+            <small>Numéro de PASS IAE</small>
             <strong>{{ approval.number|format_approval_number }}</strong>
         </li>
         <li>
@@ -70,8 +70,7 @@ Arguments:
             <p class="fs-sm fst-italic mt-3">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
         {% endif %}
     {% else %}
-        {# PoleEmploiApprovals have no prolongation, no suspension and no detail page #}
-        {% if approval.is_pass_iae and approval.state == "VALID" %}
+        {% if approval.state == "VALID" %}
             {% with approval.pending_prolongation_request as pending_prolongation_request %}
                 {% if pending_prolongation_request %}
                     <hr class="my-3 my-md-4">
@@ -85,7 +84,7 @@ Arguments:
                     </ul>
                 {% endif %}
             {% endwith %}
-        {% elif approval.is_pass_iae and approval.state == "SUSPENDED" %}
+        {% elif approval.state == "SUSPENDED" %}
             {% with approval.ongoing_suspension as suspension %}
                 {% if suspension %}
                     <hr class="my-3 my-md-4">
