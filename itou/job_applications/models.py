@@ -1096,10 +1096,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 self.notifications_deliver_approval(user).send()
             elif (
-                not self.job_seeker.latest_approval
-                and (self.job_seeker.jobseeker_profile.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
-            ) or (
-                self.job_seeker.jobseeker_profile.pole_emploi_id
+                self.job_seeker.jobseeker_profile.nir
+                or self.job_seeker.jobseeker_profile.pole_emploi_id
                 or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
                 == LackOfPoleEmploiId.REASON_NOT_REGISTERED
             ):
@@ -1117,16 +1115,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 self.notifications_deliver_approval(user).send()
-            elif not self.job_seeker.jobseeker_profile.nir or (
-                not self.job_seeker.jobseeker_profile.pole_emploi_id
-                and self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
-                == LackOfPoleEmploiId.REASON_FORGOTTEN
-            ):
+            else:
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
                 self.email_manual_approval_delivery_required_notification(user).send()
-            else:
-                raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
