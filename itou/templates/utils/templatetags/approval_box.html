@@ -99,7 +99,7 @@ Arguments:
             {% endwith %}
         {% endif %}
         {% if version == "job_seeker_dashboard" %}
-            {% if approval.user.has_latest_common_approval_in_waiting_period %}
+            {% if approval.user.has_latest_approval_in_waiting_period %}
                 <hr class="my-3 my-md-4">
                 {% if approval.user.has_valid_diagnosis %}
                     <p class="fs-sm mb-0">
