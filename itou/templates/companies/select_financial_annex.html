@@ -31,13 +31,18 @@
 
                             {% bootstrap_field select_form.financial_annexes %}
 
+                            <div class="c-info mb-3">
+                                <span class="c-info__summary">Votre annexe financière ne correspond pas ?</span>
+                                <div class="c-info__detail">
+                                    <p>
+                                        Si votre annexe financière correspond à un SIREN différent de {{ request.current_organization.siren }} ou à un type de structure différent de {{ request.current_organization.kind }}, ou bien si elle n'apparaît pas dans la liste ci-dessus, <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" class="has-external-link" aria-label="Ouverture dans un nouvel onglet">contactez-nous via la rubrique correspondant à votre structure sur la documentation des emplois de l'inclusion</a>
+                                    </p>
+                                </div>
+                            </div>
+
                             {% itou_buttons_form primary_label="Continuer" reset_url=None %}
                         </form>
                     </div>
-
-                    <p class="mt-3">
-                        Si votre annexe financière correspond à un SIREN différent de {{ request.current_organization.siren }} ou à un type de structure différent de {{ request.current_organization.kind }}, ou bien si elle n'apparaît pas dans la liste ci-dessus, contactez-nous via la rubrique correspondant à votre structure sur <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" class="has-external-link" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">{{ ITOU_HELP_CENTER_URL }}</a>
-                    </p>
                 </div>
             </div>
         </div>
