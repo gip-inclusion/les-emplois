@@ -54,7 +54,7 @@ class ItouCurrentOrganizationMiddleware:
         logout_warning = None
         if user.is_authenticated:
             if user.is_employer:
-                active_memberships = list(user.companymembership_set.filter(is_active=True).order_by("created_at"))
+                active_memberships = list(user.companymembership_set.filter(is_active=True))
                 companies = {
                     company.pk: company
                     for company in user.company_set.filter(
