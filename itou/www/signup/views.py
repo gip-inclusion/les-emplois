@@ -200,7 +200,7 @@ def company_select(request, template_name="signup/company_select.html"):
             # the template directly displays the first membership's user "as the admin".
             # that's why we only select SIAEs that have at least an active admin user.
             # it should always be the case, but lets enforce it anyway.
-            .filter(memberships__is_admin=True, memberships__user__is_active=True)
+            .filter(memberships__is_admin=True, memberships__is_active=True, memberships__user__is_active=True)
             # avoid the template issuing requests for every member and user.
             .prefetch_related("memberships__user")
         )
