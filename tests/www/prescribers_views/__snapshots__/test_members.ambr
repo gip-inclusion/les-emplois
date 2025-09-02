@@ -50,15 +50,15 @@
                           </span>
                           <div class="c-info__detail">
                               <p>
-                                  Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant
-                                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737313097361--Inviter-mes-collaborateurs-%C3%A0-se-rattacher-au-compte-de-l-organisation">
-                                      ce lien
+                                  Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant ce
+                                  <a aria-label="Documentation sur l'invitation des collaborateurs (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737313097361--Inviter-mes-collaborateurs-%C3%A0-se-rattacher-au-compte-de-l-organisation" rel="noopener" target="_blank">
+                                      lien vers notre documentation
                                   </a>
                                   .
                                   <br/>
-                                  En tant qu’administrateur, découvrez quelles actions vous pouvez réaliser en suivant
-                                  <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617--Administrateur-de-l-organisation-Prescripteur">
-                                      ce lien
+                                  En tant qu’administrateur, découvrez quelles actions vous pouvez réaliser en suivant ce
+                                  <a aria-label="Documentation sur le rôle d'administrateur (ouverture dans un nouvel onglet)" class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617--Administrateur-de-l-organisation-Prescripteur" rel="noopener" target="_blank">
+                                      lien vers notre documentation
                                   </a>
                                   .
                               </p>
