@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.models import Approval, CancelledApproval
-from itou.companies.enums import CompanyKind, siae_kind_to_ft_type_siae
+from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityCertificationAuthorities
@@ -23,7 +23,7 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_MANY_RESULTS,
     API_RECHERCHE_RESULT_KNOWN,
 )
-from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
@@ -702,38 +702,3 @@ class TestApprovalsSendToPeManagement:
         # Since the notify_pole_emploi have been mocked, the READY/SHOULD_RETRY approvals kept their statuses
         retry_approval.refresh_from_db()
         assert retry_approval.pe_notification_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
-
-
-class TestPoleEmploiApprovalNotifyPoleEmploiIntegration:
-    @respx.mock
-    def test_notification_accepted_nominal(self):
-        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
-            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
-        )
-        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
-        )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
-        pe_approval = PoleEmploiApprovalFactory(
-            nir="FOOBAR2000", siae_kind=CompanyKind.ACI.value
-        )  # avoid the OPCS, not mapped yet
-        with freeze_time() as frozen_now:
-            return_status = pe_approval.notify_pole_emploi()
-        assert return_status == api_enums.PEApiNotificationStatus.SUCCESS
-        pe_approval.refresh_from_db()
-        payload = json.loads(respx.calls.last.request.content)
-        assert payload == {
-            "dateDebutPassIAE": pe_approval.start_at.isoformat(),
-            "dateFinPassIAE": pe_approval.end_at.isoformat(),
-            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
-            "numPassIAE": pe_approval.number,
-            "numSIRETsiae": pe_approval.siae_siret,
-            "origineCandidature": "PRES",
-            "statutReponsePassIAE": "A",
-            "typeSIAE": siae_kind_to_ft_type_siae(pe_approval.siae_kind),
-            "typologiePrescripteur": "PE",
-        }
-        assert pe_approval.pe_notification_status == "notification_success"
-        assert pe_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
-        assert pe_approval.pe_notification_endpoint is None
-        assert pe_approval.pe_notification_exit_code is None

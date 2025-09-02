@@ -56,7 +56,6 @@ def get_permissions_dict():
         | PERMS_EXPORT_FT_API_REJECTIONS
         | PERMS_HANDLE_MANUAL_APPROVAL_REQUESTS,
         approvals_models.CancelledApproval: PERMS_READ,
-        approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_ALL,
         approvals_models.ProlongationRequest: PERMS_DELETE,
         approvals_models.Suspension: PERMS_ALL,
@@ -127,7 +126,6 @@ def get_permissions_dict():
         analytics_models.StatsDashboardVisit: PERMS_READ,
         approvals_models.Approval: PERMS_READ,
         approvals_models.CancelledApproval: PERMS_READ,
-        approvals_models.PoleEmploiApproval: PERMS_READ,
         approvals_models.Prolongation: PERMS_READ,
         approvals_models.Suspension: PERMS_READ,
         companies_models.Company: PERMS_READ,

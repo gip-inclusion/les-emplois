@@ -22,7 +22,7 @@ from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
-from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
@@ -33,7 +33,6 @@ from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
 from tests.approvals.factories import (
     ApprovalFactory,
-    PoleEmploiApprovalFactory,
     ProlongationFactory,
     ProlongationRequestFactory,
     SuspensionFactory,
@@ -47,18 +46,6 @@ from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFa
 
 
 class TestCommonApprovalQuerySet:
-    def test_valid_for_pole_emploi_approval_model(self):
-        start_at = timezone.localdate() - datetime.timedelta(days=365)
-        end_at = start_at + datetime.timedelta(days=365)
-        PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-
-        start_at = timezone.localdate() - relativedelta(years=5)
-        end_at = start_at + relativedelta(years=2)
-        PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-
-        assert 2 == PoleEmploiApproval.objects.count()
-        assert 1 == PoleEmploiApproval.objects.valid().count()
-
     def test_valid_for_approval_model(self):
         start_at = timezone.localdate() - datetime.timedelta(days=365)
         end_at = start_at + datetime.timedelta(days=365)
@@ -143,11 +130,11 @@ class TestCommonApprovalQuerySet:
         assert [approval_future] == list(Approval.objects.starts_in_the_future())
 
 
-class TestCommonApprovalMixin:
+class TestApprovalModel:
     def test_waiting_period_end(self):
         end_at = datetime.date(2000, 1, 1)
         start_at = datetime.date(1998, 1, 1)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         expected = datetime.date(2002, 1, 1)
         assert approval.waiting_period_end == expected
 
@@ -185,19 +172,6 @@ class TestCommonApprovalMixin:
         assert not approval.is_valid()
         assert not approval.is_in_waiting_period
 
-    def test_is_pass_iae(self):
-        # PoleEmploiApproval.
-        user = JobSeekerFactory()
-        approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
-        )
-        assert not approval.is_pass_iae
-        # Approval.
-        approval = ApprovalFactory(user=user)
-        assert approval.is_pass_iae
-
-
-class TestApprovalModel:
     def test_clean(self):
         approval = ApprovalFactory()
         approval.start_at = timezone.localdate()
@@ -726,149 +700,6 @@ class TestApprovalModel:
 
         with pytest.raises(IntegrityError):
             ApprovalFactory(public_id=approval.public_id)
-
-
-class TestPoleEmploiApprovalModel:
-    def test_format_name_as_pole_emploi(self):
-        assert PoleEmploiApproval.format_name_as_pole_emploi(" François") == "FRANCOIS"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed ") == "M'HAMMED"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  ") == "JEAN KEVIN"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  ") == "JEAN-KEVIN"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("Kertész István") == "KERTESZ ISTVAN"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl") == "BACKER-GRONDAHL"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt") == "DESIREE ARTOT"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan") == "N'GUESSAN"
-        assert PoleEmploiApproval.format_name_as_pole_emploi("N Guessan") == "N GUESSAN"
-
-    def test_number_with_spaces(self):
-        pole_emploi_approval = PoleEmploiApprovalFactory(number="400121910144")
-        expected = "40012 19 10144"
-        assert pole_emploi_approval.number_with_spaces == expected
-
-    @freeze_time()
-    def test_is_valid(self):
-        now_date = timezone.localdate()
-
-        # Ends today.
-        end_at = now_date
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
-
-        # Ended yesterday.
-        end_at = now_date - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        assert not approval.is_valid()
-
-        # Starts tomorrow.
-        start_at = now_date + relativedelta(days=1)
-        end_at = start_at + relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        assert approval.is_valid()
-
-    @pytest.mark.parametrize(
-        "date,expected",
-        [
-            ("2022-11-22", "123 jours (Environ 4 mois)"),
-            ("2023-03-18", "7 jours (1 semaine)"),
-            ("2023-03-19", "6 jours"),
-            ("2023-03-24", "1 jour"),
-        ],
-    )
-    def test_get_remainder_display(self, date, expected):
-        pole_emploi_approval = PoleEmploiApprovalFactory(
-            start_at=datetime.date(2021, 3, 25),
-            end_at=datetime.date(2023, 3, 24),
-        )
-        with freeze_time(date):
-            assert pole_emploi_approval.get_remainder_display() == expected
-
-
-class TestPoleEmploiApprovalManager:
-    def test_find_for_no_queries(self):
-        user = JobSeekerFactory(jobseeker_profile__pole_emploi_id="")
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 0
-
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 0
-
-    def test_find_for_user(self):
-        # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
-        user = JobSeekerFactory(with_pole_emploi_id=True)
-        today = timezone.localdate()
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
-            start_at=today,
-        )
-        # just another approval, to be sure we don't find the other one "by chance"
-        PoleEmploiApprovalFactory()
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 1
-        assert search_results.first() == pe_approval
-
-        # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
-        other_valid_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
-            start_at=today - datetime.timedelta(days=1),
-        )
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 2
-        assert search_results[0] == pe_approval
-        assert search_results[1] == other_valid_approval
-
-        # ensure we **also** find PE approvals using the user's NIR.
-        nir_approval = PoleEmploiApprovalFactory(
-            nir=user.jobseeker_profile.nir,
-            start_at=today - datetime.timedelta(days=2),
-        )
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 3
-        assert search_results[0] == pe_approval
-        assert search_results[1] == other_valid_approval
-        assert search_results[2] == nir_approval
-
-        # since we can have multiple PE approvals with the same nir, let's fetch them all
-        other_nir_approval = PoleEmploiApprovalFactory(
-            nir=user.jobseeker_profile.nir,
-            start_at=today - datetime.timedelta(days=3),
-        )
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 4
-        assert search_results[0] == pe_approval
-        assert search_results[1] == other_valid_approval
-        assert search_results[2] == nir_approval
-        assert search_results[3] == other_nir_approval
-
-        # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
-        nir_approval.birthdate = user.jobseeker_profile.birthdate
-        nir_approval.pole_emploi_id = user.jobseeker_profile.pole_emploi_id
-        nir_approval.save()
-
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 4
-        assert search_results[0] == pe_approval
-        assert search_results[1] == other_valid_approval
-        assert search_results[2] == nir_approval
-        assert search_results[3] == other_nir_approval
-
-    def test_find_for_no_nir(self):
-        user = JobSeekerFactory(jobseeker_profile__nir="")
-        PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
-        with assertNumQueries(0):
-            search_results = PoleEmploiApproval.objects.find_for(user)
-        assert search_results.count() == 0
 
 
 class TestAutomaticApprovalAdminViews:

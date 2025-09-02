@@ -2,7 +2,6 @@ import datetime
 import string
 
 import factory.fuzzy
-from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from faker import Faker
 
@@ -16,7 +15,6 @@ from itou.approvals.enums import (
 from itou.approvals.models import (
     Approval,
     CancelledApproval,
-    PoleEmploiApproval,
     Prolongation,
     ProlongationRequest,
     ProlongationRequestDenyInformation,
@@ -254,37 +252,3 @@ class ProlongationFactory(AutoNowOverrideMixin, BaseProlongationFactory):
                 | kwargs,
             )
             self.save(update_fields=("request", "updated_at"))
-
-
-class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = PoleEmploiApproval
-
-    pe_structure_code = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
-    pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
-    number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
-    birth_name = factory.SelfAttribute("last_name")
-    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
-    start_at = factory.LazyFunction(timezone.localdate)
-    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
-    siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    siae_kind = factory.fuzzy.FuzzyChoice(CompanyKind.values)
-
-    @factory.lazy_attribute
-    def first_name(self):
-        return PoleEmploiApproval.format_name_as_pole_emploi(fake.first_name())
-
-    @factory.lazy_attribute
-    def last_name(self):
-        return PoleEmploiApproval.format_name_as_pole_emploi(fake.last_name())
-
-    @classmethod
-    def _adjust_kwargs(cls, **kwargs):
-        """
-        If any `*_name` is passed through kwargs, ensure that it's
-        formatted like it is in the Pôle emploi export file.
-        """
-        kwargs["first_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["first_name"])
-        kwargs["last_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["last_name"])
-        kwargs["birth_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["birth_name"])
-        return kwargs

@@ -10,13 +10,12 @@ from django.contrib.postgres.fields import ArrayField, RangeBoundary, RangeOpera
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Case, Count, F, OuterRef, Q, Subquery, When
+from django.db.models import Case, F, OuterRef, Q, Subquery, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.timesince import timeuntil
-from unidecode import unidecode
 
 from itou.approvals import enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
@@ -36,10 +35,9 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiAPIException,
     pole_emploi_partenaire_api_client,
 )
-from itou.utils.db import or_queries
 from itou.utils.models import DateRange
 from itou.utils.templatetags.str_filters import pluralizefr
-from itou.utils.validators import alphanumeric, validate_siret
+from itou.utils.validators import alphanumeric
 
 
 logger = logging.getLogger(__name__)
@@ -48,11 +46,6 @@ SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = datetime.timedelta(days=365)
 
 
 class CommonApprovalMixin(models.Model):
-    """
-    Abstract model for fields and methods common to both `Approval`
-    and `PoleEmploiApproval` models.
-    """
-
     # Default duration of an approval.
     DEFAULT_APPROVAL_DAYS = 2 * 365
     # `Période de carence` in French.
@@ -84,9 +77,6 @@ class CommonApprovalMixin(models.Model):
             ),
         ]
 
-    def is_valid(self):
-        return timezone.localdate() <= self.end_at
-
     @classmethod
     def last_number(cls):
         # Lock the table's first row until the end of the transaction, effectively acting as a
@@ -103,120 +93,8 @@ class CommonApprovalMixin(models.Model):
             return int(number.removeprefix(Approval.ASP_ITOU_PREFIX))
         return 0
 
-    @property
-    def is_in_progress(self):
-        return self.start_at <= timezone.localdate() <= self.end_at
 
-    @property
-    def waiting_period_end(self):
-        return self.end_at + relativedelta(years=self.WAITING_PERIOD_YEARS)
-
-    @property
-    def is_in_waiting_period(self):
-        return self.end_at < timezone.localdate() <= self.waiting_period_end
-
-    @property
-    def waiting_period_has_elapsed(self):
-        return timezone.localdate() > self.waiting_period_end
-
-    @property
-    def is_pass_iae(self):
-        """
-        Returns True if the approval has been issued by Itou, False otherwise.
-        """
-        return isinstance(self, Approval)
-
-    @property
-    def duration(self):
-        return self.end_at - self.start_at + datetime.timedelta(days=1)
-
-    def _get_obj_remainder(self, obj):
-        """
-        Return the remaining time on an object with start_at and end_at dete fields
-        A.k.a an Approval, a Suspension or a Prolongation
-        """
-        return max(
-            obj.end_at
-            - timezone.localdate()
-            # end_at is inclusive.
-            + datetime.timedelta(days=1),
-            datetime.timedelta(0),
-        ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
-
-    def _get_human_readable_estimate(self, delta: datetime.timedelta) -> str:
-        any_day = timezone.localdate()  # It is not meaningful
-        res = timeuntil(any_day + delta, now=any_day)
-        res = res.replace("année", "an")
-        res = res.split(", ")
-        if any(v in res[0] for v in ["an", "mois"]):
-            return "Environ " + " et ".join(res)
-        return " et ".join(res)
-
-    @cached_property
-    def remainder(self):
-        """
-        Return the remaining time of an Approval, we don't count future suspended periods.
-        """
-        result = self._get_obj_remainder(self)
-
-        if hasattr(self, "suspension_set"):
-            # PoleEmploiApprovals don't have suspensions
-            result -= sum(
-                (self._get_obj_remainder(suspension) for suspension in self.suspension_set.all()),
-                datetime.timedelta(0),
-            )
-        return result
-
-    def get_remainder_display(self):
-        remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
-        if self.remainder.days >= 7:  # Prevent displaying "2 jours (2 jours)"
-            remainder_display += f" ({self._get_human_readable_estimate(self.remainder)})"
-        return remainder_display
-
-    get_remainder_display.short_description = "Reliquat"
-
-    @property
-    def remainder_as_date(self):
-        """
-        Return an estimated end date.
-        Prolongations are taken into account but not suspensions as an approval can be unsuspended.
-        """
-        return min(
-            max(self.start_at, timezone.localdate())  # Approval can start in the future
-            + relativedelta(
-                days=self.remainder.days
-                # end_at is inclusive.
-                - 1,
-            ),
-            self.end_at,
-        )
-
-    @property
-    def is_suspended(self):
-        # Only Approvals may be suspended, but it's required in state property
-        return False
-
-    @property
-    def state(self):
-        if not self.is_valid():
-            return enums.ApprovalStatus.EXPIRED
-        if self.is_suspended:
-            return enums.ApprovalStatus.SUSPENDED
-        if self.is_in_progress:
-            return enums.ApprovalStatus.VALID
-        # When creating an approval, it usually starts in the future.
-        # That's why the default "valid" state is future.
-        return enums.ApprovalStatus.FUTURE
-
-    def get_state_display(self):
-        return self.state.label
-
-
-class CommonApprovalQuerySet(models.QuerySet):
-    """
-    A QuerySet shared by both `Approval` and `PoleEmploiApproval` models.
-    """
-
+class ApprovalQuerySet(models.QuerySet):
     @property
     def valid_lookup(self):
         return Q(end_at__gte=timezone.localdate())
@@ -236,8 +114,6 @@ class CommonApprovalQuerySet(models.QuerySet):
     def starts_in_the_future(self):
         return self.filter(Q(start_at__gt=timezone.localdate()))
 
-
-class ApprovalQuerySet(CommonApprovalQuerySet):
     def delete(self, enable_mass_delete=False):
         # NOTE(vperron): Deleting through a queryset method would not leave us the opportunity to
         # create a CancelledApproval object for each deleted Approval.
@@ -314,10 +190,8 @@ class PENotificationMixin(models.Model):
         self, status: api_enums.PEApiNotificationStatus, at: datetime.datetime, endpoint=None, exit_code=None
     ) -> api_enums.PEApiNotificationStatus:
         """A helper method to update the fields of the mixin:
-        - whatever the destination class (Approval, PoleEmploiApproval)
+        - whatever the destination class (Approval, CancelledApproval)
         - without triggering the model's save() method which usually is quite computation intensive
-
-        This will become useless when we will stop managing the PoleEmploiApproval that much.
         """
         self.__class__.objects.filter(pk=self.pk).update(
             pe_notification_status=status,
@@ -717,6 +591,29 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
         super().clean()
 
+    def is_valid(self):
+        return timezone.localdate() <= self.end_at
+
+    @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.localdate() <= self.end_at
+
+    @property
+    def waiting_period_end(self):
+        return self.end_at + relativedelta(years=self.WAITING_PERIOD_YEARS)
+
+    @property
+    def is_in_waiting_period(self):
+        return self.end_at < timezone.localdate() <= self.waiting_period_end
+
+    @property
+    def waiting_period_has_elapsed(self):
+        return timezone.localdate() > self.waiting_period_end
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at + datetime.timedelta(days=1)
+
     @property
     def number_with_spaces(self):
         """
@@ -737,6 +634,80 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         Returns True if the current Approval is the most recent for the user, False otherwise.
         """
         return self == self.user.approvals.order_by("start_at").last()
+
+    def _get_obj_remainder(self, obj):
+        """
+        Return the remaining time on an object with start_at and end_at dete fields
+        A.k.a an Approval, a Suspension or a Prolongation
+        """
+        return max(
+            obj.end_at
+            - timezone.localdate()
+            # end_at is inclusive.
+            + datetime.timedelta(days=1),
+            datetime.timedelta(0),
+        ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
+
+    def _get_human_readable_estimate(self, delta: datetime.timedelta) -> str:
+        any_day = timezone.localdate()  # It is not meaningful
+        res = timeuntil(any_day + delta, now=any_day)
+        res = res.replace("année", "an")
+        res = res.split(", ")
+        if any(v in res[0] for v in ["an", "mois"]):
+            return "Environ " + " et ".join(res)
+        return " et ".join(res)
+
+    @cached_property
+    def remainder(self):
+        """
+        Return the remaining time of an Approval, we don't count future suspended periods.
+        """
+        result = self._get_obj_remainder(self)
+
+        result -= sum(
+            (self._get_obj_remainder(suspension) for suspension in self.suspension_set.all()),
+            datetime.timedelta(0),
+        )
+        return result
+
+    def get_remainder_display(self):
+        remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
+        if self.remainder.days >= 7:  # Prevent displaying "2 jours (2 jours)"
+            remainder_display += f" ({self._get_human_readable_estimate(self.remainder)})"
+        return remainder_display
+
+    get_remainder_display.short_description = "Reliquat"
+
+    @property
+    def remainder_as_date(self):
+        """
+        Return an estimated end date.
+        Prolongations are taken into account but not suspensions as an approval can be unsuspended.
+        """
+        return min(
+            max(self.start_at, timezone.localdate())  # Approval can start in the future
+            + relativedelta(
+                days=self.remainder.days
+                # end_at is inclusive.
+                - 1,
+            ),
+            self.end_at,
+        )
+
+    @property
+    def state(self):
+        if not self.is_valid():
+            return enums.ApprovalStatus.EXPIRED
+        if self.is_suspended:
+            return enums.ApprovalStatus.SUSPENDED
+        if self.is_in_progress:
+            return enums.ApprovalStatus.VALID
+        # When creating an approval, it usually starts in the future.
+        # That's why the default "valid" state is future.
+        return enums.ApprovalStatus.FUTURE
+
+    def get_state_display(self):
+        return self.state.label
 
     # Suspension.
 
@@ -1869,172 +1840,3 @@ class Prolongation(CommonProlongation):
         super().clean()
         if self.validated_by and not self.validated_by.is_prescriber_with_authorized_org_memberships:
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
-
-
-class PoleEmploiApprovalManager(models.Manager):
-    def get_import_dates(self):
-        """
-        Return a list of import dates.
-        [
-            datetime.date(2020, 2, 23),
-            datetime.date(2020, 4, 8),
-            …
-        ]
-
-        It used to be used in the admin but it slowed it down.
-        It's still used from time to time in django-admin shell.
-        """
-        return list(
-            self
-            # Remove default `Meta.ordering` to avoid an extra field being added to the GROUP BY clause.
-            .order_by()
-            .annotate(import_date=TruncDate("created_at"))
-            .values_list("import_date", flat=True)
-            .annotate(c=Count("id"))
-        )
-
-    def find_for(self, user):
-        """
-        Find existing Pôle emploi's approvals for the given user.
-
-        We were told to check on `first_name` + `last_name` + `birthdate`
-        but it's far from ideal:
-
-        - the character encoding format is different between databases
-        - there are no accents in the PE database
-            => `format_name_as_pole_emploi()` is required to harmonize the formats
-        - input errors in names are possible on both sides
-        - there can be an inversion of first and last name fields
-        - imported data can be poorly structured (first and last names in the same field)
-
-        In many cases, we can identify the user based on its NIR number, when the PoleEmploiApproval
-        has this information (which is the case 90% of the time) and we also have it.
-
-        We'll also return the PE Approvals based on the combination of `pole_emploi_id`
-        (non-unique but it is assumed that every job seeker knows his number) and `birthdate`.
-
-        Their input formats can be checked to limit the risk of errors.
-        """
-        filters = []
-        if user.jobseeker_profile.nir:
-            # Allow duplicated NIR within PE approvals, but that will most probably change with the
-            # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
-            filters.append(Q(nir=user.jobseeker_profile.nir))
-        if user.jobseeker_profile.pole_emploi_id and user.jobseeker_profile.birthdate:
-            filters.append(
-                Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate)
-            )
-        if not filters:
-            return self.none()
-        return self.filter(or_queries(filters)).order_by("-start_at", "-number")
-
-
-class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
-    """
-    Store consolidated approvals (`agréments` in French) delivered by Pôle emploi.
-
-    Two approval's delivering systems co-exist. Pôle emploi's approvals
-    are issued in parallel.
-
-    Thus, before Itou can deliver an approval, we have to check this table
-    to ensure that there isn't already a valid Pôle emploi's approval.
-
-    This table was populated and updated through the `import_pe_approvals`
-    admin command on a regular basis with data shared by Pôle emploi.
-
-    If a valid Pôle emploi's approval is found, it's copied in the `Approval`
-    at the time of issuance. See Approval model's code for more information.
-    """
-
-    # Matches prescriber_organization.code_safir_pole_emploi.
-    pe_structure_code = models.CharField("code structure France Travail", max_length=5)
-
-    # - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
-    # - next 2 digits = 2-digit year of delivery
-    # - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
-    #     - decisions are starting with 1
-    #     - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
-    number = models.CharField(verbose_name="numéro", max_length=12, unique=True)
-
-    pole_emploi_id = models.CharField("identifiant France Travail", max_length=8)
-    first_name = models.CharField("prénom", max_length=150)
-    last_name = models.CharField("nom", max_length=150)
-    birth_name = models.CharField("nom de naissance", max_length=150)
-    birthdate = models.DateField(verbose_name="date de naissance", default=timezone.localdate)
-    nir = models.CharField(verbose_name="NIR", max_length=15, null=True, blank=True)
-    # Some people have no NIR. They can have a temporary NIA or NTT instead:
-    # https://www.net-entreprises.fr/astuces/identification-des-salaries%E2%80%AF-nir-nia-et-ntt/
-    # NTT max length = 40 chars, max duration = 3 months
-    ntt_nia = models.CharField(verbose_name="NTT ou NIA", max_length=40, null=True, blank=True)
-
-    siae_siret = models.CharField(
-        verbose_name="siret de la SIAE",
-        max_length=14,
-        validators=[validate_siret],
-        null=True,
-        blank=True,
-    )
-    siae_kind = models.CharField(
-        verbose_name="type de la SIAE",
-        max_length=6,
-        choices=companies_enums.CompanyKind.choices,
-        null=True,
-        blank=True,
-    )
-
-    objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
-
-    class Meta:
-        verbose_name = "agrément Pôle emploi"
-        verbose_name_plural = "agréments Pôle emploi"
-        ordering = ["-start_at"]
-        indexes = [
-            models.Index(fields=["nir"], name="nir_idx"),
-            models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"),
-        ]
-
-    def __str__(self):
-        return self.number
-
-    @staticmethod
-    def format_name_as_pole_emploi(name):
-        """
-        Format `name` in the same way as it is in the Pôle emploi export file:
-        Upper-case ASCII transliterations of Unicode text.
-        """
-        return unidecode(name.strip()).upper()
-
-    @property
-    def number_with_spaces(self):
-        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-
-    # NOTE(cms): this seems to be dead code.
-    def notify_pole_emploi(self, client=None) -> api_enums.PEApiNotificationStatus:
-        now = timezone.now()
-
-        pe_client = client or pole_emploi_partenaire_api_client()
-        try:
-            id_national = pe_client.recherche_individu_certifie(
-                first_name=self.first_name,
-                last_name=self.last_name,
-                birthdate=self.birthdate,
-                nir=self.nir,
-            )
-        except PoleEmploiAPIException:
-            self.pe_log_err("got a recoverable error in recherche_individu")
-            return self.pe_save_should_retry(now)
-        except PoleEmploiAPIBadResponse as exc:
-            self.pe_log_err("got an unrecoverable error={} in recherche_individu", exc.response_code)
-            return self.pe_save_error(
-                now, endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU, exit_code=exc.response_code
-            )
-
-        return self.pe_maj_pass(
-            id_national_pe=id_national,
-            siae_siret=self.siae_siret,
-            siae_kind=self.siae_kind,
-            sender_kind=job_application_enums.SenderKind.PRESCRIBER,
-            prescriber_kind=prescribers_enums.PrescriberOrganizationKind.FT,
-            at=now,
-            client=pe_client,
-        )

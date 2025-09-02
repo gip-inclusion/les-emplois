@@ -28,8 +28,6 @@ def approval_details_box(
         "approval": approval,
         "request": request,
         "version": version,
-        "with_details_link": version in with_link_versions
-        and approval.is_pass_iae
-        and can_view_approval_details(request, approval),
+        "with_details_link": version in with_link_versions and can_view_approval_details(request, approval),
         "extra_classes": extra_classes,
     }
