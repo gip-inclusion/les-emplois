@@ -1466,7 +1466,7 @@ class JobSeekerProfile(models.Model):
 
                     # The birth_place field can be empty even after the certification, generating an error
                     # when the form is validated. Hence we allow the edition of this field.
-                    if self.birth_place is None:
+                    if self.birth_place_id is None:
                         blocked_fields.discard("birth_place")
         return blocked_fields
 
