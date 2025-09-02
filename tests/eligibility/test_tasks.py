@@ -12,8 +12,8 @@ from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, Ad
 from itou.eligibility.tasks import async_certify_criteria, certify_criteria
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
+from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
-    ENDPOINTS,
     RESPONSES,
     ResponseKind,
 )
@@ -33,7 +33,9 @@ class TestCertifyCriteria:
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
-        respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED])
+        respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
+            json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+        )
 
         async_certify_criteria.call_local(eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk)
 

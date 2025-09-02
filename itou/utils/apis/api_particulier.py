@@ -8,6 +8,11 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 
 
 logger = logging.getLogger("APIParticulierClient")
+ENDPOINTS = {
+    AdministrativeCriteriaKind.AAH: "v2/allocation-adulte-handicape",
+    AdministrativeCriteriaKind.PI: "v2/allocation-soutien-familial",
+    AdministrativeCriteriaKind.RSA: "v2/revenu-solidarite-active",
+}
 
 
 def client():
@@ -64,12 +69,7 @@ def certify_criteria(criteria, client, job_seeker):
     Regarding the Diagnosis Socio-Professionnel, the beneficiary should already receive
     the Allocation Soutien Familial (ASF) to be considered a Parent Isolé.
     """
-    endpoint_mapping = {
-        AdministrativeCriteriaKind.AAH: "/v2/allocation-adulte-handicape",
-        AdministrativeCriteriaKind.PI: "/v2/allocation-soutien-familial",
-        AdministrativeCriteriaKind.RSA: "/v2/revenu-solidarite-active",
-    }
-    response = _request(client, endpoint_mapping[criteria], job_seeker)
+    response = _request(client, ENDPOINTS[criteria], job_seeker)
     # Endpoints from the "Prestations sociales" section share the same response schema.
     # See https://particulier.api.gouv.fr/developpeurs/openapi#tag/Prestations-sociales
     certified = response["status"] == "beneficiaire"
