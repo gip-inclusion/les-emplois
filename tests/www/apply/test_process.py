@@ -3263,12 +3263,7 @@ class TestProcessAcceptViews:
     def test_certified_criteria_birth_place_not_readonly_if_empty(self, client):
         birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
 
-        job_seeker = JobSeekerFactory(
-            born_in_france=True,
-            with_pole_emploi_id=True,
-            with_ban_api_mocked_address=True,
-            jobseeker_profile__birth_place=None,
-        )
+        job_seeker = JobSeekerFactory(with_pole_emploi_id=True, with_ban_api_mocked_address=True)
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__author_siae=self.company,
@@ -3291,14 +3286,8 @@ class TestProcessAcceptViews:
             html=True,
             count=1,
         )
-        assertNotContains(
-            response,
-            """<select name="birth_place" class="form-select" disabled=""
-                 aria-describedby="id_birth_place_helptext" id="id_birth_place">
-                    <option value="" selected="">---------</option>
-               </select>""",
-            html=True,
-        )
+        form = response.context["form"]
+        assert form.fields["birth_place"].disabled is False
         post_data = {
             "title": job_seeker.title,
             "first_name": job_seeker.first_name,
@@ -3309,7 +3298,7 @@ class TestProcessAcceptViews:
         self.accept_job_application(client, job_application, post_data=post_data)
 
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
-        assert refreshed_job_seeker.jobseeker_profile.birth_place == birth_place
+        assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
 
 
 class TestProcessTemplates:
