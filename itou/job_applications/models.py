@@ -1096,7 +1096,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 self.notifications_deliver_approval(user).send()
             elif (
-                self.job_seeker.has_no_common_approval
+                not self.job_seeker.latest_approval
                 and (self.job_seeker.jobseeker_profile.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
             ) or (
                 self.job_seeker.jobseeker_profile.pole_emploi_id
