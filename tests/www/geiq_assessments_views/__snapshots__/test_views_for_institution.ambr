@@ -2497,7 +2497,7 @@
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
           WHERE ("institutions_institutionmembership"."user_id" = %s
                  AND "institutions_institutionmembership"."is_active")
-          ORDER BY "institutions_institutionmembership"."created_at" ASC
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({

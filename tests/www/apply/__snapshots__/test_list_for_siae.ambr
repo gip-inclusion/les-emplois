@@ -79,7 +79,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1537,7 +1537,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -2897,7 +2897,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -4347,7 +4347,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

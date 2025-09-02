@@ -79,7 +79,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -544,7 +544,7 @@
           FROM "companies_companymembership"
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "companies_companymembership"."is_active")
-          ORDER BY "companies_companymembership"."created_at" ASC
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1467,7 +1467,7 @@
           INNER JOIN "institutions_institution" ON ("institutions_institutionmembership"."institution_id" = "institutions_institution"."id")
           WHERE ("institutions_institutionmembership"."user_id" = %s
                  AND "institutions_institutionmembership"."is_active")
-          ORDER BY "institutions_institutionmembership"."created_at" ASC
+          ORDER BY "institutions_institutionmembership"."joined_at" ASC
         ''',
       }),
       dict({
