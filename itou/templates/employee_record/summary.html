@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                    <div class="c-box bg-info-lightest border-info mb-3 mb-md-4">
+                    <div id="technical-infos" class="c-box bg-info-lightest border-info mb-3 mb-md-4">
                         <ul class="list-data">
                             <li>
                                 <small>PASS IAE</small>
@@ -107,21 +107,15 @@
                                 <strong>{{ employee_record.siret|format_siret }} ({{ employee_record.asp_measure }})</strong>
                             </li>
                         </ul>
-                        {% if employee_record.asp_batch_file %}
+                        {% if updates %}
                             <hr class="my-3">
                             <p class="mb-0">Horodatage ASP</p>
                             <ul class="list-data">
-                                <li>
-                                    <small>Création</small>
-                                    <strong>{{ employee_record.asp_batch_file|remove_json_extension }}</strong>
-                                </li>
-                                {% for update_notification in employee_record.update_notifications.all %}
-                                    {% if update_notification.asp_batch_file %}
-                                        <li>
-                                            <small>Modification</small>
-                                            <strong>{{ update_notification.asp_batch_file|remove_json_extension }}</strong>
-                                        </li>
-                                    {% endif %}
+                                {% for label, asp_batch_file, timestamp in updates %}
+                                    <li>
+                                        <small>{{ label }} le {{ timestamp|date:"d/m/Y à H:i" }}</small>
+                                        <strong>{{ asp_batch_file|remove_json_extension }}</strong>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         {% endif %}
