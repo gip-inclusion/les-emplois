@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -22,6 +22,13 @@ from tests.utils.testing import ItouClient, assertSnapshotQueries
 
 
 class TestCompanySignup:
+    @staticmethod
+    def to_join_msg(admin_user):
+        return (
+            " Pour rejoindre cette structure, <b>veuillez contacter "
+            f"{admin_user.first_name.title()} {admin_user.last_name[0].upper()}.</b>"
+        )
+
     def test_choose_user_kind(self, client):
         url = reverse("signup:choose_user_kind")
         response = client.get(url)
@@ -121,7 +128,7 @@ class TestCompanySignup:
         # Find a company by SIREN.
         response = client.get(url, {"siren": company.siret[:9]})
         assert response.status_code == 200
-        assertContains(response, " Pour rejoindre cette structure, <b>veuillez contacter John D.</b>")
+        assertContains(response, self.to_join_msg(company.members.get()))
 
         # Choose a company between results.
         # Joining without invitation is impossible.
@@ -374,6 +381,12 @@ class TestCompanySignup:
         assertContains(response, "00003", count=1)
         assertContains(response, "00004", count=1)
         assertContains(response, "00005", count=2)
+
+    def test_ignores_inactive_members(self, client, snapshot):
+        company = CompanyFactory(siret="40219166200001", with_jobs=True)
+        membership = CompanyMembershipFactory.create(company=company, is_active=False)
+        response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
+        assertNotContains(response, self.to_join_msg(membership.user))
 
 
 def test_non_staff_cant_join_a_company(client):
