@@ -44,10 +44,7 @@ from itou.users.enums import LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
-from tests.approvals.factories import (
-    ApprovalFactory,
-    PoleEmploiApprovalFactory,
-)
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
@@ -1565,11 +1562,11 @@ class TestJobApplicationWorkflow:
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
+        approval = ApprovalFactory(
+            user=user,
             start_at=start_at,
             end_at=end_at,
+            eligibility_diagnosis__expired=True,
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationFactory(
@@ -1604,15 +1601,15 @@ class TestJobApplicationWorkflow:
         """
         An "orienteur" cannot bypass the waiting period.
         """
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
+        approval = ApprovalFactory(
+            user=user,
             start_at=start_at,
             end_at=end_at,
+            eligibility_diagnosis__expired=True,
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
@@ -1630,15 +1627,15 @@ class TestJobApplicationWorkflow:
         A job seeker with a valid diagnosis can start an IAE path
         even if he's in a waiting period.
         """
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
+        approval = ApprovalFactory(
+            user=user,
             start_at=start_at,
             end_at=end_at,
+            eligibility_diagnosis__expired=True,
         )
         assert approval.is_in_waiting_period
 
@@ -1646,6 +1643,8 @@ class TestJobApplicationWorkflow:
         assert diagnosis.is_valid
 
         job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
+        # A valid Pôle emploi ID should trigger an automatic approval delivery.
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
