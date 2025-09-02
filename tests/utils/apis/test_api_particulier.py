@@ -8,7 +8,6 @@ from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, Ad
 from itou.eligibility.tasks import certify_criteria
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
-    ENDPOINTS,
     RESPONSES,
     ResponseKind,
 )
@@ -51,7 +50,9 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
-    respx_mock.get(ENDPOINTS[criteria_kind]).respond(json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED])
+    respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
+        json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
+    )
 
     certify_criteria(eligibility_diagnosis)
 
