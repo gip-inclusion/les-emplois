@@ -310,10 +310,12 @@ class TestCompanyModel:
 
         company.memberships.filter(user=other_user).update(is_active=False, is_admin=True)
         invit = EmployerInvitationFactory(email=other_user.email, company=company, sender=admin_user)
+        before_joining_again = timezone.now()
         company.add_or_activate_membership(other_user)
         membership = company.memberships.get(user=other_user)
         assert membership.is_admin is False
         assert membership.is_active is True
+        assert membership.joined_at > before_joining_again
         assert (
             f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
