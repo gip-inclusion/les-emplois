@@ -1078,7 +1078,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Approval issuance logic.
         if self.to_company.is_subject_to_eligibility_rules:
-            if self.job_seeker.has_latest_common_approval_in_waiting_period:
+            if self.job_seeker.has_latest_approval_in_waiting_period:
                 if self.job_seeker.new_approval_blocked_by_waiting_period(
                     siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization
                 ):
