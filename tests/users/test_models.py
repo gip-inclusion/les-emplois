@@ -34,7 +34,7 @@ from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -948,32 +948,6 @@ class TestLatestApproval:
         assert not user.has_valid_approval
         assert not user.has_latest_approval_in_waiting_period
         assert user.latest_approval is None
-
-    def test_status_with_valid_pole_emploi_approval(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
-        )
-        assert not user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
-        assert not user.has_latest_approval_in_waiting_period
-        assert user.latest_approval is None
-        assert user.latest_pe_approval == pe_approval
-
-    def test_status_with_expired_pole_emploi_approval_and_valid_approval(self):
-        user = JobSeekerFactory(with_pole_emploi_id=True)
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.jobseeker_profile.birthdate,
-            start_at=timezone.localdate() - datetime.timedelta(3 * 365),
-        )
-        assert not pe_approval.is_valid()
-        approval = ApprovalFactory(user=user)
-        assert approval.is_valid()
-
-        assert user.has_valid_approval  # PoleEmploiFactory aren't checked anymore
-        assert not user.has_latest_approval_in_waiting_period
-        assert user.latest_approval == approval
-        assert user.latest_pe_approval == pe_approval
 
     def test_new_approval_blocked_by_waiting_period(self):
         user = user_with_approval_in_waiting_period()
