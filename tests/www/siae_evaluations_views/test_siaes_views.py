@@ -1306,7 +1306,7 @@ class TestSiaeSubmitProofsView:
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
         assert (
-            f"[DEV] [Contrôle a posteriori] La structure {evaluated_job_application.evaluated_siae.siae.kind} "
+            f"[TEST] [Contrôle a posteriori] La structure {evaluated_job_application.evaluated_siae.siae.kind} "
             f"{evaluated_job_application.evaluated_siae.siae.name} a transmis ses pièces justificatives."
         ) == email.subject
         assert (

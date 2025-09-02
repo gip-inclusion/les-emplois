@@ -221,7 +221,7 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
 
     assert len(mailoutbox[0].to) == 1
     assert origin_user.email in mailoutbox[0].to
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
+    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
     assert "a transféré la candidature de :" in mailoutbox[0].body
 
     assert len(mailoutbox[1].to) == 1
@@ -256,7 +256,7 @@ def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks, mai
     # Focusing on prescriber email content
     assert len(mailoutbox[2].to) == 1
     assert job_application.sender.email in mailoutbox[2].to
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[2].subject
+    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[2].subject
     assert "a transféré la candidature de :" in mailoutbox[2].body
 
 
@@ -286,8 +286,8 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     assert first_mail_to != second_mail_to
     assert first_mail_to in [origin_user_1.email, origin_user_2.email]
     assert second_mail_to in [origin_user_1.email, origin_user_2.email]
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
-    assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[1].subject
+    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[0].subject
+    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[1].subject
     assert "a transféré la candidature de :" in mailoutbox[0].body
     assert "a transféré la candidature de :" in mailoutbox[1].body
-    assert "[DEV] Votre candidature a été transférée à une autre structure" == mailoutbox[2].subject
+    assert "[TEST] Votre candidature a été transférée à une autre structure" == mailoutbox[2].subject

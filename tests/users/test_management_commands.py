@@ -1235,7 +1235,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert len(mailoutbox) == 2
         assert (
             mailoutbox[0].subject
-            == "[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation Organization 1"
+            == "[TEST] Rappel sécurité : vérifiez la liste des membres de l’organisation Organization 1"
         )
         assert mailoutbox[0].body == snapshot
 
@@ -1250,7 +1250,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         assert len(mailoutbox) == 1
         assert (
             mailoutbox[0].subject
-            == "[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation Organization 1"
+            == "[TEST] Rappel sécurité : vérifiez la liste des membres de l’organisation Organization 1"
         )
         assert mailoutbox[0].body == snapshot
 
@@ -1313,7 +1313,8 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         ]
         for idx, expected_organization_name in enumerate(expected_organization_names):
             assert mailoutbox[idx].subject == (
-                f"[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation {expected_organization_name}"
+                "[TEST] Rappel sécurité : "
+                f"vérifiez la liste des membres de l’organisation {expected_organization_name}"
             )
 
     def test_check_authorized_members_with_disabled_admin_companies(
@@ -1348,7 +1349,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         expected_memberships = [self.employer_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
             assert mailoutbox[idx].subject == (
-                "[DEV] Rappel sécurité : "
+                "[TEST] Rappel sécurité : "
                 f"vérifiez la liste des membres de l’organisation {expected_membership.company.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]
@@ -1389,7 +1390,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         expected_memberships = [self.prescriber_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
             assert mailoutbox[idx].subject == (
-                "[DEV] Rappel sécurité : "
+                "[TEST] Rappel sécurité : "
                 f"vérifiez la liste des membres de l’organisation {expected_membership.organization.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]
@@ -1432,7 +1433,7 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
         expected_memberships = [self.labor_inspector_1, admin_membership_1, admin_membership_2]
         for idx, expected_membership in enumerate(expected_memberships):
             assert mailoutbox[idx].subject == (
-                "[DEV] Rappel sécurité : "
+                "[TEST] Rappel sécurité : "
                 f"vérifiez la liste des membres de l’organisation {expected_membership.institution.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]

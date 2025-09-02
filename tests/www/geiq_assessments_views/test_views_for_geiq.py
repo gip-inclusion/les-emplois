@@ -635,7 +635,7 @@ class TestAssessmentDetailsForGEIQView:
         assert len(mailoutbox) == 1
         email = mailoutbox[0]
         assert (
-            f"[DEV] Transmission du bilan d’exécution par la structure {assessment.label_geiq_name}" == email.subject
+            f"[TEST] Transmission du bilan d’exécution par la structure {assessment.label_geiq_name}" == email.subject
         )
         assert email.to[0] == ddets_membership.user.email
         assert email.body == snapshot(name="body of mail sent to institution members")

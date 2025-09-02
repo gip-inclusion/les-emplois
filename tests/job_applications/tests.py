@@ -1126,7 +1126,7 @@ class TestJobApplicationNotifications:
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert (
-            f"[DEV] PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
+            f"[TEST] PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
             == email.subject
         )
         assert "PASS IAE" in email.body
@@ -1136,7 +1136,7 @@ class TestJobApplicationNotifications:
 
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
-        assert "[DEV] Confirmation de l'embauche" == email.subject
+        assert "[TEST] Confirmation de l'embauche" == email.subject
         assert "PASS IAE" not in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
 
