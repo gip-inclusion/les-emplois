@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
@@ -18,6 +18,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -25,7 +26,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
 
 
 def test_add_user(client):
@@ -565,3 +566,21 @@ def test_change_shows_permission_section_on_staff_users(client):
     assertContains(response, "Permissions")
     assertContains(response, group_permissions_markup)
     assertContains(response, user_permissions_markup)
+
+
+def test_membership_inline_includes_inactive(admin_client):
+    organization = PrescriberOrganizationFactory()
+    membership = PrescriberMembershipFactory(organization=organization, is_active=False, is_admin=False)
+
+    response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": membership.user_id}))
+    assert response.status_code == 200
+    soup = parse_response_to_soup(response, "#prescribermembership_set-0")
+    [is_active_cell] = soup.select("td.field-is_active")
+    assertHTMLEqual(
+        """
+        <td class="field-is_active">
+        <p><img src="/static/admin/img/icon-no.svg" alt="False"></p>
+        </td>
+        """,
+        str(is_active_cell),
+    )
