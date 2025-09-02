@@ -44,7 +44,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, initialize_apply_session
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import (
     CompanyFactory,
@@ -2083,10 +2083,7 @@ class TestApplyAsPrescriberNirExceptions:
         """
         job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
-        PoleEmploiApprovalFactory(
-            birthdate=job_seeker.jobseeker_profile.birthdate,
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-        )
+        ApprovalFactory(user=job_seeker)
         company, user = self.create_test_data()
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
@@ -2177,10 +2174,7 @@ class TestApplyAsPrescriberNirExceptions:
             with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
-        PoleEmploiApprovalFactory(
-            birthdate=job_seeker.jobseeker_profile.birthdate,
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-        )
+        ApprovalFactory(user=job_seeker)
         siae, user = self.create_test_data()
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
         client.force_login(user)
