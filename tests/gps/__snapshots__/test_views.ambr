@@ -1624,7 +1624,7 @@
 # ---
 # name: TestGroupLists.test_group_list
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2071,22 +2071,6 @@
       }),
       dict({
         'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
-          'group_list[www/gps/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -2271,7 +2255,7 @@
 # ---
 # name: TestGroupLists.test_old_group_list
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2712,22 +2696,6 @@
              WHERE ("qual0" > %s
                     AND "qual0" <= %s)) "qualify_mask"
           ORDER BY "qual1" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[gps/group_list.html]',
-          'group_list[www/gps/views.py]',
-          '_check_request_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "prescribers_prescribermembership"
-          WHERE "prescribers_prescribermembership"."organization_id" = %s
         ''',
       }),
       dict({

@@ -137,7 +137,7 @@ def switch_stalled_status(request, public_id):
 @check_user(lambda user: user.is_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if list_organization:
-        if not request.current_organization or not request.current_organization.memberships.count() > 1:
+        if not request.current_organization:
             raise Http404
         job_seekers_ids = list(
             User.objects.linked_job_seeker_ids(request.user, request.current_organization, from_all_coworkers=True)
