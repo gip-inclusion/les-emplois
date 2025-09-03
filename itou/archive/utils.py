@@ -9,6 +9,7 @@ from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
+from itou.siae_evaluations.models import EvaluatedJobApplication
 from itou.users.models import User, UserKind
 
 
@@ -58,6 +59,7 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
     recent_followup_group_contact = FollowUpGroupMembership.objects.filter(
         follow_up_group__beneficiary_id=OuterRef("pk"), last_contact_at__gt=inactive_since
     )
+    evaluated_job_application = EvaluatedJobApplication.objects.filter(job_application__job_seeker_id=OuterRef("pk"))
 
     qs = (
         User.objects.filter(
@@ -72,6 +74,7 @@ def inactive_jobseekers_without_recent_related_objects(inactive_since, notified,
             ~Exists(recent_geiq_eligibility_diagnosis),
             ~Exists(recent_job_application),
             ~Exists(recent_followup_group_contact),
+            ~Exists(evaluated_job_application),
         )
         .order_by("date_joined", "pk")
     )
