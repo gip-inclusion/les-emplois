@@ -61,6 +61,7 @@ from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.siae_evaluations.factories import EvaluatedJobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -136,6 +137,15 @@ class TestNotifyInactiveJobseekersManagementCommand:
 
         # jobseeker_in_followup_group_with_recent_contact
         FollowUpGroupMembershipFactory(follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY)
+
+        # jobseeker_with_evaluated_job_application
+        EvaluatedJobApplicationFactory(
+            job_application__job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
+            job_application__created_at=timezone.now() - INACTIVITY_PERIOD,
+            job_application__eligibility_diagnosis__expires_at=timezone.localdate() - INACTIVITY_PERIOD,
+            job_application__approval__start_at=timezone.localdate() - relativedelta(years=3),
+            job_application__approval__end_at=timezone.localdate() - INACTIVITY_PERIOD,
+        )
 
         # prescriber_without_recent_activity
         PrescriberFactory(joined_days_ago=DAYS_OF_INACTIVITY)
