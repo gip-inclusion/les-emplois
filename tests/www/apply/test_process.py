@@ -2430,9 +2430,6 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-
         response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
 
         # Check optgroup labels
