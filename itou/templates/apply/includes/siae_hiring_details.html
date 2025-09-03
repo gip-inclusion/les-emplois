@@ -42,7 +42,7 @@
         </ul>
 
         {% if job_application.can_update_hiring_start %}
-            <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" class="btn btn-ico btn-secondary">
+            <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" class="btn btn-ico btn-secondary mt-3">
                 <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                 <span>Modifier la période du contrat de travail</span>
             </a>
