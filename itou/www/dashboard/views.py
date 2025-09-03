@@ -417,9 +417,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
         "back_url": reverse("dashboard:index"),
         "login_string": TOKEN_ID_STR,
         "token": token,
-        "companies": request.user.companymembership_set.active_admin().values(
-            name=F("company__name"), uid=F("company__uid")
-        ),
+        "companies": request.user.companymembership_set.admin().values(name=F("company__name"), uid=F("company__uid")),
     }
 
     return render(request, template_name, context)

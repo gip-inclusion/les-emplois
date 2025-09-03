@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from django.db.models import Exists, F, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
     def get_users_to_anonymize_and_delete(self, users):
         related_objects_to_check = get_filter_kwargs_on_user_for_related_objects_to_check()
-        has_membership_in_authorized_organization_sqs = PrescriberMembership.objects.filter(
+        has_membership_in_authorized_organization_sqs = PrescriberMembership.include_inactive.filter(
             user_id=OuterRef("id"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
         )
         return list(
@@ -100,17 +100,29 @@ class Command(BaseCommand):
             .filter(**related_objects_to_check)
             .annotate(has_membership_in_authorized_organization=Exists(has_membership_in_authorized_organization_sqs))
             .prefetch_related(
-                "companymembership_set",
-                "institutionmembership_set",
-                "prescribermembership_set",
+                Prefetch(
+                    "companymembership_set",
+                    to_attr="prefetched_companymemberships",
+                    queryset=CompanyMembership.include_inactive.all(),
+                ),
+                Prefetch(
+                    "prescribermembership_set",
+                    to_attr="prefetched_prescribermemberships",
+                    queryset=PrescriberMembership.include_inactive.all(),
+                ),
+                Prefetch(
+                    "institutionmembership_set",
+                    to_attr="prefetched_institutionmemberships",
+                    queryset=InstitutionMembership.include_inactive.all(),
+                ),
             )
         )
 
     def make_anonymized_professional(self, user):
         memberships = [
-            *user.companymembership_set.all(),
-            *user.institutionmembership_set.all(),
-            *user.prescribermembership_set.all(),
+            *user.prefetched_companymemberships,
+            *user.prefetched_institutionmemberships,
+            *user.prefetched_prescribermemberships,
         ]
         return AnonymizedProfessional(
             date_joined=get_year_month_or_none(user.date_joined),

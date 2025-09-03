@@ -527,7 +527,6 @@ class TestPrescriberSignup:
         # Request for an invitation link.
         prescriber_membership = (
             PrescriberMembership.objects.filter(organization=existing_org_with_siret)
-            .active()
             .select_related("user")
             .order_by("-is_admin", "joined_at")
             .first()

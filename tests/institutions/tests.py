@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+from django.contrib.auth import get_user
 from django.db import IntegrityError, transaction
 from django.forms import ValidationError
 from django.urls import reverse
@@ -222,7 +223,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
     assert "Un administrateur vous a retiré d'une structure" in email.body
     assert email.to == [membership.user.email]
     assert (
-        f"User {admin_client.session['_auth_user_id']} deactivated institutions.InstitutionMembership "
+        f"User {get_user(admin_client).pk} deactivated institutions.InstitutionMembership "
         f"of organization_id={institution.pk} for user_id={membership.user_id} is_admin=True."
     ) in caplog.messages
 
@@ -277,7 +278,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
 def test_reactivate_member(admin_client, caplog):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
-    admin_user = User.objects.get(pk=admin_client.session["_auth_user_id"])
+    admin_user = User.objects.get(pk=get_user(admin_client).pk)
     institution.deactivate_membership(membership, updated_by=admin_user)
     change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
 

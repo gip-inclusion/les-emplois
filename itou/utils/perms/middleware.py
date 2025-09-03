@@ -4,7 +4,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django_otp import user_has_device
 
+from itou.companies.models import CompanyMembership
+from itou.institutions.models import InstitutionMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params
@@ -54,7 +57,9 @@ class ItouCurrentOrganizationMiddleware:
         logout_warning = None
         if user.is_authenticated:
             if user.is_employer:
-                active_memberships = list(user.companymembership_set.filter(is_active=True))
+                # Do not use the default manager to avoid double checking whether the user is_active.
+                # The AuthenticationMiddleware already checked that the user is_active.
+                active_memberships = list(CompanyMembership.include_inactive.filter(user=user, is_active=True))
                 companies = {
                     company.pk: company
                     for company in user.company_set.filter(
@@ -93,7 +98,9 @@ class ItouCurrentOrganizationMiddleware:
 
             elif user.is_prescriber:
                 active_memberships = list(
-                    user.prescribermembership_set.filter(is_active=True)
+                    # Do not use the default manager to avoid double checking whether the user is_active.
+                    # The AuthenticationMiddleware already checked that the user is_active.
+                    PrescriberMembership.include_inactive.filter(user=user, is_active=True)
                     .order_by("joined_at")
                     .select_related("organization")
                 )
@@ -117,7 +124,9 @@ class ItouCurrentOrganizationMiddleware:
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    user.institutionmembership_set.filter(is_active=True)
+                    # Do not use the default manager to avoid double checking whether the user is_active.
+                    # The AuthenticationMiddleware already checked that the user is_active.
+                    InstitutionMembership.include_inactive.filter(user=user, is_active=True)
                     .order_by("joined_at")
                     .select_related("institution"),
                     "institution",

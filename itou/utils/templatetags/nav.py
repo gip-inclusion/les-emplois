@@ -4,6 +4,7 @@ from django.utils.text import slugify
 
 from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
+from itou.prescribers.models import PrescriberMembership
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
 from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
@@ -300,7 +301,10 @@ def nav(request):
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
             ]
-            if request.current_organization and request.current_organization.memberships.count() > 1:
+            if (
+                request.current_organization
+                and PrescriberMembership.include_inactive.filter(organization=request.current_organization).count() > 1
+            ):
                 jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             if request.current_organization:

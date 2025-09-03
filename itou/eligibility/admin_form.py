@@ -2,7 +2,9 @@ import logging
 
 from django import forms
 
+from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
+from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 
 
@@ -44,7 +46,9 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
                         "author_prescriber_organization",
                         "Une organisation prescriptrice est obligatoire pour cet auteur.",
                     )
-                elif not author_prescriber_organization.memberships.filter(user=author).exists():
+                elif not PrescriberMembership.include_inactive.filter(
+                    organization=author_prescriber_organization, user=author
+                ).exists():
                     # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error("author_prescriber_organization", "L'auteur n'appartient pas à cette organisation.")
             elif author.kind == UserKind.EMPLOYER:
@@ -58,7 +62,7 @@ class AbstractEligibilityDiagnosisAdminForm(forms.ModelForm):
                     self.add_error(
                         self.author_company_fieldname, f"Une {company_name} est obligatoire pour cet auteur."
                     )
-                elif not author_company.memberships.filter(user=author).exists():
+                elif not CompanyMembership.include_inactive.filter(company=author_company, user=author).exists():
                     # Allow inactive membership as we may want to fix old diagnoses
                     self.add_error(self.author_company_fieldname, "L'auteur n'appartient pas à cette structure.")
             else:

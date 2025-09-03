@@ -90,9 +90,9 @@ def _get_geiq_eligibility_diagnosis(job_application, only_prescriber):
 
 def job_application_sender_left_org(job_app):
     if org_id := job_app.sender_prescriber_organization_id:
-        return not job_app.sender.prescribermembership_set.active().filter(organization_id=org_id).exists()
+        return not job_app.sender.prescribermembership_set.filter(organization_id=org_id).exists()
     if company_id := job_app.sender_company_id:
-        return not job_app.sender.companymembership_set.active().filter(company_id=company_id).exists()
+        return not job_app.sender.companymembership_set.filter(company_id=company_id).exists()
     return False
 
 
