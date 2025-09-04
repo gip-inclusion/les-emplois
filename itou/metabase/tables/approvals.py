@@ -1,10 +1,9 @@
 import functools
-from datetime import datetime
 
 from django.conf import settings
 
 from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import Approval
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -13,22 +12,6 @@ from itou.metabase.tables.utils import (
     get_model_field,
     hash_content,
 )
-from itou.prescribers.models import PrescriberOrganization
-
-
-POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE = datetime(2018, 1, 1)
-
-
-@functools.cache
-def get_code_safir_to_pe_org():
-    # Preload association for best performance and to avoid having to make
-    # PoleEmploiApproval.pe_structure_code a foreign key.
-    return {
-        org.code_safir_pole_emploi: org
-        for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).only(
-            "code_safir_pole_emploi", "department"
-        )
-    }
 
 
 @functools.cache
@@ -37,37 +20,17 @@ def get_companies_map():
 
 
 def get_company_from_approval(approval):
-    if isinstance(approval, PoleEmploiApproval) or not approval.last_hiring_company_pk:
-        return None
-    return get_companies_map()[approval.last_hiring_company_pk]
-
-
-def get_company_or_pe_org_from_approval(approval):
-    if isinstance(approval, Approval):
-        return get_company_from_approval(approval)
-    pe_org = get_code_safir_to_pe_org().get(approval.pe_structure_code)
-    return pe_org
+    return get_companies_map().get(approval.last_hiring_company_pk)
 
 
 def get_approval_type(approval):
     """
     Build a human readable category for approvals and PE approvals.
     """
-    if isinstance(approval, Approval):
-        if approval.number.startswith(settings.ASP_ITOU_PREFIX):
-            return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
+    if approval.number.startswith(settings.ASP_ITOU_PREFIX):
+        return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
 
-        return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
-    elif isinstance(approval, PoleEmploiApproval):
-        if len(approval.number) == 12:
-            return "Agrément PE"
-        elif len(approval.number) == 15:
-            suffix = approval.number[12]
-            return f"{PoleEmploiApproval.Suffix[suffix].label} PE"
-
-        raise ValueError("Unexpected PoleEmploiApproval.number length")
-
-    raise ValueError("Unknown approval type.")
+    return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
 
 
 TABLE = MetabaseTable(name="pass_agréments")
@@ -117,7 +80,7 @@ TABLE.add_columns(
         comment_suffix=(
             " de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"
         ),
-        custom_fn=get_company_or_pe_org_from_approval,
+        custom_fn=get_company_from_approval,
     )
 )
 

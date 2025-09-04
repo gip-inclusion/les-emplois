@@ -517,7 +517,7 @@
 # ---
 # name: test_populate_approvals
   dict({
-    'num_queries': 37,
+    'num_queries': 33,
     'queries': list([
       dict({
         'origin': list([
@@ -539,19 +539,6 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "approvals_approval"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "approvals_poleemploiapproval"
-          WHERE "approvals_poleemploiapproval"."start_at" >= %s
         ''',
       }),
       dict({
@@ -800,6 +787,9 @@
       }),
       dict({
         'origin': list([
+          'get_companies_map[metabase/tables/approvals.py]',
+          'get_company_from_approval[metabase/tables/approvals.py]',
+          '<lambda>[metabase/tables/approvals.py]',
           'inject_chunk[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
@@ -807,70 +797,14 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          COPY "z_new_pass_agréments" ("id",
-                                       "type",
-                                       "date_début",
-                                       "date_fin",
-                                       "durée",
-                                       "id_candidat",
-                                       "id_structure",
-                                       "type_structure",
-                                       "siret_structure",
-                                       "nom_structure",
-                                       "département_structure_ou_org_pe",
-                                       "nom_département_structure_ou_org_pe",
-                                       "région_structure_ou_org_pe",
-                                       "injection_ai",
-                                       "hash_numéro_pass_iae",
-                                       "date_mise_à_jour_metabase")
-          FROM STDIN WITH (FORMAT BINARY)
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_poleemploiapproval"."id",
-                 "approvals_poleemploiapproval"."start_at",
-                 "approvals_poleemploiapproval"."end_at",
-                 "approvals_poleemploiapproval"."pe_structure_code",
-                 "approvals_poleemploiapproval"."number"
-          FROM "approvals_poleemploiapproval"
-          WHERE "approvals_poleemploiapproval"."start_at" >= %s
-          ORDER BY "approvals_poleemploiapproval"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_code_safir_to_pe_org[metabase/tables/approvals.py]',
-          'get_company_or_pe_org_from_approval[metabase/tables/approvals.py]',
-          '<lambda>[metabase/tables/utils.py]',
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescriberorganization"."id",
-                 "prescribers_prescriberorganization"."department",
-                 "prescribers_prescriberorganization"."code_safir_pole_emploi"
-          FROM "prescribers_prescriberorganization"
-          WHERE "prescribers_prescriberorganization"."code_safir_pole_emploi" IS NOT NULL
+          SELECT "companies_company"."id",
+                 "companies_company"."department",
+                 "companies_company"."name",
+                 "companies_company"."siret",
+                 "companies_company"."kind",
+                 "companies_company"."brand"
+          FROM "companies_company"
+          WHERE NOT ("companies_company"."siret" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
