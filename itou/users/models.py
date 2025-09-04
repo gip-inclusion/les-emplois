@@ -17,6 +17,7 @@ from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Upper
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
@@ -50,6 +51,7 @@ from itou.users.notifications import JobSeekerCreatedByProxyNotification, JobSee
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.emails import get_email_message
+from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -530,6 +532,12 @@ class User(AbstractUser, AddressMixin):
 
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
+
+    def can_view_personal_information(self, user):
+        fake_request = RequestFactory()
+        fake_request.user = self
+        fake_request.from_authorized_prescriber = self.is_prescriber_with_authorized_org_memberships
+        return can_view_personal_information(fake_request, user)
 
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)

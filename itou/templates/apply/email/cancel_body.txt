@@ -6,16 +6,16 @@
 {% enums "job_applications" "SenderKind" as SenderKind %}
 Embauche annulée
 
-Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_name }} a bien été annulée.
+Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} a bien été annulée.
 
 ----------------------------------------------------------
 
 *Candidat* :
 
-- Nom : {{ job_application.job_seeker.last_name|upper }}
-- Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
-- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
-- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate %}
+- Nom : {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }}
+- Prénom : {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }}{% if job_application.job_seeker.email and can_view_personal_information%}
+- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone and can_view_personal_information %}
+- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.jobseeker_profile.birthdate and can_view_personal_information %}
 - Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}{% endif %}
 
 {% if job_application.message %}
