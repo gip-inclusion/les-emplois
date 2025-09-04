@@ -54,11 +54,14 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
 
 
 class SiaeSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="uid")
     cree_le = serializers.DateTimeField(source="created_at", label="Date de création")
     mis_a_jour_le = serializers.DateTimeField(source="updated_at", label="Date de mise à jour")
     type = serializers.ChoiceField(source="kind", label="Type de SIAE", choices=CompanyKind.choices)
     ville = serializers.CharField(source="city", label="Ville où se trouve la SIAE")
     code_postal = serializers.CharField(source="post_code", label="Code postal de la SIAE")
+    telephone = serializers.CharField(source="phone")
+    courriel = serializers.CharField(source="email")
     site_web = serializers.CharField(source="website", label="URL du site web de la SIAE")
     addresse_ligne_1 = serializers.CharField(source="address_line_1", label="1ère ligne d’adresse de la SIAE")
     addresse_ligne_2 = serializers.CharField(source="address_line_2", label="2nde ligne d’adresse de la SIAE")
@@ -73,12 +76,15 @@ class SiaeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = [
+            "id",
             "cree_le",
             "mis_a_jour_le",
             "siret",
             "type",
             "raison_sociale",
             "enseigne",
+            "telephone",
+            "courriel",
             "site_web",
             "description",
             "bloque_candidatures",
