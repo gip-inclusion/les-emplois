@@ -61,8 +61,6 @@ urlpatterns = [
     # API.
     path("api/v1/", include("itou.api.urls", namespace="v1")),
     path("api/", include("itou.www.api.urls")),
-    # Status
-    path("status/", include("itou.status.urls")),
     # www.
     path("", include("itou.www.home.urls")),
     path("apply/", include("itou.www.apply.urls")),
