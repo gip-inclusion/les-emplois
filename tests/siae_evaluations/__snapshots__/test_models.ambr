@@ -185,8 +185,9 @@
                                                         "notified_at",
                                                         "notification_reason",
                                                         "notification_text",
-                                                        "reminder_sent_at")
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "siae_evaluations_evaluatedsiae"."id"
+                                                        "reminder_sent_at",
+                                                        "final_state")
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING "siae_evaluations_evaluatedsiae"."id"
         ''',
       }),
       dict({
@@ -451,7 +452,8 @@
                  "siae_evaluations_evaluatedsiae"."notified_at",
                  "siae_evaluations_evaluatedsiae"."notification_reason",
                  "siae_evaluations_evaluatedsiae"."notification_text",
-                 "siae_evaluations_evaluatedsiae"."reminder_sent_at"
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluatedsiae"."final_state"
           FROM "siae_evaluations_evaluatedsiae"
           WHERE "siae_evaluations_evaluatedsiae"."id" IN (%s)
           ORDER BY RANDOM() ASC
