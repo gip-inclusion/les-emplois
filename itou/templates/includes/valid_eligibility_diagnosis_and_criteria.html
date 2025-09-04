@@ -1,10 +1,14 @@
 
-<p class="fs-sm">
-    <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
-</p>
+{% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
+    <p class="fs-sm">
+        {% if selected_administrative_criteria %}
+            <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
+        {% else %}
+            <i>Le prescripteur habilité n’a pas renseigné de critères.</i>
+        {% endif %}
+    </p>
 
-{% if eligibility_diagnosis.selected_administrative_criteria_for_display %}
-    {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
+    {% if selected_administrative_criteria %}
         <p class="mb-2">
             <span class="badge badge-sm rounded-pill bg-secondary">
                 {% if is_sent_by_authorized_prescriber %}
@@ -37,8 +41,8 @@
                 {% endif %}
             {% endfor %}
         </ul>
-    {% endwith %}
-{% endif %}
+    {% endif %}
+{% endwith %}
 
 {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
