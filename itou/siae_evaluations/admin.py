@@ -39,6 +39,19 @@ class EvaluatedSiaesInline(ItouTabularInline):
         return get_admin_view_link(obj, content=format_html("Lien vers la Siae évaluée <strong>{}</strong>", obj))
 
 
+class ArchivedEvaluatedSiaesInline(ItouTabularInline):
+    model = models.ArchivedEvaluatedSiae
+    fields = ("id_link", "reviewed_at", "final_state")
+    readonly_fields = ("id_link", "reviewed_at", "final_state")
+    extra = 0
+
+    @admin.display(description="lien vers les Siaes évaluées archivées")
+    def id_link(self, obj):
+        return get_admin_view_link(
+            obj, content=format_html("Lien vers la Siae évaluée archivée <strong>{}</strong>", obj)
+        )
+
+
 class EvaluatedJobApplicationsInline(ItouTabularInline):
     model = models.EvaluatedJobApplication
     fields = ("id_link", "approval", "job_seeker", "state")
@@ -229,6 +242,7 @@ class EvaluationCampaignAdmin(ReadonlyMixin, ItouModelAdmin):
     )
     inlines = [
         EvaluatedSiaesInline,
+        ArchivedEvaluatedSiaesInline,
         PkSupportRemarkInline,
     ]
 
@@ -270,6 +284,25 @@ class EvaluatedSiaeAdmin(ReadonlyMixin, ItouModelAdmin):
 
     def state(self, obj):
         return obj.state
+
+
+@admin.register(models.ArchivedEvaluatedSiae)
+class ArchivedEvaluatedSiaeAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = ["evaluation_campaign", "siae", "final_state", "reviewed_at"]
+    list_display_links = ("siae",)
+    readonly_fields = (
+        "evaluation_campaign",
+        "siae",
+        "reviewed_at",
+        "final_reviewed_at",
+        "final_state",
+        "job_applications_count",
+    )
+    list_filter = (
+        "reviewed_at",
+        "evaluation_campaign__institution__department",
+    )
+    search_fields = ("siae__name", "siae__siret")
 
 
 @admin.register(models.EvaluatedJobApplication)
