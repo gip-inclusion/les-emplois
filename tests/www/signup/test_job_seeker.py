@@ -715,7 +715,7 @@ class TestJobSeekerSignup:
             "email": existing_user.email,  # Conflict on email
             "birthdate": birthdate,
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
 
         response = client.post(reverse("signup:job_seeker"), post_data)
