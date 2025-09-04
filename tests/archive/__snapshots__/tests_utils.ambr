@@ -86,6 +86,9 @@
       'jobseekerexternaldata': <class 'itou.external_data.models.JobSeekerExternalData'>,
     }),
     dict({
+      'saved_searches': <class 'itou.search.models.SavedSearch'>,
+    }),
+    dict({
       'notification_settings': <class 'itou.communications.models.NotificationSettings'>,
     }),
     dict({

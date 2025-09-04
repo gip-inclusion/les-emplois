@@ -124,6 +124,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
         "reviewed_assessments",  # Assessment.reviewed_by
+        "saved_searches",  # SavedSearch.user
         "submitted_assessments",  # Assessment.submitted_by
         "company_invitations",  # EmployerInvitation.sender
         "companymembership",  # CompanyMembership.user
