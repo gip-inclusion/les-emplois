@@ -17,3 +17,8 @@
         </div>
     </form>
 </div>
+
+{% if saved_searches|default:None %}
+    {# A new saved search has been added, oob update the list and the settings modal #}
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches request=request only %}
+{% endif %}

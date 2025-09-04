@@ -40,6 +40,7 @@
             </form>
         </div>
     </div>
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches only %}
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endblock %}
 

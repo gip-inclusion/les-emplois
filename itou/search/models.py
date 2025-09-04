@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class SavedSearch(models.Model):
@@ -16,3 +17,7 @@ class SavedSearch(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def url(self):
+        return f"{reverse('search:employers_results')}?{self.query_params}"
