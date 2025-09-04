@@ -1052,8 +1052,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Always send notification to job seeker
         self.notifications_transfer_for_job_seeker(notification_context).send()
 
-        # Send a notification to prescriber or orienter if any
-        if self.sender_kind == SenderKind.PRESCRIBER and self.sender_id:  # Sender user may have been deleted.
+        if (
+            self.is_sent_by_proxy
+            and self.sender_company_id != self.transferred_from.pk  # Either a prescriber or an other employer
+            and self.sender_id  # Sender user may have been deleted.
+        ):
             self.notifications_transfer_for_proxy(notification_context).send()
 
     @xwf_models.transition()
@@ -1320,9 +1323,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def notifications_transfer_for_proxy(self, notification_context):
-        return job_application_notifications.JobApplicationTransferredForPrescriberNotification(
+        return job_application_notifications.JobApplicationTransferredForProxyNotification(
             self.sender,
-            self.sender_prescriber_organization,
+            self.sender_prescriber_organization or self.sender_company,
             **notification_context,
         )
 

@@ -273,7 +273,7 @@
 # ---
 # name: test_employer_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -732,6 +732,24 @@
           'edit_user_notifications[www/dashboard/views.py]',
         ]),
         'sql': '''
+          SELECT "communications_notificationrecord"."id",
+                 "communications_notificationrecord"."notification_class",
+                 "communications_notificationrecord"."name",
+                 "communications_notificationrecord"."category",
+                 "communications_notificationrecord"."can_be_disabled",
+                 "communications_notificationrecord"."is_obsolete"
+          FROM "communications_notificationrecord"
+          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EditUserNotificationForm.save[www/dashboard/forms.py]',
+          'edit_user_notifications[www/dashboard/views.py]',
+        ]),
+        'sql': '''
           SELECT "communications_notificationrecord"."id" AS "id"
           FROM "communications_notificationrecord"
           INNER JOIN "communications_disablednotification" ON ("communications_notificationrecord"."id" = "communications_disablednotification"."notification_record_id")
@@ -750,6 +768,7 @@
           SELECT "communications_disablednotification"."notification_record_id" AS "notification_record"
           FROM "communications_disablednotification"
           WHERE ("communications_disablednotification"."notification_record_id" IN (%s,
+                                                                                    %s,
                                                                                     %s,
                                                                                     %s,
                                                                                     %s,

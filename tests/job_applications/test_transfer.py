@@ -260,6 +260,34 @@ def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks, mai
     assert "a transféré la candidature de :" in mailoutbox[2].body
 
 
+def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbacks, mailoutbox):
+    # Same test and conditions as above, but this time with an employer acting as orienter
+    origin_company = CompanyFactory(with_membership=True)
+    target_company = CompanyFactory(with_membership=True)
+
+    origin_user = origin_company.members.first()
+    target_company.members.add(origin_user)
+
+    job_application = JobApplicationFactory(
+        state=JobApplicationState.PROCESSING,
+        to_company=origin_company,
+        sent_by_another_employer=True,
+    )
+    job_seeker = job_application.job_seeker
+
+    with django_capture_on_commit_callbacks(execute=True):
+        job_application.transfer(user=origin_user, target_company=target_company)
+
+    assert len(mailoutbox) == 3
+    assert mailoutbox[0].to == [origin_user.email]
+    assert mailoutbox[1].to == [job_application.job_seeker.email]
+    # Other email content have been checked in previous test
+    # Focusing on sender email content
+    assert mailoutbox[2].to == [job_application.sender.email]
+    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[2].subject
+    assert "a transféré la candidature de :" in mailoutbox[2].body
+
+
 def test_transfer_notifications_to_many_employers(django_capture_on_commit_callbacks, mailoutbox):
     # Same as test_transfer_must_notify_siae_and_job_seeker
     # but with to recipients for SIAE transfer notification
