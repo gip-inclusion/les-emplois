@@ -3,7 +3,6 @@ from itou.communications.dispatch import (
     EmailNotification,
     EmployerNotification,
     JobSeekerNotification,
-    PrescriberNotification,
     PrescriberOrEmployerNotification,
 )
 from itou.job_applications.enums import RefusalReason
@@ -145,10 +144,10 @@ class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, E
 
 
 @notifications_registry.register
-class JobApplicationTransferredForPrescriberNotification(PrescriberNotification, EmailNotification):
-    """Notification sent to prescriber when transferred"""
+class JobApplicationTransferredForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when transferred"""
 
-    name = "Transfert de candidature"
+    name = "Transfert d'une candidature envoyée"
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_prescriber_subject.txt"
     body_template = "apply/email/transfer_prescriber_body.txt"
