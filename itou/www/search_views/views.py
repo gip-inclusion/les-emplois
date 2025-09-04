@@ -59,6 +59,9 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         return self.post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        saved_searches = (
+            SavedSearch.objects.filter(user=self.request.user) if self.request.user.is_authenticated else None
+        )
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
@@ -68,6 +71,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "job_descriptions_count": 0,
             "siaes_count": 0,
             "results_page": [],
+            "saved_searches": saved_searches,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
@@ -182,7 +186,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "filters_query_string": urlencode(
                 {
                     "city": city.slug,
-                    "city_name": str(city),
+                    "city_name": str(city),  # FIXME Ewen: is it used?
                     "distance": distance,
                     "kinds": kinds,
                     "contract_types": contract_types,

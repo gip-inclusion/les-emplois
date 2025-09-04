@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.urls import reverse
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -47,3 +48,18 @@ class SavedSearch(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def url(self):
+        return reverse(
+            "search:employers_results",
+            query={
+                "city": self.city.slug,
+                "distance": self.distance,
+                "kinds": self.kinds,
+                "departments": self.departments,
+                "contract_types": self.contract_types,
+                "domains": self.domains,
+            }
+            | self.districts,
+        )
