@@ -117,7 +117,6 @@ INSTALLED_APPS = [
     "itou.www.employee_record_views",
     "itou.www.siae_evaluations_views",
     "itou.api",
-    "itou.status",
     "itou.antivirus",
     "itou.scripts",
     "itou.analytics",
