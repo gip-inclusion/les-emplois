@@ -197,7 +197,14 @@ class TestAcceptForm:
 
 
 class TestJobApplicationAcceptFormWithGEIQFields:
-    def test_save_geiq_form_fields_from_view(self, client, faker):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept-contract", id="simplified_url"),
+        ],
+    )
+    def test_save_geiq_form_fields_from_view(self, client, faker, url_name):
         # non-GEIQ accept case tests are in `tests_process.py`
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         create_test_cities(["54", "57"], num_per_department=2)
@@ -205,7 +212,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
         job_description = JobDescriptionFactory(company=job_application.to_company)
         city = City.objects.order_by("?").first()
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -245,11 +252,18 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         assert job_application.qualification_type == post_data["qualification_type"]
         assert not job_application.inverted_vae_contract
 
-    def test_geiq_inverted_vae_fields(self, client, faker):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept-contract", id="simplified_url"),
+        ],
+    )
+    def test_geiq_inverted_vae_fields(self, client, faker, url_name):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
         job_description = JobDescriptionFactory(company=job_application.to_company)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -280,14 +294,21 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         assert job_application.contract_type_details == post_data["contract_type_details"]
         assert job_application.inverted_vae_contract
 
-    def test_apply_with_past_hiring_date(self, client, faker):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept-contract", id="simplified_url"),
+        ],
+    )
+    def test_apply_with_past_hiring_date(self, client, faker, url_name):
         CANNOT_BACKDATE_TEXT = "Il n'est pas possible d'antidater un contrat."
         # GEIQ can temporarily accept job applications with a past hiring date
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
         # with a SIAE
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI, state="processing")
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
 
@@ -321,7 +342,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data |= {"hired_job": job_description.pk}
 
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
         client.force_login(job_application.to_company.members.first())
         response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
@@ -340,10 +361,17 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         "<b>Ne pas compléter cette date dans le cadre d’un CDI Inclusion</b>"
     )
 
-    def test_specific_iae_mentions_in_accept_form(self, client):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept-contract", id="simplified_url"),
+        ],
+    )
+    def test_specific_iae_mentions_in_accept_form(self, client, url_name):
         def _response(kind):
             job_application = JobApplicationFactory(to_company__kind=kind, state="processing")
-            url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+            url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
 
             client.force_login(job_application.to_company.members.first())
             response = client.get(url_accept)
