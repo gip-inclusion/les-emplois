@@ -4,7 +4,6 @@ from itertools import batched
 
 import paramiko
 from django.db import transaction
-from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
@@ -67,7 +66,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         """
         # JSONRenderer produces *byte array* not strings
         json_bytes = JSONRenderer().render(json_data)
-        remote_path = f"RIAE_FS_{timezone.now():%Y%m%d%H%M%S}.json"
+        remote_path = EmployeeRecordBatch.get_remote_path()
 
         if dry_run:
             self.logger.info(f"DRY-RUN: (not) sending '{remote_path}' ({len(json_bytes)} bytes)")
