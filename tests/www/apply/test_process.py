@@ -1383,17 +1383,20 @@ class TestProcessViews:
         # Trying to access step 2 without providing data for step 1 redirects to step 1
         assertRedirects(response, refusal_reason_url)
 
-    def test_add_to_pool_from_prescriber(self, client, snapshot, mailoutbox):
+    @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
+    def test_add_to_pool_from_prescriber(self, is_authorized_prescriber, client, snapshot, mailoutbox):
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_ADDED_TO_POOL_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
+        # Unauthorized prescriber is the default sender
+        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
-            sent_by_authorized_prescriber_organisation=True,
             state=initial_state,
+            **extra_kwargs,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -1486,18 +1489,21 @@ class TestProcessViews:
         assert mail_to_other_employer.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
         assert mail_to_other_employer.body == snapshot(name="add_to_pool_email_to_proxy_body")
 
-    def test_postpone_from_prescriber(self, client, snapshot, mailoutbox):
+    @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
+    def test_postpone_from_prescriber(self, is_authorized_prescriber, client, snapshot, mailoutbox):
         """Ensure that the `postpone` transition is triggered."""
         initial_state = random.choice(JobApplicationWorkflow.CAN_BE_POSTPONED_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
+        # Unauthorized prescriber is the default sender
+        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
-            sent_by_authorized_prescriber_organisation=True,
             state=initial_state,
+            **extra_kwargs,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)

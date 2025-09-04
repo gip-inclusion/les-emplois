@@ -67,6 +67,15 @@ from tests.users.factories import (
 from tests.utils.testing import excel_date_format, get_rows_from_streaming_response
 
 
+def assertIn(subtext, whole_text):
+    assert subtext in whole_text
+
+
+def assertNotInCaseFolded(subtext, whole_text):
+    # When checking for the absence of a string, ignore case to be extra sure
+    assert subtext.casefold() not in whole_text.casefold()
+
+
 class TestJobApplicationModel:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings):
@@ -863,25 +872,30 @@ class TestJobApplicationNotifications:
         assert str(job_application.to_company.pk) in email.body
         assert job_application.resume_link in email.body
 
-    def test_new_for_prescriber(self):
+    @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
+    def test_new_for_prescriber(self, is_authorized_prescriber):
+        # Unauthorized prescriber is the default sender
+        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, selected_jobs=Appellation.objects.all()
+            selected_jobs=Appellation.objects.all(),
+            **extra_kwargs,
         )
         email = job_application.notifications_new_for_proxy.build()
         # To.
-        assert job_application.sender.email in email.to
-        assert len(email.to) == 1
+        assert email.to == [job_application.sender.email]
         assert job_application.sender_kind == SenderKind.PRESCRIBER
 
+        assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
+
         # Subject
-        assert job_application.job_seeker.get_full_name() in email.subject
+        assertion(job_application.job_seeker.get_full_name(), email.subject)
 
         # Body.
-        assert job_application.job_seeker.first_name.title() in email.body
-        assert job_application.job_seeker.last_name.upper() in email.body
-        assert job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
-        assert job_application.job_seeker.email in email.body
-        assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
+        assertion(job_application.job_seeker.first_name.title(), email.body)
+        assertion(job_application.job_seeker.last_name.upper(), email.body)
+        assertion(job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"), email.body)
+        assertion(job_application.job_seeker.email, email.body)
+        assertion(format_filters.format_phone(job_application.job_seeker.phone), email.body)
         assert job_application.message in email.body
         for job in job_application.selected_jobs.all():
             assert job.display_name in email.body
@@ -895,7 +909,8 @@ class TestJobApplicationNotifications:
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.notifications_new_for_job_seeker.build()
         assert job_application.sender.get_full_name() in email.body
-        assert job_application.sender_prescriber_organization.display_name in email.body
+        if is_authorized_prescriber:
+            assert job_application.sender_prescriber_organization.display_name in email.body
         assert job_application.sender.email not in email.body
         assert format_filters.format_phone(job_application.sender.phone) not in email.body
         assert job_application.resume_link in email.body
@@ -939,8 +954,11 @@ class TestJobApplicationNotifications:
         assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
 
-    def test_accept_for_proxy(self):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
+    def test_accept_for_prescriber(self, is_authorized_prescriber):
+        # Unauthorized prescriber is the default sender
+        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+        job_application = JobApplicationFactory(**extra_kwargs)
         email = job_application.notifications_accept_for_proxy.build()
         # To.
         assert job_application.to_company.email not in email.to
@@ -950,7 +968,8 @@ class TestJobApplicationNotifications:
         # Subject.
         assert "Candidature acceptée et votre avis sur les emplois de l'inclusion" in email.subject
         # Body.
-        assert job_application.job_seeker.get_full_name() in email.body
+        assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
+        assertion(job_application.job_seeker.get_full_name(), email.body)
         assert job_application.sender.get_full_name() in email.body
         assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
@@ -958,7 +977,8 @@ class TestJobApplicationNotifications:
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert "Date de fin du contrat" in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
-        assert job_application.sender_prescriber_organization.accept_survey_url in email.body
+        if is_authorized_prescriber:
+            assert job_application.sender_prescriber_organization.accept_survey_url in email.body
 
     def test_accept_for_proxy_without_hiring_end_at(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, hiring_end_at=None)
@@ -1187,10 +1207,12 @@ class TestJobApplicationNotifications:
         assert job_application.approval_number_sent_at is None
         assert len(mailoutbox) == 1
 
-    def test_cancel_sent_by_prescriber(self, django_capture_on_commit_callbacks, mailoutbox):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
-        )
+    @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
+    def test_cancel_sent_by_prescriber(self, is_authorized_prescriber, django_capture_on_commit_callbacks, mailoutbox):
+        # Unauthorized prescriber is the default sender
+        extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+
+        job_application = JobApplicationFactory(state=JobApplicationState.ACCEPTED, **extra_kwargs)
 
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
@@ -1200,12 +1222,28 @@ class TestJobApplicationNotifications:
         # To.
         assert [cancellation_user.email] == mailoutbox[0].to
         assert [job_application.sender.email] == mailoutbox[1].to
+        [employer_email, prescriber_email] = mailoutbox
+
+        # Subject.
+        assert employer_email.subject == "[TEST] Embauche annulée"
+        assert prescriber_email.subject == "[TEST] Embauche annulée"
 
         # Body.
-        assert "annulée" in mailoutbox[0].body
-        assert job_application.sender.get_full_name() in mailoutbox[0].body
-        assert job_application.job_seeker.get_full_name() in mailoutbox[0].body
-        assert mailoutbox[0].body == mailoutbox[1].body
+        assert "annulée" in employer_email.body
+        assert job_application.sender.get_full_name() in employer_email.body
+        assert job_application.job_seeker.get_full_name() in employer_email.body
+
+        assert "annulée" in prescriber_email.body
+        if is_authorized_prescriber:
+            assert mailoutbox[1].body == employer_email.body
+        else:
+            assert mailoutbox[1].body != employer_email.body
+        assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
+        assertion(job_application.job_seeker.get_full_name(), prescriber_email.body)
+        assertion(job_application.job_seeker.first_name.title(), prescriber_email.body)
+        assertion(job_application.job_seeker.last_name.upper(), prescriber_email.body)
+        assertion(job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"), prescriber_email.body)
+        assertion(job_application.job_seeker.email, prescriber_email.body)
 
     def test_for_proxy_notification(self, subtests):
         employer_job_app = JobApplicationFactory(sent_by_another_employer=True)
@@ -1877,6 +1915,7 @@ class TestJobApplicationXlsxExport:
         job_application.accept(user=job_application.to_company.members.first())
         request = RequestFactory()
         request.user = job_application.to_company.members.first()
+        request.from_authorized_prescriber = False
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
@@ -1927,6 +1966,7 @@ class TestJobApplicationXlsxExport:
             job_application.accept(user=job_application.to_company.members.first())
         request = RequestFactory()
         request.user = job_application.to_company.members.first()
+        request.from_authorized_prescriber = False
 
         assert job_seeker.approvals.last().is_in_waiting_period
 
@@ -1976,6 +2016,7 @@ class TestJobApplicationXlsxExport:
 
         request = RequestFactory()
         request.user = job_application.to_company.members.first()
+        request.from_authorized_prescriber = False
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
@@ -2035,6 +2076,7 @@ class TestJobApplicationXlsxExport:
         )
         request = RequestFactory()
         request.user = company.members.first()
+        request.from_authorized_prescriber = False
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
