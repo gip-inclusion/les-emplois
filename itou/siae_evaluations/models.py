@@ -948,3 +948,35 @@ class Sanctions(models.Model):
             + bool(self.subsidy_cut_dates)
             + bool(self.deactivation_reason)
         )
+
+
+class ArchivedEvaluatedSiae(models.Model):
+    evaluation_campaign = models.ForeignKey(
+        EvaluationCampaign,
+        verbose_name="contrôle",
+        on_delete=models.CASCADE,
+        related_name="archived_evaluated_siaes",
+    )
+    siae = models.ForeignKey(
+        "companies.Company",
+        verbose_name="SIAE",
+        on_delete=models.RESTRICT,
+        related_name="archived_evaluated_siaes",
+    )
+    reviewed_at = models.DateTimeField(verbose_name="contrôlée le", blank=True, null=True)
+    final_reviewed_at = models.DateTimeField(verbose_name="contrôle définitif le", blank=True, null=True)
+    final_state = models.CharField(
+        verbose_name="état final après la cloture de la campagne d'évaluation",
+        choices=evaluation_enums.EvaluatedSiaeFinalState.choices,
+        blank=True,
+        null=True,
+    )
+    job_applications_count = models.SmallIntegerField(verbose_name="nombre d'autoprescription contrôlées")
+
+    class Meta:
+        verbose_name = "entreprise contrôlée archivée"
+        verbose_name_plural = "entreprises contrôlées archivées"
+        unique_together = ("evaluation_campaign", "siae")
+
+    def __str__(self):
+        return f"{self.siae}"
