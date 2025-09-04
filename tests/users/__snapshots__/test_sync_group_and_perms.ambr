@@ -214,8 +214,6 @@
     'change_prescriberorganization',
     'delete_prescriberorganization',
     'view_prescriberorganization',
-    'add_calendar',
-    'change_calendar',
     'view_calendar',
     'view_evaluatedadministrativecriteria',
     'view_evaluatedjobapplication',
@@ -243,12 +241,41 @@
     'view_uuidsupportremark',
   ])
 # ---
+# name: test_command[itou-siae-evaluations]
+  list([
+    'add_calendar',
+    'change_calendar',
+    'delete_calendar',
+    'view_calendar',
+    'add_evaluatedadministrativecriteria',
+    'change_evaluatedadministrativecriteria',
+    'delete_evaluatedadministrativecriteria',
+    'view_evaluatedadministrativecriteria',
+    'add_evaluatedjobapplication',
+    'change_evaluatedjobapplication',
+    'delete_evaluatedjobapplication',
+    'view_evaluatedjobapplication',
+    'add_evaluatedsiae',
+    'change_evaluatedsiae',
+    'delete_evaluatedsiae',
+    'view_evaluatedsiae',
+    'add_evaluationcampaign',
+    'change_evaluationcampaign',
+    'delete_evaluationcampaign',
+    'view_evaluationcampaign',
+    'add_sanctions',
+    'change_sanctions',
+    'delete_sanctions',
+    'view_sanctions',
+  ])
+# ---
 # name: test_command[logs]
   list([
     'group name=gps-admin created',
     'group name=gps-admin-readonly created',
     'group name=itou-admin created',
     'group name=itou-admin-readonly created',
+    'group name=itou-siae-evaluations created',
     'group name=pilotage-admin created',
     'group name=pilotage-admin-readonly created',
     'group name=rdvi created',
