@@ -4,8 +4,11 @@ from dateutil.relativedelta import relativedelta
 from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.siae_evaluations import enums as evaluation_enums
+from itou.siae_evaluations.management.commands.archive_accepted_evaluated_siae import DELAY
+from itou.siae_evaluations.models import ArchivedEvaluatedSiae, EvaluatedJobApplication, EvaluatedSiae
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -559,3 +562,51 @@ class TestManagementCommand:
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
         assert mailoutbox == []
+
+
+class TestArchivedAcceptedEvaluatedSiae:
+    def setup_method(self):
+        self.evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__ended_at=timezone.now() - DELAY,
+            reviewed_at=timezone.make_aware(datetime.datetime(2024, 5, 17, 10, 10, 10)),
+            final_reviewed_at=timezone.make_aware(datetime.datetime(2024, 7, 16, 11, 11, 11)),
+            final_state=evaluation_enums.EvaluatedSiaeFinalState.ACCEPTED,
+        )
+        EvaluatedJobApplicationFactory.create_batch(3, evaluated_siae=self.evaluated_siae)
+
+    def test_wet_run(self):
+        call_command("archive_accepted_evaluated_siae")
+        EvaluatedSiae.objects.get()
+        assert EvaluatedJobApplication.objects.count() == 3
+        assert not ArchivedEvaluatedSiae.objects.exists()
+
+    def test_archived_evaluated_siae(self, snapshot):
+        undesired_evaluated_siae = [
+            # evaluated_siae_in_active_campaign
+            EvaluatedSiaeFactory(evaluation_campaign__institution__department="76"),
+            # evaluated_siae_in_recently_closed_campaign
+            EvaluatedSiaeFactory(
+                evaluation_campaign__institution__department="54", evaluation_campaign__ended_at=timezone.now()
+            ),
+            # refused_evaluated_siae
+            EvaluatedSiaeFactory(
+                evaluation_campaign__institution__department="38",
+                evaluation_campaign__ended_at=timezone.now() - DELAY,
+                final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED,
+            ),
+        ]
+        for evaluated_siae in undesired_evaluated_siae:
+            EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+
+        call_command("archive_accepted_evaluated_siae", wet_run=True)
+        assertQuerySetEqual(EvaluatedSiae.objects.all(), undesired_evaluated_siae, ordered=False)
+        assertQuerySetEqual(
+            EvaluatedJobApplication.objects.all(),
+            [evaluated_siae.evaluated_job_applications.first() for evaluated_siae in undesired_evaluated_siae],
+            ordered=False,
+        )
+
+        archived_evaluated_siaes = ArchivedEvaluatedSiae.objects.filter(
+            evaluation_campaign=self.evaluated_siae.evaluation_campaign, siae=self.evaluated_siae.siae
+        ).values("reviewed_at", "final_reviewed_at", "final_state", "job_applications_count")
+        assert archived_evaluated_siaes == snapshot(name="archived_evaluated_siae")
