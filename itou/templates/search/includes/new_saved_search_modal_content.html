@@ -21,4 +21,5 @@
 {% if saved_searches|default:None %}
     {# A new saved search has been added, oob update the list and the settings modal #}
     {% include "search/includes/saved_searches.html" with saved_searches=saved_searches request=request only %}
+    {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token only %}
 {% endif %}
