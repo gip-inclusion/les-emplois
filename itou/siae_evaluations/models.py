@@ -439,18 +439,24 @@ class EvaluationCampaign(models.Model):
                         # The DDETS set the review_state on all documents but forgot to submit its review
                         # The validation is automatically triggered by this transition
                         evaluated_siae.final_reviewed_at = now
-                        evaluated_siae.save(update_fields=["final_reviewed_at"])
                         if evaluated_siae.state_from_applications == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                             emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
+                            evaluated_siae.final_state = evaluation_enums.EvaluatedSiaeState.ACCEPTED
                         else:
                             emails.append(SIAEEmailFactory(evaluated_siae).refused())
+                            evaluated_siae.final_state = evaluation_enums.EvaluatedSiaeState.REFUSED
+                        evaluated_siae.save(update_fields=["final_reviewed_at", "final_state"])
                 elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED:
                     emails.append(SIAEEmailFactory(evaluated_siae).refused())
+                    evaluated_siae.final_state = evaluation_enums.EvaluatedSiaeState.REFUSED
+                    evaluated_siae.save(update_fields=["final_state"])
                 elif evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                     if evaluated_siae.reviewed_at != evaluated_siae.final_reviewed_at:
                         # This check ensures that the acceptance happened in the adversarial stage
                         # and not the amicable one
                         emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
+                    evaluated_siae.final_state = evaluation_enums.EvaluatedSiaeState.ACCEPTED
+                    evaluated_siae.save(update_fields=["final_state"])
                 # Computing the state is costly, avoid it when possible.
                 if not has_siae_to_notify:
                     has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
@@ -543,6 +549,13 @@ class EvaluatedSiae(models.Model):
     notification_text = models.TextField(blank=True, null=True, verbose_name="commentaire")
 
     reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
+
+    final_state = models.CharField(
+        verbose_name="état final après la cloture de la campagne d'évaluation",
+        choices=evaluation_enums.EvaluatedSiaeFinalState.choices,
+        blank=True,
+        null=True,
+    )
 
     objects = EvaluatedSiaeQuerySet.as_manager()
 
