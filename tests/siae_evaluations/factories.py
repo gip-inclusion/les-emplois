@@ -68,6 +68,22 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
     siae = factory.SubFactory(CompanyFactory, department="14")
 
 
+class ArchivedEvaluatedSiaeFactory(factory.django.DjangoModelFactory):
+    evaluation_campaign = factory.SubFactory(EvaluationCampaignFactory)
+    siae = factory.SubFactory(CompanyFactory)
+    job_applications_count = factory.Faker("pyint")
+
+    class Meta:
+        model = models.ArchivedEvaluatedSiae
+        skip_postgeneration_save = True
+
+    class Params:
+        for_snapshot = factory.Trait(
+            siae__name="EricBnB.com",
+            job_applications_count=17,
+        )
+
+
 class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluatedJobApplication

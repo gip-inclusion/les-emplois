@@ -3,7 +3,13 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.siae_evaluations import models
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    ReadonlyMixin,
+    get_admin_view_link,
+)
 from itou.utils.export import to_streaming_response
 
 
@@ -31,6 +37,19 @@ class EvaluatedSiaesInline(ItouTabularInline):
     @admin.display(description="lien vers les Siaes évaluées")
     def id_link(self, obj):
         return get_admin_view_link(obj, content=format_html("Lien vers la Siae évaluée <strong>{}</strong>", obj))
+
+
+class ArchivedEvaluatedSiaesInline(ItouTabularInline):
+    model = models.ArchivedEvaluatedSiae
+    fields = ("id_link", "reviewed_at", "final_state")
+    readonly_fields = ("id_link", "reviewed_at", "final_state")
+    extra = 0
+
+    @admin.display(description="lien vers les Siaes évaluées archivées")
+    def id_link(self, obj):
+        return get_admin_view_link(
+            obj, content=format_html("Lien vers la Siae évaluée archivée <strong>{}</strong>", obj)
+        )
 
 
 class EvaluatedJobApplicationsInline(ItouTabularInline):
@@ -223,6 +242,7 @@ class EvaluationCampaignAdmin(ItouModelAdmin):
     )
     inlines = [
         EvaluatedSiaesInline,
+        ArchivedEvaluatedSiaesInline,
         PkSupportRemarkInline,
     ]
 
@@ -264,6 +284,25 @@ class EvaluatedSiaeAdmin(ItouModelAdmin):
 
     def state(self, obj):
         return obj.state
+
+
+@admin.register(models.ArchivedEvaluatedSiae)
+class ArchivedEvaluatedSiaeAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = ["evaluation_campaign", "siae", "final_state", "reviewed_at"]
+    list_display_links = ("siae",)
+    readonly_fields = (
+        "evaluation_campaign",
+        "siae",
+        "reviewed_at",
+        "final_reviewed_at",
+        "final_state",
+        "job_applications_count",
+    )
+    list_filter = (
+        "reviewed_at",
+        "evaluation_campaign__institution__department",
+    )
+    search_fields = ("siae__name", "siae__siret")
 
 
 @admin.register(models.EvaluatedJobApplication)
