@@ -12,7 +12,6 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
-    JobApplicationSentByPrescriberFactory,
 )
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import assertSnapshotQueries
@@ -230,23 +229,32 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     assert "a transféré votre candidature à la structure" in mailoutbox[1].body
 
 
-def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks, mailoutbox):
+@pytest.mark.parametrize(
+    "is_authorized_prescriber, expected_jobseeker_name",
+    [
+        (False, "J… D…"),
+        (True, "Jean DUPONT"),
+    ],
+)
+def test_transfer_must_notify_unauthorized_prescriber(
+    django_capture_on_commit_callbacks, mailoutbox, is_authorized_prescriber, expected_jobseeker_name
+):
     # Same test and conditions as above, but this time prescriber
-    # at the origin of the eligibility disgnosis must be notified
     origin_company = CompanyFactory(with_membership=True)
     target_company = CompanyFactory(with_membership=True)
 
     origin_user = origin_company.members.first()
     target_company.members.add(origin_user)
 
-    # Eligibility diagnosis was made by a prescriber
-    job_application = JobApplicationSentByPrescriberFactory(
+    # Unauthorized prescriber is the default sender
+    extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
+    job_application = JobApplicationFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Dupont",
         state=JobApplicationState.PROCESSING,
         to_company=origin_company,
-        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True),
+        **extra_kwargs,
     )
-    job_seeker = job_application.job_seeker
-
     with django_capture_on_commit_callbacks(execute=True):
         job_application.transfer(user=origin_user, target_company=target_company)
 
@@ -256,8 +264,8 @@ def test_transfer_must_notify_prescriber(django_capture_on_commit_callbacks, mai
     # Focusing on prescriber email content
     assert len(mailoutbox[2].to) == 1
     assert job_application.sender.email in mailoutbox[2].to
-    assert f"[TEST] La candidature de {job_seeker.get_full_name()} a été transférée" == mailoutbox[2].subject
-    assert "a transféré la candidature de :" in mailoutbox[2].body
+    assert f"[TEST] La candidature de {expected_jobseeker_name} a été transférée" == mailoutbox[2].subject
+    assert f"a transféré la candidature de : {expected_jobseeker_name}" in mailoutbox[2].body
 
 
 def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbacks, mailoutbox):
