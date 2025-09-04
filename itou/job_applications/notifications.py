@@ -65,7 +65,6 @@ class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, Ema
 
     name = "Mise en attente de candidature"
     category = NotificationCategory.JOB_APPLICATION
-    can_be_disabled = False
     subject_template = "apply/email/postpone_for_job_seeker_subject.txt"
     body_template = "apply/email/postpone_for_job_seeker_body.txt"
 
@@ -76,7 +75,6 @@ class JobApplicationPostponedForProxyNotification(PrescriberOrEmployerNotificati
 
     name = "Mise en attente d’une candidature envoyée"
     category = NotificationCategory.JOB_APPLICATION
-    can_be_disabled = False
     subject_template = "apply/email/postpone_for_proxy_subject.txt"
     body_template = "apply/email/postpone_for_proxy_body.txt"
 
