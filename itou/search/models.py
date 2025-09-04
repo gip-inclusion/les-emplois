@@ -2,6 +2,9 @@ from django.conf import settings
 from django.db import models
 
 
+MAX_SAVED_SEARCHES_COUNT = 20
+
+
 class SavedSearch(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name="utilisateur", related_name="saved_searches", on_delete=models.CASCADE

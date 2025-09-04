@@ -90,3 +90,14 @@ def create_city_partially_in_zrr():
         code_insee="97405",
         coords=Point(55.5761, -21.3389),
     )
+
+
+def create_city_lyon():
+    return City.objects.create(
+        name="Lyon",
+        slug="lyon-69",
+        department="69",
+        post_codes=["69001", "69002", "69003", "69004", "69005", "69006", "69007", "69008", "69009"],
+        code_insee="69123",
+        coords=Point(4.8351, 45.758),
+    )
