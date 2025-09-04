@@ -114,6 +114,9 @@ class TestSiaeAPIFetchList:
                 "code_postal": company.post_code,
                 "ville": company.city,
                 "departement": company.department,
+                "id": str(company.uid),
+                "telephone": company.phone,
+                "courriel": company.email,
                 "postes": [
                     {
                         "id": job_2.id,
