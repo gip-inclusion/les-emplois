@@ -1,8 +1,14 @@
+{% load str_filters %}
 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-{{ evaluated_siae.pk }}">
     <div class="c-box--results__summary flex-grow-1">
         <i class="ri-community-line" aria-hidden="true"></i>
         <div>
             <h3>{{ evaluated_siae }}</h3>
+            {% if evaluated_siae.archive_accepted_job_applications_nb is not None %}
+                <div>
+                    {{ evaluated_siae.archive_accepted_job_applications_nb }} {{ evaluated_siae.archive_accepted_job_applications_nb|pluralizefr:"autoprescription contrôlée archivée,autoprescriptions contrôlées archivées" }}
+                </div>
+            {% endif %}
         </div>
     </div>
     <div>

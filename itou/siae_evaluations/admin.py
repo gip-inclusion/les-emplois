@@ -3,7 +3,12 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.siae_evaluations import models
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    get_admin_view_link,
+)
 from itou.utils.export import to_streaming_response
 
 
@@ -241,6 +246,8 @@ class EvaluatedSiaeAdmin(ItouModelAdmin):
         "notified_at",
         "notification_reason",
         "notification_text",
+        "final_state",
+        "archive_accepted_job_applications_nb",
     )
     list_filter = (
         "reviewed_at",

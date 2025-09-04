@@ -29,6 +29,7 @@
   "0 5 * * * $ROOT/clevercloud/run_management_command.sh deactivate_old_job_descriptions",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
   "30 6 * * * $ROOT/clevercloud/run_management_command.sh check_inconsistencies",
+  "0 7 * * * $ROOT/clevercloud/run_management_command.sh archive_accepted_evaluated_siae --wet-run",
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/run_management_command.sh populate_metabase_emplois --mode all",

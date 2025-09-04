@@ -2649,7 +2649,8 @@
                  "siae_evaluations_evaluatedsiae"."notification_reason",
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
-                 "siae_evaluations_evaluatedsiae"."final_state"
+                 "siae_evaluations_evaluatedsiae"."final_state",
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb"
           FROM "siae_evaluations_evaluatedsiae"
           ORDER BY RANDOM() ASC
         ''',
