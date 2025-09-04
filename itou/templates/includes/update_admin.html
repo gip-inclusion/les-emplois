@@ -1,18 +1,14 @@
 {% load buttons_form %}
 
-<div class="content-small">
+<div class="c-form">
     {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
         {% if action == "remove" %}
-            <h1>Retrait des droits d'administrateur</h1>
-            <h2 class="text-muted">{{ structure.display_name }}</h2>
-            <div class="mt-4 alert alert-warning">
-                Vous allez retirer les droits d'administrateur de votre {{ org_display }} à <b>{{ target_member.get_full_name }}</b>
+            <div class="alert alert-warning">
+                Vous allez retirer les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_full_name }}</b>
             </div>
         {% else %}
-            <h1>Ajout des droits d'administrateur</h1>
-            <h2 class="text-muted">{{ structure.display_name }}</h2>
-            <div class="mt-4 alert alert-warning">
-                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} à <b>{{ target_member.get_full_name }}</b>
+            <div class="alert alert-warning">
+                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_full_name }}</b>
             </div>
         {% endif %}
 
@@ -26,9 +22,9 @@
             {% url base_url|add:":members" as reset_url %}
             {% csrf_token %}
             {% if action == "remove" %}
-                {% itou_buttons_form primary_label="Retirer les droits administrateur" reset_url=reset_url %}
+                {% itou_buttons_form show_mandatory_fields_mention=False primary_label="Retirer les droits administrateur" reset_url=reset_url %}
             {% else %}
-                {% itou_buttons_form primary_label="Ajouter les droits administrateur" reset_url=reset_url %}
+                {% itou_buttons_form show_mandatory_fields_mention=False primary_label="Ajouter les droits administrateur" reset_url=reset_url %}
             {% endif %}
         </form>
     {% endwith %}

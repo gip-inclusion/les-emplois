@@ -1,6 +1,19 @@
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Gestion des administrateurs {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            {% if action == "remove" %}
+                <h1>Retrait des droits d'administrateur</h1>
+            {% else %}
+                <h1>Ajout des droits d'administrateur</h1>
+            {% endif %}
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
