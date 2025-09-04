@@ -3325,7 +3325,8 @@
                  "siae_evaluations_evaluatedsiae"."notified_at",
                  "siae_evaluations_evaluatedsiae"."notification_reason",
                  "siae_evaluations_evaluatedsiae"."notification_text",
-                 "siae_evaluations_evaluatedsiae"."reminder_sent_at"
+                 "siae_evaluations_evaluatedsiae"."reminder_sent_at",
+                 "siae_evaluations_evaluatedsiae"."final_state"
           FROM "siae_evaluations_evaluatedsiae"
           ORDER BY RANDOM() ASC
         ''',
