@@ -2207,7 +2207,7 @@ class TestProcessAcceptViews:
         )
         personal_data_default_fields = {
             "birthdate": job_seeker.jobseeker_profile.birthdate,
-            "birth_country": extra_post_data.setdefault("birth_country", Country.france_id),
+            "birth_country": extra_post_data.setdefault("birth_country", Country.FRANCE_ID),
             "birth_place": extra_post_data.setdefault("birth_place", birth_place),
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
         }
@@ -3399,7 +3399,7 @@ class TestProcessAcceptViews:
         "get_birth_country_id",
         (
             pytest.param(lambda: None, id="no_country"),
-            pytest.param(lambda: Country.france_id, id="country_france"),
+            pytest.param(lambda: Country.FRANCE_ID, id="country_france"),
         ),
     )
     def test_certified_criteria_birth_fields_not_readonly_if_empty(self, client, get_birth_country_id):
@@ -3440,14 +3440,14 @@ class TestProcessAcceptViews:
             "first_name": job_seeker.first_name,
             "last_name": job_seeker.last_name,
             "birth_place": birth_place.pk,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
             "birthdate": job_seeker.jobseeker_profile.birthdate,
         }
         self.accept_job_application(client, job_application, post_data=post_data)
 
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
-        assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.france_id
+        assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
 
 class TestProcessTemplates:

@@ -741,7 +741,7 @@ class TestStandaloneCreateAsPrescriber:
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")

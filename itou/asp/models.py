@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Q, Value
 from django.db.models.functions import Lower, Replace
 from django.utils import timezone
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import cached_property
 from unidecode import unidecode
 
 from itou.utils.models import DateRange, SlylyImmutableUnaccent
@@ -491,7 +491,7 @@ class Country(PrettyPrintMixin, models.Model):
     """
 
     INSEE_CODE_FRANCE = "100"
-    _ID_FRANCE = None
+    FRANCE_ID = 91
 
     class Group(models.TextChoices):
         FRANCE = "1", "France"
@@ -512,12 +512,6 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name = "pays"
         verbose_name_plural = "pays"
         ordering = ["name"]
-
-    @classproperty
-    def france_id(cls):
-        if cls._ID_FRANCE is None:
-            cls._ID_FRANCE = Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk
-        return cls._ID_FRANCE
 
 
 class SiaeMeasure(models.TextChoices):
