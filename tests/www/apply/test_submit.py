@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.template.defaultfilters import date, time
 from django.urls import resolve, reverse
 from django.utils import timezone
+from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import (
     assertContains,
@@ -2730,8 +2731,8 @@ class TestDirectHireFullProcess:
             status_code=403,
         )
 
-    @freeze_time()
-    def test_hire_as_company(self, client):
+    @freeze_time("2025-08-22")
+    def test_hire_as_company(self, client, snapshot):
         """Apply as company (and create new job seeker)"""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -2746,7 +2747,13 @@ class TestDirectHireFullProcess:
             with_ban_geoloc_address=True,
             jobseeker_profile__nir="178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            jobseeker_profile__education_level=EducationLevel.BAC_LEVEL,
+            email="johannes@brahms.com",
+            phone="0123456789",
             title="M",
+            last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
+            first_name="Johannes",
+            last_name="Brahms",
         )
         existing_job_seeker = JobSeekerFactory()
 
@@ -2956,6 +2963,8 @@ class TestDirectHireFullProcess:
 
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        soup = parse_response_to_soup(response, selector=".personal-infos")
+        assert str(soup) == snapshot(name="personal-infos")
 
         response = client.post(next_url)
 
@@ -3109,7 +3118,6 @@ class TestDirectHireFullProcess:
             "apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session_name}
         )
         assertContains(response, prev_applicaitons_url)
-        assertContains(response, "Éligibilité GEIQ non confirmée")
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
 
         # Step check previous applications
@@ -4930,13 +4938,56 @@ class TestFindJobSeekerForHireView:
 
 
 class TestCheckJobSeekerInformationsForHire:
-    def test_company(self, client):
+    @pytest.mark.parametrize(
+        "job_seeker_kwargs",
+        [
+            pytest.param(
+                {
+                    "title": "",
+                    "first_name": "",
+                    "last_name": "",
+                    "email": None,
+                    "phone": "",
+                    "jobseeker_profile__birthdate": None,
+                    "jobseeker_profile__nir": "",
+                    "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+                    "jobseeker_profile__lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+                    "jobseeker_profile__education_level": "",
+                },
+                id="job_seeker_with_few_datas",
+            ),
+            pytest.param(
+                {
+                    "for_snapshot": True,
+                    "born_in_france": True,
+                    "with_pole_emploi_id": True,
+                    "jobseeker_profile__pole_emploi_id": "09443041",
+                    "jobseeker_profile__resourceless": True,
+                    "jobseeker_profile__rqth_employee": True,
+                    "jobseeker_profile__oeth_employee": True,
+                    "jobseeker_profile__unemployed_since": AllocationDuration.FROM_12_TO_23_MONTHS,
+                    "jobseeker_profile__has_rsa_allocation": RSAAllocation.YES_WITH_MARKUP,
+                    "jobseeker_profile__rsa_allocation_since": AllocationDuration.MORE_THAN_24_MONTHS,
+                    "jobseeker_profile__ass_allocation_since": AllocationDuration.FROM_6_TO_11_MONTHS,
+                    "jobseeker_profile__aah_allocation_since": AllocationDuration.LESS_THAN_6_MONTHS,
+                },
+                id="job_seeker_with_all_datas",
+            ),
+            pytest.param(
+                {"for_snapshot": True, "jobseeker_profile__birth_country_id": 126},
+                id="job_seeker_not_born_in_france",
+            ),
+        ],
+    )
+    def test_company(self, client, job_seeker_kwargs, snapshot):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        job_seeker_kwargs["jobseeker_profile__birth_place"] = (
+            Commune.objects.by_insee_code_and_period("59183", datetime.date(1990, 1, 1))
+            if job_seeker_kwargs.get("born_in_france")
+            else None
+        )
         job_seeker = JobSeekerFactory(
-            first_name="Son prénom",
-            last_name="Son nom de famille",
-            jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)), **job_seeker_kwargs
         )
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})
@@ -4944,36 +4995,49 @@ class TestCheckJobSeekerInformationsForHire:
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}
         )
         response = client.get(url_check_infos)
-        assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
+        content = parse_response_to_soup(
+            response,
+            selector=".personal-infos",
+            replace_in_attr=[
+                ("href", str(job_seeker.public_id), "JOB_SEEKER_PUBLIC_ID"),
+                ("href", apply_session.name, "APPLY_SESSION_NAME"),
+            ],
+        )
+        assert str(content) == snapshot(name="personal-infos")
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Éligibilité IAE à valider")
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": url_check_infos,
         }
-        url_update = f"""
-        <a class="btn btn-outline-primary float-end"
-           href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}">Mettre à jour</a>
-        """
-        assertContains(response, url_update, html=True)
+        assertContains(
+            response,
+            (
+                f'<a href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}"\n'
+                '                   class="btn btn-ico btn-outline-primary"\n'
+                '                   aria-label="Modifier les informations personnelles de '
+                f'{job_seeker.get_full_name()}">\n'
+                '                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>\n'
+                "                    <span>Modifier</span>\n                </a>"
+            ),
+            html=True,
+        )
         assertContains(
             response,
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
         )
-
         assertContains(
             response,
             reverse("apply:start_hire", kwargs={"company_pk": company.pk}),
         )
         assertContains(response, reverse("dashboard:index"))
 
-    def test_geiq(self, client):
+    def test_geiq(self, client, snapshot):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         job_seeker = JobSeekerFactory(
-            first_name="Son prénom",
-            last_name="Son nom de famille",
+            for_snapshot=True,
             jobseeker_profile__nir="",
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
         )
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})
@@ -4981,20 +5045,31 @@ class TestCheckJobSeekerInformationsForHire:
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}
         )
         response = client.get(url_check_infos)
-        assertContains(response, "Informations personnelles de Son Prénom SON NOM DE FAMILLE")
+        content = parse_response_to_soup(
+            response,
+            selector=".personal-infos",
+            replace_in_attr=[
+                ("href", str(job_seeker.public_id), "JOB_SEEKER_PUBLIC_ID"),
+                ("href", apply_session.name, "APPLY_SESSION_NAME"),
+            ],
+        )
+        assert str(content) == snapshot(name="personal-infos")
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         params = {
             "job_seeker_public_id": job_seeker.public_id,
             "from_url": url_check_infos,
         }
-        url_update = f"""
-        <a class="btn btn-outline-primary float-end"
-           href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}">Mettre à jour</a>
-        """
-        assertContains(response, url_update, html=True)
+        assertContains(
+            response,
+            f'<a href="{escape(reverse("job_seekers_views:update_job_seeker_start", query=params))}"',
+        )
         assertContains(
             response,
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
+        )
+        assertContains(
+            response,
+            reverse("apply:start_hire", kwargs={"company_pk": company.pk}),
         )
         assertContains(response, reverse("dashboard:index"))
 
