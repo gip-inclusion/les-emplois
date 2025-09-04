@@ -7,16 +7,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import OuterRef, Q, Subquery
 
 from itou.employee_record.enums import Status
-from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition, EmployeeRecordTransitionLog
+from itou.employee_record.models import (
+    EmployeeRecord,
+    EmployeeRecordBatch,
+    EmployeeRecordTransition,
+    EmployeeRecordTransitionLog,
+)
 from itou.utils.command import BaseCommand
 
 
 BULK_CREATE_BATCH_SIZE = 1_000
-
-
-def datetime_from_asp_batch_file(asp_batch_file):
-    # RIAE_FS_20210512102743.json
-    return datetime.datetime(*(time.strptime(asp_batch_file[8:-5], "%Y%m%d%H%M%S")[0:6]), tzinfo=datetime.UTC)
 
 
 def find_log_entry_approximately_matching_datetime(dt, log_entries):
@@ -67,7 +67,7 @@ class Command(BaseCommand):
                     transition=EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE,
                     from_state=Status.READY,
                     to_state=Status.SENT,
-                    timestamp=datetime_from_asp_batch_file(employee_record.asp_batch_file),
+                    timestamp=EmployeeRecordBatch.datetime_from_asp_batch_file(employee_record.asp_batch_file),
                     employee_record=employee_record,
                     recovered=True,
                 )
@@ -83,7 +83,7 @@ class Command(BaseCommand):
                         reject_tl_timestamp = employee_record.updated_at
                     else:
                         # Make it happen (improbably) *after* EmployeeRecordTransition.WAIT_FOR_ASP_RESPONSE
-                        reject_tl_timestamp = datetime_from_asp_batch_file(
+                        reject_tl_timestamp = EmployeeRecordBatch.datetime_from_asp_batch_file(
                             employee_record.asp_batch_file
                         ) + datetime.timedelta(milliseconds=1)
                     reject_transition = EmployeeRecordTransitionLog(

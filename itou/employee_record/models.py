@@ -1,3 +1,4 @@
+import datetime
 import enum
 
 import xworkflows
@@ -596,6 +597,8 @@ class EmployeeRecordBatch:
     # Feedback file names end with this string
     FEEDBACK_FILE_SUFFIX = "_FichierRetour"
 
+    TIMESTAMP_PATTERN = "%Y%m%d%H%M%S"
+
     def __init__(self, elements):
         if elements and len(elements) > self.MAX_EMPLOYEE_RECORDS:
             raise ValidationError(f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} elements")
@@ -606,7 +609,7 @@ class EmployeeRecordBatch:
         self.message = None
 
         self.elements = elements
-        self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
+        self.upload_filename = EmployeeRecordBatch.get_remote_path()
 
         # add a line number to each FS for JSON serialization
         for idx, er in enumerate(self.elements, start=1):
@@ -646,6 +649,15 @@ class EmployeeRecordBatch:
 
         # .removesuffix is Python 3.9
         return separator.join([path.removesuffix(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX), ext])
+
+    @classmethod
+    def get_remote_path(cls):
+        return cls.REMOTE_PATH_FORMAT.format(timezone.now().strftime(cls.TIMESTAMP_PATTERN))
+
+    @classmethod
+    def datetime_from_asp_batch_file(cls, asp_batch_file):
+        # RIAE_FS_20210512102743.json
+        return datetime.datetime.strptime(asp_batch_file[8:22], cls.TIMESTAMP_PATTERN).replace(tzinfo=datetime.UTC)
 
 
 class EmployeeRecordUpdateNotificationWorkflow(xwf_models.Workflow):
