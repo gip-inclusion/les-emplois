@@ -3,6 +3,7 @@
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
   "*/5 0-21 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
+  "*/20 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
 
   "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_ft_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
@@ -13,7 +14,6 @@
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 
-  "*/30 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
   "*/30 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh notify_inactive_jobseekers --wet-run",
   "0 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_professionals --wet-run",
   "30 2-18/4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data kpi fetch --wet-run",
