@@ -1,12 +1,21 @@
 {% extends "layout/base.html" %}
+{% load components %}
 
 {% block title %}Retrait d'un collaborateur {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Retrait d'un collaborateur</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                     {% with base_url="prescribers_views" %}
                         {% include "includes/deactivate_member.html" %}
                     {% endwith %}
