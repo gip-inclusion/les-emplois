@@ -1,0 +1,29 @@
+{% load django_bootstrap5 %}
+{% load matomo %}
+{% if form %}
+    <div class="modal-dialog modal-dialog-centered" id="newSavedSearchModalContent" {% if hx_swap_oob %}hx-swap-oob="true"{% endif %}>
+        <form hx-post="{% url "search:add_saved_search" %}" hx-target="#newSavedSearchModalContent" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="newSavedSearchModalLabel">Enregistrer cette recherche</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Enregistrez cette recherche afin de la retrouver facilement depuis votre tableau de bord.</p>
+                    {% bootstrap_form form alert_error_type="non_fields" %}
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-primary" {% matomo_event "recherche" "clic" "enregistrer-une-recherche" %}>
+                        Enregistrer
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if request.htmx %}
+        {# A new saved search has been added, oob update the save button #}
+        {% include "search/includes/save_search_button.html" with display_save_button=display_save_button disable_save_button=disable_save_button hx_swap_oob=True only %}
+    {% endif %}
+{% endif %}

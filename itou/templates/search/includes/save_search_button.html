@@ -1,0 +1,13 @@
+{% if display_save_button %}
+    <div id="saveSearchButton" class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+        <button class="btn btn-lg btn-secondary btn-ico" type="button" data-bs-toggle="modal" data-bs-target="#newSavedSearchModal" {% if disable_save_button %}disabled{% endif %}>
+            <i class="ri-star-line fw-medium" aria-hidden="true"></i>
+            <span>Enregistrer cette recherche</span>
+        </button>
+        {% if disable_save_button %}
+            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Le nombre maximum de recherches enregistrées a été atteint.">
+                <i class="ri-information-line ri-xl text-info ms-1" aria-label="Le nombre maximum de recherches enregistrées a été atteint."></i>
+            </button>
+        {% endif %}
+    </div>
+{% endif %}

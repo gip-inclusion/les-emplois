@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
@@ -6,7 +7,9 @@ from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
+from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
@@ -15,11 +18,18 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
+from itou.search.models import MAX_SAVED_SEARCHES_COUNT
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.search_views.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
+from itou.www.search_views.forms import (
+    JobDescriptionSearchForm,
+    NewSavedSearchForm,
+    PrescriberSearchForm,
+    SiaeSearchForm,
+)
 
 
 # INSEE codes for the french cities that do have districts.
@@ -27,6 +37,8 @@ INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
 
 
 PageAndCounts = namedtuple("PageAndCounts", ("results_page", "siaes_count", "job_descriptions_count"))
+
+logger = logging.getLogger(__name__)
 
 
 @login_not_required
@@ -50,6 +62,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         return self.post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        saved_searches = self.request.user.saved_searches.all() if self.request.user.is_authenticated else None
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
@@ -59,6 +72,8 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "job_descriptions_count": 0,
             "siaes_count": 0,
             "results_page": [],
+            "display_save_button": False,
+            "disable_save_button": saved_searches and saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
@@ -149,6 +164,12 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         results_and_counts = self.get_results_page_and_counts(siaes, job_descriptions)
 
+        new_saved_search_form = None
+        if self.request.user.is_authenticated:
+            new_saved_search_form = NewSavedSearchForm(
+                user=self.request.user, initial={"name": city.name, "query_params": self.request.GET.urlencode()}
+            )
+
         context = {
             "form": form,
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
@@ -169,6 +190,9 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "results_page": results_and_counts.results_page,
             "siaes_count": results_and_counts.siaes_count,
             "job_descriptions_count": results_and_counts.job_descriptions_count,
+            # Display the save button if the search form is valid and user is connected
+            "display_save_button": self.request.user.is_authenticated,
+            "new_saved_search_form": new_saved_search_form,
         }
         return render(self.request, self.get_template_names(), self.get_context_data(**context))
 
@@ -322,4 +346,36 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         request,
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
         context,
+    )
+
+
+@require_POST
+def add_saved_search(request):
+    form = NewSavedSearchForm(user=request.user, data=request.POST)
+
+    headers = {}
+    if form.is_valid():
+        form.save()
+        form = NewSavedSearchForm(
+            user=request.user,
+            initial={"name": form.cleaned_data["name"], "query_params": form.cleaned_data["query_params"]},
+        )
+        headers |= hx_trigger_modal_control("newSavedSearchModal", "hide")
+        logger.info("user=%d created a saved search", request.user.pk)
+
+    saved_searches = request.user.saved_searches.all()
+
+    context = {
+        "form": form,
+        "saved_searches": saved_searches,
+        "display_save_button": True,
+        "disable_save_button": saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
+        "hx_swap_oob": False,
+    }
+
+    return TemplateResponse(
+        request=request,
+        template="search/includes/new_saved_search_modal_content.html",
+        context=context,
+        headers=headers,
     )
