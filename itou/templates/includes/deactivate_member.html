@@ -1,11 +1,10 @@
 {% load buttons_form %}
 
-<div class="content-small">
+<div class="c-form">
     {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
-        <h1>Retrait d'un collaborateur</h1>
-        <p>
+        <div class="alert alert-warning">
             Êtes-vous sûr de vouloir retirer <b>{{ target_member.get_full_name }}</b> de votre {{ org_display }} <b>{{ structure.display_name }}</b> ?
-        </p>
+        </div>
 
         <p class="mb-0">Une fois retiré :</p>
         <ul>
@@ -33,6 +32,6 @@
     <form action="{% url base_url|add:":deactivate_member" target_member.public_id %}" method="post">
         {% url base_url|add:":members" as reset_url %}
         {% csrf_token %}
-        {% itou_buttons_form primary_label="Retirer l'utilisateur" reset_url=reset_url %}
+        {% itou_buttons_form show_mandatory_fields_mention=False primary_label="Retirer l'utilisateur" reset_url=reset_url %}
     </form>
 </div>
