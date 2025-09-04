@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.www.search import views
+from itou.www.search_views import views
 
 
 app_name = "search"

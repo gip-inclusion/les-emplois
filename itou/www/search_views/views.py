@@ -19,7 +19,7 @@ from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
+from itou.www.search_views.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 
 
 # INSEE codes for the french cities that do have districts.

@@ -20,7 +20,7 @@ class FailingForm:
 
 
 def test_error_handling(client, mocker):
-    mocker.patch("itou.www.search.views.SiaeSearchForm", FailingForm)
+    mocker.patch("itou.www.search_views.views.SiaeSearchForm", FailingForm)
 
     # Make sure we get the original exception
     # and not some "Undefined template variable" in layout/base.html template
