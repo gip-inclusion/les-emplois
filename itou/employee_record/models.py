@@ -624,31 +624,31 @@ class EmployeeRecordBatch:
         # String formating with {field_name=...} forms use __repr__ and not __str__
         return f"{self.upload_filename=}, {len(self.elements)=}"
 
-    @staticmethod
-    def feedback_filename(filename):
+    @classmethod
+    def feedback_filename(cls, filename):
         """
         Return name of the feedback file
         """
         validate_asp_batch_filename(filename)
         separator = "."
         path, ext = filename.split(separator)
-        path += EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX
+        path += cls.FEEDBACK_FILE_SUFFIX
 
         return separator.join([path, ext])
 
-    @staticmethod
-    def batch_filename_from_feedback(filename):
+    @classmethod
+    def batch_filename_from_feedback(cls, filename):
         """
         Return name of original filename from feedback filename
         """
         separator = "."
         path, ext = filename.split(separator)
 
-        if not path.endswith(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX):
-            raise ValidationError(EmployeeRecordBatch.ERROR_BAD_FEEDBACK_FILENAME)
+        if not path.endswith(cls.FEEDBACK_FILE_SUFFIX):
+            raise ValidationError(cls.ERROR_BAD_FEEDBACK_FILENAME)
 
         # .removesuffix is Python 3.9
-        return separator.join([path.removesuffix(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX), ext])
+        return separator.join([path.removesuffix(cls.FEEDBACK_FILE_SUFFIX), ext])
 
     @classmethod
     def get_remote_path(cls):
