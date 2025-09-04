@@ -38,6 +38,7 @@
   "40 23 * * * $ROOT/clevercloud/run_management_command.sh archive_old_gps_memberships",
 
   "0 6 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_cancelled_approvals --wet-run",
+  "0 7 * * MON-FRI $ROOT/clevercloud/run_management_command.sh archive_accepted_evaluated_siae --wet-run",
   "0 12 * * MON-FRI $ROOT/clevercloud/run_management_command.sh import_ea_eatt --from-asp --wet-run",
 
   "0 0 * * MON CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
