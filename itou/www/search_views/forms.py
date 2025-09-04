@@ -13,6 +13,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies.enums import CompanyKind, ContractType, JobSourceTag
 from itou.jobs.models import ROME_DOMAINS
+from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
@@ -162,3 +163,37 @@ class PrescriberSearchForm(forms.Form):
         if not distance:
             distance = self.fields["distance"].initial
         return distance
+
+
+class NewSavedSearchForm(forms.ModelForm):
+    class Meta:
+        model = SavedSearch
+        fields = ["name", "query_params"]
+        labels = {"name": "Nom de cette recherche"}
+        widgets = {
+            "query_params": forms.HiddenInput,
+        }
+
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        name_exists_qs = SavedSearch.objects.filter(user=self.user, name=name).exists()
+        if name_exists_qs:
+            error = forms.ValidationError("Une recherche existe déjà avec ce nom.")
+            self.add_error("name", error)
+        return name
+
+    def clean(self):
+        super().clean()
+        saved_searches_count = SavedSearch.objects.filter(user=self.user).count()
+        if saved_searches_count >= MAX_SAVED_SEARCHES_COUNT:
+            raise forms.ValidationError(
+                f"Le nombre maximum de recherches sauvegardées ({MAX_SAVED_SEARCHES_COUNT}) a été atteint."
+            )
+
+    def save(self, *args, **kwargs):
+        self.instance.user = self.user
+        return super().save()
