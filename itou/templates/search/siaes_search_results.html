@@ -54,10 +54,14 @@
             {% include "search/includes/new_saved_search_modal_content.html" with form=new_saved_search_form request=request csrf_token=csrf_token only %}
         </div>
     {% endif %}
+    <div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+        {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token only %}
+    </div>
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <script src='{% static "js/sliding_search.js"%}'></script>
 {% endblock %}

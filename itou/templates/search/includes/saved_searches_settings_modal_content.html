@@ -1,0 +1,40 @@
+{% load django_bootstrap5 %}
+<div class="modal-dialog modal-dialog-centered" id="savedSearchesSettingsModalContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+            <ul class="list-unstyled">
+                {% for saved_search in saved_searches %}
+                    <li class="d-flex lh-sm mb-3">
+                        <div class="me-2">
+                            <i class="ri-star-line text-muted" aria-hidden="true"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong class="fs-sm d-block">{{ saved_search.name }}</strong>
+                            <span class="fs-xs">{{ saved_search.display_details }}</span>
+                        </div>
+                        <div>
+                            <form hx-post="{% url 'search:delete_saved_search' saved_search_id=saved_search.id %}"
+                                  hx-target="#savedSearchesSettingsModalContent"
+                                  hx-indicator="#savedSearchesSettingsModalContent"
+                                  hx-swap="outerHTML"
+                                  class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                <button class="btn btn-danger btn-sm btn-ico-only" aria-label="Supprimer cette recherche">
+                                    <i class="ri-delete-bin-line fw-medium" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if request.htmx %}
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches request=request only %}
+{% endif %}
