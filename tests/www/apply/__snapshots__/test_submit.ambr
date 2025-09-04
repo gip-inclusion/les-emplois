@@ -2757,6 +2757,7 @@
       dict({
         'origin': list([
           'IfNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
