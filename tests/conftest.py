@@ -141,14 +141,6 @@ def preload_contenttype_cache(django_db_setup, django_db_blocker):
         ContentType.objects.get_for_models(*apps.get_models())
 
 
-@pytest.fixture(autouse=True, scope="session")
-def preload_country_france(django_db_setup, django_db_blocker):
-    from itou.asp.models import Country
-
-    with django_db_blocker.unblock():
-        Country.france_id
-
-
 @pytest.fixture(autouse=True)
 def cache_per_test(settings):
     caches = copy.deepcopy(settings.CACHES)

@@ -1414,7 +1414,7 @@ class JobSeekerProfile(models.Model):
                     # when the form is validated. Hence we allow the edition of this field.
                     if (
                         self.birth_country_id is None
-                        or self.birth_country_id == Country.france_id
+                        or self.birth_country_id == Country.FRANCE_ID
                         and self.birth_place_id is None
                     ):
                         blocked_fields.discard("birth_country")
