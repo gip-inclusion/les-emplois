@@ -24,7 +24,6 @@ from itou.utils.types import InclusiveDateRange
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
 from tests.approvals.factories import (
     ApprovalFactory,
-    PoleEmploiApprovalFactory,
     ProlongationFactory,
     ProlongationRequestDenyInformationFactory,
     SuspensionFactory,
@@ -528,7 +527,6 @@ def test_populate_job_applications(snapshot):
 @pytest.mark.usefixtures("metabase")
 def test_populate_approvals(snapshot):
     approval = ApprovalFactory()
-    pe_approval = PoleEmploiApprovalFactory()
 
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="approvals")
@@ -553,24 +551,6 @@ def test_populate_approvals(snapshot):
                 None,
                 0,
                 hash_content(approval.number),
-                datetime.date(2023, 2, 1),
-            ),
-            (
-                pe_approval.pk,
-                "Agrément PE",
-                datetime.date(2023, 2, 2),
-                datetime.date(2025, 2, 1),
-                datetime.timedelta(days=730),
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                0,
-                hash_content(pe_approval.number),
                 datetime.date(2023, 2, 1),
             ),
         ]

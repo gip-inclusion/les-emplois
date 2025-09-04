@@ -28,7 +28,7 @@ from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
-from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest, Suspension
+from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 from itou.companies.enums import ContractType
@@ -541,19 +541,12 @@ class Command(BaseCommand):
         populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_approvals(self):
-        """
-        Populate approvals table by merging Approvals and PoleEmploiApprovals.
-        Some stats are available on both kinds of objects and some only
-        on Approvals.
-        We can link PoleEmploiApproval back to its PrescriberOrganization via
-        the SAFIR code.
-        """
         only_fields = {
             "number",  # get_approval_type
             "start_at",
             "end_at",
         }
-        queryset1 = (
+        queryset = (
             Approval.objects.select_related("user")
             .annotate(
                 last_hiring_company_pk=(
@@ -569,11 +562,7 @@ class Command(BaseCommand):
                 "origin",
             )
         )
-        queryset2 = PoleEmploiApproval.objects.filter(
-            start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
-        ).only(*only_fields, "pe_structure_code")
-
-        populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset1, queryset2])
+        populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()
