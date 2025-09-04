@@ -544,6 +544,14 @@ class EvaluatedSiae(models.Model):
 
     reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
 
+    final_state = models.CharField(
+        verbose_name="état final après la cloture de la campagne d'évaluation",
+        choices=evaluation_enums.EvaluatedSiaeFinalState.choices,
+        blank=True,
+        null=True,
+        editable=False,
+    )
+
     objects = EvaluatedSiaeQuerySet.as_manager()
 
     class Meta:
