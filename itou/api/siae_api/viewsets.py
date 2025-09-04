@@ -119,7 +119,7 @@ class RestrictedUserRateThrottle(UserRateThrottle):
     rate = "12/minute"
 
 
-class SiaeViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
+class SiaeViewSet(LoginNotRequiredMixin, viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     # Liste des SIAE
 
@@ -128,34 +128,8 @@ class SiaeViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyModelViewSet):
 
     Les coordonnées des centres-villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
 
-
-    Chaque SIAE est accompagnée d’un certain nombre de métadonnées :
-
-     - SIRET
-     - Type
-     - Raison Sociale
-     - Enseigne
-     - Site web
-     - Description de la SIAE
-     - Blocage de toutes les candidatures OUI/NON
-     - Adresse de la SIAE
-     - Complément d’adresse
-     - Code Postal
-     - Ville
-     - Département
-
-    Chaque SIAE peut proposer 0, 1 ou plusieurs postes. Pour chaque poste renvoyé, les métadonnées fournies sont :
-
-     - Appellation ROME
-     - Date de création
-     - Date de modification
-     - Recrutement ouvert OUI/NON
-     - Description du poste
-     - Appellation modifiée
-     - Type de contrat
-     - Nombre de postes ouverts
-     - Lieu
-     - Profil recherché
+    Chaque SIAE est accompagnée d’un certain nombre de métadonnées, et peut proposer 0, 1 ou plusieurs postes.
+    Pour le détail des métadonnées des SIAE et de leur postes, voir plus bas dans la section Responses
     """
 
     serializer_class = SiaeSerializer
