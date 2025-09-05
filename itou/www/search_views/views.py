@@ -117,9 +117,13 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         departments = self.request.GET.getlist("departments")
 
-        districts = []
+        districts = {}
         for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
-            districts += self.request.GET.getlist(f"districts_{department_with_district}")
+            name = f"districts_{department_with_district}"
+            if selected_districts := self.request.GET.getlist(name):
+                districts["get_name"] = name
+                districts["get_value"] = selected_districts
+                break
 
         if departments:
             siaes = siaes.filter(department__in=departments)
@@ -129,7 +133,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             )
 
         if districts:
-            siaes = siaes.filter(post_code__in=districts)
+            siaes = siaes.filter(post_code__in=districts["get_value"])
 
         domains = self.request.GET.getlist("domains")
         if domains:
