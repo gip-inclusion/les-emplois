@@ -20,6 +20,7 @@
                       hx-swap="outerHTML"
                       hx-vals='{"confirmed": "True"}'
                       hx-include="#acceptForm"
+                      class="js-prevent-multiple-submit"
                       {% matomo_event "candidature" "submit" "accept_application_confirmation" %}>
                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
                     <button class="btn btn-sm btn-primary">
