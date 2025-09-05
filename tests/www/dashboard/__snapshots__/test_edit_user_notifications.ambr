@@ -273,7 +273,7 @@
 # ---
 # name: test_employer_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 26,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -524,224 +524,21 @@
                  "communications_notificationrecord"."is_obsolete"
           FROM "communications_notificationrecord"
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
+                 AND "communications_notificationrecord"."notification_class" IN (%s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s))
+          ORDER BY "communications_notificationrecord"."category" ASC,
+                   "communications_notificationrecord"."name" ASC
         ''',
       }),
       dict({
@@ -1230,7 +1027,7 @@
 # ---
 # name: test_job_seeker_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 19,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -1377,134 +1174,16 @@
                  "communications_notificationrecord"."is_obsolete"
           FROM "communications_notificationrecord"
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
+                 AND "communications_notificationrecord"."notification_class" IN (%s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s))
+          ORDER BY "communications_notificationrecord"."category" ASC,
+                   "communications_notificationrecord"."name" ASC
         ''',
       }),
       dict({
@@ -1909,7 +1588,7 @@
 # ---
 # name: test_prescriber_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 20,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2107,134 +1786,16 @@
                  "communications_notificationrecord"."is_obsolete"
           FROM "communications_notificationrecord"
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
+                 AND "communications_notificationrecord"."notification_class" IN (%s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s))
+          ORDER BY "communications_notificationrecord"."category" ASC,
+                   "communications_notificationrecord"."name" ASC
         ''',
       }),
       dict({
@@ -2716,7 +2277,7 @@
 # ---
 # name: test_solo_adviser_create_update_notification_settings[view queries - disable all notifications]
   dict({
-    'num_queries': 19,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2914,116 +2475,15 @@
                  "communications_notificationrecord"."is_obsolete"
           FROM "communications_notificationrecord"
           WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EditUserNotificationForm.save[www/dashboard/forms.py]',
-          'edit_user_notifications[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "communications_notificationrecord"."id",
-                 "communications_notificationrecord"."notification_class",
-                 "communications_notificationrecord"."name",
-                 "communications_notificationrecord"."category",
-                 "communications_notificationrecord"."can_be_disabled",
-                 "communications_notificationrecord"."is_obsolete"
-          FROM "communications_notificationrecord"
-          WHERE (NOT ("communications_notificationrecord"."is_obsolete")
-                 AND "communications_notificationrecord"."notification_class" = %s)
-          LIMIT 21
+                 AND "communications_notificationrecord"."notification_class" IN (%s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s,
+                                                                                  %s))
+          ORDER BY "communications_notificationrecord"."category" ASC,
+                   "communications_notificationrecord"."name" ASC
         ''',
       }),
       dict({
