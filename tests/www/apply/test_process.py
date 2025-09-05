@@ -1486,130 +1486,109 @@ class TestProcessViews:
         assert mail_to_other_employer.subject == snapshot(name="add_to_pool_email_to_proxy_subject")
         assert mail_to_other_employer.body == snapshot(name="add_to_pool_email_to_proxy_body")
 
-    def test_postpone_from_prescriber(self, client, snapshot, mailoutbox, subtests):
+    def test_postpone_from_prescriber(self, client, snapshot, mailoutbox):
         """Ensure that the `postpone` transition is triggered."""
-
-        states = [
-            job_applications_enums.JobApplicationState.PROCESSING,
-            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
-        ]
+        initial_state = random.choice(JobApplicationWorkflow.CAN_BE_POSTPONED_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
-        for state in states:
-            mailoutbox.clear()
-            with subtests.test(state=state.label):
-                job_application = JobApplicationFactory(
-                    job_seeker=job_seeker,
-                    to_company=company,
-                    sent_by_authorized_prescriber_organisation=True,
-                    state=state,
-                )
-                employer = job_application.to_company.members.first()
-                client.force_login(employer)
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sent_by_authorized_prescriber_organisation=True,
+            state=initial_state,
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
 
-                url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = client.get(url)
-                assert response.status_code == 200
+        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assert response.status_code == 200
 
-                post_data = {"answer": ""}
-                response = client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                assertRedirects(response, next_url)
+        post_data = {"answer": ""}
+        response = client.post(url, data=post_data)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(response, next_url)
 
-                job_application = JobApplication.objects.get(pk=job_application.pk)
-                assert job_application.state.is_postponed
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.state.is_postponed
 
-                [mail_to_job_seeker, mail_to_prescriber] = mailoutbox
-                assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
-                assert mail_to_prescriber.to == [job_application.sender.email]
-                assert mail_to_prescriber.subject == snapshot(name="postpone_email_to_proxy_subject")
-                assert mail_to_prescriber.body == snapshot(name="postpone_email_to_proxy_body")
+        [mail_to_job_seeker, mail_to_prescriber] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
+        assert mail_to_prescriber.to == [job_application.sender.email]
+        assert mail_to_prescriber.subject == snapshot(name="postpone_email_to_proxy_subject")
+        assert mail_to_prescriber.body == snapshot(name="postpone_email_to_proxy_body")
 
-    def test_postpone_from_job_seeker(self, client, snapshot, mailoutbox, subtests):
+    def test_postpone_from_job_seeker(self, client, snapshot, mailoutbox):
         """Ensure that the `postpone` transition is triggered."""
-
-        states = [
-            job_applications_enums.JobApplicationState.PROCESSING,
-            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
-        ]
+        initial_state = random.choice(JobApplicationWorkflow.CAN_BE_POSTPONED_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
-        for state in states:
-            mailoutbox.clear()
-            with subtests.test(state=state.label):
-                job_application = JobApplicationFactory(
-                    job_seeker=job_seeker,
-                    to_company=company,
-                    sender_kind=SenderKind.JOB_SEEKER,
-                    sender=job_seeker,
-                    state=state,
-                )
-                employer = job_application.to_company.members.first()
-                client.force_login(employer)
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sender_kind=SenderKind.JOB_SEEKER,
+            sender=job_seeker,
+            state=initial_state,
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
 
-                url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = client.get(url)
-                assert response.status_code == 200
+        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assert response.status_code == 200
 
-                post_data = {"answer": "On vous rappellera."}
-                response = client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                assertRedirects(response, next_url)
+        post_data = {"answer": "On vous rappellera."}
+        response = client.post(url, data=post_data)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(response, next_url)
 
-                job_application = JobApplication.objects.get(pk=job_application.pk)
-                assert job_application.state.is_postponed
-                [mail_to_job_seeker] = mailoutbox
-                assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.state.is_postponed
+        [mail_to_job_seeker] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
 
-    def test_postpone_from_employer_orienter(self, client, snapshot, mailoutbox, subtests):
+    def test_postpone_from_employer_orienter(self, client, snapshot, mailoutbox):
         """Ensure that the `postpone` transition is triggered."""
-
-        states = [
-            job_applications_enums.JobApplicationState.PROCESSING,
-            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
-        ]
+        initial_state = random.choice(JobApplicationWorkflow.CAN_BE_POSTPONED_STATES)
 
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
 
-        for state in states:
-            mailoutbox.clear()
-            with subtests.test(state=state.label):
-                job_application = JobApplicationFactory(
-                    job_seeker=job_seeker,
-                    to_company=company,
-                    sent_by_another_employer=True,
-                    state=state,
-                )
-                employer = job_application.to_company.members.first()
-                client.force_login(employer)
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sent_by_another_employer=True,
+            state=initial_state,
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
 
-                url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
-                response = client.get(url)
-                assert response.status_code == 200
+        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assert response.status_code == 200
 
-                post_data = {"answer": "On vous rappellera."}
-                response = client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                assertRedirects(response, next_url)
+        post_data = {"answer": "On vous rappellera."}
+        response = client.post(url, data=post_data)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(response, next_url)
 
-                job_application = JobApplication.objects.get(pk=job_application.pk)
-                assert job_application.state.is_postponed
-                [mail_to_job_seeker, mail_to_other_employer] = mailoutbox
-                assert mail_to_job_seeker.to == [job_application.job_seeker.email]
-                assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
-                assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
-                assert mail_to_other_employer.to == [job_application.sender.email]
-                assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
-                assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.state.is_postponed
+        [mail_to_job_seeker, mail_to_other_employer] = mailoutbox
+        assert mail_to_job_seeker.to == [job_application.job_seeker.email]
+        assert mail_to_job_seeker.subject == snapshot(name="postpone_email_to_job_seeker_subject")
+        assert mail_to_job_seeker.body == snapshot(name="postpone_email_to_job_seeker_body")
+        assert mail_to_other_employer.to == [job_application.sender.email]
+        assert mail_to_other_employer.subject == snapshot(name="postpone_email_to_proxy_subject")
+        assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
 
     def test_eligibility(self, client):
         """Test eligibility."""
