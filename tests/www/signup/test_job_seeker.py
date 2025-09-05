@@ -18,7 +18,7 @@ from itou.utils import constants as global_constants
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
-from tests.openid_connect.france_connect.tests import FC_USERINFO_V2, mock_oauth_dance_v2
+from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance_v2
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
 
@@ -501,7 +501,7 @@ class TestJobSeekerSignup:
 
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
         mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
-        job_seeker = User.objects.get(email=FC_USERINFO_V2["email"])
+        job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
 
@@ -545,7 +545,7 @@ class TestJobSeekerSignup:
 
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
         mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
-        job_seeker = User.objects.get(email=FC_USERINFO_V2["email"])
+        job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
 
