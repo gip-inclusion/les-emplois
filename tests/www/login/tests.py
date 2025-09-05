@@ -22,7 +22,7 @@ from itou.utils.urls import add_url_params
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
-from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance_v2
+from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -314,7 +314,7 @@ class TestJobSeekerPreLogin:
         )
 
         # Temporary NIR is not stored with user information.
-        response = mock_oauth_dance_v2(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance(client, expected_route="login:job_seeker")
         assertMessages(
             response,
             [
