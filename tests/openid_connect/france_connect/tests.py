@@ -501,7 +501,7 @@ class TestFranceConnect:
         url = reverse("france_connect:logout")
         response = client.get(url, data={"id_token": "123", "state": "some_state"})
         expected_url = (
-            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT_V2}?id_token_hint=123&state=some_state&"
+            f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?id_token_hint=123&state=some_state&"
             "post_logout_redirect_uri=http%3A%2F%2Flocalhost:8000%2Fsearch%2Femployers"
         )
         assertRedirects(response, expected_url, fetch_redirect_response=False)

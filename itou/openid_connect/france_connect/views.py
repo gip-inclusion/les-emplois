@@ -233,5 +233,5 @@ def france_connect_logout(request):
         "state": state,
         "post_logout_redirect_uri": get_absolute_url(reverse("search:employers_home")),
     }
-    complete_url = f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT_V2}?{urlencode(params)}"
+    complete_url = f"{constants.FRANCE_CONNECT_ENDPOINT_LOGOUT}?{urlencode(params)}"
     return HttpResponseRedirect(complete_url)
