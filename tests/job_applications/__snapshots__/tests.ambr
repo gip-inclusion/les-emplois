@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestJobApplicationNotifications.test_refuse[False-False][job_seeker_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-False][job_seeker_email]
   '''
   Votre candidature chez Acme inc. n'a malheureusement pas pu aboutir.
   
@@ -15,7 +15,25 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestJobApplicationNotifications.test_refuse[False-True][job_seeker_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-False][prescriber_email]
+  '''
+  La candidature de Jane DOE envoyée par Pierre DUPONT chez Acme inc. n'a malheureusement pas pu aboutir.
+  
+  *Motif de refus non transmis au candidat* :
+  
+  Candidat ne s’étant pas présenté à l’entretien
+  
+  *Réponse de l'entreprise transmise au candidat* :
+  
+  Pas venu
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-True][job_seeker_email]
   '''
   Votre candidature chez Acme inc. n'a malheureusement pas pu aboutir.
   
@@ -31,7 +49,7 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestJobApplicationNotifications.test_refuse[False-True][prescriber_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[False-True][prescriber_email]
   '''
   La candidature de Jane DOE envoyée par Pierre DUPONT chez Acme inc. n'a malheureusement pas pu aboutir.
   
@@ -53,7 +71,7 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestJobApplicationNotifications.test_refuse[True-False][job_seeker_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-False][job_seeker_email]
   '''
   Votre candidature chez Acme inc. n'a malheureusement pas pu aboutir.
   
@@ -73,7 +91,25 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestJobApplicationNotifications.test_refuse[True-True][job_seeker_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-False][prescriber_email]
+  '''
+  La candidature de Jane DOE envoyée par Pierre DUPONT chez Acme inc. n'a malheureusement pas pu aboutir.
+  
+  *Motif de refus transmis au candidat* :
+  
+  Candidat ne s’étant pas présenté à l’entretien
+  
+  *Réponse de l'entreprise transmise au candidat* :
+  
+  Pas venu
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-True][job_seeker_email]
   '''
   Votre candidature chez Acme inc. n'a malheureusement pas pu aboutir.
   
@@ -93,7 +129,7 @@
   http://localhost:8000/
   '''
 # ---
-# name: TestJobApplicationNotifications.test_refuse[True-True][prescriber_email]
+# name: TestJobApplicationNotifications.test_refuse_with_prescriber[True-True][prescriber_email]
   '''
   La candidature de Jane DOE envoyée par Pierre DUPONT chez Acme inc. n'a malheureusement pas pu aboutir.
   
