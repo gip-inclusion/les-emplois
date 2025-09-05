@@ -146,7 +146,7 @@ def preload_country_france(django_db_setup, django_db_blocker):
     from itou.asp.models import Country
 
     with django_db_blocker.unblock():
-        Country.france_id
+        Country.FRANCE_ID
 
 
 @pytest.fixture(autouse=True)

@@ -1070,7 +1070,7 @@ class TestApplyAsAuthorizedPrescriber:
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
@@ -1360,7 +1360,7 @@ class TestApplyAsAuthorizedPrescriber:
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
@@ -1845,7 +1845,7 @@ class TestApplyAsPrescriber:
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
@@ -2435,7 +2435,7 @@ class TestApplyAsCompany:
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
             "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-            "birth_country": Country.france_id,
+            "birth_country": Country.FRANCE_ID,
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
@@ -2871,7 +2871,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
 
         birth_place_id = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id
-        birth_country_id = Country.france_id
+        birth_country_id = Country.FRANCE_ID
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
@@ -3923,7 +3923,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             prescriber,
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -3951,7 +3951,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             authorized_prescriber,
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -3977,7 +3977,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             self.company.members.first(),
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -4022,7 +4022,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
                 "lack_of_nir": True,
                 "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
         # Check that we could update its NIR infos
@@ -4061,7 +4061,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             prescriber,
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -4089,7 +4089,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             authorized_prescriber,
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -4115,7 +4115,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             self.company.members.first(),
             extra_post_data_1={
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
 
@@ -4160,7 +4160,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
                 "lack_of_nir": True,
                 "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-                "birth_country": Country.france_id,
+                "birth_country": Country.FRANCE_ID,
             },
         )
         # Check that we could update its NIR infos
@@ -4308,7 +4308,7 @@ def test_detect_existing_job_seeker(client):
         "lack_of_nir_reason": "",
         "lack_of_nir": False,
         "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
-        "birth_country": Country.france_id,
+        "birth_country": Country.FRANCE_ID,
     }
     response = client.post(next_url, data=post_data)
     assertContains(

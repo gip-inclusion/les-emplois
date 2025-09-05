@@ -902,6 +902,22 @@ class TestJobSeekerProfileModel:
         profile = JobSeekerFactory(born_outside_france=True).jobseeker_profile
         assert profile._clean_birth_fields() is None
 
+    @pytest.mark.parametrize(
+        "factory_kwargs",
+        [
+            {"born_in_france": True, "jobseeker_profile__birth_place": None},
+            {"born_outside_france": True, "with_birth_place": True},
+            {"jobseeker_profile__birth_country": None, "with_birth_place": True},
+        ],
+    )
+    def test_valid_birth_place_and_country_constraint(self, factory_kwargs):
+        with pytest.raises(
+            IntegrityError,
+            match='new row for relation ".*" violates check constraint "jobseekerprofile_birth_country_and_place"',
+        ):
+            obj = JobSeekerFactory(**factory_kwargs)
+            print(repr(obj.jobseeker_profile.birth_country), repr(obj.jobseeker_profile.birth_place))
+
 
 def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()

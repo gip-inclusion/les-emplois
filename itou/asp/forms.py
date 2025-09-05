@@ -28,7 +28,7 @@ class BirthPlaceModelForm(forms.ModelForm):
                 "data-minimum-input-length": 1,
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
-                "data-target-value": SimpleLazyObject(lambda: f"{Country.france_id}"),
+                "data-target-value": SimpleLazyObject(lambda: f"{Country.FRANCE_ID}"),
             }
         ),
     )
