@@ -215,12 +215,17 @@ class EditUserNotificationForm(forms.Form):
 
     def save(self):
         notification_settings, _ = NotificationSettings.get_or_create(self.user, self.structure)
-        disabled_notifications = []
 
-        for field_name, value in self.cleaned_data.items():
-            if field_name.startswith("category-"):
-                continue
-            if not value:
-                disabled_notifications.append(NotificationRecord.objects.get(notification_class=field_name))
+        disabled_field_names = [
+            field_name
+            for field_name, value in self.cleaned_data.items()
+            if not value and not field_name.startswith("category-")
+        ]
+        if disabled_field_names:
+            disabled_notifications = list(
+                NotificationRecord.objects.filter(notification_class__in=disabled_field_names)
+            )
+        else:
+            disabled_notifications = []
 
         notification_settings.disabled_notifications.set(disabled_notifications)
