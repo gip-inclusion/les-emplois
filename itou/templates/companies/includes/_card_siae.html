@@ -19,6 +19,15 @@
                         </span>
                     {% endif %}
                     <h3>{{ siae.display_name }}</h3>
+                    <h5>
+                        job_app_score=={{ siae.job_app_score|floatformat:2 }}
+                        / computed_job_app_score=={{ siae.computed_job_app_score|floatformat:2 }}
+                        <br>
+                        count_recent_received_job_apps=={{ siae.count_recent_received_job_apps }}
+                        / count_active_job_descriptions=={{ siae.count_active_job_descriptions }}
+                        <br>
+                        spontaneous_applications_open_since=={{ siae.is_open_to_spontaneous_applications }}
+                    </h5>
                 </div>
             </div>
             {% if siae.kind in ea_eatt_kinds %}
