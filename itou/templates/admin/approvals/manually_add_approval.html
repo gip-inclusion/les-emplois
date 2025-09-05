@@ -1,44 +1,59 @@
 {% extends "admin/change_form.html" %}
 
 {% block content %}
-    <form method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% if job_application.job_seeker.has_valid_approval %}
+        <h2 class="h1">Délivrance impossible</h2>
+        <p>
+            Un PASS IAE valide existe pour ce candidat :
+            <a href="{% url "admin:approvals_approval_change" job_application.job_seeker.latest_approval.pk %}">{{ job_application.job_seeker.latest_approval.number }}</a>
+        </p>
+        <p>
+            Vérifiez s’il est possible d’affecter ce PASS à la candidature.
+            Il faut que les dates du PASS et les dates de contrat qui figurent dans la candidature en attente de PASS soient cohérentes.
+            Dans ce cas, ajoutez la référence du PASS dans la candidature et cochez la case PASS IAE envoyé par email.
+        </p>
+        <p>En cas de difficultés, contactez supportix.</p>
+        <p>Ces consignes seront enrichies au fur et à mesure des cas rencontrés ;)</p>
+    {% else %}
+        <form method="post" id="{{ opts.model_name }}_form" novalidate>
 
-        {% if errors %}
-            <p class="errornote">
-                {% if errors|length == 1 %}
-                    Please correct the error below.
-                {% else %}
-                    Please correct the errors below.
-                {% endif %}
-            </p>
-            {{ adminform.form.non_field_errors }}
-        {% endif %}
-
-        {% csrf_token %}
-
-        <div>
-
-            {% block field_sets %}
-                {% for fieldset in adminform %}
-                    {% include "admin/includes/fieldset.html" %}
-                {% endfor %}
-            {% endblock %}
-
-            <div class="submit-row">
-
-                <p class="deletelink-box">
-                    <a class="deletelink" href="{% url "admin:approvals_approval_manually_refuse_approval" job_application.id %}">
-                        Refuser
-                    </a>
+            {% if errors %}
+                <p class="errornote">
+                    {% if errors|length == 1 %}
+                        Please correct the error below.
+                    {% else %}
+                        Please correct the errors below.
+                    {% endif %}
                 </p>
+                {{ adminform.form.non_field_errors }}
+            {% endif %}
 
-                <input type="submit" value="Enregistrer et envoyer par email" class="default">
+            {% csrf_token %}
+
+            <div>
+
+                {% block field_sets %}
+                    {% for fieldset in adminform %}
+                        {% include "admin/includes/fieldset.html" %}
+                    {% endfor %}
+                {% endblock %}
+
+                <div class="submit-row">
+
+                    <p class="deletelink-box">
+                        <a class="deletelink" href="{% url "admin:approvals_approval_manually_refuse_approval" job_application.id %}">
+                            Refuser
+                        </a>
+                    </p>
+
+                    <input type="submit" value="Enregistrer et envoyer par email" class="default">
+
+                </div>
 
             </div>
 
-        </div>
-
-    </form>
+        </form>
+    {% endif %}
 
     {% include "admin/approvals/includes/job_application_details.html" %}
 

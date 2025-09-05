@@ -816,6 +816,8 @@ class TestAutomaticApprovalAdminViews:
 
 class TestCustomApprovalAdminViews:
     def test_manually_add_approval(self, client, mailoutbox):
+        MANUALLY_DELIVER_BUTTON_TEXT = "Enregistrer et envoyer par email"
+
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
@@ -852,6 +854,7 @@ class TestCustomApprovalAdminViews:
             "start_at": job_application.hiring_start_at,
             "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
         }
+        assertContains(response, MANUALLY_DELIVER_BUTTON_TEXT)
 
         # Without an eligibility diangosis on the job application.
         eligibility_diagnosis = job_application.eligibility_diagnosis
@@ -871,6 +874,20 @@ class TestCustomApprovalAdminViews:
         # Put back the eligibility diangosis
         job_application.eligibility_diagnosis = eligibility_diagnosis
         job_application.save()
+
+        # With a valid approval the form is disabled
+        other_job_application = JobApplicationFactory(job_seeker=job_seeker, with_approval=True)
+        response = client.get(url, follow=True)
+        assertNotContains(response, MANUALLY_DELIVER_BUTTON_TEXT)
+        post_data = {
+            "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
+            "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 403
+
+        # Remove the valid approval
+        other_job_application.approval.delete()
 
         # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
         # être délivrés à la main dans l'admin.
@@ -937,19 +954,27 @@ class TestCustomApprovalAdminViews:
 
         add_url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
         refuse_url = reverse("admin:approvals_approval_manually_refuse_approval", args=[job_application.pk])
+        post_data = {"confirm": "yes"}
 
         # Not enough perms.
-        user = JobSeekerFactory()
-        client.force_login(user)
-        response = client.get(refuse_url)
-        assert response.status_code == 302
-
-        # With good perms.
         user = ItouStaffFactory()
+        client.force_login(user)
+        response = client.post(refuse_url, data=post_data)
+        assert response.status_code == 403
+
+        # Set good perms.
         client.force_login(user)
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="handle_manual_approval_requests")
         user.user_permissions.add(permission)
+
+        # With a valid approval
+        other_job_application = JobApplicationFactory(job_seeker=job_seeker, with_approval=True)
+        response = client.post(refuse_url, data=post_data)
+        assert response.status_code == 403
+        other_job_application.approval.delete()  # Remove the valid approval
+
+        # Nominal case
         response = client.get(add_url)
         assertContains(response, refuse_url)
 
