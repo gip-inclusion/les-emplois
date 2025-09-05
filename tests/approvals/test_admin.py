@@ -1,25 +1,46 @@
-from datetime import UTC, datetime, timedelta
+import uuid
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.admin import helpers
+from django.contrib.admin import AdminSite, helpers
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertRedirects,
+)
 
+from itou.approvals.admin import JobApplicationInline
+from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.enums import Origin, ProlongationReason
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.job_applications.enums import JobApplicationState
+from itou.companies.enums import CompanyKind
+from itou.employee_record.enums import Status
+from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.models import JobApplication
+from itou.users.enums import LackOfPoleEmploiId
 from itou.users.models import User
 from itou.utils.admin import get_admin_view_link
 from itou.utils.models import PkSupportRemark
-from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    CancelledApprovalFactory,
+    ProlongationFactory,
+    SuspensionFactory,
+)
 from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
-from tests.job_applications.factories import JobApplicationFactory
+from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -729,3 +750,259 @@ def test_suspension_form(admin_client):
     assert suspension.start_at == new_start_date.date()
     assert suspension.end_at == new_end_date.date()
     assert suspension.updated_at == timezone.now()
+
+
+class TestAutomaticApprovalAdminViews:
+    def test_create_is_forbidden(self, client):
+        """
+        We cannot create an approval starting with ASP_ITOu_PREFIX
+        """
+        user = ItouStaffFactory()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
+        user.user_permissions.add(permission)
+
+        client.force_login(user)
+
+        url = reverse("admin:approvals_approval_add")
+
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+        post_data = {
+            "start_at": "01/01/2100",
+            "end_at": "31/12/2102",
+            "user": diagnosis.job_seeker_id,
+            "eligibility_diagnosis": diagnosis.pk,
+            "origin": Origin.DEFAULT,  # Will be overriden
+            "number": "XXXXX1234567",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 403
+
+    def test_edit_approval_with_an_existing_employee_record(self, client):
+        user = ItouStaffFactory()
+        user.user_permissions.add(
+            Permission.objects.get(
+                content_type=ContentType.objects.get_for_model(Approval),
+                codename="change_approval",
+            )
+        )
+        client.force_login(user)
+
+        approval = ApprovalFactory()
+        employee_record = EmployeeRecordFactory(approval_number=approval.number, status=Status.PROCESSED)
+
+        response = client.post(
+            reverse("admin:approvals_approval_change", args=[approval.pk]),
+            data=model_to_dict(
+                approval,
+                fields={
+                    "start_at",
+                    "end_at",
+                    "user",
+                    "number",
+                    "origin",
+                    "eligibility_diagnosis",
+                },
+            ),
+            follow=True,
+        )
+        assert response.status_code == 200
+        assert (
+            f"Il existe une ou plusieurs fiches salarié bloquantes "
+            f'(<a href="/admin/employee_record/employeerecord/{employee_record.pk}/change/">{employee_record.pk}</a>) '
+            f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
+        )
+
+
+class TestCustomApprovalAdminViews:
+    def test_manually_add_approval(self, client, mailoutbox):
+        # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
+        # with a manual verification.
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            approval=None,
+            approval_number_sent_by_email=False,
+            with_iae_eligibility_diagnosis=True,
+        )
+        job_application.accept(user=job_application.to_company.members.first())
+
+        url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
+
+        # Not enough perms.
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(url)
+        assert response.status_code == 302
+
+        # With good perms.
+        user = ItouStaffFactory()
+        client.force_login(user)
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="handle_manual_approval_requests")
+        user.user_permissions.add(permission)
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["form"].initial == {
+            "start_at": job_application.hiring_start_at,
+            "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
+        }
+
+        # Without an eligibility diangosis on the job application.
+        eligibility_diagnosis = job_application.eligibility_diagnosis
+        job_application.eligibility_diagnosis = None
+        job_application.save()
+        response = client.get(url, follow=True)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostic d'éligibilité.",
+                )
+            ],
+        )
+
+        # Put back the eligibility diangosis
+        job_application.eligibility_diagnosis = eligibility_diagnosis
+        job_application.save()
+
+        # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
+        # être délivrés à la main dans l'admin.
+        post_data = {
+            "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
+            "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
+            "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert "number" in response.context["form"].errors, ApprovalAdminForm.ERROR_NUMBER
+
+        # Create an approval.
+        post_data = {
+            "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
+            "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
+        }
+        response = client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        # An approval should have been created, attached to the job
+        # application, and sent by email.
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.approval_number_sent_by_email
+        assert job_application.approval_number_sent_at is not None
+        assert job_application.approval_manually_delivered_by == user
+        assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
+
+        approval = job_application.approval
+        assert approval.created_by == user
+        assert approval.user == job_application.job_seeker
+        assert approval.origin == Origin.ADMIN
+        assert approval.eligibility_diagnosis == job_application.eligibility_diagnosis
+
+        assert approval.origin_sender_kind == SenderKind.JOB_SEEKER
+        assert approval.origin_siae_kind == job_application.to_company.kind
+        assert approval.origin_siae_siret == job_application.to_company.siret
+        assert not approval.origin_prescriber_organization_kind
+
+        assert len(mailoutbox) == 1
+        email = mailoutbox[0]
+        assert approval.number_with_spaces in email.body
+
+    def test_manually_refuse_approval(self, client, mailoutbox, snapshot):
+        # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
+        # with a manual verification.
+        job_seeker = JobSeekerFactory(
+            first_name="Jean",
+            last_name="Dupont",
+            jobseeker_profile__nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            pk=uuid.UUID("00000000-1111-2222-3333-444444444444"),
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            approval=None,
+            approval_number_sent_by_email=False,
+            with_iae_eligibility_diagnosis=True,
+        )
+        employer = job_application.to_company.members.first()
+        job_application.accept(user=employer)
+
+        add_url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
+        refuse_url = reverse("admin:approvals_approval_manually_refuse_approval", args=[job_application.pk])
+
+        # Not enough perms.
+        user = JobSeekerFactory()
+        client.force_login(user)
+        response = client.get(refuse_url)
+        assert response.status_code == 302
+
+        # With good perms.
+        user = ItouStaffFactory()
+        client.force_login(user)
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="handle_manual_approval_requests")
+        user.user_permissions.add(permission)
+        response = client.get(add_url)
+        assertContains(response, refuse_url)
+
+        response = client.get(refuse_url)
+        assertContains(response, "PASS IAE refusé pour")
+
+        post_data = {"confirm": "yes"}
+        response = client.post(refuse_url, data=post_data)
+        assert response.status_code == 302
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.approval_manually_refused_by == user
+        assert job_application.approval_manually_refused_at is not None
+        assert job_application.approval is None
+
+        [email] = mailoutbox
+        assert email.to == [employer.email]
+        assert email.subject == snapshot(name="email_subject")
+        assert email.body == snapshot(name="email_body")
+
+    def test_employee_record_status(self, subtests):
+        inline = JobApplicationInline(JobApplication, AdminSite())
+        # When an employee record exists
+        employee_record = EmployeeRecordFactory()
+        url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
+        msg = inline.employee_record_status(employee_record.job_application)
+        assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
+
+        # When employee record creation is disabled for that job application
+        job_application = JobApplicationFactory(create_employee_record=False)
+        msg = inline.employee_record_status(job_application)
+        assert msg == "Non proposé à la création"
+
+        # When hiring start date is before employee record availability date
+        job_application = JobApplicationFactory(hiring_start_at=date(2021, 9, 26))
+        msg = inline.employee_record_status(job_application)
+        assert msg == "Date de début du contrat avant l'interopérabilité"
+
+        # When employee records are allowed (or not) for the SIAE
+        for kind in CompanyKind:
+            with subtests.test("SIAE doesn't use employee records", kind=kind.name):
+                job_application = JobApplicationFactory(with_approval=True, to_company__kind=kind)
+                msg = inline.employee_record_status(job_application)
+                if not job_application.to_company.can_use_employee_record:
+                    assert msg == "La SIAE ne peut pas utiliser la gestion des fiches salarié"
+                else:
+                    assert msg == "En attente de création"
+
+        # When an employee record already exists for the candidate
+        employee_record = EmployeeRecordFactory(status=Status.READY)
+        job_application = JobApplicationFactory(
+            to_company=employee_record.job_application.to_company,
+            approval=employee_record.job_application.approval,
+        )
+        msg = inline.employee_record_status(job_application)
+        assert msg == "Une fiche salarié existe déjà pour ce candidat"
