@@ -22,7 +22,7 @@ from itou.utils.urls import add_url_params
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView
-from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
+from tests.openid_connect.france_connect.tests import FC_USERINFO_V2, mock_oauth_dance_v2
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -306,15 +306,15 @@ class TestJobSeekerPreLogin:
         The job seeker has 2 accounts : a django one, and a FC one, with 2 different email adresses.
         Then he changes the email adresse on FC to use the django account email.
         """
-        JobSeekerFactory(email=FC_USERINFO["email"], identity_provider=IdentityProvider.DJANGO)
+        JobSeekerFactory(email=FC_USERINFO_V2["email"], identity_provider=IdentityProvider.DJANGO)
         JobSeekerFactory(
-            username=FC_USERINFO["sub"],
+            username=FC_USERINFO_V2["sub"],
             email="seconde@email.com",
             identity_provider=IdentityProvider.FRANCE_CONNECT,
         )
 
         # Temporary NIR is not stored with user information.
-        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        response = mock_oauth_dance_v2(client, expected_route="login:job_seeker")
         assertMessages(
             response,
             [
