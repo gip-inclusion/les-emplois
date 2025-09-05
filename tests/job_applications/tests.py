@@ -1003,18 +1003,18 @@ class TestJobApplicationNotifications:
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
         assert "Date de fin du contrat : Non renseigné" in email.body
 
-    @pytest.mark.parametrize("is_sent_by_proxy", [True, False])
+    @pytest.mark.parametrize("authorized_prescriber", [True, False])
     @pytest.mark.parametrize("is_shared_with_job_seeker", [True, False])
-    def test_refuse(self, is_sent_by_proxy, is_shared_with_job_seeker, snapshot):
+    def test_refuse_with_prescriber(self, authorized_prescriber, is_shared_with_job_seeker, snapshot):
         extra_kwargs = {}
-        if is_sent_by_proxy:
+        if authorized_prescriber:
             extra_kwargs = {
                 "sender_prescriber_organization__membership__user__for_snapshot": True,
                 "answer_to_prescriber": "Le candidat n'est pas venu.",
             }
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=is_sent_by_proxy,
+            sent_by_authorized_prescriber_organisation=authorized_prescriber,
             refusal_reason_shared_with_job_seeker=is_shared_with_job_seeker,
             refusal_reason=RefusalReason.DID_NOT_COME_TO_INTERVIEW,
             answer="Pas venu",
@@ -1028,12 +1028,11 @@ class TestJobApplicationNotifications:
         assert len(email.to) == 1
         assert email.body == snapshot(name="job_seeker_email")
 
-        if is_sent_by_proxy:
-            # Notification content sent to authorized prescriber.
-            email = job_application.notifications_refuse_for_proxy.build()
-            assert job_application.sender.email in email.to
-            assert len(email.to) == 1
-            assert email.body == snapshot(name="prescriber_email")
+        # Notification content sent to prescriber.
+        email = job_application.notifications_refuse_for_proxy.build()
+        assert job_application.sender.email in email.to
+        assert len(email.to) == 1
+        assert email.body == snapshot(name="prescriber_email")
 
     def test_refuse_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
         # When sent by authorized prescriber.
