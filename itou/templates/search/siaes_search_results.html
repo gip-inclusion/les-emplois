@@ -16,10 +16,18 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
             <h1>Rechercher un emploi inclusif</h1>
         {% endfragment %}
+        {% if request.user.is_authenticated and city %}
+            {% fragment as c_title__cta %}
+                <button class="btn btn-lg btn-secondary btn-ico" type="button" data-bs-toggle="modal" data-bs-target="#newSavedSearchModal">
+                    <i class="ri-star-line fw-medium" aria-hidden="true"></i>
+                    <span>Enregistrer cette recherche</span>
+                </button>
+            {% endfragment %}
+        {% endif %}
     {% endcomponent_title %}
 {% endblock %}
 
@@ -32,6 +40,7 @@
             </form>
         </div>
     </div>
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches only %}
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endblock %}
 
@@ -39,8 +48,20 @@
     {% include "search/includes/siaes_search_content.html" %}
 {% endblock %}
 
+{% block modals %}
+    {% if new_saved_search_form %}
+        <div class="modal fade" id="newSavedSearchModal" tabindex="-1" aria-labelledby="newSavedSearchModalLabel" aria-modal="true" role="dialog">
+            {% include "search/includes/new_saved_search_modal_content.html" with form=new_saved_search_form request=request csrf_token=csrf_token only %}
+        </div>
+    {% endif %}
+    <div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+        {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token only %}
+    </div>
+{% endblock %}
+
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <script src='{% static "js/sliding_search.js"%}'></script>
 {% endblock %}

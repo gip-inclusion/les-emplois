@@ -202,6 +202,9 @@
                                     </form>
                                 </div>
                             </div>
+                            {% if saved_searches %}
+                                {% include "search/includes/saved_searches.html" with saved_searches=saved_searches only %}
+                            {% endif %}
                             <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
                                 {% if user.is_staff %}
                                     {% include "dashboard/includes/admin_card.html" %}
@@ -278,7 +281,14 @@
     </section>
 {% endblock %}
 
+{% block modals %}
+    <div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+        {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token only %}
+    </div>
+{% endblock %}
+
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/sliding_search.js"%}'></script>
 {% endblock %}

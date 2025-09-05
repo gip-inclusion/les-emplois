@@ -24,4 +24,5 @@
     {% include "search/includes/siaes_search_subtitle.html" %}
     {% include "search/includes/siaes_search_top.html" %}
     {% include "search/includes/siaes_search_tabs.html" %}
+    {% include "search/includes/new_saved_search_modal_content.html" with form=new_saved_search_form request=request csrf_token=csrf_token only %}
 {% endif %}

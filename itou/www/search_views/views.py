@@ -5,8 +5,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
+from django.template.response import TemplateResponse
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
@@ -15,11 +17,18 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
+from itou.search.models import SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
+from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
+from itou.www.search_views.forms import (
+    JobDescriptionSearchForm,
+    NewSavedSearchForm,
+    PrescriberSearchForm,
+    SiaeSearchForm,
+)
 
 
 # INSEE codes for the french cities that do have districts.
@@ -50,6 +59,9 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         return self.post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        saved_searches = (
+            SavedSearch.objects.filter(user=self.request.user) if self.request.user.is_authenticated else None
+        )
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
@@ -59,6 +71,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "job_descriptions_count": 0,
             "siaes_count": 0,
             "results_page": [],
+            "saved_searches": saved_searches,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
@@ -117,9 +130,13 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         departments = self.request.GET.getlist("departments")
 
-        districts = []
+        districts = {}
         for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
-            districts += self.request.GET.getlist(f"districts_{department_with_district}")
+            name = f"districts_{department_with_district}"
+            if selected_districts := self.request.GET.getlist(name):
+                districts["get_name"] = name
+                districts["get_value"] = selected_districts
+                break
 
         if departments:
             siaes = siaes.filter(department__in=departments)
@@ -129,7 +146,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             )
 
         if districts:
-            siaes = siaes.filter(post_code__in=districts)
+            siaes = siaes.filter(post_code__in=districts["get_value"])
 
         domains = self.request.GET.getlist("domains")
         if domains:
@@ -149,15 +166,31 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
 
         results_and_counts = self.get_results_page_and_counts(siaes, job_descriptions)
 
+        new_saved_search_form = NewSavedSearchForm(
+            user=self.request.user,
+            initial={
+                "name": city.name,
+                "city": city,
+                "distance": distance,
+                "kinds": kinds,
+                "contract_types": contract_types,
+                "departments": departments,
+                "districts": {districts["get_name"]: districts["get_value"]} if districts else {},
+                "domains": domains,
+            },
+            prefix="saved_search",
+        )
+
         context = {
             "form": form,
+            "new_saved_search_form": new_saved_search_form,
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
             "city": city,
             "distance": distance,
             "filters_query_string": urlencode(
                 {
                     "city": city.slug,
-                    "city_name": str(city),
+                    "city_name": str(city),  # FIXME Ewen: is it used?
                     "distance": distance,
                     "kinds": kinds,
                     "contract_types": contract_types,
@@ -323,4 +356,40 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         request,
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
         context,
+    )
+
+
+@require_POST
+def add_saved_search(request):
+    form = NewSavedSearchForm(user=request.user, data=request.POST, prefix="saved_search")
+    context = {"form": form}
+
+    headers = {}
+    if form.is_valid():
+        form.save()
+        saved_searches = SavedSearch.objects.filter(user=request.user)
+        context |= {"saved_searches": saved_searches}
+        headers |= hx_trigger_modal_control("newSavedSearchModal", "hide")
+
+    return TemplateResponse(
+        request=request,
+        template="search/includes/new_saved_search_modal_content.html",
+        context=context,
+        headers=headers,
+    )
+
+
+@require_POST
+def delete_saved_search(request, saved_search_id):
+    queryset = SavedSearch.objects.filter(user=request.user)
+    saved_search = get_object_or_404(queryset, id=saved_search_id)
+    saved_search.delete()
+
+    saved_searches = SavedSearch.objects.filter(user=request.user)
+    headers = hx_trigger_modal_control("savedSearchesSettingsModal", "hide") if not saved_searches else {}
+    return TemplateResponse(
+        request=request,
+        template="search/includes/saved_searches_settings_modal_content.html",
+        context={"saved_searches": saved_searches},
+        headers=headers,
     )

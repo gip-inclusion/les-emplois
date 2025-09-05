@@ -49,7 +49,7 @@ from itou.www.apply.views.submit_views import (
 )
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
-from itou.www.search.views import EmployerSearchView
+from itou.www.search_views.views import EmployerSearchView
 
 
 logger = logging.getLogger(__name__)

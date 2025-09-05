@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.www.search import views
+from itou.www.search_views import views
 
 
 app_name = "search"
@@ -11,4 +11,6 @@ urlpatterns = [
     path("job-descriptions/results", views.JobDescriptionSearchView.as_view(), name="job_descriptions_results"),
     path("prescribers", views.search_prescribers_home, name="prescribers_home"),
     path("prescribers/results", views.search_prescribers_results, name="prescribers_results"),
+    path("saved-search/add", views.add_saved_search, name="add_saved_search"),
+    path("saved-search/<int:saved_search_id>/delete", views.delete_saved_search, name="delete_saved_search"),
 ]
