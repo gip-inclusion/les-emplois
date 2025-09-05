@@ -76,6 +76,9 @@ def manually_add_approval(
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
     if request.method == "POST" and form.is_valid():
+        if job_application.job_seeker.has_valid_approval:
+            raise PermissionDenied
+
         form.instance.user = job_application.job_seeker
         form.instance.origin = Origin.ADMIN
         form.instance.created_by = request.user
@@ -132,6 +135,9 @@ def manually_refuse_approval(
         approval_manually_delivered_by=None,
         approval_number_sent_by_email=False,
     )
+
+    if job_application.job_seeker.has_valid_approval:
+        raise PermissionDenied
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         job_application.manually_refuse_approval(refused_by=request.user)
