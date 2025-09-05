@@ -67,8 +67,13 @@ class SavedSearch(models.Model):
 
     @property
     def display_details(self):
+        def filter_ellipsis(elements, max_nb=2):
+            if len(elements) <= max_nb:
+                return ", ".join(elements)
+            return ", ".join(elements[:max_nb]) + ", +" + str(len(elements) - max_nb)
+
         departments_str = (
-            f"département{pluralizefr(self.departments)} {', '.join(self.departments)}" if self.departments else None
+            f"Département{pluralizefr(self.departments)} : {', '.join(self.departments)}" if self.departments else None
         )
 
         districts = [
@@ -77,29 +82,32 @@ class SavedSearch(models.Model):
         ]
         districts_str = f"{', '.join(districts)} arrondissement{pluralizefr(districts)}" if districts else None
 
-        kinds_str = ", ".join(self.kinds) if self.kinds else None
-
         domains_str = (
-            ", ".join([ROME_DOMAINS.get(domain) for domain in self.domains])
-            if self.domains and len(self.domains) <= 2
+            f"Domaine{pluralizefr(self.domains)} : "
+            + filter_ellipsis([ROME_DOMAINS.get(domain) for domain in self.domains])
+            if self.domains
             else None
         )
 
+        kinds_str = (
+            (f"Type{pluralizefr(self.kinds)} de structure : " + filter_ellipsis(self.kinds, 5)) if self.kinds else None
+        )
         from itou.www.search_views.forms import JobDescriptionSearchForm
 
         CONTRACT_TYPE_DICT = dict(JobDescriptionSearchForm.CONTRACT_TYPE_CHOICES)
         contract_types_str = (
-            ", ".join([CONTRACT_TYPE_DICT.get(contract) for contract in self.contract_types])
+            f"Type{pluralizefr(self.contract_types)} de contrats : "
+            + filter_ellipsis([CONTRACT_TYPE_DICT.get(contract) for contract in self.contract_types])
             if self.contract_types
             else None
         )
 
-        return ", ".join(
+        return " – ".join(
             filter(
                 lambda x: x is not None,
                 [
                     self.city.name,
-                    f"{self.distance} km",
+                    f"Distance : {self.distance} km",
                     districts_str,
                     kinds_str,
                     departments_str,
