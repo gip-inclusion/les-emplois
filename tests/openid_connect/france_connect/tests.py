@@ -30,7 +30,7 @@ from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
 
 
-FC_USERINFO_V2 = {
+FC_USERINFO = {
     "gender": "female",
     "given_name": "Angela Claire Louise",
     "given_name_array": ["Angela", "Claire", "Louise"],
@@ -68,7 +68,7 @@ def mock_oauth_dance_v2(client, expected_route="dashboard:index", matching_nonce
     access_token = "aw9EMEBXYME57xmj-ZZYPPC9yxSRfK-A3MPCL56zysd"
     access_token_hash = hashlib.sha256(access_token.encode()).digest()
     common_jwt_content = {
-        "sub": FC_USERINFO_V2["sub"],
+        "sub": FC_USERINFO["sub"],
         "aud": settings.FRANCE_CONNECT_CLIENT_ID,
         "exp": now + 60,
         "iat": now,
@@ -94,7 +94,7 @@ def mock_oauth_dance_v2(client, expected_route="dashboard:index", matching_nonce
     respx.post(constants.FRANCE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_data = {
-        **FC_USERINFO_V2,
+        **FC_USERINFO,
         **common_jwt_content,
     }
     user_response = jwt.encode(user_data, private_key, algorithm="ES256", headers={"kid": "pkcs11:ES256:hsm"})
@@ -162,14 +162,14 @@ class TestFranceConnect:
         Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
         that is sent, so we create one
         """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         assert not User.objects.filter(username=fc_user_data.username).exists()
         assert not User.objects.filter(email=fc_user_data.email).exists()
         user, created = fc_user_data.create_or_update_user()
         assert created
-        assert user.last_name == FC_USERINFO_V2["family_name"]
-        assert user.first_name == FC_USERINFO_V2["given_name"]
-        assert user.jobseeker_profile.birthdate == datetime.date.fromisoformat(FC_USERINFO_V2["birthdate"])
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.jobseeker_profile.birthdate == datetime.date.fromisoformat(FC_USERINFO["birthdate"])
 
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
@@ -186,7 +186,7 @@ class TestFranceConnect:
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     def test_create_django_user_optional_fields(self):
-        fc_info = FC_USERINFO_V2 | {
+        fc_info = FC_USERINFO | {
             "given_name": "",
             "family_name": "",
             "birthdate": "",
@@ -204,7 +204,7 @@ class TestFranceConnect:
         If there already is an existing user with this FranceConnectId, we do not create it again,
         we use it and we update it
         """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         JobSeekerFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
@@ -213,8 +213,8 @@ class TestFranceConnect:
         )
         user, created = fc_user_data.create_or_update_user()
         assert not created
-        assert user.last_name == FC_USERINFO_V2["family_name"]
-        assert user.first_name == FC_USERINFO_V2["given_name"]
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.first_name == FC_USERINFO["given_name"]
         assert user.external_data_source_history[0]["source"] == "FC"
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.title == Title.MME
@@ -224,7 +224,7 @@ class TestFranceConnect:
         If there already is an existing user with this FranceConnectId, but it comes from another SSO.
         The email is also different, so it will crash while trying to create a new user.
         """
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         JobSeekerFactory(
             username=fc_user_data.username,
             last_name="will_be_forgotten",
@@ -235,7 +235,7 @@ class TestFranceConnect:
             fc_user_data.create_or_update_user()
 
     def test_create_or_update_user_raise_invalid_kind_exception(self):
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
@@ -247,13 +247,13 @@ class TestFranceConnect:
 
     def test_update_readonly_with_certified_criteria(self, caplog):
         job_seeker = JobSeekerFactory(
-            username=FC_USERINFO_V2["sub"],
+            username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
         )
         IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user, created = fc_user_data.create_or_update_user()
         assert created is False
         assert user.last_name == job_seeker.last_name
@@ -405,10 +405,10 @@ class TestFranceConnect:
         # Redirect to edit_user_info because FC does not provide address_line_1, city and post_code
         mock_oauth_dance_v2(client, expected_route="dashboard:edit_user_info")
         assert User.objects.count() == 1
-        user = User.objects.get(email=FC_USERINFO_V2["email"])
-        assert user.first_name == FC_USERINFO_V2["given_name"]
-        assert user.last_name == FC_USERINFO_V2["family_name"]
-        assert user.username == FC_USERINFO_V2["sub"]
+        user = User.objects.get(email=FC_USERINFO["email"])
+        assert user.first_name == FC_USERINFO["given_name"]
+        assert user.last_name == FC_USERINFO["family_name"]
+        assert user.username == FC_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
@@ -444,7 +444,7 @@ class TestFranceConnect:
 
     @respx.mock
     def test_callback_redirect_on_invalid_kind_exception_v2(self, client):
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
         for kind in UserKind.professionals():
             user = UserFactory(username=fc_user_data.username, email=fc_user_data.email, kind=kind)
@@ -454,7 +454,7 @@ class TestFranceConnect:
     @respx.mock
     def test_callback_redirect_on_email_in_use_exception_v2(self, client, snapshot):
         # EmailInUseException raised by the email conflict
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         JobSeekerFactory(email=fc_user_data.email, identity_provider=IdentityProvider.PE_CONNECT, for_snapshot=True)
 
         # Test redirection and modal content
@@ -463,7 +463,7 @@ class TestFranceConnect:
 
     @respx.mock
     def test_callback_redirect_on_sub_conflict_v2(self, client, snapshot):
-        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user = JobSeekerFactory(
             username="another_sub", email=fc_user_data.email, identity_provider=IdentityProvider.FRANCE_CONNECT
         )
@@ -536,7 +536,7 @@ def test_create_fc_user_with_already_existing_email_fails(identity_provider):
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
     JobSeekerFactory(
         username="another_username",
         email=fc_user_data.email,
@@ -551,7 +551,7 @@ def test_create_fc_user_with_already_existing_fc_email_fails():
     In OIDC, SSO provider + username represents unicity.
     However, we require that emails are unique as well.
     """
-    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO_V2)
+    fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
     JobSeekerFactory(
         username="another_username",
         email=fc_user_data.email,
