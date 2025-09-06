@@ -409,6 +409,10 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     template_name = "apply/submit_step_check_prev_applications.html"
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_application = self.get_previous_applications_queryset().order_by("created_at").last()
+
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
@@ -419,7 +423,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         return reverse(view_name, kwargs={"session_uuid": self.apply_session.name})
 
     def get(self, request, *args, **kwargs):
-        if not self.get_previous_applications_queryset().exists():
+        if self.prev_application is None:
             return HttpResponseRedirect(self.get_next_url())
         return super().get(request, *args, **kwargs)
 
@@ -432,9 +436,9 @@ class CheckPreviousApplications(ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "prev_application": self.get_previous_applications_queryset().latest("created_at"),
-        }
+        context = super().get_context_data(**kwargs)
+        context["prev_application"] = self.prev_application
+        return context
 
 
 class ApplicationJobsView(ApplicationBaseView):
