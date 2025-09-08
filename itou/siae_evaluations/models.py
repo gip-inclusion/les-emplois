@@ -679,6 +679,9 @@ class EvaluatedSiae(models.Model):
 
     @property
     def state(self):
+        if self.final_state:
+            return self.final_state
+
         state_from_applications = self.state_from_applications
 
         if state_from_applications in {

@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
@@ -1449,7 +1449,13 @@ class TestEvaluatedSiaeModel:
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=1),
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+        with assertNumQueries(2):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+        evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state
+
+        with assertNumQueries(0):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_criteria_submitted(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
@@ -1533,7 +1539,13 @@ class TestEvaluatedSiaeModel:
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        with assertNumQueries(2):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+        evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state
+
+        with assertNumQueries(0):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
 @pytest.mark.parametrize(
