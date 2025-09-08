@@ -10,6 +10,7 @@
 {% endcomment %}
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load job_seekers %}
 
 <form method="post" role="form" class="js-prevent-multiple-submit">
 
@@ -46,11 +47,11 @@
             </div>
         </div>
     </div>
-
+    {% has_not_required_personal_infos_for_hire job_seeker as primary_disabled %}
     {% if cancel_url %}
-        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" reset_url=cancel_url show_mandatory_fields_mention=False %}
+        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" primary_disabled=primary_disabled reset_url=cancel_url show_mandatory_fields_mention=False %}
     {% else %}
-        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" show_mandatory_fields_mention=False %}
+        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" primary_disabled=primary_disabled show_mandatory_fields_mention=False %}
     {% endif %}
 
 </form>

@@ -1,4 +1,5 @@
 {% load django_bootstrap5 %}
+{% load job_seekers %}
 
 {% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}
 <hr>
@@ -12,13 +13,14 @@
             <span>Annuler</span>
         </a>
     </div>
+    {% has_not_required_personal_infos_for_hire job_seeker as missing_required_datas %}
     <div class="form-group col col-lg-auto order-2 order-lg-3">
         <button type="button"
                 class="btn btn-block btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#confirm_geiq_eligibility_modal"
                 aria-label="Valider les critères d'éligibilité GEIQ"
-                {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
+                {% if not form.proof_of_eligibility.value or form.errors or missing_required_datas %}disabled{% endif %}>
             <span>Valider les critères d'éligibilité GEIQ</span>
         </button>
     </div>

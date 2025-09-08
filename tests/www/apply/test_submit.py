@@ -475,6 +475,89 @@ class TestHire:
             response = client.get(url)
             assertContains(response, "Le candidat a terminé un parcours il y a moins de deux ans", status_code=403)
 
+    def test_siae_trying_to_hire_a_jobseeker_without_required_personnal_data(self, client):
+        company = CompanyFactory(with_membership=True)
+        job_seeker = JobSeekerFactory()
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+        for viewname, label in (
+            ("job_seekers_views:check_job_seeker_info_for_hire", "Poursuivre l'embauche"),
+            ("apply:iae_eligibility_for_hire", "Valider l’éligibilité du candidat"),
+        ):
+            url = reverse(viewname, kwargs={"session_uuid": apply_session.name})
+            response = client.get(url)
+            assertContains(
+                response,
+                f"""
+                <button type="button" class="btn btn-block btn-primary disabled">
+                        <span>{label}</span>
+                    </button>
+                """,
+                html=True,
+                status_code=200,
+            )
+
+    def test_geiq_trying_to_hire_a_jobseeker_without_required_personnal_data(self, client):
+        company = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+        job_seeker = JobSeekerFactory()
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+
+        # step 1 : job seeker personnal data
+        check_infos_url = reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}
+        )
+        response = client.get(check_infos_url)
+        assertContains(
+            response,
+            (
+                '<button class="btn btn-block btn-primary disabled" type="button">'
+                "           <span>Poursuivre l'embauche</span>"
+                "       </button>"
+            ),
+            html=True,
+        )
+
+        # step 2 : without eligibility diagnosis
+        response = client.post(
+            reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}),
+            data={"choice": "False"},
+            headers={"hx-request": "true"},
+            follow=True,
+        )
+        assertContains(
+            response,
+            (
+                '<button type="button" class="btn btn-block btn-primary disabled" data-bs-toggle="modal" '
+                'data-bs-target="#confirm_no_allowance_modal" aria-label="Continuer sans valider les critères GEIQ">'
+                "            <span>Continuer sans valider les critères GEIQ</span>"
+                "        </button>"
+            ),
+            html=True,
+        )
+
+        # step 2 : with eligibility diagnosis
+        response = client.post(
+            reverse("apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": apply_session.name}),
+            data={"niveau_etude_3": "on", "proof_of_eligibility": "on"},
+            headers={"hx-request": "true"},
+            follow=True,
+        )
+        assertContains(
+            response,
+            (
+                '<button type="button"'
+                '                class="btn btn-block btn-primary"'
+                '                data-bs-toggle="modal"'
+                '                data-bs-target="#confirm_geiq_eligibility_modal"'
+                '                aria-label="Valider les critères d\'éligibilité GEIQ"'
+                "               disabled>"
+                "            <span>Valider les critères d'éligibilité GEIQ</span>"
+                "        </button>"
+            ),
+            html=True,
+        )
+
     @pytest.mark.parametrize(
         "back_url,expected_session",
         [
@@ -3074,7 +3157,7 @@ class TestDirectHireFullProcess:
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
         reset_url_dashboard = reverse("dashboard:index")
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(for_snapshot=True, born_in_france=True)
 
         user = company.members.first()
         client.force_login(user)
@@ -5021,10 +5104,12 @@ class TestCheckJobSeekerInformationsForHire:
             ),
             html=True,
         )
-        assertContains(
-            response,
-            reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
+        # check job_seeker has required personal data
+        assert_func = assertContains if job_seeker_kwargs.get("for_snapshot") else assertNotContains
+        assert_func(
+            response, reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
         )
+
         assertContains(
             response,
             reverse("apply:start_hire", kwargs={"company_pk": company.pk}),
@@ -5038,6 +5123,10 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__nir="",
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
+            born_in_france=True,
+            jobseeker_profile__birth_place=Commune.objects.by_insee_code_and_period(
+                "59183", datetime.date(1990, 1, 1)
+            ),
         )
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})

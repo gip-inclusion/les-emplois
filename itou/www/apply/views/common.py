@@ -243,6 +243,7 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
                 context={
                     "next_url": self.get_next_url(),
                     "back_url": self.get_back_url(),
+                    "job_seeker": self.job_seeker,
                     "progress": 66,
                 },
             )
@@ -310,6 +311,5 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
 
         geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
         context["geo_criteria_detected"] = geo_criteria_detected
-        if geo_criteria_detected:
-            context["job_seeker"] = self.job_seeker
+        context["job_seeker"] = self.job_seeker
         return context

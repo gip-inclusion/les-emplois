@@ -2,6 +2,7 @@
 {% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
+{% load job_seekers %}
 
 {% block title_navinfo %}
     {% component_navinfo c_navinfo__info=c_navinfo__info|default:"" %}
@@ -26,7 +27,8 @@
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                     <div class="c-box mb-3 mb-md-4">
                         {% include "apply/includes/profile_infos.html" %}
-                        {% itou_buttons_form primary_url=next_url primary_label="Poursuivre l'embauche" secondary_url=back_url show_mandatory_fields_mention=False %}
+                        {% has_not_required_personal_infos_for_hire profile.user as primary_disabled %}
+                        {% itou_buttons_form primary_url=next_url primary_label="Poursuivre l'embauche" primary_disabled=primary_disabled secondary_url=back_url show_mandatory_fields_mention=False %}
                     </div>
                 </div>
             </div>
