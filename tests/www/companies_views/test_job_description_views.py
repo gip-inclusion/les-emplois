@@ -354,7 +354,7 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         "is_closed,expected",
         [
             (True, lambda: None),
-            (False, lambda: timezone.now()),
+            (False, timezone.now),
         ],
         ids=["closed", "open"],
     )
