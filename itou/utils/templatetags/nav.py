@@ -2,7 +2,6 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.geiq_assessments.models import AssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
@@ -327,11 +326,7 @@ def nav(request):
                 if request.current_organization.can_use_employee_record:
                     employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
                 menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
-            elif (
-                company_has_access_to_assessments(request.current_organization)
-                # TODO: remove this condition once the 1st campaign has been created
-                and AssessmentCampaign.objects.exists()
-            ):
+            elif company_has_access_to_assessments(request.current_organization):
                 menu_items.append(NAV_ENTRIES["employer-geiq-assessments"])
             company_group_items = [NAV_ENTRIES["employer-company"], NAV_ENTRIES["employer-jobs"]]
             if request.current_organization.is_active:
