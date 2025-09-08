@@ -353,10 +353,10 @@ class TestGetOrCreateForSender:
                 **(
                     {
                         "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
-                        "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+                        "birth_country": Country.FRANCE_ID,
                     }
                     if born_in_france
-                    else {"birth_country": Country.objects.exclude(code=Country.INSEE_CODE_FRANCE).first().pk}
+                    else {"birth_country": Country.objects.exclude(pk=Country.FRANCE_ID).first().pk}
                 ),
             },
         )
@@ -389,7 +389,7 @@ class TestGetOrCreateForSender:
                 "nir": "133116411111133",
                 "birthdate": birthdate.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
-                "birth_country": Country.objects.exclude(code=Country.INSEE_CODE_FRANCE).order_by("?").first().pk,
+                "birth_country": Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first().pk,
             },
         )
         assertContains(
@@ -427,7 +427,7 @@ class TestGetOrCreateForSender:
                 "nir": "133111111111109",
                 "birthdate": "1933-11-01",
                 # No birth_place
-                "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+                "birth_country": Country.FRANCE_ID,
             },
         )
         assertContains(
@@ -1035,10 +1035,10 @@ class TestUpdateForSender:
                 **(
                     {
                         "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
-                        "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+                        "birth_country": Country.FRANCE_ID,
                     }
                     if born_in_france
-                    else {"birth_country": Country.objects.exclude(code=Country.INSEE_CODE_FRANCE).first().pk}
+                    else {"birth_country": Country.objects.exclude(pk=Country.FRANCE_ID).first().pk}
                 ),
             },
         )
@@ -1078,7 +1078,7 @@ class TestUpdateForSender:
                 "last_name": "Calavera",
                 "birthdate": birthdate.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
-                "birth_country": Country.objects.exclude(code=Country.INSEE_CODE_FRANCE).order_by("?").first().pk,
+                "birth_country": Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first().pk,
             },
         )
         assertContains(
@@ -1123,7 +1123,7 @@ class TestUpdateForSender:
                 "last_name": "Calavera",
                 "birthdate": "1933-11-01",
                 # No birth_place
-                "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+                "birth_country": Country.FRANCE_ID,
             },
         )
         assertContains(
@@ -1184,7 +1184,7 @@ class TestUpdateForSender:
                 "last_name": "Saint Clair",
                 "birthdate": new_birth_date.isoformat(),
                 "birth_place": Commune.objects.by_insee_code_and_period("64483", new_birth_date).pk,
-                "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+                "birth_country": Country.FRANCE_ID,
             },
         )
         assertRedirects(

@@ -91,7 +91,7 @@ def validate_birthdate(birthdate):
 
 def validate_birth_location(birth_country, birth_place):
     if birth_country:
-        if birth_country.code == Country.INSEE_CODE_FRANCE:
+        if birth_country.pk == Country.FRANCE_ID:
             if not birth_place:
                 raise ValidationError(
                     "Si le pays de naissance est la France, la commune de naissance est obligatoire."

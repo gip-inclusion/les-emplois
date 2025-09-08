@@ -490,7 +490,6 @@ class Country(PrettyPrintMixin, models.Model):
     Imported from ASP reference file: ref_grp_pays_v1, ref_insee_pays_v4.csv
     """
 
-    INSEE_CODE_FRANCE = "100"
     FRANCE_ID = 91
 
     class Group(models.TextChoices):

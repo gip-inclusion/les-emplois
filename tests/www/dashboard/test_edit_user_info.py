@@ -504,7 +504,7 @@ class TestEditUserInfoView:
         user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
         client.force_login(user)
         birthdate = date(1978, 12, 20)
-        birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+        birth_country = Country.objects.get(pk=Country.FRANCE_ID)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",

@@ -10,7 +10,7 @@ def test_france_primary_key():
     # Check the constant used by our code
     assert Country.FRANCE_ID == 91
     # Check the loaded fixtures in tests, and production at the time of writing, are OK
-    assert Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk == 91
+    assert Country.objects.get(code=100).pk == 91
     # Check the data in the fixture file is OK
     assert {
         "model": "asp.Country",
