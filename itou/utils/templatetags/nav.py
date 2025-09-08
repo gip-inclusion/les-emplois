@@ -347,7 +347,10 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
-            if request.current_organization.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+            if request.current_organization and request.current_organization.kind in (
+                InstitutionKind.DDETS_GEIQ,
+                InstitutionKind.DREETS_GEIQ,
+            ):
                 menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
         if is_allowed_to_use_gps(request) and show_gps_as_a_nav_entry(request):
             menu_items.append(NAV_ENTRIES["gps"])
