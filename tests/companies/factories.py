@@ -225,7 +225,7 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
 
     class Params:
         for_snapshot = factory.Trait(
-            appellation=factory.LazyFunction(lambda: Appellation.objects.order_by("pk").first()),
+            appellation=factory.LazyFunction(Appellation.objects.order_by("pk").first),
             description="Une description statique",
             contract_type=ContractType.PERMANENT,
             location=factory.LazyFunction(create_city_vannes),
@@ -234,11 +234,11 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
             company__for_snapshot=True,
         )
 
-    appellation = factory.LazyFunction(lambda: Appellation.objects.order_by("?").first())
+    appellation = factory.LazyFunction(Appellation.objects.order_by("?").first)
     company = factory.SubFactory(CompanyFactory)
     description = factory.Faker("sentence", locale="fr_FR")
     contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
-    location = factory.LazyFunction(lambda: City.objects.order_by("?").first())
+    location = factory.LazyFunction(City.objects.order_by("?").first)
     profile_description = factory.Faker("sentence", locale="fr_FR")
     market_context_description = factory.Faker("sentence", locale="fr_FR")
     last_employer_update_at = factory.Faker(
