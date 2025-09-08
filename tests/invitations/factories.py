@@ -19,7 +19,7 @@ class EmployerInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
-        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(timezone.now))
 
     email = factory.Sequence("email{}@employer.com".format)
     first_name = factory.Sequence("first_name{}".format)
@@ -39,7 +39,7 @@ class PrescriberWithOrgInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
-        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(timezone.now))
 
     email = factory.Faker("email", locale="fr_FR")
     first_name = factory.Faker("first_name", locale="fr_FR")
@@ -59,7 +59,7 @@ class LaborInspectorInvitationFactory(factory.django.DjangoModelFactory):
                 lambda: timezone.now() - timedelta(days=models.InvitationAbstract.DEFAULT_VALIDITY_DAYS)
             )
         )
-        accepted = factory.Trait(accepted_at=factory.LazyFunction(lambda: timezone.now()))
+        accepted = factory.Trait(accepted_at=factory.LazyFunction(timezone.now))
 
     email = factory.Sequence("email{}@employer.com".format)
     first_name = factory.Sequence("first_name{}".format)

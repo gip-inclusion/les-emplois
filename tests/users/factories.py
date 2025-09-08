@@ -349,7 +349,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
             hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
             hexa_post_code=factory.Faker("postalcode"),
-            hexa_commune=factory.LazyFunction(lambda: Commune.objects.order_by("?").first()),
+            hexa_commune=factory.LazyFunction(Commune.objects.order_by("?").first),
         )
         with_required_eiti_fields = factory.Trait(
             actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
