@@ -3021,7 +3021,7 @@ class TestProcessAcceptViews:
             ],
         }
 
-        birth_country = Country.objects.get(name="FRANCE")
+        birth_country = Country.objects.get(pk=Country.FRANCE_ID)
         birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
@@ -3099,7 +3099,7 @@ class TestProcessAcceptViews:
         )
 
         # Then set it.
-        birth_country = Country.objects.get(name="FRANCE")
+        birth_country = Country.objects.get(pk=Country.FRANCE_ID)
         birth_place = Commune.objects.by_insee_code_and_period(
             "07141", job_application.job_seeker.jobseeker_profile.birthdate
         )
@@ -3292,7 +3292,7 @@ class TestProcessAcceptViews:
         )
         client.force_login(job_application.to_company.members.get())
         post_data = self._accept_view_post_data(job_application=job_application)
-        post_data["birth_country"] = Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk
+        post_data["birth_country"] = Country.FRANCE_ID
         del post_data["birth_place"]
         response = client.post(
             reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),

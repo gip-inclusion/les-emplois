@@ -191,7 +191,9 @@ class JobSeekerFactory(UserFactory):
                 )
                 .first(),
             ),
-            jobseeker_profile__birth_country=factory.LazyAttribute(lambda _: Country.objects.get(name="FRANCE")),
+            jobseeker_profile__birth_country=factory.LazyAttribute(
+                lambda _: Country.objects.get(pk=Country.FRANCE_ID)
+            ),
         )
         born_outside_france = factory.Trait(
             jobseeker_profile__birth_country=factory.LazyAttribute(
