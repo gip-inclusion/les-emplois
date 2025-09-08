@@ -725,9 +725,9 @@ lxml==5.3.2 \
     --hash=sha256:f79a63289dbaba964eb29ed3c103b7911f2dce28c36fe87c36a114e6bd21d7ad \
     --hash=sha256:f8695752cf5d639b4e981afe6c99e060621362c416058effd5c704bede9cb5d1
     # via -r requirements/base.in
-markdown==3.8.2 \
-    --hash=sha256:247b9a70dd12e27f67431ce62523e675b866d254f900c4fe75ce3dda62237c45 \
-    --hash=sha256:5c83764dbd4e00bdd94d85a19b8d55ccca20fe35b2e678a1422b380324dd5f24
+markdown==3.9 \
+    --hash=sha256:9f4d91ed810864ea88a6f32c07ba8bee1346c0cc1f6b1f9f6c822f2a9667d280 \
+    --hash=sha256:d2900fe1782bd33bdbbd56859defef70c2e78fc46668f8eb9df3128138f2cb6a
     # via
     #   -r requirements/base.in
     #   django-markdownify
