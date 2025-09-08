@@ -2849,7 +2849,7 @@ class TestDirectHireFullProcess:
             "last_name": dummy_job_seeker.last_name,
             "birthdate": birthdate,
             "birth_place": Commune.objects.by_insee_code_and_period("64483", birthdate).pk,
-            "birth_country": Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk,
+            "birth_country": Country.FRANCE_ID,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }

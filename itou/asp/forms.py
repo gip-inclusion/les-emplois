@@ -52,7 +52,7 @@ class BirthPlaceModelForm(forms.ModelForm):
             # That's also why we can't make it mandatory.
             # See utils.js > toggleDisableAndSetValue
             if birth_place:
-                birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+                birth_country = Country.objects.get(pk=Country.FRANCE_ID)
                 self.cleaned_data["birth_country"] = birth_country
             else:
                 # Display the error above the field instead of top of page.

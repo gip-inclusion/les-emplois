@@ -278,7 +278,7 @@ class TestJobSeekerSignup:
         assert response.status_code == 200
 
         job_seeker_data = JobSeekerFactory.build(for_snapshot=True)
-        birth_country = Country.objects.get(name="FRANCE")
+        birth_country = Country.objects.get(pk=Country.FRANCE_ID)
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         post_data = {
@@ -321,7 +321,7 @@ class TestJobSeekerSignup:
         geispolsheim = create_city_geispolsheim()
         birthdate = job_seeker_data.jobseeker_profile.birthdate
         birth_place = Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate)
-        birth_country = Country.objects.get(name="FRANCE")
+        birth_country = Country.objects.get(pk=Country.FRANCE_ID)
         response = client.post(
             reverse("signup:job_seeker"),
             {
