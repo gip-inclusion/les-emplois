@@ -40,6 +40,7 @@ from itou.rdv_insertion.models import Participation
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
+from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url
 
 
@@ -1363,7 +1364,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         to = [self.sender.email]
         subject = "apply/email/diagoriente_prescriber_invite_subject.txt"
         body = "apply/email/diagoriente_prescriber_invite_body.txt"
-        context = {"job_application": self}
+        context = {
+            "job_application": self,
+            "can_view_personal_information": _can_view_personal_information(
+                viewer=self.sender,
+                user=self.job_seeker,
+                viewer_is_prescriber_from_authorized_org=self.sender.is_prescriber_with_authorized_org_memberships,
+            ),
+        }
         return get_email_message(to, context, subject, body)
 
     @property

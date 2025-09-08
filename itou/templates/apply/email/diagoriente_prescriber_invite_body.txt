@@ -1,8 +1,9 @@
 {% extends "layout/base_email_text_body.txt" %}
+{% load str_filters %}
 {% block body %}
 {% if job_application.sender.title %}Bonjour {{ job_application.sender.get_title_display }} {{ job_application.sender.last_name|upper }},{% else %}Bonjour {{ job_application.sender.get_full_name }},{% endif %}
 
-{% block header %}L’entreprise {{ job_application.to_company.display_name }} vous propose d’utiliser Diagoriente pour valoriser les expériences de votre candidat : {{ job_application.job_seeker.get_full_name }}.
+{% block header %}L’entreprise {{ job_application.to_company.display_name }} vous propose d’utiliser Diagoriente pour valoriser les expériences de votre candidat : {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}.
 Vous pourrez lui créer un compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur{% endblock header %}
 
 {% block content %}Diagoriente propose différents services pour accompagner les personnes en transition professionnelle. Tous ces services partagent le même souci d’aider chacun à valoriser ce qu’il sait faire pour élargir ses perspectives professionnelles.

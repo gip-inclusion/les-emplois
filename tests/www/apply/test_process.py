@@ -47,6 +47,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_r
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
@@ -2093,7 +2094,7 @@ class TestProcessViews:
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name,
-                job_seeker_name=job_application.job_seeker.get_full_name(),
+                job_seeker_name=mask_unless(job_application.job_seeker.get_full_name(), predicate=False),
             )
             in mailoutbox[0].body
         )
