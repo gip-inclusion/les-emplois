@@ -1686,6 +1686,98 @@ def test_profile_city_display():
     assert job_seekers.profile_city_display(profile) == "Ville non renseignée"
 
 
+@pytest.mark.parametrize(
+    "factory,kwargs,expected",
+    [
+        pytest.param(LaborInspectorFactory, {}, True, id="labor_inspector"),
+        pytest.param(EmployerFactory, {}, True, id="employer"),
+        pytest.param(ItouStaffFactory, {}, True, id="itou_staff"),
+        pytest.param(PrescriberFactory, {}, True, id="prescriber"),
+        pytest.param(JobSeekerFactory, {"jobseeker_profile": None}, True, id="jobseeker_without_profile"),
+        pytest.param(JobSeekerFactory, {"for_snapshot": True, "born_in_france": True}, False, id="jobseeker"),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "title": ""},
+            True,
+            id="jobseeker_without_title",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "first_name": ""},
+            True,
+            id="jobseeker_without_first_name",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "last_name": ""},
+            True,
+            id="jobseeker_without_last_name",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "address_line_1": ""},
+            True,
+            id="jobseeker_without_address_line_1",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "post_code": ""},
+            True,
+            id="jobseeker_without_post_code",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "city": ""},
+            True,
+            id="jobseeker_without_city",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_in_france": True, "jobseeker_profile__birth_place": None},
+            True,
+            id="jobseeker_born_in_france_without_birth_place",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "born_outside_france": True},
+            False,
+            id="jobseeker_born_outside_france",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {"for_snapshot": True, "jobseeker_profile__birth_country": None},
+            True,
+            id="jobseeker_without_birth_country",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {
+                "for_snapshot": True,
+                "born_in_france": True,
+                "jobseeker_profile__nir": "",
+                "jobseeker_profile__lack_of_nir_reason": "reason",
+            },
+            False,
+            id="jobseeker_with_lack_of_nir_reason",
+        ),
+        pytest.param(
+            JobSeekerFactory,
+            {
+                "for_snapshot": True,
+                "born_in_france": True,
+                "jobseeker_profile__nir": "",
+                "jobseeker_profile__lack_of_nir_reason": "",
+            },
+            True,
+            id="jobseeker_without_nir_and_lack_of_nir_reason",
+        ),
+    ],
+)
+def test_has_not_required_personal_infos_for_hire(factory, kwargs, expected):
+    user = factory(**kwargs)
+    assert job_seekers.has_not_required_personal_infos_for_hire(user) is expected
+
+
 def test_previous_step():
     PREVIOUS_IS_LIST = "Retour à la liste"
     res = render_to_string("layout/previous_step.html", {"back_url": ""})
