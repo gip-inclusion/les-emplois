@@ -216,7 +216,7 @@ class TestCertifyCriteriaWithFranceTravail:
     def test_queue_task(self, respx_mock):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
-            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_france_travail(),
         )
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         respx_mock.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
@@ -253,7 +253,7 @@ class TestCertifyCriteriaWithFranceTravail:
     def test_not_certified(self, respx_mock):
         criterion = IAESelectedAdministrativeCriteriaFactory(
             administrative_criteria=AdministrativeCriteria.objects.get(
-                kind__in=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi()
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_france_travail()
             )
         )
         respx_mock.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
@@ -296,7 +296,7 @@ class TestCertifyCriteriaWithFranceTravail:
     def test_rechercher_usager_issues(self, caplog, response_kind, respx_mock):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
-            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_france_travail(),
         )
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
@@ -321,7 +321,7 @@ class TestCertifyCriteriaWithFranceTravail:
     def test_bad_response(self, caplog, respx_mock):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
-            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_france_travail(),
         )
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
@@ -350,7 +350,7 @@ class TestCertifyCriteriaWithFranceTravail:
     def test_rate_limit(self, respx_mock):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
-            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_france_travail(),
         )
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR

@@ -1,0 +1,9 @@
+<span class="badge badge-xs rounded-pill bg-warning-lighter text-warning{% if extra_classes|default:None %} {{ extra_classes }}{% endif %}">
+    <i class="ri-timer-line" aria-hidden="true"></i>
+    Certifié à partir du
+    {% if override_text|default:"" %}
+        {{ override_text }}
+    {% else %}
+        {{ certification_start_date|date:"d/m/Y" }}
+    {% endif %}
+</span>
