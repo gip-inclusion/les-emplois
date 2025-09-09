@@ -1,11 +1,12 @@
-from dateutil.relativedelta import relativedelta
+import datetime
+
 from django.utils import timezone
 
 from itou.companies.models import JobDescription
 from itou.utils.command import BaseCommand
 
 
-DEACTIVATION_DELAY = relativedelta(years=1)
+DEACTIVATION_DELAY = datetime.timedelta(days=90)
 
 
 class Command(BaseCommand):
