@@ -1,4 +1,25 @@
+from django.conf import settings
 from django.db import migrations, models
+
+from itou.siae_evaluations.models import EvaluatedSiae
+from itou.utils.enums import ItouEnvironment
+
+
+def populate_final_state(apps, schema_editor):
+    if settings.ITOU_ENVIRONMENT != ItouEnvironment.PROD:
+        return
+
+    evaluated_siaes = list(
+        EvaluatedSiae.objects.filter(evaluation_campaign__ended_at__isnull=False).select_for_update(
+            of=("self",), no_key=True
+        )
+    )
+
+    for evaluated_siae in evaluated_siaes:
+        evaluated_siae.final_state = evaluated_siae.state
+
+    updated = EvaluatedSiae.objects.bulk_update(evaluated_siaes, ["final_state"])
+    print(f"updated {updated} EvaluatedSiae")
 
 
 class Migration(migrations.Migration):
@@ -18,4 +39,5 @@ class Migration(migrations.Migration):
                 verbose_name="état final après la cloture de la campagne d'évaluation",
             ),
         ),
+        migrations.RunPython(code=populate_final_state, reverse_code=migrations.RunPython.noop, elidable=True),
     ]
