@@ -594,7 +594,9 @@ class TestAnonymizeJobseekersManagementCommand:
     def test_anonymize_notification_of_inactive_jobseekers_after_grace_period(
         self, kwargs, django_capture_on_commit_callbacks, mailoutbox, snapshot, respx_mock, caplog
     ):
-        jobseeker = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31, **kwargs)
+        jobseeker = JobSeekerFactory(
+            email="jobseeker@example.com", joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31, **kwargs
+        )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_jobseekers", wet_run=True)
@@ -1524,6 +1526,7 @@ class TestAnonymizeProfessionalManagementCommand:
             for_snapshot=True,
             first_name="Micheline",
             last_name="Dubois",
+            email="micheline.dubois@example.com",
         )
 
         with django_capture_on_commit_callbacks(execute=True):
