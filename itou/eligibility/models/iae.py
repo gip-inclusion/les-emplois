@@ -17,6 +17,7 @@ from itou.eligibility.models.common import (
     CommonEligibilityDiagnosisQuerySet,
 )
 from itou.gps.models import FollowUpGroup
+from itou.users.enums import UserKind
 
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="eligibility_diagnoses",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
     # When the author is an SIAE member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
