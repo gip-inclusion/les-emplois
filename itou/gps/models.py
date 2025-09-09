@@ -77,6 +77,7 @@ class FollowUpGroup(models.Model):
         blank=False,
         on_delete=models.CASCADE,
         related_name="follow_up_group",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
 
     members = models.ManyToManyField(
