@@ -11,11 +11,13 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, JobSource
 from itou.companies.models import Company, JobDescription
+from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.utils.testing import assertSnapshotQueries
 
 
 class TestMoveCompanyData:
@@ -205,15 +207,18 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     assert company_3.coords.y == 42.42
 
 
-def test_deactivate_old_job_description():
+def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks):
     create_test_romes_and_appellations(("N1101",))
-    companies_factories.JobDescriptionFactory(
+    old_job_description_1 = companies_factories.JobDescriptionFactory(
         last_employer_update_at=timezone.now() - datetime.timedelta(days=90),
-        location=None,
+        company__with_membership=True,
+        company__for_snapshot=True,
+        for_snapshot=True,
     )
-    companies_factories.JobDescriptionFactory(
+    old_job_description_2 = companies_factories.JobDescriptionFactory(
         last_employer_update_at=None,
-        location=None,
+        company__with_membership=True,
+        location=create_city_guerande(),
     )
     ft_job_description = companies_factories.JobDescriptionFactory(
         last_employer_update_at=None,
@@ -225,9 +230,21 @@ def test_deactivate_old_job_description():
         location=None,
     )
     assert JobDescription.objects.active().count() == 4
-    management.call_command("deactivate_old_job_descriptions")
+    with assertSnapshotQueries(snapshot(name="SQL")):
+        with django_capture_on_commit_callbacks(execute=True):
+            management.call_command("deactivate_old_job_descriptions")
     assertQuerySetEqual(
         JobDescription.objects.active(),
         [recently_updated_job_description, ft_job_description],
         ordered=False,
     )
+
+    assert len(mailoutbox) == 2
+
+    assert set(sum((mail.to for mail in mailoutbox), [])) == {
+        old_job_description_1.company.members.get().email,
+        old_job_description_2.company.members.get().email,
+    }
+    mail = next(mail for mail in mailoutbox if mail.to == [old_job_description_1.company.members.get().email])
+    assert mail.subject == snapshot(name="email subject")
+    assert mail.body == snapshot(name="email body")

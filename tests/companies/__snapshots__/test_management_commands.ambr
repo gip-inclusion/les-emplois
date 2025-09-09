@@ -1,0 +1,540 @@
+# serializer version: 1
+# name: test_deactivate_old_job_description[SQL]
+  dict({
+    'num_queries': 19,
+    'queries': list([
+      dict({
+        'origin': list([
+          '_set_context_connection_wrapper[utils/triggers/__init__.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': "SELECT set_config('itou.context', %s, TRUE)",
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."last_employer_update_at",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_company" V0
+             WHERE (V0."id" = ("companies_jobdescription"."company_id")
+                    AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                         OR V0."source" = %s
+                         OR EXISTS
+                           (SELECT %s AS "a"
+                            FROM "companies_siaeconvention" U0
+                            WHERE (U0."id" = (V0."convention_id")
+                                   AND U0."is_active")
+                            LIMIT 1)))
+             LIMIT 1) AS "is_siae_active",
+                 "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode"
+          FROM "companies_jobdescription"
+          INNER JOIN "companies_company" ON ("companies_jobdescription"."company_id" = "companies_company"."id")
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
+          WHERE ("companies_jobdescription"."is_active"
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (V0."id" = ("companies_jobdescription"."company_id")
+                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))
+                    LIMIT 1)
+                 AND "companies_jobdescription"."source_kind" IS NULL
+                 AND NOT ("companies_jobdescription"."last_employer_update_at" >= %s
+                          AND "companies_jobdescription"."last_employer_update_at" IS NOT NULL))
+          ORDER BY "companies_jobdescription"."last_employer_update_at" ASC
+          LIMIT 200
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE "companies_companymembership"."company_id" IN (%s,
+                                                               %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          UPDATE "companies_jobdescription"
+          SET "is_active" = %s
+          WHERE "companies_jobdescription"."id" IN (%s,
+                                                    %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OldJobDescriptionDeactivationNotification.should_send[communications/dispatch/base.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'OldJobDescriptionDeactivationNotification.should_send[communications/dispatch/base.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "communications_notificationsettings"
+          INNER JOIN "communications_disablednotification" ON ("communications_notificationsettings"."id" = "communications_disablednotification"."settings_id")
+          INNER JOIN "communications_notificationrecord" ON ("communications_disablednotification"."notification_record_id" = "communications_notificationrecord"."id")
+          WHERE ("communications_notificationsettings"."user_id" = %s
+                 AND "communications_notificationsettings"."structure_pk" = %s
+                 AND "communications_notificationsettings"."structure_type_id" = %s
+                 AND "communications_notificationrecord"."notification_class" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."is_active"
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_company" V0
+                    WHERE (V0."id" = ("companies_jobdescription"."company_id")
+                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                                OR V0."source" = %s
+                                OR EXISTS
+                                  (SELECT %s AS "a"
+                                   FROM "companies_siaeconvention" U0
+                                   WHERE (U0."id" = (V0."convention_id")
+                                          AND U0."is_active")
+                                   LIMIT 1)))
+                    LIMIT 1)
+                 AND "companies_jobdescription"."source_kind" IS NULL
+                 AND NOT ("companies_jobdescription"."last_employer_update_at" >= %s
+                          AND "companies_jobdescription"."last_employer_update_at" IS NOT NULL))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_deactivate_old_job_description[email body]
+  '''
+  Bonjour,
+  
+  Nous vous informons que votre fiche de poste intitulée Agent / Agente cariste de livraison ferroviaire à Vannes - 56 au sein de la structure EI Acme inc. a été dépubliée automatiquement, car elle n’a pas été mise à jour depuis plus de 3 mois.
+  
+  En cas de besoin, vous pouvez réactiver cette fiche de poste depuis votre espace :
+  Structure > Métiers et recrutements sur les Emplois de l’inclusion http://localhost:8000/.
+  
+  Si cette fiche de poste n’est plus d’actualité, aucune action de votre part n’est nécessaire.
+  
+  Cette mesure vise à garantir la pertinence des annonces disponibles pour les candidats et à maintenir une base d’opportunités d’emploi à jour.
+  
+  Cordialement,
+  
+  ---
+  [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
+  Les emplois de l'inclusion
+  http://localhost:8000/
+  '''
+# ---
+# name: test_deactivate_old_job_description[email subject]
+  '[TEST] Votre fiche de poste Agent / Agente cariste de livraison ferroviaire à Vannes - 56 a été dépubliée'
+# ---
