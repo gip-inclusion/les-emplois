@@ -159,7 +159,9 @@ class TestAdminForm:
         response = admin_client.post(self.get_add_url(kind), data=post_data)
 
         assert response.status_code == 200
-        assert response.context["errors"] == [["L'utilisateur doit être un candidat"]]
+        assert response.context["errors"] == [
+            ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."]
+        ]
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_bad_author(self, admin_client, kind):

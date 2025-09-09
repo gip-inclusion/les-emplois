@@ -17,6 +17,7 @@ from itou.eligibility.models.common import (
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.gps.models import FollowUpGroup
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 from itou.users.models import User
 
 
@@ -71,6 +72,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         verbose_name="demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="geiq_eligibility_diagnoses",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
     # Even if GEIQ are technically Siae objects, we keep the same structure as IAE for the author
     author_geiq = models.ForeignKey(

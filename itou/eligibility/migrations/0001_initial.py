@@ -152,6 +152,7 @@ class Migration(migrations.Migration):
                 (
                     "job_seeker",
                     models.ForeignKey(
+                        limit_choices_to={"kind": "job_seeker"},
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="eligibility_diagnoses",
                         to=settings.AUTH_USER_MODEL,
@@ -430,6 +431,7 @@ class Migration(migrations.Migration):
                 (
                     "job_seeker",
                     models.ForeignKey(
+                        limit_choices_to={"kind": "job_seeker"},
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="geiq_eligibility_diagnoses",
                         to=settings.AUTH_USER_MODEL,
