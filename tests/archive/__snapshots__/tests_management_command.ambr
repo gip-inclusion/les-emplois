@@ -26,7 +26,7 @@
 # name: TestAnonymizeJobseekersManagementCommand.test_anonymize_notification_of_inactive_jobseekers_after_grace_period[is_active_jobseeker][archived_jobseeker_email_body]
   '''
   Bonjour Johanna ANDREWS,
-  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  Le XX/XX/XXXX, nous vous avons informé que votre compte sur les Emplois de l’inclusion associé à l’email jobseeker@example.com serait supprimé.
   A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
   
@@ -806,7 +806,7 @@
 # name: TestAnonymizeProfessionalManagementCommand.test_anonymize_professionals_notification[True][anonymized_professional_email_body]
   '''
   Bonjour Micheline DUBOIS,
-  Le 17/06/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion serait supprimé.
+  Le 17/06/2025, nous vous avons informé que votre compte sur les Emplois de l’inclusion associé à l’email micheline.dubois@example.com serait supprimé.
   A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte.
   En cas de besoin, vous pouvez toujours vous réinscrire sur http://localhost:8000/
   
@@ -3124,7 +3124,7 @@
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_in_followup_group_without_recent_contact][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse jane.doe@test.local depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
   
@@ -3140,7 +3140,7 @@
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_with_job_application_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse jane.doe@test.local depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
   
@@ -3156,7 +3156,7 @@
 # name: TestNotifyInactiveJobseekersManagementCommand.test_notify_inactive_jobseekers[jobseeker_without_recent_activity][inactive_jobseeker_email_body]
   '''
   Bonjour Jane DOE,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse jane.doe@test.local depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
   
@@ -3172,7 +3172,7 @@
 # name: TestNotifyInactiveProfessionalsManagementCommand.test_notify_inactive_professionals[professional_without_recent_activity][inactive_professional_email_body]
   '''
   Bonjour Micheline DUBOIS,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion depuis le XX/XX/XXXX.
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse john.doe@test.local depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
   
