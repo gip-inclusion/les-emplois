@@ -310,6 +310,10 @@ class MembershipAbstract(models.Model):
     class Meta:
         abstract = True
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.user.field.remote_field.limit_choices_to = {"kind": cls.user_kind}
+
     def clean(self, *args, **kwargs):
         super().clean()
         if self.user.kind != self.user_kind:
