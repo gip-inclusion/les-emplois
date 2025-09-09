@@ -11,7 +11,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
     AuthorKind,
 )
-from itou.eligibility.tasks import async_certify_criteria_api_particulier
+from itou.eligibility.tasks import async_certify_criteria_api_particulier, async_certify_criteria_pole_emploi
 from itou.job_applications.enums import SenderKind
 from itou.utils.models import InclusiveDateRangeField
 
@@ -104,6 +104,8 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             criteria
         ):
             async_certify_criteria_api_particulier(self._meta.model_name, self.pk)
+        if AdministrativeCriteriaKind.certifiable_by_api_pole_emploi().intersection(criteria):
+            async_certify_criteria_pole_emploi(self._meta.model_name, self.pk)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):

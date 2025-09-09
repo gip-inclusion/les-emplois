@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criteria_api_particulier, certify_criteria_api_particulier
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
@@ -30,7 +30,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 )
 @pytest.mark.usefixtures("api_particulier_settings")
 class TestCertifyCriteriaApiParticulier:
-    @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+    @pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])

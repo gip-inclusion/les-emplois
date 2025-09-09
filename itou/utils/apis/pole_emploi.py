@@ -71,7 +71,9 @@ class MultipleUsersReturned(PoleEmploiAPIBadResponse):
 
 
 class PoleEmploiRateLimitException(PoleEmploiAPIException):
-    pass
+    def __init__(self, *args, retry_after=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.retry_after = retry_after
 
 
 API_CLIENT_EMPTY_NIR_BAD_RESPONSE = "empty_nir"
@@ -374,9 +376,11 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             )
         except httpx.HTTPStatusError as exc:
             match exc.response.status_code:
-                # Documentation does not mention a Retry-After header.
                 case 429:
-                    raise PoleEmploiRateLimitException(error_code=429)
+                    raise PoleEmploiRateLimitException(
+                        error_code=429,
+                        retry_after=int(exc.response.headers["Retry-After"]),
+                    )
                 case 400 | 401 | 403 as error_code:
                     # Should not retry
                     raise PoleEmploiAPIBadResponse(
