@@ -455,6 +455,9 @@ class EvaluationCampaign(models.Model):
                 if not has_siae_to_notify:
                     has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
+                evaluated_siae.final_state = evaluated_siae.state
+                evaluated_siae.save(update_fields=["final_state"])
+
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
             )
