@@ -14,11 +14,18 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
+from itou.utils.apis.pole_emploi import (
+    IdentityNotCertified,
+    MultipleUsersReturned,
+    PoleEmploiAPIBadResponse,
+    UserDoesNotExist,
+    pole_emploi_agent_api_client,
+)
 from itou.utils.enums import ItouEnvironment
 from itou.utils.types import InclusiveDateRange
 
 
-logger = logging.getLogger("APIParticulierClient")
+logger = logging.getLogger(__name__)
 
 
 def certify_criteria_by_api_particulier(eligibility_diagnosis):
@@ -120,7 +127,64 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
         )
 
 
-def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis_pk):
+def certify_criteria_by_api_pole_emploi(eligibility_diagnosis):
+    if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
+        logging.info(
+            "API France Travail is not configured in %s, certify_criteria_pole_emploi was skipped.",
+            settings.ITOU_ENVIRONMENT,
+        )
+        return
+    SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+    job_seeker = eligibility_diagnosis.job_seeker
+    criterion = (
+        SelectedAdministrativeCriteria.objects.filter(
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+            eligibility_diagnosis=eligibility_diagnosis,
+        )
+        .select_for_update(of=("self",), no_key=True)
+        .get()
+    )
+    with pole_emploi_agent_api_client() as pe_client:
+        try:
+            data = pe_client.certify_rqth(jobseeker_profile=job_seeker.jobseeker_profile)
+        except (IdentityNotCertified, MultipleUsersReturned, UserDoesNotExist) as e:
+            logger.info("Could not certify criterion %r: json=%s", criterion, e.response_data)
+            criterion.data_returned_by_api = e.response_data
+        except PoleEmploiAPIBadResponse as e:
+            logger.error("Error certifying criterion %r: code=%d json=%s", criterion, e.response_code, e.response_data)
+            criterion.data_returned_by_api = e.response_data
+        except httpx.HTTPError as e:
+            if e.response.status_code == 429:
+                # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/erreurs-frequentes#:~:text=429 Too Many Requests  # noqa: E501
+                raise RetryTask(delay=int(e.response.headers["Retry-After"])) from e
+            raise e
+        else:
+            criterion.certified = data["is_certified"]
+            criterion.data_returned_by_api = data["raw_response"]
+            if criterion.certified:
+                criterion.certification_period = InclusiveDateRange(data["start_at"], data["end_at"])
+    criterion.certified_at = timezone.now()
+    criterion.save(
+        update_fields=[
+            "certification_period",
+            "certified",
+            "certified_at",
+            "data_returned_by_api",
+        ]
+    )
+    if criterion.certified is not None:
+        IdentityCertification.objects.upsert_certifications(
+            [
+                IdentityCertification(
+                    certifier=IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER,
+                    jobseeker_profile=job_seeker.jobseeker_profile,
+                    certified_at=criterion.certified_at,
+                ),
+            ],
+        )
+
+
+def _async_certify_criteria(model_name, eligibility_diagnosis_pk, *, certify_func):
     model = apps.get_model("eligibility", model_name)
     try:
         eligibility_diagnosis = model.objects.select_related("job_seeker__jobseeker_profile").get(
@@ -135,7 +199,7 @@ def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis
         return
     try:
         with transaction.atomic():
-            certify_criteria_by_api_particulier(eligibility_diagnosis)
+            certify_func(eligibility_diagnosis)
     except (
         httpx.HTTPError,  # Could not connect, unexpected status code, …
         JSONDecodeError,  # Response was not JSON (text, HTML, …).
@@ -147,9 +211,20 @@ def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis
         logger.exception(e)
 
 
+def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis_pk):
+    _async_certify_criteria(model_name, eligibility_diagnosis_pk, certify_func=certify_criteria_by_api_particulier)
+
+
+def _async_certify_criteria_by_api_pole_emploi(model_name, eligibility_diagnosis_pk):
+    _async_certify_criteria(model_name, eligibility_diagnosis_pk, certify_func=certify_criteria_by_api_pole_emploi)
+
+
 # Retry every 10 minutes for 24h.
 async_certify_criteria_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
     _async_certify_criteria_by_api_particulier
+)
+async_certify_criteria_by_api_pole_emploi = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
+    _async_certify_criteria_by_api_pole_emploi
 )
 # TODO(François): Legacy task definition, drop at least 24h after it has been deployed.
 async_certify_criteria = on_commit_task(
@@ -160,3 +235,4 @@ async_certify_criteria = on_commit_task(
 # TODO: Use the decorator and drop assignment of call_local if
 # https://github.com/coleifer/huey/pull/848 is integrated.
 async_certify_criteria_by_api_particulier.call_local = _async_certify_criteria_by_api_particulier
+async_certify_criteria_by_api_pole_emploi.call_local = _async_certify_criteria_by_api_pole_emploi

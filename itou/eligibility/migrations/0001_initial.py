@@ -225,7 +225,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "certified",
-                    models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier"),
+                    models.BooleanField(blank=True, null=True, verbose_name="certifié"),
                 ),
                 ("certified_at", models.DateTimeField(blank=True, null=True, verbose_name="certifié le")),
                 (
@@ -495,7 +495,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "certified",
-                    models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier"),
+                    models.BooleanField(blank=True, null=True, verbose_name="certifié"),
                 ),
                 ("certified_at", models.DateTimeField(blank=True, null=True, verbose_name="certifié le")),
                 (

@@ -957,6 +957,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("api_recherche_individu_certifie", "API France Travail recherche individu certifié"),
                             ("api_particulier", "API Particulier"),
+                            ("api_rechercher_usager", "API France Travail rechercher usager"),
                         ],
                         max_length=32,
                         verbose_name="certificateur",

@@ -8,14 +8,24 @@ from freezegun import freeze_time
 from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import async_certify_criteria_by_api_particulier, certify_criteria_by_api_particulier
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.tasks import (
+    async_certify_criteria_by_api_particulier,
+    async_certify_criteria_by_api_pole_emploi,
+    certify_criteria_by_api_particulier,
+)
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
+from itou.utils.apis.pole_emploi import Endpoints as PE_Endpoints
 from itou.utils.mocks.api_particulier import (
-    RESPONSES,
-    ResponseKind,
+    RESPONSES as API_PARTICULIER_RESPONSES,
+    ResponseKind as ApiParticulierResponseKind,
+)
+from itou.utils.mocks.pole_emploi import (
+    RESPONSES as API_POLE_EMPLOI_RESPONSES,
+    ResponseKind as ApiPoleEmploiResponseKind,
 )
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -30,12 +40,12 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 )
 @pytest.mark.usefixtures("api_particulier_settings")
 class TestCertifyCriteriaApiParticulier:
-    @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+    @pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
         respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
-            json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            json=API_PARTICULIER_RESPONSES[criteria_kind][ApiParticulierResponseKind.CERTIFIED]
         )
 
         async_certify_criteria_by_api_particulier.call_local(
@@ -50,7 +60,10 @@ class TestCertifyCriteriaApiParticulier:
         ).get()
         assert criterion.certified is True
         assert criterion.certified_at is not None
-        assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+        assert (
+            criterion.data_returned_by_api
+            == API_PARTICULIER_RESPONSES[criteria_kind][ApiParticulierResponseKind.CERTIFIED]
+        )
         assert criterion.certification_period == InclusiveDateRange(
             datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
@@ -165,4 +178,155 @@ class TestCertifyCriteriaApiParticulier:
         eligibility_diagnosis_model = factory._meta.model
         modelname = eligibility_diagnosis_model._meta.model_name
         async_certify_criteria_by_api_particulier.call_local(modelname, 0)
+        assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]
+
+
+class TestCertifyCriteriaPoleEmploi:
+    @pytest.fixture(autouse=True)
+    def mock_api(self, respx_mock, settings):
+        settings.API_ESD = {
+            "BASE_URL": "https://pe.fake",
+            "AUTH_BASE_URL_AGENT": "https://auth.fr",
+            "KEY": "foobar",
+            "SECRET": "pe-secret",
+        }
+        respx_mock.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent").respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+        )
+
+    @freeze_time("2025-09-15")
+    def test_queue_task(self, respx_mock):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+        )
+        respx_mock.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
+            200,
+            json=API_POLE_EMPLOI_RESPONSES[PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][
+                ApiPoleEmploiResponseKind.CERTIFIED
+            ],
+        )
+        json_response = API_POLE_EMPLOI_RESPONSES[PE_Endpoints.RQTH][ApiPoleEmploiResponseKind.CERTIFIED]
+        certify_rqth_url = settings.API_ESD["BASE_URL"] + PE_Endpoints.RQTH
+        respx_mock.get(certify_rqth_url).respond(200, json=json_response)
+
+        async_certify_criteria_by_api_pole_emploi.call_local(
+            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+        )
+
+        assert [call.request.url for call in respx_mock.calls] == [
+            "https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent",
+            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            certify_rqth_url,
+        ]
+        SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+        criterion = SelectedAdministrativeCriteria.objects.get(eligibility_diagnosis=eligibility_diagnosis)
+        assert criterion.certified is True
+        assert criterion.certified_at is not None
+        assert criterion.data_returned_by_api == json_response
+        assert criterion.certification_period == InclusiveDateRange(
+            datetime.date(2024, 1, 20), datetime.date(2030, 1, 20)
+        )
+        assertQuerySetEqual(
+            eligibility_diagnosis.job_seeker.jobseeker_profile.identity_certifications.all(),
+            [IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER],
+            transform=lambda certification: certification.certifier,
+        )
+
+    @pytest.mark.parametrize(
+        "response_kind",
+        [
+            ApiPoleEmploiResponseKind.MULTIPLE_USERS_RETURNED,
+            ApiPoleEmploiResponseKind.NOT_CERTIFIED,
+            ApiPoleEmploiResponseKind.NOT_FOUND,
+        ],
+    )
+    def test_rechercher_usager_issues(self, caplog, response_kind, respx_mock):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+        )
+        rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
+        json_response = API_POLE_EMPLOI_RESPONSES[rechercher_usager_endpoint][response_kind]
+        rechercher_usager_url = f"https://pe.fake{rechercher_usager_endpoint}"
+        respx_mock.post(rechercher_usager_url).respond(200, json=json_response)
+
+        async_certify_criteria_by_api_pole_emploi.call_local(
+            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+        )
+
+        assert [call.request.url for call in respx_mock.calls] == [
+            "https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent",
+            rechercher_usager_url,
+        ]
+        SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+        criterion = SelectedAdministrativeCriteria.objects.get(eligibility_diagnosis=eligibility_diagnosis)
+        assert criterion.certified is None
+        assert criterion.certified_at is not None
+        assert criterion.data_returned_by_api == json_response
+        assert criterion.certification_period is None
+        assertQuerySetEqual(eligibility_diagnosis.job_seeker.jobseeker_profile.identity_certifications.all(), [])
+        assert f"Could not certify criterion {criterion!r}: json={json_response}" in caplog.messages
+
+    def test_bad_response(self, caplog, respx_mock):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+        )
+        rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
+        rechercher_usager_url = f"https://pe.fake{rechercher_usager_endpoint}"
+        json_response = API_POLE_EMPLOI_RESPONSES[rechercher_usager_endpoint][
+            ApiPoleEmploiResponseKind.INTERNAL_SERVER_ERROR
+        ]
+        respx_mock.post(rechercher_usager_url).respond(500, json=json_response)
+
+        with pytest.raises(httpx.HTTPError) as excinfo:
+            async_certify_criteria_by_api_pole_emploi.call_local(
+                eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+            )
+
+        assert excinfo.value.response.status_code == 500
+        assert excinfo.value.response.json() == json_response
+        assert [call.request.url for call in respx_mock.calls] == [
+            "https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent",
+            rechercher_usager_url,
+        ]
+        SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+        criterion = SelectedAdministrativeCriteria.objects.get(eligibility_diagnosis=eligibility_diagnosis)
+        assert criterion.certified is None
+        assert criterion.certified_at is None
+        assert criterion.data_returned_by_api is None
+        assert criterion.certification_period is None
+        assertQuerySetEqual(eligibility_diagnosis.job_seeker.jobseeker_profile.identity_certifications.all(), [])
+
+    def test_rate_limit(self, respx_mock):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            certifiable=True,
+            criteria_kinds=AdministrativeCriteriaKind.certifiable_by_api_pole_emploi(),
+        )
+        rechercher_usager_endpoint = PE_Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
+        rechercher_usager_url = f"https://pe.fake{rechercher_usager_endpoint}"
+        respx_mock.post(rechercher_usager_url).respond(429, headers={"Retry-After": "42"})
+
+        with pytest.raises(RetryTask) as excinfo:
+            async_certify_criteria_by_api_pole_emploi.call_local(
+                eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
+            )
+
+        assert excinfo.value.delay == 42
+        assert [call.request.url for call in respx_mock.calls] == [
+            "https://auth.fr/connexion/oauth2/access_token?realm=%2Fagent",
+            rechercher_usager_url,
+        ]
+        SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+        criterion = SelectedAdministrativeCriteria.objects.get(eligibility_diagnosis=eligibility_diagnosis)
+        assert criterion.certified is None
+        assert criterion.certified_at is None
+        assert criterion.data_returned_by_api is None
+        assert criterion.certification_period is None
+        assertQuerySetEqual(eligibility_diagnosis.job_seeker.jobseeker_profile.identity_certifications.all(), [])
+
+    def test_no_retries_when_diag_does_not_exist(self, caplog):
+        modelname = EligibilityDiagnosis._meta.model_name
+        async_certify_criteria_by_api_pole_emploi.call_local(modelname, 0)
         assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]
