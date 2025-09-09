@@ -11,7 +11,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
     AuthorKind,
 )
-from itou.eligibility.tasks import async_certify_criteria_by_api_particulier
+from itou.eligibility.tasks import async_certify_criteria_by_api_particulier, async_certify_criteria_by_api_pole_emploi
 from itou.job_applications.enums import SenderKind
 from itou.utils.models import InclusiveDateRangeField
 
@@ -104,6 +104,8 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             criteria
         ):
             async_certify_criteria_by_api_particulier(self._meta.model_name, self.pk)
+        if AdministrativeCriteriaKind.certifiable_by_api_pole_emploi().intersection(criteria):
+            async_certify_criteria_by_api_pole_emploi(self._meta.model_name, self.pk)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
@@ -171,7 +173,7 @@ class AbstractAdministrativeCriteria(models.Model):
 class AbstractSelectedAdministrativeCriteria(models.Model):
     CERTIFICATION_GRACE_PERIOD_DAYS = 92
 
-    certified = models.BooleanField(blank=True, null=True, verbose_name="certifié par l'API Particulier")
+    certified = models.BooleanField(blank=True, null=True, verbose_name="certifié")
     certified_at = models.DateTimeField(blank=True, null=True, verbose_name="certifié le")
     certification_period = InclusiveDateRangeField(blank=True, null=True, verbose_name="période de certification")
     data_returned_by_api = models.JSONField(
