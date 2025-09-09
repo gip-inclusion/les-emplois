@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2025-09-08
+
+### Ajouté
+
+- [Candidature: ajout du vivier](https://github.com/gip-inclusion/les-emplois/pull/6731)
+
+### Modifié
+
+- [Admin : Correction d'un bug empêchant la fusion d'utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6710)
+- [Admin : Permettre aux membres du groupe itou-admin-readonly de télécharger les exports CTA](https://github.com/gip-inclusion/les-emplois/pull/6734)
+- [Admin: Améliorer l'ordre d'affichage des données utilisateur](https://github.com/gip-inclusion/les-emplois/pull/6769)
+- [Admin: Bloquer la délivrance manuelle de PASS si le candidat a déjà un PASS valide](https://github.com/gip-inclusion/les-emplois/pull/6799)
+- [API: Simplifier l'API SIAE](https://github.com/gip-inclusion/les-emplois/pull/6804)
+- [Candidature: Amélioration de la délivrance automatique des PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/6779)
+- [Candidature: autoriser les utilisateurs à désactiver les notifications de mise en attente](https://github.com/gip-inclusion/les-emplois/pull/6796)
+- [Candidature: Empêcher la déclaration d'embauche en double en cas de double-clic](https://github.com/gip-inclusion/les-emplois/pull/6800)
+- [Candidature: envoi de la notification de transfert aux employeurs/orienteurs](https://github.com/gip-inclusion/les-emplois/pull/6798)
+- [Fiches salarié: Amélioration de l'affichage des horodatages](https://github.com/gip-inclusion/les-emplois/pull/6768)
+- [FranceConnect: empêcher la modification du genre](https://github.com/gip-inclusion/les-emplois/pull/6764)
+- [FranceConnect: mise à jour du bouton et de sa taille](https://github.com/gip-inclusion/les-emplois/pull/6760)
+- [Interface: Amélioration des templates de retrait des collaborateurs de structure](https://github.com/gip-inclusion/les-emplois/pull/6793)
+- [Prescripteurs : Toujours afficher l’onglet « Tous les candidats de ma structure »](https://github.com/gip-inclusion/les-emplois/pull/6781)
+- [Vie privée : ignorer les candidats ayant une candidature évaluées dans le contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/6785)
+- [Vie privée : suppression de la fiche salariée lors de l'archivage du candidat](https://github.com/gip-inclusion/les-emplois/pull/6775)
+- [Éligibilité : Amélioration des badges indiquant la certification](https://github.com/gip-inclusion/les-emplois/pull/6755)
+
 ## 2025-09-01
 
 ### Modifié
