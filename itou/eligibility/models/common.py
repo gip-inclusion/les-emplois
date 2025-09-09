@@ -11,7 +11,10 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaLevel,
     AuthorKind,
 )
-from itou.eligibility.tasks import async_certify_criterion_with_api_particulier
+from itou.eligibility.tasks import (
+    async_certify_criterion_with_api_particulier,
+    async_certify_criterion_with_pole_emploi,
+)
 from itou.job_applications.enums import SenderKind
 from itou.utils.models import InclusiveDateRangeField
 
@@ -99,11 +102,24 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             return SenderKind(self.sender_kind).label
 
     def schedule_certification(self):
-        if settings.API_PARTICULIER_TOKEN:
-            for criterion in self.selected_administrative_criteria.filter(
-                administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
-            ):
-                async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
+        certifiable_criteria = self.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+        )
+        for selected_criterion in certifiable_criteria:
+            kind = selected_criterion.administrative_criteria.kind
+            if kind in AdministrativeCriteriaKind.certifiable_by_api_particulier():
+                if settings.API_PARTICULIER_TOKEN:
+                    async_certify_criterion_with_api_particulier(
+                        selected_criterion._meta.model_name,
+                        selected_criterion.pk,
+                    )
+            elif kind in AdministrativeCriteriaKind.certifiable_by_api_pole_emploi():
+                async_certify_criterion_with_pole_emploi(
+                    selected_criterion._meta.model_name,
+                    selected_criterion.pk,
+                )
+            else:
+                raise ValueError(kind)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):

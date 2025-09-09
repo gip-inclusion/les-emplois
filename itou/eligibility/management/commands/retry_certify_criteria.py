@@ -36,8 +36,7 @@ class Command(BaseCommand):
                     certification_period=None,
                     eligibility_diagnosis__expires_at__gte=today,
                     created_at__lte=timezone.now() - API_PARTICULIER_RETRY_DURATION,
-                )
-                .exclude(
+                ).exclude(
                     or_queries(
                         [
                             Exists(
@@ -58,7 +57,6 @@ class Command(BaseCommand):
                         ],
                     )
                 )
-                .order_by("pk")
-            )
+            ).order_by("pk")
             for criterion in to_recertify:
                 async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
