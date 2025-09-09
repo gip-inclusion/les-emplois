@@ -10,7 +10,7 @@ from django.utils import timezone
 from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import RetryTask
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
@@ -35,7 +35,7 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criteria = (
         SelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
             eligibility_diagnosis=eligibility_diagnosis,
         )
         .select_for_update(of=("self",), no_key=True)
