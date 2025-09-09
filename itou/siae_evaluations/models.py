@@ -455,12 +455,26 @@ class EvaluationCampaign(models.Model):
                 if not has_siae_to_notify:
                     has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
+                evaluated_siae.final_state = evaluated_siae.state
+                evaluated_siae.save(update_fields=["final_state"])
+
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
             )
             if has_siae_to_notify:
                 emails.append(CampaignEmailFactory(self).close())
             send_email_messages(emails)
+
+            # previous loop iterates over not notified evaluated_siaes.
+            # add final_state to notified ones
+            notified_evaluated_siaes = list(
+                EvaluatedSiae.objects.filter(evaluation_campaign=self, notified_at__isnull=False).prefetch_related(
+                    "evaluated_job_applications__evaluated_administrative_criteria"
+                )
+            )
+            for notified_evaluated_siae in notified_evaluated_siaes:
+                notified_evaluated_siae.final_state = notified_evaluated_siae.state
+            EvaluatedSiae.objects.bulk_update(notified_evaluated_siaes, ["final_state"])
 
 
 class EvaluatedSiaeQuerySet(models.QuerySet):
