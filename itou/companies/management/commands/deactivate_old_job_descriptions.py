@@ -3,6 +3,7 @@ import datetime
 from django.utils import timezone
 
 from itou.companies.models import JobDescription
+from itou.companies.notifications import OldJobDescriptionDeactivationNotification
 from itou.utils.command import BaseCommand
 
 
@@ -11,10 +12,21 @@ DEACTIVATION_DELAY = datetime.timedelta(days=90)
 
 class Command(BaseCommand):
     def handle(self, verbosity, **options):
-        deactivated_nb = (
+        old_job_descriptions = list(
             JobDescription.objects.active()
             .is_internal()  # Exclude external sources such as FT API
             .exclude(last_employer_update_at__gte=timezone.now() - DEACTIVATION_DELAY)
-            .update(is_active=False)
+            .select_related("company", "appellation", "location")
+            .prefetch_related("company__members")
         )
+        deactivated_nb = JobDescription.objects.filter(
+            pk__in=[old_job_desc.pk for old_job_desc in old_job_descriptions]
+        ).update(is_active=False)
+        for old_job_description in old_job_descriptions:
+            for member in old_job_description.company.members.all():
+                OldJobDescriptionDeactivationNotification(
+                    member,
+                    old_job_description.company,
+                    job_description=old_job_description,
+                ).send()
         self.logger.info(f"Deactivated {deactivated_nb} JobDescriptions")

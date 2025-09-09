@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Votre fiche de poste {{ job_description.display_name }} à {{ job_description.display_location }} a été dépubliée
+{% endblock %}
