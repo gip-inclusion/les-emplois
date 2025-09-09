@@ -78,6 +78,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        limit_choices_to={"kind": "job_seeker"},
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="approvals",
                         to=settings.AUTH_USER_MODEL,
