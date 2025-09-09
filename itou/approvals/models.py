@@ -27,7 +27,7 @@ from itou.employee_record.enums import Status
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
-from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.enums import IdentityCertificationAuthorities, UserKind
 from itou.users.models import IdentityCertification
 from itou.utils.apis import enums as api_enums
 from itou.utils.apis.pole_emploi import (
@@ -401,6 +401,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name="demandeur d'emploi",
         on_delete=models.PROTECT,  # 2-step deletion, first the Approval to create a CancelledApproval then the User
         related_name="approvals",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
