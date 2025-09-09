@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 (
                     "beneficiary",
                     models.OneToOneField(
+                        limit_choices_to={"kind": "job_seeker"},
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="follow_up_group",
                         to=settings.AUTH_USER_MODEL,
