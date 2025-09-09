@@ -10,15 +10,21 @@ from django.utils import timezone
 from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import RetryTask
 
-from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
+from itou.utils.apis.pole_emploi import (
+    IdentityNotCertified,
+    MultipleUsersReturned,
+    PoleEmploiAPIBadResponse,
+    UserDoesNotExist,
+    pole_emploi_agent_api_client,
+)
 from itou.utils.enums import ItouEnvironment
 from itou.utils.types import InclusiveDateRange
 
 
-logger = logging.getLogger("APIParticulierClient")
+logger = logging.getLogger(__name__)
 
 
 def certify_criterion_with_api_particulier(criterion):
@@ -94,9 +100,56 @@ def certify_criterion_with_api_particulier(criterion):
             )
 
 
-# Retry every 10 minutes for 24h.
-@on_commit_task(retries=24 * 6, retry_delay=10 * 60)
-def async_certify_criterion_with_api_particulier(model_name, selected_administrative_criteria_id):
+def certify_criteria_with_pole_emploi(criterion):
+    if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
+        logging.info(
+            "API France Travail is not configured in %s, certify_criteria_pole_emploi was skipped.",
+            settings.ITOU_ENVIRONMENT,
+        )
+        return
+    job_seeker = criterion.eligibility_diagnosis.job_seeker
+    with pole_emploi_agent_api_client() as pe_client:
+        try:
+            data = pe_client.certify_rqth(jobseeker_profile=job_seeker.jobseeker_profile)
+        except (IdentityNotCertified, MultipleUsersReturned, UserDoesNotExist) as e:
+            logger.info("Could not certify criterion %r: json=%s", criterion, e.response_data)
+            criterion.data_returned_by_api = e.response_data
+        except PoleEmploiAPIBadResponse as e:
+            logger.error("Error certifying criterion %r: code=%d json=%s", criterion, e.response_code, e.response_data)
+            criterion.data_returned_by_api = e.response_data
+        except httpx.HTTPError as e:
+            if e.response.status_code == 429:
+                # https://francetravail.io/produits-partages/documentation/utilisation-api-france-travail/erreurs-frequentes#:~:text=429 Too Many Requests  # noqa: E501
+                delay_str = e.response.headers.get("Retry-After", "60")
+                try:
+                    delay = int(delay_str)
+                except ValueError:
+                    logging.info("Invalid Retry-After header %s.", delay_str)
+                    delay = 60
+                raise RetryTask(delay=delay) from e
+            raise e
+        else:
+            criterion.certified = data["is_certified"]
+            criterion.data_returned_by_api = data["raw_response"]
+            if criterion.certified:
+                criterion.certification_period = InclusiveDateRange(data["start_at"], data["end_at"])
+    criterion.certified_at = timezone.now()
+    job_seeker = criterion.eligibility_diagnosis.job_seeker
+    with transaction.atomic():
+        criterion.save()
+        if criterion.certified is not None:
+            IdentityCertification.objects.upsert_certifications(
+                [
+                    IdentityCertification(
+                        certifier=IdentityCertificationAuthorities.API_FT_RECHERCHER_USAGER,
+                        jobseeker_profile=job_seeker.jobseeker_profile,
+                        certified_at=criterion.certified_at,
+                    ),
+                ],
+            )
+
+
+def _async_certify_criterion(model_name, selected_administrative_criteria_id, *, certification_func):
     model = apps.get_model("eligibility", model_name)
     with transaction.atomic():
         try:
@@ -119,7 +172,7 @@ def async_certify_criterion_with_api_particulier(model_name, selected_administra
         captured_exc = None
         retry = False
         try:
-            certify_criterion_with_api_particulier(criterion)
+            certification_func(criterion)
         except (
             httpx.HTTPError,  # Could not connect, unexpected status code, …
             JSONDecodeError,  # Response was not JSON (text, HTML, …).
@@ -137,30 +190,20 @@ def async_certify_criterion_with_api_particulier(model_name, selected_administra
         logger.exception(captured_exc)
 
 
-def _async_certify_eligibility_diagnosis_by_api_particulier(model_name, eligibility_diagnosis_pk):
-    model = apps.get_model("eligibility", model_name)
-    try:
-        eligibility_diagnosis = model.objects.get(pk=eligibility_diagnosis_pk)
-    except model.DoesNotExist:
-        logger.info(
-            "%s with pk %d does not exist, it cannot be certified.",
-            model_name,
-            eligibility_diagnosis_pk,
-        )
-        return
-    for criterion in eligibility_diagnosis.selected_administrative_criteria.filter(
-        administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
-    ):
-        async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
-
-
-# Deprecated, preserved for backward-compatibility. Drop 24h after the deploy.
 # Retry every 10 minutes for 24h.
-async_certify_eligibility_diagnosis_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
-    _async_certify_eligibility_diagnosis_by_api_particulier,
-)
-# TODO: Use the decorator and drop assignment of call_local if
-# https://github.com/coleifer/huey/pull/848 is integrated.
-async_certify_eligibility_diagnosis_by_api_particulier.call_local = (
-    _async_certify_eligibility_diagnosis_by_api_particulier
-)
+@on_commit_task(retries=24 * 6, retry_delay=10 * 60)
+def async_certify_criterion_with_api_particulier(model_name, selected_administrative_criteria_id):
+    _async_certify_criterion(
+        model_name,
+        selected_administrative_criteria_id,
+        certification_func=certify_criterion_with_api_particulier,
+    )
+
+
+@on_commit_task(retries=24 * 6, retry_delay=10 * 60)
+def async_certify_criterion_with_pole_emploi(model_name, selected_administrative_criteria_id):
+    _async_certify_criterion(
+        model_name,
+        selected_administrative_criteria_id,
+        certification_func=certify_criteria_with_pole_emploi,
+    )
