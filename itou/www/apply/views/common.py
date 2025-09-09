@@ -242,6 +242,7 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
                 "apply/includes/geiq/continue_without_geiq_diagnosis_form.html",
                 context={
                     "next_url": self.get_next_url(),
+                    "back_url": self.get_back_url(),
                     "progress": 66,
                 },
             )
