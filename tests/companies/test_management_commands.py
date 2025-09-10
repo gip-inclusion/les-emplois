@@ -207,7 +207,7 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     assert company_3.coords.y == 42.42
 
 
-def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks):
+def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog):
     create_test_romes_and_appellations(("N1101",))
     old_job_description_1 = companies_factories.JobDescriptionFactory(
         last_employer_update_at=timezone.now() - datetime.timedelta(days=90),
@@ -239,6 +239,7 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
         ordered=False,
     )
 
+    assert caplog.messages[:-1] == ["Deactivated 2 JobDescriptions"]
     assert len(mailoutbox) == 2
 
     assert set(sum((mail.to for mail in mailoutbox), [])) == {
@@ -248,3 +249,23 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
     mail = next(mail for mail in mailoutbox if mail.to == [old_job_description_1.company.members.get().email])
     assert mail.subject == snapshot(name="email subject")
     assert mail.body == snapshot(name="email body")
+
+
+def test_deactivate_old_job_description_batch_size(mocker, caplog):
+    create_test_romes_and_appellations(("N1101",))
+    companies_factories.JobDescriptionFactory.create_batch(
+        3, last_employer_update_at=timezone.now() - datetime.timedelta(days=90)
+    )
+    assert JobDescription.objects.active().count() == 3
+    mocker.patch("itou.companies.management.commands.deactivate_old_job_descriptions.BATCH_SIZE", 1)
+
+    management.call_command("deactivate_old_job_descriptions")
+    assert JobDescription.objects.active().count() == 2
+    assert [record.message for record in caplog.records if record.levelname == "ERROR"] == [
+        "Too many old JobDescriptions to deactivate"
+    ]
+
+    caplog.clear()
+    management.call_command("deactivate_old_job_descriptions")
+    assert JobDescription.objects.active().count() == 1
+    assert [record.message for record in caplog.records if record.levelname == "ERROR"] == []
