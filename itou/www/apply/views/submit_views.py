@@ -444,6 +444,11 @@ class CheckPreviousApplications(ApplicationBaseView):
         context = super().get_context_data(**kwargs)
         context["prev_application"] = self.prev_application
         context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["enable_iae_eligibility"] = (
+            self.request.from_authorized_prescriber
+            and self.company.is_subject_to_eligibility_rules
+            and not self.job_seeker.approvals.valid().exists()
+        )
         return context
 
 
