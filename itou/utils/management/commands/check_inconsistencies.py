@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.admin import site
 from django.contrib.admin.exceptions import NotRegistered
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 
 from itou.utils.command import BaseCommand
 from itou.utils.slack import send_slack_message
@@ -11,7 +12,10 @@ from itou.utils.urls import get_absolute_url
 
 
 def get_admin_absolute_url(obj):
-    return get_absolute_url(reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk]))
+    try:
+        return get_absolute_url(reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_change", args=[obj.pk]))
+    except NoReverseMatch:
+        return None
 
 
 def get_fields_with_dict_limit_choices(model):
@@ -67,7 +71,7 @@ class Command(BaseCommand):
         s = pluralizefr(len(inconsistencies))
         msg_lines = [f"{len(inconsistencies)} incohérence{s} trouvée{s}:"]
         for obj, errors in inconsistencies.items():
-            obj_url = get_admin_absolute_url(obj)
+            obj_url = get_admin_absolute_url(obj) or obj
             msg_lines.append(f" - {obj_url} : {errors}")
         if not inconsistencies:
             msg_lines.append("Bon boulot :not-bad:")
