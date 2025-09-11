@@ -3,23 +3,31 @@
 {% load django_bootstrap5 %}
 
 {% block content_extend %}
-    <div class="alert alert-warning" role="status">
-        {% with prev_application.created_at|date:"d F Y à H:i" as prev_created_at %}
-            {% if request.user == job_seeker %}
-                <p class="mb-0">
-                    Vous avez déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
-                </p>
-            {% else %}
-                <p class="mb-0">
-                    Le candidat a déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
-                </p>
-            {% endif %}
-        {% endwith %}
-    </div>
     <form method="post" class="js-prevent-multiple-submit">
         {% csrf_token %}
-        <input type="hidden" name="force_new_application" value="force">
 
-        {% itou_buttons_form primary_label="Postuler à nouveau" %}
+        <div class="c-form">
+            {% if request.user == job_seeker %}
+                <h2>Vous avez déjà postulé pour cette entreprise</h2>
+            {% else %}
+                <h2>Ce candidat a déjà postulé pour cette entreprise</h2>
+            {% endif %}
+
+            <p>
+                Entreprise : <b>{{ siae.display_name }}</b>
+                <br>
+                Date de la dernière candidature : <b>{{ prev_application.created_at|date:"d F Y à H\hi" }}</b>
+            </p>
+
+            {% if block_apply %}
+                <div class="alert alert-warning" role="status">
+                    Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+                </div>
+            {% endif %}
+
+            <input type="hidden" name="force_new_application" value="force">
+
+            {% itou_buttons_form primary_label="Postuler à nouveau" primary_disabled=block_apply show_mandatory_fields_mention=False %}
+        </div>
     </form>
 {% endblock %}

@@ -1202,6 +1202,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     """
 
     template_name = "job_seekers_views/check_job_seeker_info.html"
+    SKIP_PREV_APPLICATIONS_CHECK = True
 
     def __init__(self):
         super().__init__()
