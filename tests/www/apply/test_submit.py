@@ -4766,6 +4766,11 @@ class TestCheckPreviousApplicationsView:
                 replace_in_attr=[
                     ("href", str(self.job_seeker.public_id), "[Public ID of JobSeeker]"),
                     ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"%2Fcompany%2F{job_application.to_company.pk}%2Fcard",
+                        "%2Fcompany%2F[PK of Company]%2Fcard",
+                    ),
                 ],
             )
         ) == snapshot(name="blocked")
@@ -4790,6 +4795,11 @@ class TestCheckPreviousApplicationsView:
                 replace_in_attr=[
                     ("href", str(self.job_seeker.public_id), "[Public ID of JobSeeker]"),
                     ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"%2Fcompany%2F{job_application.to_company.pk}%2Fcard",
+                        "%2Fcompany%2F[PK of Company]%2Fcard",
+                    ),
                 ],
             )
         ) == snapshot(name="allowed")

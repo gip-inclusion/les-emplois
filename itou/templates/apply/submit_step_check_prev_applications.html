@@ -27,7 +27,7 @@
 
             <input type="hidden" name="force_new_application" value="force">
 
-            {% if enable_iae_eligibility %}
+            {% if iae_eligibility_url %}
                 <div class="c-info mb-3 mb-md-4">
                     <div class="c-info__summary">
 
@@ -39,47 +39,11 @@
                     </div>
                 </div>
 
-                {# This is a copy from buttons_form.html to tweak the secondary button #}
-                <div class="row">
-                    <div class="col-12">
-                        <hr class="mb-3">
-                        <div class="form-row align-items-center justify-content-end gx-3">
-                            <div class="form-group col-12 col-lg order-3 order-lg-1">
-                                <a href="{{ reset_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
-                                    <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                                    <span>Annuler</span>
-                                </a>
-                            </div>
-                            {% if block_apply %}
-                                <div class="form-group col col-lg-auto order-2 order-lg-3">
-                                    <a href="{% url "eligibility_views:update_iae" job_seeker_public_id=job_seeker.public_id %}?back_url={{ reset_url|urlencode }}" class="btn btn-block btn-primary">
-                                        {% if eligibility_diagnosis %}
-                                            <span>Mettre à jour l’éligibilité IAE</span>
-                                        {% else %}
-                                            <span>Valider l’éligibilité IAE</span>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                            {% else %}
-                                <div class="form-group col col-lg-auto order-2 order-lg-3">
-                                    <a href="{% url "eligibility_views:update_iae" job_seeker_public_id=job_seeker.public_id %}?back_url={{ reset_url|urlencode }}" class="btn btn-link">
-                                        {% if eligibility_diagnosis %}
-                                            <span>Mettre à jour l’éligibilité IAE</span>
-                                        {% else %}
-                                            <span>Valider l’éligibilité IAE</span>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                                <div class="form-group col col-lg-auto order-1 order-lg-2">
-                                    <button type="submit" class="btn btn-block btn-primary">
-                                        <span>Postuler à nouveau</span>
-                                    </button>
-                                </div>
-                            {% endif %}
-
-                        </div>
-                    </div>
-                </div>
+                {% if block_apply %}
+                    {% itou_buttons_form primary_label=iae_eligibility_label primary_url=iae_eligibility_url primary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                {% else %}
+                    {% itou_buttons_form primary_label="Postuler à nouveau" secondary_label=iae_eligibility_label secondary_url=iae_eligibility_url secondary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}
+                {% endif %}
             {% else %}
                 {% itou_buttons_form primary_label="Postuler à nouveau" primary_disabled=block_apply show_mandatory_fields_mention=False reset_url=reset_url %}
             {% endif %}
