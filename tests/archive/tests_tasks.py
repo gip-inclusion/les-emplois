@@ -38,6 +38,7 @@ def test_async_delete_contact_retries_warning(
         assert warning_record.message == snapshot(name=f"attempting-to-delete-email-{retries}-retries")
 
 
-def test_async_delete_contact_when_email_is_none(respx_mock):
-    async_delete_contact(None)
-    assert not respx_mock.calls.called
+def test_async_delete_contact_does_not_send_HTTP_request(respx_mock):
+    for email in [None, "somebody@email.com_old"]:
+        async_delete_contact(None)
+        assert not respx_mock.calls.called
