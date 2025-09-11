@@ -36,3 +36,8 @@ def test_async_delete_contact_retries_warning(
     if retries % 100 == 0:
         warning_record = next(record for record in caplog.records if record.levelname == "WARNING")
         assert warning_record.message == snapshot(name=f"attempting-to-delete-email-{retries}-retries")
+
+
+def test_async_delete_contact_when_email_is_none(respx_mock):
+    async_delete_contact(None)
+    assert not respx_mock.calls.called
