@@ -413,7 +413,7 @@ def stats_ft_conversion_main(request):
 def stats_ft_state_main(request):
     return render_stats_ft(
         request=request,
-        page_title="Analyse des candidatures émises et de leur traitement",
+        page_title="Analyse des candidatures émises par France Travail",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
