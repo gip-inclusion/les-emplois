@@ -422,6 +422,17 @@ def stats_ft_state_main(request):
 
 
 @check_request(utils.can_view_stats_ft)
+def stats_ft_state_raw(request):
+    return render_stats_ft(
+        request=request,
+        page_title="Données brutes de l’état des candidatures orientées",
+        extra_params={
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
+        },
+    )
+
+
+@check_request(utils.can_view_stats_ft)
 def stats_ft_beneficiaries(request):
     return render_stats_ft(
         request=request,
