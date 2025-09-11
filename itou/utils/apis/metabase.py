@@ -98,6 +98,9 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
+    "stats_ft_state_raw": {
+        "dashboard_id": 183,
+    },
     "stats_ft_beneficiaries": {
         "dashboard_id": 545,
         "tally_popup_form_id": "wo1GOe",
