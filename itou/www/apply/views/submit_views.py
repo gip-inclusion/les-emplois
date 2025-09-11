@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -121,7 +122,10 @@ class ApplicationPermissionMixin:
             return HttpResponseRedirect(self.get_reset_url())
         # Limit the possibility of applying to the same SIAE for 24 hours.
         if (
-            hasattr(self, "job_seeker")
+            not getattr(
+                self, "SKIP_PREV_APPLICATIONS_CHECK", False
+            )  # Don't enforce this rule until after CheckPreviousApplications
+            and hasattr(self, "job_seeker")
             and not (self.auto_prescription_process or self.hire_process)
             and self.get_previous_applications_queryset().created_in_past(hours=24).exists()
         ):
@@ -408,6 +412,11 @@ class CheckPreviousApplications(ApplicationBaseView):
     """
 
     template_name = "apply/submit_step_check_prev_applications.html"
+    SKIP_PREV_APPLICATIONS_CHECK = True
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.prev_application = self.get_previous_applications_queryset().order_by("created_at").last()
 
     def get_next_url(self):
         if self.hire_process:
@@ -419,7 +428,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         return reverse(view_name, kwargs={"session_uuid": self.apply_session.name})
 
     def get(self, request, *args, **kwargs):
-        if not self.get_previous_applications_queryset().exists():
+        if self.prev_application is None:
             return HttpResponseRedirect(self.get_next_url())
         return super().get(request, *args, **kwargs)
 
@@ -432,9 +441,25 @@ class CheckPreviousApplications(ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "prev_application": self.get_previous_applications_queryset().latest("created_at"),
-        }
+        context = super().get_context_data(**kwargs)
+        context["prev_application"] = self.prev_application
+        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["iae_eligibility_url"] = None
+        if (
+            self.request.from_authorized_prescriber
+            and self.company.is_subject_to_eligibility_rules
+            and not self.job_seeker.approvals.valid().exists()
+        ):
+            context["iae_eligibility_url"] = reverse(
+                "eligibility_views:update_iae",
+                kwargs={"job_seeker_public_id": self.job_seeker.public_id},
+                query={"back_url": self.get_reset_url()},
+            )
+
+        context["iae_eligibility_label"] = (
+            "Mettre à jour l’éligibilité IAE" if self.eligibility_diagnosis else "Valider l’éligibilité IAE"
+        )
+        return context
 
 
 class ApplicationJobsView(ApplicationBaseView):
