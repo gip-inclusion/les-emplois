@@ -2417,8 +2417,8 @@ class TestJobApplicationAdminForm:
         job_application.job_seeker = PrescriberFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"] == form.errors[
-            "__all__"
+        assert ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."] == form.errors[
+            "job_seeker"
         ]
 
     def test_application_bad_eligibility_diagnosis_job_seeker(self):
