@@ -73,6 +73,8 @@ class BrevoClient:
                 self._import_contacts(batch, list_id, serializer)
 
     def delete_contact(self, email):
+        if not email:
+            return
         try:
             response = self.client.delete(
                 f"/contacts/{email}?identifierType=email_id",
