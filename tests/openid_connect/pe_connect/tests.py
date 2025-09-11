@@ -20,7 +20,7 @@ from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
-from itou.utils import constants as global_constants
+from itou.utils import constants as global_constants, triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
@@ -67,7 +67,8 @@ def mock_oauth_dance(
 
     state = PoleEmploiConnectState.save_state()
     url = reverse("pe_connect:callback")
-    response = client.get(url, data={"code": "123", "state": state}, follow=True)
+    with triggers.context():
+        response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
 
@@ -130,6 +131,7 @@ class TestPoleEmploiConnect:
         assert pec_state.nonce is not None
         assert f"nonce={pec_state.nonce}" in response.url
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_user(self):
         """
         Nominal scenario: there is no user with the PEAMU id or PEAMU email
@@ -153,6 +155,7 @@ class TestPoleEmploiConnect:
         assert user.last_name == "DUPUIS"
         assert user.identity_provider == IdentityProvider.PE_CONNECT
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_user_with_already_existing_peamu_id(self):
         """
         If there already is an existing user with this PEAMU id, we do not create it again,
@@ -197,6 +200,7 @@ class TestPoleEmploiConnect:
 
             user.delete()
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_update_readonly_with_certified_criteria(self, caplog):
         job_seeker = JobSeekerFactory(
             username=PEAMU_USERINFO["sub"],
@@ -233,7 +237,6 @@ class TestPoleEmploiConnect:
         response = client.get(url, data={"code": "123", "state": "000"})
         assert response.status_code == 302
 
-    @pytest.mark.django_db(transaction=True)
     @respx.mock
     def test_callback(self, client):
         # New created job seeker has no title and is redirected to complete its infos

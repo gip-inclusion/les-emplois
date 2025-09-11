@@ -2,6 +2,7 @@ import random
 from functools import partial
 from urllib.parse import urlencode
 
+import pytest
 import respx
 from django.conf import settings
 from django.contrib import messages
@@ -592,6 +593,7 @@ class ProConnectSignupTestAcceptInvitation:
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_existing_user__login_with_ProConnect(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         user = self.user_factory(

@@ -231,6 +231,7 @@ class TestCommandSendUsersToBrevo:
         settings.BREVO_API_KEY = "BREVO_API_KEY"
 
     @freeze_time("2023-05-01T23:30:00Z")
+    @pytest.mark.usefixtures("trigger_context")
     def test_wet_run_siae(self, caplog, respx_mock, snapshot):
         for kind in set(CompanyKind) - set(CompanyKind.siae_kinds()):
             CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.PRO_CONNECT)
@@ -353,6 +354,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_siae")
 
     @freeze_time("2023-05-02")
+    @pytest.mark.usefixtures("trigger_context")
     def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
         pe = PrescriberOrganizationFactory(france_travail=True)
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
@@ -426,6 +428,7 @@ class TestCommandSendUsersToBrevo:
         assert caplog.record_tuples == snapshot(name="send_users_to_brevo_prescribers")
 
     @freeze_time("2023-05-02")
+    @pytest.mark.usefixtures("trigger_context")
     def test_wet_run_orienteurs(self, caplog, respx_mock, snapshot):
         PrescriberFactory(
             first_name="Billy",

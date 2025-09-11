@@ -14,6 +14,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.pro_connect import constants
 from itou.users.enums import IdentityProvider
+from itou.utils import triggers
 from tests.utils.testing import reload_module
 
 
@@ -79,7 +80,8 @@ def mock_oauth_dance(
     state = client.session[constants.PRO_CONNECT_SESSION_KEY]["state"]
     url = reverse("pro_connect:callback")
     callback_client = other_client or client
-    response = callback_client.get(url, data={"code": "123", "state": state})
+    with triggers.context():
+        response = callback_client.get(url, data={"code": "123", "state": state})
     # If a expected_redirect_url was provided, check it redirects there
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
     expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")

@@ -1016,6 +1016,7 @@ class TestDashboardView:
             pytest.param("city", "Dunkerque", id="city"),
         ],
     )
+    @pytest.mark.usefixtures("trigger_context")
     def test_job_seeker_without_required_field_redirected(self, client, field, data):
         empty_field = {field: ""}
         user = JobSeekerFactory(with_address=True, **empty_field)

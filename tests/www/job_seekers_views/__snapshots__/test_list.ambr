@@ -655,6 +655,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -801,6 +802,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -891,8 +893,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -970,6 +972,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1060,8 +1063,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -1138,6 +1141,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1233,6 +1237,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1323,10 +1328,10 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 36 ASC,
+          ORDER BY 37 ASC,
                    "users_user"."id" ASC
           LIMIT 4
         ''',
@@ -1697,6 +1702,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1839,6 +1845,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1928,8 +1935,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -2006,6 +2013,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2095,8 +2103,8 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -2172,6 +2180,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2268,6 +2277,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -2357,10 +2367,10 @@
                                            %s,
                                            %s))
           GROUP BY "users_user"."id",
-                   36,
                    37,
+                   38,
                    "users_jobseekerprofile"."user_id"
-          ORDER BY 36 ASC,
+          ORDER BY 37 ASC,
                    "users_user"."id" ASC
           LIMIT 3
         ''',

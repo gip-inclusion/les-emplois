@@ -25,6 +25,7 @@ from itou.openid_connect.france_connect.models import FranceConnectState, France
 from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleSubSameEmailException
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.users.models import User
+from itou.utils import triggers
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.testing import reload_module
@@ -102,7 +103,8 @@ def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=T
 
     state = FranceConnectState.save_state(nonce=id_token_nonce if matching_nonces else "other_nonce")
     url = reverse("france_connect:callback")
-    response = client.get(url, data={"code": "123", "state": state}, follow=True)
+    with triggers.context():
+        response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
 
@@ -157,6 +159,7 @@ class TestFranceConnect:
         assert fc_state.nonce is not None
         assert f"nonce={fc_state.nonce}" in response.url
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_django_user(self):
         """
         Nominal scenario: there is no user with the FranceConnect id or FranceConnect email
@@ -199,6 +202,7 @@ class TestFranceConnect:
         assert not user.title
         assert not user.jobseeker_profile.birthdate
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_django_user_with_already_existing_fc_id(self):
         """
         If there already is an existing user with this FranceConnectId, we do not create it again,
@@ -245,6 +249,7 @@ class TestFranceConnect:
 
             user.delete()
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_update_readonly_with_certified_criteria(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
@@ -490,6 +495,7 @@ class TestFranceConnect:
         assertMessages(response, [messages.Message(messages.ERROR, snapshot)])
 
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_callback_redirect_on_sub_conflict(self, client, snapshot):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user = JobSeekerFactory(

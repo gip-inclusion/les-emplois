@@ -18,6 +18,7 @@ from tests.users.factories import JobSeekerFactory
 pytestmark = pytest.mark.usefixtures("api_particulier_settings")
 
 
+@pytest.mark.usefixtures("trigger_context")
 def test_build_params_from(snapshot):
     job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True)
     job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
