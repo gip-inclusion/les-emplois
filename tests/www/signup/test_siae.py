@@ -174,6 +174,7 @@ class TestCompanySignup:
         assert response.status_code == 200
 
     @freeze_time("2022-09-15 15:53:54")
+    @pytest.mark.usefixtures("trigger_context")
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
         """
         A user joins a company without members.
@@ -222,6 +223,7 @@ class TestCompanySignup:
         assert 2 == user.company_set.count()
 
     @freeze_time("2022-09-15 15:53:54")
+    @pytest.mark.usefixtures("trigger_context")
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
         self, client, pro_connect
     ):

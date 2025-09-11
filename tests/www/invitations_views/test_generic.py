@@ -2,6 +2,7 @@ import random
 from functools import partial
 from urllib.parse import urlencode
 
+import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
@@ -587,6 +588,7 @@ class ProConnectSignupTestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_existing_user__login_with_ProConnect(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         user = self.user_factory(

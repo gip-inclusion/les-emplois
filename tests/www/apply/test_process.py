@@ -160,6 +160,7 @@ class TestProcessViews:
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_details_for_company_from_approval(self, client, snapshot):
         """Display the details of a job application coming from the approval detail page."""
 
@@ -240,6 +241,7 @@ class TestProcessViews:
         )
         assert pretty_indented(content) == snapshot(name="copy_public_id")
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 

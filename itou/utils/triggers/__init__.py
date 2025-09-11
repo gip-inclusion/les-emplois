@@ -42,6 +42,13 @@ def context(**kwargs):
     _context.data, _context.last_data_set = previous_data, None
 
 
+@contextlib.contextmanager
+def update_context(**kwargs):
+    current_data = getattr(_context, "data", None) or {}
+    with context(**{**current_data, **kwargs}):
+        yield
+
+
 class FieldsHistory(core.Trigger):
     when: core.When = core.Before
     operation: core.Operation = core.Update
