@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
@@ -121,7 +122,10 @@ class ApplicationPermissionMixin:
             return HttpResponseRedirect(self.get_reset_url())
         # Limit the possibility of applying to the same SIAE for 24 hours.
         if (
-            hasattr(self, "job_seeker")
+            not getattr(
+                self, "SKIP_PREV_APPLICATIONS_CHECK", False
+            )  # Don't enforce this rule until after CheckPreviousApplications
+            and hasattr(self, "job_seeker")
             and not (self.auto_prescription_process or self.hire_process)
             and self.get_previous_applications_queryset().created_in_past(hours=24).exists()
         ):
@@ -408,6 +412,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     """
 
     template_name = "apply/submit_step_check_prev_applications.html"
+    SKIP_PREV_APPLICATIONS_CHECK = True
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -438,6 +443,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["prev_application"] = self.prev_application
+        context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
         return context
 
 
