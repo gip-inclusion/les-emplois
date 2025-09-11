@@ -77,15 +77,31 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
     def clean_session(self):
         pass
 
-    def get_context_data(self, **kwargs):
-        forms = self.get_forms()
+    def get_context_data(
+        self,
+        form_accept=None,
+        form_user_address=None,
+        form_birth_place=None,
+        form_personal_data=None,
+        **kwargs,
+    ):
+        if all(f is None for f in [form_accept, form_user_address, form_birth_place, form_personal_data]):
+            forms = self.get_forms()
+            form_accept = forms["accept"]
+            form_user_address = forms.get("user_address")
+            form_personal_data = forms.get("personal_data")
+            form_birth_place = forms.get("birth_place")
 
         context = super().get_context_data(**kwargs)
-        context["form_accept"] = forms["accept"]
-        context["form_user_address"] = forms.get("user_address")
-        context["form_personal_data"] = forms.get("personal_data")
-        context["form_birth_place"] = forms.get("birth_place")
-        context["has_form_error"] = any(form.errors for form in forms.values())
+        context["form_accept"] = form_accept
+        context["form_user_address"] = form_user_address
+        context["form_personal_data"] = form_personal_data
+        context["form_birth_place"] = form_birth_place
+        context["has_form_error"] = any(
+            form.errors
+            for form in [form_accept, form_user_address, form_birth_place, form_personal_data]
+            if form is not None
+        )
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["hide_value"] = ContractType.OTHER.value
         context["matomo_custom_title"] = "Candidature acceptée"
@@ -111,7 +127,12 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             return TemplateResponse(
                 request=request,
                 template="apply/includes/job_application_accept_form.html",
-                context=self.get_context_data(),
+                context=self.get_context_data(
+                    form_accept=forms["accept"],
+                    form_user_address=forms.get("user_address"),
+                    form_birth_place=forms.get("birth_place"),
+                    form_personal_data=forms.get("personal_data"),
+                ),
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
 

@@ -41,8 +41,8 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
-from itou.users.models import User
+from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
+from itou.users.models import IdentityCertification, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
@@ -3163,6 +3163,49 @@ class TestProcessAcceptViews:
         jobseeker_profile.refresh_from_db()
         assert not jobseeker_profile.birth_country
         assert not jobseeker_profile.birth_place
+
+    def test_accept_with_job_seeker_update(self, client):
+        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        job_application = self.create_job_application(
+            eligibility_diagnosis=diagnosis,
+            job_seeker__jobseeker_profile__birthdate=datetime.date(1995, 12, 27),
+        )
+        job_seeker = job_application.job_seeker
+        IdentityCertification.objects.create(
+            jobseeker_profile=job_seeker.jobseeker_profile,
+            certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+        )
+        birth_country = Country.objects.get(name="BORA-BORA")
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.get()
+        client.force_login(employer)
+
+        response = client.post(
+            url_accept,
+            headers={"hx-request": "true"},
+            data={
+                "ban_api_resolved_address": job_seeker.geocoding_address,
+                "address_line_1": job_seeker.address_line_1,
+                "post_code": job_seeker.insee_city.post_codes[0],
+                "insee_code": job_seeker.insee_city.code_insee,
+                "city": job_seeker.insee_city.name,
+                "fill_mode": "ban_api",
+                # Select the first and only one option
+                "address_for_autocomplete": "0",
+                "geocoding_score": 0.9714,
+                "birthdate": job_seeker.jobseeker_profile.birthdate,
+                "birth_country": birth_country.pk,
+                "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "answer": "",
+            },
+        )
+        assert response.status_code == 200
+        soup = parse_response_to_soup(response, selector="#id_birth_country")
+        assert soup.attrs.get("disabled", False) is False
+        [selected_option] = soup.find_all(attrs={"selected": True})
+        assert selected_option.text == "BORA-BORA"
 
     @freeze_time("2024-09-11")
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
