@@ -79,6 +79,11 @@ class BrevoClient:
             )
             if response.status_code == 404:
                 return
+            # Brevo excludes HTTP DELETE calls for email addresses ending by .old .back .zip
+            # We do not want to try these tasks again every 10 minutes during 90 days.
+            if response.status_code == 403:
+                logger.error("Brevo API: unable to delete email=%s", email)
+                return
             response.raise_for_status()
         except httpx.RequestError as e:
             logger.error("Brevo API: Request failed: %s", str(e))
