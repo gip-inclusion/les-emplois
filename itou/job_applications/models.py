@@ -494,6 +494,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="demandeur d'emploi",
         on_delete=models.RESTRICT,  # This object is central to us and the SIAE
         related_name="job_applications",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
 
     # The job seeker's eligibility diagnosis used for this job application
@@ -625,6 +626,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         null=True,
         blank=True,
         related_name="approval_manually_delivered",
+        limit_choices_to={"kind": UserKind.ITOU_STAFF},
     )
     approval_manually_refused_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -633,6 +635,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         null=True,
         blank=True,
         related_name="approval_manually_refused",
+        limit_choices_to={"kind": UserKind.ITOU_STAFF},
     )
     approval_manually_refused_at = models.DateTimeField(
         verbose_name="date de refus manuel du PASS IAE", blank=True, null=True

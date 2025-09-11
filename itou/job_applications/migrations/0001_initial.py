@@ -67,6 +67,7 @@ class Migration(migrations.Migration):
                 (
                     "job_seeker",
                     models.ForeignKey(
+                        limit_choices_to={"kind": "job_seeker"},
                         on_delete=django.db.models.deletion.RESTRICT,
                         related_name="job_applications",
                         to=settings.AUTH_USER_MODEL,
@@ -188,6 +189,7 @@ class Migration(migrations.Migration):
                     "approval_manually_delivered_by",
                     models.ForeignKey(
                         blank=True,
+                        limit_choices_to={"kind": "itou_staff"},
                         null=True,
                         on_delete=django.db.models.deletion.RESTRICT,
                         related_name="approval_manually_delivered",
@@ -203,6 +205,7 @@ class Migration(migrations.Migration):
                     "approval_manually_refused_by",
                     models.ForeignKey(
                         blank=True,
+                        limit_choices_to={"kind": "itou_staff"},
                         null=True,
                         on_delete=django.db.models.deletion.RESTRICT,
                         related_name="approval_manually_refused",
