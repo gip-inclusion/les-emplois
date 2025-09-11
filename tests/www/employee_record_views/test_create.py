@@ -221,7 +221,7 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         data = _get_user_form_data(self.job_seeker)
 
         # France as birth country without commune
-        data["birth_country"] = Country.objects.get(name="FRANCE").pk
+        data["birth_country"] = Country.FRANCE_ID
         data.pop("birth_place")
         response = client.post(self.url, data=data)
 

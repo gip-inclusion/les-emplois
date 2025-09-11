@@ -183,6 +183,16 @@ class JobSeekerFactory(UserFactory):
             born_in_france=True,
         )
         born_in_france = factory.Trait(
+            with_birth_place=True,
+            jobseeker_profile__birth_country=factory.LazyFunction(lambda: Country.objects.get(pk=Country.FRANCE_ID)),
+        )
+        born_outside_france = factory.Trait(
+            jobseeker_profile__birth_place=None,
+            jobseeker_profile__birth_country=factory.LazyFunction(
+                lambda: Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
+            ),
+        )
+        with_birth_place = factory.Trait(
             jobseeker_profile__birth_place=factory.LazyAttribute(
                 lambda instance: Commune.objects.order_by("?")
                 .filter(
@@ -190,13 +200,7 @@ class JobSeekerFactory(UserFactory):
                     end_date__gte=instance.birthdate,
                 )
                 .first(),
-            ),
-            jobseeker_profile__birth_country=factory.LazyAttribute(lambda _: Country.objects.get(name="FRANCE")),
-        )
-        born_outside_france = factory.Trait(
-            jobseeker_profile__birth_country=factory.LazyAttribute(
-                lambda _: Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first()
-            ),
+            )
         )
         with_pole_emploi_id = factory.Trait(
             jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
@@ -345,7 +349,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
             hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
             hexa_post_code=factory.Faker("postalcode"),
-            hexa_commune=factory.LazyAttribute(lambda _: Commune.objects.order_by("?").first()),
+            hexa_commune=factory.LazyFunction(Commune.objects.order_by("?").first),
         )
         with_required_eiti_fields = factory.Trait(
             actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator

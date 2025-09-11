@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
-from django.utils.functional import SimpleLazyObject
 
 from itou.asp.models import Commune, Country
 from itou.users.models import JobSeekerProfile
@@ -28,7 +27,7 @@ class BirthPlaceModelForm(forms.ModelForm):
                 "data-minimum-input-length": 1,
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
-                "data-target-value": SimpleLazyObject(lambda: f"{Country.france_id}"),
+                "data-target-value": Country.FRANCE_ID,
             }
         ),
     )
@@ -53,7 +52,7 @@ class BirthPlaceModelForm(forms.ModelForm):
             # That's also why we can't make it mandatory.
             # See utils.js > toggleDisableAndSetValue
             if birth_place:
-                birth_country = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
+                birth_country = Country.objects.get(pk=Country.FRANCE_ID)
                 self.cleaned_data["birth_country"] = birth_country
             else:
                 # Display the error above the field instead of top of page.
