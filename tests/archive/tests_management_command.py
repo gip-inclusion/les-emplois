@@ -1241,7 +1241,13 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         snapshot,
     ):
         factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
-        user = factory(for_snapshot=True, first_name="Micheline", last_name="Dubois", **factory_kwargs)
+        user = factory(
+            for_snapshot=True,
+            first_name="Micheline",
+            last_name="Dubois",
+            email="micheline.dubois@example.com",
+            **factory_kwargs,
+        )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("notify_inactive_professionals", wet_run=True)
