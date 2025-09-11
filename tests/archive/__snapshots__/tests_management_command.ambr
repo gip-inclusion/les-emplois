@@ -3172,7 +3172,7 @@
 # name: TestNotifyInactiveProfessionalsManagementCommand.test_notify_inactive_professionals[professional_without_recent_activity][inactive_professional_email_body]
   '''
   Bonjour Micheline DUBOIS,
-  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse john.doe@test.local depuis le XX/XX/XXXX.
+  Nous n’avons détecté aucune activité sur votre compte sur les Emplois de l’inclusion associé à l’adresse micheline.dubois@example.com depuis le XX/XX/XXXX.
   Sans connexion de votre part avant le YY/YY/YYYY, votre compte sera supprimé ainsi que toutes les données associées.
   Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous reconnecter sur http://localhost:8000/
   
