@@ -1166,6 +1166,7 @@ def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
 
 
 @freezegun.freeze_time("2022-08-10")
+@pytest.mark.usefixtures("empty_fields_history_context")
 def test_save_erases_ft_fields_if_details_change():
     UserFactory(
         email="foobar@truc.com",

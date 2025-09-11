@@ -37,7 +37,7 @@ from slippers.templatetags.slippers import AttrsNode
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.utils import faker_providers  # noqa: E402
+from itou.utils import faker_providers, triggers  # noqa: E402
 from itou.utils.cache import UnclearableCache  # noqa: E402
 from itou.utils.storage.s3 import (  # noqa: E402
     NoObjectsInBucket,
@@ -799,3 +799,9 @@ def detect_missing_csrf_token():
         return origin_render(self, context)
 
     CsrfTokenNode.render = render
+
+
+@pytest.fixture(name="empty_fields_history_context", scope="function")
+def empty_fields_history_context_fixture():
+    with triggers.context():
+        yield
