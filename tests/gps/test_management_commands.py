@@ -14,8 +14,7 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.users.enums import UserKind
-from itou.users.models import User
-from itou.utils.export import generate_excel_sheet
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
 from tests.companies.factories import CompanyFactory
@@ -256,7 +255,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     )
 
     # A job seeker whose advisor is a prescriber that does not exist, with a safir that exists
-    job_seeker_3 = JobSeekerFactory()
+    job_seeker_3 = JobSeekerFactory(jobseeker_profile__ft_gps_id="kn_9")
     # previous certified referent
     previous_membership_3 = FollowUpGroupMembershipFactory(
         follow_up_group__beneficiary=job_seeker_3, is_referent_certified=True
@@ -268,22 +267,29 @@ def test_import_advisor_information(settings, caplog, mocker):
     # An old membership that had is_referent_certified=True
     old_certified_referent_membership = FollowUpGroupMembershipFactory(is_referent_certified=True)
 
-    with NamedTemporaryFile() as file:
+    with NamedTemporaryFile("w") as file:
         # write imported file add a column to ignore to ensure the code does'nt crash
-        headers = ["ID", "prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde", "some random column"]
         data = [
+            [
+                "identifiant_gps",
+                "prenom_conseiller",
+                "nom_conseiller",
+                "code_agence",
+                "mail_conseiller",
+                "kn_individu_national",
+            ],
             # missing prenom_cdde
-            [job_seeker_with_no_correct_data.pk, "", "Test", "Test", "Test", "random value"],
+            [job_seeker_with_no_correct_data.pk, "", "Test", "Test", "Test", "kn_1"],
             # missing nom_cdde
-            [job_seeker_with_no_correct_data.pk, "Test", "", "Test", "Test", "random value"],
+            [job_seeker_with_no_correct_data.pk, "Test", "", "Test", "Test", "kn_2"],
             # missing code_safir_agence
-            [job_seeker_with_no_correct_data.pk, "test", "Test", "", "Test", "random value"],
+            [job_seeker_with_no_correct_data.pk, "Test", "Test", "", "Test", "kn_3"],
             # missing mail_cdde
-            [job_seeker_with_no_correct_data.pk, "test", "Test", "Test", "", "random value"],
+            [job_seeker_with_no_correct_data.pk, "Test", "Test", "Test", "", "kn_4"],
             # mail_cdde is used by an employer
-            [job_seeker_with_no_correct_data.pk, "Test", "Test", "Test", employer.email, "random value"],
+            [job_seeker_with_no_correct_data.pk, "Test", "Test", "Test", employer.email, "kn_5"],
             # Not a job seeker
-            [prescriber_1.pk, "Test", "Test", "Test", "Test", "random value"],
+            [prescriber_1.pk, "Test", "Test", "Test", "Test", "kn_6"],
             # correct data
             [
                 job_seeker_1.pk,
@@ -291,7 +297,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "prescriber_1_last_name",  # This value isn't used
                 known_safir,  # This will be ignored as the prescriber already exists
                 prescriber_1.email,
-                "random value",
+                "kn_7",
             ],
             [
                 job_seeker_2.pk,
@@ -299,7 +305,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "prescriber_2_last_name",  # This value isn't used
                 unknown_safir,  # This will be ignored as the prescriber already exists
                 prescriber_2.email,
-                "random value",
+                "kn_8",
             ],
             [
                 job_seeker_3.pk,
@@ -307,7 +313,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Armani",
                 known_safir,
                 "alphonse.armani@mailinator.com",
-                "random value",
+                "kn_9",
             ],
             [
                 job_seeker_4.pk,
@@ -315,12 +321,30 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Balladur",
                 unknown_safir,
                 "beatrice.balladur@mailinator.com",
-                "random value",
+                "kn_10",
             ],
+            [
+                job_seeker_4.pk,
+                "",
+                "",
+                "",
+                "",
+                "kn_11",
+            ],  # This job seeker has more than one kn_individu_national values : ignore them
         ]
-        generate_excel_sheet(headers, data).save(file)
+        writer = csv.writer(file, delimiter=";")
+        writer.writerows(data)
         file.seek(0)
         management.call_command("import_advisor_information", file.name, wet_run=True)
+
+    # Check ft_gps_id: only the job seekers with only one value will be updated:
+    assert list(
+        JobSeekerProfile.objects.filter(ft_gps_id__isnull=False).order_by("pk").values_list("pk", "ft_gps_id")
+    ) == [
+        (job_seeker_1.pk, "kn_7"),
+        (job_seeker_2.pk, "kn_8"),
+        (job_seeker_3.pk, "kn_9"),
+    ]
 
     # The old membership is not certified anymore
     old_certified_referent_membership.refresh_from_db()
@@ -384,6 +408,7 @@ def test_import_advisor_information(settings, caplog, mocker):
         "Found 6 rows from GPS export.",  # 10 minus the 4 with missing data
         f"Some job seekers ids where not found: [{prescriber_1.pk}].",
         f"Some advisor email are attached to non prescriber accounts: ['{employer.email}'].",
+        "Updated 2 ft_gps_id values the database",  # job seeker 3 already had a value
         "Matched 4 users in the database",
         "100.00%",
         "--------------------------------------------------------------------------------",
