@@ -4,11 +4,14 @@ import socket
 from itou.utils.enums import ItouEnvironment
 
 
-ITOU_ENVIRONMENT = ItouEnvironment.DEV
-os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
+# Define ITOU_ENVIRONMENT before importing base settings
+os.environ["ITOU_ENVIRONMENT"] = ItouEnvironment.DEV
 
 from config.settings.test import *  # noqa: E402,F403
 
+
+# Override ITOU_ENVIRONMENT value imported from config.settings.test
+ITOU_ENVIRONMENT = ItouEnvironment.DEV
 
 # Django settings
 # ---------------
