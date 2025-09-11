@@ -4652,10 +4652,24 @@ class TestCheckPreviousApplicationsView:
         job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = client.get(self.check_prev_applications_url)
         assertContains(
-            response, "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response,
+            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
+            "vous ne pouvez pas en soumettre une nouvelle.",
+        )
+        assertContains(
+            response,
+            """
+            <button type="button" class="btn btn-block btn-primary disabled">
+                <span>Postuler à nouveau</span>
+            </button>""",
+            html=True,
         )
 
         # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assertContains(
+            response, "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404
 
@@ -4664,7 +4678,7 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, self.job_seeker)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Vous avez déjà postulé chez cet employeur le")
+        assertContains(response, "Vous avez déjà postulé pour cette entreprise")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4692,10 +4706,24 @@ class TestCheckPreviousApplicationsView:
         job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = client.get(self.check_prev_applications_url)
         assertContains(
-            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response,
+            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
+            "vous ne pouvez pas en soumettre une nouvelle.",
+        )
+        assertContains(
+            response,
+            """
+            <button type="button" class="btn btn-block btn-primary disabled">
+                <span>Postuler à nouveau</span>
+            </button>""",
+            html=True,
         )
 
         # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assertContains(
+            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404
 
@@ -4704,7 +4732,7 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, authorized_prescriber)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4727,7 +4755,7 @@ class TestCheckPreviousApplicationsView:
         self._login_and_setup_session(client, self.company.members.first())
 
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4759,10 +4787,24 @@ class TestCheckPreviousApplicationsView:
         )
         response = client.get(self.check_prev_applications_url)
         assertContains(
-            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+            response,
+            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
+            "vous ne pouvez pas en soumettre une nouvelle.",
+        )
+        assertContains(
+            response,
+            """
+            <button type="button" class="btn btn-block btn-primary disabled">
+                <span>Postuler à nouveau</span>
+            </button>""",
+            html=True,
         )
 
         # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assertContains(
+            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
         response = client.get(self.application_jobs_url)
         assert response.status_code == 404
 
@@ -4771,7 +4813,7 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, employer)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -5018,7 +5060,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
             data={"force_new_application": "force"},
@@ -5039,7 +5081,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
             data={"force_new_application": "force"},
@@ -5061,7 +5103,7 @@ class TestCheckPreviousApplicationsForHireView:
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
         response = client.post(
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
             data={"force_new_application": "force"},
