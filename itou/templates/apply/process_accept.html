@@ -29,6 +29,7 @@
     {{ block.super }}
 
     <!-- Needed to use the Datepicker JS widget. -->
+    {% comment %}legacy. to be removed in early september 2025{% endcomment %}
     {{ form_accept.media.js }}
     {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
 
@@ -48,6 +49,7 @@
         });
     </script>
     {% if form_user_address %}
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
         {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
         {{ form_user_address.media.js }}
     {% endif %}

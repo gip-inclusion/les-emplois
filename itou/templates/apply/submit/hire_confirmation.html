@@ -15,13 +15,16 @@
 {% endblock %}
 
 {% block content_extend %}
-    <div class="c-box my-4">
-        <h2>Candidat</h2>
-        <hr>
-        {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
+    {% if form_user_address or form_personal_data or form_birth_place %}
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
+        <div class="c-box my-4">
+            <h2>Candidat</h2>
+            <hr>
+            {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
 
-        {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=company eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False itou_help_center_url=ITOU_HELP_CENTER_URL %}
-    </div>
+            {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=company eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False itou_help_center_url=ITOU_HELP_CENTER_URL %}
+        </div>
+    {% endif %}
     {% include "apply/includes/accept_section.html" %}
 {% endblock %}
 
@@ -29,6 +32,7 @@
     {{ block.super }}
 
     <!-- Needed to use the Datepicker JS widget. -->
+    {% comment %}legacy. to be removed in early september 2025{% endcomment %}
     {{ form_accept.media.js }}
     {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
 
@@ -49,6 +53,7 @@
     </script>
 
     {% if form_user_address %}
+        {% comment %}legacy. to be removed in early september 2025{% endcomment %}
         {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
         {{ form_user_address.media.js }}
     {% endif %}

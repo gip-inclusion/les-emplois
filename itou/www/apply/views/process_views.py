@@ -469,7 +469,7 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
 class AcceptView(common_views.BaseAcceptView):
     template_name = "apply/process_accept.html"
 
-    def setup(self, request, job_application_id, *args, **kwargs):
+    def setup(self, request, job_application_id, *args, only_accept_form=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
         queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
@@ -495,6 +495,9 @@ class AcceptView(common_views.BaseAcceptView):
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 job_seeker=self.job_seeker, for_geiq=self.company
             ).first()
+
+        # simplified view. `only_accept_form` to be removed in early september 2025
+        self.only_accept_form = only_accept_form if only_accept_form is not None else False
 
     def dispatch(self, request, *args, **kwargs):
         if self.job_application.eligibility_diagnosis_by_siae_required():
@@ -901,7 +904,7 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
 
     def get_success_url(self):
         return reverse(
-            "apply:accept",
+            "apply:accept-contract",
             kwargs={"job_application_id": self.job_application.id},
             query={"next_url": self.next_url} if self.next_url else None,
         )
