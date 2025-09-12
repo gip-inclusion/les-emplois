@@ -98,7 +98,7 @@ def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo
     with pytest.raises(httpx.HTTPStatusError):
         # using the client directly to simulate the error, as async_delete_contact does not propagate it
         # but catch it for managing retries
-        brevo_client.delete_contact("somebody@mail.com")
+        brevo_client.delete_contact(email)
 
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-http-error-500")
