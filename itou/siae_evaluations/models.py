@@ -455,6 +455,9 @@ class EvaluationCampaign(models.Model):
                 if not has_siae_to_notify:
                     has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
+                evaluated_siae.final_state = evaluated_siae.state
+                evaluated_siae.save(update_fields=["final_state"])
+
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
             )
@@ -543,6 +546,14 @@ class EvaluatedSiae(models.Model):
     notification_text = models.TextField(blank=True, null=True, verbose_name="commentaire")
 
     reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
+
+    final_state = models.CharField(
+        verbose_name="état final après la cloture de la campagne d'évaluation",
+        choices=evaluation_enums.EvaluatedSiaeFinalState.choices,
+        blank=True,
+        null=True,
+        editable=False,
+    )
 
     objects = EvaluatedSiaeQuerySet.as_manager()
 
@@ -657,6 +668,9 @@ class EvaluatedSiae(models.Model):
 
     @property
     def state(self):
+        if self.final_state:
+            return self.final_state
+
         state_from_applications = self.state_from_applications
 
         if state_from_applications in {
