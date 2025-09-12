@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestJobDescriptionSearchView.test_dipretty_indentedict
+# name: TestJobDescriptionSearchView.test_district
   dict({
     'num_queries': 8,
     'queries': list([
@@ -1464,7 +1464,7 @@
     ]),
   })
 # ---
-# name: TestSearchCompany.test_dipretty_indentedict
+# name: TestSearchCompany.test_district
   dict({
     'num_queries': 9,
     'queries': list([
