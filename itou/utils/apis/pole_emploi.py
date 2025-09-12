@@ -333,7 +333,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
-    def _request(self, url, data=None, params=None, method="POST"):
+    def _request(self, url, data=None, params=None, method="POST", additional_headers=None):
         token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
         if not token:
             token = self._refresh_token()
@@ -349,21 +349,28 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "pa-prenom-agent": "<string>",
             "pa-identifiant-agent": "<string>",
         }
+        headers = {"Authorization": token, "Content-Type": "application/json", **agents_headers}
+        if additional_headers:
+            headers = {**headers, **additional_headers}
 
         try:
-            response = httpx.request(
-                method,
-                url,
-                params=params,
-                json=data,
-                headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
-                timeout=API_TIMEOUT_SECONDS,
-            ).raise_for_status()
+            response = (
+                self._get_httpx_client()
+                .request(
+                    method,
+                    url,
+                    params=params,
+                    json=data,
+                    headers=headers,
+                    timeout=API_TIMEOUT_SECONDS,
+                )
+                .raise_for_status()
+            )
         except httpx.HTTPStatusError as exc:
             match exc.response.status_code:
                 case 429:
                     raise PoleEmploiRateLimitException(error_code=429)
-                case 400 | 403 as error_code:
+                case 400 | 401 | 403 as error_code:
                     # Should not retry
                     raise PoleEmploiAPIBadResponse(
                         response_code=error_code, response_data=exc.response.json()
@@ -428,9 +435,36 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
         return data["jetonUsager"]
 
+    def certify_rqth(self, jobseeker_profile):
+        jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
+        data = self._request(
+            f"{self.base_url}/donnees-rqth/v1/rqth", method="GET", additional_headers={"ft-jeton-usager": jeton_usager}
+        )
+        certified = data["topValiditeRQTH"] is True
+        end_at = data["dateFinRqth"] if certified else None
+        if end_at:
+            end_at = datetime.date.fromisoformat(data["dateFinRqth"])
+            if end_at == datetime.date(9999, 12, 31):
+                end_at = None
+        return {
+            "is_certified": certified,
+            "start_at": datetime.date.fromisoformat(data["dateDebutRqth"]) if certified else None,
+            "end_at": end_at,
+            "raw_response": data,
+        }
+
 
 def pole_emploi_partenaire_api_client():
     return PoleEmploiRoyaumePartenaireApiClient(
+        settings.API_ESD["BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["KEY"],
+        settings.API_ESD["SECRET"],
+    )
+
+
+def pole_emploi_agent_api_client():
+    return PoleEmploiRoyaumeAgentAPIClient(
         settings.API_ESD["BASE_URL"],
         settings.API_ESD["AUTH_BASE_URL"],
         settings.API_ESD["KEY"],
