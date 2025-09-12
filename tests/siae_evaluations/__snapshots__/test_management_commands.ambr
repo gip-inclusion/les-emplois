@@ -1,4 +1,7 @@
 # serializer version: 1
+# name: TestArchivedAcceptedEvaluatedSiae.test_archived_evaluated_siae[archived_evaluated_siae]
+  <QuerySet [{'reviewed_at': datetime.datetime(2024, 5, 17, 8, 10, 10, tzinfo=datetime.timezone.utc), 'final_reviewed_at': datetime.datetime(2024, 7, 16, 9, 11, 11, tzinfo=datetime.timezone.utc), 'final_state': 'ACCEPTED', 'job_applications_count': 3}]>
+# ---
 # name: TestManagementCommand.test_institution_submission_freeze_reminder
   '''
   Bonjour,
