@@ -73,10 +73,11 @@ class BrevoClient:
                 self._import_contacts(batch, list_id, serializer)
 
     def delete_contact(self, email):
-        # Brevo rejects with 400 status code, HTTP DELETE calls for addresses ending by "_old"
-        # These address are made when Support Team disable a user in admin
+        # Brevo rejects HTTP DELETE calls for addresses ending by
+        # "_old" (status_code 400), these address are made when Support Team disable a user in admin
+        # ".old", ".back", ".tar", ".zip" (status_code 403), told as fitering by CloudFlare
         # We do not want to call Brevo in that case
-        if not email or email.endswith("_old"):
+        if not email or email.endswith(("_old", ".old", ".back", ".tar", ".zip")):
             return
         try:
             response = self.client.delete(

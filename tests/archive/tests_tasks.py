@@ -39,7 +39,15 @@ def test_async_delete_contact_retries_warning(
 
 
 def test_async_delete_contact_does_not_send_HTTP_request(respx_mock, django_capture_on_commit_callbacks, brevo_client):
-    for email, called in [(None, False), ("somebody@email.com_old", False), ("somebody@email.com", True)]:
+    for email, called in [
+        (None, False),
+        ("somebody@email.com_old", False),
+        ("somebody@email.old", False),
+        ("somebody@email.back", False),
+        ("somebody@email.zip", False),
+        ("somebody@email.tar", False),
+        ("somebody@email.com", True),  # positive case to avoid any test misconfiguration
+    ]:
         respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
             return_value=httpx.Response(status_code=204)
         )
