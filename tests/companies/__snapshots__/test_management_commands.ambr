@@ -1,8 +1,15 @@
 # serializer version: 1
 # name: test_deactivate_old_job_description[SQL]
   dict({
-    'num_queries': 19,
+    'num_queries': 21,
     'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
       dict({
         'origin': list([
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
@@ -416,6 +423,13 @@
                  AND NOT ("companies_jobdescription"."last_employer_update_at" >= %s
                           AND "companies_jobdescription"."last_employer_update_at" IS NOT NULL))
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
