@@ -515,12 +515,12 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         )
 
         assert fieldsets[0] == (None, {"fields": ("username", "password")})
-        fieldsets[0] = (None, {"fields": ("username", "public_id", "password", "identity_provider")})
+        fieldsets[0] = (None, {"fields": ("username", "public_id", "password")})
 
         assert fieldsets[1] == ("Informations personnelles", {"fields": ("first_name", "last_name", "email")})
         fieldsets[1] = (
             "Informations personnelles",
-            {"fields": ("first_name", "last_name", "email", "kind", "jobseeker_profile_link")},
+            {"fields": ("first_name", "last_name", "email", "identity_provider", "kind", "jobseeker_profile_link")},
         )
 
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
