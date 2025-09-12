@@ -14,7 +14,9 @@ TABLE.add_columns(
             "name": "état",
             "type": "varchar",
             "comment": "Etat du contrôle de la structure",
-            "fn": attrgetter("state"),
+            "fn": attrgetter(
+                "state"
+            ),  # /!\ final_state required in Metabase ? /!\ state will be inconsistent afer evaluation_campaign is closed and evaluated_jobapplication archived > @rsebille
         },
         get_column_from_field(get_model_field(EvaluatedSiae, "reviewed_at"), name="date_contrôle"),
         get_column_from_field(get_model_field(EvaluatedSiae, "final_reviewed_at"), name="date_définitive_contrôle"),
