@@ -12,6 +12,8 @@ BATCH_SIZE = 200  # Limit the number of sent notifications by limiting the numbe
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     def handle(self, verbosity, **options):
         old_job_descriptions_qs = (
             JobDescription.objects.active()
