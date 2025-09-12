@@ -322,7 +322,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
 
     def test_job_seeker_not_resident_in_qpv_or_zrr(self, client):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(for_snapshot=True, born_in_france=True)
         diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
         job_application = JobApplicationFactory(job_seeker=job_seeker, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})

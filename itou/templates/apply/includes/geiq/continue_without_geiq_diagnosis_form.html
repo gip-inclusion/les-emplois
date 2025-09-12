@@ -1,7 +1,8 @@
 {% load django_bootstrap5 %}
+{% load job_seekers %}
 
 {% include "apply/includes/geiq/progress_bar.html" with progress=progress only %}
-
+{% has_not_required_personal_infos_for_hire job_seeker as disabled %}
 <hr class="mb-3">
 <div class="form-row align-items-center justify-content-end gx-3">
     <div class="form-group col-12 col-lg order-3 order-lg-1">
@@ -11,7 +12,11 @@
         </a>
     </div>
     <div class="form-group col col-lg-auto order-2 order-lg-3">
-        <button type="button" class="btn btn-block btn-primary" data-bs-toggle="modal" data-bs-target="#confirm_no_allowance_modal" aria-label="Continuer sans valider les critères GEIQ">
+        <button type="button"
+                class="btn btn-block btn-primary{% if disabled %} disabled{% endif %}"
+                data-bs-toggle="modal"
+                data-bs-target="#confirm_no_allowance_modal"
+                aria-label="Continuer sans valider les critères GEIQ">
             <span>Continuer sans valider les critères GEIQ</span>
         </button>
     </div>

@@ -1,7 +1,9 @@
 from django import template
 from django.template.defaultfilters import title
 
+from itou.asp.models import Country
 from itou.common_apps.address.departments import department_from_postcode
+from itou.users.enums import UserKind
 
 
 register = template.Library()
@@ -28,3 +30,21 @@ def profile_city_display(profile):
     if parts:
         return " - ".join(parts)
     return "Ville non renseignée"
+
+
+@register.simple_tag
+def has_not_required_personal_infos_for_hire(user):
+    if not (user.kind == UserKind.JOB_SEEKER and hasattr(user, "jobseeker_profile")):
+        return True
+
+    profile = user.jobseeker_profile
+    if (
+        not (user.title and user.first_name and user.last_name)
+        or not (profile.nir or profile.lack_of_nir_reason)
+        or not profile.birth_country
+        or (profile.birth_country and profile.birth_country_id == Country.france_id and not profile.birth_place)
+        or not (user.address_line_1 and user.post_code and user.city)
+    ):
+        return True
+
+    return False

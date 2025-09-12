@@ -18,6 +18,14 @@
     {{ block.super }}
 {% endblock %}
 
+{% block title_navinfo %}
+    {% component_navinfo c_navinfo__info=c_navinfo__info|default:"" %}
+        {% fragment as c_navinfo__info %}
+            Mis à jour le {{ profile.user.last_checked_at|date:"d/m/Y" }}
+        {% endfragment %}
+    {% endcomponent_navinfo %}
+{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
