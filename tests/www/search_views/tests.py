@@ -33,6 +33,14 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQuerie
 DISTRICTS = "Arrondissements de Paris"
 
 
+def distance_radio(simulated_page, distance):
+    [elt] = simulated_page.find_all(
+        "input",
+        attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
+    )
+    return elt
+
+
 class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
@@ -379,15 +387,8 @@ class TestSearchCompany:
         assertNotContains(response, vannes_opt, html=True)
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all(
-                "input",
-                attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
-            )
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(25)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 25)["checked"]
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},
@@ -608,12 +609,8 @@ class TestSearchPrescriber:
         response = client.get(url, {"city": guerande.slug, "distance": 50})
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(50)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 50)["checked"]
         response = client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
         response = client.get(url, {"city": guerande.slug, "distance": 100})
@@ -1284,12 +1281,8 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug})
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(25)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 25)["checked"]
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},
