@@ -7098,7 +7098,74 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_transfer[inactive transfer button]
+# name: test_list_for_siae_select_applications_batch_transfer[both transfer modal]
+  '''
+  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h2 class="modal-title" id="transfer_modal_title">
+                          Transfert de 1 candidature
+                      </h2>
+                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group form-group-required">
+                          <label class="form-label" for="id_target_company_id">
+                              Sélectionnez la structure vers laquelle vous souhaitez transférer la candidature.
+                          </label>
+                          <select class="form-select" id="id_target_company_id" name="target_company_id" required="">
+                              <option selected="" value="">
+                                  Sélectionnez une structure
+                              </option>
+                              <option value="2222">
+                                  EI - Acme inc.
+                              </option>
+                              <option value="3333">
+                                  EITI - Superbe snapshot
+                              </option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-ico btn-outline-primary" href="/apply/22222222-2222-2222-2222-222222222222/siae/external-transfer/1">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </a>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[inactive transfer button mono org]
+  '''
+  <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez selectionner une seule candidature au statut « déclinée » pour faire un transfert à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
+      <i class="ri-arrow-left-right-line me-2">
+      </i>
+      <span>
+          Transférer vers
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[inactive transfer button multi org]
   '''
   <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Les candidatures au statut « Acceptée » ne peuvent pas être transférées." data-bs-toggle="tooltip" disabled="" type="button">
       <i class="ri-arrow-left-right-line me-2">
@@ -7110,7 +7177,102 @@
   
   '''
 # ---
-# name: test_list_for_siae_select_applications_batch_transfer[modal with 1 transferable application]
+# name: test_list_for_siae_select_applications_batch_transfer[modal with 2 internal transferable application]
+  '''
+  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <input name="application_ids" type="hidden" value="33333333-3333-3333-3333-333333333333"/>
+              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h2 class="modal-title" id="transfer_modal_title">
+                          Transfert de 2 candidatures
+                      </h2>
+                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group form-group-required">
+                          <label class="form-label" for="id_target_company_id">
+                              Sélectionnez la structure vers laquelle vous souhaitez transférer les 2 candidatures.
+                          </label>
+                          <select class="form-select" id="id_target_company_id" name="target_company_id" required="">
+                              <option selected="" value="">
+                                  Sélectionnez une structure
+                              </option>
+                              <option value="2222">
+                                  EI - Acme inc.
+                              </option>
+                              <option value="3333">
+                                  EITI - Superbe snapshot
+                              </option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <button class="btn btn-sm btn-ico btn-outline-primary" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Vous devez selectionner une seule candidature au statut « déclinée » pour faire un transfert à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </button>
+                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
+                          Confirmer
+                      </button>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[modal with only external transfer]
+  '''
+  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h2 class="modal-title" id="transfer_modal_title">
+                          Transfert de 1 candidature
+                      </h2>
+                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <p>
+                          Sélectionnez la structure vers laquelle vous souhaitez transférer la candidature.
+                      </p>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-ico btn-outline-primary" href="/apply/22222222-2222-2222-2222-222222222222/siae/external-transfer/1">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
+                      </a>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_transfer[modal with only internal transfer]
   '''
   <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -7144,57 +7306,15 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                      <button class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal" type="button">
                           Retour
                       </button>
-                      <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
-                          Confirmer
-                      </button>
-                  </div>
-              </div>
-          </form>
-      </div>
-  </div>
-  
-  '''
-# ---
-# name: test_list_for_siae_select_applications_batch_transfer[modal with 2 transferable application]
-  '''
-  <div aria-hidden="true" aria-labelledby="transfer_modal_title" class="modal" id="transfer_confirmation_modal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-          <form action="/apply/company/batch/transfer?next_url=/apply/siae/list%3Fdisplay%3Dtable%26start_date%3D2015-01-01" method="post">
-              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-              <input name="application_ids" type="hidden" value="22222222-2222-2222-2222-222222222222"/>
-              <input name="application_ids" type="hidden" value="11111111-1111-1111-1111-111111111111"/>
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h2 class="modal-title" id="transfer_modal_title">
-                          Transfert de 2 candidatures
-                      </h2>
-                      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
-                      </button>
-                  </div>
-                  <div class="modal-body">
-                      <div class="form-group form-group-required">
-                          <label class="form-label" for="id_target_company_id">
-                              Sélectionnez la structure vers laquelle vous souhaitez transférer les 2 candidatures.
-                          </label>
-                          <select class="form-select" id="id_target_company_id" name="target_company_id" required="">
-                              <option selected="" value="">
-                                  Sélectionnez une structure
-                              </option>
-                              <option value="2222">
-                                  EI - Acme inc.
-                              </option>
-                              <option value="3333">
-                                  EITI - Superbe snapshot
-                              </option>
-                          </select>
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
-                          Retour
+                      <button class="btn btn-sm btn-ico btn-outline-primary" data-bs-custom-class="modal-tooltip" data-bs-placement="top" data-bs-title="Vous devez selectionner une seule candidature au statut « déclinée » pour faire un transfert à un autre employeur." data-bs-toggle="tooltip" disabled="" type="button">
+                          <i aria-hidden="true" class="ri-home-smile-line">
+                          </i>
+                          <strong>
+                              Une autre structure
+                          </strong>
                       </button>
                       <button class="btn btn-sm btn-primary" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-transfer-applications-submit">
                           Confirmer
