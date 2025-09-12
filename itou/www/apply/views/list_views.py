@@ -434,10 +434,10 @@ def list_for_siae_actions(request):
     can_postpone = all(job_application.postpone.is_available() for job_application in selected_job_applications)
     can_process = all(job_application.process.is_available() for job_application in selected_job_applications)
     can_refuse = all(job_application.refuse.is_available() for job_application in selected_job_applications)
-    enable_transfer = len(request.organizations) > 1
-    can_transfer = enable_transfer and (
-        all(job_application.transfer.is_available() for job_application in selected_job_applications)
+    can_transfer_internal = len(request.organizations) > 1 and all(
+        job_application.transfer.is_available() for job_application in selected_job_applications
     )
+    can_transfer_external = len(selected_job_applications) == 1 and selected_job_applications[0].state.is_refused
     cannot_accept_reason = None
     if len(selected_job_applications) != 1:
         cannot_accept_reason = "Une seule candidature doit être séléctionnée pour être acceptée."
@@ -469,9 +469,17 @@ def list_for_siae_actions(request):
         "can_process": can_process,
         "can_postpone": can_postpone,
         "can_refuse": can_refuse,
-        "can_transfer": can_transfer,
-        "enable_transfer": enable_transfer,
-        "other_actions_count": sum([can_add_to_pool, can_process, can_postpone, can_archive, can_transfer]),
+        "can_transfer_internal": can_transfer_internal,
+        "can_transfer_external": can_transfer_external,
+        "other_actions_count": sum(
+            [
+                can_add_to_pool,
+                can_process,
+                can_postpone,
+                can_archive,
+                can_transfer_internal or can_transfer_external,  # both transfers use the same dropdown item
+            ]
+        ),
         "add_to_pool_form": BatchAddToPoolForm(
             job_seeker_nb=job_seeker_nb,
             prescriber_nb=prescriber_nb,

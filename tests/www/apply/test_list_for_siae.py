@@ -1370,17 +1370,23 @@ def test_list_for_siae_select_applications_batch_unarchive(client, snapshot):
 
 
 def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
+    MODAL_ID = "transfer_confirmation_modal"
+
     company = CompanyFactory(pk=1111, with_membership=True)
     employer = company.members.first()
 
-    transferable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.REFUSED
+    internal_transferable_app = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.NEW
     )
-    assert transferable_app_1.transfer.is_available()
-    transferable_app_2 = JobApplicationFactory(
+    assert internal_transferable_app.transfer.is_available()
+    both_transferable_app_1 = JobApplicationFactory(
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"), to_company=company, state=JobApplicationState.REFUSED
     )
-    assert transferable_app_2.transfer.is_available()
+    assert both_transferable_app_1.transfer.is_available()
+    both_transferable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("33333333-3333-3333-3333-333333333333"), to_company=company, state=JobApplicationState.REFUSED
+    )
+    assert both_transferable_app_2.transfer.is_available()
 
     untransferable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
     assert not untransferable_app.transfer.is_available()
@@ -1421,53 +1427,66 @@ def test_list_for_siae_select_applications_batch_transfer(client, snapshot):
         [transfer_button] = transfer_buttons
         return transfer_button
 
+    def get_transfer_modal():
+        modal = simulated_page.find(id=MODAL_ID)
+        if modal:
+            modal_form_action = urlsplit(modal.find("form")["action"])
+            assert modal_form_action.path == reverse("apply:batch_transfer")
+            assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
+        return modal
+
     assert get_transfer_button() is None
 
-    # Select 1 transferable application but user in not member of multiple companies
-    simulate_applications_selection([transferable_app_1.pk])
-    assert get_transfer_button() is None
+    # Mono organization cases : internal transfer is disabled
+    # -------------------------------------------------------
 
-    # The employer needs at least an other Company to be able to transfer an application
+    # Select 1 external transferable application and user is not member of multiple companies
+    simulate_applications_selection([both_transferable_app_1.pk])
+    transfer_button = get_transfer_button()
+    assert transfer_button["data-bs-target"] == f"#{MODAL_ID}"
+    assert pretty_indented(transfer_button) == snapshot(name="active transfer button")
+    assert pretty_indented(get_transfer_modal()) == snapshot(name="modal with only external transfer")
+
+    for app_list in [
+        [untransferable_app.pk],
+        [internal_transferable_app.pk],
+        [untransferable_app.pk, both_transferable_app_1.pk],
+        [both_transferable_app_1.pk, both_transferable_app_2.pk],  # only one job app can be transfered externally
+    ]:
+        simulate_applications_selection(app_list)
+        assert pretty_indented(get_transfer_button()) == snapshot(name="inactive transfer button mono org")
+        assert get_transfer_modal() is None
+
+    # Multi organization cases : internal transfer is allowed
+    # ------------------------------------------------------
     CompanyMembershipFactory(company__pk=2222, company__for_snapshot=True, user=employer).company
     CompanyMembershipFactory(
         company__pk=3333, company__kind=CompanyKind.EITI, company__name="Superbe snapshot", user=employer
     ).company
 
-    simulate_applications_selection([transferable_app_1.pk])
-    transfer_button = get_transfer_button()
-    assert transfer_button is not None
-    assert pretty_indented(transfer_button) == snapshot(name="active transfer button")
+    # Select 1 internal transferable application (only internal transfer is available)
+    simulate_applications_selection([internal_transferable_app.pk])
+    assert pretty_indented(get_transfer_button()) == snapshot(name="active transfer button")
+    assert pretty_indented(get_transfer_modal()) == snapshot(name="modal with only internal transfer")
 
-    modal_selector = transfer_button["data-bs-target"]
-    assert modal_selector == "#transfer_confirmation_modal"
-    modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
-    assert pretty_indented(modal) == snapshot(name="modal with 1 transferable application")
+    # Select 1 external transferable application (both transfers available)
+    simulate_applications_selection([both_transferable_app_1.pk])
+    assert pretty_indented(get_transfer_button()) == snapshot(name="active transfer button")
+    assert pretty_indented(get_transfer_modal()) == snapshot(name="both transfer modal")
 
-    # Check that the next_url is correctly transmitted
-    modal_form_action = urlsplit(modal.find("form")["action"])
-    assert modal_form_action.path == reverse("apply:batch_transfer")
-    assert parse_qs(modal_form_action.query) == {"next_url": [table_url]}
-
-    # Select 2 transferable applications
-    simulate_applications_selection([transferable_app_1.pk, transferable_app_2.pk])
-    transfer_button = get_transfer_button()
-    assert transfer_button is not None
-    assert pretty_indented(transfer_button) == snapshot(name="active transfer button")
-
-    modal_selector = transfer_button["data-bs-target"]
-    assert modal_selector == "#transfer_confirmation_modal"
-    modal = simulated_page.find(id=modal_selector[1:])  # Drop the first "#"
-    assert pretty_indented(modal) == snapshot(name="modal with 2 transferable application")
+    # Select 2 external transferable applications (only internal transfer is available)
+    simulate_applications_selection([both_transferable_app_1.pk, both_transferable_app_2.pk])
+    assert pretty_indented(get_transfer_button()) == snapshot(name="active transfer button")
+    assert pretty_indented(get_transfer_modal()) == snapshot(name="modal with 2 internal transferable application")
 
     # Test with untransferable batches
     for app_list in [
         [untransferable_app.pk],
-        [untransferable_app.pk, transferable_app_1.pk],
+        [untransferable_app.pk, internal_transferable_app.pk],
     ]:
         simulate_applications_selection(app_list)
-        transfer_button = get_transfer_button()
-        assert pretty_indented(transfer_button) == snapshot(name="inactive transfer button")
-        assert simulated_page.find(id="transfer_confirmation_modal") is None
+        assert pretty_indented(get_transfer_button()) == snapshot(name="inactive transfer button multi org")
+        assert get_transfer_modal() is None
 
 
 def test_list_for_siae_select_applications_batch_add_to_pool(client, snapshot):

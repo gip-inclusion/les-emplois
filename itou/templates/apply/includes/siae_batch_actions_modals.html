@@ -180,7 +180,7 @@
                 </div>
             </div>
         {% endif %}
-        {% if can_transfer %}
+        {% if can_transfer_internal or can_transfer_external %}
             <div id="transfer_confirmation_modal" class="modal" tabindex="-1" aria-labelledby="transfer_modal_title" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <form method="post" action="{% url 'apply:batch_transfer' %}?next_url={{ list_url|urlencode }}">
@@ -196,13 +196,39 @@
                                 </h2>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                             </div>
-                            <div class="modal-body">{% bootstrap_field transfer_form.target_company_id label_class="" %}</div>
+                            {% if can_transfer_internal %}
+                                <div class="modal-body">{% bootstrap_field transfer_form.target_company_id label_class="" %}</div>
+                            {% else %}
+                                <div class="modal-body">
+                                    <p>Sélectionnez la structure vers laquelle vous souhaitez transférer la candidature.</p>
+                                </div>
+                            {% endif %}
+
                             <div class="modal-footer">
 
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                                <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
-                                    Confirmer
-                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Retour</button>
+                                {% if can_transfer_external %}
+                                    <a class="btn btn-sm btn-ico btn-outline-primary" href="{% url 'apply:job_application_external_transfer_step_1' job_application_id=selected_application_ids.0 %}">
+                                        <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                        <strong>Une autre structure</strong>
+                                    </a>
+                                {% else %}
+                                    <button type="button"
+                                            class="btn btn-sm btn-ico btn-outline-primary"
+                                            disabled
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-custom-class="modal-tooltip"
+                                            data-bs-title="Vous devez selectionner une seule candidature au statut « déclinée » pour faire un transfert à un autre employeur.">
+                                        <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                        <strong>Une autre structure</strong>
+                                    </button>
+                                {% endif %}
+                                {% if can_transfer_internal %}
+                                    <button class="btn btn-sm btn-primary" {% matomo_event "candidature" "submit" "batch-transfer-applications-submit" %}>
+                                        Confirmer
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
                     </form>
