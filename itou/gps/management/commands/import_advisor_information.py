@@ -1,9 +1,11 @@
 import pathlib
 import uuid
+from collections import defaultdict
 from itertools import batched
 from math import ceil
 from typing import NamedTuple
 
+import numpy
 import pandas
 from django.conf import settings
 from django.db import transaction
@@ -12,7 +14,7 @@ from django.utils import timezone
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand
 
@@ -33,9 +35,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "import_excel_file",
+            "import_csv_file",
             type=pathlib.Path,
-            help="The filepath of the GPS export file, with extension .xlsx",
+            help="The filepath of the GPS export file, with extension .csv",
         )
         parser.add_argument(
             "--wet-run",
@@ -45,41 +47,60 @@ class Command(BaseCommand):
         )
 
     def parse_gps_advisors_file(self, import_file):
-        df = pandas.read_excel(
+        df = pandas.read_csv(
             import_file,
             converters={
-                "code_safir_agence": str,
-                "ID": int,
+                "code_agence": str,
+                "identifiant_gps": int,
             },
+            delimiter=";",
         )
-        df = df.dropna(
-            subset=["prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde"]
-        )  # only keep lines with all user information
-        df = df[["ID", "prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde"]]
+
+        df.rename(
+            columns={
+                "identifiant_gps": "pk",
+                "nom_conseiller": "last_name",
+                "prenom_conseiller": "first_name",
+                "mail_conseiller": "email",
+                "kn_individu_national": "ft_gps_id",
+                "code_agence": "code_safir_agence",
+            },
+            inplace=True,
+        )
+
+        # Extract ft_gps_id:
+        ft_gps_ids = defaultdict(list)
+        for pk, ft_gps_id in df[["pk", "ft_gps_id"]].to_dict(orient="split")["data"]:
+            ft_gps_ids[pk].append(ft_gps_id)
+        ft_gps_ids = {pk: ids[0] for pk, ids in ft_gps_ids.items() if len(ids) == 1}
+
+        # extract advisors
+        df = df.replace("", numpy.nan).dropna(subset=["code_safir_agence", "last_name", "first_name", "email"])
+        df = df[["pk", "code_safir_agence", "last_name", "first_name", "email"]]
 
         self.logger.info(f"Found {len(df)} rows from GPS export.")
 
         job_seekers_pks = list(
-            User.objects.filter(pk__in=df["ID"], kind=UserKind.JOB_SEEKER).values_list("pk", flat=True)
+            User.objects.filter(pk__in=df["pk"], kind=UserKind.JOB_SEEKER).values_list("pk", flat=True)
         )
         non_prescriber_account_emails = list(
-            User.objects.filter(email__in=df["mail_cdde"])
+            User.objects.filter(email__in=df["email"])
             .exclude(kind=UserKind.PRESCRIBER)
             .values_list("email", flat=True)
         )
         pk_to_contact = {}
         invalid_pks = []
         for row in df.itertuples():
-            if row.ID not in job_seekers_pks:
-                invalid_pks.append(row.ID)
+            if row.pk not in job_seekers_pks:
+                invalid_pks.append(row.pk)
                 continue
-            if row.mail_cdde in non_prescriber_account_emails:
+            if row.email in non_prescriber_account_emails:
                 continue
-            pk_to_contact[row.ID] = AdvisorDetails(
-                first_name=row.prenom_cdde,
-                last_name=row.nom_cdde,
+            pk_to_contact[row.pk] = AdvisorDetails(
+                first_name=row.first_name,
+                last_name=row.last_name,
                 code_safir_agence=row.code_safir_agence,
-                email=row.mail_cdde,
+                email=row.email,
             )
 
         if invalid_pks:
@@ -89,14 +110,24 @@ class Command(BaseCommand):
                 f"Some advisor email are attached to non prescriber accounts: {non_prescriber_account_emails}."
             )
 
-        return pk_to_contact
+        return ft_gps_ids, pk_to_contact
 
-    def handle(self, import_excel_file, wet_run=False, **options):
+    def handle(self, import_csv_file, wet_run=False, **options):
         objects_created_by = User.objects.get(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-        # parse the excel import
-        beneficiaries_id_to_contact = self.parse_gps_advisors_file(import_excel_file)
+        # parse the csv import file
+        ft_gps_ids, beneficiaries_id_to_contact = self.parse_gps_advisors_file(import_csv_file)
 
+        # Update ft_gps_id
+        jobseeker_profiles = list(JobSeekerProfile.objects.filter(pk__in=ft_gps_ids, ft_gps_id=None))
+        for jobseeker_profile in jobseeker_profiles:
+            jobseeker_profile.ft_gps_id = ft_gps_ids[jobseeker_profile.pk]
+        if wet_run:
+            for batch in batched(jobseeker_profiles, 1000):
+                JobSeekerProfile.objects.bulk_update(batch, fields=["ft_gps_id"])
+        self.logger.info(f"Updated {len(jobseeker_profiles)} ft_gps_id values the database")
+
+        # Process advisors
         self.logger.info(f"Matched {len(beneficiaries_id_to_contact)} users in the database")
 
         chunk_size = 1000
