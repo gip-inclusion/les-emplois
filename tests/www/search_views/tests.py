@@ -33,6 +33,14 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQuerie
 DISTRICTS = "Arrondissements de Paris"
 
 
+def distance_radio(simulated_page, distance):
+    [elt] = simulated_page.find_all(
+        "input",
+        attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
+    )
+    return elt
+
+
 class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
@@ -45,7 +53,7 @@ class TestSearchCompany:
         assert "company" not in response.context["form"]
 
     @override_settings(MATOMO_BASE_URL="https://matomo.example.com")
-    def test_dipretty_indentedict(self, client, snapshot):
+    def test_district(self, client, snapshot):
         city_slug = "paris-75"
         paris_city = City.objects.create(
             name="Paris",
@@ -379,15 +387,8 @@ class TestSearchCompany:
         assertNotContains(response, vannes_opt, html=True)
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all(
-                "input",
-                attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
-            )
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(25)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 25)["checked"]
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},
@@ -608,12 +609,8 @@ class TestSearchPrescriber:
         response = client.get(url, {"city": guerande.slug, "distance": 50})
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(50)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 50)["checked"]
         response = client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
         response = client.get(url, {"city": guerande.slug, "distance": 100})
@@ -683,7 +680,7 @@ class TestJobDescriptionSearchView:
         company_url = f"{company.get_card_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
         assertContains(response, company_url)
 
-    def test_dipretty_indentedict(self, client, snapshot):
+    def test_district(self, client, snapshot):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city_slug = "paris-75"
         paris_city = City.objects.create(
@@ -1284,12 +1281,8 @@ class TestJobDescriptionSearchView:
         response = client.get(self.URL, {"city": guerande.slug})
         simulated_page = parse_response_to_soup(response)
 
-        def distance_radio(distance):
-            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
-            return elt
-
-        distance_radio(100)["checked"] = ""
-        del distance_radio(25)["checked"]
+        distance_radio(simulated_page, 100)["checked"] = ""
+        del distance_radio(simulated_page, 25)["checked"]
         response = client.get(
             self.URL,
             {"city": guerande.slug, "distance": 100},

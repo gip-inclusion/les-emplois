@@ -1,0 +1,25 @@
+{% load django_bootstrap5 %}
+<div class="modal-dialog modal-dialog-centered" id="newSavedSearchModalContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <form hx-post="{% url "search:add_saved_search" %}" hx-target="#newSavedSearchModalContent" hx-swap="outerHTML" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="newSavedSearchModalLabel">Enregistrer cette recherche</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <p>Enregistrez cette recherche afin de la retrouver facilement depuis votre tableau de bord.</p>
+                {% bootstrap_form form alert_error_type="non_fields" %}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-primary">Enregistrer</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if saved_searches|default:None %}
+    {# A new saved search has been added, oob update the list and the settings modal #}
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches request=request only %}
+    {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token only %}
+{% endif %}
