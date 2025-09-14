@@ -472,6 +472,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "follow_up_groups_or_members",
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
+                "first_login",
             ]
         )
         if not request.user.is_superuser:
@@ -527,7 +528,15 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         assert "last_login" in fieldsets[-2][1]["fields"]
         fieldsets[-2] = (
             "Dates importantes",
-            {"fields": ("last_login", "date_joined", "last_checked_at", "upcoming_deletion_notified_at")},
+            {
+                "fields": (
+                    "last_login",
+                    "first_login",
+                    "date_joined",
+                    "last_checked_at",
+                    "upcoming_deletion_notified_at",
+                )
+            },
         )
 
         assert fieldsets[2][0] == "Permissions"
