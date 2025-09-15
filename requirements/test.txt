@@ -980,9 +980,9 @@ paramiko==4.0.0 \
     --hash=sha256:0e20e00ac666503bf0b4eda3b6d833465a2b7aff2e2b3d79a8bba5ef144ee3b9 \
     --hash=sha256:6a25f07b380cc9c9a88d2b920ad37167ac4667f8d9886ccebd8f90f654b5d69f
     # via -r requirements/base.txt
-patchy==2.9.0 \
-    --hash=sha256:cb1329b9fc4156fb8a4279a8298ec646b64daf3bdf24d24294142a3b7686e334 \
-    --hash=sha256:f4364bbe9d0281d12fe92690e79ef3c86c317294b3ae9d33405e7a4b6e8d9d5f
+patchy==2.10.0 \
+    --hash=sha256:e7dc3610d20b8ce30af2ddbfa4a1ed67f066269fa6b10094f16dc798b80119da \
+    --hash=sha256:f5c13adee5db3eea36a702ae3ab95f24d2c62d28d3a2246cc2f329e2e3e0cd74
     # via -r requirements/test.in
 pathspec==0.12.1 \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
