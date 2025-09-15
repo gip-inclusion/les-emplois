@@ -6,6 +6,7 @@ from uuid import uuid1, uuid4
 
 import httpx
 import pytest
+from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management import call_command
@@ -1422,6 +1423,7 @@ class TestAnonymizeProfessionalManagementCommand:
                     "user__coords": city.coords,
                     "user__insee_city": city,
                     "user__email": f"test{city.post_codes[0]}@mail.com",
+                    "user__with_verified_email": True,
                 }
             else:
                 kwargs = {
@@ -1478,6 +1480,7 @@ class TestAnonymizeProfessionalManagementCommand:
             )
         )
         assert users == snapshot(name="anonymized_professionals_without_deletion")
+        assert not EmailAddress.objects.exists()
         assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
             name="deleted_anonymized_professionals"
         )
