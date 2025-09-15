@@ -157,7 +157,6 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "filters_query_string": urlencode(
                 {
                     "city": city.slug,
-                    "city_name": str(city),
                     "distance": distance,
                     "kinds": kinds,
                     "contract_types": contract_types,
