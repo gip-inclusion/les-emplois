@@ -128,7 +128,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     try:
         display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
     except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
+        display_kind = JobApplicationsDisplayKind.TABLE
 
     if display_kind == JobApplicationsDisplayKind.LIST:
         job_applications = (
