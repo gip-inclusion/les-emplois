@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
@@ -146,6 +147,8 @@ class Command(BaseCommand):
         user_ids = [user.id for user in users]
         for model in [CompanyMembership, InstitutionMembership, PrescriberMembership]:
             model.objects.filter(user_id__in=user_ids).update(is_active=False)
+
+        EmailAddress.objects.filter(user_id__in=user_ids).delete()
 
         User.objects.filter(id__in=user_ids).update(
             is_active=False,
