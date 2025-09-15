@@ -4610,7 +4610,7 @@ class TestApplicationGEIQEligibilityView:
 class TestCheckPreviousApplicationsView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True, for_snapshot=True)
         self.job_seeker = JobSeekerFactory()
 
     def _login_and_setup_session(self, client, user):
@@ -4645,25 +4645,22 @@ class TestCheckPreviousApplicationsView:
         # Reset URL is correct
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
-    def test_with_previous_as_job_seeker(self, client):
+    @freeze_time("2025-09-08 11:39")
+    def test_with_previous_as_job_seeker(self, client, snapshot):
         self._login_and_setup_session(client, self.job_seeker)
 
         # Create a very recent application
         job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = client.get(self.check_prev_applications_url)
-        assertContains(
-            response,
-            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
-            "vous ne pouvez pas en soumettre une nouvelle.",
-        )
-        assertContains(
-            response,
-            """
-            <button type="button" class="btn btn-block btn-primary disabled">
-                <span>Postuler à nouveau</span>
-            </button>""",
-            html=True,
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="blocked")
 
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
@@ -4678,7 +4675,15 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, self.job_seeker)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Vous avez déjà postulé pour cette entreprise")
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="allowed")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4698,26 +4703,77 @@ class TestCheckPreviousApplicationsView:
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
-    def test_with_previous_as_authorized_prescriber(self, client):
+    @freeze_time("2025-09-08 11:39")
+    def test_with_previous_as_prescriber(self, client, snapshot):
+        prescriber = PrescriberFactory()
+        self._login_and_setup_session(client, prescriber)
+
+        # Create a very recent application
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
+        response = client.get(self.check_prev_applications_url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="blocked")
+
+        # Don't allow to skip to another step
+        response = client.get(self.application_jobs_url)
+        assertContains(
+            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
+        response = client.get(self.application_jobs_url)
+        assert response.status_code == 404
+
+        # Make it less recent to avoid the 403
+        job_application.created_at = timezone.now() - datetime.timedelta(days=2)
+        job_application.save(update_fields=("created_at", "updated_at"))
+        self._login_and_setup_session(client, prescriber)
+        response = client.get(self.check_prev_applications_url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="allowed")
+        response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
+        assertRedirects(response, self.application_jobs_url)
+
+        # Reset URL is correct
+        response = client.get(self.application_jobs_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
+
+    @freeze_time("2025-09-08 11:39")
+    def test_with_previous_as_authorized_prescriber(self, client, snapshot):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._login_and_setup_session(client, authorized_prescriber)
 
         # Create a very recent application
         job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = client.get(self.check_prev_applications_url)
-        assertContains(
-            response,
-            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
-            "vous ne pouvez pas en soumettre une nouvelle.",
-        )
-        assertContains(
-            response,
-            """
-            <button type="button" class="btn btn-block btn-primary disabled">
-                <span>Postuler à nouveau</span>
-            </button>""",
-            html=True,
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", str(self.job_seeker.public_id), "[Public ID of JobSeeker]"),
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"%2Fcompany%2F{job_application.to_company.pk}%2Fcard",
+                        "%2Fcompany%2F[PK of Company]%2Fcard",
+                    ),
+                ],
+            )
+        ) == snapshot(name="blocked")
 
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
@@ -4732,7 +4788,44 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, authorized_prescriber)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", str(self.job_seeker.public_id), "[Public ID of JobSeeker]"),
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"%2Fcompany%2F{job_application.to_company.pk}%2Fcard",
+                        "%2Fcompany%2F[PK of Company]%2Fcard",
+                    ),
+                ],
+            )
+        ) == snapshot(name="allowed update diagnosis")
+
+        # Remove previous eligibility diagnosis to change the button label
+        eligibility_diagnosis = job_application.eligibility_diagnosis
+        job_application.eligibility_diagnosis = None
+        job_application.save()
+        eligibility_diagnosis.delete()
+        response = client.get(self.check_prev_applications_url)
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", str(self.job_seeker.public_id), "[Public ID of JobSeeker]"),
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"%2Fcompany%2F{job_application.to_company.pk}%2Fcard",
+                        "%2Fcompany%2F[PK of Company]%2Fcard",
+                    ),
+                ],
+            )
+        ) == snapshot(name="allowed validate diagnosis")
+
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 
@@ -4774,7 +4867,8 @@ class TestCheckPreviousApplicationsView:
         company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
-    def test_with_previous_as_another_employer(self, client):
+    @freeze_time("2025-09-08 11:39")
+    def test_with_previous_as_another_employer(self, client, snapshot):
         employer = EmployerFactory(with_company=True)
         self._login_and_setup_session(client, employer)
 
@@ -4786,19 +4880,15 @@ class TestCheckPreviousApplicationsView:
             to_company=self.company,
         )
         response = client.get(self.check_prev_applications_url)
-        assertContains(
-            response,
-            "Une candidature ayant déjà été envoyée il y a moins de 24 heures, "
-            "vous ne pouvez pas en soumettre une nouvelle.",
-        )
-        assertContains(
-            response,
-            """
-            <button type="button" class="btn btn-block btn-primary disabled">
-                <span>Postuler à nouveau</span>
-            </button>""",
-            html=True,
-        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="blocked")
 
         # Don't allow to skip to another step
         response = client.get(self.application_jobs_url)
@@ -4813,7 +4903,15 @@ class TestCheckPreviousApplicationsView:
         job_application.save(update_fields=("created_at", "updated_at"))
         self._login_and_setup_session(client, employer)
         response = client.get(self.check_prev_applications_url)
-        assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                ".c-form",
+                replace_in_attr=[
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                ],
+            )
+        ) == snapshot(name="allowed")
         response = client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         assertRedirects(response, self.application_jobs_url)
 

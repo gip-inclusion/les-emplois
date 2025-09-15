@@ -23,11 +23,11 @@
                 <div class="form-group col col-lg-auto order-1 order-lg-2">
                     {% if secondary_name and secondary_value %}
                         <button type="submit" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}" name="{{ secondary_name }}" value="{{ secondary_value }}">
-                            <span>Retour</span>
+                            <span>{{ secondary_label }}</span>
                         </button>
                     {% else %}
                         <a href="{{ secondary_url }}" class="btn btn-block btn-outline-primary" aria-label="{{ secondary_aria_label }}">
-                            <span>Retour</span>
+                            <span>{{ secondary_label }}</span>
                         </a>
                     {% endif %}
                 </div>
