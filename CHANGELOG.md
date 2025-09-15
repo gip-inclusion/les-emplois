@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2025-09-15
+
+### Modifié
+
+- [Candidature: cacher les informations personnelles dans les emails envoyés aux orienteurs n'y ayant pas accès dans l'interface](https://github.com/gip-inclusion/les-emplois/pull/6811)
+- [Candidatures: Permettre le transfert d'une candidature vers une autre structure depuis les actions par lot](https://github.com/gip-inclusion/les-emplois/pull/6803)
+- [Employeur : Correction du pays de naissance manquant à l’embauche](https://github.com/gip-inclusion/les-emplois/pull/6831)
+- [Employeur: Dépublier les fiches de poste non mises à jour depuis 90 jours.](https://github.com/gip-inclusion/les-emplois/pull/6829)
+- [Employeur: Notifier les membres de l'entreprise lorsque les fiches de poste sont dépubliées.](https://github.com/gip-inclusion/les-emplois/pull/6830)
+- [Ne lister que les membres actifs d’une organisation par défaut](https://github.com/gip-inclusion/les-emplois/pull/6515)
+- [Vie privée: ajout de l'email du compte concerné dans le texte des notifications emails envoyées](https://github.com/gip-inclusion/les-emplois/pull/6828)
+
+### Supprimé
+
+- [Prescripteur: Suppression d'un bandeau d’alerte pour une enquête Maze](https://github.com/gip-inclusion/les-emplois/pull/6812)
+
+### Tech
+
+- [Suppression du code de l'application `status`](https://github.com/gip-inclusion/les-emplois/pull/6791)
+- [Tech: ajout de la vérification des attributs `limit_choices_to` pour détecter plus d'incohérences](https://github.com/gip-inclusion/les-emplois/pull/6837)
+- [Tech: Améliorer le formulaire de connexion](https://github.com/gip-inclusion/les-emplois/pull/6809)
+
 ## 2025-09-08
 
 ### Ajouté
