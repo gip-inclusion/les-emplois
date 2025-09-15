@@ -464,6 +464,512 @@
   
   '''
 # ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_another_employer[allowed]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              06 septembre 2025 à 13h39
+          </b>
+      </p>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_another_employer[blocked]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              08 septembre 2025 à 13h39
+          </b>
+      </p>
+      <div class="alert alert-warning" role="status">
+          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+      </div>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[allowed update diagnosis]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              06 septembre 2025 à 13h39
+          </b>
+      </p>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="c-info mb-3 mb-md-4">
+          <div class="c-info__summary">
+              Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
+              <br/>
+              Vous pouvez simplement valider ou mettre à jour l’éligibilité.
+              <br/>
+              Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </button>
+                  </div>
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Mettre à jour l’éligibilité IAE" class="btn btn-block btn-outline-primary" href="/eligibility/update/iae/[Public ID of JobSeeker]?back_url=%2Fcompany%2F[PK of Company]%2Fcard">
+                          <span>
+                              Mettre à jour l’éligibilité IAE
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title">
+                          Êtes-vous sûr de vouloir annuler ?
+                      </h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-danger" href="/company/[PK of Company]/card">
+                          Confirmer l'annulation
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[allowed validate diagnosis]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              06 septembre 2025 à 13h39
+          </b>
+      </p>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="c-info mb-3 mb-md-4">
+          <div class="c-info__summary">
+              Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
+              <br/>
+              Vous pouvez simplement valider ou mettre à jour l’éligibilité.
+              <br/>
+              Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </button>
+                  </div>
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Valider l’éligibilité IAE" class="btn btn-block btn-outline-primary" href="/eligibility/update/iae/[Public ID of JobSeeker]?back_url=%2Fcompany%2F[PK of Company]%2Fcard">
+                          <span>
+                              Valider l’éligibilité IAE
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title">
+                          Êtes-vous sûr de vouloir annuler ?
+                      </h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                          Retour
+                      </button>
+                      <a class="btn btn-sm btn-danger" href="/company/[PK of Company]/card">
+                          Confirmer l'annulation
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_authorized_prescriber[blocked]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              08 septembre 2025 à 13h39
+          </b>
+      </p>
+      <div class="alert alert-warning" role="status">
+          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+      </div>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="c-info mb-3 mb-md-4">
+          <div class="c-info__summary">
+              Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
+              <br/>
+              Vous pouvez simplement valider ou mettre à jour l’éligibilité.
+              <br/>
+              Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <a aria-label="Mettre à jour l’éligibilité IAE" class="btn btn-block btn-primary" href="/eligibility/update/iae/[Public ID of JobSeeker]?back_url=%2Fcompany%2F[PK of Company]%2Fcard">
+                          <span>
+                              Mettre à jour l’éligibilité IAE
+                          </span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_job_seeker[allowed]
+  '''
+  <div class="c-form">
+      <h2>
+          Vous avez déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              06 septembre 2025 à 13h39
+          </b>
+      </p>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_job_seeker[blocked]
+  '''
+  <div class="c-form">
+      <h2>
+          Vous avez déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              08 septembre 2025 à 13h39
+          </b>
+      </p>
+      <div class="alert alert-warning" role="status">
+          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+      </div>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_prescriber[allowed]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              06 septembre 2025 à 13h39
+          </b>
+      </p>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCheckPreviousApplicationsView.test_with_previous_as_prescriber[blocked]
+  '''
+  <div class="c-form">
+      <h2>
+          Ce candidat a déjà postulé pour cette entreprise
+      </h2>
+      <p>
+          Entreprise :
+          <b>
+              Acme inc.
+          </b>
+          <br/>
+          Date de la dernière candidature :
+          <b>
+              08 septembre 2025 à 13h39
+          </b>
+      </p>
+      <div class="alert alert-warning" role="status">
+          Une candidature ayant déjà été envoyée il y a moins de 24 heures, vous ne pouvez pas en soumettre une nouvelle.
+      </div>
+      <input name="force_new_application" type="hidden" value="force"/>
+      <div class="row">
+          <div class="col-12">
+              <hr class="mb-3"/>
+              <div class="form-row align-items-center justify-content-end gx-3">
+                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/company/[PK of Company]/card">
+                          <i aria-hidden="true" class="ri-close-line ri-lg">
+                          </i>
+                          <span>
+                              Annuler
+                          </span>
+                      </a>
+                  </div>
+                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                      <button class="btn btn-block btn-primary disabled" type="button">
+                          <span>
+                              Postuler à nouveau
+                          </span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestHireConfirmation.test_as_company[view queries]
   dict({
     'num_queries': 28,

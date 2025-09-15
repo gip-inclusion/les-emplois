@@ -444,6 +444,20 @@ class CheckPreviousApplications(ApplicationBaseView):
         context = super().get_context_data(**kwargs)
         context["prev_application"] = self.prev_application
         context["block_apply"] = self.prev_application.created_at > timezone.now() - timedelta(hours=24)
+        context["iae_eligibility_url"] = None
+        if (
+            self.request.from_authorized_prescriber
+            and self.company.is_subject_to_eligibility_rules
+            and not self.job_seeker.approvals.valid().exists()
+        ):
+            context["iae_eligibility_url"] = reverse(
+                "eligibility_views:update_iae",
+                kwargs={"job_seeker_public_id": self.job_seeker.public_id},
+                query={"back_url": self.get_reset_url()},
+            )
+            context["iae_eligibility_label"] = (
+                "Mettre à jour l’éligibilité IAE" if self.eligibility_diagnosis else "Valider l’éligibilité IAE"
+            )
         return context
 
 

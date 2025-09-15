@@ -16,6 +16,7 @@ def itou_buttons_form(
     primary_aria_label="Passer à l’étape suivante",
     reset_url=reverse_lazy("dashboard:index"),
     show_mandatory_fields_mention=True,
+    secondary_label="Retour",
     secondary_url=None,
     secondary_aria_label="Retourner à l’étape précédente",
     secondary_name=None,
@@ -41,6 +42,9 @@ def itou_buttons_form(
 
         primary_aria_label
             The ARIA label for the primary button.
+
+        secondary_label
+            The label for the secondary button.
 
         secondary_url
             The url for the secondary button.
@@ -100,6 +104,7 @@ def itou_buttons_form(
         "primary_value": primary_value,
         "primary_url": primary_url,
         "reset_url": reset_url,
+        "secondary_label": secondary_label,
         "secondary_url": secondary_url,
         "secondary_aria_label": secondary_aria_label,
         "secondary_name": secondary_name,
