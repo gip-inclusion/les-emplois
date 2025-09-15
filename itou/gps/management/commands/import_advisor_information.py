@@ -4,6 +4,7 @@ from itertools import batched
 from math import ceil
 from typing import NamedTuple
 
+import numpy
 import pandas
 from django.conf import settings
 from django.db import transaction
@@ -12,7 +13,7 @@ from django.utils import timezone
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand
 
@@ -24,6 +25,15 @@ class AdvisorDetails(NamedTuple):
     email: str
 
 
+class JobSeekerDetails(NamedTuple):
+    first_name: str
+    last_name: str
+    pole_emploi_id: str
+    nir: str
+    birthdate: str
+    ft_gps_id: str
+
+
 class Command(BaseCommand):
     """
     Import advisors from an Excel file (GPS)
@@ -33,9 +43,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "import_excel_file",
+            "import_csv_file",
             type=pathlib.Path,
-            help="The filepath of the GPS export file, with extension .xlsx",
+            help="The filepath of the GPS export file, with extension .csv",
         )
         parser.add_argument(
             "--wet-run",
@@ -45,41 +55,90 @@ class Command(BaseCommand):
         )
 
     def parse_gps_advisors_file(self, import_file):
-        df = pandas.read_excel(
+        df = pandas.read_csv(
             import_file,
             converters={
-                "code_safir_agence": str,
-                "ID": int,
+                "code_agence": str,
+                "identifiant_gps": int,
+                "nir": str,
+                "identifiant_local": str,
             },
+            delimiter=";",
         )
-        df = df.dropna(
-            subset=["prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde"]
-        )  # only keep lines with all user information
-        df = df[["ID", "prenom_cdde", "nom_cdde", "code_safir_agence", "mail_cdde"]]
+
+        df.rename(
+            columns={
+                # exported data
+                "identifiant_gps": "job_seeker_pk",
+                "nom": "job_seeker_last_name",
+                "prénom": "job_seeker_first_name",
+                "identifiant_local": "job_seeker_pole_emploi_id",
+                "date_de_naissance": "job_seeker_birthdate",
+                "nir": "job_seeker_nir",
+                # New data
+                "nom_conseiller": "last_name",
+                "prenom_conseiller": "first_name",
+                "mail_conseiller": "email",
+                "kn_individu_national": "job_seeker_ft_gps_id",
+                "code_agence": "code_safir_agence",
+            },
+            inplace=True,
+        )
+
+        # Extract ft_gps_id:
+        job_seeker_details = {}
+        for pk, last_name, first_name, pole_emploi_id, birthdate, nir, ft_gps_id in (
+            df[
+                [
+                    "job_seeker_pk",
+                    "job_seeker_last_name",
+                    "job_seeker_first_name",
+                    "job_seeker_pole_emploi_id",
+                    "job_seeker_birthdate",
+                    "job_seeker_nir",
+                    "job_seeker_ft_gps_id",
+                ]
+            ]
+            .fillna("")
+            .drop_duplicates(subset=["job_seeker_pk"], keep=False)
+            .to_dict(orient="split")["data"]
+        ):
+            job_seeker_details[pk] = JobSeekerDetails(
+                first_name=first_name,
+                last_name=last_name,
+                pole_emploi_id=pole_emploi_id,
+                nir=nir,
+                birthdate=birthdate,
+                ft_gps_id=ft_gps_id,
+            )
+
+        # extract advisors
+        df = df.replace("", numpy.nan).dropna(subset=["code_safir_agence", "last_name", "first_name", "email"])
+        df = df[["job_seeker_pk", "code_safir_agence", "last_name", "first_name", "email"]]
 
         self.logger.info(f"Found {len(df)} rows from GPS export.")
 
         job_seekers_pks = list(
-            User.objects.filter(pk__in=df["ID"], kind=UserKind.JOB_SEEKER).values_list("pk", flat=True)
+            User.objects.filter(pk__in=df["job_seeker_pk"], kind=UserKind.JOB_SEEKER).values_list("pk", flat=True)
         )
         non_prescriber_account_emails = list(
-            User.objects.filter(email__in=df["mail_cdde"])
+            User.objects.filter(email__in=df["email"])
             .exclude(kind=UserKind.PRESCRIBER)
             .values_list("email", flat=True)
         )
         pk_to_contact = {}
         invalid_pks = []
         for row in df.itertuples():
-            if row.ID not in job_seekers_pks:
-                invalid_pks.append(row.ID)
+            if row.job_seeker_pk not in job_seekers_pks:
+                invalid_pks.append(row.job_seeker_pk)
                 continue
-            if row.mail_cdde in non_prescriber_account_emails:
+            if row.email in non_prescriber_account_emails:
                 continue
-            pk_to_contact[row.ID] = AdvisorDetails(
-                first_name=row.prenom_cdde,
-                last_name=row.nom_cdde,
+            pk_to_contact[row.job_seeker_pk] = AdvisorDetails(
+                first_name=row.first_name,
+                last_name=row.last_name,
                 code_safir_agence=row.code_safir_agence,
-                email=row.mail_cdde,
+                email=row.email,
             )
 
         if invalid_pks:
@@ -89,14 +148,35 @@ class Command(BaseCommand):
                 f"Some advisor email are attached to non prescriber accounts: {non_prescriber_account_emails}."
             )
 
-        return pk_to_contact
+        return job_seeker_details, pk_to_contact
 
-    def handle(self, import_excel_file, wet_run=False, **options):
+    def update_ft_gps_id(self, job_seeker_details, wet_run):
+        jobseeker_profiles = list(
+            JobSeekerProfile.objects.filter(pk__in=job_seeker_details, ft_gps_id=None).select_related("user")
+        )
+        profiles_to_update = []
+        for jobseeker_profile in jobseeker_profiles:
+            details = job_seeker_details[jobseeker_profile.pk]
+            if all(
+                [
+                    jobseeker_profile.user.first_name == details.first_name,
+                    jobseeker_profile.user.last_name == details.last_name,
+                    jobseeker_profile.nir == details.nir,
+                    jobseeker_profile.pole_emploi_id == details.pole_emploi_id,
+                    str(jobseeker_profile.birthdate or "") == details.birthdate,
+                ]
+            ):
+                jobseeker_profile.ft_gps_id = job_seeker_details[jobseeker_profile.pk].ft_gps_id
+                profiles_to_update.append(jobseeker_profile)
+        if wet_run:
+            for batch in batched(profiles_to_update, 1000):
+                JobSeekerProfile.objects.bulk_update(batch, fields=["ft_gps_id"])
+        self.logger.info(f"Updated {len(profiles_to_update)} ft_gps_id values the database")
+
+    def process_advisors(self, beneficiaries_id_to_contact, wet_run):
         objects_created_by = User.objects.get(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-        # parse the excel import
-        beneficiaries_id_to_contact = self.parse_gps_advisors_file(import_excel_file)
-
+        # Process advisors
         self.logger.info(f"Matched {len(beneficiaries_id_to_contact)} users in the database")
 
         chunk_size = 1000
@@ -213,6 +293,12 @@ class Command(BaseCommand):
             f"Import complete. {created_prescriber_count} prescribers were created "
             f"and {len(beneficiaries_id_to_contact)} certified referent were set."
         )
+
+    def handle(self, import_csv_file, wet_run=False, **options):
+        job_seeker_details, beneficiaries_id_to_contact = self.parse_gps_advisors_file(import_csv_file)
+        self.update_ft_gps_id(job_seeker_details, wet_run)
+        self.process_advisors(beneficiaries_id_to_contact, wet_run)
+
         if not wet_run:
             self.logger.warning(
                 "This was a dry run, nothing was committed. Execute the command with --wet-run to change this."
