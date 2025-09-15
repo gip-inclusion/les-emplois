@@ -210,7 +210,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     try:
         display_kind = JobApplicationsDisplayKind(request.GET.get("display"))
     except ValueError:
-        display_kind = JobApplicationsDisplayKind.LIST
+        display_kind = JobApplicationsDisplayKind.TABLE
 
     try:
         order = JobApplicationOrder(request.GET.get("order"))

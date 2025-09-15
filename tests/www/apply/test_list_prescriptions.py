@@ -11,10 +11,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import (
-    AdministrativeCriteriaKind,
-    AuthorKind,
-)
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -268,8 +265,8 @@ def test_list_display_kind(client):
     LIST_VIEW_MARKER = '<div class="c-box--results__header">'
 
     for display_param, expected_marker in [
-        ({}, LIST_VIEW_MARKER),
-        ({"display": "invalid"}, LIST_VIEW_MARKER),
+        ({}, TABLE_VIEW_MARKER),
+        ({"display": "invalid"}, TABLE_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.LIST}, LIST_VIEW_MARKER),
         ({"display": JobApplicationsDisplayKind.TABLE}, TABLE_VIEW_MARKER),
     ]:
