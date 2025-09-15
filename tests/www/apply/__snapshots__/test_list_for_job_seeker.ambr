@@ -97,7 +97,7 @@
                   </ul>
               </div>
           </fieldset>
-          <input id="display-kind" name="display" type="hidden" value="list"/>
+          <input id="display-kind" name="display" type="hidden" value="table"/>
           <input id="id_order" name="order" type="hidden" value="-created_at"/>
           <hr/>
           <fieldset>
@@ -1658,7 +1658,7 @@
       <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">
           Voir
       </button>
-      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=list&order=-created_at">
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-block btn-outline-primary" href="/apply/job_seeker/list?display=table&order=-created_at">
           <i aria-hidden="true" class="ri-eraser-line fw-medium">
           </i>
           <span>
@@ -1689,7 +1689,7 @@
 # name: test_reset_filter_button_snapshot[reset-filter button in list view]
   '''
   <div class="ms-md-auto" id="apply-list-filter-counter">
-      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=list&order=-created_at">
+      <a aria-label="Réinitialiser le filtre actif" class="btn btn-ico btn-dropdown-filter" href="/apply/job_seeker/list?display=table&order=-created_at">
           <i aria-hidden="true" class="ri-eraser-line fw-medium">
           </i>
           <span>
