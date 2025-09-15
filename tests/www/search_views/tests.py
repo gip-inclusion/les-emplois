@@ -632,7 +632,7 @@ class TestJobDescriptionSearchView:
         paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
-        filters_param = {"city": city_slug, "city_name": "Paris (75)", "distance": 25}
+        filters_param = {"city": city_slug, "distance": 25}
 
         company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
         job = JobDescriptionFactory(company=company)
@@ -686,7 +686,7 @@ class TestJobDescriptionSearchView:
         paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
-        filters_param = {"city": city_slug, "city_name": "Paris (75)", "distance": 25}
+        filters_param = {"city": city_slug, "distance": 25}
 
         company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
         job = JobDescriptionFactory(company=company)
@@ -740,7 +740,6 @@ class TestJobDescriptionSearchView:
             self.URL,
             {
                 "city": city.slug,
-                "city_name": city.name + " (44)",
                 "distance": 25,
                 "kinds": [CompanyKind.AI, CompanyKind.ETTI],
             },
