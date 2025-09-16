@@ -801,6 +801,15 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         )
 
     def dispatch(self, request, *args, **kwargs):
+        missing_fields = self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+        if missing_fields:
+            fmt_missing_fields = ", ".join(sorted(missing_fields))
+            messages.error(
+                request,
+                f"Les données suivantes sont manquantes pour déclarer l'embauche : {fmt_missing_fields}.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(self.get_back_url())
         if self.get_eligibility_for_hire_step_url() is None:
             return HttpResponseRedirect(self.get_next_url())
         return super().dispatch(request, *args, **kwargs)
