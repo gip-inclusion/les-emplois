@@ -104,7 +104,7 @@ def _mock_status_failed():
 def mock_api_esd(settings):
     settings.API_ESD = {
         "BASE_URL": "https://some.auth.domain",
-        "AUTH_BASE_URL": "https://some-authentication-domain.fr",
+        "AUTH_BASE_URL_PARTENAIRE": "https://some-authentication-domain.fr",
     }
 
 

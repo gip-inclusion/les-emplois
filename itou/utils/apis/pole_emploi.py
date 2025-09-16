@@ -422,7 +422,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 def pole_emploi_partenaire_api_client():
     return PoleEmploiRoyaumePartenaireApiClient(
         settings.API_ESD["BASE_URL"],
-        settings.API_ESD["AUTH_BASE_URL"],
+        settings.API_ESD["AUTH_BASE_URL_PARTENAIRE"],
         settings.API_ESD["KEY"],
         settings.API_ESD["SECRET"],
     )

@@ -81,7 +81,7 @@ class TestJobApplicationModel:
     def setup_method(self, settings):
         settings.API_ESD = {
             "BASE_URL": "https://base.domain",
-            "AUTH_BASE_URL": "https://authentication-domain.fr",
+            "AUTH_BASE_URL_PARTENAIRE": "https://authentication-domain.fr",
             "KEY": "foobar",
             "SECRET": "pe-secret",
         }
@@ -1300,7 +1300,7 @@ class TestJobApplicationWorkflow:
     def setup_method(self, settings):
         settings.API_ESD = {
             "BASE_URL": "https://base.domain",
-            "AUTH_BASE_URL": "https://authentication-domain.fr",
+            "AUTH_BASE_URL_PARTENAIRE": "https://authentication-domain.fr",
             "KEY": "foobar",
             "SECRET": "pe-secret",
         }

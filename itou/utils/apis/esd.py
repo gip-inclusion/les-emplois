@@ -28,7 +28,7 @@ def get_access_token(scope):
 
     r = (
         httpx.post(
-            f"{settings.API_ESD['AUTH_BASE_URL']}/connexion/oauth2/access_token",
+            f"{settings.API_ESD['AUTH_BASE_URL_PARTENAIRE']}/connexion/oauth2/access_token",
             params={"realm": "/partenaire"},
             data={
                 "grant_type": "client_credentials",
