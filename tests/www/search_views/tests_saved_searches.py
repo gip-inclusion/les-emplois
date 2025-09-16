@@ -11,7 +11,7 @@ from tests.cities.factories import create_city_lyon
 from tests.search.factories import SavedSearchFactory
 from tests.users.factories import PrescriberFactory, random_user_kind_factory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import parse_response_to_soup
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestSavedSearches:
@@ -39,6 +39,7 @@ class TestSavedSearches:
     JOB_DESCRIPTIONS_SEARCH_URL = reverse("search:job_descriptions_results")
     DASHBOARD_URL = reverse("dashboard:index")
     ADD_SAVED_SEARCH_URL = reverse("search:add_saved_search")
+    DELETE_SAVED_SEARCH_VIEW_NAME = "search:delete_saved_search"
 
     def setup_method(self):
         self.lyon = create_city_lyon()
@@ -101,7 +102,7 @@ class TestSavedSearches:
         assertContains(response, self.DISABLED_ADD_BUTTON_MARKUP, html=True)
 
     @pytest.mark.parametrize("url", [DASHBOARD_URL, EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
-    def test_display_saved_searches(self, client, url):
+    def test_display_saved_searches_and_delete_modal(self, client, url):
         user = PrescriberFactory()
         client.force_login(user)
 
@@ -136,6 +137,12 @@ class TestSavedSearches:
             """,
             html=True,
         )
+        # Only check that the delete modal is present on the 3 pages, the content is checked bellow
+        assertContains(
+            response,
+            """<h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>""",
+            html=True,
+        )
 
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_add_saved_search(self, client):
@@ -157,7 +164,7 @@ class TestSavedSearches:
             response,
             f"""
             <a href="{saved_search.url}" class="btn-link btn-ico">
-                <i class="ri-star-line" aria-hidden="true"></i>
+    <i class="ri-star-line" aria-hidden="true"></i>
                 <span>{saved_search.name}</span>
             </a>
            """,
@@ -204,3 +211,76 @@ class TestSavedSearches:
         response = client.post(self.ADD_SAVED_SEARCH_URL, data)
         assertContains(response, "Le nombre maximum de recherches sauvegardées (1) a été atteint.")
         assert SavedSearch.objects.count() == 1
+
+    def test_details_delete_modal_content(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user, for_snapshot=True)
+        response = client.get(self.EMPLOYERS_SEARCH_URL)
+        modal = parse_response_to_soup(
+            response,
+            selector="#savedSearchesSettingsModal",
+            replace_in_attr=[
+                (
+                    "hx-post",
+                    f"/search/saved-searches/{saved_search.pk}/delete",
+                    "/search/saved-searches/[Pk of SavedSearch]/delete",
+                )
+            ],
+        )
+        assert pretty_indented(modal) == snapshot
+
+    def test_delete_saved_search(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user)
+        response = client.post(
+            reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME, kwargs={"saved_search_id": saved_search.id}),
+            headers={"HX-Request": "true"},
+        )
+
+        assert SavedSearch.objects.count() == 0
+        assertContains(
+            response,
+            """
+            <div class="c-search__list" id="savedSearchesList" hx-swap-oob="true"></div>
+           """,
+            html=True,
+        )
+        assertContains(
+            response,
+            self.ADD_BUTTON_MARKUP,
+            html=True,
+        )
+
+    @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
+    def test_delete_saved_search_htmx_reload(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user)
+        response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
+        simulated_page = parse_response_to_soup(response, selector="body")
+
+        # Delete the saved search, with a limit of 1: the add button should be re-enabled
+        response = client.post(
+            reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME, kwargs={"saved_search_id": saved_search.id}),
+            headers={"HX-Request": "true"},
+        )
+        assert response.status_code == 200
+        update_page_with_htmx(
+            simulated_page,
+            (
+                "form[hx-post="
+                f"'{reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME, kwargs={'saved_search_id': saved_search.id})}']"
+            ),
+            response,
+        )
+
+        # Check that a fresh reload gets us in the same state
+        response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
+        fresh_page = parse_response_to_soup(response, selector="body")
+
+        assertSoupEqual(fresh_page, simulated_page)
