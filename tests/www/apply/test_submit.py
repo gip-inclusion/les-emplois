@@ -3641,6 +3641,7 @@ class UpdateJobSeekerTestMixin:
             jobseeker_profile__nir="178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
+            born_in_france=True,
         )
         self.apply_session = fake_session_initialization(client, self.company, None, {})
         from_url = reverse(self.FINAL_REDIRECT_VIEW_NAME, kwargs={"session_uuid": self.apply_session.name})

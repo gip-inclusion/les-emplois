@@ -886,8 +886,9 @@ def send_diagoriente_invite(request, job_application_id):
     return HttpResponseRedirect(redirect_url)
 
 
-class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityView(common_views.CheckJobSeekerMissingPersonalInfoMixin, BaseIAEEligibilityViewForEmployer):
     template_name = "apply/process_eligibility.html"
+    required_personal_data_msg = "Les données candidat suivantes sont manquantes pour accepter la candidature"
 
     def setup(self, request, job_application_id, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -912,6 +913,13 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
 
     def get_cancel_url(self):
         return self.next_url
+
+    def get_required_personal_data_redirect_url(self):
+        params = {
+            "job_seeker_public_id": self.job_seeker.public_id,
+            "from_url": reverse("apply:eligibility", kwargs={"job_application_id": self.job_application.pk}),
+        }
+        return reverse("job_seekers_views:update_job_seeker_start", query=params)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
