@@ -2759,6 +2759,44 @@
       }),
       dict({
         'origin': list([
+          'Company.has_member[common_apps/organizations/models.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.get_active_suspension_dates[companies/models.py]',
+          'Company.get_active_suspension_text_with_dates[companies/models.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
+          FROM "siae_evaluations_evaluatedsiae"
+          INNER JOIN "siae_evaluations_sanctions" ON ("siae_evaluations_evaluatedsiae"."id" = "siae_evaluations_sanctions"."evaluated_siae_id")
+          WHERE ("siae_evaluations_evaluatedsiae"."siae_id" = %s
+                 AND "siae_evaluations_sanctions"."suspension_dates" @> %s::date)
+          ORDER BY UPPER("siae_evaluations_sanctions"."suspension_dates") DESC NULLS FIRST
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
@@ -2783,6 +2821,31 @@
                  "asp_commune"."ignore"
           FROM "asp_commune"
           WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          'HireConfirmationView.get_forms[www/apply/views/common.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/common.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.get_context_data[www/apply/views/submit_views.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
           LIMIT 21
         ''',
       }),
@@ -3098,7 +3161,7 @@
 # ---
 # name: TestHireConfirmation.test_as_company[simplified_url][view queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -3733,22 +3796,6 @@
                  "users_jobseekerprofile"."fields_history"
           FROM "users_jobseekerprofile"
           WHERE "users_jobseekerprofile"."user_id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.has_required_personal_info_for_hire[users/models.py]',
-          'HireConfirmationView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          WHERE "asp_country"."id" = %s
           LIMIT 21
         ''',
       }),
