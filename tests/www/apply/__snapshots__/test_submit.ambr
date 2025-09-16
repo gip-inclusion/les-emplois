@@ -4143,7 +4143,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -4366,6 +4366,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -4386,6 +4426,32 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -5113,7 +5179,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -5389,6 +5455,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -5453,6 +5559,32 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -6324,7 +6456,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -6547,6 +6679,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -6567,6 +6739,32 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -7294,7 +7492,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -7570,6 +7768,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -7634,6 +7872,32 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -8505,7 +8769,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -8728,6 +8992,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -8748,6 +9052,32 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -9475,7 +9805,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -9751,6 +10081,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -9815,6 +10185,32 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -10686,7 +11082,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -10909,6 +11305,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -10929,6 +11365,32 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -11656,7 +12118,7 @@
 # ---
 # name: TestUpdateJobSeekerForHire.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -11932,6 +12394,46 @@
       }),
       dict({
         'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
+          'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
+          'UpdateJobSeekerStep1View.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'JobSeekerProfile.readonly_pii_fields[users/models.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[users/forms.py]',
           'CreateOrUpdateJobSeekerStep1Form.__init__[common_apps/nir/forms.py]',
@@ -11996,6 +12498,32 @@
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'IfNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[job_seekers_views/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."id" IN (%s))
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
