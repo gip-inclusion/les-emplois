@@ -787,8 +787,11 @@ class IAEEligibilityForHireView(
         return context
 
 
-class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityView):
+class GEIQEligibilityForHireView(
+    common_views.CheckJobSeekerMissingPersonalInfoMixin, ApplicationBaseView, common_views.BaseGEIQEligibilityView
+):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour déclarer l'embauche"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -809,6 +812,9 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
+
+    def get_required_personal_data_redirect_url(self):
+        return self.get_back_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
