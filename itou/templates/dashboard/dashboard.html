@@ -259,6 +259,12 @@
     </section>
 {% endblock %}
 
+{% block modals %}
+    <div class="modal fade" id="savedSearchesSettingsModal" tabindex="-1" aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" role="dialog">
+        {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches request=request csrf_token=csrf_token hx_swap_oob=False only %}
+    </div>
+{% endblock %}
+
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>

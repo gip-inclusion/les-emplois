@@ -1,0 +1,43 @@
+{% load django_bootstrap5 %}
+<div class="modal-dialog modal-dialog-centered" id="savedSearchesSettingsModalContent"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+            <ul class="list-unstyled">
+                {% if saved_searches %}
+                    <form hx-post="{% url 'search:delete_saved_search' %}"
+                          hx-target="#savedSearchesSettingsModalContent"
+                          hx-indicator="#savedSearchesSettingsModalContent .modal-body"
+                          hx-swap="outerHTML"
+                          class="js-prevent-multiple-submit">
+                        {% csrf_token %}
+                        {% for saved_search in saved_searches %}
+                            <li class="d-flex lh-sm mb-3">
+                                <div class="me-2">
+                                    <i class="ri-star-line text-muted" aria-hidden="true"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <strong class="fs-sm d-block"><a href="{{ saved_search.url }}">{{ saved_search.name }}</a></strong>
+                                    <span class="fs-xs">{{ saved_search.display_details }}</span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-danger btn-sm btn-ico-only" aria-label="Supprimer cette recherche" name="saved_search_id" value="{{ saved_search.id }}">
+                                        <i class="ri-delete-bin-line fw-medium" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </form>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if request.htmx %}
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches hx_swap_oob=True only %}
+    {% include "search/includes/save_search_button.html" with display_save_button=display_save_button disable_save_button=disable_save_button hx_swap_oob=True only %}
+{% endif %}

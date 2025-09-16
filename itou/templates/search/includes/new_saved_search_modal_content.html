@@ -23,8 +23,8 @@
     </div>
 
     {% if request.htmx %}
-        {# A new saved search has been added, oob update the save button and the list #}
-        {% include "search/includes/save_search_button.html" with display_save_button=display_save_button disable_save_button=disable_save_button hx_swap_oob=True only %}
+        {# A new saved search has been added, oob update the list and the settings modal (that oob updates the save button too) #}
         {% include "search/includes/saved_searches.html" with saved_searches=saved_searches request=request hx_swap_oob=True only %}
+        {% include "search/includes/saved_searches_settings_modal_content.html" with saved_searches=saved_searches display_save_button=display_save_button disable_save_button=disable_save_button request=request csrf_token=csrf_token hx_swap_oob=True only %}
     {% endif %}
 {% endif %}

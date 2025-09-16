@@ -11,7 +11,7 @@ from tests.cities.factories import create_city_lyon
 from tests.search.factories import SavedSearchFactory
 from tests.users.factories import PrescriberFactory, random_user_kind_factory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import parse_response_to_soup
+from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
 
 
 class TestSavedSearches:
@@ -39,6 +39,7 @@ class TestSavedSearches:
     JOB_DESCRIPTIONS_SEARCH_URL = reverse("search:job_descriptions_results")
     DASHBOARD_URL = reverse("dashboard:index")
     ADD_SAVED_SEARCH_URL = reverse("search:add_saved_search")
+    DELETE_SAVED_SEARCH_VIEW_NAME = "search:delete_saved_search"
 
     def setup_method(self):
         self.lyon = create_city_lyon()
@@ -101,7 +102,7 @@ class TestSavedSearches:
         assertContains(response, self.DISABLED_ADD_BUTTON_MARKUP, html=True)
 
     @pytest.mark.parametrize("url", [DASHBOARD_URL, EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
-    def test_display_saved_searches(self, client, url):
+    def test_display_saved_searches_and_delete_modal(self, client, url, snapshot):
         SEARCH_LIST_MARKUP = """<div class="c-search__list__title">Recherches enregistrées :</div>"""
         user = PrescriberFactory()
         client.force_login(user)
@@ -110,7 +111,8 @@ class TestSavedSearches:
         assertNotContains(response, SEARCH_LIST_MARKUP, html=True)
 
         [saved_search1, saved_search2] = [SavedSearchFactory(user=user), SavedSearchFactory(user=user)]
-        response = client.get(url)
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(url)
         # Most recent first
         assertContains(
             response,
@@ -137,6 +139,12 @@ class TestSavedSearches:
                 </div>
             </div>
             """,
+            html=True,
+        )
+        # Only check that the delete modal is present on the 3 pages, the content is checked in a later test
+        assertContains(
+            response,
+            """<h3 class="modal-title" id="savedSearchesSettingsModalLabel">Recherches enregistrées</h3>""",
             html=True,
         )
 
@@ -210,3 +218,82 @@ class TestSavedSearches:
         response = client.post(self.ADD_SAVED_SEARCH_URL, data)
         assertContains(response, "Le nombre maximum de recherches enregistrées (1) a été atteint.")
         assert SavedSearch.objects.count() == 1
+
+    def test_details_delete_modal_content(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user, for_snapshot=True)
+        response = client.get(self.EMPLOYERS_SEARCH_URL)
+        modal = parse_response_to_soup(
+            response,
+            selector="#savedSearchesSettingsModal",
+            replace_in_attr=[("value", str(saved_search.pk), "[Pk of SavedSearch]")],
+        )
+        assert pretty_indented(modal) == snapshot
+
+    def test_details_delete_modal_content_with_bad_data(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        SavedSearchFactory(user=user, name="", query_params="distance=50&kinds=ACI")
+        SavedSearchFactory(user=user, name="No city", query_params="kinds=ACI")
+        SavedSearchFactory(user=user, name="Not existing", query_params="city=foo-350&distance=50")
+
+        response = client.get(self.EMPLOYERS_SEARCH_URL)
+        assertContains(response, '<i class="ri-star-line" aria-hidden="true"></i><span></span>', html=True)
+        assertContains(response, '<i class="ri-star-line" aria-hidden="true"></i><span>No city</span>', html=True)
+        assertContains(response, '<i class="ri-star-line" aria-hidden="true"></i><span>Not existing</span>', html=True)
+
+    def test_delete_saved_search(self, client, caplog):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user)
+        response = client.post(
+            reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME),
+            data={"saved_search_id": saved_search.id},
+            headers={"HX-Request": "true"},
+        )
+
+        assert SavedSearch.objects.count() == 0
+        assert f"user={user.pk} deleted 1 saved search" in caplog.messages
+        assertContains(
+            response,
+            """
+            <div class="c-search__list" id="savedSearchesList" hx-swap-oob="true"></div>
+           """,
+            html=True,
+        )
+        assertContains(
+            response,
+            self.ADD_BUTTON_MARKUP,
+            html=True,
+        )
+
+    @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
+    def test_delete_saved_search_htmx_reload(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        saved_search = SavedSearchFactory(user=user)
+        response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
+        simulated_page = parse_response_to_soup(response, selector="body")
+
+        response = client.post(
+            reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME),
+            data={"saved_search_id": saved_search.id},
+            headers={"HX-Request": "true"},
+        )
+        assert response.status_code == 200
+        update_page_with_htmx(
+            simulated_page,
+            (f"form[hx-post='{reverse(self.DELETE_SAVED_SEARCH_VIEW_NAME)}']"),
+            response,
+        )
+
+        # Check that a fresh reload gets us in the same state
+        response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
+        fresh_page = parse_response_to_soup(response, selector="body")
+
+        assertSoupEqual(fresh_page, simulated_page)

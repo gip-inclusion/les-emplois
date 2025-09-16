@@ -221,6 +221,22 @@
       }),
       dict({
         'origin': list([
+          'add_city_name_attr[search/models.py]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "search_savedsearch"."id",
+                 "search_savedsearch"."user_id",
+                 "search_savedsearch"."name",
+                 "search_savedsearch"."query_params",
+                 "search_savedsearch"."created_at"
+          FROM "search_savedsearch"
+          WHERE "search_savedsearch"."user_id" = %s
+          ORDER BY "search_savedsearch"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           '_employer_dashboard_context[www/dashboard/views.py]',
           'dashboard[www/dashboard/views.py]',
         ]),
@@ -344,24 +360,6 @@
           INNER JOIN "companies_jobdescription" ON ("jobs_appellation"."code" = "companies_jobdescription"."appellation_id")
           WHERE "companies_jobdescription"."company_id" = %s
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[dashboard/dashboard.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[dashboard/dashboard.html]',
-          'dashboard[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "search_savedsearch"."id",
-                 "search_savedsearch"."user_id",
-                 "search_savedsearch"."name",
-                 "search_savedsearch"."query_params",
-                 "search_savedsearch"."created_at"
-          FROM "search_savedsearch"
-          WHERE "search_savedsearch"."user_id" = %s
-          ORDER BY "search_savedsearch"."created_at" DESC
         ''',
       }),
       dict({
@@ -726,6 +724,22 @@
       }),
       dict({
         'origin': list([
+          'add_city_name_attr[search/models.py]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "search_savedsearch"."id",
+                 "search_savedsearch"."user_id",
+                 "search_savedsearch"."name",
+                 "search_savedsearch"."query_params",
+                 "search_savedsearch"."created_at"
+          FROM "search_savedsearch"
+          WHERE "search_savedsearch"."user_id" = %s
+          ORDER BY "search_savedsearch"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_for_job_seeker[eligibility/models/iae.py]',
           'dashboard[www/dashboard/views.py]',
@@ -1080,24 +1094,6 @@
           WHERE "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" = %s
           ORDER BY "eligibility_geiqeligibilitydiagnosis"."created_at" DESC
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[dashboard/dashboard.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[dashboard/dashboard.html]',
-          'dashboard[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "search_savedsearch"."id",
-                 "search_savedsearch"."user_id",
-                 "search_savedsearch"."name",
-                 "search_savedsearch"."query_params",
-                 "search_savedsearch"."created_at"
-          FROM "search_savedsearch"
-          WHERE "search_savedsearch"."user_id" = %s
-          ORDER BY "search_savedsearch"."created_at" DESC
         ''',
       }),
       dict({

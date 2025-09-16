@@ -18,7 +18,7 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
-from itou.search.models import MAX_SAVED_SEARCHES_COUNT
+from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
@@ -62,7 +62,13 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         return self.post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        saved_searches = self.request.user.saved_searches.all() if self.request.user.is_authenticated else None
+        saved_searches = (
+            self.request.user.saved_searches.all()
+            if self.request.user.is_authenticated
+            else SavedSearch.objects.none()
+        )
+        saved_searches = SavedSearch.add_city_name_attr(saved_searches)
+
         context = {
             "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
@@ -74,7 +80,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "results_page": [],
             "display_save_button": False,
             "saved_searches": saved_searches,
-            "disable_save_button": saved_searches and saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
+            "disable_save_button": len(saved_searches) >= MAX_SAVED_SEARCHES_COUNT,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
@@ -364,13 +370,13 @@ def add_saved_search(request):
         headers |= hx_trigger_modal_control("newSavedSearchModal", "hide")
         logger.info("user=%d created a saved search", request.user.pk)
 
-    saved_searches = request.user.saved_searches.all()
+    saved_searches = SavedSearch.add_city_name_attr(request.user.saved_searches.all())
 
     context = {
         "form": form,
         "saved_searches": saved_searches,
         "display_save_button": True,
-        "disable_save_button": saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
+        "disable_save_button": len(saved_searches) >= MAX_SAVED_SEARCHES_COUNT,
         "hx_swap_oob": False,
     }
 
@@ -378,5 +384,26 @@ def add_saved_search(request):
         request=request,
         template="search/includes/new_saved_search_modal_content.html",
         context=context,
+        headers=headers,
+    )
+
+
+@require_POST
+def delete_saved_search(request):
+    if (saved_search_id := request.POST.get("saved_search_id")).isdigit():
+        del_count, _ = request.user.saved_searches.filter(id=saved_search_id).delete()
+        logger.info("user=%d deleted %d saved search", request.user.pk, del_count)
+
+    saved_searches = SavedSearch.add_city_name_attr(request.user.saved_searches.all())
+    headers = hx_trigger_modal_control("savedSearchesSettingsModal", "hide") if not saved_searches else {}
+    return TemplateResponse(
+        request=request,
+        template="search/includes/saved_searches_settings_modal_content.html",
+        context={
+            "saved_searches": saved_searches,
+            "display_save_button": True,
+            "disable_save_button": len(saved_searches) >= MAX_SAVED_SEARCHES_COUNT,
+            "hx_swap_oob": False,
+        },
         headers=headers,
     )
