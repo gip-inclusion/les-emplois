@@ -37,6 +37,7 @@ class TestSavedSearches:
 
     EMPLOYERS_SEARCH_URL = reverse("search:employers_results")
     JOB_DESCRIPTIONS_SEARCH_URL = reverse("search:job_descriptions_results")
+    DASHBOARD_URL = reverse("dashboard:index")
     ADD_SAVED_SEARCH_URL = reverse("search:add_saved_search")
 
     def setup_method(self):
@@ -99,13 +100,50 @@ class TestSavedSearches:
         response = client.get(self.EMPLOYERS_SEARCH_URL, {"city": self.lyon.slug})
         assertContains(response, self.DISABLED_ADD_BUTTON_MARKUP, html=True)
 
+    @pytest.mark.parametrize("url", [DASHBOARD_URL, EMPLOYERS_SEARCH_URL, JOB_DESCRIPTIONS_SEARCH_URL])
+    def test_display_saved_searches(self, client, url):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(url)
+        assertNotContains(
+            response, """<div class="c-search__list__title">Recherches enregistrées :</div>""", html=True
+        )
+
+        [saved_search1, saved_search2] = [SavedSearchFactory(user=user), SavedSearchFactory(user=user)]
+        response = client.get(url)
+        # Most recent first
+        assertContains(
+            response,
+            f"""
+            <div class="c-search__list__title">Recherches enregistrées :</div>
+            <div class="c-search__list__slider">
+                <div data-it-sliding-search="true">
+                        <div>
+                            <a href="{saved_search2.url}" class="btn-link btn-ico">
+                                <i class="ri-star-line" aria-hidden="true"></i>
+                                <span>{saved_search2.name}</span>
+                            </a>
+                        </div>
+                        <div>
+                            <a href="{saved_search1.url}" class="btn-link btn-ico">
+                                <i class="ri-star-line" aria-hidden="true"></i>
+                                <span>{saved_search1.name}</span>
+                            </a>
+                        </div>
+                </div>
+            </div>
+            """,
+            html=True,
+        )
+
     @patch.object(views, "MAX_SAVED_SEARCHES_COUNT", 1)
     def test_add_saved_search(self, client):
         user = PrescriberFactory()
         client.force_login(user)
 
         data = {"saved_search-name": "Grand Lyon", "saved_search-query_params": "city=lyon-69"}
-        response = client.post(self.ADD_SAVED_SEARCH_URL, data, headers={"HX-Request": "true"})
+        response = client.post(self.ADD_SAVED_SEARCH_URL, headers={"HX-Request": "true"}, data=data)
         qs = SavedSearch.objects.all()
         assert qs.count() == 1
 
@@ -114,9 +152,15 @@ class TestSavedSearches:
         assert saved_search.user == user
         assert saved_search.query_params == "city=lyon-69"
         # The max count is reached, deactivate the add button
+        assertContains(response, self.DISABLED_ADD_BUTTON_MARKUP, html=True)
         assertContains(
             response,
-            self.DISABLED_ADD_BUTTON_MARKUP,
+            f"""
+            <a href="{saved_search.url}" class="btn-link btn-ico">
+                <i class="ri-star-line" aria-hidden="true"></i>
+                <span>{saved_search.name}</span>
+            </a>
+           """,
             html=True,
         )
 
