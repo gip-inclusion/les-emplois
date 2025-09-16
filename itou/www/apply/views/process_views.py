@@ -466,8 +466,9 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
     return render(request, template_name, context)
 
 
-class AcceptView(common_views.BaseAcceptView):
+class AcceptView(common_views.CheckJobSeekerMissingPersonalInfoMixin, common_views.BaseAcceptView):
     template_name = "apply/process_accept.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour accepter la candidature"
 
     def setup(self, request, job_application_id, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -513,6 +514,9 @@ class AcceptView(common_views.BaseAcceptView):
         return self.next_url
 
     def get_success_url(self):
+        return self.next_url
+
+    def get_required_personal_data_redirect_url(self):
         return self.next_url
 
 
@@ -901,7 +905,7 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
 
     def get_success_url(self):
         return reverse(
-            "apply:accept",
+            "apply:accept_contract",
             kwargs={"job_application_id": self.job_application.id},
             query={"next_url": self.next_url} if self.next_url else None,
         )

@@ -47,6 +47,8 @@ class CheckJobSeekerMissingPersonalInfoMixin:
 
 class BaseAcceptView(UserPassesTestMixin, TemplateView):
     template_name = None
+    # simplified view. `only_accept_form` to be removed
+    only_accept_form = False
 
     def test_func(self):
         return self.request.user.is_employer
@@ -62,6 +64,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
     def get_forms(self):
         forms = {}
 
+        # legacy hiring process. to be removed
         if self.company.is_subject_to_eligibility_rules and not self.only_accept_form:
             # Info that will be used to search for an existing Pôle emploi approval.
             forms["personal_data"] = JobSeekerPersonalDataForm(
@@ -107,6 +110,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
         if all(f is None for f in [form_accept, form_user_address, form_birth_place, form_personal_data]):
             forms = self.get_forms()
             form_accept = forms["accept"]
+            # legacy hiring process. to be removed
             form_user_address = forms.get("user_address")
             form_personal_data = forms.get("personal_data")
             form_birth_place = forms.get("birth_place")
@@ -157,22 +161,32 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
 
         creating = self.job_application is None
 
+        can_certify_eligibility_diag = (
+            settings.API_PARTICULIER_TOKEN
+            and self.eligibility_diagnosis
+            and self.eligibility_diagnosis.criteria_can_be_certified()
+        )
+
         try:
             with transaction.atomic():
-                if form_personal_data := forms.get("personal_data"):
-                    form_personal_data.save()
-                    if (
-                        self.eligibility_diagnosis
-                        and self.eligibility_diagnosis.criteria_can_be_certified()
-                        and settings.API_PARTICULIER_TOKEN
-                    ):
+                # simplified view
+                if self.only_accept_form:
+                    if can_certify_eligibility_diag:
                         self.eligibility_diagnosis.schedule_certification()
-                if form_user_address := forms.get("user_address"):
-                    form_user_address.save()
-                if form_birth_place := forms.get("birth_place"):
-                    form_birth_place.save()
-                    if settings.API_PARTICULIER_TOKEN:
+                    if settings.API_PARTICULIER_TOKEN and self.geiq_eligibility_diagnosis:
                         self.geiq_eligibility_diagnosis.schedule_certification()
+                # legacy view
+                else:
+                    if form_personal_data := forms.get("personal_data"):
+                        form_personal_data.save()
+                        if can_certify_eligibility_diag:
+                            self.eligibility_diagnosis.schedule_certification()
+                    if form_user_address := forms.get("user_address"):
+                        form_user_address.save()
+                    if form_birth_place := forms.get("birth_place"):
+                        form_birth_place.save()
+                        if settings.API_PARTICULIER_TOKEN:
+                            self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = forms["accept"].save(commit=False)
                 if creating:
