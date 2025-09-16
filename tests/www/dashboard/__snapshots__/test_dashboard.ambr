@@ -48,7 +48,7 @@
 # ---
 # name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -349,6 +349,24 @@
       dict({
         'origin': list([
           'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "search_savedsearch"."id",
+                 "search_savedsearch"."user_id",
+                 "search_savedsearch"."name",
+                 "search_savedsearch"."query_params",
+                 "search_savedsearch"."created_at"
+          FROM "search_savedsearch"
+          WHERE "search_savedsearch"."user_id" = %s
+          ORDER BY "search_savedsearch"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[dashboard/dashboard.html]',
           'IfNode[dashboard/dashboard.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[dashboard/dashboard.html]',
@@ -639,7 +657,7 @@
 # ---
 # name: TestDashboardView.test_jobseeker_approval_card[job seeker with approval queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1062,6 +1080,24 @@
           WHERE "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" = %s
           ORDER BY "eligibility_geiqeligibilitydiagnosis"."created_at" DESC
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[dashboard/dashboard.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[dashboard/dashboard.html]',
+          'dashboard[www/dashboard/views.py]',
+        ]),
+        'sql': '''
+          SELECT "search_savedsearch"."id",
+                 "search_savedsearch"."user_id",
+                 "search_savedsearch"."name",
+                 "search_savedsearch"."query_params",
+                 "search_savedsearch"."created_at"
+          FROM "search_savedsearch"
+          WHERE "search_savedsearch"."user_id" = %s
+          ORDER BY "search_savedsearch"."created_at" DESC
         ''',
       }),
       dict({

@@ -35,6 +35,7 @@
             </form>
         </div>
     </div>
+    {% include "search/includes/saved_searches.html" with saved_searches=saved_searches hx_swap_oob=False only %}
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endblock %}
 
@@ -54,4 +55,5 @@
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+    <script src='{% static "js/sliding_search.js"%}'></script>
 {% endblock %}

@@ -73,6 +73,7 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
             "siaes_count": 0,
             "results_page": [],
             "display_save_button": False,
+            "saved_searches": saved_searches,
             "disable_save_button": saved_searches and saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
