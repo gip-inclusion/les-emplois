@@ -140,6 +140,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
+        "saved_searches": request.user.saved_searches.all(),
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
         "stalled_job_seekers_count": None,

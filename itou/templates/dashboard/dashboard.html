@@ -180,6 +180,9 @@
                                     </form>
                                 </div>
                             </div>
+                            {% if saved_searches %}
+                                {% include "search/includes/saved_searches.html" with saved_searches=saved_searches hx_swap_oob=False only %}
+                            {% endif %}
                             <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
                                 {% if user.is_staff %}
                                     {% include "dashboard/includes/admin_card.html" %}
@@ -259,4 +262,5 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/sliding_search.js"%}'></script>
 {% endblock %}

@@ -24,5 +24,5 @@
     {% include "search/includes/siaes_search_subtitle.html" %}
     {% include "search/includes/siaes_search_top.html" %}
     {% include "search/includes/siaes_search_tabs.html" %}
-    {% include "search/includes/new_saved_search_modal_content.html" with form=new_saved_search_form display_save_button=display_save_button disable_save_button=disable_save_button request=request csrf_token=csrf_token hx_swap_oob=True only %}
+    {% include "search/includes/new_saved_search_modal_content.html" with form=new_saved_search_form saved_searches=saved_searches display_save_button=display_save_button disable_save_button=disable_save_button request=request csrf_token=csrf_token hx_swap_oob=True only %}
 {% endif %}
