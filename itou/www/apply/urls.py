@@ -77,6 +77,14 @@ urlpatterns = [
         name="geiq_eligibility_criteria_for_hire",
         kwargs={"hire_process": True},
     ),
+    # simplified view. `only_accept_form` to be removed
+    path(
+        "<uuid:session_uuid>/hire/contract",
+        submit_views.HireConfirmationView.as_view(),
+        name="contract_for_hire",
+        kwargs={"hire_process": True, "only_accept_form": True},
+    ),
+    # legacy hiring process. to be removed
     path(
         "<uuid:session_uuid>/hire/confirm",
         submit_views.HireConfirmationView.as_view(),
