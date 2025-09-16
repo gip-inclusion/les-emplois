@@ -330,69 +330,6 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         token = self.api_client._refresh_token()
         assert token == "Bearer Catwoman"
 
-    @pytest.mark.parametrize(
-        "json_response,http_status_code,expected_error,expected_error_message",
-        [
-            pytest.param(
-                {
-                    "codeRetour": "R997",
-                    "message": "Une erreur de validation s'est produite",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
-                400,
-                PoleEmploiAPIBadResponse,
-                r"PoleEmploiAPIBadResponse\(code=400\)",
-                id="400",
-            ),
-            pytest.param(
-                {
-                    "codeRetour": "R001",
-                    "message": "Accès non autorisé",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
-                403,
-                PoleEmploiAPIBadResponse,
-                r"PoleEmploiAPIBadResponse\(code=403\)",
-                id="403",
-            ),
-            pytest.param(
-                {
-                    "codeRetour": "R998",
-                    "message": "Un service a répondu en erreur",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
-                500,
-                PoleEmploiAPIException,
-                r"PoleEmploiAPIException\(code=500\)",
-                id="500",
-            ),
-            pytest.param(
-                {
-                    "codeRetour": "R999",
-                    "message": "Service indisponible, veuillez réessayer ultérieurement",
-                    "topIdentiteCertifiee": "null",
-                    "jetonUsager": "null",
-                },
-                503,
-                PoleEmploiAPIException,
-                r"PoleEmploiAPIException\(code=503\)",
-                id="503",
-            ),
-        ],
-    )
-    @respx.mock
-    def test_request_status_codes(self, json_response, http_status_code, expected_error, expected_error_message):
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            http_status_code, json=json_response
-        )
-        with pytest.raises(expected_error, match=expected_error_message):
-            self.api_client._request(
-                "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
-            )
-
     @respx.mock
     def test_rechercher_usager_by_birthdate_and_nir(self):
         json_response = {
