@@ -150,6 +150,24 @@ class BasePoleEmploiApiClient:
         )
         return token
 
+
+class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
+    # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
+    AUTHORIZED_SCOPES = [
+        "api_maj-pass-iaev1",
+        "api_offresdemploiv2",
+        "api_rechercheindividucertifiev1",
+        "api_rome-metiersv1",
+        "nomenclatureRome",
+        "o2dsoffre",
+        "passIAE",
+        "rechercherIndividuCertifie",
+        "api_referentielagencesv1",
+        "organisationpe",
+    ]
+    REALM = "/partenaire"
+    CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
+
     def _request(self, url, data=None, params=None, method="POST"):
         try:
             token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
@@ -184,24 +202,6 @@ class BasePoleEmploiApiClient:
             return data
         except httpx.RequestError as exc:
             raise PoleEmploiAPIException(API_CLIENT_HTTP_ERROR_CODE) from exc
-
-
-class PoleEmploiRoyaumePartenaireApiClient(BasePoleEmploiApiClient):
-    # Pole Emploi also sent us a "sandbox" scope value: "api_testmaj-pass-iaev1" instead of "api_maj-pass-iaev1"
-    AUTHORIZED_SCOPES = [
-        "api_maj-pass-iaev1",
-        "api_offresdemploiv2",
-        "api_rechercheindividucertifiev1",
-        "api_rome-metiersv1",
-        "nomenclatureRome",
-        "o2dsoffre",
-        "passIAE",
-        "rechercherIndividuCertifie",
-        "api_referentielagencesv1",
-        "organisationpe",
-    ]
-    REALM = "/partenaire"
-    CACHE_API_TOKEN_KEY = "pole_emploi_api_partenaire_client_token"
 
     def recherche_individu_certifie(self, first_name, last_name, birthdate, nir):
         """Example data:
