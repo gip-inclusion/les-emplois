@@ -27,6 +27,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.users.models import User
@@ -128,6 +129,7 @@ def _employer_dashboard_context(request):
 
 
 def dashboard(request, template_name="dashboard/dashboard.html"):
+    saved_searches = SavedSearch.add_city_name_attr(request.user.saved_searches.all())
     context = {
         "active_geiq_campaign": None,
         "active_campaigns": [],
@@ -140,7 +142,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
-        "saved_searches": request.user.saved_searches.all(),
+        "saved_searches": saved_searches,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
         "stalled_job_seekers_count": None,
