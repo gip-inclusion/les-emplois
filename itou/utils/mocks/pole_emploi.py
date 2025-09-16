@@ -1,3 +1,8 @@
+import enum
+
+from itou.utils.apis.pole_emploi import Endpoints
+
+
 API_RECHERCHE_RESPONSE_KNOWN = {
     "idNationalDE": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
     "codeSortie": "S001",
@@ -205,3 +210,78 @@ API_APPELLATIONS_RESPONSE_OK = [
     {"code": "11426", "libelle": "Auteur / Auteure de bande dessinée", "metier": {"code": "E1102"}},
     {"code": "11427", "libelle": "Auteur / Auteure dramatique", "metier": {"code": "E1102"}},
 ]
+
+
+class ResponseKind(enum.Enum):
+    CERTIFIED = "certified"  # 200
+    CERTIFIED_FOR_EVER = "certified_for_ever"  # 200
+    NOT_CERTIFIED = "not_certified"  # 200
+    NOT_FOUND = "not_found"  # 200
+    MULTIPLE_USERS_RETURNED = "multiple_users_returned"  # 200
+    BAD_REQUEST = "validation_error"  # 400
+    FORBIDDEN = "not_allowed"  # 403
+    INTERNAL_SERVER_ERROR = "server_error"  # 500
+    SERVICE_UNAVAILABLE = "service_unavailable"  # 503
+
+
+RESPONSES = {
+    Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR: {
+        ResponseKind.CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "N",
+        },
+        ResponseKind.NOT_FOUND: {
+            "codeRetour": "S002",
+            "message": "Aucun approchant trouvé",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        },
+        ResponseKind.MULTIPLE_USERS_RETURNED: {
+            "codeRetour": "S003",
+            "message": "Plusieurs usagers trouvés",
+            "jetonUsager": None,
+            "topIdentiteCertifiee": None,
+        },
+        # TODO(cms): check if this is common to all endpoints and, if so, add them too.
+        ResponseKind.BAD_REQUEST: {
+            "codeRetour": "R997",
+            "message": "Une erreur de validation s'est produite",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.FORBIDDEN: {
+            "codeRetour": "R001",
+            "message": "Accès non autorisé",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.INTERNAL_SERVER_ERROR: {
+            "codeRetour": "R998",
+            "message": "Un service a répondu en erreur",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+        ResponseKind.SERVICE_UNAVAILABLE: {
+            "codeRetour": "R999",
+            "message": "Service indisponible, veuillez réessayer ultérieurement",
+            "topIdentiteCertifiee": "null",
+            "jetonUsager": "null",
+        },
+    },
+    Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL: {
+        ResponseKind.CERTIFIED: {
+            "codeRetour": "S001",
+            "message": "Approchant trouvé",
+            "jetonUsager": "a_long_token",
+            "topIdentiteCertifiee": "O",
+        },
+    },
+}
