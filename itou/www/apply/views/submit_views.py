@@ -763,6 +763,15 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):
+        missing_fields = self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+        if missing_fields:
+            fmt_missing_fields = ", ".join(sorted(missing_fields))
+            messages.error(
+                request,
+                f"Les données suivantes sont manquantes pour accepter l'embauche : {fmt_missing_fields}.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(self.get_cancel_url())
         if self.get_eligibility_for_hire_step_url() is None:
             return HttpResponseRedirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)

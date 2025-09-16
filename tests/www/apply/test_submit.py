@@ -2745,7 +2745,7 @@ class TestDirectHireFullProcess:
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(with_required_personal_info_for_hire=True)
         user = company.members.first()
         client.force_login(user)
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
@@ -5428,6 +5428,26 @@ class TestEligibilityForHire:
         )
         assertRedirects(response, reverse("apply:contract_for_hire", kwargs={"session_uuid": apply_session.name}))
         assert self.job_seeker.has_valid_diagnosis(for_siae=company)
+
+    def test_eligibility_for_jobseeker_without_required_personal_info(self, client):
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, JobSeekerFactory(), {})
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(
+            response,
+            reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Les données suivantes sont manquantes pour accepter l'embauche : "
+                    "Adresse, Code postal, Pays de naissance, Ville.",
+                )
+            ],
+        )
 
 
 class TestGEIQEligibilityForHire:
