@@ -350,32 +350,18 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "pa-identifiant-agent": "<string>",
         }
 
-        try:
-            response = (
-                self._get_httpx_client()
-                .request(
-                    method,
-                    url,
-                    params=params,
-                    json=data,
-                    headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
-                    timeout=API_TIMEOUT_SECONDS,
-                )
-                .raise_for_status()
+        response = (
+            self._get_httpx_client()
+            .request(
+                method,
+                url,
+                params=params,
+                json=data,
+                headers={"Authorization": token, "Content-Type": "application/json", **agents_headers},
+                timeout=API_TIMEOUT_SECONDS,
             )
-        except httpx.HTTPStatusError as exc:
-            match exc.response.status_code:
-                case 429:
-                    raise PoleEmploiRateLimitException(error_code=429)
-                case 400 | 403 as error_code:
-                    # Should not retry
-                    raise PoleEmploiAPIBadResponse(
-                        response_code=error_code, response_data=exc.response.json()
-                    ) from exc
-                case _ as error_code:
-                    # Should retry
-                    raise PoleEmploiAPIException(error_code=error_code, response_content=exc.response.content) from exc
-
+            .raise_for_status()
+        )
         return response.json()
 
     def _rechercher_usager_by_pole_emploi_id(self, pole_emploi_id):
