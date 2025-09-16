@@ -759,8 +759,11 @@ class ApplicationEndView(TemplateView):
         }
 
 
-class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityForHireView(
+    common_views.CheckJobSeekerMissingPersonalInfoMixin, ApplicationBaseView, BaseIAEEligibilityViewForEmployer
+):
     template_name = "apply/submit/eligibility_for_hire.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour accepter l'embauche"
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_eligibility_for_hire_step_url() is None:
@@ -774,6 +777,9 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
+
+    def get_required_personal_data_redirect_url(self):
+        return self.get_cancel_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
