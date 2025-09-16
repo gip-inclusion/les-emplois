@@ -36,7 +36,7 @@ def mock_api(settings):
     )
     settings.API_ESD = {
         "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
+        "AUTH_BASE_URL_PARTENAIRE": "https://auth.fr",
         "KEY": "foobar",
         "SECRET": "pe-secret",
     }

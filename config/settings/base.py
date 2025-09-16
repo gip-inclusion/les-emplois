@@ -451,7 +451,7 @@ GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = (
 # same depending on the environment
 # Please note that some of APIs have a dry run mode which is handled through (possibly undocumented) scopes
 API_ESD = {
-    "AUTH_BASE_URL": os.getenv("API_ESD_AUTH_BASE_URL"),
+    "AUTH_BASE_URL_PARTENAIRE": os.getenv("API_ESD_AUTH_BASE_URL_PARTENAIRE"),
     "KEY": os.getenv("API_ESD_KEY"),
     "SECRET": os.getenv("API_ESD_SECRET"),
     "BASE_URL": os.getenv("API_ESD_BASE_URL"),
