@@ -5470,7 +5470,14 @@ class TestGEIQEligibilityForHire:
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
         assertRedirects(response, reverse("apply:contract_for_hire", kwargs={"session_uuid": apply_session.name}))
 
-    def test_job_seeker_without_valid_diagnosis(self, client):
+    @pytest.mark.parametrize(
+        "view_name",
+        [
+            pytest.param("apply:hire_confirmation", id="legacy_url"),
+            pytest.param("apply:contract_for_hire", id="simplified_url"),
+        ],
+    )
+    def test_job_seeker_without_valid_diagnosis(self, client, view_name):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
         client.force_login(company.members.first())
@@ -5516,6 +5523,30 @@ class TestGEIQEligibilityForHire:
         )
         assertRedirects(response, reverse("apply:contract_for_hire", kwargs={"session_uuid": apply_session.name}))
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
+
+    def test_eligibility_for_job_seeker_without_required_personal_info(self, client):
+        job_application = JobApplicationFactory()
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, job_application.job_seeker, {})
+
+        url = reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name})
+        response = client.get(url)
+        assertRedirects(
+            response,
+            reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Les données suivantes sont manquantes pour déclarer l'embauche : "
+                    "adresse, code postal, commune de naissance, pays de naissance, ville.",
+                    extra_tags="toast",
+                )
+            ],
+        )
 
 
 class TestHireConfirmation:
