@@ -1722,6 +1722,7 @@ class TestProcessViews:
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
+            job_seeker__with_required_personal_info_for_hire=True,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -1735,7 +1736,7 @@ class TestProcessViews:
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address=True),
+            job_seeker=JobSeekerFactory(with_address=True, born_in_france=True),
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -1755,7 +1756,7 @@ class TestProcessViews:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
-            to_company=company, job_seeker=JobSeekerFactory(with_address=True)
+            to_company=company, job_seeker=JobSeekerFactory(with_address=True, born_in_france=True)
         )
 
         # Right states
@@ -1779,6 +1780,27 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 404
         client.logout()
+
+    def test_eligibility_for_job_seeker_without_required_personal_info(self, client):
+        job_application = JobApplicationFactory()
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertRedirects(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Les données suivantes candidat sont manquantes pour accepter la candidature : "
+                    "Adresse, Code postal, Pays de naissance, Ville.",
+                )
+            ],
+        )
 
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
