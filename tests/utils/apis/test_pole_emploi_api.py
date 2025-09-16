@@ -5,12 +5,14 @@ import time
 import httpx
 import pytest
 import respx
+from django.conf import settings
 from django.core.cache import caches
 from django_redis import get_redis_connection
 
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import (
     REFRESH_TOKEN_MARGIN_SECONDS,
+    Endpoints,
     IdentityNotCertified,
     MultipleUsersReturned,
     PoleEmploiAPIBadResponse,
@@ -28,6 +30,8 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_RESPONSE_ERROR,
     API_RECHERCHE_RESPONSE_KNOWN,
     API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK,
+    RESPONSES,
+    ResponseKind,
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
@@ -344,28 +348,16 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @respx.mock
     def test_rechercher_usager_by_birthdate_and_nir(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir").respond(
-            200, json=json_response
+        respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}").respond(
+            200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.CERTIFIED]
         )
         jeton_usager = self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
         assert jeton_usager == "a_long_token"
 
     @respx.mock
     def test_rechercher_usager_by_pole_emploi_id(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
-        respx.post("https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail").respond(
-            200, json=json_response
+        respx.post(f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}").respond(
+            200, json=RESPONSES[Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL][ResponseKind.CERTIFIED]
         )
         jobseeker_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678901")
         jeton_usager = self.api_client.rechercher_usager(jobseeker_profile=jobseeker_profile)
@@ -375,34 +367,19 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         "json_response,exception_raised,exception_pattern",
         [
             pytest.param(
-                {
-                    "codeRetour": "S002",
-                    "message": "Aucun approchant trouvé",
-                    "jetonUsager": None,
-                    "topIdentiteCertifiee": None,
-                },
+                RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.NOT_FOUND],
                 UserDoesNotExist,
                 r"UserDoesNotExist",
                 id="user_does_not_exist",
             ),
             pytest.param(
-                {
-                    "codeRetour": "S001",
-                    "message": "Approchant trouvé",
-                    "jetonUsager": "a_long_token",
-                    "topIdentiteCertifiee": "N",
-                },
+                RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.NOT_CERTIFIED],
                 IdentityNotCertified,
                 r"IdentityNotCertified",
                 id="identity_not_certified",
             ),
             pytest.param(
-                {
-                    "codeRetour": "S003",
-                    "message": "Plusieurs usagers trouvés",
-                    "jetonUsager": None,
-                    "topIdentiteCertifiee": None,
-                },
+                RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.MULTIPLE_USERS_RETURNED],
                 MultipleUsersReturned,
                 r"MultipleUsersReturned",
                 id="multiple_users_returned",
@@ -422,24 +399,19 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
     )
     @respx.mock
     def test_rechercher_usager_response_exceptions(self, json_response, exception_raised, exception_pattern):
-        url = "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+        url = f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}"
         respx.post(url).respond(200, json=json_response)
         with pytest.raises(exception_raised, match=exception_pattern):
             self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
 
     @respx.mock
     def test_rechercher_usager_calls_nir_endpoint(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
+        json_response = RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.CERTIFIED]
         mock_birthdate_nir = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+            f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}"
         ).respond(200, json=json_response)
         mock_pole_emploi_id = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
+            f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}"
         ).respond(200, json=json_response)
 
         token = self.api_client.rechercher_usager(jobseeker_profile=JobSeekerProfileFactory())
@@ -449,17 +421,12 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
 
     @respx.mock
     def test_rechercher_usager_calls_pole_emploi_id_endpoint(self):
-        json_response = {
-            "codeRetour": "S001",
-            "message": "Approchant trouvé",
-            "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
-        }
+        json_response = RESPONSES[Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR][ResponseKind.CERTIFIED]
         mock_birthdate_nir = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+            settings.API_ESD["BASE_URL"] + Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR
         ).respond(200, json=json_response)
         mock_pole_emploi_id = respx.post(
-            "https://pe.fake/rechercher-usager/v2/usagers/par-numero-francetravail"
+            settings.API_ESD["BASE_URL"] + Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL
         ).respond(200, json=json_response)
 
         jobseeker_profile = JobSeekerProfileFactory(birthdate=None, nir="", pole_emploi_id="12345678910")
