@@ -1898,23 +1898,32 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     employer = company.members.first()
 
     acceptable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        job_seeker__born_in_france=True,
     )
     assert acceptable_app_1.accept.is_available()
     acceptable_app_2 = JobApplicationFactory(
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
+        job_seeker__born_in_france=True,
     )
     assert acceptable_app_2.accept.is_available()
     acceptable_app_3 = JobApplicationFactory(
         pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=company,
         state=JobApplicationState.NEW,
+        job_seeker__born_in_france=True,
     )
     assert acceptable_app_3.accept.is_available()
 
-    unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    unacceptable_app = JobApplicationFactory(
+        to_company=company,
+        state=JobApplicationState.ACCEPTED,
+        job_seeker__born_in_france=True,
+    )
     assert not unacceptable_app.accept.is_available()
 
     client.force_login(employer)
@@ -1964,7 +1973,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
         )
         # Check that the next_url is correctly transmitted
         assert accept_button["href"] == reverse(
-            "apply:accept", kwargs={"job_application_id": acceptable_app.pk}, query={"next_url": table_url}
+            "apply:accept_contract", kwargs={"job_application_id": acceptable_app.pk}, query={"next_url": table_url}
         )
 
     # Test with unacceptable batches

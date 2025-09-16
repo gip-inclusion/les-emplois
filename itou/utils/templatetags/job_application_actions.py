@@ -56,7 +56,7 @@ def accept_button(job_application, geiq_eligibility_diagnosis, *, next_url=None)
         and geiq_eligibility_diagnosis.is_valid
     ):
         url = reverse(
-            "apply:accept",
+            "apply:accept_contract",
             kwargs={"job_application_id": job_application.pk},
             query={"next_url": next_url} if next_url else None,
         )
