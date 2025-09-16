@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -377,5 +377,26 @@ def add_saved_search(request):
         request=request,
         template="search/includes/new_saved_search_modal_content.html",
         context=context,
+        headers=headers,
+    )
+
+
+@require_POST
+def delete_saved_search(request, saved_search_id):
+    queryset = SavedSearch.objects.filter(user=request.user)
+    saved_search = get_object_or_404(queryset, id=saved_search_id)
+    saved_search.delete()
+
+    saved_searches = SavedSearch.objects.filter(user=request.user)
+    headers = hx_trigger_modal_control("savedSearchesSettingsModal", "hide") if not saved_searches else {}
+    return TemplateResponse(
+        request=request,
+        template="search/includes/saved_searches_settings_modal_content.html",
+        context={
+            "saved_searches": saved_searches,
+            "display_save_button": True,
+            "disable_save_button": saved_searches and saved_searches.count() >= MAX_SAVED_SEARCHES_COUNT,
+            "hx_swap_oob": False,
+        },
         headers=headers,
     )
