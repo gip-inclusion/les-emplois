@@ -421,7 +421,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+                "apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name}
             )
         else:
             view_name = "apply:application_jobs"
@@ -768,7 +768,7 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name})
 
     def get_cancel_url(self):
         return reverse(
@@ -797,7 +797,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name})
 
     def get_back_url(self):
         return reverse(
@@ -821,6 +821,24 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
     def setup(self, request, *args, **kwargs):
         self.job_application = None
         return super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.only_accept_form:
+            missing_fields = self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+            if missing_fields:
+                fmt_missing_fields = ", ".join(sorted(missing_fields))
+                messages.error(
+                    request,
+                    f"Les données suivantes sont manquantes pour déclarer l'embauche : {fmt_missing_fields}.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(
+                    reverse(
+                        "job_seekers_views:check_job_seeker_info_for_hire",
+                        kwargs={"session_uuid": self.apply_session.name},
+                    )
+                )
+        return super().dispatch(request, *args, **kwargs)
 
     def clean_session(self):
         self.apply_session.delete()

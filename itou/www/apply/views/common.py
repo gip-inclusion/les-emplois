@@ -34,16 +34,18 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
     def test_func(self):
         return self.request.user.is_employer
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, only_accept_form=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
+        # simplified view. `only_accept_form` to be removed
+        self.only_accept_form = only_accept_form if only_accept_form is not None else None
 
     def get_forms(self):
         forms = {}
 
-        if self.company.is_subject_to_eligibility_rules:
+        if self.company.is_subject_to_eligibility_rules and not self.only_accept_form:
             # Info that will be used to search for an existing Pôle emploi approval.
             forms["personal_data"] = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
@@ -51,7 +53,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                 back_url=self.request.get_full_path(),
             )
             forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
-        elif self.company.kind == CompanyKind.GEIQ:
+        elif self.company.kind == CompanyKind.GEIQ and not self.only_accept_form:
             if self.geiq_eligibility_diagnosis and self.geiq_eligibility_diagnosis.criteria_can_be_certified():
                 forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
                     instance=self.job_seeker.jobseeker_profile,
