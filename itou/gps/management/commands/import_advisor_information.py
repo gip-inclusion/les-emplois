@@ -87,6 +87,7 @@ class Command(BaseCommand):
 
         # Extract ft_gps_id:
         job_seeker_details = {}
+        job_seekers_nb = df["job_seeker_pk"].nunique()
         for pk, last_name, first_name, pole_emploi_id, birthdate, nir, ft_gps_id in (
             df[
                 [
@@ -101,7 +102,7 @@ class Command(BaseCommand):
             ]
             .fillna("")
             .drop_duplicates(subset=["job_seeker_pk"], keep=False)
-            .to_dict(orient="split")["data"]
+            .itertuples(index=False)
         ):
             job_seeker_details[pk] = JobSeekerDetails(
                 first_name=first_name,
@@ -111,6 +112,10 @@ class Command(BaseCommand):
                 birthdate=birthdate,
                 ft_gps_id=ft_gps_id,
             )
+        self.logger.info(
+            "Some job seekers were found multiple times, their ft_gps_id won't be saved: "
+            f"{job_seekers_nb - len(job_seeker_details)} jobseekers"
+        )
 
         # extract advisors
         df = df.replace("", numpy.nan).dropna(subset=["code_safir_agence", "last_name", "first_name", "email"])
