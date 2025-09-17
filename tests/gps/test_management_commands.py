@@ -273,7 +273,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     old_certified_referent_membership = FollowUpGroupMembershipFactory(is_referent_certified=True)
 
     with NamedTemporaryFile("w") as file:
-        # write imported file add a column to ignore to ensure the code does'nt crash
+        # write imported file add a column to ignore to ensure the code doesn't crash
         data = [
             [
                 "identifiant_gps",
@@ -300,7 +300,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Test",
                 "Test",
                 "Test",
-                "kn_1",  # The sams job seeker has multples kn_individu_national : ingore all values
+                "kn_1",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # missing nom_conseiller
             [
@@ -314,7 +314,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "",
                 "Test",
                 "Test",
-                "kn_2",  # The sams job seeker has multples kn_individu_national : ingore all values
+                "kn_2",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # missing code_agence
             [
@@ -328,7 +328,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Test",
                 "",
                 "Test",
-                "kn_3",  # The sams job seeker has multples kn_individu_national : ingore all values
+                "kn_3",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # missing mail_conseiller
             [
@@ -342,7 +342,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Test",
                 "Test",
                 "",
-                "kn_4",  # The sams job seeker has multples kn_individu_national : ingore all values
+                "kn_4",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # mail_conseiller is used by an employer
             [
@@ -356,7 +356,7 @@ def test_import_advisor_information(settings, caplog, mocker):
                 "Test",
                 "Test",
                 employer.email,
-                "kn_5",  # The sams job seeker has multples kn_individu_national : ingore all values
+                "kn_5",  # The same job seeker has multple kn_individu_national : ignore all values
             ],
             # Not a job seeker
             [
@@ -499,6 +499,7 @@ def test_import_advisor_information(settings, caplog, mocker):
     assert user_remark.remark == "Créé par l'import des référents FT pour GPS"
 
     assert caplog.messages[:-1] == [
+        "Some job seekers were found multiple times, their ft_gps_id won't be saved: 1 jobseekers",
         "Found 6 rows from GPS export.",  # 10 minus the 4 with missing data
         f"Some job seekers ids where not found: [{prescriber_1.pk}].",
         f"Some advisor email are attached to non prescriber accounts: ['{employer.email}'].",
