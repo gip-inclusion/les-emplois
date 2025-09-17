@@ -951,6 +951,11 @@ class Sanctions(models.Model):
         )
 
 
+class ArchivedEvaluatedSiaeQuerySet(models.QuerySet):
+    def viewable(self):
+        return self.filter(evaluation_campaign__in=EvaluationCampaign.objects.viewable())
+
+
 class ArchivedEvaluatedSiae(models.Model):
     evaluation_campaign = models.ForeignKey(
         EvaluationCampaign,
@@ -978,6 +983,8 @@ class ArchivedEvaluatedSiae(models.Model):
     job_applications_count = models.SmallIntegerField(
         editable=False, verbose_name="nombre d'autoprescription contrôlées"
     )
+
+    objects = ArchivedEvaluatedSiaeQuerySet.as_manager()
 
     class Meta:
         verbose_name = "entreprise contrôlée archivée"
