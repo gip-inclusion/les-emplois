@@ -1032,3 +1032,56 @@ class TestCustomApprovalAdminViews:
         )
         msg = inline.employee_record_status(job_application)
         assert msg == "Une fiche salarié existe déjà pour ce candidat"
+
+
+def test_prolongation_inconsistency_check(admin_client):
+    consistent_prolongation = ProlongationFactory()
+
+    response = admin_client.post(
+        reverse("admin:approvals_prolongation_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [consistent_prolongation.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    inconsistent_prolongation_1 = ProlongationFactory(
+        approval__start_at=timezone.localdate(), start_at=timezone.localdate() - timedelta(days=1)
+    )
+    inconsistent_prolongation_2 = ProlongationFactory()
+    inconsistent_prolongation_2.approval.end_at = inconsistent_prolongation_2.end_at - timedelta(days=1)
+    inconsistent_prolongation_2.approval.save()
+
+    response = admin_client.post(
+        reverse("admin:approvals_prolongation_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [
+                consistent_prolongation.pk,
+                inconsistent_prolongation_1.pk,
+                inconsistent_prolongation_2.pk,
+            ],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.WARNING,
+                (
+                    '2 objets incohérents: <ul><li class="warning">'
+                    f'<a href="/admin/approvals/prolongation/{inconsistent_prolongation_2.pk}/change/">'
+                    f"prolongation - {inconsistent_prolongation_2.pk}"
+                    "</a>: Prolongation hors période du PASS IAE"
+                    '</li><li class="warning">'
+                    f'<a href="/admin/approvals/prolongation/{inconsistent_prolongation_1.pk}/change/">'
+                    f"prolongation - {inconsistent_prolongation_1.pk}"
+                    "</a>: Prolongation hors période du PASS IAE"
+                    "</li></ul>"
+                ),
+            )
+        ],
+    )

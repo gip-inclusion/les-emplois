@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import admin, messages
+from django.db.models import F, Q
 from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -654,7 +655,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
 
 @admin.register(models.Prolongation)
-class ProlongationAdmin(ProlongationCommonAdmin):
+class ProlongationAdmin(InconsistencyCheckMixin, ProlongationCommonAdmin):
     list_display = (
         "pk",
         "approval",
@@ -715,6 +716,13 @@ class ProlongationAdmin(ProlongationCommonAdmin):
             },
         ),
     )
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "Prolongation hors période du PASS IAE",
+            lambda q: q.filter(Q(start_at__lt=F("approval__start_at")) | Q(end_at__gt=F("approval__end_at"))),
+        ),
+    ]
 
     @admin.display(boolean=True, description="demande")
     def from_prolongation_request(self, obj):
