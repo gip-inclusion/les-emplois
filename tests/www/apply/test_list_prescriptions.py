@@ -46,41 +46,40 @@ BESOIN_DUN_CHIFFRE = "besoin-dun-chiffre"
 
 
 def test_get(client):
-    """
-    Connect as Thibault to see a list of job applications
-    sent by his organization (Pôle emploi).
-    """
     job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
     organization = job_application.sender_prescriber_organization
     client.force_login(job_application.sender)
-
-    response = client.get(reverse("apply:list_prescriptions"))
-    # Has link to export with back_url set
-    exports_link = unquote(
-        reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
-    )
-    assertContains(response, exports_link)
-
-    # Has job application link with back_url set
-    job_application_link = unquote(
-        reverse(
-            "apply:details_for_prescriber",
-            kwargs={"job_application_id": job_application.pk},
-            query={"back_url": reverse("apply:list_prescriptions")},
+    for display in JobApplicationsDisplayKind:
+        response = client.get(reverse("apply:list_prescriptions", query={"display": display}))
+        # Has link to export with back_url set
+        exports_link = unquote(
+            reverse("apply:list_prescriptions_exports", query={"back_url": reverse("apply:list_prescriptions")})
         )
-    )
-    assertContains(response, job_application_link)
+        assertContains(response, exports_link)
 
-    # Has link to company with back_url set
-    company_link = unquote(
-        add_url_params(job_application.to_company.get_card_url(), {"back_url": reverse("apply:list_prescriptions")})
-    )
-    assertContains(response, company_link)
+        # Has job application link with back_url set
+        job_application_link = unquote(
+            reverse(
+                "apply:details_for_prescriber",
+                kwargs={"job_application_id": job_application.pk},
+                query={"back_url": reverse("apply:list_prescriptions")},
+            )
+        )
+        assertContains(response, job_application_link)
 
-    # Count job applications used by the template
-    assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
+        if display == JobApplicationsDisplayKind.LIST:
+            # Has link to company with back_url set
+            company_link = unquote(
+                add_url_params(
+                    job_application.to_company.get_card_url(), {"back_url": reverse("apply:list_prescriptions")}
+                )
+            )
+            assertContains(response, company_link)
 
-    assertContains(response, job_application.job_seeker.get_full_name())
+        # Count job applications used by the template
+        assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
+
+        assertContains(response, job_application.job_seeker.get_full_name())
 
 
 @override_settings(PAGE_SIZE_DEFAULT=1)
@@ -129,11 +128,16 @@ def test_as_unauthorized_prescriber(client, snapshot):
 
     list_url = reverse("apply:list_prescriptions")
     with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
-        response = client.get(list_url)
+        response = client.get(list_url, data={"display": JobApplicationsDisplayKind.LIST})
 
     assertContains(response, "<h3>S… U…</h3>")
     assertNotContains(response, "Supersecretname")
     assertContains(response, "<h3>Liz IBLE</h3>")
+
+    response = client.get(list_url, data={"display": JobApplicationsDisplayKind.TABLE})
+    assertContains(response, "S… U…")
+    assertNotContains(response, "Supersecretname")
+    assertContains(response, "Liz IBLE")
 
 
 def test_filtered_by_state(client):
@@ -301,23 +305,24 @@ def test_archived(client):
     """
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
-    response = client.get(url)
+    list_display_param = {"display": JobApplicationsDisplayKind.LIST}
+    response = client.get(url, data=list_display_param)
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": ""})
+    response = client.get(url, data={"archived": "", **list_display_param})
     assertContains(response, active.pk)
     assertNotContains(response, archived.pk)
     assertNotContains(response, archived_badge_html, html=True)
-    response = client.get(url, data={"archived": "archived"})
+    response = client.get(url, data={"archived": "archived", **list_display_param})
     assertNotContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "all"})
+    response = client.get(url, data={"archived": "all", **list_display_param})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
-    response = client.get(url, data={"archived": "invalid"})
+    response = client.get(url, data={"archived": "invalid", **list_display_param})
     assertContains(response, active.pk)
     assertContains(response, archived.pk)
     assertContains(response, archived_badge_html, html=True, count=1)
