@@ -15,6 +15,7 @@ from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
+from itou.archive.constants import EXPIRATION_DAYS
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
@@ -209,7 +210,9 @@ class TestApprovalModel:
         with pytest.raises(NotImplementedError):
             Approval.objects.all().delete()
 
-        expired_approval = ApprovalFactory(expired=True, end_at=timezone.localdate() - relativedelta(years=2))
+        expired_approval = ApprovalFactory(
+            expired=True, end_at=timezone.localdate() - datetime.timedelta(days=EXPIRATION_DAYS)
+        )
         expiring_soon_approval = ApprovalFactory(
             expired=True, end_at=expired_approval.end_at + datetime.timedelta(days=1)
         )
