@@ -69,6 +69,13 @@
                             </div>
                         </div>
                     {% endfor %}
+                    {% for archived_evaluated_siae in archived_evaluated_siaes %}
+                        <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                            <div class="c-box--results__header">
+                                {% include "siae_evaluations/includes/archived_siae_infos.html" with archived_evaluated_siae=archived_evaluated_siae %}
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
