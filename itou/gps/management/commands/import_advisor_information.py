@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 # exported data
                 "identifiant_gps": "job_seeker_pk",
                 "nom": "job_seeker_last_name",
-                "prénom": "job_seeker_first_name",
+                "prenom": "job_seeker_first_name",
                 "identifiant_local": "job_seeker_pole_emploi_id",
                 "date_de_naissance": "job_seeker_birthdate",
                 "nir": "job_seeker_nir",

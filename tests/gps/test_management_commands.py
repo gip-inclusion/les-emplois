@@ -278,7 +278,7 @@ def test_import_advisor_information(settings, caplog, mocker):
             [
                 "identifiant_gps",
                 "nom",
-                "prénom",
+                "prenom",
                 "identifiant_local",
                 "date_de_naissance",
                 "nir",
