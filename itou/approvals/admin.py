@@ -464,7 +464,7 @@ class FromProlongationRequest(admin.SimpleListFilter):
 
 
 @admin.register(models.Suspension)
-class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
+class SuspensionAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelAdmin):
     list_display = (
         "pk",
         "approval",
@@ -487,6 +487,13 @@ class SuspensionAdmin(CreatedOrUpdatedByMixin, ItouModelAdmin):
         "approval__number",
     )
     inlines = (PkSupportRemarkInline,)
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "Suspension hors période du PASS IAE",
+            lambda q: q.filter(Q(start_at__lt=F("approval__start_at")) | Q(end_at__gt=F("approval__end_at"))),
+        ),
+    ]
 
     @admin.display(boolean=True, description="en cours")
     def is_in_progress(self, obj):

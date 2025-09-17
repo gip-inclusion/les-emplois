@@ -1127,3 +1127,56 @@ def test_prolongation_creation(admin_client):
     response = admin_client.post(url, data=creation_data)
     assert response.status_code == 302
     assert approval.prolongation_set.count() == 1
+
+
+def test_suspension_inconsistency_check(admin_client):
+    consistent_suspension = SuspensionFactory()
+
+    response = admin_client.post(
+        reverse("admin:approvals_suspension_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [consistent_suspension.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    inconsistent_suspension_1 = SuspensionFactory(
+        approval__start_at=timezone.localdate(), start_at=timezone.localdate() - timedelta(days=1)
+    )
+    inconsistent_suspension_2 = SuspensionFactory()
+    inconsistent_suspension_2.approval.end_at = inconsistent_suspension_2.end_at - timedelta(days=1)
+    inconsistent_suspension_2.approval.save()
+
+    response = admin_client.post(
+        reverse("admin:approvals_suspension_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [
+                consistent_suspension.pk,
+                inconsistent_suspension_1.pk,
+                inconsistent_suspension_2.pk,
+            ],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.WARNING,
+                (
+                    '2 objets incohérents: <ul><li class="warning">'
+                    f'<a href="/admin/approvals/suspension/{inconsistent_suspension_2.pk}/change/">'
+                    f"suspension - {inconsistent_suspension_2.pk}"
+                    "</a>: Suspension hors période du PASS IAE"
+                    '</li><li class="warning">'
+                    f'<a href="/admin/approvals/suspension/{inconsistent_suspension_1.pk}/change/">'
+                    f"suspension - {inconsistent_suspension_1.pk}"
+                    "</a>: Suspension hors période du PASS IAE"
+                    "</li></ul>"
+                ),
+            )
+        ],
+    )
