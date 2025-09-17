@@ -21,6 +21,7 @@ from itou.approvals import enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
+from itou.archive.constants import EXPIRATION_DAYS
 from itou.companies import enums as companies_enums
 from itou.companies.models import CompanyMembership
 from itou.employee_record.enums import Status
@@ -120,7 +121,9 @@ class ApprovalQuerySet(models.QuerySet):
         # create a CancelledApproval object for each deleted Approval.
         # NOTE(vincentporte): Mass deletion is needed for jobseekers anonymization, so we make it possible only if
         # the approvals ended at least 2 years ago.
-        recent_exists = self.filter(end_at__gt=timezone.localdate() - relativedelta(years=2)).exists()
+        recent_exists = self.filter(
+            end_at__gt=timezone.localdate() - datetime.timedelta(days=EXPIRATION_DAYS)
+        ).exists()
         if not enable_mass_delete or recent_exists:
             raise NotImplementedError(
                 "Supprimer en masse des PASS IAE non échus depuis au moins 2 ans est interdit,"
