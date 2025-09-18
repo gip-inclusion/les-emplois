@@ -55,13 +55,8 @@
         </li>
         {% if show_birth_place %}
             <li>
-
                 <small>Commune de naissance</small>
-                {% if profile.birth_place %}
-                    <strong>{{ profile.birth_place|title }}</strong>
-                {% else %}
-                    <i class="text-warning">À renseigner obligatoirement si le pays est "France"</i>
-                {% endif %}
+                <strong>{{ profile.birth_place|title }}</strong>
             </li>
         {% endif %}
         <li>
