@@ -18,10 +18,10 @@ from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import enums as api_enums
 from itou.utils.mocks.pole_emploi import (
-    API_MAJPASS_RESULT_ERROR,
-    API_MAJPASS_RESULT_OK,
-    API_RECHERCHE_MANY_RESULTS,
-    API_RECHERCHE_RESULT_KNOWN,
+    API_MAJPASS_RESPONSE_ERROR,
+    API_MAJPASS_RESPONSE_OK,
+    API_RECHERCHE_RESPONSE_KNOWN,
+    API_RECHERCHE_RESPONSE_MANY_RESULTS,
 )
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -77,9 +77,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @freeze_time("2021-06-21")
     def test_notification_accepted_nominal(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
@@ -115,7 +115,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
 
     @respx.mock
     def test_notification_accepted_with_id_national(self):
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
@@ -149,9 +149,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_with_prescriber_organization(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
@@ -182,9 +182,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_with_sensitive_prescriber_organization(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
@@ -216,9 +216,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     def test_notification_stays_pending_if_approval_starts_after_today(self, caplog):
         now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         tomorrow = (now + datetime.timedelta(days=1)).date()
         approval = ApprovalFactory(start_at=tomorrow)
         with freeze_time() as frozen_now:
@@ -254,7 +254,7 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_rech_individu(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_MANY_RESULTS
+            200, json=API_RECHERCHE_RESPONSE_MANY_RESULTS
         )
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
@@ -270,9 +270,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_maj_pass(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
         with freeze_time() as frozen_now:
@@ -287,9 +287,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_missing_siae_kind(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
@@ -306,9 +306,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_pending_if_job_application_is_not_accepted(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
@@ -327,9 +327,9 @@ class TestApprovalNotifyPoleEmploiIntegration:
     def test_notification_use_origin_values(self):
         now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         job_seeker = JobSeekerFactory()
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
@@ -385,9 +385,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_nominal(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         cancelled_approval = CancelledApprovalFactory(origin_siae_kind=CompanyKind.EI)
         with freeze_time() as frozen_now:
             return_status = cancelled_approval.notify_pole_emploi()
@@ -411,7 +411,7 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
 
     @respx.mock
     def test_notification_accepted_with_id_national(self):
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         cancelled_approval = CancelledApprovalFactory(
             origin_siae_kind=CompanyKind.ACI, user_id_national_pe="ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         )
@@ -438,9 +438,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_with_prescriber_organization(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         cancelled_approval = CancelledApprovalFactory(
             origin_siae_kind=CompanyKind.ACI,
             origin_sender_kind=SenderKind.PRESCRIBER,
@@ -470,9 +470,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_with_sensitive_prescriber_organization(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         cancelled_approval = CancelledApprovalFactory(
             origin_siae_kind=CompanyKind.ACI,
             origin_sender_kind=SenderKind.PRESCRIBER,
@@ -503,9 +503,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @freeze_time()
     def test_notification_stays_pending_if_approval_starts_after_today(self, caplog):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         tomorrow = timezone.localdate() + datetime.timedelta(days=1)
         cancelled_approval = CancelledApprovalFactory(start_at=tomorrow)
         return_status = cancelled_approval.notify_pole_emploi()
@@ -539,7 +539,7 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_rech_individu(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_MANY_RESULTS
+            200, json=API_RECHERCHE_RESPONSE_MANY_RESULTS
         )
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
@@ -554,9 +554,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_maj_pass(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         cancelled_approval = CancelledApprovalFactory()
         with freeze_time() as frozen_now:
             return_status = cancelled_approval.notify_pole_emploi()
@@ -570,9 +570,9 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_goes_to_error_if_missing_siae_kind(self):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         cancelled_approval = CancelledApprovalFactory(origin_siae_kind="FOO")  # unknown kind
         with freeze_time() as frozen_now:
             return_status = cancelled_approval.notify_pole_emploi()

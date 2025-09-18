@@ -21,13 +21,13 @@ from itou.utils.apis.pole_emploi import (
     UserDoesNotExist,
 )
 from itou.utils.mocks.pole_emploi import (
-    API_APPELLATIONS,
-    API_MAJPASS_RESULT_ERROR,
-    API_MAJPASS_RESULT_OK,
-    API_OFFRES,
-    API_RECHERCHE_ERROR,
-    API_RECHERCHE_RESULT_KNOWN,
-    API_REFERENTIEL_NATURE_CONTRATS,
+    API_APPELLATIONS_RESPONSE_OK,
+    API_MAJPASS_RESPONSE_ERROR,
+    API_MAJPASS_RESPONSE_OK,
+    API_OFFRES_RESPONSE_OK,
+    API_RECHERCHE_RESPONSE_ERROR,
+    API_RECHERCHE_RESPONSE_KNOWN,
+    API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK,
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory
@@ -77,10 +77,10 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         )
         respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
             200,
-            json=API_APPELLATIONS,
+            json=API_APPELLATIONS_RESPONSE_OK,
         )
         respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
-            200, json=API_REFERENTIEL_NATURE_CONTRATS
+            200, json=API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK
         )
 
         # Connection pooling
@@ -88,8 +88,8 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         with client:
             first_client = client._get_httpx_client()
             assert client._refresh_token() == "foo batman"
-            assert client.appellations() == API_APPELLATIONS
-            assert client.referentiel("naturesContrats") == API_REFERENTIEL_NATURE_CONTRATS
+            assert client.appellations() == API_APPELLATIONS_RESPONSE_OK
+            assert client.referentiel("naturesContrats") == API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK
             assert first_client is client._get_httpx_client()
 
         # Outside a context manager…
@@ -101,14 +101,14 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         client = PoleEmploiRoyaumePartenaireApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
         assert client._refresh_token() == "foo batman"
         first_client = client._get_httpx_client()
-        assert client.appellations() == API_APPELLATIONS
+        assert client.appellations() == API_APPELLATIONS_RESPONSE_OK
         assert first_client is not client._get_httpx_client()
 
     @respx.mock
     def test_recherche_individu_certifie_api_nominal(self):
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_RESULT_KNOWN
+            200, json=API_RECHERCHE_RESPONSE_KNOWN
         )
         id_national = self.api_client.recherche_individu_certifie(
             job_seeker.first_name,
@@ -135,7 +135,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     def test_recherche_individu_certifie_individual_api_errors(self):
         job_seeker = JobSeekerFactory()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
-            200, json=API_RECHERCHE_ERROR
+            200, json=API_RECHERCHE_RESPONSE_ERROR
         )
         with pytest.raises(PoleEmploiAPIBadResponse) as ctx:
             self.api_client.recherche_individu_certifie(
@@ -145,7 +145,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
                 job_seeker.jobseeker_profile.nir,
             )
         assert ctx.value.response_code == PEApiRechercheIndividuExitCode.R010
-        assert ctx.value.response_data == API_RECHERCHE_ERROR
+        assert ctx.value.response_data == API_RECHERCHE_RESPONSE_ERROR
 
     @respx.mock
     def test_recherche_individu_certifie_retryable_errors(self):
@@ -190,7 +190,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
         HTTP 200 + codeSortie = S001 is the only way mise_a_jour_pass_iae does not raise.
         """
         job_application = JobApplicationFactory(with_approval=True)
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_OK)
         # we really don't care about the arguments there
         self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
@@ -198,7 +198,7 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     def test_mise_a_jour_pass_iae_failure(self):
         job_application = JobApplicationFactory(with_approval=True)
         # non-S001 codeSortie
-        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESPONSE_ERROR)
         with pytest.raises(PoleEmploiAPIBadResponse):
             self.api_client.mise_a_jour_pass_iae(job_application.approval, "foo", "bar", 42, "DEAD")
 
@@ -221,23 +221,23 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     @respx.mock
     def test_referentiel(self):
         respx.get("https://pe.fake/offresdemploi/v2/referentiel/naturesContrats").respond(
-            200, json=API_REFERENTIEL_NATURE_CONTRATS
+            200, json=API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK
         )
-        assert self.api_client.referentiel("naturesContrats") == API_REFERENTIEL_NATURE_CONTRATS
+        assert self.api_client.referentiel("naturesContrats") == API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK
 
     @respx.mock
     def test_offres(self):
         respx.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=FT&range=0-1").respond(
             206,  # test code 206 as we already know that 200 is tested through the other tests
-            json={"resultats": API_OFFRES},
+            json={"resultats": API_OFFRES_RESPONSE_OK},
         )
-        assert self.api_client.offres(natureContrat="FT", range="0-1") == API_OFFRES
+        assert self.api_client.offres(natureContrat="FT", range="0-1") == API_OFFRES_RESPONSE_OK
         respx.get("https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&range=100-140").respond(
             204
         )
         assert self.api_client.offres(range="100-140") == []
 
-        EA_OFFERS = [{**offer, "entrepriseAdaptee": True} for offer in API_OFFRES]
+        EA_OFFERS = [{**offer, "entrepriseAdaptee": True} for offer in API_OFFRES_RESPONSE_OK]
 
         respx.get(
             "https://pe.fake/offresdemploi/v2/offres/search?typeContrat=&natureContrat=&entreprisesAdaptees=true&range=0-1"
@@ -251,9 +251,9 @@ class TestPoleEmploiRoyaumePartenaireApiClient:
     def test_appellations(self):
         respx.get("https://pe.fake/rome-metiers/v1/metiers/appellation?champs=code,libelle,metier(code)").respond(
             200,
-            json=API_APPELLATIONS,
+            json=API_APPELLATIONS_RESPONSE_OK,
         )
-        assert self.api_client.appellations() == API_APPELLATIONS
+        assert self.api_client.appellations() == API_APPELLATIONS_RESPONSE_OK
 
     @respx.mock
     def test_agences(self):
