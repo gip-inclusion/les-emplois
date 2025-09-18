@@ -2,7 +2,7 @@ import json
 import uuid
 
 import pytest
-from django.db import connection
+from django.db import connection, transaction
 from pytest_django.asserts import assertNumQueries
 
 from itou.utils import triggers
@@ -32,7 +32,7 @@ def test_context_stacking():
             assert cursor.fetchone() == (json.dumps(context_1),)
 
 
-def test_context_with_same_data():
+def test_context_stacking_with_same_data():
     expected = {"uuid": str(uuid.uuid4())}
     with assertNumQueries(3), connection.cursor() as cursor:
         with triggers.context(**expected):
@@ -41,6 +41,36 @@ def test_context_with_same_data():
 
             with triggers.context(**expected):
                 cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps(expected),)
+
+
+def test_context_consecutively_with_same_data():
+    expected = {"uuid": str(uuid.uuid4())}
+    with assertNumQueries(4), connection.cursor() as cursor:
+        with triggers.context(**expected):
+            cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps(expected),)
+
+        with triggers.context(**expected):
+            cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == (json.dumps(expected),)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_context_savepoint_rollback():
+    expected = {"uuid": str(uuid.uuid4())}
+    with transaction.atomic(), assertNumQueries(7), connection.cursor() as cursor:
+        savepoint_id = transaction.savepoint()
+        with triggers.context(**expected):
+            cursor.execute("SELECT current_setting('itou.context')")
+            assert cursor.fetchone() == (json.dumps(expected),)
+
+        transaction.savepoint_rollback(savepoint_id)
+        cursor.execute("SELECT current_setting('itou.context')")
+        assert cursor.fetchone() == ("",)
+
+        with triggers.context(**expected):
+            cursor.execute("SELECT current_setting('itou.context')")
             assert cursor.fetchone() == (json.dumps(expected),)
 
 
