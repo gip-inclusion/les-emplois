@@ -243,7 +243,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_prolongations[Approval detail view with prolongations as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -957,38 +957,6 @@
                                                     %s))
           ORDER BY 46 DESC,
                    "job_applications_jobapplication"."hiring_start_at" DESC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_last_for_user[approvals/models.py]',
-          'Approval.can_be_prolonged[approvals/models.py]',
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."start_at" DESC
           LIMIT 1
         ''',
       }),
@@ -2555,7 +2523,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_detail_with_suspensions[Approval detail view with suspensions as employer]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3271,38 +3239,6 @@
           WHERE ("approvals_prolongationrequest"."approval_id" = %s
                  AND "approvals_prolongation"."id" IS NULL)
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_last_for_user[approvals/models.py]',
-          'Approval.can_be_prolonged[approvals/models.py]',
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind",
-                 "approvals_approval"."public_id"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."start_at" DESC
-          LIMIT 1
         ''',
       }),
       dict({

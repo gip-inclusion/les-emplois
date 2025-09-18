@@ -852,8 +852,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         # have to ensure that the current PASS IAE is the most recent for the user
         # before allowing a prolongation.
         return (
-            self.is_last_for_user
-            and self.is_open_to_prolongation
+            self.is_open_to_prolongation
+            and self.is_last_for_user
             and not self.is_suspended
             and not self.pending_prolongation_request()
         )
