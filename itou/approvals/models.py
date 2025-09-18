@@ -633,13 +633,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         except (JobApplication.DoesNotExist, JobApplication.MultipleObjectsReturned):
             return False
 
-    @cached_property
-    def is_last_for_user(self):
-        """
-        Returns True if the current Approval is the most recent for the user, False otherwise.
-        """
-        return self == self.user.approvals.order_by("start_at").last()
-
     def _get_obj_remainder(self, obj):
         """
         Return the remaining time on an object with start_at and end_at dete fields
@@ -853,7 +846,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         # before allowing a prolongation.
         return (
             self.is_open_to_prolongation
-            and self.is_last_for_user
+            and self == self.user.latest_approval
             and not self.is_suspended
             and not self.pending_prolongation_request()
         )
