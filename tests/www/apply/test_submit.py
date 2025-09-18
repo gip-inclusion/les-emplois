@@ -3073,7 +3073,7 @@ class TestDirectHireFullProcess:
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
-        job_seeker = JobSeekerFactory(born_outside_france=True)
+        job_seeker = JobSeekerFactory(born_outside_france=True, with_address=True)
 
         user = company.members.first()
         client.force_login(user)
@@ -5089,6 +5089,8 @@ class TestCheckJobSeekerInformationsForHire:
                     "email": None,
                     "phone": "",
                     "jobseeker_profile__birthdate": None,
+                    "jobseeker_profile__birth_country": None,
+                    "jobseeker_profile__birth_place": None,
                     "jobseeker_profile__nir": "",
                     "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
                     "jobseeker_profile__lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -5102,6 +5104,7 @@ class TestCheckJobSeekerInformationsForHire:
                     "born_in_france": True,
                     "with_pole_emploi_id": True,
                     "jobseeker_profile__pole_emploi_id": "09443041",
+                    "jobseeker_profile__pole_emploi_since": AllocationDuration.MORE_THAN_24_MONTHS,
                     "jobseeker_profile__resourceless": True,
                     "jobseeker_profile__rqth_employee": True,
                     "jobseeker_profile__oeth_employee": True,
@@ -5161,10 +5164,39 @@ class TestCheckJobSeekerInformationsForHire:
             ),
             html=True,
         )
-        assertContains(
-            response,
-            reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
-        )
+        if job_seeker_kwargs.get("for_snapshot"):
+            # job seeker has required personal data for hire
+            expected_url = reverse(
+                "apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}
+            )
+            assertContains(
+                response,
+                f"""
+                <a href="{expected_url}"
+                    class="btn btn-block btn-primary"
+                    aria-label="Passer à l’étape suivante"
+                >
+                    <span>Poursuivre l'embauche</span>
+                </a>
+                """,
+                html=True,
+            )
+        else:
+            # job seeker _missing_ required personal data for hire
+            assertContains(
+                response,
+                """
+                <button type="button" class="btn btn-block btn-primary disabled">
+                    <span>Poursuivre l'embauche</span>
+                </button>
+                """,
+                html=True,
+            )
+            assertNotContains(
+                response,
+                reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
+            )
+
         assertContains(
             response,
             reverse("apply:start_hire", kwargs={"company_pk": company.pk}),
@@ -5178,6 +5210,10 @@ class TestCheckJobSeekerInformationsForHire:
             jobseeker_profile__nir="",
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
+            born_in_france=True,
+            jobseeker_profile__birth_place=Commune.objects.by_insee_code_and_period(
+                "59183", datetime.date(1990, 1, 1)
+            ),
         )
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})

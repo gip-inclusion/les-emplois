@@ -1084,9 +1084,17 @@
               <small>
                   Pays de naissance
               </small>
-              <i class="text-warning">
-                  À renseigner
-              </i>
+              <strong>
+                  France
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Commune de naissance
+              </small>
+              <strong>
+                  Dunkerque
+              </strong>
           </li>
           <li>
               <small>
