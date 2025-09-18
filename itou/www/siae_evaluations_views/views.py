@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -14,6 +14,7 @@ from itou.files.models import save_file
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.models import (
+    ArchivedEvaluatedSiae,
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
     EvaluatedSiae,
@@ -94,21 +95,32 @@ def institution_evaluated_siae_list(
         institution=institution,
         evaluations_asked_at__isnull=False,
     )
-    evaluated_siaes = get_list_or_404(
+    evaluated_siaes = list(
         EvaluatedSiae.objects.viewable()
         # select related `siae`` because of __str__() method of EvaluatedSiae
         .select_related("evaluation_campaign", "siae")
         .prefetch_related(
             "evaluated_job_applications", "evaluated_job_applications__evaluated_administrative_criteria"
         )
-        .order_by("siae__name"),
-        evaluation_campaign=evaluation_campaign,
+        .filter(evaluation_campaign=evaluation_campaign)
+        .order_by("siae__name")
     )
+
+    archived_evaluated_siaes = list(
+        ArchivedEvaluatedSiae.objects.viewable()
+        .select_related("siae")
+        .filter(evaluation_campaign=evaluation_campaign)
+        .order_by("siae__name")
+    )
+
+    if not evaluated_siaes and not archived_evaluated_siaes:
+        raise Http404()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
     context = {
         "evaluation_campaign": evaluation_campaign,
         "evaluated_siaes": evaluated_siaes,
+        "archived_evaluated_siaes": archived_evaluated_siaes,
         "back_url": back_url,
     }
     return render(request, template_name, context)
