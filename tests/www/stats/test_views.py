@@ -435,12 +435,14 @@ def test_webinar_banner_display(client, snapshot):
         assert response.context["pilotage_webinar_banners"] == []
 
 
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(
+    METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar", TALLY_URL="http://tally.fake"
+)
 def test_suspended_stats_page_banner(client, snapshot):
     """Test a banner appears for the user when a dashboard is marked as suspended"""
     client.force_login(ItouStaffFactory())
     staff_dashboard_id = METABASE_DASHBOARDS.get("stats_staff_service_indicators")["dashboard_id"]
-    tally_suspension_form = f"https://tally.so/r/wkOxRR?URLTB={staff_dashboard_id}"
+    tally_suspension_form = f"http://tally.fake/r/wkOxRR?URLTB={staff_dashboard_id}"
 
     with patch("itou.utils.apis.metabase.SUSPENDED_DASHBOARD_IDS", [staff_dashboard_id]):
         response = client.get(reverse("stats:stats_staff_service_indicators"))
