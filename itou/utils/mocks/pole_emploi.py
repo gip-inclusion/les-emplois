@@ -1,34 +1,34 @@
-API_RECHERCHE_RESULT_KNOWN = {
+API_RECHERCHE_RESPONSE_KNOWN = {
     "idNationalDE": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
     "codeSortie": "S001",
     "certifDE": False,
 }
 
-API_RECHERCHE_MANY_RESULTS = {
+API_RECHERCHE_RESPONSE_MANY_RESULTS = {
     "idNationalDE": "",
     "codeSortie": "S002",
     "certifDE": False,
 }
 
-API_RECHERCHE_ERROR = {
+API_RECHERCHE_RESPONSE_ERROR = {
     "idNationalDE": "",
     "codeSortie": "R010",
     "certifDE": False,
 }
 
-API_MAJPASS_RESULT_OK = {
+API_MAJPASS_RESPONSE_OK = {
     "codeSortie": "S000",
     "idNational": "some_id_national",
     "message": "Pass IAE prescrit",
 }
 
-API_MAJPASS_RESULT_ERROR = {
+API_MAJPASS_RESPONSE_ERROR = {
     "codeSortie": "S022",
     "idNational": "some_id_national",
     "message": "SD non installé : : Refus du PASS IAE",
 }
 
-API_REFERENTIEL_NATURE_CONTRATS = [
+API_REFERENTIEL_NATURE_CONTRATS_RESPONSE_OK = [
     {"code": "E1", "libelle": "Contrat travail"},
     {"code": "E2", "libelle": "Contrat apprentissage"},
     {"code": "FA", "libelle": "Act. Formation pré.recrut."},
@@ -51,7 +51,7 @@ API_REFERENTIEL_NATURE_CONTRATS = [
     {"code": "CI", "libelle": "Contrat intermittent"},
 ]
 
-API_OFFRES = [
+API_OFFRES_RESPONSE_OK = [
     {
         "id": "FOOBAR",
         "intitule": "Mécanicien de maintenance (F/H).",
@@ -185,7 +185,7 @@ API_OFFRES = [
     },
 ]
 
-API_APPELLATIONS = [
+API_APPELLATIONS_RESPONSE_OK = [
     {"code": "11405", "libelle": "Audioprothésiste", "metier": {"code": "J1401"}},
     {"code": "11406", "libelle": "Audiotypiste", "metier": {"code": "M1606"}},
     {"code": "11407", "libelle": "Auditeur / Auditrice comptable", "metier": {"code": "M1202"}},
