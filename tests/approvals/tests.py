@@ -252,21 +252,23 @@ class TestApprovalModel:
         expected = "XXXXX 00 00001"
         assert approval.number_with_spaces == expected
 
-    def test_is_last_for_user(self):
+    def test_can_be_prolonged(self):
         user = JobSeekerFactory()
 
-        # Ended 1 year ago.
-        end_at = timezone.localdate() - relativedelta(years=1)
-        start_at = end_at - relativedelta(years=2)
+        # Expired approval
+        end_at = timezone.localdate() - datetime.timedelta(days=100)
+        start_at = end_at - datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS - 1)
         approval1 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
 
-        # Start today, end in 2 years.
-        start_at = timezone.localdate()
-        end_at = start_at + relativedelta(years=2)
-        approval2 = ApprovalFactory(start_at=start_at, end_at=end_at, user=user)
+        # Started before approval1 but still active
+        approval2 = ApprovalFactory(
+            start_at=approval1.start_at - datetime.timedelta(days=10),
+            end_at=timezone.localdate() + datetime.timedelta(days=10),
+            user=user,
+        )
 
-        assert not approval1.is_last_for_user
-        assert approval2.is_last_for_user
+        assert not approval1.can_be_prolonged
+        assert approval2.can_be_prolonged
 
     @freeze_time("2022-11-17")
     def test_is_open_to_prolongation(self):
