@@ -42,6 +42,7 @@ from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.auth import check_request
+from itou.utils.urls import get_tally_form_url
 from itou.www.stats import utils
 
 
@@ -120,7 +121,7 @@ def render_stats(
         "tally_embed_form_id": metabase_dashboard.get("tally_embed_form_id") if show_tally else None,
         "PILOTAGE_HELP_CENTER_URL": global_constants.PILOTAGE_HELP_CENTER_URL,
         "tally_suspension_form": (
-            f"https://tally.so/r/wkOxRR?URLTB={dashboard_id}" if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS else None
+            get_tally_form_url("wkOxRR", URLTB=dashboard_id) if dashboard_id in mb.SUSPENDED_DASHBOARD_IDS else None
         ),
         "tally_hidden_fields": {},
     }
