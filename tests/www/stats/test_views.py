@@ -30,6 +30,12 @@ class TestStatsView:
         response = client.get(url)
         assert response.status_code == 200
 
+    @override_settings(METABASE_SITE_URL=None, METABASE_SECRET_KEY=None)
+    def test_stats_public_empty_settings(self, client):
+        url = reverse("stats:stats_public")
+        response = client.get(url)
+        assert response.status_code == 200
+
 
 def assert_stats_dashboard_equal(values):
     assertQuerySetEqual(
