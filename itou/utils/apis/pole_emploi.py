@@ -1,4 +1,5 @@
 import datetime
+import enum
 import json
 import logging
 import re
@@ -14,6 +15,13 @@ logger = logging.getLogger(__name__)
 
 API_CLIENT_HTTP_ERROR_CODE = "http_error"
 REFRESH_TOKEN_MARGIN_SECONDS = 10  # arbitrary value, in order not to be *right* on the expiry time.
+
+
+class Endpoints(enum.StrEnum):
+    RECHERCHER_USAGER_DATE_NAISSANCE_NIR = "/rechercher-usager/v2/usagers/par-datenaissance-et-nir"
+    RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL = "/rechercher-usager/v2/usagers/par-numero-francetravail"
+    RQTH = "/donnees-rqth/v1/rqth"
+
 
 # Source:
 # https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
@@ -368,7 +376,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not pole_emploi_id:
             raise TypeError("`pole_emploi_id` is mandatory.")
         return self._request(
-            f"{self.base_url}/rechercher-usager/v2/usagers/par-numero-francetravail",
+            f"{self.base_url}{Endpoints.RECHERCHER_USAGER_NUMERO_FRANCE_TRAVAIL}",
             {
                 "numeroFranceTravail": pole_emploi_id,
             },
@@ -378,7 +386,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         if not (birthdate and nir):
             raise TypeError("`birthdate` and `nir` are mandatory.")
         return self._request(
-            f"{self.base_url}/rechercher-usager/v2/usagers/par-datenaissance-et-nir",
+            f"{self.base_url}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}",
             {
                 "dateNaissance": birthdate.strftime(DATE_FORMAT),
                 "nir": nir,
