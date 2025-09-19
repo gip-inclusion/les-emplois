@@ -7,7 +7,7 @@ from itou.companies.enums import POLE_EMPLOI_SIRET
 from itou.companies.models import JobDescription
 from itou.jobs.models import Appellation, Rome
 from itou.utils.apis import pe_api_enums
-from itou.utils.mocks.pole_emploi import API_OFFRES
+from itou.utils.mocks.pole_emploi import API_OFFRES_RESPONSE_OK
 
 
 @override_settings(
@@ -22,9 +22,9 @@ from itou.utils.mocks.pole_emploi import API_OFFRES
 def test_sync_ft_offers(caplog, respx_mock):
     PEC_OFFERS = [
         {**offer, "natureContrat": pe_api_enums.NATURE_CONTRATS[pe_api_enums.NATURE_CONTRAT_PEC]}
-        for offer in API_OFFRES
+        for offer in API_OFFRES_RESPONSE_OK
     ]
-    EA_OFFERS = [{**offer, "id": offer["id"][::-1], "entrepriseAdaptee": True} for offer in API_OFFRES]
+    EA_OFFERS = [{**offer, "id": offer["id"][::-1], "entrepriseAdaptee": True} for offer in API_OFFRES_RESPONSE_OK]
 
     city = City.objects.create(
         slug="slug",
