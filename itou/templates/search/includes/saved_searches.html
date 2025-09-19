@@ -1,0 +1,22 @@
+<div class="c-search__list" id="savedSearchesList"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+    {% if saved_searches %}
+        <div class="c-search__list__title">Recherches enregistrées :</div>
+        <div class="c-search__list__slider">
+            <div data-it-sliding-search="true">
+                {% for saved_search in saved_searches %}
+                    <div>
+                        <a href="{{ saved_search.url }}" class="btn-link btn-ico">
+                            <i class="ri-star-line" aria-hidden="true"></i>
+                            <span>{{ saved_search.name }}</span>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="c-search__list__settings">
+            <button class="btn btn-link btn-sm btn-ico-only" type="button" aria-label="Modifier les recherches enregistrées" data-bs-toggle="modal" data-bs-target="#savedSearchesSettingsModal">
+                <i class="ri-equalizer-fill fw-medium" aria-hidden="true"></i>
+            </button>
+        </div>
+    {% endif %}
+</div>
