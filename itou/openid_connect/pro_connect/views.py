@@ -15,7 +15,12 @@ from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
-from itou.openid_connect.models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
+from itou.openid_connect.models import (
+    EmailInUseException,
+    InactiveUserException,
+    InvalidKindException,
+    MultipleUsersFoundException,
+)
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import ProConnectEmployerData, ProConnectPrescriberData, ProConnectState
@@ -235,6 +240,10 @@ def pro_connect_callback(request):
 
     try:
         user, _ = pc_user_data.create_or_update_user(is_login=pro_connect_state.data.get("is_login"))
+    except InactiveUserException as e:
+        logger.info("ProConnect login attempt with inactive user: %s", e.user)
+        messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT))
+        is_successful = False
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)

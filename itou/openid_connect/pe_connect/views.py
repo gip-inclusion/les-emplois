@@ -18,6 +18,7 @@ from itou.external_data.tasks import huey_import_user_pe_data
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.models import (
     EmailInUseException,
+    InactiveUserException,
     InvalidKindException,
     MultipleSubSameEmailException,
     MultipleUsersFoundException,
@@ -136,6 +137,11 @@ def pe_connect_callback(request):
     try:
         # At this step, we can update the user's fields in DB and create a session if required
         user, _ = pe_user_data.create_or_update_user()
+    except InactiveUserException as e:
+        logger.info("PE Connect login attempt with inactive user: %s", e.user)
+        return _redirect_to_job_seeker_login_on_error(
+            e.format_message_html(IdentityProvider.PE_CONNECT), request=request
+        )
     except InvalidKindException as e:
         messages.info(request, "Ce compte existe déjà, veuillez vous connecter.")
         return HttpResponseRedirect(UserKind.get_login_url(e.user.kind))

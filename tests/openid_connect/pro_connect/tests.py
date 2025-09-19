@@ -1,5 +1,6 @@
 import dataclasses
 import json
+import random
 from operator import itemgetter
 from unittest import mock
 from urllib.parse import quote, urlencode
@@ -478,6 +479,37 @@ class TestProConnectCallbackView:
             assertContains(response, "existe déjà avec cette adresse e-mail")
             assertContains(response, "pour devenir prescripteur sur la plateforme")
             user.delete()
+
+    @respx.mock
+    def test_callback_redirect_on_inactive_user_exception(self, client, pro_connect):
+        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+
+        user = UserFactory(
+            username=pc_user_data.username,
+            email=pc_user_data.email,
+            kind=random.choice([UserKind.EMPLOYER, UserKind.PRESCRIBER]),
+            is_active=False,
+        )
+        response = pro_connect.mock_oauth_dance(
+            client,
+            user.kind,
+            expected_redirect_url=reverse(
+                "pro_connect:logout", query={"redirect_url": reverse("search:employers_home")}
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La connexion via ProConnect a fonctionné mais le compte lié sur les Emplois de l’inclusion "
+                        "est désactivé. Veuillez vous rapprocher du support pour débloquer la situation en suivant "
+                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                    ),
+                )
+            ],
+        )
 
     @respx.mock
     def test_callback_redirect_employer_on_too_many_kind_exception(self, client, pro_connect):
