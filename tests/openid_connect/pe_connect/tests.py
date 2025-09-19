@@ -307,6 +307,32 @@ class TestPoleEmploiConnect:
         assert client.session.get(global_constants.ITOU_SESSION_JOB_SEEKER_SIGNUP_KEY) is None
 
     @respx.mock
+    def test_callback_redirect_on_inactive_user_exception(self, client):
+        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+
+        UserFactory(
+            username=peamu_user_data.username,
+            email=peamu_user_data.email,
+            kind=UserKind.JOB_SEEKER,
+            is_active=False,
+            identity_provider=IdentityProvider.PE_CONNECT,
+        )
+        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La connexion via Pôle emploi Connect a fonctionné mais le compte lié sur les Emplois de "
+                        "l’inclusion est désactivé. Veuillez vous rapprocher du support pour débloquer la situation "
+                        'en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                    ),
+                )
+            ],
+        )
+
+    @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 

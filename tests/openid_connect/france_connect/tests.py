@@ -443,6 +443,33 @@ class TestFranceConnect:
         )
 
     @respx.mock
+    def test_callback_redirect_on_inactive_user(self, client):
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+
+        UserFactory(
+            username=fc_user_data.username,
+            email=fc_user_data.email,
+            kind=UserKind.JOB_SEEKER,
+            is_active=False,
+            identity_provider=IdentityProvider.FRANCE_CONNECT,
+        )
+        response = mock_oauth_dance(client, expected_route="login:job_seeker")
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "La connexion via FranceConnect a fonctionné mais le compte lié sur les Emplois de l’inclusion"
+                        " est désactivé. Veuillez vous rapprocher du support pour débloquer la situation en suivant "
+                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                    ),
+                )
+            ],
+        )
+
+    @respx.mock
+    @respx.mock
     def test_callback_redirect_on_invalid_kind_exception(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
