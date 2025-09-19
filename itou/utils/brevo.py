@@ -92,3 +92,17 @@ class BrevoClient:
         except httpx.HTTPStatusError as e:
             logger.error("Brevo API: Response with status_code=%s", e.response.status_code)
             raise
+
+    def list_contacts(self, limit=1000, offset=0):
+        try:
+            response = self.client.get(f"/contacts?limit={limit}&offset={offset}&sort=asc")
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict) or "contacts" not in data:
+                raise ValueError(
+                    "Unexpected response format from Brevo API /contacts, limit: %d, offset: %d", limit, offset
+                )
+            return data
+        except httpx.RequestError as e:
+            logger.error("Brevo API contacts: Request failed: %s, limit: %d, offset: %d", str(e), limit, offset)
+            raise
