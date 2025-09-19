@@ -1,6 +1,10 @@
+import random
+
 import pytest
+from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
@@ -13,6 +17,8 @@ from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
 from itou.utils.models import PkSupportRemark
+from tests.companies.factories import CompanyMembershipFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -25,6 +31,7 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
+    LaborInspectorFactory,
     PrescriberFactory,
 )
 from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
@@ -585,3 +592,90 @@ def test_membership_inline_includes_inactive(admin_client):
         """,
         str(is_active_cell),
     )
+
+
+class TestDeactivateView:
+    def test_deactivate_button(self, client):
+        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+        deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
+
+        # Basic staff users without write access don't see the button
+        admin_user = ItouStaffFactory()
+        perms = Permission.objects.filter(codename="view_user")
+        admin_user.user_permissions.add(*perms)
+        client.force_login(admin_user)
+        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+        assertNotContains(response, deactivate_url)
+
+        # With the change permission, the button appears
+        perms = Permission.objects.filter(codename="change_user")
+        admin_user.user_permissions.add(*perms)
+        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+        assertContains(response, deactivate_url)
+
+        # But if the user is already inactive, it doesn't appear
+        user.is_active = False
+        user.save(update_fields=("is_active",))
+        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+        assertNotContains(response, deactivate_url)
+
+    def test_deactivate_without_change_permission(self, client):
+        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+        deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
+        admin_user = ItouStaffFactory()
+        perms = Permission.objects.filter(codename="view_user")
+        admin_user.user_permissions.add(*perms)
+        client.force_login(admin_user)
+        response = client.post(deactivate_url)
+        assert response.status_code == 403
+
+    def test_deactivate_inactive_user(self, admin_client):
+        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])(
+            is_active=False
+        )
+        deactivate_url = reverse("admin:deactivate_user", kwargs={"user_pk": user.pk})
+        response = admin_client.post(deactivate_url)
+        assert response.status_code == 404
+
+    @freeze_time("2023-08-31 12:34:56")
+    def test_deactivate_user(self, admin_client, caplog):
+        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])(
+            username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
+            email="user@example.com",
+        )
+        EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
+        membership_factory = {
+            UserKind.EMPLOYER: CompanyMembershipFactory,
+            UserKind.PRESCRIBER: PrescriberMembershipFactory,
+            UserKind.LABOR_INSPECTOR: InstitutionMembershipFactory,
+            UserKind.JOB_SEEKER: None,
+        }[user.kind]
+        if membership_factory:
+            membership = membership_factory(user=user)
+        else:
+            membership = None
+
+        response = admin_client.post(reverse("admin:deactivate_user", kwargs={"user_pk": user.pk}))
+        assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+
+        admin_user = get_user(admin_client)
+        user.refresh_from_db()
+        assert user.is_active is False
+        assert user.username == "old_0e8bee68-6c4b-48bb-850c-0dea09915d94"
+        assert user.email == "user@example.com_old"
+        assert not EmailAddress.objects.filter(user=user).exists()
+        if membership is not None:
+            membership.refresh_from_db()
+            assert membership.is_active is False
+            assert membership.updated_by == admin_user
+
+        assert f"user={user.pk} deactivated" in caplog.text
+        assertMessages(
+            response,
+            [
+                messages.Message(messages.SUCCESS, f"Désactivation de l'utilisateur {user} effectuée."),
+            ],
+        )
+        user_content_type = ContentType.objects.get_for_model(User)
+        user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).first()
+        assert f"2023-08-31 ({admin_user.get_full_name()}): Désactivation de l’utilisateur" in user_remark.remark

@@ -11,6 +11,7 @@ from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -637,6 +638,11 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         urls = super().get_urls()
         return [
             path(
+                "deactivate/<int:user_pk>",
+                self.admin_site.admin_view(self.deactivate_view),
+                name="deactivate_user",
+            ),
+            path(
                 "transfer/<int:from_user_pk>",
                 self.admin_site.admin_view(self.transfer_view),
                 name="transfer_user_data",
@@ -647,6 +653,42 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 name="transfer_user_data",
             ),
         ] + urls
+
+    def deactivate_view(self, request, user_pk):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        user = get_object_or_404(models.User.objects.filter(is_active=True), pk=user_pk)
+
+        user.emailaddress_set.filter(email=user.email).delete()
+
+        now = timezone.now()
+        # The user is active and we only want to update active memberships
+        PrescriberMembership.objects.filter(user=user).update(
+            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
+        )
+        CompanyMembership.objects.filter(user=user).update(
+            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
+        )
+        InstitutionMembership.objects.filter(user=user).update(
+            is_active=False, is_admin=False, updated_by=request.user, updated_at=now
+        )
+
+        user.email = f"{user.email}_old"
+        user.username = f"old_{user.username}"
+        user.is_active = False
+        changed_fields = ["email", "username", "is_active"]  # As a list to mimic Django change_message format
+        user.save(update_fields=changed_fields)
+        self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
+
+        logger.info("user=%d deactivated", user.pk)
+        messages.success(request, format_html("Désactivation de l'utilisateur {user} effectuée.", user=user))
+        add_support_remark_to_obj(
+            user,
+            f"{now:%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
+        )
+        return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
 
     def transfer_view(self, request, from_user_pk, to_user_pk=None):
         if not self.has_change_permission(request):
