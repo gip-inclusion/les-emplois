@@ -14,6 +14,29 @@
         </li>
     {% endif %}
 
+    {% if has_change_permission and original.is_active %}
+        <li>
+            <form method="post" action="{% url 'admin:deactivate_user' user_pk=original.pk %}">
+                {% csrf_token %}
+                <button class="button with-confirm">Désactiver</button>
+            </form>
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}
+
+
+{% block extrabody %}
     {{ block.super }}
 
+    <script nonce="{{ CSP_NONCE }}">
+        Array.from(document.getElementsByClassName("with-confirm")).forEach((button) => {
+            button.addEventListener("click", function(event) {
+                if (!confirm('Êtes vous certain ?')) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 {% endblock %}
