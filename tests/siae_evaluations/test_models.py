@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
@@ -461,6 +461,8 @@ class TestEvaluationCampaignManager:
         evaluated_job_apps = EvaluatedJobApplication.objects.all()
         assert len(evaluated_job_apps) == 2
 
+        assert evaluated_siae.final_state is None
+
         # check links between EvaluatedSiae and EvaluatedJobApplication
         for evaluated_job_application in evaluated_job_apps:
             with subtests.test(evaluated_job_application_pk=evaluated_job_application.pk):
@@ -618,6 +620,7 @@ class TestEvaluationCampaignManager:
             campaign.transition_to_adversarial_phase()
 
         assert ignored_siae == EvaluatedSiae.objects.get(reviewed_at__isnull=True)
+        assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
 
         # Transitioned to ACCEPTED, the DDETS IAE did not review the documents
         # submitted by SIAE before the transition.
@@ -698,6 +701,8 @@ class TestEvaluationCampaignManager:
         evaluated_siae_no_response.refresh_from_db()
         assert evaluated_siae_no_response.reviewed_at == timezone.now()
 
+        assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
+
         [siae_no_response_email, institution_email] = sorted(mailoutbox, key=lambda mail: mail.subject)
         assert (
             siae_no_response_email.subject
@@ -725,6 +730,8 @@ class TestEvaluationCampaignManager:
 
         with django_capture_on_commit_callbacks(execute=True):
             campaign.transition_to_adversarial_phase()
+
+        assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
 
         # Transitioned to ACCEPTED, the DDETS IAE did not review the documents
         # submitted by SIAE before the transition.
@@ -764,6 +771,8 @@ class TestEvaluationCampaignManager:
         with django_capture_on_commit_callbacks(execute=True):
             campaign.transition_to_adversarial_phase()
 
+        assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
+
         # Transitioned to ACCEPTED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
@@ -799,6 +808,8 @@ class TestEvaluationCampaignManager:
         with django_capture_on_commit_callbacks(execute=True):
             campaign.transition_to_adversarial_phase()
 
+        assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
+
         # Transitioned to REFUSED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
         assert evaluated_siae_submitted.reviewed_at == datetime.datetime(2023, 1, 2, 11, 11, 11, tzinfo=datetime.UTC)
@@ -828,6 +839,8 @@ class TestEvaluationCampaignManager:
             evaluation_campaign.close()
         assert evaluation_campaign.ended_at is not None
         ended_at = evaluation_campaign.ended_at
+
+        EvaluatedSiae.objects.get(final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED)
 
         [siae_email, institution_email] = mailoutbox
         assert siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
@@ -878,6 +891,8 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.final_reviewed_at is not None
         ended_at = evaluation_campaign.ended_at
 
+        EvaluatedSiae.objects.get(final_state=evaluation_enums.EvaluatedSiaeFinalState.ACCEPTED)
+
         [accepted_siae_email] = mailoutbox
         assert accepted_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
         assert (
@@ -922,6 +937,8 @@ class TestEvaluationCampaignManager:
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.final_reviewed_at is not None
         ended_at = evaluation_campaign.ended_at
+
+        EvaluatedSiae.objects.get(final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED)
 
         [refused_siae_email, institution_email] = mailoutbox
         assert refused_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
@@ -1406,7 +1423,13 @@ class TestEvaluatedSiaeModel:
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=1),
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+        with assertNumQueries(2):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
+
+        evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state
+
+        with assertNumQueries(0):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
     def test_state_on_closed_campaign_criteria_submitted(self):
         evaluated_job_app = EvaluatedJobApplicationFactory(
@@ -1490,7 +1513,13 @@ class TestEvaluatedSiaeModel:
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+        with assertNumQueries(2):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
+
+        evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state
+
+        with assertNumQueries(0):
+            assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
 
 @pytest.mark.parametrize(
