@@ -504,6 +504,16 @@ class AcceptView(common_views.BaseAcceptView):
                 extra_tags="toast",
             )
             return HttpResponseRedirect(self.next_url)
+        if self.only_accept_form:
+            missing_fields = self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+            if missing_fields:
+                fmt_missing_fields = ", ".join(sorted(missing_fields))
+                messages.error(
+                    request,
+                    f"Les données suivantes sont manquantes pour accepter la candidature : {fmt_missing_fields}.",
+                    extra_tags="toast",
+                )
+                return HttpResponseRedirect(self.next_url)
         return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):
@@ -899,9 +909,23 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
 
         self.next_url = get_safe_url(request, "next_url")
 
+    def dispatch(self, request, *args, **kwargs):
+        missing_fields = self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+        if missing_fields:
+            fmt_missing_fields = ", ".join(sorted(missing_fields))
+            messages.error(
+                request,
+                f"Les données suivantes candidat sont manquantes pour accepter la candidature : {fmt_missing_fields}.",
+                extra_tags="toast",
+            )
+            return HttpResponseRedirect(
+                reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id})
+            )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         return reverse(
-            "apply:accept",
+            "apply:accept_contract",
             kwargs={"job_application_id": self.job_application.id},
             query={"next_url": self.next_url} if self.next_url else None,
         )

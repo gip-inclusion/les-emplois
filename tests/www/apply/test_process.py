@@ -1601,7 +1601,7 @@ class TestProcessViews:
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            job_seeker=JobSeekerFactory(with_address_in_qpv=True, born_in_france=True),
             eligibility_diagnosis=None,
         )
 
@@ -1639,7 +1639,7 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        next_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
@@ -1663,7 +1663,7 @@ class TestProcessViews:
         """Test the page propagates the next url to the accept view"""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            job_seeker=JobSeekerFactory(with_address_in_qpv=True, born_in_france=True),
             eligibility_diagnosis=None,
         )
 
@@ -1710,7 +1710,9 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url})
+        url = reverse(
+            "apply:accept_contract", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url}
+        )
         assertRedirects(response, url)
 
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
@@ -1720,6 +1722,7 @@ class TestProcessViews:
             sent_by_authorized_prescriber_organisation=True,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
+            job_seeker__with_required_personal_info_for_hire=True,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -1733,7 +1736,7 @@ class TestProcessViews:
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address=True),
+            job_seeker=JobSeekerFactory(with_address=True, born_in_france=True),
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -1753,7 +1756,7 @@ class TestProcessViews:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
-            to_company=company, job_seeker=JobSeekerFactory(with_address=True)
+            to_company=company, job_seeker=JobSeekerFactory(with_address=True, born_in_france=True)
         )
 
         # Right states
@@ -1777,6 +1780,27 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 404
         client.logout()
+
+    def test_eligibility_for_job_seeker_without_required_personal_info(self, client):
+        job_application = JobApplicationFactory()
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        assertRedirects(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Les données suivantes candidat sont manquantes pour accepter la candidature : "
+                    "Adresse, Code postal, Pays de naissance, Ville.",
+                )
+            ],
+        )
 
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
@@ -2160,8 +2184,7 @@ class TestProcessAcceptViews:
     def setup_method(self, settings, mocker):
         self.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
         self.job_seeker = JobSeekerFactory(
-            with_pole_emploi_id=True,
-            with_ban_api_mocked_address=True,
+            with_pole_emploi_id=True, with_ban_api_mocked_address=True, born_in_france=True
         )
 
         settings.API_BAN_BASE_URL = "http://ban-api"
@@ -2181,7 +2204,7 @@ class TestProcessAcceptViews:
         } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
-    def _accept_view_post_data(self, job_application, post_data=None):
+    def _accept_view_post_data(self, job_application, post_data=None, legacy_accept_url=False):
         extra_post_data = post_data or {}
         job_seeker = job_application.job_seeker
         # JobSeekerAddressForm
@@ -2231,15 +2254,15 @@ class TestProcessAcceptViews:
                 "qualification_level": QualificationLevel.LEVEL_4,
                 "planned_training_hours": 20,
             }
-        return {
-            **personal_data_default_fields,
-            **address_default_fields,
-            **accept_default_fields,
-        } | extra_post_data
+        if legacy_accept_url:
+            return personal_data_default_fields | address_default_fields | accept_default_fields | extra_post_data
+        return accept_default_fields
 
-    def accept_job_application(self, client, job_application, post_data=None, assert_successful=True, next_url=None):
+    def accept_job_application(
+        self, client, job_application, post_data=None, assert_successful=True, next_url=None, legacy_accept_url=False
+    ):
         """
-        This is not a test. It's a shortcut to process "apply:accept" view steps:
+        This is not a test. It's a shortcut to process "apply:accept_contract" view steps:
         - GET
         - POST: show the confirmation modal
         - POST: hide the modal and redirect to the next url.
@@ -2247,8 +2270,11 @@ class TestProcessAcceptViews:
         If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
         If not provided, a new one will be created and linked to the given job application.
         """
+        # testing legacy view to be removed soon / simplified view
+        url_accept_name = "apply:accept" if legacy_accept_url else "apply:accept_contract"
+
         url_accept = reverse(
-            "apply:accept",
+            url_accept_name,
             kwargs={"job_application_id": job_application.pk},
             query={"next_url": next_url} if next_url else None,
         )
@@ -2257,21 +2283,17 @@ class TestProcessAcceptViews:
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
 
-        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+        post_data = self._accept_view_post_data(
+            job_application=job_application, post_data=post_data, legacy_accept_url=legacy_accept_url
+        )
         response = client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
 
         if assert_successful:
             # Easier to debug than just a « sorry, the modal goes on a strike ».
             if response.context["has_form_error"]:
-                forms = [
-                    response.context["form_accept"],
-                    response.context["form_user_address"],
-                    response.context["form_personal_data"],
-                    response.context.get("form_birth_place"),
-                ]
-                for form in forms:
-                    if form:
-                        logger.error(f"{form.errors=}")
+                form = response.context["form_accept"]
+                if form:
+                    logger.error(f"{form.errors=}")
             assert not response.context["has_form_error"]
             assert (
                 response.headers["HX-Trigger"] == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
@@ -2302,7 +2324,14 @@ class TestProcessAcceptViews:
         _nominal_cases,
         ids=[state + ("_no_end_date" if not end_at else "") for end_at, state in _nominal_cases],
     )
-    def test_nominal_case(self, client, hiring_end_at, state):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_nominal_case(self, client, hiring_end_at, state, legacy_accept_url):
         today = timezone.localdate()
         job_application = self.create_job_application(state=state, with_iae_eligibility_diagnosis=True)
         previous_last_checked_at = self.job_seeker.last_checked_at
@@ -2315,8 +2344,9 @@ class TestProcessAcceptViews:
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT) if hiring_end_at else ""
         }
 
-        _, next_url = self.accept_job_application(client, job_application, post_data=post_data)
-
+        _, next_url = self.accept_job_application(
+            client, job_application, post_data=post_data, legacy_accept_url=legacy_accept_url
+        )
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
         assert job_application.hiring_end_at == hiring_end_at
@@ -2341,7 +2371,14 @@ class TestProcessAcceptViews:
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_accept_with_next_url(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_accept_with_next_url(self, client, legacy_accept_url):
         today = timezone.localdate()
         job_application = self.create_job_application(
             state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
@@ -2354,8 +2391,9 @@ class TestProcessAcceptViews:
         post_data = {"hiring_end_at": ""}
 
         next_url = reverse("apply:list_for_siae")
-        self.accept_job_application(client, job_application, post_data=post_data, next_url=next_url)
-
+        self.accept_job_application(
+            client, job_application, post_data=post_data, next_url=next_url, legacy_accept_url=legacy_accept_url
+        )
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
         assert job_application.hiring_end_at is None
@@ -2363,12 +2401,15 @@ class TestProcessAcceptViews:
 
     @pytest.mark.usefixtures("api_particulier_settings")
     @freeze_time("2024-09-11")
-    def test_select_other_job_description_for_job_application(self, client, mocker):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept_contract", id="simplified_url"),
+        ],
+    )
+    def test_select_other_job_description_for_job_application(self, client, mocker, url_name):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
-        mocked_request = mocker.patch(
-            "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
-        )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
@@ -2381,7 +2422,7 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url = reverse(url_name, kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
         assertContains(response, "Postes ouverts au recrutement")
@@ -2391,10 +2432,11 @@ class TestProcessAcceptViews:
         # Selecting "Autre" must enable the employer to create a new job description
         # linked to the accepted job application.
         post_data = {
-            "birthdate": "2002-02-20",  # Required to certify the criteria later.
             "hired_job": AcceptForm.OTHER_HIRED_JOB,
         }
-        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+        post_data = self._accept_view_post_data(
+            job_application=job_application, post_data=post_data, legacy_accept_url=True
+        )
         response = client.post(url, data=post_data)
         assertContains(response, "Localisation du poste")
         assertContains(response, "Préciser le nom du poste (code ROME)")
@@ -2416,7 +2458,6 @@ class TestProcessAcceptViews:
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        mocked_request.assert_called_once()
 
         # Perform some checks on job description now attached to job application
         job_application.refresh_from_db()
@@ -2425,16 +2466,23 @@ class TestProcessAcceptViews:
         assert not job_application.hired_job.is_active
         assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
 
-    def test_select_job_description_for_job_application(self, client, snapshot):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept_contract", id="simplified_url"),
+        ],
+    )
+    def test_select_job_description_for_job_application(self, client, snapshot, url_name):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
 
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse(url_name, kwargs={"job_application_id": job_application.pk}))
 
         # Check optgroup labels
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=True)
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse(url_name, kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
@@ -2444,24 +2492,38 @@ class TestProcessAcceptViews:
         # Inactive job description must also appear in select
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
         with assertSnapshotQueries(snapshot(name="accept view SQL queries")):
-            response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+            response = client.get(reverse(url_name, kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
         assertContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
-    def test_no_job_description_for_job_application(self, client):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept_contract", id="simplified_url"),
+        ],
+    )
+    def test_no_job_description_for_job_application(self, client, url_name):
         self.company.jobs.clear()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
         client.force_login(employer)
-        response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        response = client.get(reverse(url_name, kwargs={"job_application_id": job_application.pk}))
         assertNotContains(response, "Postes ouverts au recrutement")
         assertNotContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
-    def test_wrong_dates(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_wrong_dates(self, client, legacy_accept_url):
         today = timezone.localdate()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         hiring_start_at = today
@@ -2476,7 +2538,7 @@ class TestProcessAcceptViews:
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=legacy_accept_url
         )
         assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
@@ -2488,11 +2550,18 @@ class TestProcessAcceptViews:
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=legacy_accept_url
         )
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
 
-    def test_accept_hiring_date_after_approval(self, client, mocker):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_accept_hiring_date_after_approval(self, client, mocker, legacy_accept_url):
         # Jobseeker has an approval, but it ends after the start date of the job.
         approval = ApprovalFactory(end_at=timezone.localdate() + datetime.timedelta(days=1))
         self.job_seeker.approvals.add(approval)
@@ -2512,9 +2581,10 @@ class TestProcessAcceptViews:
             post_data={
                 "hiring_start_at": job_application.hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
             },
+            legacy_accept_url=legacy_accept_url,
         )
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=legacy_accept_url
         )
         assertFormError(
             response.context["form_accept"],
@@ -2524,8 +2594,11 @@ class TestProcessAcceptViews:
 
         # employer amends the situation by submitting a different hiring start date
         post_data["hiring_start_at"] = timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
-        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        response, _ = self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=legacy_accept_url
+        )
 
+    # testing legacy view. to be removed
     def test_no_address(self, client):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         employer = self.company.members.first()
@@ -2543,11 +2616,18 @@ class TestProcessAcceptViews:
         }
 
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
         assertFormError(response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire.")
 
-    def test_no_diagnosis_on_job_application(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_no_diagnosis_on_job_application(self, client, legacy_accept_url):
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
         self.job_seeker.eligibility_diagnoses.add(diagnosis)
@@ -2556,9 +2636,18 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        self.accept_job_application(client, job_application, assert_successful=True, post_data={})
+        self.accept_job_application(
+            client, job_application, assert_successful=True, post_data={}, legacy_accept_url=legacy_accept_url
+        )
 
-    def test_no_diagnosis(self, client):
+    @pytest.mark.parametrize(
+        "url_name",
+        [
+            pytest.param("apply:accept", id="legacy_url"),
+            pytest.param("apply:accept_contract", id="simplified_url"),
+        ],
+    )
+    def test_no_diagnosis(self, client, url_name):
         # if no, should not see the confirm button, nor accept posted data
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
         assert job_application.eligibility_diagnosis is None
@@ -2566,7 +2655,7 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(url_name, kwargs={"job_application_id": job_application.pk})
         response = client.get(url_accept, follow=True)
         assertRedirects(
             response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -2575,7 +2664,14 @@ class TestProcessAcceptViews:
             list(response.context["messages"])[-1]
         )
 
-    def test_with_active_suspension(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_with_active_suspension(self, client, legacy_accept_url):
         """Test the `accept` transition with active suspension for active user"""
         employer = self.company.members.first()
         today = timezone.localdate()
@@ -2615,7 +2711,7 @@ class TestProcessAcceptViews:
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=legacy_accept_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         suspension = job_application.approval.suspension_set.in_progress().last()
@@ -2627,6 +2723,7 @@ class TestProcessAcceptViews:
             days=(suspension.end_at - suspension.start_at).days
         )
 
+    # testing legacy view. to be removed
     def test_with_manual_approval_delivery(self, client):
         """
         Test the "manual approval delivery mode" path of the view.
@@ -2651,11 +2748,18 @@ class TestProcessAcceptViews:
             "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
         }
 
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=True)
         job_application.refresh_from_db()
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
-    def test_update_hiring_start_date_of_two_job_applications(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_update_hiring_start_date_of_two_job_applications(self, client, legacy_accept_url):
         hiring_start_at = timezone.localdate() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
@@ -2687,7 +2791,7 @@ class TestProcessAcceptViews:
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
 
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=legacy_accept_url)
 
         # First job application has been accepted.
         # All other job applications are obsolete.
@@ -2712,7 +2816,9 @@ class TestProcessAcceptViews:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(client, job_app_starting_earlier, post_data=post_data)
+        self.accept_job_application(
+            client, job_app_starting_earlier, post_data=post_data, legacy_accept_url=legacy_accept_url
+        )
         job_app_starting_earlier.refresh_from_db()
 
         # Second job application has been accepted.
@@ -2736,7 +2842,9 @@ class TestProcessAcceptViews:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        self.accept_job_application(client, job_app_starting_later, post_data=post_data)
+        self.accept_job_application(
+            client, job_app_starting_later, post_data=post_data, legacy_accept_url=legacy_accept_url
+        )
         job_app_starting_later.refresh_from_db()
 
         # Third job application has been accepted.
@@ -2744,6 +2852,7 @@ class TestProcessAcceptViews:
         assert job_app_starting_later.state.is_accepted
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
+    # testing legacy view. to be removed
     def test_nir_readonly(self, client):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
@@ -2782,6 +2891,7 @@ class TestProcessAcceptViews:
             html=True,
         )
 
+    # testing legacy view. to be removed
     def test_no_nir_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
@@ -2796,15 +2906,15 @@ class TestProcessAcceptViews:
         # Check that the NIR field is not disabled
         assertNotContains(response, DISABLED_NIR)
 
-        post_data = self._accept_view_post_data(job_application)
+        post_data = self._accept_view_post_data(job_application, legacy_accept_url=True)
         response, _ = self.accept_job_application(
-            client, job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data, legacy_accept_url=True
         )
         assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         post_data["nir"] = "1234"
         response, _ = self.accept_job_application(
-            client, job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data, legacy_accept_url=True
         )
         assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         assertFormError(
@@ -2815,10 +2925,11 @@ class TestProcessAcceptViews:
 
         NEW_NIR = "197013625838386"
         post_data["nir"] = NEW_NIR
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=True)
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.nir == NEW_NIR
 
+    # testing legacy view. to be removed
     def test_no_nir_other_user(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
@@ -2837,7 +2948,7 @@ class TestProcessAcceptViews:
             "nir": other_job_seeker.jobseeker_profile.nir,
         }
         response, _ = self.accept_job_application(
-            client, job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data, legacy_accept_url=True
         )
         assertContains(response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True)
         assertFormError(
@@ -2846,6 +2957,7 @@ class TestProcessAcceptViews:
             "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
         )
 
+    # testing legacy view. to be removed
     def test_no_nir_update_with_reason(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
@@ -2855,25 +2967,28 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
 
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         response, _ = self.accept_job_application(
-            client, job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data, legacy_accept_url=True
         )
         assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         # Check the box
         post_data["lack_of_nir"] = True
         response, _ = self.accept_job_application(
-            client, job_application, assert_successful=False, post_data=post_data
+            client, job_application, assert_successful=False, post_data=post_data, legacy_accept_url=True
         )
         assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
 
         post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
-        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=True
+        )
         job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
+    # testing legacy view. to be removed
     def test_lack_of_nir_reason_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
@@ -2898,15 +3013,22 @@ class TestProcessAcceptViews:
             "pole_emploi_id": jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
-        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+        post_data = self._accept_view_post_data(
+            job_application=job_application, post_data=post_data, legacy_accept_url=True
+        )
         self.accept_job_application(
-            client, job_application=job_application, post_data=post_data, assert_successful=True
+            client,
+            job_application=job_application,
+            post_data=post_data,
+            assert_successful=True,
+            legacy_accept_url=True,
         )
         job_application.job_seeker.refresh_from_db()
         # New NIR is set and the lack_of_nir_reason is cleaned
         assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
+    # testing legacy view. to be removed
     def test_lack_of_nir_reason_other_user(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
@@ -2941,7 +3063,14 @@ class TestProcessAcceptViews:
             html=True,
         )
 
-    def test_accept_after_cancel(self, client):
+    @pytest.mark.parametrize(
+        "legacy_accept_url",
+        [
+            pytest.param(True, id="legacy_url"),
+            pytest.param(False, id="simplified_url"),
+        ],
+    )
+    def test_accept_after_cancel(self, client, legacy_accept_url):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         job_application = self.create_job_application(
@@ -2950,7 +3079,7 @@ class TestProcessAcceptViews:
 
         employer = self.company.members.first()
         client.force_login(employer)
-        self.accept_job_application(client, job_application=job_application)
+        self.accept_job_application(client, job_application=job_application, legacy_accept_url=legacy_accept_url)
 
         job_application.refresh_from_db()
         assert job_application.job_seeker.approvals.count() == 1
@@ -2958,6 +3087,7 @@ class TestProcessAcceptViews:
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
+    # testing legacy view. to be removed
     @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
@@ -2995,20 +3125,20 @@ class TestProcessAcceptViews:
 
         # CertifiedCriteriaForm
         # Birth country is mandatory.
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         post_data = {
             "birth_country": "",
             "birth_place": "",
         }
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
 
         # Wrong birth country and birth place.
         post_data["birth_country"] = "0012345"
         post_data["birth_place"] = "008765"
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
         assert response.context["form_personal_data"].errors == {
             "birth_place": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
@@ -3030,7 +3160,9 @@ class TestProcessAcceptViews:
             "birth_country": "",
             "birth_place": birth_place.pk,
         }
-        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=True
+        )
         mocked_request.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -3048,6 +3180,56 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
+    # testing simplified view
+    @pytest.mark.usefixtures("api_particulier_settings")
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @freeze_time("2024-09-11")
+    def test_accept_iae_criteria_can_be_certified_simplifiedview(self, client, mocker, from_kind):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        mocked_request = mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+        )
+
+        birthdate = datetime.date(1995, 12, 27)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
+            criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
+        )
+        job_application = self.create_job_application(
+            eligibility_diagnosis=diagnosis,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
+        )
+        to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=criteria_kind
+        )
+        url_accept = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        client.get(url_accept)
+        post_data = self._accept_view_post_data(job_application=job_application)
+        self.accept_job_application(client, job_application, post_data=post_data)
+        mocked_request.assert_called_once()
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
+            )
+            assert criterion.certified_at
+
+    # testing legacy view. to be removed
     @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
@@ -3086,13 +3268,13 @@ class TestProcessAcceptViews:
 
         # CertifiedCriteriaForm
         # Birth country is mandatory.
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         post_data = {
             "birth_country": "",
             "birth_place": "",
         }
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
 
         # Then set it.
@@ -3104,7 +3286,9 @@ class TestProcessAcceptViews:
             "birth_country": "",
             "birth_place": birth_place.pk,
         }
-        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        response, _ = self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=True
+        )
         mocked_request.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -3122,6 +3306,59 @@ class TestProcessAcceptViews:
             )
             assert criterion.certified_at
 
+    # testing simplified view
+    @pytest.mark.usefixtures("api_particulier_settings")
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @freeze_time("2024-09-11")
+    def test_accept_geiq_criteria_can_be_certified_simplifiedview(self, client, mocker, from_kind):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        mocked_request = mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+        )
+        birthdate = datetime.date(1995, 12, 27)
+        self.company.kind = CompanyKind.GEIQ
+        self.company.save()
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_geiq=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
+            criteria_kinds=[criteria_kind],
+        )
+        job_application = self.create_job_application(
+            geiq_eligibility_diagnosis=diagnosis,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
+        )
+        to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
+            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
+        ).all()
+        url_accept = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        client.get(url_accept)
+        post_data = self._accept_view_post_data(job_application=job_application)
+        self.accept_job_application(client, job_application, post_data=post_data)
+
+        mocked_request.assert_called_once()
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
+            )
+            assert criterion.certified_at
+
+    # testing legacy view. to be removed
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_no_siae_criteria_can_be_certified(self, client, mocker, from_kind):
@@ -3142,6 +3379,11 @@ class TestProcessAcceptViews:
             selected_jobs=company.jobs.all(),
             to_company=company,
         )
+        # undo born_in_france=True kwargs in setup
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.birth_country = None
+        jobseeker_profile.birth_place = None
+        jobseeker_profile.save()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -3151,16 +3393,54 @@ class TestProcessAcceptViews:
         assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
         assertNotContains(response, self.BIRTH_PLACE_LABEL)
 
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         del post_data["birth_country"]
         del post_data["birth_place"]
-        self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=True
+        )
 
-        jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
         assert not jobseeker_profile.birth_country
         assert not jobseeker_profile.birth_place
 
+    # testing simplified view
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @freeze_time("2024-09-11")
+    def test_accept_no_siae_criteria_can_be_certified_simplifiedview(self, client, mocker, from_kind):
+        criteria_kind = [AdministrativeCriteriaKind.CAP_BEP]
+        mocked_request = mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
+        )
+        company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
+            criteria_kinds=criteria_kind,
+        )
+        job_application = self.create_job_application(
+            eligibility_diagnosis=diagnosis,
+            selected_jobs=company.jobs.all(),
+            to_company=company,
+        )
+        url_accept = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        client.get(url_accept)
+        post_data = self._accept_view_post_data(job_application=job_application)
+        self.accept_job_application(client, job_application, post_data=post_data)
+
+        mocked_request.assert_not_called()
+        assert not diagnosis.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=criteria_kind, certified__isnull=False
+        ).exists()
+
+    # testing legacy view. to be removed
     def test_accept_with_job_seeker_update(self, client):
         diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         job_application = self.create_job_application(
@@ -3168,6 +3448,11 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=datetime.date(1995, 12, 27),
         )
         job_seeker = job_application.job_seeker
+        # undo born_in_france=True kwargs in setup
+        jobseeker_profile = job_seeker.jobseeker_profile
+        jobseeker_profile.birth_country = None
+        jobseeker_profile.birth_place = None
+        jobseeker_profile.save()
         IdentityCertification.objects.create(
             jobseeker_profile=job_seeker.jobseeker_profile,
             certifier=IdentityCertificationAuthorities.API_PARTICULIER,
@@ -3204,6 +3489,7 @@ class TestProcessAcceptViews:
         [selected_option] = soup.find_all(attrs={"selected": True})
         assert selected_option.text == "BORA-BORA"
 
+    # testing legacy view. to be removed
     @freeze_time("2024-09-11")
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
         mocker.patch(
@@ -3254,7 +3540,7 @@ class TestProcessAcceptViews:
         }
 
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
         expected_msg = (
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
@@ -3265,15 +3551,18 @@ class TestProcessAcceptViews:
         # assert malformed birthdate does not crash view
         post_data["birthdate"] = "20240-001-001"
         response, _ = self.accept_job_application(
-            client, job_application, post_data=post_data, assert_successful=False
+            client, job_application, post_data=post_data, assert_successful=False, legacy_accept_url=True
         )
 
         assert response.context["form_personal_data"].errors == {"birthdate": ["Saisissez une date valide."]}
 
         # test that fixing the birthdate fixes the form submission
         post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
-        response, _ = self.accept_job_application(client, job_application, post_data=post_data, assert_successful=True)
+        response, _ = self.accept_job_application(
+            client, job_application, post_data=post_data, assert_successful=True, legacy_accept_url=True
+        )
 
+    # testing legacy view. to be removed
     @freeze_time("2024-09-11")
     def test_accept_born_in_france_no_birth_place(self, client, mocker):
         birthdate = datetime.date(1995, 12, 27)
@@ -3286,9 +3575,10 @@ class TestProcessAcceptViews:
         job_application = self.create_job_application(
             eligibility_diagnosis=diagnosis,
             job_seeker__jobseeker_profile__birthdate=birthdate,
+            job_seeker__with_pole_emploi_id=True,
         )
         client.force_login(job_application.to_company.members.get())
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         post_data["birth_country"] = Country.FRANCE_ID
         del post_data["birth_place"]
         response = client.post(
@@ -3311,6 +3601,7 @@ class TestProcessAcceptViews:
             count=1,
         )
 
+    # testing legacy view. to be removed
     @freeze_time("2024-09-11")
     def test_accept_born_outside_of_france_specifies_birth_place(self, client, mocker):
         birthdate = datetime.date(1995, 12, 27)
@@ -3325,7 +3616,7 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         client.force_login(job_application.to_company.members.get())
-        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = self._accept_view_post_data(job_application=job_application, legacy_accept_url=True)
         post_data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
         response = client.post(
             reverse("apply:accept", kwargs={"job_application_id": job_application.pk}),
@@ -3347,6 +3638,7 @@ class TestProcessAcceptViews:
             count=1,
         )
 
+    # testing legacy view. to be removed
     @freeze_time("2024-09-11")
     def test_accept_personal_data_readonly_with_certified_criteria(self, client):
         job_seeker = JobSeekerFactory(
@@ -3383,7 +3675,7 @@ class TestProcessAcceptViews:
             "birth_place": Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1)).pk,
             "birthdate": "1990-01-01",
         }
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=True)
 
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         for attr in ["title", "first_name", "last_name"]:
@@ -3391,6 +3683,7 @@ class TestProcessAcceptViews:
         for attr in ["birthdate", "birth_place", "birth_country"]:
             assert getattr(refreshed_job_seeker.jobseeker_profile, attr) == getattr(job_seeker.jobseeker_profile, attr)
 
+    # testing legacy view. to be removed
     @freeze_time("2025-06-06")
     def test_certified_criteria_birth_fields_not_readonly_if_empty(self, client):
         birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
@@ -3434,11 +3727,44 @@ class TestProcessAcceptViews:
             "birth_country": Country.FRANCE_ID,
             "birthdate": job_seeker.jobseeker_profile.birthdate,
         }
-        self.accept_job_application(client, job_application, post_data=post_data)
+        self.accept_job_application(client, job_application, post_data=post_data, legacy_accept_url=True)
 
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
         assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+
+    @pytest.mark.parametrize(
+        "view_name,legacy_case",
+        [
+            pytest.param("apply:accept", True, id="legacy_url"),
+            pytest.param("apply:accept_contract", False, id="simplified_url"),
+        ],
+    )
+    def test_siae_trying_to_hire_a_jobseeker_without_required_personal_info(self, client, view_name, legacy_case):
+        job_application = self.create_job_application(
+            with_iae_eligibility_diagnosis=True, job_seeker=JobSeekerFactory()
+        )
+        employer = self.company.members.first()
+        client.force_login(employer)
+        url = reverse(view_name, kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        if legacy_case:
+            assert response.status_code == 200
+        else:
+            assertRedirects(
+                response,
+                reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
+            )
+            assertMessages(
+                response,
+                [
+                    messages.Message(
+                        messages.ERROR,
+                        "Les données suivantes sont manquantes pour accepter la candidature : "
+                        "Adresse, Code postal, Pays de naissance, Ville.",
+                    )
+                ],
+            )
 
 
 class TestProcessTemplates:
@@ -3866,7 +4192,7 @@ def test_accept_button(client):
         state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=CompanyKind.GEIQ,
     )
-    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    accept_url = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
     DIRECT_ACCEPT_BUTTON = (
         f'<a href="{accept_url}" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" '
         'data-matomo-event="true" data-matomo-category="candidature" '
@@ -4394,15 +4720,23 @@ def test_reload_contract_type_and_options_404(client, missing_field):
     assert response.status_code == 404
 
 
-def test_htmx_reload_contract_type_and_options(client):
+@pytest.mark.parametrize(
+    "url_name",
+    [
+        pytest.param("apply:accept", id="legacy_url"),
+        pytest.param("apply:accept_contract", id="simplified_url"),
+    ],
+)
+def test_htmx_reload_contract_type_and_options(client, url_name):
     job_application = JobApplicationFactory(
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         job_seeker__for_snapshot=True,
+        job_seeker__born_in_france=True,
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
-    accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    accept_url = reverse(url_name, kwargs={"job_application_id": job_application.pk})
     data = {
         "guidance_days": "1",
         "contract_type": ContractType.PROFESSIONAL_TRAINING,

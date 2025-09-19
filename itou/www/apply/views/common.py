@@ -30,20 +30,25 @@ from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForG
 
 class BaseAcceptView(UserPassesTestMixin, TemplateView):
     template_name = None
+    # simplified view. `only_accept_form` to be removed
+    only_accept_form = False
 
     def test_func(self):
         return self.request.user.is_employer
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, only_accept_form=None, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
+        # simplified view. `only_accept_form` to be removed
+        self.only_accept_form = only_accept_form if only_accept_form is not None else None
 
     def get_forms(self):
         forms = {}
 
-        if self.company.is_subject_to_eligibility_rules:
+        # legacy hiring process. to be removed
+        if self.company.is_subject_to_eligibility_rules and not self.only_accept_form:
             # Info that will be used to search for an existing Pôle emploi approval.
             forms["personal_data"] = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
@@ -51,7 +56,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                 back_url=self.request.get_full_path(),
             )
             forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
-        elif self.company.kind == CompanyKind.GEIQ:
+        elif self.company.kind == CompanyKind.GEIQ and not self.only_accept_form:
             if self.geiq_eligibility_diagnosis and self.geiq_eligibility_diagnosis.criteria_can_be_certified():
                 forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
                     instance=self.job_seeker.jobseeker_profile,
@@ -88,6 +93,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
         if all(f is None for f in [form_accept, form_user_address, form_birth_place, form_personal_data]):
             forms = self.get_forms()
             form_accept = forms["accept"]
+            # legacy hiring process. to be removed
             form_user_address = forms.get("user_address")
             form_personal_data = forms.get("personal_data")
             form_birth_place = forms.get("birth_place")
@@ -138,22 +144,32 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
 
         creating = self.job_application is None
 
+        can_certify_eligibility_diag = (
+            settings.API_PARTICULIER_TOKEN
+            and self.eligibility_diagnosis
+            and self.eligibility_diagnosis.criteria_can_be_certified()
+        )
+
         try:
             with transaction.atomic():
-                if form_personal_data := forms.get("personal_data"):
-                    form_personal_data.save()
-                    if (
-                        self.eligibility_diagnosis
-                        and self.eligibility_diagnosis.criteria_can_be_certified()
-                        and settings.API_PARTICULIER_TOKEN
-                    ):
+                # simplified view
+                if self.only_accept_form:
+                    if can_certify_eligibility_diag:
                         self.eligibility_diagnosis.schedule_certification()
-                if form_user_address := forms.get("user_address"):
-                    form_user_address.save()
-                if form_birth_place := forms.get("birth_place"):
-                    form_birth_place.save()
-                    if settings.API_PARTICULIER_TOKEN:
+                    if settings.API_PARTICULIER_TOKEN and self.geiq_eligibility_diagnosis:
                         self.geiq_eligibility_diagnosis.schedule_certification()
+                # legacy view
+                else:
+                    if form_personal_data := forms.get("personal_data"):
+                        form_personal_data.save()
+                        if can_certify_eligibility_diag:
+                            self.eligibility_diagnosis.schedule_certification()
+                    if form_user_address := forms.get("user_address"):
+                        form_user_address.save()
+                    if form_birth_place := forms.get("birth_place"):
+                        form_birth_place.save()
+                        if settings.API_PARTICULIER_TOKEN:
+                            self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = forms["accept"].save(commit=False)
                 if creating:

@@ -1278,14 +1278,17 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         assert self.hire_process
 
     def get_context_data(self, **kwargs):
+        profile = self.job_seeker.jobseeker_profile
+        missing_fields = profile.get_missing_personal_info_for_hire()
         return super().get_context_data(**kwargs) | {
-            "profile": self.job_seeker.jobseeker_profile,
+            "profile": profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
             "next_url": reverse(
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
-            **jobseeker_personal_infos_display_kwargs(self.job_seeker.jobseeker_profile),
+            **jobseeker_personal_infos_display_kwargs(profile),
             "allow_modify_job_seeker": True,
+            "job_seeker_missing_required_data": bool(missing_fields),
         }
 
 

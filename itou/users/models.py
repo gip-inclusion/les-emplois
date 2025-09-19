@@ -1364,6 +1364,20 @@ class JobSeekerProfile(models.Model):
 
         self.save()
 
+    def get_missing_personal_info_for_hire(self):
+        required_fields = {
+            "Civilité": self.user.title,
+            "Prénom": self.user.first_name,
+            "Nom": self.user.last_name,
+            "Adresse": self.user.address_line_1,
+            "Code postal": self.user.post_code,
+            "Ville": self.user.city,
+            "Pays de naissance": self.birth_country_id,
+        }
+        if not (self.nir or self.lack_of_nir_reason):
+            required_fields["NIR"] = None
+        return {field for field, value in required_fields.items() if not value}
+
     @property
     def is_employed(self):
         return not self.unemployed_since

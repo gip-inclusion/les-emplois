@@ -918,6 +918,43 @@ class TestJobSeekerProfileModel:
             JobSeekerFactory(**factory_kwargs)
 
 
+@pytest.mark.parametrize(
+    "kwargs,expected",
+    [
+        pytest.param({"with_required_personal_info_for_hire": True}, set(), id="jobseeker"),
+        pytest.param(
+            {
+                "with_required_personal_info_for_hire": True,
+                "title": "",
+                "first_name": "",
+                "last_name": "",
+                "address_line_1": "",
+                "post_code": "",
+                "city": "",
+                "jobseeker_profile__birth_place": None,
+                "jobseeker_profile__birth_country": None,
+                "jobseeker_profile__nir": "",
+                "jobseeker_profile__lack_of_nir_reason": "",
+            },
+            {"Adresse", "Civilité", "Code postal", "NIR", "Nom", "Pays de naissance", "Prénom", "Ville"},
+            id="jobseeker_with_few_datas",
+        ),
+        pytest.param(
+            {
+                "with_required_personal_info_for_hire": True,
+                "jobseeker_profile__nir": "",
+                "jobseeker_profile__lack_of_nir_reason": "reason",
+            },
+            set(),
+            id="jobseeker_with_lack_of_nir_reason",
+        ),
+    ],
+)
+def test_jobseeker_profile_get_missing_personal_info_for_hire(kwargs, expected):
+    user = JobSeekerFactory(**kwargs)
+    assert user.jobseeker_profile.get_missing_personal_info_for_hire() == expected
+
+
 def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()
     end_at = timezone.localdate() - relativedelta(days=30)
