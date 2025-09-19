@@ -43,6 +43,21 @@ class MultipleSubSameEmailException(Exception):
         )
 
 
+class InactiveUserException(Exception):
+    def __init__(self, user, *args):
+        self.user = user
+        super().__init__(*args)
+
+    def format_message_html(self, identity_provider):
+        return format_html(
+            "La connexion via {} a fonctionné mais le compte lié sur les Emplois de l’inclusion est désactivé. "
+            "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
+            '<a href="{}">ce lien</a>.',
+            identity_provider.label,
+            ITOU_HELP_CENTER_URL,
+        )
+
+
 class InvalidKindException(Exception):
     def __init__(self, user, *args):
         self.user = user
@@ -197,6 +212,9 @@ class OIDConnectUserData:
                 # We found a user with its sub, but there's another user using its email.
                 # This happens when the user tried to update its email with one already used by another account.
                 raise MultipleUsersFoundException([user, other_user])
+
+        if not user.is_active:
+            raise InactiveUserException(user)
 
         self.check_valid_kind(user, user_data_dict, is_login)
 
