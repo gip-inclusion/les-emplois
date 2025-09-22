@@ -505,7 +505,8 @@ class TestProConnectCallbackView:
                     (
                         "La connexion via ProConnect a fonctionné mais le compte lié sur les Emplois de l’inclusion "
                         "est désactivé. Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a> et en leur '
+                        f"fournissant l’identifiant public de ce compte : {user.public_id}."
                     ),
                 )
             ],

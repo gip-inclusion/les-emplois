@@ -446,7 +446,7 @@ class TestFranceConnect:
     def test_callback_redirect_on_inactive_user(self, client):
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
 
-        UserFactory(
+        user = UserFactory(
             username=fc_user_data.username,
             email=fc_user_data.email,
             kind=UserKind.JOB_SEEKER,
@@ -462,7 +462,8 @@ class TestFranceConnect:
                     (
                         "La connexion via FranceConnect a fonctionné mais le compte lié sur les Emplois de l’inclusion"
                         " est désactivé. Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                        '<a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a> et en leur '
+                        f"fournissant l’identifiant public de ce compte : {user.public_id}."
                     ),
                 )
             ],

@@ -52,9 +52,10 @@ class InactiveUserException(Exception):
         return format_html(
             "La connexion via {} a fonctionné mais le compte lié sur les Emplois de l’inclusion est désactivé. "
             "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-            '<a href="{}">ce lien</a>.',
+            '<a href="{}">ce lien</a> et en leur fournissant l’identifiant public de ce compte : {}.',
             identity_provider.label,
             ITOU_HELP_CENTER_URL,
+            self.user.public_id,
         )
 
 

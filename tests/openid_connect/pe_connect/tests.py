@@ -310,7 +310,7 @@ class TestPoleEmploiConnect:
     def test_callback_redirect_on_inactive_user_exception(self, client):
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
 
-        UserFactory(
+        user = UserFactory(
             username=peamu_user_data.username,
             email=peamu_user_data.email,
             kind=UserKind.JOB_SEEKER,
@@ -326,7 +326,8 @@ class TestPoleEmploiConnect:
                     (
                         "La connexion via Pôle emploi Connect a fonctionné mais le compte lié sur les Emplois de "
                         "l’inclusion est désactivé. Veuillez vous rapprocher du support pour débloquer la situation "
-                        'en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a>.'
+                        'en suivant <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr">ce lien</a> et en leur'
+                        f" fournissant l’identifiant public de ce compte : {user.public_id}."
                     ),
                 )
             ],
