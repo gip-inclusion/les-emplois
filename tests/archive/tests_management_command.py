@@ -47,6 +47,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
+from itou.utils.brevo import MalformedResponseException
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import (
     create_city_geispolsheim,
@@ -1721,3 +1722,123 @@ class TestAnonymizeCancelledApprovalsManagementCommand:
 
         anonymized_cancelled_approval = AnonymizedCancelledApproval.objects.get()
         assert anonymized_cancelled_approval.anonymized_at == timezone.localdate().replace(day=1)
+
+
+class TestRemoveUnknownEmailsFromBrevoCommand:
+    def test_remove_unknown_emails_from_brevo_dry_run(
+        self, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
+    ):
+        responses = [
+            [
+                {
+                    "email": "test@email.com",
+                    "modifiedAt": "2022-01-18T16:15:13.678Z",
+                }
+            ],
+            [],
+        ]
+
+        mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=responses)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("remove_unknown_emails_from_brevo")
+
+        assert respx_mock.calls.call_count == 0
+        for msg in [
+            "Found 1 emails to delete at offset 0",
+            "[DRY RUN] Would delete contact: test@email.com",
+            "No more contact to process at offset 1000",
+            "Found 1 emails to delete",
+        ]:
+            assert msg in caplog.messages
+
+    def test_remove_unknown_emails_from_brevo_with_offset(
+        self, django_capture_on_commit_callbacks, caplog, respx_mock
+    ):
+        respx_mock.get(f"{settings.BREVO_API_URL}/contacts?limit=1000&offset=200&sort=asc").mock(
+            return_value=httpx.Response(status_code=200, json={"contacts": []})
+        )
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("remove_unknown_emails_from_brevo", wet_run=True, offset=200)
+
+        assert respx_mock.calls.call_count == 1
+        assert "No more contact to process at offset 200" in caplog.messages
+
+    def test_remove_unknown_emails_from_brevo_exception(
+        self, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
+    ):
+        mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=MalformedResponseException)
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("remove_unknown_emails_from_brevo", wet_run=True)
+
+        assert respx_mock.calls.call_count == 0
+        assert "Error fetching contacts at offset 0: Malformed response" in caplog.messages
+
+    @pytest.mark.parametrize("verbosity", [1, 2])
+    def test_remove_unknown_emails_from_brevo(
+        self, verbosity, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
+    ):
+        known_users = EmployerFactory.create_batch(2)
+        two_years_ago = timezone.now() - relativedelta(years=2) - datetime.timedelta(minutes=1)
+        almost_two_years_ago = two_years_ago + datetime.timedelta(days=1)
+        two_years_ago_fmt = two_years_ago.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
+        almost_two_years_ago_fmt = almost_two_years_ago.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
+
+        responses = [
+            [
+                {
+                    "email": known_users[0].email,
+                    "createdAt": two_years_ago_fmt,
+                    "modifiedAt": almost_two_years_ago_fmt,
+                },
+                {
+                    "email": known_users[1].email,
+                    "createdAt": two_years_ago_fmt,
+                    "modifiedAt": two_years_ago_fmt,
+                },
+                {
+                    "email": "recently.modified@email.com",
+                    "createdAt": two_years_ago_fmt,
+                    "modifiedAt": almost_two_years_ago_fmt,
+                },
+                {
+                    "email": "modified.two.years.ago@email.com",
+                    "createdAt": two_years_ago_fmt,
+                    "modifiedAt": two_years_ago_fmt,
+                },
+            ],
+            [
+                {
+                    "email": "created.two.years.ago@email.com",
+                    "createdAt": two_years_ago_fmt,
+                },
+                {
+                    "email": "no.created_at.key@email.com",
+                    "modifiedAt": almost_two_years_ago_fmt,
+                },
+                {
+                    "email": "dummy@email.com",
+                },
+            ],
+            [],
+        ]
+
+        mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=responses)
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("remove_unknown_emails_from_brevo", wet_run=True, verbosity=verbosity)
+
+        assert respx_mock.calls.call_count == 2
+
+        for msg in [
+            "Found 1 emails to delete at offset 0",
+            "Found 1 emails to delete at offset 1000",
+            "No more contact to process at offset 2000",
+            "Found 2 emails to delete",
+        ]:
+            assert msg in caplog.messages
+        for msg in [
+            "Deleting contact: modified.two.years.ago@email.com",
+            "Deleting contact: created.two.years.ago@email.com",
+        ]:
+            assert (msg in caplog.messages) == (verbosity > 1)
