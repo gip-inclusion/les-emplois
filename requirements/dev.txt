@@ -471,9 +471,9 @@ django-hijack==3.7.4 \
     --hash=sha256:08419f130b9ab95b605b30b1bad30a01412cf58b1ff56c67e51527b25383ea64 \
     --hash=sha256:73ede036db49b13e615994e28e98446345d27400bdc54100be218a20cb3130aa
     # via -r requirements/test.txt
-django-htmx==1.23.2 \
-    --hash=sha256:65a8c8825fcae983b94aedce26af96a70717ab185d55cdb8a7a4bb68863ab079 \
-    --hash=sha256:c288fe92bdcfa7c2ed9665d6d23cc55c6693a7cc8d22cf0a01e1e38318874030
+django-htmx==1.26.0 \
+    --hash=sha256:3a80ffaa6df5a07e833752cd8ada7cee0fa711787841ab17a805075b1aecacc7 \
+    --hash=sha256:88ecc2f8a3f13ad5a50e6b16be127f04fba369124cc40a09b21ce33babb04aa6
     # via -r requirements/test.txt
 django-markdownify==0.9.5 \
     --hash=sha256:2c4ae44e386c209453caf5e9ea1b74f64535985d338ad2d5ad5e7089cc94be86 \
