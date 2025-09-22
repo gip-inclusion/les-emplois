@@ -60,7 +60,6 @@ jobs:
         echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t python --org itou_review_apps --region par --alias $REVIEW_APP_NAME
-        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
 
     - name: 🗃 Create database addon
@@ -70,7 +69,6 @@ jobs:
 
     - name: 🤝 Link addons & add environment variables
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         $CLEVER_CLI env set ITOU_ENVIRONMENT "REVIEW-APP"
         $CLEVER_CLI env set S3_STORAGE_BUCKET_NAME $REVIEW_APP_NAME
         $CLEVER_CLI env set ITOU_FQDN $DEPLOY_URL
@@ -89,7 +87,6 @@ jobs:
     - name: 🚀 Deploy to Clever Cloud
       timeout-minutes: 15
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         until $CLEVER_CLI env | grep --quiet POSTGRESQL_ADDON_DIRECT_PORT
         do
           echo "Waiting for POSTGRESQL_ADDON_DIRECT_HOST/PORT env variables to be available"
