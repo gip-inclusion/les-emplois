@@ -422,6 +422,7 @@ class EvaluationCampaign(models.Model):
             siae_without_proofs = []
             emails = []
             for evaluated_siae in evaluated_siaes:
+                updates = {}
                 if evaluated_siae.final_reviewed_at is None:
                     has_missing_proofs = not any(
                         crit.submitted_at
@@ -438,8 +439,7 @@ class EvaluationCampaign(models.Model):
                     ):
                         # The DDETS set the review_state on all documents but forgot to submit its review
                         # The validation is automatically triggered by this transition
-                        evaluated_siae.final_reviewed_at = now
-                        evaluated_siae.save(update_fields=["final_reviewed_at"])
+                        updates["final_reviewed_at"] = now
                         if evaluated_siae.state_from_applications == evaluation_enums.EvaluatedSiaeState.ACCEPTED:
                             emails.append(SIAEEmailFactory(evaluated_siae).accepted(adversarial=True))
                         else:
@@ -455,8 +455,8 @@ class EvaluationCampaign(models.Model):
                 if not has_siae_to_notify:
                     has_siae_to_notify |= evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
-                evaluated_siae.final_state = evaluated_siae.state
-                evaluated_siae.save(update_fields=["final_state"])
+                updates["final_state"] = evaluated_siae.state
+                EvaluatedSiae.objects.filter(pk=evaluated_siae.pk).update(**updates)
 
             emails.extend(
                 SIAEEmailFactory(evaluated_siae).refused_no_proofs() for evaluated_siae in siae_without_proofs
