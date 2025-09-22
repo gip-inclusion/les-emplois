@@ -1212,7 +1212,12 @@ class TestJobApplicationNotifications:
         # Unauthorized prescriber is the default sender
         extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
 
-        job_application = JobApplicationFactory(state=JobApplicationState.ACCEPTED, **extra_kwargs)
+        job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            sender__first_name="Un joli prénom",
+            sender__last_name="Un nom de famille original",
+            **extra_kwargs,
+        )
 
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
