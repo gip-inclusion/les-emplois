@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2025-09-22
+
+### Ajouté
+
+- [Candidat : Ajout d'une contrainte pour la cohérence entre le pays et la ville de naissance](https://github.com/gip-inclusion/les-emplois/pull/6765)
+
+### Modifié
+
+- [Accessibilité: Mise à jour de la déclaration de conformité](https://github.com/gip-inclusion/les-emplois/pull/6846)
+- [Admin: passage de l'admin des fichiers en lecture seule](https://github.com/gip-inclusion/les-emplois/pull/6873)
+- [Candidatures: Améliorer la détection d'anciennes candidatures dans la même structure](https://github.com/gip-inclusion/les-emplois/pull/6808)
+- [GPS: Mise en place de l'import du nouveau fichier référent](https://github.com/gip-inclusion/les-emplois/pull/6832)
+- [Interface: Activer la vue tableau par défaut pour tous les types d'utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6860)
+- [Parcours embauche: mise à jour de l'affichage des données personnelles](https://github.com/gip-inclusion/les-emplois/pull/6871)
+- [PASS IAE: amélioration de la règle autorisant ou non une prolongation](https://github.com/gip-inclusion/les-emplois/pull/6872)
+- [Vie privée : ajuster le calcul de la date d'expiration du PASS](https://github.com/gip-inclusion/les-emplois/pull/6868)
+- [Vie privée : supprimer EmailAddress (allauth) des professionnels anonymisés mais non effacés](https://github.com/gip-inclusion/les-emplois/pull/6845)
+
 ## 2025-09-15
 
 ### Modifié
