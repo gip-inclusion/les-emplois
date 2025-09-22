@@ -34,7 +34,7 @@ class ProConnectUserData(OIDConnectUserData):
         try:
             organization = PrescriberOrganization.objects.get(code_safir_pole_emploi=safir)
         except PrescriberOrganization.DoesNotExist:
-            logger.error(f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}.")
+            logger.warning("Organization with SAFIR %s does not exist. Unable to add user %s.", safir, user)
             raise
         if not organization.has_member(user):
             organization.add_or_activate_membership(user)
