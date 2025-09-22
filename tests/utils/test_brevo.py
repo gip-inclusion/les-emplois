@@ -2,7 +2,7 @@ import httpx
 import pytest
 from django.conf import settings
 
-from itou.utils.brevo import BrevoClient
+from itou.utils.brevo import BrevoClient, MalformedResponseException
 from tests.users.factories import JobSeekerFactory
 
 
@@ -125,3 +125,39 @@ def test_delete_contact_on_400(respx_mock, caplog, brevo_client):
     with pytest.raises(httpx.HTTPStatusError):
         brevo_client.delete_contact(email)
     assert respx_mock.calls.called
+
+
+LIST_CONTACTS_EMAILS = [{"email": "test@email.com", "modifiedAt": "2022-01-18T16:15:13.678Z"}]
+
+
+def test_list_contacts(respx_mock, brevo_client):
+    respx_mock.get(f"{settings.BREVO_API_URL}/contacts?limit=100&offset=200&sort=asc").mock(
+        return_value=httpx.Response(status_code=200, json={"contacts": LIST_CONTACTS_EMAILS})
+    )
+    assert brevo_client.list_contacts(limit=100, offset=200) == LIST_CONTACTS_EMAILS
+
+
+def test_list_contacts_raise_for_status(respx_mock, brevo_client):
+    respx_mock.get(f"{settings.BREVO_API_URL}/contacts?limit=1000&offset=0&sort=asc").mock(
+        return_value=httpx.Response(status_code=401)
+    )
+    with pytest.raises(httpx.HTTPStatusError):
+        brevo_client.list_contacts()
+
+
+def test_list_contacts_request_error(mocker, caplog, brevo_client):
+    mocker.patch("itou.utils.brevo.httpx.Client.get", side_effect=httpx.RequestError("Connection timed out"))
+    with pytest.raises(httpx.RequestError):
+        brevo_client.list_contacts()
+    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
+    assert error_record.message == "Brevo API contacts: Request failed: Connection timed out, limit: 1000, offset: 0"
+
+
+def test_list_contacts_malformed_response(respx_mock, caplog, brevo_client):
+    respx_mock.get(f"{settings.BREVO_API_URL}/contacts?limit=1000&offset=0&sort=asc").mock(
+        return_value=httpx.Response(status_code=200, json={"dummy_key": LIST_CONTACTS_EMAILS})
+    )
+    with pytest.raises(MalformedResponseException):
+        brevo_client.list_contacts()
+    error_record = next(record for record in caplog.records if record.levelname == "ERROR")
+    assert error_record.message == "Unexpected response format from Brevo API /contacts, limit: 1000, offset: 0"

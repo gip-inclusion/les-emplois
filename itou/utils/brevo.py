@@ -9,6 +9,11 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+class MalformedResponseException(Exception):
+    def __init__(self, message="Malformed response"):
+        super().__init__(message)
+
+
 # https://app.brevo.com/contact/list-listing
 class BrevoListID(enum.IntEnum):
     LES_EMPLOIS = 31
@@ -97,4 +102,19 @@ class BrevoClient:
             raise
         except httpx.HTTPStatusError as e:
             logger.error("Brevo API: Response with status_code=%s", e.response.status_code)
+            raise
+
+    def list_contacts(self, limit=1000, offset=0):
+        try:
+            response = self.client.get("/contacts", params={"limit": limit, "offset": offset, "sort": "asc"})
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict) or "contacts" not in data:
+                logger.error(
+                    "Unexpected response format from Brevo API /contacts, limit: %d, offset: %d", limit, offset
+                )
+                raise MalformedResponseException()
+            return data["contacts"]
+        except httpx.RequestError as e:
+            logger.error("Brevo API contacts: Request failed: %s, limit: %d, offset: %d", str(e), limit, offset)
             raise
