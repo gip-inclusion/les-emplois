@@ -33,7 +33,7 @@ METABASE_DASHBOARDS = {
     # Employer stats.
     #
     "stats_siae_etp": {
-        "dashboard_id": 465,
+        "dashboard_id": 566,
         "tally_popup_form_id": "mYxB7W",
         "tally_embed_form_id": "3qPVOY",
     },
@@ -76,7 +76,7 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "w52xL6",
     },
     "stats_cd_orga_etp": {
-        "dashboard_id": 485,
+        "dashboard_id": 578,
         "tally_popup_form_id": "3N0oLB",
         "tally_embed_form_id": "mOoDva",
     },
