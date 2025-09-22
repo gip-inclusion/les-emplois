@@ -413,34 +413,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
     def external_data_source_history_formatted(self, obj):
         return format_html("<pre><code>{}</code></pre>", pformat(obj.external_data_source_history, width=120))
 
-    @admin.action(description="Désactiver le compte IC / PC pour changement prescripteur <-> employeur")
-    def free_sso_email(self, request, queryset):
-        try:
-            [user] = queryset
-        except ValueError:
-            messages.error(request, "Vous ne pouvez selectionner qu'un seul utilisateur à la fois")
-            return
-
-        if user.identity_provider not in [IdentityProvider.INCLUSION_CONNECT, IdentityProvider.PRO_CONNECT]:
-            messages.error(request, "Vous devez sélectionner un compte Inclusion Connect ou ProConnect")
-            return
-
-        if user.username.startswith("old"):
-            messages.error(request, "Ce compte a déjà été libéré")
-            return
-
-        user.emailaddress_set.filter(email=user.email).delete()
-        user.email = f"{user.email}_old"
-        user.username = f"old_{user.username}"
-        user.is_active = False
-        user.save(update_fields=("email", "username", "is_active"))
-        PrescriberMembership.include_inactive.filter(user=user).update(is_active=False)
-        CompanyMembership.include_inactive.filter(user=user).update(is_active=False)
-
-        messages.success(request, "L'utilisateur peut à présent se créer un nouveau compte")
-
-    actions = [free_sso_email]
-
     def get_queryset(self, request):
         """
         Exclude superusers. The purpose is to prevent staff users

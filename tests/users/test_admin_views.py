@@ -12,7 +12,6 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
-from itou.companies.models import CompanyMembership
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
@@ -262,121 +261,6 @@ def test_app_model_change_url(admin_client):
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": user.jobseeker_profile.pk})
     )
     assert response.status_code == 200
-
-
-def test_free_sso_email_errors(admin_client):
-    employer = EmployerFactory(with_company=True, username="ic_uuid_username", email="ic_user@email.com")
-    prescriber = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
-
-    # only:one user at a time
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [prescriber.pk, employer.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "Vous ne pouvez selectionner qu'un seul utilisateur à la fois", html=True)
-    prescriber.refresh_from_db()
-    assert prescriber.is_active is True
-    employer.refresh_from_db()
-    assert employer.is_active is True
-
-    # only SSO accounts
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [prescriber.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "Vous devez sélectionner un compte Inclusion Connect ou ProConnect")
-    prescriber.refresh_from_db()
-    assert prescriber.is_active is True
-
-
-def test_free_sso_email_ic(admin_client):
-    employer = EmployerFactory(
-        with_company=True,
-        username="ic_uuid_username",
-        email="ic_user@email.com",
-        identity_provider=IdentityProvider.INCLUSION_CONNECT,
-    )
-    employer.emailaddress_set.create(email=employer.email, verified=True, primary=True)
-
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
-    employer.refresh_from_db()
-    assert employer.is_active is False
-    assert CompanyMembership.include_inactive.get(user=employer).is_active is False
-    assert employer.username == "old_ic_uuid_username"
-    assert employer.email == "ic_user@email.com_old"
-    assert not employer.emailaddress_set.exists()
-
-    # It won't work twice on the same user
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "Ce compte a déjà été libéré", html=True)
-    employer.refresh_from_db()
-    assert employer.is_active is False
-    assert employer.username == "old_ic_uuid_username"
-    assert employer.email == "ic_user@email.com_old"
-
-
-def test_free_sso_email_proconnect(admin_client):
-    employer = EmployerFactory(
-        with_company=True,
-        username="ic_uuid_username",
-        email="ic_user@email.com",
-        identity_provider=IdentityProvider.PRO_CONNECT,
-    )
-    assert not employer.emailaddress_set.exists()
-
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "L'utilisateur peut à présent se créer un nouveau compte", html=True)
-    employer.refresh_from_db()
-    assert employer.is_active is False
-    assert CompanyMembership.include_inactive.get(user=employer).is_active is False
-    assert employer.username == "old_ic_uuid_username"
-    assert employer.email == "ic_user@email.com_old"
-    assert not employer.emailaddress_set.exists()
-
-    # It won't work twice on the same user
-    response = admin_client.post(
-        reverse("admin:users_user_changelist"),
-        {
-            "action": "free_sso_email",
-            helpers.ACTION_CHECKBOX_NAME: [employer.pk],
-        },
-        follow=True,
-    )
-    assertContains(response, "Ce compte a déjà été libéré", html=True)
-    employer.refresh_from_db()
-    assert employer.is_active is False
-    assert employer.username == "old_ic_uuid_username"
-    assert employer.email == "ic_user@email.com_old"
 
 
 def test_num_queries(admin_client, snapshot):
