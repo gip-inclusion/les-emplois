@@ -7622,7 +7622,7 @@
                   <thead>
                       <tr>
                           <th class="text-start w-50px" scope="col">
-                              <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
+                              <input autocomplete="off" class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
                               <label class="visually-hidden" for="select-all-applications">
                                   Sélectionner toutes les candidatures
                               </label>
@@ -7656,7 +7656,7 @@
                   <tbody>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -7706,7 +7706,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -7754,7 +7754,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -7913,7 +7913,7 @@
                   <thead>
                       <tr>
                           <th class="text-start w-50px" scope="col">
-                              <input class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
+                              <input autocomplete="off" class="form-check-input" data-emplois-select-all-target-input-name="selected-application" id="select-all-applications" type="checkbox"/>
                               <label class="visually-hidden" for="select-all-applications">
                                   Sélectionner toutes les candidatures
                               </label>
@@ -7947,7 +7947,7 @@
                   <tbody>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8000,7 +8000,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8046,7 +8046,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8094,7 +8094,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8149,7 +8149,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8197,7 +8197,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
@@ -8252,7 +8252,7 @@
                       </tr>
                       <tr class="align-top">
                           <th class="text-start w-50px" scope="row">
-                              <input class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
+                              <input autocomplete="off" class="form-check-input" id="select-[PK of JobApplication]" name="selected-application" type="checkbox" value="[PK of JobApplication]"/>
                               <label class="visually-hidden" for="select-[PK of JobApplication]">
                                   Sélectionner cette candidature
                               </label>
