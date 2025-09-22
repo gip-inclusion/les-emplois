@@ -4,7 +4,7 @@
         <tr>
             {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                 <th scope="col" class="text-start w-50px">
-                    <input class="form-check-input" type="checkbox" id="select-all-applications" data-emplois-select-all-target-input-name="selected-application">
+                    <input class="form-check-input" type="checkbox" id="select-all-applications" data-emplois-select-all-target-input-name="selected-application" autocomplete="off">
                     <label class="visually-hidden" for="select-all-applications">Sélectionner toutes les candidatures</label>
                 </th>
             {% endif %}
