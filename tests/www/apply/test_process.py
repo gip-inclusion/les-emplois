@@ -29,7 +29,7 @@ from itou.approvals.models import Approval, Suspension
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,

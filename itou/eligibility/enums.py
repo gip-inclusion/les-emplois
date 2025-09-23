@@ -136,3 +136,30 @@ class AdministrativeCriteriaKind(models.TextChoices):
 CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = AdministrativeCriteriaKind.certifiable_by_api_particulier().union(
     AdministrativeCriteriaKind.certifiable_by_api_pole_emploi()
 )
+
+
+class CertificationValidityLogic(models.TextChoices):
+    """
+    How should the criteria certification information be interpreted?
+
+    ON_THE_DAY:
+        The criteria certification is valid for the whole duration of the
+        eligibility diagnosis, regardless of its certification_period.
+
+        The eligibility diagnosis validity duration was chosen to match the
+        most commonly required proof: a document at most 3 months-old
+        (92 days).
+
+
+    """
+
+    ON_THE_DAY = "on_the_day"
+    DAY_IN_PERIOD = "day_in_period"
+
+
+ADMINISTRATIVE_CRITERIA_CERTIFICATION_VALIDITY_LOGIC = {
+    AdministrativeCriteriaKind.AAH: CertificationValidityLogic.ON_THE_DAY,
+    AdministrativeCriteriaKind.PI: CertificationValidityLogic.ON_THE_DAY,
+    AdministrativeCriteriaKind.RSA: CertificationValidityLogic.ON_THE_DAY,
+    AdministrativeCriteriaKind.TH: CertificationValidityLogic.DAY_IN_PERIOD,
+}
