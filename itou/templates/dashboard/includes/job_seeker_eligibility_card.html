@@ -1,24 +1,40 @@
 {% load badges %}
+
 <div class="col-12 col-md-12 col-xxl-12 {% if kind == "IAE" %}col-xxxl-6{% else %}col-xxxl-12{% endif %} mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
-        <div class="p-3 p-lg-4">
-            <span class="h4 mb-0">
+        <div class="row p-3 p-lg-4">
+            <div class="col-12 col-sm">
                 {% if kind == "IAE" %}
-                    Diagnostic d’éligibilité à l’IAE
+                    <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
                     {% if not eligibility_diagnosis %}
-                        non renseigné
+                        <span class="text-warning fs-sm">Diagnostic non renseigné</span>
+                    {% elif eligibility_diagnosis.is_considered_valid %}
+                        <span class="text-success fs-sm">
+                            Critères validés le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par {{ eligibility_diagnosis.author.get_full_name }}
+                            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                            {% if eligibility_diagnosis.author_prescriber_organization %}
+                                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                            {% endif %}
+                        </span>
                     {% else %}
-                        {{ eligibility_diagnosis.is_considered_valid|yesno:"valide,expiré" }}
+                        <span class="text-warning fs-sm">Diagnostic expiré</span>
                     {% endif %}
                 {% elif kind == "GEIQ" %}
-                    Diagnostic public prioritaire GEIQ {{ eligibility_diagnosis.is_valid|yesno:"valide,expiré" }}
+                    <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+                    {% if eligibility_diagnosis.is_valid %}
+                        <span class="text-success fs-sm">Diagnostic validé</span>
+                    {% else %}
+                        <span class="text-warning fs-sm">Diagnostic expiré</span>
+                    {% endif %}
                 {% endif %}
-            </span>
-            {% if kind == "IAE" %}
-                {% iae_eligibility_badge is_eligible=eligibility_diagnosis.is_considered_valid|default:False extra_classes="badge-sm float-end" for_job_seeker=True %}
-            {% elif kind == "GEIQ" %}
-                {% geiq_eligibility_badge is_eligible=eligibility_diagnosis.is_valid|default:False extra_classes="badge-sm float-end" for_job_seeker=True %}
-            {% endif %}
+            </div>
+            <div class="col-12 col-sm-auto">
+                {% if kind == "IAE" %}
+                    {% iae_eligibility_badge is_eligible=eligibility_diagnosis.is_considered_valid|default:False extra_classes="badge-sm" for_job_seeker=True %}
+                {% elif kind == "GEIQ" %}
+                    {% geiq_eligibility_badge is_eligible=eligibility_diagnosis.is_valid|default:False extra_classes="badge-sm" for_job_seeker=True %}
+                {% endif %}
+            </div>
         </div>
         <div class="px-3 px-lg-4">
             {% if kind == "IAE" %}
@@ -37,7 +53,6 @@
                         </li>
                     </ul>
                     <hr class="mb-3">
-
                     <p class="fs-sm mb-lg-5">
                         {% if not eligibility_diagnosis %}
                             Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE.
@@ -46,16 +61,7 @@
                         {% endif %}
                     </p>
                 {% else %}
-                    <div class="fs-sm mb-lg-5">
-                        <p class="text-success mb-1">
-                            Critères validés
-                            le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
-                            <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
-                            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
-                            {% if eligibility_diagnosis.author_prescriber_organization %}
-                                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
-                            {% endif %}
-                        </p>
+                    <div>
                         {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True itou_help_center_url=itou_help_center_url request=request only %}
                     </div>
                 {% endif %}
@@ -72,7 +78,8 @@
                             {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
                         {% endfor %}
                     </ul>
-                    <p>
+                    <hr class="mb-3">
+                    <p class="fs-sm mb-lg-5">
                         <i>Ce diagnostic {{ eligibility_diagnosis.is_valid|yesno:"expire,a expiré" }} le {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}.</i>
                     </p>
                 {% endif %}
