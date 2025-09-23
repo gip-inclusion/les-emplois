@@ -85,6 +85,12 @@ class BrevoClient:
             )
             if response.status_code == 404:
                 return
+            if response.status_code == 400:
+                data = response.json()
+                if data.get("code") == "invalid_parameter" and data.get("message", "") == "Invalid email address":
+                    logger.warning("Brevo API: email considered as invalid - no need to delete it")
+                    # The email address is considered as invalid by Brevo, nothing to do
+                    return
             response.raise_for_status()
         except httpx.RequestError as e:
             logger.error("Brevo API: Request failed: %s", str(e))
