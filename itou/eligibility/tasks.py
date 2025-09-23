@@ -151,12 +151,6 @@ def _async_certify_criteria_by_api_particulier(model_name, eligibility_diagnosis
 async_certify_criteria_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
     _async_certify_criteria_by_api_particulier
 )
-# TODO(François): Legacy task definition, drop at least 24h after it has been deployed.
-async_certify_criteria = on_commit_task(
-    retries=24 * 6,
-    retry_delay=10 * 60,
-    name="_async_certify_criteria",
-)(_async_certify_criteria_by_api_particulier)
 # TODO: Use the decorator and drop assignment of call_local if
 # https://github.com/coleifer/huey/pull/848 is integrated.
 async_certify_criteria_by_api_particulier.call_local = _async_certify_criteria_by_api_particulier
