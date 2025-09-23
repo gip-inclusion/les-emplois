@@ -53,6 +53,6 @@
 
 {% if request.htmx %}
     {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request only %}
-    {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request only %}
+    {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request csrf_token=csrf_token only %}
     {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
 {% endif %}

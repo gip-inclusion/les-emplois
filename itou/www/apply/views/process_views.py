@@ -329,6 +329,30 @@ def add_threaded_comment_for_company(request, job_application_id):
     )
 
 
+@require_POST
+@check_user(lambda user: user.is_employer)
+def delete_threaded_comment_for_company(request, job_application_id, comment_id):
+    queryset = JobApplicationThreadedComment.objects.filter(
+        job_application__id=job_application_id, created_by=request.user
+    )
+    comment = get_object_or_404(queryset, id=comment_id)
+
+    comment.delete()
+
+    comments = JobApplicationThreadedComment.objects.filter(job_application=job_application_id).order_by("-created_at")
+    context = {
+        "comments": comments,
+        "last_comments": comments[:3],
+        "location": "tab",
+    }
+
+    return render(
+        request,
+        "apply/includes/job_application_comments_list.html",
+        context,
+    )
+
+
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
