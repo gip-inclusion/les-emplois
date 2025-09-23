@@ -1,0 +1,15 @@
+{% load matomo %}
+
+<a class="nav-link"
+   id="comments-tab"
+   data-bs-toggle="tab"
+   href="#comments"
+   role="tab"
+   aria-controls="comments"
+   aria-selected="false"
+   {% matomo_event "candidature" "clic-onglet" "commentaires" %}
+   {% if request.htmx %}hx-swap-oob="true"{% endif %}>Commentaires
+    {% if comments %}
+        <span class="badge badge-base rounded-pill bg-info-lighter text-info ms-2">{{ comments|length }}</span>
+    {% endif %}
+</a>
