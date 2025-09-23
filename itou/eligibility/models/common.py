@@ -187,8 +187,10 @@ class AbstractAdministrativeCriteria(models.Model):
 class AbstractSelectedAdministrativeCriteria(models.Model):
     CERTIFICATION_GRACE_PERIOD_DAYS = 92
 
+    # See CertificationValidityLogic to interpret that field.
     certified = models.BooleanField(blank=True, null=True, verbose_name="certifié")
     certified_at = models.DateTimeField(blank=True, null=True, verbose_name="certifié le")
+    # See CertificationValidityLogic to interpret that field.
     certification_period = InclusiveDateRangeField(blank=True, null=True, verbose_name="période de certification")
     data_returned_by_api = models.JSONField(
         blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"
