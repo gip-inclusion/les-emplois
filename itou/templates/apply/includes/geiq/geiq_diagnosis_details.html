@@ -21,7 +21,7 @@
         <h4>Situation administrative du candidat</h4>
         <ul>
             {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
-                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion hiring_start_date=hiring_start_date request=request only %}
+                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion hiring_date_for_eligibility=hiring_date_for_eligibility request=request only %}
             {% endfor %}
         </ul>
     {% endif %}

@@ -56,8 +56,7 @@
                                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
                             {% endif %}
                         </p>
-                        {# Job seekers don’t see certified criteria, don’t bother with hiring_start_date. #}
-                        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True hiring_start_date=None itou_help_center_url=itou_help_center_url request=request only %}
+                        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True hiring_date_for_eligibility=None itou_help_center_url=itou_help_center_url request=request only %}
                     </div>
                 {% endif %}
             {% elif kind == "GEIQ" %}
@@ -70,8 +69,14 @@
                     </p>
                     <ul>
                         {% for criterion in eligibility_diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
+                            <<<<<<< HEAD
                             {# Job seekers don’t see certified criteria, don’t bother with hiring_start_date. #}
                             {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion hiring_start_date=None request=request only %}
+                            ||||||| parent of 235515be4 (WIP, temporary badge)
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            =======
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion hiring_date_for_eligibility=hiring_date_for_eligibility request=request only %}
+                            >>>>>>> 235515be4 (WIP, temporary badge)
                         {% endfor %}
                     </ul>
                     <p>

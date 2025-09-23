@@ -1,5 +1,6 @@
 from django import template
 from django.template.loader import get_template
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import ApprovalStatus
@@ -117,18 +118,33 @@ def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=Fals
 
 
 @register.simple_tag
-def criterion_certification_badge(selected_criterion, hiring_start_date):
+def criterion_certification_badge(selected_criterion, *, hiring_start_at):
     if not selected_criterion.administrative_criteria.is_certifiable:
         return ""
 
+    certification_end_date = None
     if selected_criterion.certified_at:
         if selected_criterion.certification_period is None:
             template = "eligibility/includes/badge_certification_error.html"
         else:
-            if hiring_start_date in selected_criterion.certification_period:
-                template = "eligibility/includes/badge_certified.html"
+            certification_end_date = selected_criterion.certification_period.upper
+            if hiring_start_at is None:
+                if selected_criterion.eligibility_diagnosis.expires_at in selected_criterion.certification_period:
+                    template = "eligibility/includes/badge_certified.html"
+                else:
+                    template = "eligibility/includes/badge_temporarily_certified.html"
             else:
-                template = "eligibility/includes/badge_not_certified.html"
+                if hiring_start_at in selected_criterion.certification_period:
+                    template = "eligibility/includes/badge_certified.html"
+                elif hiring_start_at > timezone.localdate():
+                    template = "eligibility/includes/badge_temporarily_certified.html"
+                else:
+                    template = "eligibility/includes/badge_not_certified.html"
     else:
         template = "eligibility/includes/badge_certification_in_progress.html"
-    return get_template(template).render({"extra_classes": "ms-3"})
+    return get_template(template).render(
+        {
+            "extra_classes": "ms-3",
+            "certification_end_date": certification_end_date,
+        }
+    )
