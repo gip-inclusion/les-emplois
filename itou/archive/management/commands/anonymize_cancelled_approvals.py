@@ -34,7 +34,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="anonymize_cancelled_approvals",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 7 * * MON-FRI"},
+            "schedule": {"type": "crontab", "value": "0 6 * * MON-FRI"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
