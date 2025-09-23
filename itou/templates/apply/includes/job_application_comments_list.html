@@ -1,0 +1,49 @@
+{% load matomo %}
+<div class="{% if location == "sidebar" %}c-box{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-list-{{ location }}"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <h3>
+        {% if location == "sidebar" %}
+            Derniers commentaires
+        {% else %}
+            Liste des commentaires ({{ comments|length }})
+        {% endif %}
+    </h3>
+    <ul class="list-note">
+        {% for comment in comments %}
+            <li {% if comment.created_by == request.user %}class="is-current-user"{% endif %}>
+                {% if location == "tab" %}<i class="ri-user-line"></i>{% endif %}
+                <div>
+                    <time datetime="{{ comment.created_at.isoformat }}">Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</time>
+                    <strong>
+                        {{ comment.created_by.get_full_name }}
+                        {% if comment.created_by == request.user %}(vous){% endif %}
+                    </strong>
+                    <blockquote class="blockquote">
+                        {% if location == "sidebar" and comment.message|length > 200 %}
+                            <div class="collapse show has-no-transition" id="collapse-comment-{{ comment.id }}">
+                                <p class="mb-0">{{ comment.message|truncatechars:200 }}</p>
+                                <button class="btn-link d-inline-block mt-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-comment-{{ comment.id }}"
+                                        aria-expanded="false"
+                                        aria-controls="collapse-comment-{{ comment.id }}">Voir +</button>
+                            </div>
+                            <div class="collapse has-no-transition" id="collapse-comment-{{ comment.id }}">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% else %}
+                            <div class="collapse show">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% endif %}
+                    </blockquote>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if location == "sidebar" %}
+        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
+            Voir tous les commentaires
+        </button>
+    {% endif %}
+</div>

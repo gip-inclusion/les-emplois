@@ -1,0 +1,8 @@
+{% load matomo %}
+
+<span id="comments-counter" {% if request.htmx %}hx-swap-oob="true"{% endif %}>Commentaires
+    {% if comments %}
+        <span class="badge badge-base rounded-pill bg-info-lighter text-info ms-2">{{ comments|length }}</span>
+    {% endif %}
+    <span class="badge badge-sm rounded-pill bg-important text-white ms-3">Nouveau</span>
+</span>
