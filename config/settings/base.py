@@ -434,6 +434,7 @@ API_INSEE_PASSWORD = os.getenv("API_INSEE_PASSWORD")
 # https://portail-api.insee.fr/catalog/api/26d13266-689d-3fee-845d-c08e12b8f0dd/doc?page=4a0ebed4-14e5-4520-8ebe-d414e5e52004
 # This link requires to login : click on Sign-in > CONNEXION-POUR-LES-EXTERNES and use the credentials in Bitwarden
 API_INSEE_SIRENE_URL = os.getenv("API_INSEE_SIRENE_URL")
+API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL")
 
 API_DATA_INCLUSION_BASE_URL = os.getenv("API_DATA_INCLUSION_BASE_URL")
 API_DATA_INCLUSION_TOKEN = os.getenv("API_DATA_INCLUSION_TOKEN")
