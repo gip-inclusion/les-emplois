@@ -108,6 +108,9 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             can_edit_iae_eligibility = True
 
         return super().get_context_data(**kwargs) | {
+            # Always defined in the context, to track it through eligibility
+            # templates includes.
+            "hiring_date_for_eligibility": None,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,

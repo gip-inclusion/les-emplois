@@ -113,6 +113,7 @@ class EmployeeDetailView(DetailView):
         context["matomo_custom_title"] = "Profil salarié"
         context["eligibility_diagnosis"] = eligibility_diagnosis
         context["expired_eligibility_diagnosis"] = None
+        context["hiring_date_for_eligibility"] = job_application.hiring_start_at
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
 
         context["immersion_search_url"] = immersion_search_url(self.object)
