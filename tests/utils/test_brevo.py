@@ -103,3 +103,25 @@ def test_delete_contact_on_http_status_error(respx_mock, caplog, snapshot, brevo
     error_record = next(record for record in caplog.records if record.levelname == "ERROR")
     assert error_record.message == snapshot(name="brevo-api-http-error-500")
     assert email not in caplog.text
+
+
+def test_delete_contact_on_400(respx_mock, caplog, brevo_client):
+    email = "accent@démonstration.fr"
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        return_value=httpx.Response(
+            status_code=400, json={"code": "invalid_parameter", "message": "Invalid email address"}
+        )
+    )
+
+    # should not raise
+    brevo_client.delete_contact(email)
+    assert respx_mock.calls.called
+    assert "Brevo API: email considered as invalid - no need to delete it" in caplog.text
+
+    email = "test@example.com"
+    respx_mock.delete(f"{settings.BREVO_API_URL}/contacts/{email}?identifierType=email_id").mock(
+        return_value=httpx.Response(status_code=400, json={"code": "other_error", "message": "Some other error"})
+    )
+    with pytest.raises(httpx.HTTPStatusError):
+        brevo_client.delete_contact(email)
+    assert respx_mock.calls.called
