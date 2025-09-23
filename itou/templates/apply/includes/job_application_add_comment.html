@@ -1,0 +1,62 @@
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+{% load matomo %}
+
+<div class="{% if location == "sidebar" %}c-box c-box--note{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-add-{{ location }}">
+    {% if location == "sidebar" %}
+        <span class="badge badge-sm rounded-pill bg-important text-white mb-3">Nouveau</span>
+    {% endif %}
+    <form hx-post="{% url 'apply:add_comment_for_company' job_application_id=job_application.id %}"
+          hx-target="#comments-add-{{ location }}"
+          hx-indicator="#comments-add-{{ location }}"
+          hx-swap="outerHTML"
+          hx-vals='{"location": "{{ location }}"}'
+          class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% bootstrap_form_errors form type="all" %}
+        {% if location == "sidebar" %}
+            <h3>
+                Ajouter un commentaire
+                <button type="button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-title="Attention à vos propos. La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés.">
+                    <i class="ri-information-line ri-xl text-info ms-1"
+                       aria-label="Attention à vos propos. La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés."></i>
+                </button>
+            </h3>
+            {% bootstrap_field form.message show_label=False field_class="has-textarea-ratio-16-9" %}
+            <div class="form-group">
+                <div class="form-row">
+                    <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" type="reset">
+                        <span class="visually-hidden">Annuler l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+                        <i class="ri-close-line" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" type="submit" {% matomo_event "candidature" "clic" "ajout-commentaire-sidebar" %}>
+                        <span class="visually-hidden">Valider l'ajout d'un commentaire partagé avec tous les membres de la structure</span>
+                        <i class="ri-check-line" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            {% bootstrap_field form.message %}
+            <div class="c-info mb-3">
+                <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWarningInfo" aria-expanded="false" aria-controls="collapseWarningInfo">
+                    <span>Attention à vos propos</span>
+                </button>
+                <div class="c-info__detail collapse" id="collapseWarningInfo">
+                    <p>
+                        La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés.
+                    </p>
+                </div>
+            </div>
+            {% itou_buttons_form primary_label="Envoyer" reset_url=None primary_aria_label="Envoyer votre commentaire partagé avec tous les membres de la structure" show_mandatory_fields_mention=False matomo_category="candidature" matomo_action="clic" matomo_name="ajout-commentaire-onglet" %}
+        {% endif %}
+    </form>
+</div>
+
+{% if request.htmx %}
+    {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request only %}
+    {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request only %}
+    {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
+{% endif %}

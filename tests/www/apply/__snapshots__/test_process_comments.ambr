@@ -1,0 +1,2042 @@
+# serializer version: 1
+# name: test_add_comment_htmx[add comment]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/siae/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Candidature de
+                  
+                      Jane DOE
+                                  <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_11111111-1111-1111-1111-111111111111">
+                                      Nouvelle candidature
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__cta">
+                              <button aria-label="Imprimer la candidature de Jane DOE" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                                  <i aria-hidden="true" class="ri-printer-line fw-normal">
+                                  </i>
+                              </button>
+                          </div>
+                      </div>
+                      <div class="c-box c-box--action" data-disable-btn-if=".editing-prior-action" id="transition_buttons_11111111-1111-1111-1111-111111111111">
+                          <h2 class="visually-hidden">
+                              Actions rapides
+                          </h2>
+                          <div class="form-row align-items-center gx-3">
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/11111111-1111-1111-1111-111111111111/siae/eligibility">
+                                      <i aria-hidden="true" class="ri-check-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Accepter
+                                      </span>
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg-auto">
+                                  <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/11111111-1111-1111-1111-111111111111/siae/refuse">
+                                      <i aria-hidden="true" class="ri-close-line fw-medium">
+                                      </i>
+                                      <span>
+                                          Décliner
+                                      </span>
+                                  </a>
+                              </div>
+                              <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
+                                  <div class="dropdown">
+                                      <button aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" data-bs-toggle="dropdown" id="other_actions" type="button">
+                                          Autres actions
+                                          <span class="badge badge-base rounded-pill bg-info text-white ms-2">
+                                              3
+                                          </span>
+                                      </button>
+                                      <div aria-labelledby="other_actions" class="dropdown-menu w-100">
+                                          <form action="/apply/11111111-1111-1111-1111-111111111111/siae/process" class="js-prevent-multiple-submit" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn justify-content-start dropdown-item" data-matomo-action="submit" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="processing_application">
+                                                  <i aria-hidden="true" class="ri-eye-line fw-medium me-2">
+                                                  </i>
+                                                  <span>
+                                                      Étudier
+                                                  </span>
+                                              </button>
+                                          </form>
+                                          <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postpone_application" href="/apply/11111111-1111-1111-1111-111111111111/siae/postpone">
+                                              <i aria-hidden="true" class="ri-history-line fw-medium me-2">
+                                              </i>
+                                              <span>
+                                                  Mettre en attente
+                                              </span>
+                                          </a>
+                                          <a class="btn justify-content-start dropdown-item" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="add_application_to_pool" href="/apply/11111111-1111-1111-1111-111111111111/siae/add-to-pool">
+                                              <i aria-hidden="true" class="ri-folder-user-line fw-medium me-2">
+                                              </i>
+                                              <span>
+                                                  Ajouter au vivier
+                                              </span>
+                                          </a>
+                                          <hr class="dropdown-divider m-0"/>
+                                          <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur." data-bs-toggle="tooltip" disabled="" id="transfer_to_button" type="button">
+                                              <i class="ri-arrow-left-right-line me-2">
+                                              </i>
+                                              <span>
+                                                  Transférer vers
+                                              </span>
+                                          </button>
+                                          <button class="btn justify-content-start dropdown-item" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Seules les candidatures au statut « Déclinée », « Embauché ailleurs » et « Embauche annulée » peuvent être archivées." data-bs-toggle="tooltip" disabled="" type="button">
+                                              <i aria-hidden="true" class="ri-archive-line fw-medium me-2">
+                                              </i>
+                                              <span>
+                                                  Archiver
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+                          <li class="nav-item" role="presentation">
+                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="informations-generales" href="#informations" id="informations-tab" role="tab">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                              <a aria-controls="comments" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="commentaires" href="#comments" id="comments-tab" role="tab">
+                                  <span id="comments-counter">
+                                      Commentaires
+                                      <span class="badge badge-base rounded-pill bg-info-lighter text-info ms-2">
+                                          2
+                                      </span>
+                                      <span class="badge badge-sm rounded-pill bg-important text-white ms-3">
+                                          Nouveau
+                                      </span>
+                                  </span>
+                              </a>
+                          </li>
+                          <li class="nav-item" role="presentation">
+                              <a aria-controls="historique" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="historique" href="#historique" id="historique-tab" role="tab">
+                                  Historique
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="tab-content">
+                  <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                      <div class="s-section__row row">
+                          <div class="s-section__col col-12 col-xxl-12 order-2 order-xxl-1">
+                              <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                                  <h2 class="mb-0">
+                                      Informations générales
+                                  </h2>
+                                  <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
+                                      <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                          </i>
+                                          <span>
+                                              Copier l'ID du candidat
+                                          </span>
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="row mb-3">
+                                      <div class="col-12 col-sm">
+                                          <h3 class="mb-0">
+                                              Informations personnelles
+                                          </h3>
+                                      </div>
+                                      <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                              <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                              </i>
+                                              <span>
+                                                  Modifier
+                                              </span>
+                                          </a>
+                                          <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
+                                              <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1">
+                                              </i>
+                                          </button>
+                                      </div>
+                                  </div>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Prénom
+                                          </small>
+                                          <strong>
+                                              Jane
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Nom
+                                          </small>
+                                          <strong>
+                                              DOE
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              jane.doe@test.local
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Date de naissance
+                                          </small>
+                                          <strong>
+                                              01/01/1990
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse
+                                          </small>
+                                          <address>
+                                              12 rue Georges Bizet, 35000 Rennes
+                                          </address>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Numéro de sécurité sociale
+                                          </small>
+                                          <strong>
+                                              <span>
+                                                  2
+                                              </span>
+                                              <span class="ms-1">
+                                                  90
+                                              </span>
+                                              <span class="ms-1">
+                                                  01
+                                              </span>
+                                              <span class="ms-1">
+                                                  01
+                                              </span>
+                                              <span class="ms-1">
+                                                  010
+                                              </span>
+                                              <span class="ms-1">
+                                                  101
+                                              </span>
+                                              <span class="ms-1">
+                                                  25
+                                              </span>
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Identifiant France Travail
+                                          </small>
+                                          <i class="text-disabled">
+                                              Non renseigné
+                                          </i>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Curriculum vitae
+                                          </small>
+                                          <i class="text-disabled">
+                                              Non renseigné
+                                          </i>
+                                      </li>
+                                  </ul>
+                                  <div class="c-info d-flex flex-column flex-md-row justify-content-between align-items-center mb-3 p-3 fs-sm d-print-none">
+                                      <div class="w-100 w-md-50 text-center text-md-start">
+                                          <p class="fw-bold mb-2">
+                                              Ce candidat n’a pas de CV ?
+                                          </p>
+                                          <p class="m-0">
+                                              Invitez le prescripteur à en créer un via notre partenaire Diagoriente.
+                                          </p>
+                                      </div>
+                                      <div class="w-100 w-md-50 text-center text-md-end mt-3 mt-md-0">
+                                          <form action="/apply/11111111-1111-1111-1111-111111111111/siae/diagoriente/send_invite" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-partner btn-partner--diagoriente fs-sm" type="submit">
+                                                  Inviter à créer un CV avec Diagoriente
+                                              </button>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <h3>
+                                      Candidature
+                                  </h3>
+                                  <ul class="list-data mb-3">
+                                      <li>
+                                          <small>
+                                              Émetteur
+                                          </small>
+                                          <strong>
+                                              Pierre DUPONT
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Type
+                                          </small>
+                                          <strong>
+                                              Orienteur
+                                          </strong>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Adresse e-mail
+                                          </small>
+                                          <strong>
+                                              pierre.dupont@test.local
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_email" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Téléphone
+                                          </small>
+                                          <strong>
+                                              06 12 34 56 78
+                                          </strong>
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+                                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                              </i>
+                                              <span class="visually-hidden">
+                                                  Copier
+                                              </span>
+                                          </button>
+                                      </li>
+                                      <li>
+                                          <small>
+                                              Date
+                                          </small>
+                                          <strong>
+                                              Le 26/09/2025
+                                          </strong>
+                                      </li>
+                                  </ul>
+                                  <ul class="list-data mb-3">
+                                      <li class="has-forced-line-break">
+                                          <small>
+                                              Message de candidature
+                                          </small>
+                                          <blockquote class="blockquote mt-2 mb-0">
+                                              <p>
+                                                  Message de candidature
+                                              </p>
+                                          </blockquote>
+                                      </li>
+                                  </ul>
+                                  <span class="d-block fs-sm">
+                                      Poste recherché
+                                  </span>
+                                  <ul class="list-group list-group-flush mt-2">
+                                      <li class="list-group-item list-group-item-action">
+                                          <b>
+                                              Candidature spontanée
+                                          </b>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="c-box mb-4">
+                                  <h3>
+                                      Réponse de l'employeur
+                                  </h3>
+                                  <ul class="list-data mb-3">
+                                      <li class="has-forced-line-break">
+                                          <small>
+                                              Message envoyé au candidat
+                                          </small>
+                                          <blockquote class="blockquote mt-2 mb-0">
+                                              <p>
+                                                  👋
+                                              </p>
+                                          </blockquote>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
+                              <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
+                                  <span class="badge badge-sm rounded-pill bg-important text-white mb-3">
+                                      Nouveau
+                                  </span>
+                                  <form class="js-prevent-multiple-submit" hx-indicator="#comments-add-sidebar" hx-post="/apply/11111111-1111-1111-1111-111111111111/siae/comment" hx-swap="outerHTML" hx-target="#comments-add-sidebar" hx-vals='{"location": "sidebar"}'>
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <h3>
+                                          Ajouter un commentaire
+                                          <button data-bs-placement="top" data-bs-title="Attention à vos propos. La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés." data-bs-toggle="tooltip" type="button">
+                                              <i aria-label="Attention à vos propos. La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés." class="ri-information-line ri-xl text-info ms-1">
+                                              </i>
+                                          </button>
+                                      </h3>
+                                      <div class="form-group form-group-required">
+                                          <label class="visually-hidden" for="id_message">
+                                              Ajouter un commentaire
+                                          </label>
+                                          <textarea aria-describedby="id_message_helptext" class="form-control has-textarea-ratio-16-9" cols="40" data-it-expandable="true" id="id_message" maxlength="2000" name="message" required="" rows="10"></textarea>
+                                          <div class="form-text" id="id_message_helptext">
+                                              Les commentaires ne sont visibles que par les membres de votre structure.
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="form-row">
+                                              <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" type="reset">
+                                                  <span class="visually-hidden">
+                                                      Annuler l'ajout d'un commentaire partagé avec tous les membres de la structure
+                                                  </span>
+                                                  <i aria-hidden="true" class="ri-close-line">
+                                                  </i>
+                                              </button>
+                                              <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire-sidebar" type="submit">
+                                                  <span class="visually-hidden">
+                                                      Valider l'ajout d'un commentaire partagé avec tous les membres de la structure
+                                                  </span>
+                                                  <i aria-hidden="true" class="ri-check-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </form>
+                              </div>
+                              <div class="c-box mb-3 mb-md-4" id="comments-list-sidebar">
+                                  <h3>
+                                      Derniers commentaires
+                                  </h3>
+                                  <ul class="list-note">
+                                      <li>
+                                          <div>
+                                              <time datetime="2025-09-26T12:12:12+00:00">
+                                                  Le 26 septembre 2025 à 14:12
+                                              </time>
+                                              <strong>
+                                                  Alice ABOLIVIER
+                                              </strong>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li class="is-current-user">
+                                          <div>
+                                              <time datetime="2025-09-26T12:12:12+00:00">
+                                                  Le 26 septembre 2025 à 14:12
+                                              </time>
+                                              <strong>
+                                                  Bob BANANA
+                          (vous)
+                                              </strong>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Candidate rencontrée en entretien. A recontacter dans 2 semaines.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                  </ul>
+                                  <button class="btn btn-outline-primary btn-block bg-white mt-3" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="commentaires" hx-preserve="true" id="comments-btn" role="presentation">
+                                      Voir tous les commentaires
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div aria-labelledby="comments-tab" class="tab-pane fade" id="comments" role="tabpanel">
+                      <div class="s-section__row row">
+                          <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                              <h2>
+                                  Commentaires
+                              </h2>
+                              <div class="c-form mb-3 mb-md-4" id="comments-add-tab">
+                                  <form class="js-prevent-multiple-submit" hx-indicator="#comments-add-tab" hx-post="/apply/11111111-1111-1111-1111-111111111111/siae/comment" hx-swap="outerHTML" hx-target="#comments-add-tab" hx-vals='{"location": "tab"}'>
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      <div class="form-group form-group-required">
+                                          <label class="form-label" for="id_message">
+                                              Ajouter un commentaire
+                                          </label>
+                                          <textarea aria-describedby="id_message_helptext" class="form-control" cols="40" data-it-expandable="true" id="id_message" maxlength="2000" name="message" required="" rows="10"></textarea>
+                                          <div class="form-text" id="id_message_helptext">
+                                              Les commentaires ne sont visibles que par les membres de votre structure.
+                                          </div>
+                                      </div>
+                                      <div class="c-info mb-3">
+                                          <button aria-controls="collapseWarningInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseWarningInfo" data-bs-toggle="collapse" type="button">
+                                              <span>
+                                                  Attention à vos propos
+                                              </span>
+                                          </button>
+                                          <div class="c-info__detail collapse" id="collapseWarningInfo">
+                                              <p>
+                                                  La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés.
+                                              </p>
+                                          </div>
+                                      </div>
+                                      <div class="row">
+                                          <div class="col-12">
+                                              <hr class="mb-3"/>
+                                              <div class="form-row align-items-center justify-content-end gx-3">
+                                                  <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                                  </div>
+                                                  <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                                      <button aria-label="Envoyer votre commentaire partagé avec tous les membres de la structure" class="btn btn-block btn-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire-onglet" type="submit">
+                                                          <span>
+                                                              Envoyer
+                                                          </span>
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </form>
+                              </div>
+                              <div class="c-form mb-3 mb-md-4" id="comments-list-tab">
+                                  <h3>
+                                      Liste des commentaires (2)
+                                  </h3>
+                                  <ul class="list-note">
+                                      <li>
+                                          <i class="ri-user-line">
+                                          </i>
+                                          <div>
+                                              <time datetime="2025-09-26T12:12:12+00:00">
+                                                  Le 26 septembre 2025 à 14:12
+                                              </time>
+                                              <strong>
+                                                  Alice ABOLIVIER
+                                              </strong>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li class="is-current-user">
+                                          <i class="ri-user-line">
+                                          </i>
+                                          <div>
+                                              <time datetime="2025-09-26T12:12:12+00:00">
+                                                  Le 26 septembre 2025 à 14:12
+                                              </time>
+                                              <strong>
+                                                  Bob BANANA
+                          (vous)
+                                              </strong>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Candidate rencontrée en entretien. A recontacter dans 2 semaines.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div aria-labelledby="historique-tab" class="tab-pane fade" id="historique" role="tabpanel">
+                      <div class="s-section__row row">
+                          <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                              <h2>
+                                  Historique des modifications
+                              </h2>
+                              <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
+                                  <li>
+                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                          Le 26 septembre 2025 à 14:12
+                                      </time>
+                                      <span>
+                                          Nouvelle candidature
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_display_in_sidebar_and_tab
+  dict({
+    'num_queries': 22,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND (NOT ("companies_company"."kind" IN (%s,
+                                                          %s,
+                                                          %s,
+                                                          %s,
+                                                          %s))
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+          
+            (SELECT COUNT(U0."id") AS "count"
+             FROM "rdv_insertion_participation" U0
+             INNER JOIN "rdv_insertion_appointment" U1 ON (U0."appointment_id" = U1."id")
+             WHERE (U1."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U1."start_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND U0."status" = %s)
+             ORDER BY RANDOM() ASC) AS "upcoming_participations_count",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "rdv_insertion_invitationrequest" U0
+             WHERE (U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                    AND U0."created_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id"))
+             LIMIT 1) AS "has_pending_rdv_insertion_invitation_request",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."fields_history",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 T6."id",
+                 T6."password",
+                 T6."last_login",
+                 T6."is_superuser",
+                 T6."username",
+                 T6."first_name",
+                 T6."last_name",
+                 T6."is_staff",
+                 T6."is_active",
+                 T6."date_joined",
+                 T6."address_line_1",
+                 T6."address_line_2",
+                 T6."post_code",
+                 T6."city",
+                 T6."department",
+                 T6."coords",
+                 T6."geocoding_score",
+                 T6."geocoding_updated_at",
+                 T6."ban_api_resolved_address",
+                 T6."insee_city_id",
+                 T6."title",
+                 T6."full_name_search_vector",
+                 T6."email",
+                 T6."phone",
+                 T6."kind",
+                 T6."identity_provider",
+                 T6."has_completed_welcoming_tour",
+                 T6."created_by_id",
+                 T6."external_data_source_history",
+                 T6."last_checked_at",
+                 T6."public_id",
+                 T6."address_filled_at",
+                 T6."first_login",
+                 T6."upcoming_deletion_notified_at",
+                 T6."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 T8."id",
+                 T8."password",
+                 T8."last_login",
+                 T8."is_superuser",
+                 T8."username",
+                 T8."first_name",
+                 T8."last_name",
+                 T8."is_staff",
+                 T8."is_active",
+                 T8."date_joined",
+                 T8."address_line_1",
+                 T8."address_line_2",
+                 T8."post_code",
+                 T8."city",
+                 T8."department",
+                 T8."coords",
+                 T8."geocoding_score",
+                 T8."geocoding_updated_at",
+                 T8."ban_api_resolved_address",
+                 T8."insee_city_id",
+                 T8."title",
+                 T8."full_name_search_vector",
+                 T8."email",
+                 T8."phone",
+                 T8."kind",
+                 T8."identity_provider",
+                 T8."has_completed_welcoming_tour",
+                 T8."created_by_id",
+                 T8."external_data_source_history",
+                 T8."last_checked_at",
+                 T8."public_id",
+                 T8."address_filled_at",
+                 T8."first_login",
+                 T8."upcoming_deletion_notified_at",
+                 T8."allow_next_sso_sub_update",
+                 T9."user_id",
+                 T9."birthdate",
+                 T9."birth_place_id",
+                 T9."birth_country_id",
+                 T9."nir",
+                 T9."lack_of_nir_reason",
+                 T9."pole_emploi_id",
+                 T9."lack_of_pole_emploi_id_reason",
+                 T9."ft_gps_id",
+                 T9."asp_uid",
+                 T9."education_level",
+                 T9."resourceless",
+                 T9."rqth_employee",
+                 T9."oeth_employee",
+                 T9."pole_emploi_since",
+                 T9."unemployed_since",
+                 T9."has_rsa_allocation",
+                 T9."rsa_allocation_since",
+                 T9."ass_allocation_since",
+                 T9."aah_allocation_since",
+                 T9."are_allocation_since",
+                 T9."activity_bonus_since",
+                 T9."cape_freelance",
+                 T9."cesa_freelance",
+                 T9."actor_met_for_business_creation",
+                 T9."mean_monthly_income_before_process",
+                 T9."eiti_contributions",
+                 T9."hexa_lane_number",
+                 T9."hexa_std_extension",
+                 T9."hexa_non_std_extension",
+                 T9."hexa_lane_type",
+                 T9."hexa_lane_name",
+                 T9."hexa_additional_address",
+                 T9."hexa_post_code",
+                 T9."hexa_commune_id",
+                 T9."pe_obfuscated_nir",
+                 T9."pe_last_certification_attempt_at",
+                 T9."created_by_prescriber_organization_id",
+                 T9."is_stalled",
+                 T9."is_not_stalled_anymore",
+                 T9."fields_history",
+                 T10."id",
+                 T10."address_line_1",
+                 T10."address_line_2",
+                 T10."post_code",
+                 T10."city",
+                 T10."department",
+                 T10."coords",
+                 T10."geocoding_score",
+                 T10."geocoding_updated_at",
+                 T10."ban_api_resolved_address",
+                 T10."insee_city_id",
+                 T10."name",
+                 T10."created_at",
+                 T10."updated_at",
+                 T10."uid",
+                 T10."active_members_email_reminder_last_sent_at",
+                 T10."automatic_geocoding_update",
+                 T10."siret",
+                 T10."naf",
+                 T10."kind",
+                 T10."brand",
+                 T10."phone",
+                 T10."email",
+                 T10."auth_email",
+                 T10."website",
+                 T10."description",
+                 T10."provided_support",
+                 T10."source",
+                 T10."created_by_id",
+                 T10."block_job_applications",
+                 T10."job_applications_blocked_at",
+                 T10."spontaneous_applications_open_since",
+                 T10."convention_id",
+                 T10."job_app_score",
+                 T10."is_searchable",
+                 T10."rdv_solidarites_id",
+                 T10."fields_history",
+                 "eligibility_geiqeligibilitydiagnosis"."id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_kind",
+                 "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_geiqeligibilitydiagnosis"."created_at",
+                 "eligibility_geiqeligibilitydiagnosis"."updated_at",
+                 "eligibility_geiqeligibilitydiagnosis"."expires_at",
+                 "eligibility_geiqeligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_geiq_id",
+                 T12."id",
+                 T12."password",
+                 T12."last_login",
+                 T12."is_superuser",
+                 T12."username",
+                 T12."first_name",
+                 T12."last_name",
+                 T12."is_staff",
+                 T12."is_active",
+                 T12."date_joined",
+                 T12."address_line_1",
+                 T12."address_line_2",
+                 T12."post_code",
+                 T12."city",
+                 T12."department",
+                 T12."coords",
+                 T12."geocoding_score",
+                 T12."geocoding_updated_at",
+                 T12."ban_api_resolved_address",
+                 T12."insee_city_id",
+                 T12."title",
+                 T12."full_name_search_vector",
+                 T12."email",
+                 T12."phone",
+                 T12."kind",
+                 T12."identity_provider",
+                 T12."has_completed_welcoming_tour",
+                 T12."created_by_id",
+                 T12."external_data_source_history",
+                 T12."last_checked_at",
+                 T12."public_id",
+                 T12."address_filled_at",
+                 T12."first_login",
+                 T12."upcoming_deletion_notified_at",
+                 T12."allow_next_sso_sub_update",
+                 T13."id",
+                 T13."address_line_1",
+                 T13."address_line_2",
+                 T13."post_code",
+                 T13."city",
+                 T13."department",
+                 T13."coords",
+                 T13."geocoding_score",
+                 T13."geocoding_updated_at",
+                 T13."ban_api_resolved_address",
+                 T13."insee_city_id",
+                 T13."name",
+                 T13."created_at",
+                 T13."updated_at",
+                 T13."uid",
+                 T13."active_members_email_reminder_last_sent_at",
+                 T13."automatic_geocoding_update",
+                 T13."siret",
+                 T13."naf",
+                 T13."kind",
+                 T13."brand",
+                 T13."phone",
+                 T13."email",
+                 T13."auth_email",
+                 T13."website",
+                 T13."description",
+                 T13."provided_support",
+                 T13."source",
+                 T13."created_by_id",
+                 T13."block_job_applications",
+                 T13."job_applications_blocked_at",
+                 T13."spontaneous_applications_open_since",
+                 T13."convention_id",
+                 T13."job_app_score",
+                 T13."is_searchable",
+                 T13."rdv_solidarites_id",
+                 T13."fields_history",
+                 T14."id",
+                 T14."address_line_1",
+                 T14."address_line_2",
+                 T14."post_code",
+                 T14."city",
+                 T14."department",
+                 T14."coords",
+                 T14."geocoding_score",
+                 T14."geocoding_updated_at",
+                 T14."ban_api_resolved_address",
+                 T14."insee_city_id",
+                 T14."name",
+                 T14."created_at",
+                 T14."updated_at",
+                 T14."uid",
+                 T14."active_members_email_reminder_last_sent_at",
+                 T14."automatic_geocoding_update",
+                 T14."siret",
+                 T14."kind",
+                 T14."is_brsa",
+                 T14."phone",
+                 T14."email",
+                 T14."website",
+                 T14."description",
+                 T14."code_safir_pole_emploi",
+                 T14."created_by_id",
+                 T14."authorization_status",
+                 T14."authorization_updated_at",
+                 T14."authorization_updated_by_id",
+                 T14."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history",
+                 T15."id",
+                 T15."password",
+                 T15."last_login",
+                 T15."is_superuser",
+                 T15."username",
+                 T15."first_name",
+                 T15."last_name",
+                 T15."is_staff",
+                 T15."is_active",
+                 T15."date_joined",
+                 T15."address_line_1",
+                 T15."address_line_2",
+                 T15."post_code",
+                 T15."city",
+                 T15."department",
+                 T15."coords",
+                 T15."geocoding_score",
+                 T15."geocoding_updated_at",
+                 T15."ban_api_resolved_address",
+                 T15."insee_city_id",
+                 T15."title",
+                 T15."full_name_search_vector",
+                 T15."email",
+                 T15."phone",
+                 T15."kind",
+                 T15."identity_provider",
+                 T15."has_completed_welcoming_tour",
+                 T15."created_by_id",
+                 T15."external_data_source_history",
+                 T15."last_checked_at",
+                 T15."public_id",
+                 T15."address_filled_at",
+                 T15."first_login",
+                 T15."upcoming_deletion_notified_at",
+                 T15."allow_next_sso_sub_update",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "users_user" T6 ON ("eligibility_eligibilitydiagnosis"."author_id" = T6."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "users_user" T8 ON ("eligibility_eligibilitydiagnosis"."job_seeker_id" = T8."id")
+          LEFT OUTER JOIN "users_jobseekerprofile" T9 ON (T8."id" = T9."user_id")
+          LEFT OUTER JOIN "companies_company" T10 ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = T10."id")
+          LEFT OUTER JOIN "eligibility_geiqeligibilitydiagnosis" ON ("job_applications_jobapplication"."geiq_eligibility_diagnosis_id" = "eligibility_geiqeligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "users_user" T12 ON ("job_applications_jobapplication"."sender_id" = T12."id")
+          LEFT OUTER JOIN "companies_company" T13 ON ("job_applications_jobapplication"."sender_company_id" = T13."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" T14 ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = T14."id")
+          LEFT OUTER JOIN "users_user" T15 ON ("job_applications_jobapplication"."archived_by_id" = T15."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          WHERE (EXISTS
+                   (SELECT %s AS "a"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
+                           AND U0."user_id" = %s)
+                    LIMIT 1)
+                 AND "job_applications_jobapplication"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
+                 "companies_jobdescription"."id",
+                 "companies_jobdescription"."appellation_id",
+                 "companies_jobdescription"."company_id",
+                 "companies_jobdescription"."created_at",
+                 "companies_jobdescription"."updated_at",
+                 "companies_jobdescription"."is_active",
+                 "companies_jobdescription"."last_employer_update_at",
+                 "companies_jobdescription"."custom_name",
+                 "companies_jobdescription"."description",
+                 "companies_jobdescription"."ui_rank",
+                 "companies_jobdescription"."contract_type",
+                 "companies_jobdescription"."other_contract_type",
+                 "companies_jobdescription"."location_id",
+                 "companies_jobdescription"."hours_per_week",
+                 "companies_jobdescription"."open_positions",
+                 "companies_jobdescription"."profile_description",
+                 "companies_jobdescription"."is_resume_mandatory",
+                 "companies_jobdescription"."is_qpv_mandatory",
+                 "companies_jobdescription"."market_context_description",
+                 "companies_jobdescription"."source_id",
+                 "companies_jobdescription"."source_kind",
+                 "companies_jobdescription"."source_url",
+                 "companies_jobdescription"."source_tags",
+                 "companies_jobdescription"."field_history",
+                 "companies_jobdescription"."creation_source"
+          FROM "companies_jobdescription"
+          INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          ORDER BY "jobs_appellation"."name" ASC,
+                   "companies_jobdescription"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."created_at",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
+          FROM "eligibility_selectedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.latest_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.has_considered_valid[eligibility/models/iae.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_expired[eligibility/models/iae.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" = %s
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.has_considered_valid[eligibility/models/iae.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_expired[eligibility/models/iae.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 CASE
+                     WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
+                     ELSE %s
+                 END AS "from_prescriber",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_eligibilitydiagnosis"
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
+          INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                  OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
+                 AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
+          ORDER BY 10 DESC,
+                   "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplicationcomment"."id",
+                 "job_applications_jobapplicationcomment"."job_application_id",
+                 "job_applications_jobapplicationcomment"."company_id",
+                 "job_applications_jobapplicationcomment"."created_at",
+                 "job_applications_jobapplicationcomment"."created_by_id",
+                 "job_applications_jobapplicationcomment"."message",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "job_applications_jobapplicationcomment"
+          INNER JOIN "users_user" ON ("job_applications_jobapplicationcomment"."created_by_id" = "users_user"."id")
+          WHERE ("job_applications_jobapplicationcomment"."job_application_id" = %s
+                 AND "job_applications_jobapplicationcomment"."company_id" = %s)
+          ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
+          'IfNode[layout/base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "companies_jobdescription"
+          WHERE ("companies_jobdescription"."company_id" = %s
+                 AND "companies_jobdescription"."is_active"
+                 AND "companies_jobdescription"."last_employer_update_at" < %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.convention_can_be_accessed_by[companies/models.py]',
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "users_user"
+          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
+          WHERE ("companies_companymembership"."id" IN
+                   (SELECT U0."id"
+                    FROM "companies_companymembership" U0
+                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
+                    WHERE (U1."is_active"
+                           AND U0."is_active"
+                           AND U0."company_id" = %s
+                           AND U0."is_admin"
+                           AND U1."is_active"))
+                 AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'RelatedManager.last_considered_valid[eligibility/models/iae.py]',
+          'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
+          'User.has_valid_diagnosis[users/models.py]',
+          'JobApplication.eligibility_diagnosis_by_siae_required[job_applications/models.py]',
+          'accept_button[utils/templatetags/job_application_actions.py]',
+          'SimpleNode[apply/includes/siae_actions.html]',
+          'IfNode[apply/includes/siae_actions.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[apply/process_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 CASE
+                     WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
+                     ELSE %s
+                 END AS "from_prescriber",
+                 T4."id",
+                 T4."password",
+                 T4."last_login",
+                 T4."is_superuser",
+                 T4."username",
+                 T4."first_name",
+                 T4."last_name",
+                 T4."is_staff",
+                 T4."is_active",
+                 T4."date_joined",
+                 T4."address_line_1",
+                 T4."address_line_2",
+                 T4."post_code",
+                 T4."city",
+                 T4."department",
+                 T4."coords",
+                 T4."geocoding_score",
+                 T4."geocoding_updated_at",
+                 T4."ban_api_resolved_address",
+                 T4."insee_city_id",
+                 T4."title",
+                 T4."full_name_search_vector",
+                 T4."email",
+                 T4."phone",
+                 T4."kind",
+                 T4."identity_provider",
+                 T4."has_completed_welcoming_tour",
+                 T4."created_by_id",
+                 T4."external_data_source_history",
+                 T4."last_checked_at",
+                 T4."public_id",
+                 T4."address_filled_at",
+                 T4."first_login",
+                 T4."upcoming_deletion_notified_at",
+                 T4."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_eligibilitydiagnosis"
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
+          INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND ("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                      OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
+                 AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
+          ORDER BY 10 DESC,
+                   "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.resume_link[job_applications/models.py]',
+          'VariableNode[apply/includes/job_seeker_info.html]',
+          'IfNode[apply/includes/job_seeker_info.html]',
+          'IfNode[apply/includes/job_seeker_info.html]',
+          'IfNode[apply/includes/job_seeker_info.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "files_file"."id",
+                 "files_file"."key",
+                 "files_file"."last_modified"
+          FROM "files_file"
+          WHERE "files_file"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IfNode[apply/includes/certification_info_box.html]',
+          'IncludeNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
+          'VariableNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
+          'IfNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
+          ORDER BY "approvals_approval"."created_at" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[apply/includes/transition_logs.html]',
+          'WithNode[apply/includes/transition_logs.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplicationtransitionlog"."id",
+                 "job_applications_jobapplicationtransitionlog"."transition",
+                 "job_applications_jobapplicationtransitionlog"."from_state",
+                 "job_applications_jobapplicationtransitionlog"."to_state",
+                 "job_applications_jobapplicationtransitionlog"."timestamp",
+                 "job_applications_jobapplicationtransitionlog"."job_application_id",
+                 "job_applications_jobapplicationtransitionlog"."user_id",
+                 "job_applications_jobapplicationtransitionlog"."target_company_id",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "job_applications_jobapplicationtransitionlog"
+          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplicationtransitionlog"."user_id" = "users_user"."id")
+          WHERE "job_applications_jobapplicationtransitionlog"."job_application_id" = %s
+          ORDER BY "job_applications_jobapplicationtransitionlog"."timestamp" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---

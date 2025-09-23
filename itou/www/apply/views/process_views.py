@@ -24,7 +24,11 @@ from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.job_applications.models import (
+    JobApplication,
+    JobApplicationWorkflow,
+    PriorAction,
+)
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title, UserKind
@@ -36,6 +40,7 @@ from itou.www.apply.forms import (
     AcceptForm,
     AddToPoolForm,
     AnswerForm,
+    JobApplicationAddCommentForCompanyForm,
     JobApplicationInternalTransferForm,
     PriorActionForm,
     TransferJobApplicationForm,
@@ -56,6 +61,7 @@ logger = logging.getLogger(__name__)
 
 
 JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY = "JOB_APP_DETAILS_FOR_COMPANY-BACK_URL-%d"
+LAST_COMMENTS_COUNT = 3
 
 
 def check_waiting_period(job_application):
@@ -258,27 +264,69 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
 
-    context = {
-        "can_be_cancelled": can_be_cancelled,
-        "can_view_personal_information": True,  # SIAE members have access to personal info
-        "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
-        "display_refusal_info": False,
-        "eligibility_diagnosis": eligibility_diagnosis,
-        "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
-        "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
-        "job_application": job_application,
-        "invitation_requests": invitation_requests,
-        "participations": participations,
-        "transition_logs": transition_logs,
-        "back_url": back_url,
-        "add_prior_action_form": (
-            PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
-        ),
-        "matomo_custom_title": "Candidature",
-        "job_application_sender_left_org": job_application_sender_left_org(job_application),
-    } | get_siae_actions_context(request, job_application)
+    comments = list(job_application.comments.select_related("created_by").filter(company=job_application.to_company))
+    context = (
+        {
+            "can_be_cancelled": can_be_cancelled,
+            "can_view_personal_information": True,  # SIAE members have access to personal info
+            "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
+            "display_refusal_info": False,
+            "eligibility_diagnosis": eligibility_diagnosis,
+            "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
+            "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+            "job_application": job_application,
+            "invitation_requests": invitation_requests,
+            "participations": participations,
+            "transition_logs": transition_logs,
+            "back_url": back_url,
+            "add_prior_action_form": (
+                PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
+            ),
+            "comments": comments,
+            "last_comments": comments[:LAST_COMMENTS_COUNT],
+            "add_comment_form": JobApplicationAddCommentForCompanyForm(
+                job_application=job_application, created_by=request.user
+            ),
+            "matomo_custom_title": "Candidature",
+            "job_application_sender_left_org": job_application_sender_left_org(job_application),
+        }
+        | get_siae_actions_context(request, job_application)
+    )
 
     return render(request, template_name, context)
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def add_comment_for_company(request, job_application_id):
+    queryset = JobApplication.objects.is_active_company_member(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+    location = "tab" if request.POST.get("location") == "tab" else "sidebar"
+
+    form = JobApplicationAddCommentForCompanyForm(
+        request.POST or None, job_application=job_application, created_by=request.user
+    )
+
+    if form.is_valid():
+        form.save()
+        logger.info("user=%d added a new comment on job_application=%s", request.user.pk, job_application_id)
+        # Serve an empty form
+        form = JobApplicationAddCommentForCompanyForm(job_application=job_application, created_by=request.user)
+
+    comments = list(job_application.comments.select_related("created_by").filter(company=job_application.to_company))
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "comments": comments,
+        "last_comments": comments[:LAST_COMMENTS_COUNT],
+        "location": location,
+    }
+
+    return render(
+        request,
+        "apply/includes/job_application_add_comment.html",
+        context,
+    )
 
 
 @check_user(lambda u: u.is_prescriber or u.is_employer)

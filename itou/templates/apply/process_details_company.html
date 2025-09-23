@@ -47,6 +47,12 @@
             </li>
         {% endif %}
         <li class="nav-item" role="presentation">
+            <a class="nav-link" id="comments-tab" data-bs-toggle="tab" href="#comments" role="tab" aria-controls="comments" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
+                {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
+            </a>
+
+        </li>
+        <li class="nav-item" role="presentation">
             <a class="nav-link" id="historique-tab" data-bs-toggle="tab" href="#historique" role="tab" aria-controls="historique" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
         </li>
     </ul>
@@ -124,7 +130,11 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
-                            {% block sidebar %}{{ block.super }}{% endblock %}
+                            {% block sidebar %}
+                                {{ block.super }}
+                                {% include "apply/includes/job_application_add_comment.html" with location="sidebar" job_application=job_application form=add_comment_form request=request csrf_token=csrf_token only %}
+                                {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request only %}
+                            {% endblock %}
                         </div>
                     </div>
                 </div>
@@ -139,6 +149,17 @@
                         </div>
                     </div>
                 {% endif %}
+
+                <div class="tab-pane fade" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+                    <div class="s-section__row row">
+                        <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                            {# Comments ------------------------------------------------------ #}
+                            <h2>Commentaires</h2>
+                            {% include "apply/includes/job_application_add_comment.html" with location="tab" job_application=job_application form=add_comment_form request=request csrf_token=csrf_token only %}
+                            {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request only %}
+                        </div>
+                    </div>
+                </div>
 
                 <div class="tab-pane fade" id="historique" role="tabpanel" aria-labelledby="historique-tab">
                     <div class="s-section__row row">
@@ -158,6 +179,14 @@
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script nonce="{{ CSP_NONCE }}">
+        const commentsBtn = document.querySelector('#comments-btn');
+        const commentsTab = document.querySelector('#comments-tab');
+
+        commentsBtn.addEventListener("click", function() {
+            bootstrap.Tab.getOrCreateInstance(commentsTab).show();
+        });
+    </script>
 {% endblock %}
 
 {% block modals %}
@@ -174,7 +203,12 @@
                             <h3 class="modal-title" id="transfer_modal_title">Transfert de la candidature</h3>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
-                        <div class="modal-body">{% bootstrap_field transfer_form.target_company_id label_class="" %}</div>
+                        <div class="modal-body">
+                            {% bootstrap_field transfer_form.target_company_id label_class="" %}
+                            <div class="c-info">
+                                <span class="c-info__summary">Les commentaires restent internes à votre structure et ne seront pas transmis lors du transfert.</span>
+                            </div>
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Annuler</button>
                             {% if can_transfer_external %}

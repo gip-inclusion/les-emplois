@@ -29,6 +29,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerFactory,
     PrescriberFactory,
 )
@@ -256,3 +257,22 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         born_in_france=True,
     )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)
+
+
+class JobApplicationCommentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobApplicationComment
+
+    class Params:
+        for_snapshot = factory.Trait(
+            job_application__for_snapshot=True,
+            created_at=datetime(2000, 1, 1, 12, 12, 0, tzinfo=UTC),
+            created_by__for_snapshot=True,
+            message="Cette candidate est venue 3 fois, elle est motivée.",
+        )
+
+    job_application = factory.SubFactory(JobApplicationFactory)
+    created_at = factory.LazyFunction(datetime.now)
+    created_by = factory.SubFactory(EmployerFactory)  # Usually a member of the company, but he might have left
+    message = factory.Faker("sentence", nb_words=40)
+    company = factory.SelfAttribute(".job_application.to_company")

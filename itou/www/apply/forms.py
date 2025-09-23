@@ -20,7 +20,7 @@ from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, PriorAction
+from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -1043,3 +1043,34 @@ class JobApplicationInternalTransferForm(forms.Form):
             elif job_app_count > 1:
                 label += f"les {job_app_count} candidatures."
             self.fields["target_company_id"].label = label
+
+
+class JobApplicationAddCommentForCompanyForm(forms.ModelForm):
+    """
+    Allows members of a company to add a comment on the job application detail page.
+    These comments are seen by all active members of the company.
+    """
+
+    message = forms.CharField(
+        label="Ajouter un commentaire",
+        required=True,
+        widget=forms.Textarea(attrs={"data-it-expandable": "true"}),
+        strip=True,
+        max_length=JobApplicationComment.MAX_LENGTH,
+        help_text="Les commentaires ne sont visibles que par les membres de votre structure.",
+    )
+
+    class Meta:
+        model = JobApplicationComment
+        fields = ["message"]
+
+    def __init__(self, *args, job_application, created_by, **kwargs):
+        self.job_application = job_application
+        self.created_by = created_by
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.instance.job_application = self.job_application
+        self.instance.created_by = self.created_by
+        self.instance.company = self.job_application.to_company
+        return super().save()

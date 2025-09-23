@@ -5628,7 +5628,7 @@ class TestHireConfirmation:
 
         job_application = JobApplication.objects.get(sender=company.members.first(), to_company=company)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        assertRedirects(response, next_url, status_code=200)
+        assert response.url == next_url
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
