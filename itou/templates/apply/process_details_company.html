@@ -133,7 +133,7 @@
                             {% block sidebar %}
                                 {{ block.super }}
                                 {% include "apply/includes/job_application_add_comment.html" with location="sidebar" job_application=job_application form=add_comment_form request=request csrf_token=csrf_token only %}
-                                {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request only %}
+                                {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request hx_swap_oob=False only %}
                             {% endblock %}
                         </div>
                     </div>
@@ -156,7 +156,7 @@
                             {# Comments ------------------------------------------------------ #}
                             <h2>Commentaires</h2>
                             {% include "apply/includes/job_application_add_comment.html" with location="tab" job_application=job_application form=add_comment_form request=request csrf_token=csrf_token only %}
-                            {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request only %}
+                            {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request csrf_token=csrf_token hx_swap_oob=False only %}
                         </div>
                     </div>
                 </div>

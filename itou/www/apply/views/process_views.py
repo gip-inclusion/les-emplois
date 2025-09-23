@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, F, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
@@ -26,6 +26,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import (
     JobApplication,
+    JobApplicationComment,
     JobApplicationWorkflow,
     PriorAction,
 )
@@ -325,6 +326,36 @@ def add_comment_for_company(request, job_application_id):
     return render(
         request,
         "apply/includes/job_application_add_comment.html",
+        context,
+    )
+
+
+@require_POST
+@check_user(lambda user: user.is_employer)
+def delete_comment_for_company(request, job_application_id, comment_id):
+    comment = JobApplicationComment.objects.filter(
+        job_application_id=job_application_id, created_by=request.user, id=comment_id
+    )
+
+    del_count, _ = comment.delete()
+    logger.info("user=%d deleted %d comment on job_application=%s", request.user.pk, del_count, job_application_id)
+
+    comments = list(
+        JobApplicationComment.objects.select_related("created_by").filter(
+            job_application=job_application_id,
+            company=F("job_application__to_company"),
+        )
+    )
+    context = {
+        "comments": comments,
+        "last_comments": comments[:LAST_COMMENTS_COUNT],
+        "location": "tab",
+        "hx_swap_oob": False,
+    }
+
+    return render(
+        request,
+        "apply/includes/job_application_comments_list.html",
         context,
     )
 
