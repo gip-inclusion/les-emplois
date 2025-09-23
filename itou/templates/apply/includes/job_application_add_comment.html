@@ -56,7 +56,7 @@
 </div>
 
 {% if request.htmx %}
-    {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request only %}
-    {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments request=request only %}
+    {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments request=request hx_swap_oob=True only %}
+    {% include "apply/includes/job_application_comments_list.html" with location="tab" comments=comments last_comments=last_comments request=request csrf_token=csrf_token hx_swap_oob=True only %}
     {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
 {% endif %}

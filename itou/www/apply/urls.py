@@ -140,6 +140,11 @@ urlpatterns = [
         process_views.add_comment_for_company,
         name="add_comment_for_company",
     ),
+    path(
+        "<uuid:job_application_id>/siae/comment/<int:comment_id>/delete",
+        process_views.delete_comment_for_company,
+        name="delete_comment_for_company",
+    ),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
     path("<uuid:job_application_id>/siae/eligibility", process_views.IAEEligibilityView.as_view(), name="eligibility"),
     path(

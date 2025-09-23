@@ -469,12 +469,16 @@
                                   <ul class="list-note">
                                       <li>
                                           <div>
-                                              <time datetime="2025-09-26T12:12:12+00:00">
-                                                  Le 26 septembre 2025 à 14:12
-                                              </time>
-                                              <strong>
-                                                  Alice ABOLIVIER
-                                              </strong>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
                                               <blockquote class="blockquote">
                                                   <div class="collapse show">
                                                       <p class="mb-0">
@@ -486,13 +490,17 @@
                                       </li>
                                       <li class="is-current-user">
                                           <div>
-                                              <time datetime="2025-09-26T12:12:12+00:00">
-                                                  Le 26 septembre 2025 à 14:12
-                                              </time>
-                                              <strong>
-                                                  Bob BANANA
-                          (vous)
-                                              </strong>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Bob BANANA
+                                  (vous)
+                                                      </strong>
+                                                  </div>
+                                              </div>
                                               <blockquote class="blockquote">
                                                   <div class="collapse show">
                                                       <p class="mb-0">
@@ -567,12 +575,16 @@
                                           <i class="ri-user-line">
                                           </i>
                                           <div>
-                                              <time datetime="2025-09-26T12:12:12+00:00">
-                                                  Le 26 septembre 2025 à 14:12
-                                              </time>
-                                              <strong>
-                                                  Alice ABOLIVIER
-                                              </strong>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
                                               <blockquote class="blockquote">
                                                   <div class="collapse show">
                                                       <p class="mb-0">
@@ -586,13 +598,60 @@
                                           <i class="ri-user-line">
                                           </i>
                                           <div>
-                                              <time datetime="2025-09-26T12:12:12+00:00">
-                                                  Le 26 septembre 2025 à 14:12
-                                              </time>
-                                              <strong>
-                                                  Bob BANANA
-                          (vous)
-                                              </strong>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Bob BANANA
+                                  (vous)
+                                                      </strong>
+                                                  </div>
+                                                  <button class="btn btn-sm btn-link btn-ico-only" data-bs-target="#delete_comment_[Pk of JobApplicationComment]_modal" data-bs-toggle="modal">
+                                                      <i aria-label="Supprimer ce commentaire" class="ri-delete-bin-line" data-bs-title="Supprimer" data-bs-toggle="tooltip">
+                                                      </i>
+                                                  </button>
+                                                  <div aria-hidden="true" aria-labelledby="delete_comment_[Pk of JobApplicationComment]_title" class="modal fade" id="delete_comment_[Pk of JobApplicationComment]_modal" tabindex="-1">
+                                                      <div class="modal-dialog modal-dialog-centered">
+                                                          <div class="modal-content">
+                                                              <div class="modal-header">
+                                                                  <h3 id="delete_comment_[Pk of JobApplicationComment]_title">
+                                                                      Suppression du commentaire
+                                                                  </h3>
+                                                                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                                                                  </button>
+                                                              </div>
+                                                              <div class="modal-body">
+                                                                  <div class="row">
+                                                                      <div class="col">
+                                                                          <p>
+                                                                              Voulez-vous supprimer ce commentaire ?
+                                                                          </p>
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                              <div class="modal-footer">
+                                                                  <form class="d-block js-prevent-multiple-submit" hx-indicator="#comments-list-tab" hx-post="/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete" hx-swap="outerHTML" hx-target="#comments-list-tab">
+                                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                                      <div class="text-end">
+                                                                          <button aria-label="Annuler la suppression du commentaire" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">
+                                                                              Annuler
+                                                                          </button>
+                                                                          <button aria-label="Supprimer le commentaire" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                                                                              <i aria-hidden="true" class="ri-delete-bin-line fw-normal">
+                                                                              </i>
+                                                                              <span>
+                                                                                  Supprimer
+                                                                              </span>
+                                                                          </button>
+                                                                      </div>
+                                                                  </form>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </div>
                                               <blockquote class="blockquote">
                                                   <div class="collapse show">
                                                       <p class="mb-0">
