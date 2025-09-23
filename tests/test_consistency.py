@@ -1,4 +1,5 @@
 import collections
+import inspect
 import itertools
 import json
 import os
@@ -8,6 +9,7 @@ import pathlib
 from crontab import CronTab
 from django.apps import apps
 from django.conf import settings
+from django.core import management
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.related import RelatedField
 from django.template import loader, loader_tags
@@ -29,17 +31,40 @@ def iter_template_names():
                     yield os.path.relpath(os.path.join(dirpath, filename), template_dir)
 
 
-def test_crontab_order(settings):
-    current_jobs = list(
+def load_cron_items_from_json(settings):
+    return list(
         CronTab(
             tab="\n".join(
                 json.loads(pathlib.Path(settings.ROOT_DIR).joinpath("clevercloud", "cron.json").read_bytes())
             )
         )
     )
+
+
+def test_crontab_order(settings):
+    current_jobs = load_cron_items_from_json(settings)
     ordered_jobs = sorted(current_jobs, key=lambda j: (-j.frequency(), j.hour.parts, j.minute.parts))
 
     assert ordered_jobs == current_jobs
+
+
+def test_sentry_monitor_cron_config(settings):
+    cron_items = load_cron_items_from_json(settings)
+    checked_commands = set()
+    for cmd_name, app_name in management.get_commands().items():
+        command_handle = management.load_command_class(app_name, cmd_name).handle
+        if closure_nonlocals_self := inspect.getclosurevars(command_handle).nonlocals.get("self"):
+            if monitor_config := getattr(closure_nonlocals_self, "monitor_config", None):
+                # This command is likely monitored by Sentry
+                schedule = monitor_config["schedule"]
+                assert schedule["type"] == "crontab"
+                for cron_item in cron_items:
+                    if cron_item.command and cmd_name in cron_item.command:
+                        assert schedule["value"] == cron_item.slices.render()
+                        checked_commands.add(cmd_name)
+
+    # Make sure our shenanigans worked and we actually checked something
+    assert checked_commands
 
 
 def test_unused_templates():
