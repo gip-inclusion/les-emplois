@@ -846,6 +846,9 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
             self.eligibility_diagnosis.job_seeker = self.job_seeker
 
         context["expired_eligibility_diagnosis"] = None
+        # Always defined in the context, to track it through eligibility
+        # templates includes.
+        context["hiring_date_for_eligibility"] = None
         return context
 
 
