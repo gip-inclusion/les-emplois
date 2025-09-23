@@ -135,6 +135,11 @@ urlpatterns = [
     ),
     path("<uuid:job_application_id>/siae/details", process_views.details_for_company, name="details_for_company"),
     path("<uuid:job_application_id>/siae/add-to-pool", process_views.add_to_pool, name="add_to_pool"),
+    path(
+        "<uuid:job_application_id>/siae/comment",
+        process_views.add_comment_for_company,
+        name="add_comment_for_company",
+    ),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
     path("<uuid:job_application_id>/siae/eligibility", process_views.IAEEligibilityView.as_view(), name="eligibility"),
     path(
