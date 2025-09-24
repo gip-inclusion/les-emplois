@@ -877,6 +877,8 @@ class TestJobApplicationNotifications:
         # Unauthorized prescriber is the default sender
         extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
         job_application = JobApplicationFactory(
+            sender__first_name="Un joli prénom",
+            sender__last_name="Un nom de famille original",
             selected_jobs=Appellation.objects.all(),
             **extra_kwargs,
         )
@@ -958,7 +960,11 @@ class TestJobApplicationNotifications:
     def test_accept_for_prescriber(self, is_authorized_prescriber):
         # Unauthorized prescriber is the default sender
         extra_kwargs = {"sent_by_authorized_prescriber_organisation": True} if is_authorized_prescriber else {}
-        job_application = JobApplicationFactory(**extra_kwargs)
+        job_application = JobApplicationFactory(
+            sender__first_name="Un joli prénom",
+            sender__last_name="Un nom de famille original",
+            **extra_kwargs,
+        )
         email = job_application.notifications_accept_for_proxy.build()
         # To.
         assert job_application.to_company.email not in email.to
