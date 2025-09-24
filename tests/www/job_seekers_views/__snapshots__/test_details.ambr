@@ -196,11 +196,11 @@
                                                   <h3 class="mb-0">
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                  <span class="text-warning fs-sm">
+                                                      Diagnostic non confirmé par John DOE (Acme inc.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                                                       <i aria-hidden="true" class="ri-error-warning-line">
                                                       </i>
@@ -211,10 +211,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      John DOE
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -466,13 +466,14 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés le 14/08/2024 par John DOE
+                      (Acme inc.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -483,11 +484,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      John DOE
-                  (Acme inc.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -932,13 +932,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés le 14/08/2024 par Pierre DUPONT
+                      
+                      
+                          (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -949,13 +952,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -983,10 +983,10 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Diagnostic confirmé par Pierre DUPONT (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -997,13 +997,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -2147,10 +2144,10 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Diagnostic confirmé par Pierre DUPONT (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2161,13 +2158,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -2432,10 +2426,10 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Diagnostic confirmé par Pierre DUPONT (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2446,13 +2440,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -2886,13 +2877,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés le 14/08/2024 par Pierre DUPONT
+                      
+                      
+                          (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2903,13 +2897,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -3147,13 +3138,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés le 14/08/2024 par Pierre DUPONT
+                      
+                      
+                          (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -3164,13 +3158,10 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Diagnostic valide
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>

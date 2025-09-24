@@ -1,15 +1,31 @@
 {% load badges %}
+
 <div class="c-box mb-3 mb-md-4">
     <div class="row mb-3">
         <div class="col-12 col-sm">
             {% if kind == "IAE" %}
-                <h3 class="mb-0">Diagnostic IAE</h3>
+                <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
+                <span class="text-success fs-sm">
+                    Critères validés le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par {{ eligibility_diagnosis.author.get_full_name }}
+                    {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                    {% if eligibility_diagnosis.author_prescriber_organization %}
+                        ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                    {% endif %}
+                </span>
             {% elif kind == "GEIQ" %}
                 <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+                {% if eligibility_diagnosis.allowance_amount %}
+                    <span class="text-success fs-sm">
+                        Diagnostic confirmé par {{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }})
+                    </span>
+                {% else %}
+                    <span class="text-warning fs-sm">
+                        Diagnostic non confirmé par {{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }})
+                    </span>
+                {% endif %}
             {% endif %}
-            <span class="text-success fs-sm">Valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</span>
         </div>
-        <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+        <div class="col-12 col-sm-auto">
             {% if kind == "IAE" %}
                 {% iae_eligibility_badge is_eligible=True extra_classes="badge-sm" %}
             {% elif kind == "GEIQ" %}
@@ -23,13 +39,8 @@
     </div>
     <ul class="list-data mb-3">
         <li>
-            <small>Confirmé par</small>
-            <strong>{{ eligibility_diagnosis.author.get_full_name }}
-                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
-                {% if eligibility_diagnosis.author_prescriber_organization %}
-                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
-                {% endif %}
-            </strong>
+            <small>Diagnostic valide</small>
+            <strong>du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
         </li>
         <li>
             <small>Critères administratifs sélectionnés</small>

@@ -9,9 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.templatetags import format_filters
-from tests.approvals.factories import (
-    ApprovalFactory,
-)
+from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
@@ -66,7 +64,7 @@ class TestEmployeeDetailView:
         assertContains(response, self.APPROVAL_NUMBER_LABEL)
         assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
         assertContains(response, "Informations du salarié")
-        assertContains(response, "Éligibilité à l'IAE", html=True)
+        assertContains(response, "Diagnostic d'éligibilité à l'IAE", html=True)
         assertContains(response, "Candidatures de ce salarié")
         assertContains(response, "Voir sa candidature", count=2)
         job_application_base_url = reverse(

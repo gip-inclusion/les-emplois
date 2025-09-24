@@ -1,67 +1,65 @@
 {% if diagnosis.is_valid or job_application.state.is_accepted and diagnosis %}
     {% if diagnosis.allowance_amount %}
         <hr class="my-4">
-        <h3>Éligibilité public prioritaire GEIQ validée</h3>
+        <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+        <span class="text-success fs-sm">
+            Diagnostic confirmé par {{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})
+        </span>
     {% else %}
         <hr class="my-4">
-        <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
+        <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+        <span class="text-warning fs-sm">
+            Diagnostic non confirmé par {{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})
+        </span>
     {% endif %}
-
-    {% if diagnosis.allowance_amount %}
-        <p>
-            Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
-        </p>
-    {% else %}
-        <p>
-            Renseignée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
-        </p>
-    {% endif %}
-
-    {% if diagnosis.selected_administrative_criteria_for_display %}
-        <h4>Situation administrative du candidat</h4>
-        <ul>
-            {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
-                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
-
-    {% if diagnosis.allowance_amount %}
-        <p>
-            <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
-        </p>
-        {% if request.user.is_employer %}
-            {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
+    <div class="mt-3">
+        {% if diagnosis.selected_administrative_criteria_for_display %}
+            <h4>Situation administrative du candidat</h4>
+            <ul>
+                {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
+                    {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                {% endfor %}
+            </ul>
         {% endif %}
-    {% elif request.user.is_employer %}
-        {# Existing GEIQ, diagnosis but no allowance #}
-        <div class="alert alert-warning mt-4" role="status">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Aide à l'accompagement GEIQ</strong>
-                    </p>
-                    <p class="mb-0">
-                        Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}" class="btn btn-sm btn-primary">Mettre à jour</a>
+
+        {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
+
+        {% if diagnosis.allowance_amount %}
+            <p>
+                <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
+            </p>
+            {% if request.user.is_employer %}
+                {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
+            {% endif %}
+        {% elif request.user.is_employer %}
+            {# Existing GEIQ, diagnosis but no allowance #}
+            <div class="alert alert-warning mt-4" role="status">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Aide à l'accompagnement GEIQ</strong>
+                        </p>
+                        <p class="mb-0">
+                            Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                        <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}" class="btn btn-sm btn-primary">Mettre à jour</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 {% else %}
     {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
     <hr class="my-4">
-    <div class="row align-items-center">
+    <div class="row">
         <div class="col-12 col-md">
-            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
+            <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+            <span class="text-warning fs-sm">Diagnostic non confirmé</span>
         </div>
         {% if request.user.is_employer %}
             <div class="col-12 col-md-auto">
@@ -71,24 +69,24 @@
                     </a>
                 {% endwith %}
             </div>
-            {# GEIQ eligibility diagnosis expired #}
-            {% if diagnosis and not diagnosis.is_valid %}
-                <div class="alert alert-warning mt-4" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Aide à l'accompagement GEIQ</strong>
-                            </p>
-                            <p class="mb-0">
-                                Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
         {% endif %}
     </div>
+    {# GEIQ eligibility diagnosis expired #}
+    {% if request.user.is_employer and diagnosis and not diagnosis.is_valid %}
+        <div class="alert alert-warning mt-3" role="status">
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>Aide à l'accompagnement GEIQ</strong>
+                    </p>
+                    <p class="mb-0">
+                        Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endif %}
