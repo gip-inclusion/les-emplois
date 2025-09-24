@@ -99,9 +99,6 @@ class Command(BaseCommand):
         n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
         self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, cities_removed_by_api)
 
-        objs = City.objects.bulk_create(cities_added_by_api)
-        self.logger.info("successfully created count=%d new cities", len(objs))
-
         n_objs = City.objects.bulk_update(
             cities_updated_by_api,
             fields=[
@@ -115,3 +112,6 @@ class Command(BaseCommand):
             batch_size=1000,
         )
         self.logger.info("successfully updated count=%d cities", n_objs)
+
+        objs = City.objects.bulk_create(cities_added_by_api)
+        self.logger.info("successfully created count=%d new cities", len(objs))
