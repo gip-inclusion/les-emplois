@@ -25,9 +25,6 @@
         {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
         {% if diagnosis.allowance_amount %}
-            <p>
-                <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
-            </p>
             {% if request.user.is_employer %}
                 {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
             {% endif %}
@@ -51,6 +48,9 @@
                     </div>
                 </div>
             </div>
+        {% endif %}
+        {% if diagnosis.allowance_amount %}
+            {% include "apply/includes/administrative_criteria_info.html" with eligibility_diagnosis_expire_at=diagnosis.expires_at kind="GEIQ" only %}
         {% endif %}
     </div>
 {% else %}
