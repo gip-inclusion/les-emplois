@@ -4,11 +4,10 @@ import urllib.parse
 import httpx
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
-from django.db import transaction
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City, EditionModeChoices
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 
@@ -53,12 +52,15 @@ def api_city_to_db_city(data):
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
+
     help = "Synchronizes cities with the GEO API"
 
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    def handle(self, *, wet_run, **options):
+    @dry_runnable
+    def handle(self, **options):
         cities_from_api = fetch_cities() + fetch_cities(districts_only=True)
 
         cities_added_by_api = []
@@ -91,27 +93,25 @@ class Command(BaseCommand):
                 cities_removed_by_api.add(item.key)
             self.logger.info(item.label)
 
-        if wet_run:
-            with transaction.atomic():
-                # Note: for now we'll let the cron remove the cities since there is very little chance that
-                # a City that is linked to one of our JobDescriptions would suddenly disappear. Handle that
-                # case as it happens, by "deactivating" the city by instance: the cron would crash.
-                n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
-                self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, cities_removed_by_api)
+        # Note: for now we'll let the cron remove the cities since there is very little chance that
+        # a City that is linked to one of our JobDescriptions would suddenly disappear. Handle that
+        # case as it happens, by "deactivating" the city by instance: the cron would crash.
+        n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
+        self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, cities_removed_by_api)
 
-                objs = City.objects.bulk_create(cities_added_by_api)
-                self.logger.info("successfully created count=%d new cities", len(objs))
+        objs = City.objects.bulk_create(cities_added_by_api)
+        self.logger.info("successfully created count=%d new cities", len(objs))
 
-                n_objs = City.objects.bulk_update(
-                    cities_updated_by_api,
-                    fields=[
-                        "name",
-                        "slug",
-                        "department",
-                        "post_codes",
-                        "code_insee",
-                        "coords",
-                    ],
-                    batch_size=1000,
-                )
-                self.logger.info("successfully updated count=%d cities", n_objs)
+        n_objs = City.objects.bulk_update(
+            cities_updated_by_api,
+            fields=[
+                "name",
+                "slug",
+                "department",
+                "post_codes",
+                "code_insee",
+                "coords",
+            ],
+            batch_size=1000,
+        )
+        self.logger.info("successfully updated count=%d cities", n_objs)
