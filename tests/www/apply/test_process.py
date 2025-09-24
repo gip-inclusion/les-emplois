@@ -30,7 +30,7 @@ from itou.approvals.models import Approval, Suspension
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
@@ -2448,7 +2448,7 @@ class TestProcessAcceptViews:
         ],
     )
     def test_select_other_job_description_for_job_application(self, client, mocker, view_name, legacy_case):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
@@ -3052,7 +3052,7 @@ class TestProcessAcceptViews:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3145,7 +3145,7 @@ class TestProcessAcceptViews:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified_simplifiedview(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -3194,7 +3194,7 @@ class TestProcessAcceptViews:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3214,7 +3214,7 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
         ).all()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -3271,7 +3271,7 @@ class TestProcessAcceptViews:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified_simplifiedview(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
@@ -3291,7 +3291,7 @@ class TestProcessAcceptViews:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
         ).all()
         url_accept = reverse("apply:accept_contract", kwargs={"job_application_id": job_application.pk})
