@@ -52,7 +52,7 @@
             {% bootstrap_field form_user_address.fill_mode %}
         {% endif %}
 
-        <hr>
+        {% if form_user_address or form_personal_data or form_birth_place %}<hr>{% endif %}
         <h2>Contrat</h2>
         {% bootstrap_form_errors form_accept type="non_fields" %}
 
