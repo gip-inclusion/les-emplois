@@ -37,11 +37,7 @@
             {% endif %}
         </div>
     </div>
-    <ul class="list-data mb-3">
-        <li>
-            <small>Diagnostic valide</small>
-            <strong>du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
-        </li>
+    <ul class="list-data my-3">
         <li>
             <small>Critères administratifs sélectionnés</small>
             {# Keep ordering from manager (level then ui_rank) #}
@@ -66,4 +62,5 @@
     {% if kind == "GEIQ" and with_allowance %}
         {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
     {% endif %}
+    {% include "apply/includes/administrative_criteria_info.html" with eligibility_diagnosis_expire_at=eligibility_diagnosis.expires_at kind=kind only %}
 </div>

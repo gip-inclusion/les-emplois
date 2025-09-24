@@ -2812,8 +2812,6 @@
       dict({
         'origin': list([
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-          'VariableNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
-          'IfNode[includes/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',

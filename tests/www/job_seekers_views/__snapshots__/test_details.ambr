@@ -208,15 +208,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -258,6 +250,11 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -481,15 +478,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -507,6 +496,12 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+              Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -949,15 +944,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -975,6 +962,12 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+              Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
@@ -994,15 +987,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -1020,6 +1005,11 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2155,15 +2145,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -2208,6 +2190,11 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2437,15 +2424,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -2466,6 +2445,11 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2894,15 +2878,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -2923,6 +2899,12 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+              Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -3155,15 +3137,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Diagnostic valide
-                                                  </small>
-                                                  <strong>
-                                                      du 14/08/2024 au 14/02/2025
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Critères administratifs sélectionnés
@@ -3184,6 +3158,12 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+              Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>

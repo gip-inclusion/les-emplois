@@ -1,13 +1,5 @@
 
 {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
-    <p class="fs-sm">
-        {% if selected_administrative_criteria %}
-            <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
-        {% else %}
-            <i>Le prescripteur habilité n’a pas renseigné de critères.</i>
-        {% endif %}
-    </p>
-
     {% if selected_administrative_criteria %}
         <p class="mb-2">
             <span class="badge badge-sm rounded-pill bg-secondary">
@@ -41,19 +33,11 @@
                 {% endif %}
             {% endfor %}
         </ul>
+    {% else %}
+        <p class="fs-sm mb-2">
+            <i>Le prescripteur habilité n’a pas renseigné de critères.</i>
+        </p>
     {% endif %}
 {% endwith %}
 
 {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis itou_help_center_url=itou_help_center_url request=request only %}
-
-<p class="mb-0">
-    <i>
-        {% if is_sent_by_authorized_prescriber %}
-            Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% else %}
-            Ce diagnostic expire le
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% endif %}
-    </i>
-</p>

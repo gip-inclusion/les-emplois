@@ -11,14 +11,17 @@
         </span>
         <div class="mt-3">
             {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request itou_help_center_url=itou_help_center_url only %}
+            {% include "apply/includes/administrative_criteria_info.html" with eligibility_diagnosis_expire_at=eligibility_diagnosis.considered_to_expire_at kind="IAE" only %}
         </div>
     {% elif expired_eligibility_diagnosis %}
         <hr class="my-4">
         <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
         <span class="text-warning fs-sm">Diagnostic expiré</span>
         <div class="mt-3">
-            <p class="mb-0">
-                Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
+            <p class="fs-sm mb-0">
+                <i>
+                    Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
+                </i>
             </p>
         </div>
     {% endif %}
