@@ -1714,7 +1714,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2022,6 +2022,45 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_archivedevaluatedsiae"."id",
+                 "siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_archivedevaluatedsiae"."siae_id",
+                 "siae_evaluations_archivedevaluatedsiae"."reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_state",
+                 "siae_evaluations_archivedevaluatedsiae"."job_applications_count",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
+          FROM "siae_evaluations_archivedevaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          WHERE ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_archivedevaluatedsiae"."siae_id" = %s)
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
         ''',
       }),
       dict({
@@ -2055,7 +2094,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep2.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2365,6 +2404,45 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_archivedevaluatedsiae"."id",
+                 "siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_archivedevaluatedsiae"."siae_id",
+                 "siae_evaluations_archivedevaluatedsiae"."reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_state",
+                 "siae_evaluations_archivedevaluatedsiae"."job_applications_count",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
+          FROM "siae_evaluations_archivedevaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          WHERE ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_archivedevaluatedsiae"."siae_id" = %s)
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
         ''',
       }),
       dict({
@@ -2398,7 +2476,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2708,6 +2786,45 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_archivedevaluatedsiae"."id",
+                 "siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id",
+                 "siae_evaluations_archivedevaluatedsiae"."siae_id",
+                 "siae_evaluations_archivedevaluatedsiae"."reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_reviewed_at",
+                 "siae_evaluations_archivedevaluatedsiae"."final_state",
+                 "siae_evaluations_archivedevaluatedsiae"."job_applications_count",
+                 "siae_evaluations_evaluationcampaign"."id",
+                 "siae_evaluations_evaluationcampaign"."name",
+                 "siae_evaluations_evaluationcampaign"."created_at",
+                 "siae_evaluations_evaluationcampaign"."percent_set_at",
+                 "siae_evaluations_evaluationcampaign"."evaluations_asked_at",
+                 "siae_evaluations_evaluationcampaign"."ended_at",
+                 "siae_evaluations_evaluationcampaign"."submission_freeze_notified_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_start_at",
+                 "siae_evaluations_evaluationcampaign"."evaluated_period_end_at",
+                 "siae_evaluations_evaluationcampaign"."institution_id",
+                 "siae_evaluations_evaluationcampaign"."chosen_percent",
+                 "siae_evaluations_evaluationcampaign"."calendar_id"
+          FROM "siae_evaluations_archivedevaluatedsiae"
+          INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
+          WHERE ("siae_evaluations_archivedevaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_archivedevaluatedsiae"."siae_id" = %s)
+          ORDER BY "siae_evaluations_evaluationcampaign"."evaluated_period_start_at" DESC
         ''',
       }),
       dict({
