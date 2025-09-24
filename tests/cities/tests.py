@@ -109,8 +109,8 @@ def test_sync_cities(settings, caplog, respx_mock):
         "count=1 label=City removed by collection",
         "\tREMOVED Guérande (44)",
         "successfully deleted count=1 cities insee_codes={'44350'}",
-        "successfully created count=3 new cities",
         "successfully updated count=1 cities",
+        "successfully created count=3 new cities",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.sync_cities succeeded in"
@@ -171,8 +171,8 @@ def test_sync_cities(settings, caplog, respx_mock):
         "count=1 label=City removed by collection",
         "\tREMOVED L'Abergement-de-Varey (01)",
         "successfully deleted count=1 cities insee_codes={'01002'}",
-        "successfully created count=1 new cities",
         "successfully updated count=0 cities",  # no update to post codes
+        "successfully created count=1 new cities",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.sync_cities succeeded in"
