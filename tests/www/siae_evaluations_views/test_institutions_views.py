@@ -2093,6 +2093,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
         )
+        ArchivedEvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            siae=evaluated_siae.siae,
+            evaluation_campaign__evaluated_period_start_at=datetime.date(2023, 5, 17),
+            evaluation_campaign__evaluated_period_end_at=datetime.date(2023, 7, 16),
+        )
         client.force_login(self.user)
         response = client.get(
             reverse(
@@ -2118,11 +2124,14 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             """
-            <h3>
-             Historique des campagnes de contrôle
-            </h3>
+            <h3>Historique des campagnes de contrôle</h3>
             <ul class="list-unstyled">
-            </ul>""",
+             <li>
+              Période du 17/05/2023 au 16/07/2023 :
+              <b class="text-success">Positif</b>
+             </li>
+            </ul>
+            """,
             html=True,
             count=1,
         )
