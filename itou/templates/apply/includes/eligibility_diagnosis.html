@@ -1,25 +1,25 @@
 {% if siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
         <hr class="my-4">
-        <h3>{{ is_sent_by_authorized_prescriber|yesno:"Éligibilité à l'IAE,Critères d'éligibilité" }}</h3>
-        <p class="text-success mb-1">
-            {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validés" }}
-            le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
-            <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
-            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
+        <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
+        <span class="text-success fs-sm">
+            Critères validés le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par {{ eligibility_diagnosis.author.get_full_name }}
+            {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
             {% if eligibility_diagnosis.author_prescriber_organization %}
-                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
+                ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
             {% endif %}
-        </p>
-
-        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request itou_help_center_url=itou_help_center_url only %}
-
+        </span>
+        <div class="mt-3">
+            {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request itou_help_center_url=itou_help_center_url only %}
+        </div>
     {% elif expired_eligibility_diagnosis %}
         <hr class="my-4">
-        <h3>Éligibilité à l'IAE</h3>
-        <p class="mb-0">
-            Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
-        </p>
+        <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
+        <span class="text-warning fs-sm">Diagnostic expiré</span>
+        <div class="mt-3">
+            <p class="mb-0">
+                Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
+            </p>
+        </div>
     {% endif %}
-
 {% endif %}
