@@ -40,6 +40,9 @@
                     {% if menu_group_or_item.is_new %}
                         <span class="badge badge-sm rounded-pill bg-important text-white ms-3">nouveau</span>
                     {% endif %}
+                    {% if menu_group_or_item.count != None %}
+                        <span class="badge rounded-pill badge-xs bg-info-lighter text-info">{{ menu_group_or_item.count }}</span>
+                    {% endif %}
                 </a>
             </li>
         {% endif %}

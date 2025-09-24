@@ -2,6 +2,8 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
+from itou.approvals.enums import ProlongationRequestStatus
+from itou.approvals.models import ProlongationRequest
 from itou.institutions.enums import InstitutionKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
@@ -20,6 +22,7 @@ class NavItem:
         target,
         active_view_names,
         is_new=False,
+        count=None,
         matomo_event_category=None,
         matomo_event_name=None,
         matomo_event_option=None,
@@ -29,6 +32,7 @@ class NavItem:
         self.target = target
         self.active_view_names = active_view_names
         self.is_new = is_new
+        self.count = count
         self.matomo_event_category = matomo_event_category
         self.matomo_event_name = matomo_event_name
         self.matomo_event_option = matomo_event_option
@@ -150,6 +154,13 @@ NAV_ENTRIES = {
         matomo_event_category="offcanvasNav",
         matomo_event_name="clic",
         matomo_event_option="collaborateurs",
+    ),
+    "prescriber-approval-prolongations": NavItem(
+        label="Gérer les prolongations de PASS\xa0IAE",
+        icon="ri-pass-valid-line",
+        is_new=True,  # Remove on 01/12/2025
+        target=reverse("approvals:prolongation_requests_list", query={"only_pending": "on"}),
+        active_view_names=["approvals:prolongation_requests_list"],
     ),
     # Employers.
     "employer-job-apps": NavItem(
@@ -302,6 +313,13 @@ def nav(request):
             if request.current_organization:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
+            if request.from_authorized_prescriber and request.current_organization:
+                prolongation_item = NAV_ENTRIES["prescriber-approval-prolongations"]
+                prolongation_item.count = ProlongationRequest.objects.filter(
+                    prescriber_organization=request.current_organization,
+                    status=ProlongationRequestStatus.PENDING,
+                ).count()
+                menu_items.append(prolongation_item)
             if request.current_organization:
                 organization_items = [
                     (

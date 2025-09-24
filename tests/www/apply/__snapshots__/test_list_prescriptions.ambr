@@ -2866,7 +2866,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -3997,6 +3997,23 @@
       }),
       dict({
         'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."prescriber_organization_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -4032,7 +4049,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -5101,6 +5118,23 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'nav[utils/templatetags/nav.py]',
+          'InclusionNode[layout/_header_authenticated.html]',
+          'IncludeNode[layout/base.html]',
+          'IfNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."prescriber_organization_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
         ''',
       }),
       dict({

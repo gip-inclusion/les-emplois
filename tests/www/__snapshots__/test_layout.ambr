@@ -1012,6 +1012,21 @@
                       </div>
                   </li>
                   <li class="nav-item">
+                      <a class="nav-link" href="/approvals/prolongation/requests?only_pending=on">
+                          <i aria-hidden="true" class="ri-pass-valid-line fw-medium">
+                          </i>
+                          <span>
+                              Gérer les prolongations de PASS IAE
+                          </span>
+                          <span class="badge badge-sm rounded-pill bg-important text-white ms-3">
+                              nouveau
+                          </span>
+                          <span class="badge rounded-pill badge-xs bg-info-lighter text-info">
+                              0
+                          </span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
