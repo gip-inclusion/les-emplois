@@ -10,7 +10,7 @@ from itou.eligibility import models as eligibility_models
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
-from itou.siae_evaluations.models import EvaluatedSiae
+from itou.siae_evaluations.models import ArchivedEvaluatedSiae, EvaluatedSiae
 from itou.users import models as users_models
 
 
@@ -147,7 +147,10 @@ def transfer_company_data(
     ignore_siae_evaluations=False,
 ):
     assert from_company.pk != to_company.pk, "Cannot transfer from one company to itself"
-    if not ignore_siae_evaluations and EvaluatedSiae.objects.filter(siae=from_company).exists():
+    if not ignore_siae_evaluations and (
+        EvaluatedSiae.objects.filter(siae=from_company).exists()
+        or ArchivedEvaluatedSiae.objects.filter(siae=from_company).exists()
+    ):
         raise TransferError(
             f"Impossible de transférer les objets de l'entreprise ID={from_company.pk}: il y a un contrôle "
             "a posteriori lié. Vérifiez avec l'équipe support."
