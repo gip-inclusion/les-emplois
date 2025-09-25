@@ -2,14 +2,16 @@
 
 <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
     <li class="nav-item" role="presentation">
-        <a class="nav-link{% if active_nav_tab == "details" %} active{% endif %}"
+        <a id="informations-tab"
+           class="nav-link{% if active_nav_tab == "details" %} active{% endif %}"
            href="{% url 'job_seekers_views:details' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
            aria-controls="informations"
            aria-selected="{% if active_nav_tab == "details" %}true{% else %}false{% endif %}"
            {% matomo_event "candidat" "clic-onglet" "informations candidat" %}>Informations générales</a>
     </li>
     <li class="nav-item" role="presentation">
-        <a class="nav-link{% if active_nav_tab == "job-applications" %} active{% endif %}"
+        <a id="job-applications-tab"
+           class="nav-link{% if active_nav_tab == "job-applications" %} active{% endif %}"
            href="{% url 'job_seekers_views:job_applications' public_id=job_seeker.public_id %}?back_url={% url 'job_seekers_views:list' %}"
            aria-controls="candidatures"
            aria-selected="{% if active_nav_tab == "job-applications" %}true{% else %}false{% endif %}"
