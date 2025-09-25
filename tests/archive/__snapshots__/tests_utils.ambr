@@ -18,6 +18,7 @@
     'job_applications__isnull': True,
     'job_applications_sent__isnull': True,
     'jobapplication__isnull': True,
+    'jobapplicationcomment__isnull': True,
     'jobapplicationtransitionlog__isnull': True,
     'prolongationrequest_processed__isnull': True,
     'prolongationrequests_assigned__isnull': True,
