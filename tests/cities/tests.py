@@ -108,7 +108,7 @@ def test_sync_cities(settings, caplog, respx_mock):
         '"codesPostaux": ["13002"], "nom": "Marseille 2e"}',
         "count=1 label=City removed by collection",
         "\tREMOVED Guérande (44)",
-        "successfully deleted count=1 cities insee_codes={'44350'}",
+        "successfully deleted count=1 cities insee_codes=['44350']",
         "successfully updated count=1 cities",
         "successfully created count=3 new cities",
     ]
@@ -170,7 +170,7 @@ def test_sync_cities(settings, caplog, respx_mock):
         '"codesPostaux": ["01400"], "nom": "L\'Abergement-de-Varey"}',
         "count=1 label=City removed by collection",
         "\tREMOVED L'Abergement-de-Varey (01)",
-        "successfully deleted count=1 cities insee_codes={'01002'}",
+        "successfully deleted count=1 cities insee_codes=['01002']",
         "successfully updated count=0 cities",  # no update to post codes
         "successfully created count=1 new cities",
     ]
