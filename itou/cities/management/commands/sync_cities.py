@@ -100,7 +100,7 @@ class Command(BaseCommand):
         # a City that is linked to one of our JobDescriptions would suddenly disappear. Handle that
         # case as it happens, by "deactivating" the city by instance: the cron would crash.
         n_objs, _ = City.objects.filter(code_insee__in=cities_removed_by_api).delete()
-        self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, cities_removed_by_api)
+        self.logger.info("successfully deleted count=%d cities insee_codes=%s", n_objs, sorted(cities_removed_by_api))
 
         n_objs = City.objects.bulk_update(
             cities_updated_by_api,
