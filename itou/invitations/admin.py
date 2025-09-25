@@ -47,6 +47,9 @@ class BaseInvitationAdmin(ItouModelAdmin):
     raw_id_fields = ("sender",)
     list_select_related = ("sender",)
 
+    def has_add_permission(self, *args, **kwargs):
+        return False
+
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return not obj.has_expired
