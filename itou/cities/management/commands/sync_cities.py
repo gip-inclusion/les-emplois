@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.template.defaultfilters import slugify
+from django.utils import timezone
 
 from itou.cities.models import City, EditionModeChoices
 from itou.utils.command import BaseCommand, dry_runnable
@@ -37,7 +38,7 @@ def point_from_api_data(obj):
     return GEOSGeometry(json.dumps(obj["centre"]))
 
 
-def api_city_to_db_city(data):
+def api_city_to_db_city(data, last_synced_at):
     name = data["nom"]
     department = data["codeDepartement"]
     return City(
@@ -48,6 +49,7 @@ def api_city_to_db_city(data):
         code_insee=data["code"],
         coords=point_from_api_data(data),
         edition_mode=EditionModeChoices.AUTO,
+        last_synced_at=last_synced_at,
     )
 
 
@@ -62,6 +64,7 @@ class Command(BaseCommand):
     @dry_runnable
     def handle(self, **options):
         cities_from_api = fetch_cities() + fetch_cities(districts_only=True)
+        last_synced_at = timezone.now()
 
         cities_added_by_api = []
         cities_updated_by_api = []
@@ -80,13 +83,13 @@ class Command(BaseCommand):
             ],
         ):
             if item.kind == DiffItemKind.ADDITION:
-                cities_added_by_api.append(api_city_to_db_city(item.raw))
+                cities_added_by_api.append(api_city_to_db_city(item.raw, last_synced_at))
             elif item.kind == DiffItemKind.EDITION:
                 db_city = item.db_obj
                 if db_city.edition_mode != EditionModeChoices.AUTO:
                     self.logger.warning("skipping manually edited city=%s from update", db_city)
                     continue
-                city = api_city_to_db_city(item.raw)
+                city = api_city_to_db_city(item.raw, last_synced_at)
                 city.pk = db_city.pk
                 cities_updated_by_api.append(city)
             elif item.kind == DiffItemKind.DELETION:
@@ -108,6 +111,7 @@ class Command(BaseCommand):
                 "post_codes",
                 "code_insee",
                 "coords",
+                "last_synced_at",
             ],
             batch_size=1000,
         )

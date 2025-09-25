@@ -1251,7 +1251,8 @@
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
                  "cities_city"."coords",
-                 "cities_city"."edition_mode"
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
           FROM "cities_city"
           WHERE ("cities_city"."id") IN ((%s))
         ''',
@@ -2637,7 +2638,8 @@
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
                  "cities_city"."coords",
-                 "cities_city"."edition_mode"
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
           FROM "cities_city"
           WHERE ("cities_city"."id") IN ((%s))
         ''',
