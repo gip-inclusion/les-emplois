@@ -1,17 +1,8 @@
 {% if eligibility_diagnosis.selected_administrative_criteria_for_display %}
     {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
-        <p class="mb-2">
-            <span class="badge badge-sm rounded-pill bg-secondary">
-                {% if is_sent_by_authorized_prescriber %}
-                    Situation administrative du candidat
-                {% else %}
-                    Critères administratifs
-                {% endif %}
-            </span>
-        </p>
         {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
         {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
-        <ul>
+        <ul class="list-data mb-3">
             {% for level, criteria in levels_list %}
                 {% comment %}
                 Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
@@ -19,17 +10,22 @@
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
                 {% endcomment %}
                 {% if not flat_criteria_list %}
-                    <li>
-                        <span class="fw-bold">{{ level }}</span>
-                        <ul>
-                        {% endif %}
+                    <li class="align-items-start">
+                        <small>
+                            {% if is_sent_by_authorized_prescriber %}
+                                Situation administrative du candidat
+                            {% else %}
+                                Critères administratifs {{ level|lower }}
+                            {% endif %}
+                        </small>
+                    {% endif %}
+                    <strong>
                         {% for criterion in criteria %}
                             {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
-                        {% if not flat_criteria_list %}
-                        </ul>
-                    </li>
-                {% endif %}
+                    </strong>
+                    {% if not flat_criteria_list %}</li>{% endif %}
             {% endfor %}
         </ul>
     {% endwith %}

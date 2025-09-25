@@ -211,19 +211,19 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       GEIQ
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <div class="alert alert-info" role="status">
@@ -250,6 +250,7 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -482,21 +483,22 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Employeur
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -948,21 +950,22 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -994,21 +997,22 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -2156,21 +2160,20 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
+                                                  </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      <br/>
+                                                      Problème de mobilité
                                                   </strong>
                                               </li>
                                           </ul>
@@ -2198,6 +2201,7 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -2439,24 +2443,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      <br/>
+                                                      Problème de mobilité
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -2894,24 +2898,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                      <br/>
+                                                      Résident ZRR
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
@@ -3153,24 +3157,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                      <br/>
+                                                      Résident ZRR
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
                                           <p class="fs-sm mb-0">
                                               <i>
                                                   Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.

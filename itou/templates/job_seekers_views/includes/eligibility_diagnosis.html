@@ -30,7 +30,11 @@
     </div>
     <ul class="list-data my-3">
         <li>
-            <small>Critères administratifs sélectionnés</small>
+            <small>Type</small>
+            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
+        </li>
+        <li class="align-items-start">
+            <small>Critères administratifs</small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
                 {% if not criteria %}
@@ -39,19 +43,16 @@
                     <strong>
                         {% for criterion in criteria %}
                             {{ criterion.name }}
-                            {% if not forloop.last %};{% endif %}
+                            {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     </strong>
                 {% endif %}
             {% endwith %}
         </li>
-        <li>
-            <small>Type</small>
-            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
-        </li>
     </ul>
     {% if kind == "GEIQ" and with_allowance %}
         {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
     {% endif %}
+    <hr class="mb-3">
     {% include "apply/includes/certification_info_dated_diagnosis.html" with eligibility_diagnosis_expire_at=eligibility_diagnosis.expires_at only %}
 </div>
