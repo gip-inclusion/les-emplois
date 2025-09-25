@@ -1,5 +1,6 @@
 import datetime
 import enum
+import logging
 
 import xworkflows
 from dateutil.relativedelta import relativedelta
@@ -20,6 +21,8 @@ from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.job_applications.enums import SenderKind
 from itou.utils.validators import validate_siret
 
+
+logger = logging.getLogger(__name__)
 
 # Validators
 
@@ -385,6 +388,9 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
     @xworkflows.transition_check(EmployeeRecordTransition.ARCHIVE)
     def check_archive(self):
+        if self.job_application.approval is None:
+            logger.error("Employee record without approval: %s - THIS SHOULD NOT HAPPEN", self)
+            return False
         # We only archive an employee record when the job seeker's approval is expired and can no longer be prolonged
         return not self.job_application.approval.is_valid() and not self.job_application.approval.can_be_prolonged
 
