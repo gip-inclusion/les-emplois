@@ -101,5 +101,6 @@ class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.EvaluatedAdministrativeCriteria
 
+    evaluated_job_application = factory.SubFactory(EvaluatedJobApplicationFactory)
     administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
     proof = factory.SubFactory(FileFactory)
