@@ -1426,6 +1426,26 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
         return choices[self.to_state]
 
 
+class JobApplicationComment(models.Model):
+    job_application = models.ForeignKey(
+        JobApplication,
+        verbose_name="candidature",
+        related_name="comments",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(verbose_name="posté le", auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="posté par", on_delete=models.RESTRICT)
+    message = models.TextField(verbose_name="commentaire")
+
+    class Meta:
+        verbose_name = "commentaire de candidature"
+        verbose_name_plural = "commentaires de candidature"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Commentaire {self.pk} sur la candidature {self.job_application}"
+
+
 class PriorAction(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name="prior_actions", on_delete=models.CASCADE)
     action = models.TextField(
