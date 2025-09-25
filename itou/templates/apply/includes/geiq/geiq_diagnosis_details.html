@@ -14,11 +14,17 @@
     {% endif %}
     <div class="mt-3">
         {% if diagnosis.selected_administrative_criteria_for_display %}
-            <h4>Situation administrative du candidat</h4>
-            <ul>
-                {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
-                    {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
-                {% endfor %}
+            <ul class="list-data mb-3">
+                <li>
+                    <small>Situation administrative du candidat</small>
+                    <ul>
+                        {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
+                            <li>
+                                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             </ul>
         {% endif %}
 

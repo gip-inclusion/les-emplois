@@ -39,24 +39,21 @@
     </div>
     <ul class="list-data my-3">
         <li>
-            <small>Critères administratifs sélectionnés</small>
+            <small>Type</small>
+            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
+        </li>
+        <li class="align-items-start">
+            <small>Critères administratifs</small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
                 {% if not criteria %}
                     <i class="text-disabled">Non renseigné</i>
                 {% else %}
-                    <strong>
-                        {% for criterion in criteria %}
-                            {{ criterion.name }}
-                            {% if not forloop.last %};{% endif %}
-                        {% endfor %}
-                    </strong>
+                    <ul>
+                        {% for criterion in criteria %}<li>{{ criterion.name }}</li>{% endfor %}
+                    </ul>
                 {% endif %}
             {% endwith %}
-        </li>
-        <li>
-            <small>Type</small>
-            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
         </li>
     </ul>
     {% if kind == "GEIQ" and with_allowance %}
