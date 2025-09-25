@@ -478,7 +478,8 @@
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
                  "cities_city"."coords",
-                 "cities_city"."edition_mode"
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
@@ -576,7 +577,8 @@
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
                  "cities_city"."coords",
-                 "cities_city"."edition_mode"
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")

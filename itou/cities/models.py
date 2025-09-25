@@ -45,6 +45,8 @@ class City(models.Model):
         default=EditionModeChoices.MANUAL,
     )
 
+    last_synced_at = models.DateTimeField(verbose_name="dernière synchronisation avec l'API GEO", null=True)
+
     objects = models.Manager()  # The default manager.
 
     class Meta:

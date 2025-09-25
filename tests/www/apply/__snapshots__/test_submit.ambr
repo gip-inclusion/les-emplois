@@ -2685,7 +2685,8 @@
                  "cities_city"."post_codes",
                  "cities_city"."code_insee",
                  "cities_city"."coords",
-                 "cities_city"."edition_mode"
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at"
           FROM "companies_jobdescription"
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
