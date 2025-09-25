@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxLengthValidator, MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Count, Exists, F, Func, Max, OuterRef, Prefetch, Q, Subquery, When
 from django.db.models.functions import Coalesce, Greatest, TruncMonth
@@ -1424,6 +1424,35 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationState.choices)
         return choices[self.to_state]
+
+
+class JobApplicationComment(models.Model):
+    MAX_LENGTH = 2000
+    job_application = models.ForeignKey(
+        JobApplication,
+        verbose_name="candidature",
+        related_name="comments",
+        on_delete=models.CASCADE,
+    )
+    # Keeping the company information in addition to job_application allows us to be sure a comment won't be
+    # displayed to a member of a company not supposed to, after any manual transfer in the admin for instance.
+    company = models.ForeignKey("companies.Company", verbose_name="ID de l'entreprise", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(verbose_name="posté le", auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="posté par",
+        on_delete=models.RESTRICT,
+        limit_choices_to={"kind": UserKind.EMPLOYER},
+    )
+    message = models.TextField(verbose_name="commentaire", validators=[MaxLengthValidator(MAX_LENGTH)])
+
+    class Meta:
+        verbose_name = "commentaire de candidature"
+        verbose_name_plural = "commentaires de candidature"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Commentaire {self.pk} sur la candidature {self.job_application}"
 
 
 class PriorAction(models.Model):
