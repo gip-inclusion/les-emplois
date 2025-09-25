@@ -12,25 +12,27 @@
         </p>
         {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
         {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
-        <ul>
+        <ul class="list-data mb-3">
             {% for level, criteria in levels_list %}
                 {% comment %}
                 Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
                 {% endcomment %}
-                {% if not flat_criteria_list %}
-                    <li>
-                        <span class="fw-bold">{{ level }}</span>
-                        <ul>
-                        {% endif %}
+                <li>
+                    {% if not flat_criteria_list %}
+                        <small>{{ level }}</small>
+                    {% else %}
+                        <small>Critères</small>
+                    {% endif %}
+                    <ul>
                         {% for criterion in criteria %}
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            <li>
+                                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            </li>
                         {% endfor %}
-                        {% if not flat_criteria_list %}
-                        </ul>
-                    </li>
-                {% endif %}
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
     {% else %}

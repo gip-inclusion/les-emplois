@@ -211,19 +211,19 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       GEIQ
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <div class="alert alert-info" role="status">
@@ -481,19 +481,19 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Employeur
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
@@ -947,19 +947,19 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
@@ -990,19 +990,19 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
@@ -2148,22 +2148,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                           </ul>
                                           <div class="alert alert-info" role="status">
@@ -2427,22 +2429,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
@@ -2881,22 +2885,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
@@ -3140,22 +3146,24 @@
                                           <ul class="list-data my-3">
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                           </ul>
                                           <p class="fs-sm mb-0">
