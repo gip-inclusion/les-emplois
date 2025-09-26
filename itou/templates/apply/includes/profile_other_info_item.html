@@ -1,0 +1,15 @@
+{% if item == "resourceless" %}
+    Sans ressources
+{% elif item == "unemployed_since" %}
+    Sans emploi depuis {{ profile.get_unemployed_since_display|lower }}
+{% elif item == "rqth_employee" %}
+    Titulaire de la RQTH
+{% elif item == "oeth_employee" %}
+    Bénéficiaire de la loi handicap (OETH)
+{% elif item == "rsa_allocation_since" %}
+    Bénéficiaire du RSA depuis {{ profile.get_rsa_allocation_since_display|lower }}
+{% elif item == "ass_allocation_since" %}
+    Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}
+{% elif item == "aah_allocation_since" %}
+    Bénéficiaire de l'AAH depuis {{ profile.get_aah_allocation_since_display|lower }}
+{% endif %}
