@@ -1294,6 +1294,104 @@ class TestProlongationModel:
 
         assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
 
+    def test_report_file_constraint_ok(self):
+        # PASS: valid reasons + report file
+        for reason in (
+            ProlongationReason.PARTICULAR_DIFFICULTIES,
+            ProlongationReason.SENIOR,
+            ProlongationReason.RQTH,
+        ):
+            ProlongationFactory(reason=reason, report_file=FileFactory())
+
+    @pytest.mark.django_db(transaction=True)
+    def test_report_file_constraint_invalid_reasons_ko(self):
+        # FAIL: invalid reasons + report file
+        report_file = FileFactory()
+        for reason in (
+            ProlongationReason.COMPLETE_TRAINING,
+            ProlongationReason.SENIOR_CDI,
+            ProlongationReason.HEALTH_CONTEXT,
+        ):
+            with pytest.raises(IntegrityError):
+                ProlongationFactory(reason=reason, report_file=report_file)
+
+            # Check message on clean() / validate_constraints()
+            with pytest.raises(
+                ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"
+            ):
+                Prolongation(reason=reason, report_file=report_file).validate_constraints()
+
+    @pytest.mark.parametrize("reason", PROLONGATION_REPORT_FILE_REASONS)
+    def test_mandatory_contact_fields_validation(self, reason, faker):
+        # Contact details are mandatory for these reasons
+        prolongation = ProlongationFactory(
+            reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=True
+        )
+
+        for phone, email in [
+            ([phone, email])
+            for phone in (None, faker.phone_number())
+            for email in (None, faker.email())
+            if not (phone and email)
+        ]:
+            prolongation.contact_email = email
+            prolongation.contact_phone = phone
+            with pytest.raises(
+                ValidationError,
+                match="L'adresse email et le numéro de téléphone sont obligatoires pour ce motif",
+            ):
+                prolongation.clean()
+
+        # Must pass with both contact fields filled
+        prolongation.contact_email = faker.email()
+        prolongation.contact_phone = faker.phone_number()
+        prolongation.clean()
+
+    @pytest.mark.parametrize("reason", (ProlongationReason.SENIOR_CDI, ProlongationReason.HEALTH_CONTEXT))
+    def test_optional_contact_fields_validation(self, reason, faker):
+        # ProlongationReason.COMPLETE_TRAINING is a specific case
+        prolongation = ProlongationFactory(
+            reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=False
+        )
+        prolongation.clean()
+
+        for phone, email in [
+            ([phone, email])
+            for phone in (None, faker.phone_number())
+            for email in (None, faker.email())
+            if phone or email
+        ]:
+            prolongation.contact_email = email
+            prolongation.contact_phone = phone
+            with pytest.raises(
+                ValidationError,
+                match="L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
+            ):
+                prolongation.clean()
+
+
+class TestProlongationRequestModel:
+    def test_prolongation_from_prolongation_request(self):
+        prolongation_request = ProlongationRequestFactory(processed=True)
+
+        prolongation = Prolongation.from_prolongation_request(prolongation_request)
+        assert prolongation.request == prolongation_request
+        assert prolongation.validated_by == prolongation_request.processed_by
+        # Copied fields
+        assert prolongation.approval == prolongation_request.approval
+        assert prolongation.start_at == prolongation_request.start_at
+        assert prolongation.end_at == prolongation_request.end_at
+        assert prolongation.reason == prolongation_request.reason
+        assert prolongation.reason_explanation == prolongation_request.reason_explanation
+        assert prolongation.declared_by == prolongation_request.declared_by
+        assert prolongation.declared_by_siae == prolongation_request.declared_by_siae
+        assert prolongation.prescriber_organization == prolongation_request.prescriber_organization
+        assert prolongation.created_by == prolongation_request.created_by
+        assert prolongation.report_file == prolongation_request.report_file
+        assert prolongation.require_phone_interview == prolongation_request.require_phone_interview
+        assert prolongation.contact_email == prolongation_request.contact_email
+        assert prolongation.contact_phone == prolongation_request.contact_phone
+
 
 @pytest.mark.django_db(transaction=True)
 class TestApprovalConcurrentModel:
@@ -1417,107 +1515,6 @@ class TestPENotificationMixin:
         assert approval.pe_notification_time == now
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
-
-
-# Pytest
-
-
-def test_prolongation_report_file_constraint_ok():
-    # PASS: valid reasons + report file
-    for reason in (
-        ProlongationReason.PARTICULAR_DIFFICULTIES,
-        ProlongationReason.SENIOR,
-        ProlongationReason.RQTH,
-    ):
-        ProlongationFactory(reason=reason, report_file=FileFactory())
-
-
-@pytest.mark.django_db(transaction=True)
-def test_prolongation_report_file_constraint_invalid_reasons_ko():
-    # FAIL: invalid reasons + report file
-    report_file = FileFactory()
-    for reason in (
-        ProlongationReason.COMPLETE_TRAINING,
-        ProlongationReason.SENIOR_CDI,
-        ProlongationReason.HEALTH_CONTEXT,
-    ):
-        with pytest.raises(IntegrityError):
-            ProlongationFactory(reason=reason, report_file=report_file)
-
-        # Check message on clean() / validate_constraints()
-        with pytest.raises(
-            ValidationError, match="Incohérence entre le fichier de bilan et la raison de prolongation"
-        ):
-            Prolongation(reason=reason, report_file=report_file).validate_constraints()
-
-
-@pytest.mark.parametrize("reason", PROLONGATION_REPORT_FILE_REASONS)
-def test_mandatory_contact_fields_validation(reason, faker):
-    # Contact details are mandatory for these reasons
-    prolongation = ProlongationFactory(
-        reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=True
-    )
-
-    for phone, email in [
-        ([phone, email])
-        for phone in (None, faker.phone_number())
-        for email in (None, faker.email())
-        if not (phone and email)
-    ]:
-        prolongation.contact_email = email
-        prolongation.contact_phone = phone
-        with pytest.raises(
-            ValidationError,
-            match="L'adresse email et le numéro de téléphone sont obligatoires pour ce motif",
-        ):
-            prolongation.clean()
-
-    # Must pass with both contact fields filled
-    prolongation.contact_email = faker.email()
-    prolongation.contact_phone = faker.phone_number()
-    prolongation.clean()
-
-
-@pytest.mark.parametrize("reason", (ProlongationReason.SENIOR_CDI, ProlongationReason.HEALTH_CONTEXT))
-def test_optional_contact_fields_validation(reason, faker):
-    # ProlongationReason.COMPLETE_TRAINING is a specific case
-    prolongation = ProlongationFactory(
-        reason=reason, declared_by_siae__kind=CompanyKind.ACI, require_phone_interview=False
-    )
-    prolongation.clean()
-
-    for phone, email in [
-        ([phone, email]) for phone in (None, faker.phone_number()) for email in (None, faker.email()) if phone or email
-    ]:
-        prolongation.contact_email = email
-        prolongation.contact_phone = phone
-        with pytest.raises(
-            ValidationError,
-            match="L'adresse email et le numéro de téléphone ne peuvent être saisis pour ce motif",
-        ):
-            prolongation.clean()
-
-
-def test_prolongation_from_prolongation_request():
-    prolongation_request = ProlongationRequestFactory(processed=True)
-
-    prolongation = Prolongation.from_prolongation_request(prolongation_request)
-    assert prolongation.request == prolongation_request
-    assert prolongation.validated_by == prolongation_request.processed_by
-    # Copied fields
-    assert prolongation.approval == prolongation_request.approval
-    assert prolongation.start_at == prolongation_request.start_at
-    assert prolongation.end_at == prolongation_request.end_at
-    assert prolongation.reason == prolongation_request.reason
-    assert prolongation.reason_explanation == prolongation_request.reason_explanation
-    assert prolongation.declared_by == prolongation_request.declared_by
-    assert prolongation.declared_by_siae == prolongation_request.declared_by_siae
-    assert prolongation.prescriber_organization == prolongation_request.prescriber_organization
-    assert prolongation.created_by == prolongation_request.created_by
-    assert prolongation.report_file == prolongation_request.report_file
-    assert prolongation.require_phone_interview == prolongation_request.require_phone_interview
-    assert prolongation.contact_email == prolongation_request.contact_email
-    assert prolongation.contact_phone == prolongation_request.contact_phone
 
 
 @pytest.mark.parametrize(
