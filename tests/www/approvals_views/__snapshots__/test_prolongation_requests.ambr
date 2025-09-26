@@ -70,17 +70,31 @@
                                   </a>
                               </div>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">
-                                  Annuler
-                              </a>
-                              <button class="btn btn-primary" type="submit">
-                                  Suivant
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/approvals/prolongation/request/666">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -122,17 +136,62 @@
                               </label>
                               <textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">
-                                  Retour
-                              </button>
-                              <button class="btn btn-primary" type="submit">
-                                  Confirmer le refus
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="reason">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Confirmer le refus
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/dashboard/">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -219,17 +278,62 @@
                               </label>
                               <textarea class="form-control" cols="40" id="id_proposed_actions-proposed_actions_explanation" name="proposed_actions-proposed_actions_explanation" placeholder="Message" required="" rows="10"></textarea>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason_explanation">
-                                  Retour
-                              </button>
-                              <button class="btn btn-primary" type="submit">
-                                  Confirmer le refus
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="reason_explanation">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Confirmer le refus
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/dashboard/">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -311,17 +415,31 @@
                                   </a>
                               </div>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">
-                                  Annuler
-                              </a>
-                              <button class="btn btn-primary" type="submit">
-                                  Suivant
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/approvals/prolongation/request/666">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -363,17 +481,62 @@
                               </label>
                               <textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">
-                                  Retour
-                              </button>
-                              <button class="btn btn-primary" type="submit">
-                                  Suivant
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="reason">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/dashboard/">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -475,17 +638,31 @@
                                   </a>
                               </div>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">
-                                  Annuler
-                              </a>
-                              <button class="btn btn-primary" type="submit">
-                                  Suivant
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/approvals/prolongation/request/666">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -527,17 +704,62 @@
                               </label>
                               <textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">
-                                  Retour
-                              </button>
-                              <button class="btn btn-primary" type="submit">
-                                  Confirmer le refus
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="reason">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Confirmer le refus
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/dashboard/">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -639,17 +861,31 @@
                                   </a>
                               </div>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <a class="btn btn-link btn-outline-primary" href="/approvals/prolongation/request/666">
-                                  Annuler
-                              </a>
-                              <button class="btn btn-primary" type="submit">
-                                  Suivant
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/approvals/prolongation/request/666">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Suivant
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -691,17 +927,62 @@
                               </label>
                               <textarea class="form-control" cols="40" id="id_reason_explanation-reason_explanation" name="reason_explanation-reason_explanation" placeholder="Message" required="" rows="10"></textarea>
                           </div>
-                          <hr/>
-                          <p class="fs-xs">
-                              * champ obligatoire
-                          </p>
-                          <div class="form-group text-end">
-                              <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">
-                                  Retour
-                              </button>
-                              <button class="btn btn-primary" type="submit">
-                                  Confirmer le refus
-                              </button>
+                          <div class="row">
+                              <div class="col-12">
+                                  <hr class="mb-3"/>
+                                  <small class="d-inline-block mb-3">
+                                      * champs obligatoires
+                                  </small>
+                                  <div class="form-row align-items-center justify-content-end gx-3">
+                                      <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                          <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                                              <i aria-hidden="true" class="ri-close-line ri-lg">
+                                              </i>
+                                              <span>
+                                                  Annuler
+                                              </span>
+                                          </button>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                          <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="reason">
+                                              <span>
+                                                  Retour
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                          <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                                              <span>
+                                                  Confirmer le refus
+                                              </span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                  <div class="modal-content">
+                                      <div class="modal-header">
+                                          <h3 class="modal-title">
+                                              Êtes-vous sûr de vouloir annuler ?
+                                          </h3>
+                                      </div>
+                                      <div class="modal-body">
+                                          Les informations renseignées ne seront pas enregistrées.
+                                          <br/>
+                                          Cette action est irréversible.
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">
+                                              Retour
+                                          </button>
+                                          <a class="btn btn-sm btn-danger" href="/dashboard/">
+                                              Confirmer l'annulation
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </form>
                   </div>
@@ -1797,7 +2078,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
@@ -2065,7 +2346,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
@@ -2369,7 +2650,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
