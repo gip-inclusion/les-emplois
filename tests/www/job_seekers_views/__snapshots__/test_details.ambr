@@ -197,10 +197,10 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par John DOE
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                                                       <i aria-hidden="true" class="ri-error-warning-line">
                                                       </i>
@@ -208,23 +208,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      John DOE
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -232,6 +216,14 @@
                                                   <strong>
                                                       GEIQ
                                                   </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
                                               </li>
                                           </ul>
                                           <div class="alert alert-info" role="status">
@@ -258,6 +250,13 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -466,13 +465,14 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par John DOE
+                  (Acme inc.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -480,24 +480,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      John DOE
-                  (Acme inc.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -506,7 +489,22 @@
                                                       Employeur
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -932,13 +930,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -946,26 +947,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -974,7 +956,22 @@
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
@@ -983,10 +980,13 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -994,26 +994,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <i class="text-disabled">
-                                                      Non renseigné
-                                                  </i>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -1022,7 +1003,22 @@
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2147,10 +2143,13 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2158,35 +2157,23 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
                                                   </small>
                                                   <strong>
                                                       Prescripteur habilité
+                                                  </strong>
+                                              </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      <br/>
+                                                      Problème de mobilité
                                                   </strong>
                                               </li>
                                           </ul>
@@ -2214,6 +2201,13 @@
                                                   </div>
                                               </div>
                                           </div>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2432,10 +2426,13 @@
                                                       Diagnostic public prioritaire GEIQ
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2443,29 +2440,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -2474,7 +2449,24 @@
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      <br/>
+                                                      Problème de mobilité
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -2886,13 +2878,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2900,29 +2895,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -2931,7 +2904,24 @@
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                      <br/>
+                                                      Résident ZRR
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>
@@ -3147,13 +3137,16 @@
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-0">
-                                                      Diagnostic IAE
+                                                      Diagnostic d'éligibilité à l'IAE
                                                   </h3>
                                                   <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
+                                                      Critères validés par Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
                                                   </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -3161,29 +3154,7 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <ul class="list-data mb-3">
-                                              <li>
-                                                  <small>
-                                                      Confirmé par
-                                                  </small>
-                                                  <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
-                                                  </strong>
-                                              </li>
-                                              <li>
-                                                  <small>
-                                                      Critères administratifs sélectionnés
-                                                  </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
-                                              </li>
+                                          <ul class="list-data my-3">
                                               <li>
                                                   <small>
                                                       Type
@@ -3192,7 +3163,24 @@
                                                       Prescripteur habilité
                                                   </strong>
                                               </li>
+                                              <li class="align-items-start">
+                                                  <small>
+                                                      Critères administratifs
+                                                  </small>
+                                                  <strong>
+                                                      Bénéficiaire du RSA
+                                                      <br/>
+                                                      Résident ZRR
+                                                  </strong>
+                                              </li>
                                           </ul>
+                                          <hr class="mb-3"/>
+                                          <p class="fs-sm mb-0">
+                                              <i>
+                                                  Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+          Ce diagnostic expire le 14/02/2025.
+                                              </i>
+                                          </p>
                                       </div>
                                   </div>
                               </div>

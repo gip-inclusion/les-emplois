@@ -1,15 +1,22 @@
 {% load badges %}
+
 <div class="c-box mb-3 mb-md-4">
     <div class="row mb-3">
         <div class="col-12 col-sm">
             {% if kind == "IAE" %}
-                <h3 class="mb-0">Diagnostic IAE</h3>
+                <h3 class="mb-0">Diagnostic d'éligibilité à l'IAE</h3>
             {% elif kind == "GEIQ" %}
                 <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
             {% endif %}
-            <span class="text-success fs-sm">Valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</span>
+            <span class="text-success fs-sm">
+                Critères validés par {{ eligibility_diagnosis.author.get_full_name }}
+                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                {% if eligibility_diagnosis.author_prescriber_organization %}
+                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                {% endif %}
+            </span>
         </div>
-        <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+        <div class="col-12 col-sm-auto">
             {% if kind == "IAE" %}
                 {% iae_eligibility_badge is_eligible=True extra_classes="badge-sm" %}
             {% elif kind == "GEIQ" %}
@@ -21,18 +28,13 @@
             {% endif %}
         </div>
     </div>
-    <ul class="list-data mb-3">
+    <ul class="list-data my-3">
         <li>
-            <small>Confirmé par</small>
-            <strong>{{ eligibility_diagnosis.author.get_full_name }}
-                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
-                {% if eligibility_diagnosis.author_prescriber_organization %}
-                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
-                {% endif %}
-            </strong>
+            <small>Type</small>
+            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
         </li>
-        <li>
-            <small>Critères administratifs sélectionnés</small>
+        <li class="align-items-start">
+            <small>Critères administratifs</small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
                 {% if not criteria %}
@@ -41,18 +43,16 @@
                     <strong>
                         {% for criterion in criteria %}
                             {{ criterion.name }}
-                            {% if not forloop.last %};{% endif %}
+                            {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     </strong>
                 {% endif %}
             {% endwith %}
         </li>
-        <li>
-            <small>Type</small>
-            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
-        </li>
     </ul>
     {% if kind == "GEIQ" and with_allowance %}
         {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
     {% endif %}
+    <hr class="mb-3">
+    {% include "apply/includes/certification_info_dated_diagnosis.html" with eligibility_diagnosis_expire_at=eligibility_diagnosis.expires_at only %}
 </div>
