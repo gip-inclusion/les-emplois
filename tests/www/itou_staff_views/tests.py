@@ -26,6 +26,7 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
+from itou.users.enums import UserKind
 from itou.users.models import NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
@@ -744,6 +745,35 @@ class TestMergeUsers:
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — "
             f"itou.gps.models.FollowUpGroupMembership.user updated : [{membership_1.pk}]",
             f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    @pytest.mark.parametrize("kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    def test_merge_updated_by_membership(self, kind, admin_client, caplog):
+        if kind == UserKind.EMPLOYER:
+            user_factory = EmployerFactory
+            membership_factory = CompanyMembershipFactory
+        elif kind == UserKind.PRESCRIBER:
+            user_factory = PrescriberFactory
+            membership_factory = PrescriberMembershipFactory
+        else:
+            raise ValueError("Invalid kind")
+        membership_model = membership_factory._meta.model
+
+        user_1 = user_factory()
+        user_2 = user_factory()
+        # Inactive membership that would not be found by membership_model.objects default manager
+        membership = membership_factory(user=user_1, is_active=False, updated_by=user_2)
+
+        url = reverse("itou_staff_views:merge_users_confirm", args=(user_1.public_id, user_2.public_id))
+        admin_client.post(url, data={"user_to_keep": "to_user"})
+        assert User.objects.filter(pk__in=(user_1.pk, user_2.pk)).get() == user_1
+        assert caplog.messages == [
+            (
+                f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — "
+                f"{membership_model.__module__}.{membership_model.__name__}.updated_by : [{membership.pk}]"
+            ),
+            f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — Done !",
             "HTTP 302 Found",
         ]
 
