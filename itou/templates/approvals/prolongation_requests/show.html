@@ -131,7 +131,7 @@
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}
-                            {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True only %}
+                            {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class='mb-3 mb-md-4' only %}
                         {% endif %}
                     {% endwith %}
                 </div>

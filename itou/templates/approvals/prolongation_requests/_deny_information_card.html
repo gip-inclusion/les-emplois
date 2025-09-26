@@ -19,7 +19,7 @@
             {% if prolongation_request.deny_information.proposed_actions %}
                 <li class="has-forced-line-break">
                     <small>Actions envisagées par le prescripteur habilité</small>
-                    <ul class="fw-bold">
+                    <ul class="fw-bold list-unstyled">
                         <li>
                             {% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
                                 {{ proposed_action }}
