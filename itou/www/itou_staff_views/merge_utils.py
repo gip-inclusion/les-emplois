@@ -8,6 +8,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
+from itou.common_apps.organizations.models import MembershipAbstract
 from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -180,14 +181,19 @@ def migrate_field(model, field_name, from_user, to_user):
     if func := MODEL_MAPPING.get((model, field_name)):
         func(model, from_user, to_user)
     else:
-        pks = list(model.objects.filter(**{field_name: from_user}).values_list("pk", flat=True))
+        if issubclass(model, MembershipAbstract):
+            # Inactive objects must also be migrated to avoid RESTRICT errors on updated_by
+            manager = model.include_inactive
+        else:
+            manager = model.objects
+        pks = list(manager.filter(**{field_name: from_user}).values_list("pk", flat=True))
         if pks:
             if isinstance(pks[0], uuid.UUID):
                 pks = "[" + ", ".join(str(pk) for pk in pks) + "]"
             logger.info(
                 get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.{field_name} : {pks}"
             )
-        model.objects.filter(**{field_name: from_user}).update(**{field_name: to_user})
+        manager.filter(**{field_name: from_user}).update(**{field_name: to_user})
 
 
 @transaction.atomic
