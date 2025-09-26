@@ -637,7 +637,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = list(super().get_fieldsets(request, obj))
-        if obj.status == ProlongationRequestStatus.DENIED:
+        if obj and obj.status == ProlongationRequestStatus.DENIED:
             fieldsets[2:2] = [
                 (
                     "Refus",
