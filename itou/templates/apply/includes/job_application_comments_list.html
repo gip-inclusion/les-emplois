@@ -1,0 +1,69 @@
+<div class="{% if location == "sidebar" %}c-box{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments_list_{{ location }}"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <h3>
+        {% if location == "sidebar" %}
+            Derniers commentaires
+        {% else %}
+            Liste des commentaires ({{ comments.count }})
+        {% endif %}
+    </h3>
+    <ul class="list-note">
+        {% for comment in comments %}
+            <li {% if request.user == comment.created_by %}class="is-current-user"{% endif %}>
+                {% if location == "tab" %}<i class="ri-user-line"></i>{% endif %}
+                <div>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <time datetime="{{ comment.created_at.isoformat }}">Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</time>
+                            <strong>
+                                {{ comment.created_by.get_full_name }}
+                                {% if comment.created_by == request.user %}(vous){% endif %}
+                            </strong>
+                        </div>
+                        {% if location == "tab" and request.user == comment.created_by %}
+                            <button class="btn btn-sm btn-link btn-ico-only"
+                                    type="button"
+                                    hx-post="{% url "apply:delete_threaded_comment_for_company" job_application_id=comment.job_application.id comment_id=comment.id %}"
+                                    hx-swap="outerHTML"
+                                    hx-target="#comments_list_tab"
+                                    hx-indicator="#comments_list_tab"
+                                    hx-include="#label-form">
+                                <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce commentaire"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    <blockquote class="blockquote">
+                        {% if location == "sidebar" and comment.message|length > 200 %}
+                            <div class="collapse show collapseLastComment">
+                                <p class="mb-0">{{ comment.message|truncatechars:200 }}</p>
+                                <button class="btn-link d-inline-block mt-2" type="button" data-bs-toggle="collapse" data-bs-target=".collapseLastComment" aria-expanded="false" aria-controls="collapseLastComment">
+                                    Voir +
+                                </button>
+                            </div>
+                            <div class="collapse collapseLastComment">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% else %}
+                            <div class="collapse collapseLastComment show">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% endif %}
+                    </blockquote>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if location == "sidebar" %}
+        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation">
+            Voir tous les commentaires
+        </button>
+    {% else %}
+        <form id="label-form">
+            {% csrf_token %}{# Used by htmx posts #}
+        </form>
+    {% endif %}
+</div>
+
+
+{% if request.htmx %}
+    {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
+{% endif %}
