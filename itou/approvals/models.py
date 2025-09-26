@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import ArrayField, RangeBoundary, RangeOperators
+from django.core.cache import caches
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
@@ -19,7 +20,7 @@ from django.utils.timesince import timeuntil
 
 from itou.approvals import enums, notifications
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.enums import Origin
+from itou.approvals.enums import Origin, ProlongationRequestStatus
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.archive.constants import EXPIRATION_DAYS
 from itou.companies import enums as companies_enums
@@ -1625,6 +1626,17 @@ class ProlongationRequest(CommonProlongation):
             self.assigned_to, self.prescriber_organization, prolongation_request=self
         ).send()
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.prescriber_organization:
+            self.__class__.get_count(self.prescriber_organization, refresh=True)
+
+    def delete(self, *args, **kwargs):
+        org = self.prescriber_organization
+        super().delete(*args, **kwargs)
+        if org:
+            self.__class__.get_count(org, refresh=True)
+
     def grant(self, user):
         self.status = enums.ProlongationRequestStatus.GRANTED
         self.processed_by = user
@@ -1665,6 +1677,20 @@ class ProlongationRequest(CommonProlongation):
         notifications.ProlongationRequestDeniedForJobSeekerNotification(
             self.approval.user, prolongation_request=self
         ).send()
+
+    @classmethod
+    def get_count(cls, organization, refresh=False):
+        cache_key = f"prolongation-request-count-{organization.pk}"
+        cache = caches["failsafe"]
+        count = cache.get(cache_key)
+        if count is None or refresh is True:
+            count = cls.objects.filter(
+                prescriber_organization=organization,
+                status=ProlongationRequestStatus.PENDING,
+            ).count()
+            # Only refresh it once per day or if required (new processed prolongation)
+            cache.set(cache_key, count, 60 * 60 * 24)
+        return count
 
 
 class ProlongationRequestDenyInformation(models.Model):

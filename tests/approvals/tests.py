@@ -12,8 +12,8 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
-from itou.approvals.models import Approval, CancelledApproval, Prolongation, Suspension
+from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason, ProlongationRequestStatus
+from itou.approvals.models import Approval, CancelledApproval, Prolongation, ProlongationRequest, Suspension
 from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.archive.constants import EXPIRATION_DAYS
 from itou.companies.enums import CompanyKind
@@ -1391,6 +1391,28 @@ class TestProlongationRequestModel:
         assert prolongation.require_phone_interview == prolongation_request.require_phone_interview
         assert prolongation.contact_email == prolongation_request.contact_email
         assert prolongation.contact_phone == prolongation_request.contact_phone
+
+    def test_get_count(self):
+        prolongation_request = ProlongationRequestFactory()
+
+        with assertNumQueries(1):
+            assert ProlongationRequest.get_count(prolongation_request.prescriber_organization, refresh=True) == 1
+        with assertNumQueries(0):
+            assert ProlongationRequest.get_count(prolongation_request.prescriber_organization) == 1
+
+        # Calling save refreshes the cache
+        prolongation_request.status = ProlongationRequestStatus.GRANTED
+        prolongation_request.save()
+        with assertNumQueries(0):
+            assert ProlongationRequest.get_count(prolongation_request.prescriber_organization) == 0
+
+        # calling delete() refreshes the cache
+        prolongation_request = ProlongationRequestFactory()
+        with assertNumQueries(0):
+            assert ProlongationRequest.get_count(prolongation_request.prescriber_organization) == 1
+        prolongation_request.delete()
+        with assertNumQueries(0):
+            assert ProlongationRequest.get_count(prolongation_request.prescriber_organization) == 0
 
 
 @pytest.mark.django_db(transaction=True)

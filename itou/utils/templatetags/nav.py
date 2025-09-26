@@ -2,7 +2,6 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.institutions.enums import InstitutionKind
 from itou.utils.errors import silently_report_exception
@@ -315,10 +314,7 @@ def nav(request):
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             if request.from_authorized_prescriber and request.current_organization:
                 prolongation_item = NAV_ENTRIES["prescriber-approval-prolongations"]
-                prolongation_item.count = ProlongationRequest.objects.filter(
-                    prescriber_organization=request.current_organization,
-                    status=ProlongationRequestStatus.PENDING,
-                ).count()
+                prolongation_item.count = ProlongationRequest.get_count(request.current_organization)
                 menu_items.append(prolongation_item)
             if request.current_organization:
                 organization_items = [

@@ -682,6 +682,7 @@
       }),
       dict({
         'origin': list([
+          'get_count[approvals/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
