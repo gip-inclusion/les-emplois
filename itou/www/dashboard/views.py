@@ -18,7 +18,6 @@ from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
 
 from itou.api.token_auth.views import TOKEN_ID_STR
-from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -155,10 +154,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 stalled=True,
             ).count()
             if current_org.is_authorized:
-                context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
-                    prescriber_organization=current_org,
-                    status=ProlongationRequestStatus.PENDING,
-                ).count()
+                context["pending_prolongation_requests"] = ProlongationRequest.get_count(request.current_organization)
     elif request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
         six_months_ago = timezone.now() - timezone.timedelta(days=182)
