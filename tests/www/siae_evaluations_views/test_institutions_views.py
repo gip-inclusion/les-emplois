@@ -31,6 +31,7 @@ from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import (
+    ArchivedEvaluatedSiaeFactory,
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
@@ -261,6 +262,41 @@ class TestInstitutionEvaluatedSiaeListView:
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert pretty_indented(state_div) == snapshot(name="final accepted state")
 
+    @pytest.mark.parametrize(
+        "evaluated_siae,archived_evaluated_siae,status_code",
+        [(True, True, 200), (True, False, 200), (False, True, 200), (False, False, 404)],
+    )
+    def test_closed_campaign_after_evaluated_siaes_are_archived(
+        self, client, snapshot, evaluated_siae, archived_evaluated_siae, status_code
+    ):
+        evaluation_campaign = EvaluationCampaignFactory(
+            pk=10,
+            evaluations_asked_at=timezone.now() - relativedelta(days=90),
+            ended_at=timezone.now() - datetime.timedelta(days=60),
+            institution=self.institution,
+        )
+        if evaluated_siae:
+            EvaluatedSiaeFactory(
+                pk=1000,
+                complete=True,
+                for_snapshot=True,
+                final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED,
+                evaluation_campaign=evaluation_campaign,
+            )
+        if archived_evaluated_siae:
+            ArchivedEvaluatedSiaeFactory(pk=100, for_snapshot=True, evaluation_campaign=evaluation_campaign)
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.id},
+        )
+        client.force_login(self.user)
+        response = client.get(url)
+        assert response.status_code == status_code
+
+        if status_code == 200:
+            content = parse_response_to_soup(response, selector="section.s-section")
+            assert pretty_indented(content) == snapshot(name="institution evaluated_siae list")
+
     def test_siae_refused_can_be_notified(self, client, snapshot):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
@@ -455,6 +491,7 @@ class TestInstitutionEvaluatedSiaeListView:
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
         )
+        ArchivedEvaluatedSiaeFactory(evaluation_campaign=evaluated_siae.evaluation_campaign)
         client.force_login(self.user)
         response = client.get(
             reverse(
@@ -2056,6 +2093,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
         )
+        ArchivedEvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            siae=evaluated_siae.siae,
+            evaluation_campaign__evaluated_period_start_at=datetime.date(2023, 5, 17),
+            evaluation_campaign__evaluated_period_end_at=datetime.date(2023, 7, 16),
+        )
         client.force_login(self.user)
         response = client.get(
             reverse(
@@ -2081,11 +2124,14 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             """
-            <h3>
-             Historique des campagnes de contrôle
-            </h3>
+            <h3>Historique des campagnes de contrôle</h3>
             <ul class="list-unstyled">
-            </ul>""",
+             <li>
+              Période du 17/05/2023 au 16/07/2023 :
+              <b class="text-success">Positif</b>
+             </li>
+            </ul>
+            """,
             html=True,
             count=1,
         )
