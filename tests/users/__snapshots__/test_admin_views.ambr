@@ -118,6 +118,7 @@
                  "cities_city"."code_insee",
                  "cities_city"."coords",
                  "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at",
                  T3."id",
                  T3."password",
                  T3."last_login",
