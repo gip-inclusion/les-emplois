@@ -143,30 +143,19 @@
             {% endif %}
         </li>
         <li>
-            <small class="align-self-start">Autres</small>
-            {% if other_infos %}
-                <strong>
-                    {% for item in other_infos %}
-                        {% if item == "resourceless" %}
-                            Sans ressources
-                        {% elif item == "unemployed_since" %}
-                            Sans emploi depuis {{ profile.get_unemployed_since_display|lower }}
-                        {% elif item == "rqth_employee" %}
-                            Titulaire de la RQTH
-                        {% elif item == "oeth_employee" %}
-                            Bénéficiaire de la loi handicap (OETH)
-                        {% elif item == "rsa_allocation_since" %}
-                            Bénéficiaire du RSA depuis {{ profile.get_rsa_allocation_since_display|lower }}
-                        {% elif item == "ass_allocation_since" %}
-                            Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}
-                        {% elif item == "aah_allocation_since" %}
-                            Bénéficiaire de l'AAH depuis {{ profile.get_aah_allocation_since_display|lower }}
-                        {% endif %}
-                        {% if not forloop.last %}<br>{% endif %}
-                    {% endfor %}
-                </strong>
-            {% else %}
+            <small>Autres</small>
+            {% if not other_infos %}
                 <i class="text-disabled">Aucune information supplémentaire</i>
+            {% elif other_infos|length > 1 %}
+                <ul>
+                    {% for item in other_infos %}
+                        <li>{% include "apply/includes/profile_other_info_item.html" with item=item profile=profile only %}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% for item in other_infos %}
+                    <strong>{% include "apply/includes/profile_other_info_item.html" with item=item profile=profile only %}</strong>
+                {% endfor %}
             {% endif %}
         </li>
     </ul>
