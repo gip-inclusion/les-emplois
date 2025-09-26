@@ -844,21 +844,29 @@
               <small class="align-self-start">
                   Autres
               </small>
-              <strong>
-                  Sans ressources
-                  <br/>
-                  Sans emploi depuis de 12 à 23 mois
-                  <br/>
-                  Titulaire de la RQTH
-                  <br/>
-                  Bénéficiaire de la loi handicap (OETH)
-                  <br/>
-                  Bénéficiaire du RSA depuis 24 mois et plus
-                  <br/>
-                  Bénéficiaire de l'ASS depuis de 6 à 11 mois
-                  <br/>
-                  Bénéficiaire de l'AAH depuis moins de 6 mois
-              </strong>
+              <ul class="fw-bold list-unstyled">
+                  <li>
+                      Sans ressources
+                  </li>
+                  <li>
+                      Sans emploi depuis de 12 à 23 mois
+                  </li>
+                  <li>
+                      Titulaire de la RQTH
+                  </li>
+                  <li>
+                      Bénéficiaire de la loi handicap (OETH)
+                  </li>
+                  <li>
+                      Bénéficiaire du RSA depuis 24 mois et plus
+                  </li>
+                  <li>
+                      Bénéficiaire de l'ASS depuis de 6 à 11 mois
+                  </li>
+                  <li>
+                      Bénéficiaire de l'AAH depuis moins de 6 mois
+                  </li>
+              </ul>
           </li>
       </ul>
   </div>
