@@ -1,0 +1,48 @@
+# serializer version: 1
+# name: TestSavedSearches.test_details_delete_modal_content
+  '''
+  <div aria-labelledby="savedSearchesSettingsModalLabel" aria-modal="true" class="modal fade" id="savedSearchesSettingsModal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered" id="savedSearchesSettingsModalContent">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="savedSearchesSettingsModalLabel">
+                      Recherches enregistrées
+                  </h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button">
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <ul class="list-unstyled">
+                      <li class="d-flex lh-sm mb-3">
+                          <div class="me-2">
+                              <i aria-hidden="true" class="ri-star-line text-muted">
+                              </i>
+                          </div>
+                          <div class="flex-grow-1">
+                              <strong class="fs-sm d-block">
+                                  <a href="/search/employers/results?city=lyon-69&distance=50&kinds=ACI&kinds=EI&kinds=OPCS&departments=69&district_69=69001&district_69=69003">
+                                      Grand Lyon
+                                  </a>
+                              </strong>
+                              <span class="fs-xs">
+                                  Lyon – Distance : 50 km – Types de structure : ACI, EI, OPCS – Département : 69 + 1 filtre
+                              </span>
+                          </div>
+                          <div>
+                              <form class="js-prevent-multiple-submit" hx-indicator="#savedSearchesSettingsModalContent .modal-body" hx-post="/search/saved-searches/[Pk of SavedSearch]/delete" hx-swap="outerHTML" hx-target="#savedSearchesSettingsModalContent">
+                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                  <button aria-label="Supprimer cette recherche" class="btn btn-danger btn-sm btn-ico-only">
+                                      <i aria-hidden="true" class="ri-delete-bin-line fw-medium">
+                                      </i>
+                                  </button>
+                              </form>
+                          </div>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
