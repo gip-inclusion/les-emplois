@@ -60,16 +60,13 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <hr>
-                                <p class="fs-xs">* champ obligatoire</p>
-                                <div class="form-group text-end">
-                                    {% if wizard.steps.prev %}
-                                        {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev formnovalidate=True %}
-                                    {% else %}
-                                        <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
-                                    {% endif %}
-                                    {% bootstrap_button wizard.steps.next|yesno:"Suivant,Confirmer le refus" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
+
+                                {% if wizard.steps.prev %}
+                                    {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" secondary_url=wizard.steps.prev %}
+                                {% else %}
+                                    {% url "approvals:prolongation_request_show" prolongation_request.pk as reset_url %}
+                                    {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" reset_url=reset_url %}
+                                {% endif %}
                             </form>
                         {% endblock %}
                     </div>
