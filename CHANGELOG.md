@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## 2025-09-29
+
+### Ajouté
+
+- [Vie privée: supprimer les emails inconnus de Brevo](https://github.com/gip-inclusion/les-emplois/pull/6874)
+
+### Modifié
+
+- [Admin: ajout d'un bouton de désactivation d'un utilisateur](https://github.com/gip-inclusion/les-emplois/pull/6888)
+- [Admin: amélioration de la fusion des comptes](https://github.com/gip-inclusion/les-emplois/pull/6910)
+- [Connexion: ajout d'un message d'erreur pour les utilisateurs se connectant en SSO sur un compte désactivé](https://github.com/gip-inclusion/les-emplois/pull/6875)
+- [Contrôle a posteriori : figer l'état final de l'évaluation d'une SIAE à la clôture d'une campagne](https://github.com/gip-inclusion/les-emplois/pull/6794)
+- [Vie privée : réduction de la fréquence du traitement de notification des professionnels inactifs](https://github.com/gip-inclusion/les-emplois/pull/6904)
+
 ## 2025-09-22
 
 ### Ajouté
