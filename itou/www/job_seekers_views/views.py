@@ -967,8 +967,17 @@ class UpdateJobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         }
 
     def _disable_form(self):
+        edition_required_fields = {
+            label for label, _ in self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
+        }
+        if "lack_of_nir_reason" in edition_required_fields:
+            edition_required_fields.add("lack_of_nir")
+        if any(label in edition_required_fields for label in ["address_line_1", "post_code", "city"]):
+            edition_required_fields.add("address_for_autocomplete")
+            edition_required_fields.add("address_line_2")
         for field in self.form:
-            field.field.disabled = True
+            if field.name not in edition_required_fields:
+                field.field.disabled = True
 
     def get_reset_url(self):
         return self.job_seeker_session.get("config").get("from_url")
@@ -983,6 +992,11 @@ class UpdateJobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         return reverse(
             self.next_url,
             kwargs={"session_uuid": self.job_seeker_session.name},
+        )
+
+    def editable_form(self):
+        return can_edit_personal_information(self.request, self.job_seeker) or bool(
+            self.job_seeker.jobseeker_profile.get_missing_personal_info_for_hire()
         )
 
 
@@ -1023,7 +1037,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
             self._disable_form()
 
     def post(self, request, *args, **kwargs):
-        if not can_edit_personal_information(self.request, self.job_seeker):
+        if not self.editable_form():
             return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set(
@@ -1072,7 +1086,7 @@ class UpdateJobSeekerStep2View(UpdateJobSeekerBaseView):
             self._disable_form()
 
     def post(self, request, *args, **kwargs):
-        if not can_edit_personal_information(self.request, self.job_seeker):
+        if not self.editable_form():
             return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
             self.job_seeker_session.set("user", self.job_seeker_session.get("user") | self.form.cleaned_data)
@@ -1162,7 +1176,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         super().setup(request, *args, **kwargs)
 
         allowed_user_fields_to_update = []
-        if can_edit_personal_information(self.request, self.job_seeker):
+        if self.editable_form():
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep1Form.Meta.fields)
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep2Form.Meta.fields)
 
@@ -1278,14 +1292,17 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         assert self.hire_process
 
     def get_context_data(self, **kwargs):
+        profile = self.job_seeker.jobseeker_profile
+        missing_fields = profile.get_missing_personal_info_for_hire()
         return super().get_context_data(**kwargs) | {
-            "profile": self.job_seeker.jobseeker_profile,
+            "profile": profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
             "next_url": reverse(
                 "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
             ),
-            **jobseeker_personal_infos_display_kwargs(self.job_seeker.jobseeker_profile),
+            **jobseeker_personal_infos_display_kwargs(profile),
             "allow_modify_job_seeker": True,
+            "job_seeker_missing_required_data": bool(missing_fields),
         }
 
 
