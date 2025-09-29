@@ -548,7 +548,11 @@ def stats_ddets_iae_auto_prescription(request):
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_ph_prescription(request):
-    return render_stats_ddets(request=request, page_title="Analyse des candidatures émises et de leur traitement")
+    return render_stats_ddets(
+        request=request,
+        page_title="Analyse des candidatures émises et de leur traitement",
+        with_department_name=False,
+    )
 
 
 @check_request(utils.can_view_stats_ddets_iae)
@@ -619,7 +623,9 @@ def stats_dreets_iae_auto_prescription(request):
 
 @check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_ph_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Analyse des candidatures émises et de leur traitement")
+    return render_stats_dreets_iae(
+        request=request, page_title="Analyse des candidatures émises et de leur traitement", with_department_name=False
+    )
 
 
 @check_request(utils.can_view_stats_dreets_iae)
