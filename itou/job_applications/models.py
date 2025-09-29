@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from django.conf import settings
@@ -42,6 +43,9 @@ from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
@@ -1039,6 +1043,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.eligibility_diagnosis = None
             self.save(update_fields={"eligibility_diagnosis", "updated_at"})
             eligibility_diagnosis.delete()
+
+        # Delete comments
+        del_count, _ = JobApplicationComment.objects.filter(job_application=self.pk).delete()
+        if del_count:
+            logger.info("job_application=%s was transferred and %d comments were deleted", self.pk, del_count)
 
         notification_context = {
             "job_application": self,

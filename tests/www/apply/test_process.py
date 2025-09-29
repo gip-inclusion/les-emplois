@@ -64,6 +64,7 @@ from tests.eligibility.factories import (
 )
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
+    JobApplicationCommentFactory,
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
@@ -3670,8 +3671,10 @@ class TestProcessTransferJobApplication:
             job_seeker__for_snapshot=True,
             job_seeker__first_name="<>html escaped<>",
         )
+        JobApplicationCommentFactory(job_application=job_application)
 
         assert 2 == user.companymembership_set.count()
+        assert 1 == job_application.comments.count()
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
@@ -3728,6 +3731,7 @@ class TestProcessTransferJobApplication:
         assert job_application.state == job_applications_enums.JobApplicationState.NEW
         assert job_application.logs.order_by("timestamp").last().transition == "transfer"
         assert job_application.to_company_id == other_company.pk
+        assert 0 == job_application.comments.count()
 
     def test_job_application_transfer_without_rights(self, client):
         company = CompanyFactory()

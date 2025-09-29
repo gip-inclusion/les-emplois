@@ -13,7 +13,7 @@ from itou.job_applications.models import JobApplication
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
-from tests.job_applications.factories import JobApplicationFactory
+from tests.job_applications.factories import JobApplicationCommentFactory, JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_session_initialization
@@ -617,6 +617,7 @@ def test_full_process(client, pdf_file):
         with_file=pdf_file,
     )
     employer = job_application.to_company.members.get()
+    JobApplicationCommentFactory(job_application=job_application)
     client.force_login(employer)
 
     # STEP 1
@@ -679,6 +680,9 @@ def test_full_process(client, pdf_file):
     )
     assertRedirects(response, transfer_step_end_url)
     assert transfert_session_name not in client.session
+
+    assert job_application.comments.count() == 1
+    assert new_job_application.comments.count() == 0
 
     assert new_job_application.message == "blah"
     assert new_job_application.job_seeker == job_application.job_seeker
