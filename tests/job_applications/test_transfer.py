@@ -5,11 +5,12 @@ from django.utils import timezone
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationComment, JobApplicationWorkflow
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
+    JobApplicationCommentFactory,
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
 )
@@ -327,3 +328,29 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     assert "a transféré la candidature de :" in mailoutbox[0].body
     assert "a transféré la candidature de :" in mailoutbox[1].body
     assert "[TEST] Votre candidature a été transférée à une autre structure" == mailoutbox[2].subject
+
+
+@pytest.mark.parametrize("comments_count", [0, 2])
+def test_transfer_must_delete_comments(comments_count, caplog):
+    origin_company = CompanyFactory(with_membership=True)
+    target_company = CompanyFactory(with_membership=True)
+
+    origin_user = origin_company.members.first()
+    target_company.members.add(origin_user)
+
+    job_application = JobApplicationSentByCompanyFactory(
+        state=JobApplicationState.PROCESSING,
+        to_company=origin_company,
+        eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
+    )
+    if comments_count:
+        JobApplicationCommentFactory.create_batch(comments_count, job_application=job_application)
+
+    job_application.transfer(user=origin_user, target_company=target_company)
+
+    if comments_count:
+        assert (
+            f"job_application={job_application.pk} was transferred and {comments_count} comments were deleted"
+            in caplog.messages
+        )
+    assert JobApplicationComment.objects.count() == 0
