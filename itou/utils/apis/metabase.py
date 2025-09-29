@@ -133,7 +133,7 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "nG6gBj",
     },
     "stats_ddets_iae_ph_prescription": {
-        "dashboard_id": 289,
+        "dashboard_id": 577,
         "tally_popup_form_id": "wbWKEo",
         "tally_embed_form_id": "wvPEvQ",
     },
@@ -172,7 +172,7 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "nG6gBj",
     },
     "stats_dreets_iae_ph_prescription": {
-        "dashboard_id": 289,
+        "dashboard_id": 577,
         "tally_popup_form_id": "wbWKEo",
         "tally_embed_form_id": "wvPEvQ",
     },
