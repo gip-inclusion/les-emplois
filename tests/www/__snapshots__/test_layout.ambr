@@ -1008,6 +1008,11 @@
                                       Tous les candidats de la structure
                                   </a>
                               </li>
+                              <li>
+                                  <a href="/approvals/prolongation/requests?only_pending=on">
+                                      Gérer les prolongations de PASS IAE
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
