@@ -118,6 +118,11 @@ NAV_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="candidats-organisation",
     ),
+    "prescriber-approval-prolongations": NavItem(
+        label="Gérer les prolongations de PASS\xa0IAE",
+        target=reverse("approvals:prolongation_requests_list", query={"only_pending": "on"}),
+        active_view_names=["approvals:prolongation_requests_list"],
+    ),
     "prescriber-job-apps": NavItem(
         label="Candidatures",
         icon="ri-draft-line",
@@ -301,6 +306,8 @@ def nav(request):
             ]
             if request.current_organization:
                 jobseekers_items.append(NAV_ENTRIES["prescriber-jobseekers-organization"])
+                if request.from_authorized_prescriber:
+                    jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
             if request.current_organization:
                 organization_items = [
