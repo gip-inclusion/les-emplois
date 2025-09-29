@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_model_fields
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -97,6 +97,16 @@
           DELETE
           FROM "eligibility_eligibilitydiagnosis"
           WHERE "eligibility_eligibilitydiagnosis"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobApplication.transfer[job_applications/models.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "job_applications_jobapplicationcomment"
+          WHERE "job_applications_jobapplicationcomment"."job_application_id" = %s
         ''',
       }),
       dict({
