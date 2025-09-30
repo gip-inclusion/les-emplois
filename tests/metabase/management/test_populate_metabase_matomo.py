@@ -5,6 +5,8 @@ from django.db import connection
 from django.test import override_settings
 from freezegun import freeze_time
 
+from tests.utils.testing import assertSnapshotQueries
+
 
 MATOMO_HEADERS = (
     "Unique visitors,Visits,Users,Actions,Maximum actions in one visit,Bounces,"
@@ -77,7 +79,8 @@ def test_matomo_populate_public(respx_mock, snapshot):
     with connection.cursor() as cursor:
         cursor.execute("DROP TABLE IF EXISTS suivi_visiteurs_tb_publics_v1")
 
-    management.call_command("populate_metabase_matomo", wet_run=True)
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        management.call_command("populate_metabase_matomo", wet_run=True)
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v1")
         rows = cursor.fetchall()
