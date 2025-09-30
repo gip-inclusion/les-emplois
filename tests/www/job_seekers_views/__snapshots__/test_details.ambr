@@ -34,14 +34,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -55,7 +55,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -306,14 +306,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -327,7 +327,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -562,14 +562,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -583,7 +583,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -772,14 +772,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -793,7 +793,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -1061,14 +1061,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -1082,7 +1082,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="job-applications-tab" class="tab-pane fade show active" id="candidatures" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <h2>
                                   Candidatures envoyées par ma structure
                               </h2>
@@ -1984,14 +1984,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2005,7 +2005,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -2269,14 +2269,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2290,7 +2290,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -2523,14 +2523,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2544,7 +2544,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -2726,14 +2726,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2747,7 +2747,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -2987,14 +2987,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -3008,7 +3008,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -3241,14 +3241,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -3262,7 +3262,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12">
                                       <h2>
@@ -3444,14 +3444,14 @@
                               </a>
                           </div>
                       </div>
-                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="informations" aria-selected="true" class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="informations-tab">
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Informations générales
                               </a>
                           </li>
-                          <li class="nav-item" role="presentation">
-                              <a aria-controls="candidatures" aria-selected="false" class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list" id="job-applications-tab">
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
                                   Candidatures
                               </a>
                           </li>
@@ -3465,7 +3465,7 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <div class="tab-content">
-                          <div aria-labelledby="informations-tab" class="tab-pane fade show active" id="informations" role="tabpanel">
+                          <div class="tab-pane fade show active">
                               <div class="row">
                                   <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                                       <h2>

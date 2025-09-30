@@ -1105,7 +1105,7 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
           </li>
@@ -1405,7 +1405,7 @@
                           </button>
                       </div>
                   </div>
-                  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+                  <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                       <li class="nav-item">
                           <a class="nav-link active" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">
                               Mon dossier
@@ -1525,7 +1525,7 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
           </li>
@@ -1803,7 +1803,7 @@
   
                               
                               
-      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true" role="tablist">
+      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
           <li class="nav-item">
               <a class="nav-link" href="/geiq-assessments/00000000-1111-2222-3333-444444444444">Mon dossier</a>
           </li>
