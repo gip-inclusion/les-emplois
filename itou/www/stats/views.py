@@ -543,14 +543,14 @@ def render_stats_ddets(
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_auto_prescription(request):
-    return render_stats_ddets(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
+    return render_stats_ddets(request=request, page_title="Suivi des auto-prescriptions et de leur contrôle")
 
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_ph_prescription(request):
     return render_stats_ddets(
         request=request,
-        page_title="Analyse des candidatures émises et de leur traitement",
+        page_title="Suivi de l’orientation et du traitement des candidatures émises par les prescripteurs habilités",
         with_department_name=False,
     )
 
@@ -570,7 +570,7 @@ def stats_ddets_iae_siae_evaluation(request):
 def stats_ddets_iae_hiring(request):
     return render_stats_ddets(
         request=request,
-        page_title="Analyse des candidatures reçues et de leur traitement",
+        page_title="Suivi des candidatures reçues et de leur traitement par les SIAE",
         with_department_name=False,
     )
 
@@ -579,7 +579,7 @@ def stats_ddets_iae_hiring(request):
 def stats_ddets_iae_state(request):
     return render_stats_ddets(
         request=request,
-        page_title="Analyse des candidatures émises par les acteurs AHI",
+        page_title="Suivi de l’orientation et du traitement des candidatures émises par les acteurs AHI",
         extend_stats_to_whole_region=True,
     )
 
@@ -618,13 +618,15 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None, with_dep
 
 @check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_auto_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Analyse des auto-prescriptions et de leur contrôle")
+    return render_stats_dreets_iae(request=request, page_title="Suivi des auto-prescriptions et de leur contrôle")
 
 
 @check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_ph_prescription(request):
     return render_stats_dreets_iae(
-        request=request, page_title="Analyse des candidatures émises et de leur traitement", with_department_name=False
+        request=request,
+        page_title="Suivi de l’orientation et du traitement des candidatures émises par les prescripteurs habilités",
+        with_department_name=False,
     )
 
 
@@ -632,7 +634,7 @@ def stats_dreets_iae_ph_prescription(request):
 def stats_dreets_iae_hiring(request):
     return render_stats_dreets_iae(
         request=request,
-        page_title="Analyse des candidatures reçues et de leur traitement",
+        page_title="Suivi des candidatures reçues et de leur traitement par les SIAE",
         with_department_name=False,
     )
 
@@ -641,7 +643,7 @@ def stats_dreets_iae_hiring(request):
 def stats_dreets_iae_state(request):
     return render_stats_dreets_iae(
         request=request,
-        page_title="Analyse des candidatures émises par les acteurs AHI",
+        page_title="Suivi de l’orientation et du traitement des candidatures émises par les acteurs AHI",
     )
 
 
