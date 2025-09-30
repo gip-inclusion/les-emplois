@@ -9,13 +9,16 @@ from itou.metabase.tables.utils import (
 )
 
 
-@pytest.fixture(name="metabase")
-def metabase_fixture(mocker):
+@pytest.fixture(name="pilotage_datastore_db", autouse=True)
+def pilotage_datastore_db_fixture(mocker):
     class FakePsycopgConnection:
         """
         This fake psycopg connection allows us to benefit from all
         the Django heavy lifting that is done with creating the database,
         wrap everything in a transaction, etc.
+
+        We can't directly use `connection` because `ConnectionProxy()`
+        doesn't support the context manager protocol.
 
         This makes us write the metabase tables in the main test database.
         """

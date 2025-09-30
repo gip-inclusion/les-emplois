@@ -52,7 +52,6 @@ from tests.utils.testing import assertSnapshotQueries
 
 @freeze_time("2023-03-10")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_analytics(snapshot):
     date_maj = timezone.localdate() + datetime.timedelta(days=-1)
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
@@ -131,7 +130,6 @@ def test_populate_analytics(snapshot):
 # We can use fakegun because datetime.date return FakeDate objects, but the database
 # return datetime.date objects that are not equal...
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_job_seekers(snapshot):
     QPVFactory(code="QP075019")
 
@@ -432,7 +430,6 @@ def test_populate_job_seekers(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_criteria(snapshot):
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="criteria")
@@ -446,7 +443,6 @@ def test_populate_criteria(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_job_applications(snapshot):
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     company = CompanyFactory(
@@ -524,7 +520,6 @@ def test_populate_job_applications(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_approvals(snapshot):
     approval = ApprovalFactory()
 
@@ -558,7 +553,6 @@ def test_populate_approvals(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_prolongations(snapshot):
     prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
@@ -590,7 +584,6 @@ def test_populate_prolongations(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_prolongation_requests(snapshot):
     prolongation = ProlongationFactory(with_request=True)
     prolongation_request = prolongation.request
@@ -631,7 +624,6 @@ def test_populate_prolongation_requests(snapshot):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_suspensions(snapshot):
     suspension = SuspensionFactory()
 
@@ -658,7 +650,6 @@ def test_populate_suspensions(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_institutions(snapshot):
     institution = InstitutionFactory(department="14")
 
@@ -683,7 +674,6 @@ def test_populate_institutions(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_evaluation_campaigns(snapshot):
     evaluation_campaign = EvaluationCampaignFactory()
 
@@ -708,7 +698,6 @@ def test_populate_evaluation_campaigns(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_evaluated_siaes(snapshot):
     evaluated_siae = EvaluatedSiaeFactory()
 
@@ -733,7 +722,6 @@ def test_populate_evaluated_siaes(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_evaluated_job_applications(snapshot):
     evaluated_job_application = EvaluatedJobApplicationFactory()
 
@@ -756,7 +744,6 @@ def test_populate_evaluated_job_applications(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_evaluated_criteria(snapshot):
     evaluated_job_application = EvaluatedJobApplicationFactory()
     evaluated_criteria = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
@@ -782,7 +769,6 @@ def test_populate_evaluated_criteria(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_users_exclude_job_seekers():
     """
     Job seeker personal data (email...) should never ever ever ever ever ever end up in Metabase.
@@ -798,7 +784,6 @@ def test_populate_users_exclude_job_seekers():
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_users(snapshot):
     pro_user = EmployerFactory()
 
@@ -823,7 +808,6 @@ def test_populate_users(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_memberships(snapshot):
     company_membership = CompanyMembershipFactory()
     CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
@@ -871,7 +855,6 @@ def test_populate_memberships(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_enums(snapshot):
     with assertSnapshotQueries(snapshot):
         management.call_command("populate_metabase_emplois", mode="enums")
@@ -912,7 +895,6 @@ def test_populate_enums(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_job_descriptions(snapshot):
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     company = CompanyFactory(
@@ -981,7 +963,6 @@ def test_populate_job_descriptions(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_companies(snapshot):
     company = CompanyFactory(
         for_snapshot=True,
@@ -1063,7 +1044,6 @@ def test_populate_companies(snapshot):
 
 
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_companies_convergence(settings):
     convergence_company = CompanyFactory(kind=CompanyKind.ACI)
     settings.ACI_CONVERGENCE_SIRET_WHITELIST = [convergence_company.siret]
@@ -1082,7 +1062,6 @@ def test_populate_companies_convergence(settings):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_gps_groups(snapshot):
     group = FollowUpGroupFactory(for_snapshot=True)
 
@@ -1106,7 +1085,6 @@ def test_populate_gps_groups(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_gps_memberships(snapshot):
     membership = FollowUpGroupMembershipFactory(follow_up_group__for_snapshot=True, member__for_snapshot=True)
     prescriber = membership.member
@@ -1137,7 +1115,6 @@ def test_populate_gps_memberships(snapshot):
 
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 def test_populate_organizations(snapshot):
     first_organisation = PrescriberOrganizationWith2MembershipFactory(
         authorized=True,
