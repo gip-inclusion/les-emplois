@@ -46,7 +46,6 @@ MATOMO_ONLINE_CONTENT = (
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.respx(base_url="https://mato.mo")
-@pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
 def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
     monkeypatch.setattr("tenacity.wait_fixed", lambda _a: None)
@@ -67,7 +66,6 @@ def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
 
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar", AIRFLOW_BASE_URL="https://airfl.ow")
 @pytest.mark.django_db(transaction=True)
-@pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
 def test_matomo_populate_public(respx_mock, snapshot):
     respx_mock.get("https://mato.mo/index.php").respond(
@@ -91,7 +89,6 @@ def test_matomo_populate_public(respx_mock, snapshot):
 @override_settings(MATOMO_BASE_URL="https://mato.mo", MATOMO_AUTH_TOKEN="foobar")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.respx(base_url="https://mato.mo")
-@pytest.mark.usefixtures("metabase")
 @freeze_time("2022-06-21")
 def test_matomo_empty_output(respx_mock, caplog, snapshot):
     MATOMO_ONLINE_EMPTY_CONTENT = "0," * 56 + "0"
