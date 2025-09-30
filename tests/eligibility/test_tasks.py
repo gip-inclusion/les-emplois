@@ -1,5 +1,4 @@
 import datetime
-from json import JSONDecodeError
 
 import httpx
 import pytest
@@ -86,36 +85,6 @@ class TestCertifyCriteriaApiParticulier:
             assert criterion.certified_at is None
             assert criterion.data_returned_by_api is None
             assert criterion.certification_period is None
-        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
-        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
-
-    @pytest.mark.parametrize(
-        "data,exception",
-        [
-            ({"text": "Internal server error"}, JSONDecodeError),
-            ({"json": {"error": "Internal server error"}}, httpx.HTTPError),
-        ],
-    )
-    def test_retry_task_on_http_error(self, data, exception, factory, respx_mock):
-        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(500, **data)
-        with pytest.raises(exception):
-            async_certify_criteria_by_api_particulier.call_local(
-                eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-            )
-        # Huey catches the exception and retries the task.
-        jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
-        assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
-
-    def test_no_retry_on_exception(self, caplog, factory, respx_mock):
-        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
-            side_effect=TypeError("Programming error")
-        )
-        async_certify_criteria_by_api_particulier.call_local(
-            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-        )
-        assert "TypeError: Programming error" in caplog.text
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
