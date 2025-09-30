@@ -499,7 +499,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     ],
 )
 def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, EligibilityDiagnosisFactory):
-    RSA_ENDPOINT = "https://fake-api-particulier.com/api/v2/revenu-solidarite-active"
+    RSA_ENDPOINT = "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite"
     respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
     job_seeker = JobSeekerFactory()  # Missing data.
     eligibility_diagnosis = EligibilityDiagnosisFactory(
@@ -605,7 +605,7 @@ def test_selected_administrative_criteria_certified(
         certifiable=True,
         criteria_kinds=[AdministrativeCriteriaKind.RSA],
     )
-    respx_mock.get("https://fake-api-particulier.com/api/v2/revenu-solidarite-active").respond(
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
         response_status, json=response
     )
 

@@ -54,37 +54,25 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
                     criterion.data_returned_by_api,
                 )
                 match exc.response.status_code:
-                    case 400 | 404:
+                    case 404:
+                        if "errors" not in criterion.data_returned_by_api:
+                            raise
                         # Job seeker not found or missing profile information.
                         criterion.certified_at = timezone.now()
-                    case 409:
-                        # We sometimes get a 409 for some reason and the returned error message is not very helpful:
-                        # "Une requête associé à votre jeton est déjà en cours de traitement
-                        #  pour ces paramètres. Veuillez attendr..."
-                        # Since we don't want the request URL with personal data to be logged
-                        # we simply retry later
-                        raise RetryTask(delay=5) from exc
                     case 429:
                         # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                         raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc
-                    case 503:
-                        # TODO: Use the error code instead of the message when switching to API v3.
-                        if criterion.data_returned_by_api["message"] == (
-                            "Erreur de fournisseur de donnée : "
-                            "Trop de requêtes effectuées, veuillez réessayer plus tard."
+                    case 502:
+                        if (
+                            len(criterion.data_returned_by_api["errors"]) == 1
+                            and criterion.data_returned_by_api["errors"][0]["code"]
+                            == api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE
                         ):
-                            # The data provider for API particulier returned a 429.
-                            # Let’s hope the data provider rate limit has been reset by then.
-                            raise RetryTask(delay=3600) from exc
-                        else:
-                            # The data provider for API particulier likely returned a 500.
-                            # According to the API particulier team, it often means integrity
-                            # errors on the beneficiary case. The data provider itself aggregates data
-                            # from other providers (e.g. regional information systems). When the data
-                            # sources aren’t consistent with each other, the data provider cannot
-                            # answer.
-                            # Retrying won’t fix the issue, and the error has been logged already.
+                            # Retrying won’t fix the issue, and the error has
+                            # been logged already.
                             pass
+                        else:
+                            raise
                     case _:
                         raise
             else:
