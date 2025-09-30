@@ -1,7 +1,6 @@
 import pytest
 from django.db import connection
 
-from itou.metabase import dataframes, db
 from itou.metabase.tables.utils import (
     get_ai_stock_job_seeker_pks,
     get_insee_code_to_zrr_status_map,
@@ -11,33 +10,23 @@ from itou.metabase.tables.utils import (
 
 
 @pytest.fixture(name="metabase")
-def metabase_fixture(monkeypatch, settings):
-    class FakeMetabase:
+def metabase_fixture(mocker):
+    class FakePsycopgConnection:
         """
-        This fake metabase database allows us to benefit from all
+        This fake psycopg connection allows us to benefit from all
         the Django heavy lifting that is done with creating the database,
         wrap everything in a transaction, etc.
 
         This makes us write the metabase tables in the main test database.
-
-        FIXME(vperron): This is very basic for now. It still does not handle
-        initial table creation, there might be table name collision or other
-        issues. Let's fix them as they arise.
         """
 
-        def __init__(self):
-            self.cursor = None
-
         def __enter__(self):
-            self.cursor = connection.cursor().cursor
-            return connection.make_debug_cursor(self.cursor), connection
+            return connection
 
-        def __exit__(self, exc_type, exc_value, exc_traceback):
-            if self.cursor:
-                self.cursor.close()
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
 
-    monkeypatch.setattr(dataframes, "MetabaseDatabaseCursor", FakeMetabase)
-    monkeypatch.setattr(db, "MetabaseDatabaseCursor", FakeMetabase)
+    mocker.patch("itou.metabase.db.get_connection", return_value=FakePsycopgConnection())
 
 
 @pytest.fixture(autouse=True)

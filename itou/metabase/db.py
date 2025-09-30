@@ -20,31 +20,18 @@ from itou.metabase.utils import convert_boolean_to_int, convert_datetime_to_loca
 logger = logging.getLogger(__name__)
 
 
-class MetabaseDatabaseCursor:
-    def __init__(self):
-        self.cursor = None
-        self.connection = None
-
-    def __enter__(self):
-        self.connection = psycopg.connect(
-            host=settings.PILOTAGE_DATASTORE_DB_HOST,
-            port=settings.PILOTAGE_DATASTORE_DB_PORT,
-            dbname=settings.PILOTAGE_DATASTORE_DB_DATABASE,
-            user=settings.PILOTAGE_DATASTORE_DB_USER,
-            password=settings.PILOTAGE_DATASTORE_DB_PASSWORD,
-            keepalives=1,
-            keepalives_idle=30,
-            keepalives_interval=5,
-            keepalives_count=5,
-        )
-        self.cursor = self.connection.cursor()
-        return self.cursor, self.connection
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        if self.cursor:
-            self.cursor.close()
-        if self.connection:
-            self.connection.close()
+def get_connection():
+    return psycopg.connect(
+        host=settings.PILOTAGE_DATASTORE_DB_HOST,
+        port=settings.PILOTAGE_DATASTORE_DB_PORT,
+        dbname=settings.PILOTAGE_DATASTORE_DB_DATABASE,
+        user=settings.PILOTAGE_DATASTORE_DB_USER,
+        password=settings.PILOTAGE_DATASTORE_DB_PASSWORD,
+        keepalives=1,
+        keepalives_idle=30,
+        keepalives_interval=5,
+        keepalives_count=5,
+    )
 
 
 def get_new_table_name(table_name):
@@ -65,12 +52,11 @@ def rename_table_atomically(from_table_name, to_table_name):
     are deleted as well, they will be rebuilt by the next run of the airflow DAG `dbt_daily`.
     """
 
-    with MetabaseDatabaseCursor() as (cur, conn):
+    with get_connection() as conn, conn.cursor() as cur:
         # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
         cur.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
         )
-        conn.commit()
         cur.execute(
             sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
                 sql.Identifier(to_table_name),
@@ -83,17 +69,15 @@ def rename_table_atomically(from_table_name, to_table_name):
                 sql.Identifier(to_table_name),
             )
         )
-        conn.commit()
         # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
         cur.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
         )
-        conn.commit()
 
 
 def create_table(table_name: str, columns: list[str, str], reset=False):
     """Create table from columns names and types"""
-    with MetabaseDatabaseCursor() as (cursor, conn):
+    with get_connection() as conn, conn.cursor() as cursor:
         if reset:
             cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
         create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
@@ -103,7 +87,6 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
             ),
         )
         cursor.execute(create_table_query)
-        conn.commit()
 
 
 def populate_table(table, batch_size, querysets=None, extra_object=None):
@@ -152,7 +135,7 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     new_table_name = get_new_table_name(table_name)
     create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True)
 
-    with MetabaseDatabaseCursor() as (cur, conn):
+    with get_connection() as conn, conn.cursor() as cur:
 
         def inject_chunk(table_columns, chunk, new_table_name):
             rows = [[c["fn"](row) for c in table_columns] for row in chunk]
@@ -167,7 +150,6 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 copy.set_types([c["type"] for c in table_columns])
                 for row in rows:
                     copy.write_row(row)
-            conn.commit()
 
         # Add comments on table columns.
         for c in table.columns:
@@ -180,8 +162,6 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
                 column_comment=sql.Literal(column_comment),
             )
             cur.execute(comment_query)
-
-        conn.commit()
 
         if extra_object:
             inject_chunk(table_columns=table.columns, chunk=[extra_object], new_table_name=new_table_name)

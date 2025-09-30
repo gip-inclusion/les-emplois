@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from psycopg import sql
 
-from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
+from itou.metabase.db import create_table, get_connection, get_new_table_name, rename_table_atomically
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def store_df(df, table_name, batch_size=10_000):
     new_table_name = get_new_table_name(table_name)
     create_table(new_table_name, columns, reset=True)
 
-    with MetabaseDatabaseCursor() as (cursor, conn):
+    with get_connection() as conn, conn.cursor() as cursor:
         written_rows = 0
         # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
         for df_chunk in [df[i : i + batch_size] for i in range(0, df.shape[0], batch_size)]:
@@ -71,7 +71,6 @@ def store_df(df, table_name, batch_size=10_000):
                 copy.set_types([col[1] for col in columns])
                 for row in rows:
                     copy.write_row(row)
-            conn.commit()
             written_rows += len(df_chunk)
             logger.info(
                 "%r: %i of %i rows written in %0.2f seconds",

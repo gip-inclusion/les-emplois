@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_populate_analytics
   dict({
-    'num_queries': 48,
+    'num_queries': 36,
     'queries': list([
       dict({
         'origin': list([
@@ -44,16 +44,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_c1_analytics_v0" ("id" varchar,"type" text,"date" text,"value" integer,"type_detail" varchar,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -116,15 +106,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "analytics_datum"."id",
                  "analytics_datum"."code",
@@ -155,16 +136,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
@@ -172,16 +143,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_analytics_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -211,27 +172,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_analytics_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -267,16 +208,6 @@
           CREATE TABLE IF NOT EXISTS "z_new_c1_private_dashboard_visits_v0" ("id" integer,"measured_at" timestamp WITH TIME ZONE,
                                                                                                                             "dashboard_id" varchar,"department" varchar,"region" text,"current_company_id" integer,"current_prescriber_organization_id" integer,"current_institution_id" integer,"user_kind" text,"user_id" integer,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -384,15 +315,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "analytics_statsdashboardvisit"."id",
                  "analytics_statsdashboardvisit"."dashboard_id",
@@ -434,16 +356,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
@@ -451,16 +363,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_private_dashboard_visits_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -490,34 +392,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_private_dashboard_visits_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_analytics[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_approvals
   dict({
-    'num_queries': 33,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -560,16 +442,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_pass_agréments" ("id" integer,"type" varchar,"date_début" date,"date_fin" date,"durée" interval,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"siret_structure" varchar,"nom_structure" varchar,"département_structure_ou_org_pe" varchar,"nom_département_structure_ou_org_pe" varchar,"région_structure_ou_org_pe" varchar,"injection_ai" integer,"hash_numéro_pass_iae" varchar,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -722,15 +594,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "approvals_approval"."id",
                  "approvals_approval"."start_at",
@@ -838,16 +701,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
@@ -855,16 +708,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_pass_agréments" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -894,34 +737,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_pass_agréments" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_approvals[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_companies
   dict({
-    'num_queries': 68,
+    'num_queries': 62,
     'queries': list([
       dict({
         'origin': list([
@@ -1022,16 +845,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_structures_v0" ("id" integer,"id_asp" integer,"nom" varchar,"nom_complet" varchar,"description" text,"type" varchar,"siret" varchar,"source" varchar,"code_naf" varchar,"email_public" varchar,"email_authentification" varchar,"convergence_france" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"adresse_ligne_1_c1" varchar,"adresse_ligne_2_c1" varchar,"code_postal_c1" varchar,"code_commune_c1" varchar,"ville_c1" varchar,"longitude_c1" double precision,"latitude_c1" double precision,"département_c1" varchar,"nom_département_c1" varchar,"région_c1" varchar,"date_inscription" date,"total_membres" integer,"total_candidatures" integer,"total_candidatures_30j" integer,"total_embauches" integer,"total_embauches_30j" integer,"taux_conversion_30j" double precision,"total_auto_prescriptions" integer,"total_candidatures_autonomes" integer,"total_candidatures_via_prescripteur" integer,"total_candidatures_non_traitées" integer,"total_candidatures_en_étude" integer,"date_dernière_connexion" date,"active" integer,"date_dernière_évolution_candidature" date,"total_fiches_de_poste_actives" integer,"total_fiches_de_poste_inactives" integer,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -1490,15 +1303,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "companies_company"."id",
                  "companies_company"."address_line_1",
@@ -1724,16 +1528,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
@@ -1741,16 +1535,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_structures_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -1780,34 +1564,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_structures_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_companies[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_criteria
   dict({
-    'num_queries': 21,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1850,16 +1614,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_critères_iae" ("id" integer,"nom" varchar,"niveau" varchar,"description" varchar,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -1913,15 +1667,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
                  "eligibility_administrativecriteria"."level",
@@ -1957,16 +1702,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
@@ -1974,16 +1709,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_critères_iae" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2013,34 +1738,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_critères_iae" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_enums
   dict({
-    'num_queries': 61,
+    'num_queries': 36,
     'queries': list([
       dict({
         'origin': list([
@@ -2075,16 +1780,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2098,15 +1793,6 @@
       }),
       dict({
         'origin': list([
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2114,16 +1800,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_origine_candidature" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2153,27 +1829,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_origine_candidature" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2197,16 +1853,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2220,15 +1866,6 @@
       }),
       dict({
         'origin': list([
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2236,16 +1873,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_type_contrat" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2275,27 +1902,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_type_contrat" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2319,16 +1926,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2342,15 +1939,6 @@
       }),
       dict({
         'origin': list([
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2358,16 +1946,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_type_prescripteur" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2397,27 +1975,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_type_prescripteur" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2441,16 +1999,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2464,15 +2012,6 @@
       }),
       dict({
         'origin': list([
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2480,16 +2019,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_motif_de_refus" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2519,27 +2048,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_motif_de_refus" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2563,16 +2072,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2586,15 +2085,6 @@
       }),
       dict({
         'origin': list([
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'store_df[metabase/dataframes.py]',
           'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2602,16 +2092,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_motif_suspension" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2641,34 +2121,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_c1_ref_motif_suspension" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'store_df[metabase/dataframes.py]',
-          'Command.populate_enums[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_evaluated_criteria
   dict({
-    'num_queries': 23,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -2715,16 +2175,6 @@
                                                                                                                                                                    "date_transmission" timestamp WITH TIME ZONE,
                                                                                                                                                                                                            "état" varchar,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2796,15 +2246,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
                  "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
@@ -2842,16 +2283,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
@@ -2859,16 +2290,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_critères_iae" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -2898,34 +2319,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_critères_iae" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_criteria[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_evaluated_job_applications
   dict({
-    'num_queries': 22,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -2974,16 +2375,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3026,15 +2417,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_cap_candidatures"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3095,16 +2477,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3112,16 +2484,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_candidatures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3151,34 +2513,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_candidatures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_evaluated_siaes
   dict({
-    'num_queries': 25,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3225,16 +2567,6 @@
                                                                                                                                                                               "date_définitive_contrôle" timestamp WITH TIME ZONE,
                                                                                                                                                                                                                              "date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3298,15 +2630,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_cap_structures"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3397,16 +2720,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3414,16 +2727,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_structures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3453,34 +2756,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_structures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluated_siaes[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_evaluation_campaigns
   dict({
-    'num_queries': 23,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3523,16 +2806,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_cap_campagnes" ("id" integer,"nom" varchar,"id_institution" integer,"date_début" date,"date_fin" date,"pourcentage_sélection" integer,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3604,15 +2877,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "siae_evaluations_evaluationcampaign"."id",
                  "siae_evaluations_evaluationcampaign"."name",
@@ -3653,16 +2917,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3670,16 +2924,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_campagnes" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3709,34 +2953,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_cap_campagnes" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_evaluation_campaigns[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_gps_groups
   dict({
-    'num_queries': 22,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -3784,16 +3008,6 @@
                                                                                                           "updated_at" timestamp WITH TIME ZONE,
                                                                                                                                            "created_in_bulk" integer,"department" text,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3856,15 +3070,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "gps_followupgroup"."id",
                  "gps_followupgroup"."created_at",
@@ -3897,16 +3102,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
@@ -3914,16 +3109,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_gps_groups_v1" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -3953,34 +3138,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_gps_groups_v1" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_gps_memberships
   dict({
-    'num_queries': 25,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -4035,16 +3200,6 @@
                                                                                                                               "updated_at" timestamp WITH TIME ZONE,
                                                                                                                                                                "ended_at" date,"member_id" integer,"org_departments" text[],"created_in_bulk" integer,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -4134,15 +3289,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "gps_followupgroupmembership"."id",
                  "gps_followupgroupmembership"."is_referent_certified",
@@ -4198,16 +3344,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4215,16 +3351,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_gps_membres_v1" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -4254,34 +3380,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_gps_membres_v1" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_institutions
   dict({
-    'num_queries': 23,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -4324,16 +3430,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_institutions" ("id" integer,"type" varchar,"département" varchar,"nom_département" varchar,"région" varchar,"nom" varchar,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -4405,15 +3501,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "institutions_institution"."id",
                  "institutions_institution"."address_line_1",
@@ -4458,16 +3545,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
@@ -4475,16 +3552,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_institutions" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -4514,34 +3581,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_institutions" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_institutions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_job_applications
   dict({
-    'num_queries': 48,
+    'num_queries': 42,
     'queries': list([
       dict({
         'origin': list([
@@ -4604,16 +3651,6 @@
           CREATE TABLE IF NOT EXISTS "z_new_candidatures" ("id" UUID,
                                                                 "candidature_archivee" integer,"candidature_refusée_automatiquement" integer,"date_candidature" date,"date_début_contrat" date,"date_traitement" date,"état" varchar,"origine" varchar,"origine_détaillée" varchar,"origine_id_structure" integer,"parcours_de_création" varchar,"délai_prise_en_compte" interval,"délai_de_réponse" interval,"motif_de_refus" varchar,"id_candidat" integer,"id_structure" integer,"type_structure" varchar,"nom_structure" varchar,"nom_complet_structure" varchar,"département_structure" varchar,"nom_département_structure" varchar,"région_structure" varchar,"id_org_prescripteur" integer,"nom_org_prescripteur" varchar,"safir_org_prescripteur" varchar,"nom_prénom_conseiller" varchar,"date_embauche" date,"injection_ai" integer,"mode_attribution_pass_iae" varchar,"type_contrat" varchar,"présence_de_cv" integer,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -4910,15 +3947,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
                  "job_applications_jobapplication"."job_seeker_id",
@@ -5042,16 +4070,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5059,16 +4077,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_candidatures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -5098,34 +4106,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_candidatures" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_applications[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_job_applications.1
   dict({
-    'num_queries': 19,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5192,16 +4180,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5226,15 +4204,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_fiches_de_poste_par_candidature"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -5286,16 +4255,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5303,16 +4262,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_fiches_de_poste_par_candidature" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -5342,34 +4291,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_fiches_de_poste_par_candidature" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_selected_jobs[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_job_descriptions
   dict({
-    'num_queries': 33,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -5435,16 +4364,6 @@
           CREATE TABLE IF NOT EXISTS "z_new_fiches_de_poste" ("id" integer,"code_rome" varchar,"nom_rome" varchar,"recrutement_ouvert" integer,"type_contrat" varchar,"id_employeur" integer,"type_employeur" varchar,"siret_employeur" varchar,"nom_employeur" varchar,"mises_a_jour_champs" JSONB,
                                                                                                                                                                                                                                                                                               "département_employeur" varchar,"nom_département_employeur" varchar,"région_employeur" varchar,"total_candidatures" integer,"date_création" date,"date_dernière_modification" date,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -5606,15 +4525,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
                  "companies_jobdescription"."appellation_id",
@@ -5745,16 +4655,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
@@ -5762,16 +4662,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_fiches_de_poste" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -5801,34 +4691,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_fiches_de_poste" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_descriptions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_job_seekers
   dict({
-    'num_queries': 82,
+    'num_queries': 76,
     'queries': list([
       dict({
         'origin': list([
@@ -5914,16 +4784,6 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "critère_n2_parent_isolé_période_certification" daterange,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_un_parcours_de_rue" integer,"critère_n2_réfugié_statutaire_bénéficiaire_d_une_protection_temporaire_protégé_subsidiaire_ou_demandeur_d_asile" integer,"critère_n2_résident_zrr" integer,"critère_n2_résident_qpv" integer,"critère_n2_sortant_de_détention_ou_personne_placée_sous_main_de_justice" integer,"critère_n2_maîtrise_de_la_langue_française_inférieure_au_niveau_a1" integer,"critère_n2_problème_de_mobilité" integer,"injection_ai" integer,"date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -6481,15 +5341,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "users_user"."id",
                  "users_user"."last_login",
@@ -6731,16 +5582,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
@@ -6748,16 +5589,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_candidats_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -6787,34 +5618,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_candidats_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_job_seekers[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_memberships
   dict({
-    'num_queries': 30,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -6893,16 +5704,6 @@
       }),
       dict({
         'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -6962,15 +5763,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
                  "companies_companymembership"."user_id",
@@ -7005,16 +5797,6 @@
                                        "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -7060,16 +5842,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7112,16 +5884,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7129,16 +5891,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_collaborations" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -7168,34 +5920,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_collaborations" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_memberships[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_organizations
   dict({
-    'num_queries': 48,
+    'num_queries': 41,
     'queries': list([
       dict({
         'origin': list([
@@ -7266,16 +5998,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_organisations_v0" ("id" integer,"siret" varchar,"nom" varchar,"type" varchar,"type_complet" varchar,"habilitée" integer,"adresse_ligne_1" varchar,"adresse_ligne_2" varchar,"code_postal" varchar,"code_commune" varchar,"ville" varchar,"longitude" double precision,"latitude" double precision,"département" varchar,"nom_département" varchar,"région" varchar,"date_inscription" date,"code_safir" varchar,"total_membres" integer,"total_candidatures" integer,"total_embauches" integer,"date_dernière_candidature" date,"date_dernière_connexion" date,"active" integer,"brsa" integer,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -7513,15 +6235,6 @@
       }),
       dict({
         'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'get_post_code_to_insee_cities_map[metabase/tables/utils.py]',
           'get_code_commune[metabase/tables/utils.py]',
           '<lambda>[metabase/tables/utils.py]',
@@ -7661,16 +6374,6 @@
                                          "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -7815,16 +6518,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
@@ -7832,16 +6525,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_organisations_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -7871,34 +6554,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_organisations_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_organizations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_prolongation_requests
   dict({
-    'num_queries': 33,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -7945,16 +6608,6 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                   "id_utilisateur_traitant" integer,"date_envoi_rappel" timestamp WITH TIME ZONE,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8116,15 +6769,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
                  "approvals_prolongationrequest"."approval_id",
@@ -8212,16 +6856,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8229,16 +6863,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_demandes_de_prolongation" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8268,34 +6892,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_demandes_de_prolongation" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongation_requests[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_prolongations
   dict({
-    'num_queries': 28,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -8338,16 +6942,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "z_new_prolongations" ("id" integer,"id_pass_agrément" integer,"date_début" date,"date_fin" date,"motif" varchar,"id_utilisateur_déclarant" integer,"id_structure_déclarante" integer,"id_organisation_prescripteur" integer,"id_utilisateur_prescripteur" integer,"date_de_création" date,"id_demande_de_prolongation" integer,"date_mise_à_jour_metabase" date)',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8464,15 +7058,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
                  "approvals_prolongation"."approval_id",
@@ -8523,16 +7108,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8540,16 +7115,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_prolongations" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8579,34 +7144,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_prolongations" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_prolongations[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_suspensions
   dict({
-    'num_queries': 24,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -8652,16 +7197,6 @@
           CREATE TABLE IF NOT EXISTS "z_new_suspensions_v0" ("id" integer,"id_pass_agrément" integer,"date_début" date,"date_fin" date,"motif" varchar,"en_cours" integer,"date_de_création" timestamp WITH TIME ZONE,
                                                                                                                                                                                                                  "date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8742,15 +7277,6 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
                  "approvals_suspension"."approval_id",
@@ -8789,16 +7315,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
@@ -8806,16 +7322,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_suspensions_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8845,34 +7351,14 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_suspensions_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_suspensions[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
 # ---
 # name: test_populate_users
   dict({
-    'num_queries': 23,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -8922,16 +7408,6 @@
           CREATE TABLE IF NOT EXISTS "z_new_utilisateurs_v0" ("id" integer,"email" varchar,"type" varchar,"prenom" varchar,"nom" varchar,"dernière_connexion" timestamp WITH TIME ZONE,
                                                                                                                                                                                   "date_mise_à_jour_metabase" date)
         ''',
-      }),
-      dict({
-        'origin': list([
-          'create_table[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -8995,15 +7471,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_utilisateurs_v0"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
-      }),
-      dict({
-        'origin': list([
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -9077,16 +7544,6 @@
       }),
       dict({
         'origin': list([
-          'inject_chunk[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
           'rename_table_atomically[metabase/db.py]',
           'populate_table[metabase/db.py]',
           'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
@@ -9094,16 +7551,6 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_utilisateurs_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
       dict({
         'origin': list([
@@ -9133,27 +7580,7 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
-        'sql': 'COMMIT',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
         'sql': 'DROP TABLE IF EXISTS "z_old_utilisateurs_v0" CASCADE',
-      }),
-      dict({
-        'origin': list([
-          'rename_table_atomically[metabase/db.py]',
-          'populate_table[metabase/db.py]',
-          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
-          'Command.execute[utils/command.py]',
-        ]),
-        'sql': 'COMMIT',
       }),
     ]),
   })
