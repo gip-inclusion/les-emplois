@@ -8,17 +8,21 @@ from itou.eligibility.enums import AdministrativeCriteriaKind
 
 
 logger = logging.getLogger("APIParticulierClient")
+SIRET_PLATEFORME_INCLUSION = "13003013300016"
 ENDPOINTS = {
-    AdministrativeCriteriaKind.AAH: "v2/allocation-adulte-handicape",
-    AdministrativeCriteriaKind.PI: "v2/allocation-soutien-familial",
-    AdministrativeCriteriaKind.RSA: "v2/revenu-solidarite-active",
+    AdministrativeCriteriaKind.AAH: "v3/dss/allocation_adulte_handicape/identite",
+    AdministrativeCriteriaKind.PI: "v3/dss/allocation_soutien_familial/identite",
+    AdministrativeCriteriaKind.RSA: "v3/dss/revenu_solidarite_active/identite",
 }
+# From the docs for the 502 HTTP response content:
+# “La réponse retournée par le fournisseur de données est invalide et inconnue de notre service.”
+UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE = "37999"
 
 
 def client():
     return httpx.Client(
         base_url=settings.API_PARTICULIER_BASE_URL,
-        headers={"X-Api-Key": settings.API_PARTICULIER_TOKEN},
+        headers={"Authorization": f"Bearer {settings.API_PARTICULIER_TOKEN}"},
     )
 
 
@@ -27,19 +31,20 @@ def _build_params_from(job_seeker):
     params = {
         "nomNaissance": job_seeker.last_name.upper(),
         "prenoms[]": job_seeker.first_name.upper().split(" "),
-        "anneeDateDeNaissance": jobseeker_profile.birthdate.year,
-        "moisDateDeNaissance": jobseeker_profile.birthdate.month,
-        "jourDateDeNaissance": jobseeker_profile.birthdate.day,
-        "codePaysLieuDeNaissance": f"99{jobseeker_profile.birth_country.code}",
-        "sexe": "F" if job_seeker.title == "MME" else job_seeker.title,
+        "anneeDateNaissance": jobseeker_profile.birthdate.year,
+        "moisDateNaissance": jobseeker_profile.birthdate.month,
+        "jourDateNaissance": jobseeker_profile.birthdate.day,
+        "codeCogInseePaysNaissance": f"99{jobseeker_profile.birth_country.code}",
+        "sexeEtatCivil": "F" if job_seeker.title == "MME" else job_seeker.title,
     }
     if jobseeker_profile.is_born_in_france:
-        params["codeInseeLieuDeNaissance"] = jobseeker_profile.birth_place.code
+        params["codeCogInseeCommuneNaissance"] = jobseeker_profile.birth_place.code
     return params
 
 
 def _request(client, endpoint, job_seeker):
     params = _build_params_from(job_seeker=job_seeker)
+    params["recipient"] = SIRET_PLATEFORME_INCLUSION
     return client.get(endpoint, params=params).raise_for_status().json()
 
 
@@ -72,9 +77,10 @@ def certify_criteria(criteria, client, job_seeker):
     response = _request(client, ENDPOINTS[criteria], job_seeker)
     # Endpoints from the "Prestations sociales" section share the same response schema.
     # See https://particulier.api.gouv.fr/developpeurs/openapi#tag/Prestations-sociales
-    certified = response["status"] == "beneficiaire"
+    data = response["data"]
+    certified = data["est_beneficiaire"]
     return {
-        "start_at": datetime.date.fromisoformat(response["dateDebut"]) if certified else None,
+        "start_at": datetime.date.fromisoformat(data["date_debut_droit"]) if certified else None,
         # When offered by the endpoint, the end_at field is always null. Ignore it.
         "is_certified": certified,
         "raw_response": response,

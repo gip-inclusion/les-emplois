@@ -766,7 +766,7 @@ def github_respx_mock_fixture(respx_mock):
 
 @pytest.fixture
 def api_particulier_settings(settings):
-    settings.API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/api/"
+    settings.API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/"
     settings.API_PARTICULIER_TOKEN = "test"
 
 
