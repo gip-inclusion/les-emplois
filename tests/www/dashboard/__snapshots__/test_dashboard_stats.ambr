@@ -1562,20 +1562,20 @@
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Suivi des auto-prescriptions et de leur contrôle
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/redirect/hiring">
                                           <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Suivi des candidatures reçues et de leur traitement par les SIAE
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des auto-prescriptions et de leur contrôle
                                           </span>
                                       </a>
                                   </li>
@@ -1930,20 +1930,20 @@
                               <div class="px-3 px-lg-4">
                                   <ul class="list-unstyled mb-lg-5">
                                       <li class="d-flex justify-content-between align-items-center mb-3">
-                                          <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_auto_prescription">
-                                              <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                              </i>
-                                              <span>
-                                                  Suivi des auto-prescriptions et de leur contrôle
-                                              </span>
-                                          </a>
-                                      </li>
-                                      <li class="d-flex justify-content-between align-items-center mb-3">
                                           <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_ph_prescription">
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
                                                   Suivi de l’orientation et du traitement des candidatures émises par les prescripteurs habilités
+                                              </span>
+                                          </a>
+                                      </li>
+                                      <li class="d-flex justify-content-between align-items-center mb-3">
+                                          <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_state">
+                                              <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                              </i>
+                                              <span>
+                                                  Suivi de l’orientation et du traitement des candidatures émises par les acteurs AHI
                                               </span>
                                           </a>
                                       </li>
@@ -1957,11 +1957,11 @@
                                           </a>
                                       </li>
                                       <li class="d-flex justify-content-between align-items-center mb-3">
-                                          <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_state">
+                                          <a class="btn-link btn-ico" href="/stats/dgefp/showroom/ddets_iae_auto_prescription">
                                               <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
                                               </i>
                                               <span>
-                                                  Suivi de l’orientation et du traitement des candidatures émises par les acteurs AHI
+                                                  Suivi des auto-prescriptions et de leur contrôle
                                               </span>
                                           </a>
                                       </li>
@@ -2368,20 +2368,20 @@
                                       </a>
                                   </li>
                                   <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Suivi des auto-prescriptions et de leur contrôle
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
                                       <a class="btn-link btn-ico" href="/stats/redirect/hiring">
                                           <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
                                           </i>
                                           <span>
                                               Suivi des candidatures reçues et de leur traitement par les SIAE
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/redirect/auto_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des auto-prescriptions et de leur contrôle
                                           </span>
                                       </a>
                                   </li>
