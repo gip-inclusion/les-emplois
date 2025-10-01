@@ -3073,7 +3073,7 @@ class TestDirectHireFullProcess:
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(born_outside_france=True)
 
         user = company.members.first()
         client.force_login(user)
@@ -3173,6 +3173,7 @@ class TestDirectHireFullProcess:
 
         hiring_start_at = timezone.localdate()
         post_data = {
+            "birth_country": job_seeker.jobseeker_profile.birth_country_id,
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
@@ -5590,6 +5591,8 @@ class TestHireConfirmation:
 
         hiring_start_at = timezone.localdate()
         post_data = {
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
