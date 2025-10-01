@@ -77,5 +77,8 @@ def test_navigation_authenticated(snapshot, client, user_factory):
     assert pretty_indented(nav_primary) == snapshot(name="user menu")
 
     [offcanvasNav] = soup.select("#offcanvasNav")
+    for a_tags in soup.find_all("a", attrs={"href": True}):
+        if a_tags["href"].startswith("/static/pdf/syntheseSecurite"):
+            a_tags["href"] = "/static/pdf/syntheseSecurite.pdf"  # Normalize href for CI
     set_org_id_for_snapshot(offcanvasNav)
     assert pretty_indented(offcanvasNav) == snapshot(name="navigation")
