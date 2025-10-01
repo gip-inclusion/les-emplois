@@ -66,10 +66,12 @@ class Command(BaseCommand):
                     ):
                         info = "En attente de création"
                     else:
-                        info = "-"
+                        info = ""
+                    info += f" - {job_application.pk}"
             except EmployeeRecord.MultipleObjectsReturned:
                 info, siret_used = "Plusieurs FS", "+".join(siret)
             else:
-                info, siret_used = employee_record.get_status_display(), employee_record.siret
+                info = f"{employee_record.get_status_display()} - {employee_record.pk}"
+                siret_used = employee_record.siret
 
             self.stdout.write(f"{approval_number};{siret_used};{info}")
