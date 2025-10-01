@@ -44,14 +44,20 @@ class Command(BaseCommand):
         resend.add_argument("--wet-run", action="store_true")
 
     def create(self, *, job_application, siret, ready, wet_run):
-        employee_record = EmployeeRecord.from_job_application(JobApplication.objects.get(pk=job_application))
-        if ready:
-            employee_record.ready()
+        employee_record = EmployeeRecord(job_application=JobApplication.objects.get(pk=job_application))
+        employee_record._fill_denormalized_fields()
         if siret is not None:
             # In some edge cases we need to send an employee record for an old/previous SIRET but don't want to mess
             # with the existing one (i.e. already processed by the ASP)
             employee_record.siret = siret
-            employee_record.save(update_fields={"siret", "updated_at"})
+        employee_record.save()
+
+        if ready:
+            employee_record.ready(save=False)
+            if siret is not None:
+                # This needs to be done again because ready() call _fill_denormalized_fields() which reset the SIRET
+                employee_record.siret = siret
+            employee_record.save()
 
     def resend(self, *, employee_record, unarchive, wet_run):
         employee_record = EmployeeRecord.objects.get(pk=employee_record)

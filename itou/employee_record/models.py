@@ -330,7 +330,7 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
     # Business methods
 
     @xwf_models.transition()
-    def ready(self, *, user=None):
+    def ready(self, *, user=None, save=True):
         """
         Prepare the employee record for transmission
         """
