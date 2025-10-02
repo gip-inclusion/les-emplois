@@ -201,6 +201,7 @@ class EligibilityDiagnosisInline(ReadonlyMixin, ItouTabularInline):
         "pk_link",
         "author",
         "author_kind",
+        "created_at",
         "is_valid",
     )
     readonly_fields = fields
