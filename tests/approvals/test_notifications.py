@@ -66,8 +66,9 @@ def test_prolongation_request_denied_employer(snapshot):
     assert email.body == snapshot(name="body")
 
 
-def test_prolongation_request_denied_jobseeker(snapshot):
+def test_prolongation_request_denied_jobseeker(snapshot, settings):
     prolongation_request = ProlongationRequestDenyInformationFactory(for_snapshot=True).request
+    settings.AFPA_DEPARTMENTS = []  # Without Afpa paragraph
     email = notifications.ProlongationRequestDeniedForJobSeekerNotification(
         prolongation_request.approval.user, prolongation_request=prolongation_request
     ).build()
@@ -75,3 +76,12 @@ def test_prolongation_request_denied_jobseeker(snapshot):
     assert email.to == [prolongation_request.approval.user.email]
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
+
+    settings.AFPA_DEPARTMENTS = [prolongation_request.approval.user.department]  # With Afpa paragraph
+    email = notifications.ProlongationRequestDeniedForJobSeekerNotification(
+        prolongation_request.approval.user, prolongation_request=prolongation_request
+    ).build()
+
+    assert email.to == [prolongation_request.approval.user.email]
+    assert email.subject == snapshot(name="subject")
+    assert email.body == snapshot(name="body with Afpa")

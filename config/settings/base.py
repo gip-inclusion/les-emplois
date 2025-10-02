@@ -14,6 +14,7 @@ from botocore.config import Config
 from dotenv import load_dotenv
 
 from config.sentry import sentry_init
+from itou.common_apps.address.departments import REGIONS
 from itou.utils.enums import ItouEnvironment
 from itou.utils.urls import markdown_url_set_protocol, markdown_url_set_target_blank
 
@@ -771,6 +772,19 @@ GPS_NAV_ENTRY_DEPARTMENTS = ["30"]
 GRIST_API_KEY = os.getenv("GRIST_API_KEY")
 GPS_SLACK_WEBHOOK_URL = os.getenv("GPS_SLACK_WEBHOOK_URL")
 GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
+
+# Afpa
+AFPA_DEPARTMENTS = [
+    department
+    for region in [
+        "Auvergne-Rhône-Alpes",
+        "Bretagne",
+        "Nouvelle-Aquitaine",
+        "Occitanie",
+        "Provence-Alpes-Côte d'Azur",
+    ]
+    for department in REGIONS[region]
+]
 
 # Mon récap
 # ------------------------------------------------------------------------------
