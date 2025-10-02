@@ -30,6 +30,7 @@ class Command(BaseCommand):
 
         self.stdout.write("PASS;SIRET;Information")
         for approval_number in sorted(set(approvals_number)):
+            notes = ""
             try:
                 employee_record = EmployeeRecord.objects.get(siret__in=siret, approval_number=approval_number)
             except EmployeeRecord.DoesNotExist:
@@ -46,6 +47,7 @@ class Command(BaseCommand):
                 except JobApplication.MultipleObjectsReturned:
                     info, siret_used = "Plusieurs candidatures", "+".join(siret)
                 else:
+                    notes = str(job_application.pk)
                     siret_used = job_application.to_company.siret
                     if job_application.state != JobApplicationState.ACCEPTED:
                         info = "La candidature n'est pas en état 'acceptée'"
@@ -67,11 +69,10 @@ class Command(BaseCommand):
                         info = "En attente de création"
                     else:
                         info = ""
-                    info += f" - {job_application.pk}"
             except EmployeeRecord.MultipleObjectsReturned:
                 info, siret_used = "Plusieurs FS", "+".join(siret)
             else:
-                info = f"{employee_record.get_status_display()} - {employee_record.pk}"
-                siret_used = employee_record.siret
+                notes = str(employee_record.pk)
+                info, siret_used = employee_record.get_status_display(), employee_record.siret
 
-            self.stdout.write(f"{approval_number};{siret_used};{info}")
+            self.stdout.write(f"{approval_number};{siret_used};{info};{notes}")
