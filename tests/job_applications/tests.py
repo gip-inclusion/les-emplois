@@ -840,6 +840,8 @@ class TestJobApplicationQuerySet:
 
 
 class TestJobApplicationNotifications:
+    AFPA = "Afpa"
+
     @pytest.fixture(autouse=True)
     def setup_method(self):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
@@ -1053,6 +1055,7 @@ class TestJobApplicationNotifications:
         assert job_application.job_seeker.email in email.to
         assert len(email.to) == 1
         assert email.body == snapshot(name="job_seeker_email")
+        assert self.AFPA not in email.body
 
         # Notification content sent to prescriber.
         email = job_application.notifications_refuse_for_proxy.build()
@@ -1075,6 +1078,20 @@ class TestJobApplicationNotifications:
             job_application.refuse(user=job_application.to_company.members.first())
         [email] = mailoutbox
         assert email.to == [job_application.job_seeker.email]
+        assert self.AFPA not in email.body
+
+    def test_refuse_afpa_message(self):
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker__jobseeker_profile__hexa_post_code="59284",
+            refusal_reason=RefusalReason.DID_NOT_COME,
+            answer_to_prescriber="Le candidat n'est pas venu.",
+        )
+        email = job_application.notifications_refuse_for_job_seeker.build()
+        assert [job_application.job_seeker.email] == email.to
+        assert job_application.to_company.display_name in email.body
+        assert job_application.answer in email.body
+        assert job_application.answer_to_prescriber not in email.body
+        assert self.AFPA in email.body
 
     @pytest.mark.parametrize(
         "refusal_reason,expected",
