@@ -4,6 +4,7 @@ from itou.communications import NotificationCategory, registry as notifications_
 from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
 from itou.communications.dispatch.utils import PrescriberNotification
 from itou.companies.enums import CompanyKind
+from itou.job_applications.utils import show_afpa_ad
 from itou.utils.urls import get_absolute_url
 
 
@@ -70,6 +71,11 @@ class ProlongationRequestDeniedForJobSeekerNotification(JobSeekerNotification, E
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/denied/jobseeker_subject.txt"
     body_template = "approvals/email/prolongation_request/denied/jobseeker_body.txt"
+
+    def get_context(self):
+        context = super().get_context()
+        context["show_afpa_ad"] = show_afpa_ad(self.user)
+        return context
 
 
 @notifications_registry.register
