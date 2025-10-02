@@ -117,6 +117,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
                 functools.partial(
                     create_fake_postcode,
                     ignore=[
+                        *settings.AFPA_DEPARTMENTS,
                         *settings.GPS_NAV_ENTRY_DEPARTMENTS,
                         *settings.MON_RECAP_BANNER_DEPARTMENTS,
                     ],

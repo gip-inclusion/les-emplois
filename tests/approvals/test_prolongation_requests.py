@@ -66,7 +66,8 @@ def test_grant():
 
 @freeze_time()
 @pytest.mark.parametrize("postcode,contained", [("59284", True), ("75001", False)])
-def test_deny(django_capture_on_commit_callbacks, mailoutbox, postcode, contained):
+def test_deny(django_capture_on_commit_callbacks, mailoutbox, postcode, contained, settings):
+    settings.AFPA_DEPARTMENTS = ["59"]
     prolongation_request = ProlongationRequestFactory(approval__user__jobseeker_profile__hexa_post_code=postcode)
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 

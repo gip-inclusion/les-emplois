@@ -1033,7 +1033,8 @@ class TestJobApplicationNotifications:
 
     @pytest.mark.parametrize("authorized_prescriber", [True, False])
     @pytest.mark.parametrize("is_shared_with_job_seeker", [True, False])
-    def test_refuse_with_prescriber(self, authorized_prescriber, is_shared_with_job_seeker, snapshot):
+    def test_refuse_with_prescriber(self, authorized_prescriber, is_shared_with_job_seeker, snapshot, settings):
+        settings.AFPA_DEPARTMENTS = []  # Disable Afpa paragraph
         extra_kwargs = {}
         if authorized_prescriber:
             extra_kwargs = {
@@ -1080,7 +1081,8 @@ class TestJobApplicationNotifications:
         assert email.to == [job_application.job_seeker.email]
         assert self.AFPA not in email.body
 
-    def test_refuse_afpa_message(self):
+    def test_refuse_afpa_message(self, settings):
+        settings.AFPA_DEPARTMENTS = ["59"]
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker__jobseeker_profile__hexa_post_code="59284",
             refusal_reason=RefusalReason.DID_NOT_COME,
