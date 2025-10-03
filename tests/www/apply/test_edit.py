@@ -11,7 +11,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL, JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 
 
@@ -24,9 +24,11 @@ class TestEditContract:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        company_1 = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
-        company_2 = CompanyWithMembershipAndJobsFactory(
-            name="Duke of Hazard Corp.", membership__user__first_name="Roscoe"
+        company_1 = CompanyFactory(
+            name="Evil Corp.", membership__user__first_name="Elliot", with_membership=True, with_jobs=True
+        )
+        company_2 = CompanyFactory(
+            name="Duke of Hazard Corp.", membership__user__first_name="Roscoe", with_membership=True, with_jobs=True
         )
 
         self.user1 = company_1.members.get(first_name="Elliot")
@@ -305,7 +307,7 @@ class TestArchiveView:
 
     def test_already_in_target_state(self, client, archived_at_func, expected_func, viewname):
         target_archived_at = expected_func()
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         employer = company.members.get()
         job_app = JobApplicationFactory(
             to_company=company,
@@ -321,7 +323,7 @@ class TestArchiveView:
 
     def test_only_selected_job_application(self, client, archived_at_func, expected_func, viewname):
         archived_at = archived_at_func()
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         [job_app1, job_app2] = JobApplicationFactory.create_batch(
             2,
             to_company=company,

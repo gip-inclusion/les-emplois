@@ -22,7 +22,7 @@ from tests.utils.testing import assertSnapshotQueries
 
 class TestMoveCompanyData:
     def test_uses_wet_run(self):
-        company_1 = companies_factories.CompanyWithMembershipAndJobsFactory()
+        company_1 = companies_factories.CompanyFactory(with_membership=True, with_jobs=True)
         company_2 = companies_factories.CompanyFactory()
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk)
         assert company_1.jobs.count() == 4
@@ -37,7 +37,7 @@ class TestMoveCompanyData:
         assert company_2.members.count() == 1
 
     def test_does_not_stop_if_kind_is_different(self):
-        company_1 = companies_factories.CompanyWithMembershipAndJobsFactory(kind=CompanyKind.ACI)
+        company_1 = companies_factories.CompanyFactory(kind=CompanyKind.ACI, with_membership=True, with_jobs=True)
         company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EI)
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.jobs.count() == 0

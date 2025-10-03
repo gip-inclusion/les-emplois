@@ -21,7 +21,7 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSH
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.cities.factories import create_city_geispolsheim
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory, SiaeFinancialAnnexFactory
+from tests.companies.factories import CompanyFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
@@ -51,14 +51,18 @@ class CreateEmployeeRecordTestMixin:
 
     @pytest.fixture(autouse=True)
     def abstract_setup_method(self, mocker):
-        self.company = CompanyWithMembershipAndJobsFactory(
-            name="Evil Corp.", membership__user__first_name="Elliot", kind=self.SIAE_KIND
+        self.company = CompanyFactory(
+            name="Evil Corp.",
+            membership__user__first_name="Elliot",
+            kind=self.SIAE_KIND,
+            with_membership=True,
+            with_jobs=True,
         )
-        self.company_without_perms = CompanyWithMembershipAndJobsFactory(
-            kind="EI", name="A-Team", membership__user__first_name="Hannibal"
+        self.company_without_perms = CompanyFactory(
+            kind="EI", name="A-Team", membership__user__first_name="Hannibal", with_membership=True, with_jobs=True
         )
-        self.company_bad_kind = CompanyWithMembershipAndJobsFactory(
-            kind="EA", name="A-Team", membership__user__first_name="Barracus"
+        self.company_bad_kind = CompanyFactory(
+            kind="EA", name="A-Team", membership__user__first_name="Barracus", with_membership=True, with_jobs=True
         )
 
         self.user = self.company.members.get(first_name="Elliot")

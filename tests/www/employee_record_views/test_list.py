@@ -20,7 +20,7 @@ from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
-from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -44,7 +44,9 @@ class TestListEmployeeRecords:
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
         # User must be super user for UI first part (tmp)
-        self.company = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
+        self.company = CompanyFactory(
+            name="Evil Corp.", membership__user__first_name="Elliot", with_membership=True, with_jobs=True
+        )
         self.user = self.company.members.get(first_name="Elliot")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
             to_company=self.company,
@@ -60,8 +62,10 @@ class TestListEmployeeRecords:
         """
         Non-eligible SIAE should not be able to access this list
         """
-        company = CompanyWithMembershipAndJobsFactory(
+        company = CompanyFactory(
             kind=factory.fuzzy.FuzzyChoice(set(CompanyKind) - set(Company.ASP_EMPLOYEE_RECORD_KINDS)),
+            with_membership=True,
+            with_jobs=True,
         )
         client.force_login(company.members.get())
 

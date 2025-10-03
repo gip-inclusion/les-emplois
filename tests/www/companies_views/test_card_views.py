@@ -10,7 +10,7 @@ from itou.companies.enums import ContractType
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
 from tests.cities.factories import create_city_vannes
-from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -368,7 +368,7 @@ class TestJobDescriptionCardView:
         create_test_romes_and_appellations(["N1101"])
 
     def test_job_description_card(self, client, snapshot):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         job_description.open_positions = 1234
@@ -402,14 +402,14 @@ class TestJobDescriptionCardView:
         assert pretty_indented(navinfo) == snapshot(name="navinfo")
 
     def test_job_description_card_is_searchable_false(self, client):
-        company = CompanyWithMembershipAndJobsFactory(is_searchable=False)
+        company = CompanyFactory(is_searchable=False, with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = client.get(url)
         assert response.status_code == 404
 
     def test_job_description_card_render_markdown(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         job_description.description = "*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr)."
         job_description.profile_description = "* list 1\n* list 2\n\n1. list 1\n2. list 2"
@@ -427,7 +427,7 @@ class TestJobDescriptionCardView:
         )
 
     def test_job_description_card_render_markdown_links(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         job_description.description = "www.lien1.com\nhttps://lien2.com\n[test](https://lien3.com)\n[test2](lien4.bzh)\ntest@admin.com\nftp://lien5.com"
         job_description.save()
@@ -445,7 +445,7 @@ class TestJobDescriptionCardView:
         )
 
     def test_job_description_card_render_markdown_forbidden_tags(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         job_description.description = (
             '# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>'

@@ -11,7 +11,7 @@ from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
@@ -23,7 +23,7 @@ class TestApplyAsPrescriber:
     @freeze_time("2025-04-03 10:03")
     def test_apply_as_prescriber(self, client, snapshot):
         guerande = create_city_guerande()
-        guerande_company = CompanyWithMembershipAndJobsFactory(
+        guerande_company = CompanyFactory(
             for_snapshot=True,
             romes=("N1101", "N1105"),
             department="44",
@@ -31,6 +31,7 @@ class TestApplyAsPrescriber:
             post_code="44350",
             kind=CompanyKind.AI,
             with_membership=True,
+            with_jobs=True,
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
         prescriber = PrescriberFactory(membership__organization__authorized=True)
@@ -191,13 +192,14 @@ class TestApplyAsPrescriber:
 
     def test_apply_as_prescriber_without_seeing_personal_info(self, client):
         guerande = create_city_guerande()
-        guerande_company = CompanyWithMembershipAndJobsFactory(
+        guerande_company = CompanyFactory(
             romes=("N1101", "N1105"),
             department="44",
             coords=guerande.coords,
             post_code="44350",
             kind=CompanyKind.AI,
             with_membership=True,
+            with_jobs=True,
         )
         JobDescriptionFactory(company=guerande_company, location=guerande)
         prescriber = PrescriberFactory(membership__organization__authorized=False)
@@ -335,7 +337,7 @@ class TestApplyAsPrescriber:
         assertRedirects(response, next_url)
 
     def test_cannot_apply_as_prescriber_with_incorrect_public_id(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = JobDescriptionFactory(company=company)
         prescriber = PrescriberFactory(membership__organization__authorized=True)
 
@@ -367,21 +369,23 @@ class TestApplyAsCompany:
 
     def test_apply_as_company(self, client):
         guerande = create_city_guerande()
-        guerande_company = CompanyWithMembershipAndJobsFactory(
+        guerande_company = CompanyFactory(
             romes=("N1101", "N1105"),
             department="44",
             coords=guerande.coords,
             post_code="44350",
             kind=CompanyKind.ETTI,
             with_membership=True,
+            with_jobs=True,
         )
-        other_company = CompanyWithMembershipAndJobsFactory(
+        other_company = CompanyFactory(
             romes=("N1101", "N1105"),
             department="44",
             coords=guerande.coords,
             post_code="44350",
             kind=CompanyKind.ETTI,
             with_membership=True,
+            with_jobs=True,
         )
         JobDescriptionFactory(company=other_company, location=guerande)
         employer = guerande_company.members.first()
@@ -489,8 +493,8 @@ class TestApplyAsCompany:
         assertRedirects(response, next_url)
 
     def test_cannot_apply_as_company_with_incorrect_public_id(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
-        other_company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        other_company = CompanyFactory(with_membership=True, with_jobs=True)
         employer = company.members.first()
         job_description = JobDescriptionFactory(company=other_company)
 
@@ -519,7 +523,7 @@ class TestApplyAsCompany:
 
 class TestApplyAsJobSeeker:
     def test_cannot_apply_as_job_seeker_for_someone_else(self, client):
-        company = CompanyWithMembershipAndJobsFactory()
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         job_description = JobDescriptionFactory(company=company)
         job_seeker = JobSeekerFactory()
         other_job_seeker = JobSeekerFactory()
