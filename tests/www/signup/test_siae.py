@@ -357,12 +357,12 @@ class TestCompanySignup:
 
     def test_company_select_does_not_die_under_requests(self, client, snapshot):
         companies = (
-            CompanyFactory(siret="40219166200001", with_membership=True, with_jobs=True),
-            CompanyFactory(siret="40219166200002", with_membership=True, with_jobs=True),
-            CompanyFactory(siret="40219166200003", with_membership=True, with_jobs=True),
-            CompanyFactory(siret="40219166200004", with_membership=True, with_jobs=True),
-            CompanyFactory(siret="40219166200005", with_membership=True, with_jobs=True),
-            CompanyFactory(siret="40219166200005", kind=CompanyKind.AI, with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200001", with_membership=True),
+            CompanyFactory(siret="40219166200002", with_membership=True),
+            CompanyFactory(siret="40219166200003", with_membership=True),
+            CompanyFactory(siret="40219166200004", with_membership=True),
+            CompanyFactory(siret="40219166200005", with_membership=True),
+            CompanyFactory(siret="40219166200005", kind=CompanyKind.AI, with_membership=True),
         )
         # Add more than one member to all company to test prefetch and distinct
         for company in companies:
