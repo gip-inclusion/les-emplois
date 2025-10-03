@@ -54,7 +54,7 @@ class TestNotificationSettingsModel:
     def setup_method(self):
         self.job_seeker = JobSeekerFactory(first_name="John", last_name="Doe", with_disabled_notifications=True)
         self.employer = EmployerFactory(
-            first_name="Alice", last_name="Doe", with_company=True, with_disabled_notifications=True
+            first_name="Alice", last_name="Doe", membership=True, with_disabled_notifications=True
         )
         self.employer_structure = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(

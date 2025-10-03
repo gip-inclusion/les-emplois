@@ -59,7 +59,7 @@ class TestExportJobApplications:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"with_company": True}, 403),
+            (EmployerFactory, {"membership": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
@@ -167,7 +167,7 @@ class TestExportPEApiRejections:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"with_company": True}, 403),
+            (EmployerFactory, {"membership": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
@@ -231,7 +231,7 @@ class TestExportCTA:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {}, 403),
-            (EmployerFactory, {"with_company": True}, 403),
+            (EmployerFactory, {"membership": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
@@ -277,7 +277,7 @@ class TestMergeUsers:
         "factory,factory_kwargs,expected_status",
         [
             (JobSeekerFactory, {"for_snapshot": True}, 403),
-            (EmployerFactory, {"with_company": True}, 403),
+            (EmployerFactory, {"membership": True}, 403),
             (PrescriberFactory, {}, 403),
             (LaborInspectorFactory, {"membership": True}, 403),
             (ItouStaffFactory, {}, 302),
@@ -783,7 +783,7 @@ class TestOTP:
         "factory,expected_status",
         [
             (JobSeekerFactory, 403),
-            (partial(EmployerFactory, with_company=True), 403),
+            (partial(EmployerFactory, membership=True), 403),
             (PrescriberFactory, 403),
             (partial(LaborInspectorFactory, membership=True), 403),
             (ItouStaffFactory, 200),

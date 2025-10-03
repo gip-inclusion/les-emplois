@@ -143,7 +143,7 @@ class EmployerFactory(UserFactory):
     identity_provider = IdentityProvider.PRO_CONNECT
 
     @factory.post_generation
-    def with_company(self, created, extracted, **kwargs):
+    def membership(self, created, extracted, **kwargs):
         from tests.companies.factories import CompanyMembershipFactory
 
         if created and extracted is True:
@@ -399,7 +399,7 @@ def random_user_kind_factory(**kwargs):
             ItouStaffFactory,
             JobSeekerFactory,
             PrescriberFactory,
-            functools.partial(EmployerFactory, with_company=True),
+            functools.partial(EmployerFactory, membership=True),
             functools.partial(LaborInspectorFactory, membership=True),
         ]
     )(**kwargs)

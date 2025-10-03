@@ -16,9 +16,9 @@ params_tuples = [
 @pytest.mark.parametrize(
     "params,user,redirection",
     [
-        ("", lambda: EmployerFactory(with_company=True), "dashboard:index"),
-        ("?param=1", lambda: EmployerFactory(with_company=True), "dashboard:index"),
-        ("?param=1&username=2", lambda: EmployerFactory(with_company=True), "dashboard:index"),
+        ("", lambda: EmployerFactory(membership=True), "dashboard:index"),
+        ("?param=1", lambda: EmployerFactory(membership=True), "dashboard:index"),
+        ("?param=1&username=2", lambda: EmployerFactory(membership=True), "dashboard:index"),
         ("", None, "search:employers_home"),
         ("?param=1", None, "search:employers_home"),
         ("?param=1&username=2", None, "search:employers_home"),
@@ -33,7 +33,7 @@ def test_middleware_wo_proconnect_login_param(client, db, params, user, redirect
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middleware_for_authenticated_user(client, db, params, expected_params):
-    user = EmployerFactory(with_company=True)
+    user = EmployerFactory(membership=True)
     client.force_login(user)
 
     for username_param in ["", "&username=123-abc"]:
@@ -43,7 +43,7 @@ def test_middleware_for_authenticated_user(client, db, params, expected_params):
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middlware_for_non_proconnect_user(client, db, params, expected_params):
-    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+    user = EmployerFactory(membership=True, identity_provider=IdentityProvider.INCLUSION_CONNECT)
     for username_param in ["", "&username=123-abc", f"&username={user.username}"]:
         response = client.get(f"/{params}{username_param}")
         assertRedirects(
@@ -55,7 +55,7 @@ def test_middlware_for_non_proconnect_user(client, db, params, expected_params):
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middleware_for_unlogged_proconnect_user(client, db, params, expected_params):
-    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.PRO_CONNECT)
+    user = EmployerFactory(membership=True, identity_provider=IdentityProvider.PRO_CONNECT)
     response = client.get(f"/{params}&username={user.username}")
     assertRedirects(
         response,

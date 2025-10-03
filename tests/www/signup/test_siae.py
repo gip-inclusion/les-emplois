@@ -249,7 +249,7 @@ class TestCompanySignup:
         )
 
     def test_join_invalid_company_id(self, client):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = client.get(

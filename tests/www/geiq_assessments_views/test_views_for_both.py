@@ -44,7 +44,7 @@ class TestAssessmentContractsListAndToggle:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 404),
+            (EmployerFactory(membership=True), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -456,7 +456,7 @@ class TestAssessmentContractsDetails:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 404),
+            (EmployerFactory(membership=True), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -715,7 +715,7 @@ class TestAssessmentContractsExportView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 404),
+            (EmployerFactory(membership=True), 404),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)

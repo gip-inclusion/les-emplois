@@ -32,9 +32,9 @@ from tests.users.factories import (
         (PrescriberFactory, IdentityProvider.DJANGO, True),
         (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, True),
         (PrescriberFactory, IdentityProvider.PRO_CONNECT, False),
-        (partial(EmployerFactory, with_company=True), IdentityProvider.DJANGO, True),
-        (partial(EmployerFactory, with_company=True), IdentityProvider.INCLUSION_CONNECT, True),
-        (partial(EmployerFactory, with_company=True), IdentityProvider.PRO_CONNECT, False),
+        (partial(EmployerFactory, membership=True), IdentityProvider.DJANGO, True),
+        (partial(EmployerFactory, membership=True), IdentityProvider.INCLUSION_CONNECT, True),
+        (partial(EmployerFactory, membership=True), IdentityProvider.PRO_CONNECT, False),
         (LaborInspectorFactory, IdentityProvider.DJANGO, False),
     ],
 )

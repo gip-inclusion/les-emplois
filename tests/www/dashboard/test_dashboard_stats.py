@@ -15,8 +15,8 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 def test_index_stats_for_employer(snapshot, client):
     client.force_login(
         EmployerFactory(
-            with_company=True,
-            with_company__company__kind=random.choice(list(CompanyKind)),
+            membership=True,
+            membership__company__kind=random.choice(list(CompanyKind)),
         )
     )
 

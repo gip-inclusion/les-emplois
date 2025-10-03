@@ -31,7 +31,7 @@ def test_can_view_approval_details():
         JobSeekerFactory(),  # another job seeker
         PrescriberMembershipFactory(organization__authorized=True).user,  # a random authorized prescriber
         JobApplicationFactory(job_seeker=approval.user).sender,  # a non authorized prescriber linked to the job seeker
-        EmployerFactory(with_company=True),
+        EmployerFactory(membership=True),
     ]:
         request = get_request(bad_user)
         assert can_view_approval_details(request, approval) is None

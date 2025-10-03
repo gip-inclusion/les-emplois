@@ -22,7 +22,7 @@ class TestUpdateEligibilityView:
             (partial(PrescriberFactory, membership__organization__authorized=True), 200),
             (partial(PrescriberFactory, membership__organization__authorized=False), 403),
             (PrescriberFactory, 403),
-            (partial(EmployerFactory, with_company=True), 403),
+            (partial(EmployerFactory, membership=True), 403),
             [partial(LaborInspectorFactory, membership=True), 403],
         ],
         ids=[

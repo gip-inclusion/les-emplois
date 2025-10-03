@@ -32,7 +32,7 @@ def test_labor_inspector_not_allowed(client):
 
 
 def test_employer_allowed(client, snapshot):
-    employer = EmployerFactory(with_company=True)
+    employer = EmployerFactory(membership=True)
     client.force_login(employer)
     url = reverse("dashboard:edit_user_notifications")
     with assertSnapshotQueries(snapshot(name="view queries")):
@@ -68,7 +68,7 @@ def test_job_seeker_allowed(client, snapshot):
 
 
 def test_employer_create_update_notification_settings(client, snapshot):
-    employer = EmployerFactory(with_company=True)
+    employer = EmployerFactory(membership=True)
     company = employer.company_set.first()
     client.force_login(employer)
     url = reverse("dashboard:edit_user_notifications")

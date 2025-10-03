@@ -992,7 +992,7 @@ class TestProConnectPrescribersViewsExceptions:
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
         EmployerFactory(
-            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"], with_company=True
+            email=pro_connect.oidc_userinfo["email"], username=pro_connect.oidc_userinfo["sub"], membership=True
         )
 
         response = client.get(reverse("signup:prescriber_check_already_exists"))

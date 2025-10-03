@@ -26,7 +26,7 @@ class TestNewsRender:
     def test_all_news_rendered_html(self, client, snapshot):
         campaign = AnnouncementCampaignFactory(for_snapshot=True, with_items_for_every_user_kind=True)
 
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         client.force_login(user)
         response = client.get(reverse("announcements:news"))
 

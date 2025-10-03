@@ -201,7 +201,7 @@ def test_can_view_stats_dgefp_iae():
 
 def test_can_view_stats_staff():
     for user in [
-        EmployerFactory(with_company=True),
+        EmployerFactory(membership=True),
         PrescriberFactory(),
         LaborInspectorFactory(membership=True),
         JobSeekerFactory(),

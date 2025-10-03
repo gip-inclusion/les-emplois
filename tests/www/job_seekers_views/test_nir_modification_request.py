@@ -32,7 +32,7 @@ def test_access_for_job_seeker(client):
         (JobSeekerFactory, 404),  # Trying to access another job seeker's form
         (PrescriberFactory, 404),
         (partial(PrescriberFactory, membership=True, membership__organization__authorized=True), 200),
-        (partial(EmployerFactory, with_company=True), 200),
+        (partial(EmployerFactory, membership=True), 200),
         (ItouStaffFactory, 403),
         (partial(LaborInspectorFactory, membership=True), 403),
     ],

@@ -2612,7 +2612,7 @@ class TestApplyAsCompany:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_another_employer(self, client, pdf_file):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
-        employer = EmployerFactory(with_company=True)
+        employer = EmployerFactory(membership=True)
         client.force_login(employer)
 
         dummy_job_seeker = JobSeekerFactory.build(
@@ -2627,7 +2627,7 @@ class TestApplyAsCompany:
 
     def test_check_info_as_employer_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
-        employer = EmployerFactory(with_company=True)
+        employer = EmployerFactory(membership=True)
         client.force_login(employer)
         dummy_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_hexa_address=True,
@@ -4877,7 +4877,7 @@ class TestCheckPreviousApplicationsView:
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_another_employer(self, client, snapshot):
-        employer = EmployerFactory(with_company=True)
+        employer = EmployerFactory(membership=True)
         self._login_and_setup_session(client, employer)
 
         # Create a very recent application
