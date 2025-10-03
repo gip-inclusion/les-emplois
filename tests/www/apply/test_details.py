@@ -15,7 +15,7 @@ def test_missing_job_seeker_info(client):
         message="Motivation est mon deuxième prénom.",
         answer="Réponse au candidat.",
     )
-    user = EmployerFactory(with_company=True, with_company__company=job_application.to_company)
+    user = EmployerFactory(membership=True, membership__company=job_application.to_company)
     client.force_login(user)
     url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)

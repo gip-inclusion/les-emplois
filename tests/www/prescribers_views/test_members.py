@@ -25,7 +25,7 @@ class TestMembers:
         "factory,access",
         [
             [JobSeekerFactory, False],
-            [partial(EmployerFactory, with_company=True), False],
+            [partial(EmployerFactory, membership=True), False],
             [PrescriberFactory, False],
             [partial(PrescriberFactory, membership=True), True],
             [partial(LaborInspectorFactory, membership=True), False],

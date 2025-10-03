@@ -30,7 +30,7 @@ class TestListAssessmentsView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 403),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -167,7 +167,7 @@ class TestAssessmentDetailsForInstitutionView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 403),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -487,7 +487,7 @@ class TestAssessmentReviewView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(with_company=True), 403),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)

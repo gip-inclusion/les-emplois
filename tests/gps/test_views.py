@@ -100,7 +100,7 @@ class TestGroupLists:
         "factory,status_code",
         [
             [partial(JobSeekerFactory, for_snapshot=True), 403],
-            [partial(EmployerFactory, with_company=True), 200],
+            [partial(EmployerFactory, membership=True), 200],
             [PrescriberFactory, 200],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), 403],
         ],
@@ -337,7 +337,7 @@ class TestGroupDetailsMembershipTab:
         "factory,access",
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
-            [partial(EmployerFactory, with_company=True), True],
+            [partial(EmployerFactory, membership=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -548,9 +548,9 @@ class TestGroupDetailsMembershipTab:
     @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info_as_employer(self, client, snapshot, caplog):
         employer = EmployerFactory(
-            with_company=True,
+            membership=True,
             for_snapshot=True,
-            with_company__company__name="Les Olivades",
+            membership__company__name="Les Olivades",
         )
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=employer)
@@ -679,7 +679,7 @@ class TestGroupDetailsBeneficiaryTab:
         "factory,access",
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
-            [partial(EmployerFactory, with_company=True), True],
+            [partial(EmployerFactory, membership=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -806,7 +806,7 @@ class TestGroupDetailsContributionTab:
         "factory,access",
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
-            [partial(EmployerFactory, with_company=True), True],
+            [partial(EmployerFactory, membership=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -873,7 +873,7 @@ class TestGroupDetailsEditionTab:
         "factory,access",
         [
             [partial(JobSeekerFactory, for_snapshot=True), False],
-            [partial(EmployerFactory, with_company=True), True],
+            [partial(EmployerFactory, membership=True), True],
             [PrescriberFactory, True],  # we don't need authorized organizations as of today
             [partial(LaborInspectorFactory, membership=True), False],
         ],
@@ -1076,7 +1076,7 @@ class TestJoinGroup:
     @pytest.mark.parametrize(
         "user_factory",
         [
-            partial(EmployerFactory, with_company=True),
+            partial(EmployerFactory, membership=True),
             partial(PrescriberFactory, membership__organization__authorized=True),
             partial(PrescriberFactory, membership__organization__is_gps_authorized=True),
             partial(PrescriberFactory, membership=True),
@@ -1127,7 +1127,7 @@ class TestBeneficiariesAutocomplete:
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, False),
-            (partial(EmployerFactory, with_company=True), True),
+            (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -1260,7 +1260,7 @@ class TestBeneficiariesAutocomplete:
         }
 
         # a random other user won't see anyone
-        results = get_autocomplete_results(EmployerFactory(with_company=True))
+        results = get_autocomplete_results(EmployerFactory(membership=True))
         assert results == []
 
         # with "martin gps" Martin is the only match
@@ -1287,7 +1287,7 @@ class TestJoinGroupFromCoworker:
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, False),
-            (partial(EmployerFactory, with_company=True), True),
+            (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -1369,7 +1369,7 @@ class TestJoinGroupFromNir:
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), False),
             (PrescriberFactory, False),
-            (partial(EmployerFactory, with_company=True), True),
+            (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[
@@ -1392,7 +1392,7 @@ class TestJoinGroupFromNir:
             assert response.status_code == 403
 
     def test_view(self, client, snapshot, caplog):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
 
         client.force_login(user)
         response = client.get(self.URL)
@@ -1447,7 +1447,7 @@ class TestJoinGroupFromNir:
         assert gps_logs(caplog) == [{"message": "GPS visit_list_groups"}]
 
     def test_unknown_nir_known_email_with_no_nir(self, client, snapshot, caplog):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         existing_job_seeker_without_nir = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="")
         nir = "276024719711371"
 
@@ -1508,7 +1508,7 @@ class TestJoinGroupFromNir:
         ]
 
     def test_unknown_nir_known_email_with_another_nir(self, client, snapshot, caplog):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         existing_job_seeker_with_nir = JobSeekerFactory(for_snapshot=True)
         job_seeker_nir = existing_job_seeker_with_nir.jobseeker_profile.nir
         nir = "276024719711371"
@@ -1567,7 +1567,7 @@ class TestJoinGroupFromNir:
         ]
 
     def test_unknown_nir_and_unknown_email(self, client, settings, mocker, caplog, mailoutbox):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
@@ -1740,7 +1740,7 @@ class TestJoinGroupFromNameAndEmail:
             (partial(PrescriberFactory, membership__organization__is_gps_authorized=True), True),
             (partial(PrescriberFactory, membership=True), True),
             (PrescriberFactory, True),
-            (partial(EmployerFactory, with_company=True), True),
+            (partial(EmployerFactory, membership=True), True),
             [partial(LaborInspectorFactory, membership=True), False],
         ],
         ids=[

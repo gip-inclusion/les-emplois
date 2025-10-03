@@ -697,7 +697,7 @@ class TestProcessViews:
 
         for user in [
             JobSeekerFactory(),
-            EmployerFactory(with_company=True),
+            EmployerFactory(membership=True),
             PrescriberFactory(),
             LaborInspectorFactory(membership=True),
         ]:

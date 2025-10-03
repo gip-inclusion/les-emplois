@@ -29,8 +29,8 @@ class TestZendeskUrl:
         request = get_request(
             EmployerFactory(
                 for_snapshot=True,
-                with_company=True,
-                with_company__company__for_snapshot=True,
+                membership=True,
+                membership__company__for_snapshot=True,
             )
         )
         assert get_zendesk_form_url(request) == snapshot

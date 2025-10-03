@@ -323,7 +323,7 @@ class TestCardView:
         assertContains(response, EXIT_URL_PRESCRIBER)
 
         # If any employer, show the alert
-        employer = EmployerFactory(with_company=True)
+        employer = EmployerFactory(membership=True)
         client.force_login(employer)
         response = client.get(url)
         assertContains(response, BANNER_TXT_NAME)
@@ -531,7 +531,7 @@ class TestJobDescriptionCardView:
         assertContains(response, EXIT_URL_PRESCRIBER)
 
         # If any employer, show the alert
-        employer = EmployerFactory(with_company=True)
+        employer = EmployerFactory(membership=True)
         client.force_login(employer)
         response = client.get(url)
         assertContains(response, BANNER_TXT_NAME)

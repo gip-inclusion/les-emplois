@@ -44,7 +44,7 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
 @respx.mock
 def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     user = EmployerFactory(
-        with_company=True, identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"]
+        membership=True, identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"]
     )
     client.force_login(user)
     url = reverse("dashboard:index")
@@ -73,7 +73,7 @@ def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
         (ItouStaffFactory, True),
         (JobSeekerFactory, True),
         (PrescriberFactory, False),
-        (partial(EmployerFactory, with_company=True), False),
+        (partial(EmployerFactory, membership=True), False),
         (partial(LaborInspectorFactory, membership=True), True),
     ],
 )

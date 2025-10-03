@@ -875,9 +875,7 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
         pytest.param(lambda: JobSeekerFactory(for_snapshot=True), id="job_seeker"),
         pytest.param(lambda: PrescriberFactory(), id="prescriber"),
         pytest.param(
-            lambda: EmployerFactory(
-                with_company=True, with_company__company__spontaneous_applications_open_since=None
-            ),
+            lambda: EmployerFactory(membership=True, membership__company__spontaneous_applications_open_since=None),
             id="employer_without_jobs",
         ),
     ],

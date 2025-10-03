@@ -257,7 +257,7 @@ class TestEmailNotification:
     def test_method_send_for_employer_that_left_his_company(
         self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
     ):
-        user = EmployerFactory(with_company=True)
+        user = EmployerFactory(membership=True)
         company = user.companymembership_set.first().company
         user.companymembership_set.update(is_active=False)
 
@@ -315,7 +315,7 @@ class TestEmailNotification:
 class TestProfiledNotification:
     def setup_method(self):
         self.job_seeker = JobSeekerFactory()
-        self.employer = EmployerFactory(with_company=True)
+        self.employer = EmployerFactory(membership=True)
         self.employer_structure = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(membership=True)
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()

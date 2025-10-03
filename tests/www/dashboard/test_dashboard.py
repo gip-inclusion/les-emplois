@@ -625,8 +625,8 @@ class TestDashboardView:
                 partial(
                     EmployerFactory,
                     for_snapshot=True,
-                    with_company=True,
-                    with_company__company__department="75",
+                    membership=True,
+                    membership__company__department="75",
                 ),
                 "card",
             ],
@@ -634,8 +634,8 @@ class TestDashboardView:
                 partial(
                     EmployerFactory,
                     for_snapshot=True,
-                    with_company=True,
-                    with_company__company__department="30",
+                    membership=True,
+                    membership__company__department="30",
                 ),
                 "nav",
             ],  # in the Gard
@@ -1117,7 +1117,7 @@ class TestDashboardView:
     "factory,expected",
     [
         pytest.param(partial(JobSeekerFactory, with_address=True), assertNotContains, id="JobSeeker"),
-        pytest.param(partial(EmployerFactory, with_company=True), assertNotContains, id="Employer"),
+        pytest.param(partial(EmployerFactory, membership=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
         pytest.param(

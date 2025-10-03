@@ -527,7 +527,7 @@ class TestContractView:
             PrescriberFactory(
                 membership=True, membership__organization__authorized=True
             ),  # random authorized prescriber
-            EmployerFactory(with_company=True),  # random employer
+            EmployerFactory(membership=True),  # random employer
         ]:
             client.force_login(user)
             response = client.get(url)

@@ -100,8 +100,8 @@ class TestAdminForm:
         if user_kind == UserKind.PRESCRIBER:
             return PrescriberFactory(membership=True, membership__organization__authorized=True)
         if kind == "iae":
-            return EmployerFactory(with_company=True)
-        return EmployerFactory(with_company=True, with_company__company__kind=CompanyKind.GEIQ)
+            return EmployerFactory(membership=True)
+        return EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ)
 
     def get_diag_model(self, kind):
         if kind == "iae":
@@ -226,7 +226,7 @@ class TestAdminForm:
         assert not self.get_diag_model(kind).objects.exists()
 
     def test_add_eligibility_diagnostic_employer_bad_company_kind(self, admin_client, kind):
-        author = EmployerFactory(with_company=True)
+        author = EmployerFactory(membership=True)
         post_data = self.build_post_data(kind, author, JobSeekerFactory(), with_administrative_criteria=False)
         Company.objects.filter(pk=post_data[self.company_field_name(kind)]).update(kind=CompanyKind.EA)  # Not a siae
         response = admin_client.post(self.get_add_url(kind), data=post_data)

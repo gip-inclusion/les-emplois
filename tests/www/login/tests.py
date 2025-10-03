@@ -389,7 +389,7 @@ class TestExistingUserLogin:
         [
             JobSeekerFactory,
             PrescriberFactory,
-            partial(EmployerFactory, with_company=True),
+            partial(EmployerFactory, membership=True),
             LaborInspectorFactory,
             ItouStaffFactory,
         ],
@@ -495,7 +495,7 @@ def test_prescriber_account_activation_view_with_next(client, pro_connect):
 
 
 def test_employer_account_activation_view(client, pro_connect):
-    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO)
+    user = EmployerFactory(membership=True, identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
     url = reverse("dashboard:activate_pro_connect_account")
