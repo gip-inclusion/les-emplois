@@ -29,6 +29,12 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.files.factories import FileFactory
 from tests.geiq_assessments.factories import AssessmentCampaignFactory
 from tests.geo.factories import QPVFactory
+from tests.institutions.factories import (
+    InstitutionFactory,
+    InstitutionMembershipFactory,
+    InstitutionWith2MembershipFactory,
+)
+from tests.invitations.factories import LaborInspectorInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import (
@@ -77,10 +83,10 @@ def test_all_admin(admin_client, mocker, subtests):
     EmailAddress.objects.create(user=admin_user, email="foobar@example.com", primary=False, verified=False)
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     ExternalDataImport.objects.create(user=admin_user)
-    Sanctions.objects.create(
-        evaluated_siae=EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae,
-        training_session="RDV",
-    )
+    evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
+    Sanctions.objects.create(evaluated_siae=evaluated_siae, training_session="RDV")
+    InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
+    LaborInspectorInvitationFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LabelInfos.objects.create(campaign=AssessmentCampaignFactory(), data=[])
     job_seeker = JobSeekerFactory()
     NirModificationRequest.objects.create(
@@ -111,8 +117,12 @@ def test_all_admin(admin_client, mocker, subtests):
             FileFactory,  # Already used above
             GEIQEligibilityDiagnosisFactory,  # Already used above
             IAEEligibilityDiagnosisFactory,  # Already used above
+            InstitutionFactory,  # Called by EvaluatedAdministrativeCriteriaFactory
+            InstitutionMembershipFactory,  # Already used above
+            InstitutionWith2MembershipFactory,  # No need
             JobApplicationFactory,  # Already used above
             JobSeekerFactory,  # Already used above
+            LaborInspectorInvitationFactory,  # Already used above
             QPVFactory,  # Already used above
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
             UserFactory,  # A lot of subfactories, no need to use it
