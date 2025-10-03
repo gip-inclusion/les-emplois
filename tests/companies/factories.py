@@ -45,6 +45,16 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ("asp_id", "kind")
         skip_postgeneration_save = True
 
+    class Params:
+        after_grace_period = factory.Trait(
+            is_active=False,
+            deactivated_at=factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD - ONE_DAY),
+        )
+        pending_grace_period = factory.Trait(
+            is_active=False,
+            deactivated_at=factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD + ONE_DAY),
+        )
+
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     # FIXME(vperron): this should be made random
@@ -177,30 +187,12 @@ class CompanyWithMembershipAndJobsFactory(CompanyFactory):
     with_jobs = True
 
 
-class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
-    """
-    Generates a SiaeConvention() object which is inactive but still experiencing its grace period.
-    """
-
-    is_active = False
-    deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD + ONE_DAY)
-
-
 class CompanyPendingGracePeriodFactory(CompanyFactory):
-    convention = factory.SubFactory(SiaeConventionPendingGracePeriodFactory)
-
-
-class SiaeConventionAfterGracePeriodFactory(SiaeConventionFactory):
-    """
-    Generates an SiaeConvention() object which is inactive and has passed its grace period.
-    """
-
-    is_active = False
-    deactivated_at = factory.LazyFunction(lambda: timezone.now() - GRACE_PERIOD - ONE_DAY)
+    convention = factory.SubFactory(SiaeConventionFactory, pending_grace_period=True)
 
 
 class CompanyAfterGracePeriodFactory(CompanyFactory):
-    convention = factory.SubFactory(SiaeConventionAfterGracePeriodFactory)
+    convention = factory.SubFactory(SiaeConventionFactory, after_grace_period=True)
 
 
 class JobDescriptionFactory(factory.django.DjangoModelFactory):
