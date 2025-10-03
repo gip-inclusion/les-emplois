@@ -35,7 +35,6 @@ from tests.prescribers.factories import (
     PrescriberFactory,
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
-    PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
 
@@ -354,7 +353,7 @@ class TestCommandSendUsersToBrevo:
 
     @freeze_time("2023-05-02")
     def test_wet_run_prescribers(self, caplog, respx_mock, snapshot):
-        pe = PrescriberPoleEmploiFactory()
+        pe = PrescriberOrganizationFactory(france_travail=True)
         other_org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
         alice = PrescriberFactory(
             first_name="Alice",

@@ -43,7 +43,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
-from tests.prescribers.factories import PrescriberPoleEmploiFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     PrescriberFactory,
@@ -168,7 +168,7 @@ class TestProConnectModel:
 
     def test_join_org(self, caplog, pro_connect):
         # New membership.
-        organization = PrescriberPoleEmploiFactory()
+        organization = PrescriberOrganizationFactory(france_travail=True)
         assert organization.active_members.count() == 0
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         user, _ = pc_user_data.create_or_update_user()
@@ -584,7 +584,7 @@ class TestProConnectCallbackView:
         user = PrescriberFactory(
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
         )
-        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi="95021")
+        org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         assert not org.members.exists()
 
         pro_connect.mock_oauth_dance(
@@ -596,7 +596,7 @@ class TestProConnectCallbackView:
 
     @respx.mock
     def test_callback_update_FT_organization_as_employer_does_not_crash(self, client, pro_connect):
-        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi="95021")
+        org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         pro_connect.mock_oauth_dance(
             client,
             UserKind.EMPLOYER,
@@ -676,7 +676,7 @@ class TestProConnectCallbackView:
         user = PrescriberFactory(
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
         )
-        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi="00000")
+        org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="00000")
         org.add_or_activate_membership(user)
 
         oidc_userinfo = pro_connect.oidc_userinfo_with_safir.copy()

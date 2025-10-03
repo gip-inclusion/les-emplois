@@ -6,7 +6,7 @@ from pytest_django.asserts import (
 
 from itou.utils import constants as global_constants
 from tests.prescribers.factories import (
-    PrescriberPoleEmploiFactory,
+    PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
     PrescriberFactory,
@@ -25,7 +25,7 @@ class TestPEOrganizationInvitation:
         ],
     )
     def test_successful(self, client, suffix):
-        organization = PrescriberPoleEmploiFactory()
+        organization = PrescriberOrganizationFactory(france_travail=True)
         organization.members.add(PrescriberFactory())
         sender = organization.members.first()
         guest = PrescriberFactory.build(email=f"sabine.lagrange{suffix}")
@@ -43,7 +43,7 @@ class TestPEOrganizationInvitation:
         assertRedirects(response, reverse("prescribers_views:members"))
 
     def test_unsuccessful(self, client):
-        organization = PrescriberPoleEmploiFactory()
+        organization = PrescriberOrganizationFactory(france_travail=True)
         organization.members.add(PrescriberFactory())
         sender = organization.members.first()
         client.force_login(sender)

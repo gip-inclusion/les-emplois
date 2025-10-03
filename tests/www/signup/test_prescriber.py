@@ -28,7 +28,6 @@ from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
-    PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient
@@ -61,7 +60,7 @@ class TestPrescriberSignup:
 
     @respx.mock
     def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, pro_connect):
-        organization = PrescriberPoleEmploiFactory()
+        organization = PrescriberOrganizationFactory(france_travail=True)
 
         # Go through each step to ensure session data is recorded properly.
         # Step 1: the user works for PE follows PE link
@@ -1148,7 +1147,7 @@ class TestProConnectPrescribersViewsExceptions:
         He wants to join a Pôle emploi organization
         but his e-mail suffix is wrong. An error should be raised.
         """
-        pe_org = PrescriberPoleEmploiFactory()
+        pe_org = PrescriberOrganizationFactory(france_travail=True)
         pe_email = f"athos{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}"
 
         # Go through each step to ensure session data is recorded properly.
