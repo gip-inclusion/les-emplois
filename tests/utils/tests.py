@@ -27,7 +27,7 @@ from django.utils import timezone
 from django.utils.html import escape
 from faker import Faker as fk
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 import itou.utils.json
 import itou.utils.session
@@ -1491,10 +1491,8 @@ def test_matomo_context_processor(client, settings, snapshot):
 
     # check that we don't crash when the route is not resolved
     response = client.get("/doesnotexist?token=blah&mtm_foo=truc")
-    assert response.status_code == 404
-    assert response.context["matomo_custom_url"] == "/doesnotexist?mtm_foo=truc"
-    script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
-    assert pretty_indented(script_content) == snapshot(name="matomo custom init 404")
+    assert response.context["send_to_matomo"] is False
+    assertNotContains(response, "matomo-custom-init", status_code=404)
 
     # canonical case
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
