@@ -1,9 +1,7 @@
 from django.urls import reverse
 
 from tests.companies.factories import (
-    CompanyAfterGracePeriodFactory,
     CompanyFactory,
-    CompanyPendingGracePeriodFactory,
 )
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.prescribers import factories as prescribers_factories
@@ -63,7 +61,7 @@ class TestSwitchCompany:
         user = company.members.first()
         client.force_login(user)
 
-        related_company = CompanyPendingGracePeriodFactory(with_membership=True)
+        related_company = CompanyFactory(with_membership=True, convention__pending_grace_period=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")
@@ -86,7 +84,7 @@ class TestSwitchCompany:
         user = company.members.first()
         client.force_login(user)
 
-        related_company = CompanyAfterGracePeriodFactory()
+        related_company = CompanyFactory(convention__after_grace_period=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")

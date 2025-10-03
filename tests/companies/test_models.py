@@ -17,10 +17,8 @@ from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
 from tests.companies.factories import (
-    CompanyAfterGracePeriodFactory,
     CompanyFactory,
     CompanyMembershipFactory,
-    CompanyPendingGracePeriodFactory,
     CompanyWith2MembershipsFactory,
     CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
@@ -221,14 +219,14 @@ class TestCompanyModel:
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyPendingGracePeriodFactory()
+        company = CompanyFactory(convention__pending_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 1
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyAfterGracePeriodFactory()
+        company = CompanyFactory(convention__after_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 0
