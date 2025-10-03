@@ -27,7 +27,7 @@ from tests.eligibility.factories import (
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
-    PrescriberPoleEmploiWithMembershipFactory,
+    PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import (
     JobSeekerFactory,
@@ -224,7 +224,7 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPres
 class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of Pôle emploi organization."""
 
-    sender_prescriber_organization = factory.SubFactory(PrescriberPoleEmploiWithMembershipFactory)
+    sender_prescriber_organization = factory.SubFactory(PrescriberPoleEmploiFactory, with_membership=True)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 

@@ -113,10 +113,3 @@ class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
     authorized = True
     kind = PrescriberOrganizationKind.FT
-
-
-class PrescriberPoleEmploiWithMembershipFactory(PrescriberPoleEmploiFactory):
-    class Meta:
-        skip_postgeneration_save = True
-
-    membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
