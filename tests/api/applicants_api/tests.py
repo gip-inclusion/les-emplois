@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from pytest_django.asserts import assertNumQueries
 
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
@@ -29,7 +29,7 @@ class TestApplicantsAPI:
         assert response.status_code == 403
 
     def test_login_as_institution(self, api_client):
-        user = InstitutionWithMembershipFactory().members.first()
+        user = InstitutionFactory(with_membership=True).members.first()
         api_client.force_authenticate(user)
 
         response = api_client.get(self.URL, format="json")

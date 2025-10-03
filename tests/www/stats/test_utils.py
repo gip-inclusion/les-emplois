@@ -4,7 +4,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
-from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
 )
@@ -149,7 +149,7 @@ def can_view_stats_ph_whitelisted(kind):
     ],
 )
 def test_can_view_stats_ddets_iae(kind, is_admin, expected_can_view_stats_ddets_iae):
-    institution = InstitutionWithMembershipFactory(kind=kind, membership__is_admin=is_admin, department="93")
+    institution = InstitutionFactory(kind=kind, with_membership=True, membership__is_admin=is_admin, department="93")
     request = get_request(institution.members.get())
     assert utils.can_view_stats_ddets_iae(request) is expected_can_view_stats_ddets_iae
     assert utils.can_view_stats_dashboard_widget(request)
@@ -157,21 +157,21 @@ def test_can_view_stats_ddets_iae(kind, is_admin, expected_can_view_stats_ddets_
 
 def test_can_view_stats_dreets_iae():
     # Admin member of DREETS IAE can access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DREETS_IAE, department="93")
+    institution = InstitutionFactory(kind=InstitutionKind.DREETS_IAE, department="93", with_membership=True)
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dreets_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin member of DREETS IAE can access as well.
-    institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DREETS_IAE, membership__is_admin=False, department="93"
+    institution = InstitutionFactory(
+        kind=InstitutionKind.DREETS_IAE, with_membership=True, membership__is_admin=False, department="93"
     )
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dreets_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Member of institution of wrong kind cannot access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
+    institution = InstitutionFactory(kind=InstitutionKind.OTHER, department="93", with_membership=True)
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dreets_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
@@ -179,21 +179,21 @@ def test_can_view_stats_dreets_iae():
 
 def test_can_view_stats_dgefp_iae():
     # Admin member of DGEFP can access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE, department="93")
+    institution = InstitutionFactory(kind=InstitutionKind.DGEFP_IAE, department="93", with_membership=True)
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin member of DGEFP can access as well.
-    institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DGEFP_IAE, membership__is_admin=False, department="93"
+    institution = InstitutionFactory(
+        kind=InstitutionKind.DGEFP_IAE, with_membership=True, membership__is_admin=False, department="93"
     )
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Member of institution of wrong kind cannot access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
+    institution = InstitutionFactory(kind=InstitutionKind.OTHER, department="93", with_membership=True)
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)

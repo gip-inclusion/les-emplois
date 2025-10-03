@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from itou.invitations import models
 from tests.companies.factories import CompanyFactory
-from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 
 
@@ -65,5 +65,5 @@ class LaborInspectorInvitationFactory(factory.django.DjangoModelFactory):
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
     sent_at = factory.LazyFunction(timezone.now)
-    institution = factory.SubFactory(InstitutionWithMembershipFactory)
+    institution = factory.SubFactory(InstitutionFactory, with_membership=True)
     sender = factory.LazyAttribute(lambda o: o.institution.members.first())

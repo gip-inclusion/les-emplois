@@ -17,7 +17,6 @@ from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
-    InstitutionWithMembershipFactory,
 )
 from tests.invitations.factories import LaborInspectorInvitationFactory
 from tests.users.factories import LaborInspectorFactory, PrescriberFactory
@@ -29,9 +28,9 @@ class TestInstitutionModel:
         Test that if a user is admin of org1 and regular user
         of org2 he is not considered as admin of org2.
         """
-        institution1 = InstitutionWithMembershipFactory(department="01")
+        institution1 = InstitutionFactory(department="01", with_membership=True)
         institution1_admin_user = institution1.members.first()
-        institution2 = InstitutionWithMembershipFactory(department="02")
+        institution2 = InstitutionFactory(department="02", with_membership=True)
         institution2.members.add(institution1_admin_user)
 
         assert institution1_admin_user in institution1.active_admin_members
@@ -138,7 +137,7 @@ class TestInstitutionModel:
 
 
 def test_remove_last_admin_status(admin_client, mailoutbox):
-    institution = InstitutionWithMembershipFactory(department="")
+    institution = InstitutionFactory(department="", with_membership=True)
     membership = institution.memberships.first()
     assert membership.is_admin
 
@@ -183,7 +182,7 @@ def test_remove_last_admin_status(admin_client, mailoutbox):
 
 
 def test_deactivate_admin(admin_client, caplog, mailoutbox):
-    institution = InstitutionWithMembershipFactory(department="")
+    institution = InstitutionFactory(department="", with_membership=True)
     membership = institution.memberships.first()
     assert membership.is_admin
 
@@ -229,7 +228,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
 
 
 def test_add_admin(admin_client, caplog, mailoutbox):
-    institution = InstitutionWithMembershipFactory(department="")
+    institution = InstitutionFactory(department="", with_membership=True)
     membership = institution.memberships.first()
     labor_inspector = LaborInspectorFactory()
     assert membership.is_admin
@@ -276,7 +275,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
 
 
 def test_reactivate_member(admin_client, caplog):
-    institution = InstitutionWithMembershipFactory(department="")
+    institution = InstitutionFactory(department="", with_membership=True)
     membership = institution.memberships.first()
     admin_user = User.objects.get(pk=get_user(admin_client).pk)
     institution.deactivate_membership(membership, updated_by=admin_user)
