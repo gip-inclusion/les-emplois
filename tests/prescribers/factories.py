@@ -42,6 +42,12 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
                 )
             )
         )
+        france_travail = factory.Trait(
+            kind=PrescriberOrganizationKind.FT,
+            code_safir_pole_emploi=factory.fuzzy.FuzzyText(length=5, chars=string.digits),
+            authorized=True,
+        )
+
         for_snapshot = factory.Trait(
             uid="0260ad4f-2008-48bd-88cc-b41c0211e219",
             name="Pres. Org.",
@@ -107,9 +113,3 @@ class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory
 
     membership1 = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
     membership2 = factory.RelatedFactory(PrescriberMembershipFactory, "organization", is_admin=False)
-
-
-class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
-    code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
-    authorized = True
-    kind = PrescriberOrganizationKind.FT
