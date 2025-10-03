@@ -24,8 +24,8 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -386,7 +386,7 @@ def test_htmx_filters(client):
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
+    prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")
@@ -677,7 +677,7 @@ def test_htmx_order(client):
 
 @freeze_time("2024-11-27", tick=True)
 def test_table_iae_state_and_criteria(client, snapshot):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True, for_snapshot=True)
+    prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
     url = reverse("apply:list_prescriptions")

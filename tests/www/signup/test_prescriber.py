@@ -25,10 +25,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
-from tests.prescribers.factories import (
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient
 
@@ -486,9 +483,8 @@ class TestPrescriberSignup:
         siret1 = "26570134200056"
         siret2 = "26570134200148"
 
-        # PrescriberOrganizationWithMembershipFactory.
-        PrescriberOrganizationWithMembershipFactory(
-            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="01"
+        PrescriberOrganizationFactory(
+            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="01", with_membership=True
         )
 
         # Step 1: search organizations with SIRET
@@ -510,8 +506,8 @@ class TestPrescriberSignup:
         siret1 = "26570134200056"
         siret2 = "26570134200148"
 
-        existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
-            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="67"
+        existing_org_with_siret = PrescriberOrganizationFactory(
+            siret=siret1, kind=PrescriberOrganizationKind.SPIP, department="67", with_membership=True
         )
 
         # Search organizations with SIRET
@@ -713,8 +709,8 @@ class TestPrescriberSignup:
 
     def test_form_to_request_for_an_invitation(self, client, mailoutbox):
         siret = "26570134200148"
-        prescriber_org = PrescriberOrganizationWithMembershipFactory(
-            siret=siret, membership__user__for_snapshot=True, for_snapshot=True
+        prescriber_org = PrescriberOrganizationFactory(
+            siret=siret, membership__user__for_snapshot=True, for_snapshot=True, with_membership=True
         )
         prescriber_membership = prescriber_org.memberships.first()
 

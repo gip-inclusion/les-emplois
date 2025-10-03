@@ -44,7 +44,9 @@ def test_list_view_access(client, authorized_organization, expected):
 
 
 def test_empty_list_view(snapshot, client):
-    prescriber = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+    prescriber = prescribers_factories.PrescriberOrganizationFactory(
+        authorized=True, with_membership=True
+    ).members.first()
     client.force_login(prescriber)
 
     with assertSnapshotQueries(snapshot(name="SQL queries")):
@@ -67,7 +69,7 @@ def test_list_view(snapshot, client):
 
 @override_settings(PAGE_SIZE_DEFAULT=1)
 def test_pagination(client):
-    organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
+    organization = prescribers_factories.PrescriberOrganizationFactory(authorized=True, with_membership=True)
     approvals_factories.ProlongationRequestFactory.create_batch(2, prescriber_organization=organization)
     client.force_login(organization.members.first())
     url = reverse("approvals:prolongation_requests_list")

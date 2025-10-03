@@ -16,7 +16,7 @@ from itou.companies.enums import CompanyKind
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -27,7 +27,7 @@ class TestApprovalProlongation:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         with freeze_time("2023-08-23"):
-            self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+            self.prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
             self.prescriber = self.prescriber_organization.members.first()
 
             self._setup_with_company_kind(CompanyKind.EI)
@@ -453,10 +453,10 @@ class TestApprovalProlongation:
 
     def test_check_multiple_prescriber_organization(self, client, snapshot, faker):
         # Link prescriber to another prescriber organization
-        other_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        other_prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         other_prescriber_organization.members.add(self.prescriber)
 
-        inactive_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        inactive_prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         PrescriberMembershipFactory(
             user=self.prescriber,
             organization=inactive_prescriber_organization,
@@ -488,7 +488,7 @@ class TestApprovalProlongation:
         assert pretty_indented(error_msg) == snapshot(name="prescriber is member of many organizations")
 
     def test_check_invalid_prescriber(self, client, snapshot, faker):
-        unauthorized_prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=False)
+        unauthorized_prescriber_organization = PrescriberOrganizationFactory(authorized=False, with_membership=True)
         prescriber = unauthorized_prescriber_organization.members.first()
 
         client.force_login(self.employer)
@@ -522,7 +522,7 @@ def test_prolongation_report_file(client, mocker, faker, xlsx_file, mailoutbox):
         "itou.files.models.uuid.uuid4",
         return_value=uuid.UUID("11111111-1111-1111-1111-111111111111"),
     )
-    prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
     prescriber = prescriber_organization.members.first()
 
     today = timezone.localdate()

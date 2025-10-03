@@ -56,7 +56,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -929,7 +929,7 @@ class TestApplyAsAuthorizedPrescriber:
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         from_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
+        prescriber_organization = PrescriberOrganizationFactory(with_pending_authorization=True, with_membership=True)
         user = prescriber_organization.members.first()
         client.force_login(user)
 
@@ -1227,7 +1227,7 @@ class TestApplyAsAuthorizedPrescriber:
         city = create_city_in_zrr()
         ZRRFactory(insee_code=city.code_insee)
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.first()
         client.force_login(user)
 
@@ -1560,7 +1560,7 @@ class TestApplyAsAuthorizedPrescriber:
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
         company = CompanyMembershipFactory().company
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.first()
         client.force_login(user)
 
@@ -1596,7 +1596,7 @@ class TestApplyAsAuthorizedPrescriber:
         company = CompanyFactory(name="Les petits pains", with_membership=True, subject_to_eligibility=True)
         job_seeker = JobSeekerFactory()
         IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, job_seeker=job_seeker)
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         prescriber = prescriber_organization.members.get()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
@@ -1608,7 +1608,7 @@ class TestApplyAsAuthorizedPrescriber:
 
     def test_apply_with_temporary_nir(self, client):
         company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.get()
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         client.force_login(user)
@@ -2069,7 +2069,7 @@ class TestApplyAsPrescriberNirExceptions:
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         # Only authorized prescribers can add a NIR.
         # See User.can_add_nir
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.first()
         return company, user
 
@@ -3319,7 +3319,7 @@ class TestApplicationView:
         assert client.session[apply_session_name].get("selected_jobs") is None
 
     def test_access_without_session(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         client.force_login(prescriber)
         response = client.get(reverse("apply:application_iae_eligibility", kwargs={"session_uuid": uuid.uuid4()}))
         assert response.status_code == 404
@@ -3364,7 +3364,7 @@ class TestApplicationView:
 
     def test_application_resume_diagoriente_shown_as_prescriber(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+        prescriber = PrescriberOrganizationFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
@@ -3394,7 +3394,7 @@ class TestApplicationView:
 
     def test_application_eligibility_is_bypassed_for_unauthorized_prescriber(self, client):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+        prescriber = PrescriberOrganizationFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
 
         client.force_login(prescriber)
@@ -3427,7 +3427,7 @@ class TestApplicationView:
 
     def test_application_eligibility_update_diagnosis_only_if_not_shrouded(self, client):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         client.force_login(prescriber)
@@ -3564,15 +3564,15 @@ class TestLastCheckedAtView:
         self._check_last_checked_at(client, self.job_seeker, sees_warning=False, sees_verify_link=False)
 
     def test_authorized_prescriber(self, client):
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         self._check_last_checked_at(client, authorized_prescriber, sees_warning=True, sees_verify_link=True)
 
     def test_unauthorized_prescriber(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self._check_last_checked_at(client, prescriber, sees_warning=True, sees_verify_link=False)
 
     def test_unauthorized_prescriber_that_created_the_job_seeker(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.save(update_fields=["created_by"])
         self._check_last_checked_at(client, prescriber, sees_warning=True, sees_verify_link=True)
@@ -3912,11 +3912,11 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         self._check_nothing_permitted(client, self.job_seeker)
 
     def test_as_unauthorized_prescriber(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self._check_nothing_permitted(client, prescriber)
 
     def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
@@ -3935,7 +3935,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         )
 
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
@@ -3947,7 +3947,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
 
         geispolsheim = create_city_geispolsheim()
         birthdate = self.job_seeker.jobseeker_profile.birthdate
@@ -3966,7 +3966,7 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         self._check_only_administrative_allowed(client, authorized_prescriber)
 
     def test_as_company_with_proxied_job_seeker(self, client, snapshot):
@@ -4050,11 +4050,11 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self._check_nothing_permitted(client, self.job_seeker)
 
     def test_as_unauthorized_prescriber(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self._check_nothing_permitted(client, prescriber)
 
     def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, client, snapshot):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
@@ -4073,7 +4073,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         )
 
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self, client):
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=False, with_membership=True).members.first()
         self.job_seeker.created_by = prescriber
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
@@ -4085,7 +4085,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
 
         geispolsheim = create_city_geispolsheim()
         birthdate = self.job_seeker.jobseeker_profile.birthdate
@@ -4104,7 +4104,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         self._check_only_administrative_allowed(client, authorized_prescriber)
 
     def test_as_company_with_proxied_job_seeker(self, client, snapshot):
@@ -4217,7 +4217,7 @@ def test_detect_existing_job_seeker(client):
     company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
     reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
-    prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
     user = prescriber_organization.members.first()
     client.force_login(user)
 
@@ -4372,7 +4372,7 @@ class TestApplicationGEIQEligibilityView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         self.geiq = CompanyFactory(with_membership=True, with_jobs=True, kind=CompanyKind.GEIQ)
-        self.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        self.prescriber_org = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         self.orienter = PrescriberFactory()
         self.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
         self.company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
@@ -4700,7 +4700,7 @@ class TestCheckPreviousApplicationsView:
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_no_previous_as_authorized_prescriber(self, client):
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         self._login_and_setup_session(client, authorized_prescriber)
         response = client.get(self.check_prev_applications_url)
         assertRedirects(response, self.application_jobs_url)
@@ -4760,7 +4760,7 @@ class TestCheckPreviousApplicationsView:
 
     @freeze_time("2025-09-08 11:39")
     def test_with_previous_as_authorized_prescriber(self, client, snapshot):
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         self._login_and_setup_session(client, authorized_prescriber)
 
         # Create a very recent application

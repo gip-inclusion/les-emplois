@@ -33,7 +33,6 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberFactory
 
@@ -153,9 +152,9 @@ class TestPrescriberOrganizationModel:
         Test that if a user is admin of org_1 and regular user
         of org2 he is not considered as admin of org_2.
         """
-        org_1 = PrescriberOrganizationWithMembershipFactory()
+        org_1 = PrescriberOrganizationFactory(with_membership=True)
         org_1_admin_user = org_1.members.first()
-        org_2 = PrescriberOrganizationWithMembershipFactory()
+        org_2 = PrescriberOrganizationFactory(with_membership=True)
         org_2.members.add(org_1_admin_user)
 
         assert org_1_admin_user in org_1.active_admin_members
@@ -854,7 +853,7 @@ def test_prevent_validated_authorization_if_other_constraint():
 
 
 def test_remove_last_admin_status(admin_client, mailoutbox):
-    organization = PrescriberOrganizationWithMembershipFactory()
+    organization = PrescriberOrganizationFactory(with_membership=True)
     membership = organization.memberships.first()
     assert membership.is_admin
 
@@ -907,7 +906,7 @@ def test_remove_last_admin_status(admin_client, mailoutbox):
 
 
 def test_deactivate_admin(admin_client, caplog, mailoutbox):
-    organization = PrescriberOrganizationWithMembershipFactory()
+    organization = PrescriberOrganizationFactory(with_membership=True)
     membership = organization.memberships.first()
     assert membership.is_admin
 
@@ -961,7 +960,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
 
 
 def test_add_admin(admin_client, caplog, mailoutbox):
-    organization = PrescriberOrganizationWithMembershipFactory()
+    organization = PrescriberOrganizationFactory(with_membership=True)
     membership = organization.memberships.first()
     prescriber = PrescriberFactory()
     assert membership.is_admin
@@ -1029,7 +1028,7 @@ def test_admin_too_many_memberships(admin_client, mocker):
 
 
 def test_reactivate_member(admin_client, caplog):
-    organization = PrescriberOrganizationWithMembershipFactory()
+    organization = PrescriberOrganizationFactory(with_membership=True)
     membership = organization.memberships.first()
     admin_user = User.objects.get(pk=get_user(admin_client).pk)
     organization.deactivate_membership(membership, updated_by=admin_user)

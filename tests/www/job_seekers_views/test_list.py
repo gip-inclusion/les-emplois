@@ -25,7 +25,6 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
     JobSeekerFactory,
@@ -122,7 +121,9 @@ def test_raise_404_on_organization_tab_for_prescriber_without_org(client):
         ),
         pytest.param(
             lambda: PrescriberFactory.create_batch(
-                2, membership__organization=PrescriberOrganizationWithMembershipFactory(), membership__is_active=True
+                2,
+                membership__organization=PrescriberOrganizationFactory(with_membership=True),
+                membership__is_active=True,
             )[0],
             assertContains,
             id="PrescriberWithActiveMember",
@@ -130,7 +131,7 @@ def test_raise_404_on_organization_tab_for_prescriber_without_org(client):
         pytest.param(
             lambda: PrescriberFactory.create_batch(
                 2,
-                membership__organization=PrescriberOrganizationWithMembershipFactory(),
+                membership__organization=PrescriberOrganizationFactory(with_membership=True),
                 membership__is_active=factory.Iterator([True, False]),
             )[0],
             assertContains,
@@ -382,8 +383,8 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
 
 
 def test_job_seeker_created_for_prescription_is_shown(client):
-    organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     company = CompanyFactory(with_membership=True, with_jobs=True)
+    organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
     company_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
     prescriber = organization.members.first()
     client.force_login(prescriber)

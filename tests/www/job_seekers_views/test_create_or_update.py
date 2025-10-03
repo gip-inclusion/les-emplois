@@ -24,8 +24,8 @@ from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
+    PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
@@ -461,7 +461,7 @@ class TestStandaloneCreateAsPrescriber:
     def test_standalone_creation_as_prescriber_existing_nir(self, client, snapshot, case):
         from_url = reverse("job_seekers_views:list")
         prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
-        other_organization = PrescriberOrganizationWithMembershipFactory()
+        other_organization = PrescriberOrganizationFactory(with_membership=True)
         user = prescriber_organization.members.first()
         other_user = prescriber_organization.members.last()
         other_user_in_other_organization = other_organization.members.first()
@@ -542,7 +542,7 @@ class TestStandaloneCreateAsPrescriber:
     def test_standalone_creation_as_prescriber_existing_email(self, client, snapshot, case):
         from_url = reverse("job_seekers_views:list")
         prescriber_organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
-        other_organization = PrescriberOrganizationWithMembershipFactory()
+        other_organization = PrescriberOrganizationFactory(with_membership=True)
         user = prescriber_organization.members.first()
         other_user = prescriber_organization.members.last()
         other_user_in_other_organization = other_organization.members.first()
@@ -620,7 +620,7 @@ class TestStandaloneCreateAsPrescriber:
 
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
-        user = PrescriberOrganizationWithMembershipFactory().members.first()
+        user = PrescriberOrganizationFactory(with_membership=True).members.first()
         client.force_login(user)
 
         dummy_job_seeker = JobSeekerFactory.build(
@@ -976,7 +976,7 @@ class TestUpdateForSender:
     def test_update_with_wrong_session(self, client):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         client.force_login(prescriber)
 
         # Create a session with a wrong tunnel key

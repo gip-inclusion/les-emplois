@@ -12,7 +12,6 @@ from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -99,7 +98,7 @@ class TestMembers:
         assert inactive_member_inactive_user not in response.context["object_list"]
 
     def test_members_admin_warning_one_user(self, client):
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = PrescriberOrganizationFactory(with_membership=True)
         user = organization.members.first()
         client.force_login(user)
         url = reverse("prescribers_views:members")
@@ -132,8 +131,8 @@ class TestMembers:
     @pytest.mark.parametrize(
         "factory,assertion",
         [
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+            (partial(PrescriberOrganizationFactory, authorized=True, with_membership=True), assertContains),
+            (partial(PrescriberOrganizationFactory, authorized=False, with_membership=True), assertNotContains),
         ],
     )
     def test_tab_bar(self, client, factory, assertion):
@@ -153,7 +152,7 @@ class TestUserMembershipDeactivation:
         A user, even if admin, can't self-deactivate
         (must be done by another admin)
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = PrescriberOrganizationFactory(with_membership=True)
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         memberships = admin.prescribermembership_set.all()
         membership = memberships.first()
@@ -245,7 +244,7 @@ class TestUserMembershipDeactivation:
         """
         Non-admin user can't change memberships
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = PrescriberOrganizationFactory(with_membership=True)
         guest = PrescriberFactory()
         organization.members.add(guest)
 
@@ -343,10 +342,10 @@ class TestUserMembershipDeactivation:
         Check that a deactivated member can't access the structure
         from dashboard selector
         """
-        organization2 = PrescriberOrganizationWithMembershipFactory()
+        organization2 = PrescriberOrganizationFactory(with_membership=True)
         guest = organization2.members.first()
 
-        organization1 = PrescriberOrganizationWithMembershipFactory()
+        organization1 = PrescriberOrganizationFactory(with_membership=True)
         admin = organization1.members.first()
         organization1.members.add(guest)
 
