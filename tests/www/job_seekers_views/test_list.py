@@ -95,7 +95,7 @@ def test_refused_access(client, url):
     for user in [
         JobSeekerFactory(),
         LaborInspectorFactory(membership=True),
-        CompanyFactory(with_membership=True, with_jobs=True).members.first(),
+        CompanyFactory(with_membership=True).members.first(),
     ]:
         client.force_login(user)
         response = client.get(url)
