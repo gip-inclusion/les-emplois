@@ -11,7 +11,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -40,12 +40,12 @@ def administrative_criteria_both_annexes():
 
 @pytest.fixture
 def new_geiq():
-    return CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+    return CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
 
 
 def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     prescriber_org = PrescriberOrganizationWithMembershipFactory()
-    geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+    geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
 
     # good cops:
 
@@ -80,7 +80,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # bad cops:
 
     # Author is SIAE, not GEIQ
-    company = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.EI)
+    company = CompanyFactory(kind=CompanyKind.EI, with_membership=True, with_jobs=True)
     with pytest.raises(
         ValueError,
         match="Impossible de créer un diagnostic GEIQ avec une structure de type",
@@ -139,12 +139,12 @@ def test_geiq_eligibility_diagnosis_validation():
     diagnosis.clean()
 
     # Only prescriber org or GEIQ are possible authors
-    diagnosis.author_geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.EI)
+    diagnosis.author_geiq = CompanyFactory(kind=CompanyKind.EI, with_membership=True, with_jobs=True)
     with pytest.raises(ValidationError, match="L'auteur du diagnostic n'est pas un GEIQ"):
         diagnosis.clean()
 
     # Contraint: both author kinds are not allowed
-    geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
+    geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
 
     with pytest.raises(
         ValidationError,

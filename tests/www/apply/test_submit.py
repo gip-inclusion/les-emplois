@@ -50,7 +50,6 @@ from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr,
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
-    CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -494,7 +493,7 @@ class TestHire:
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     """Apply as jobseeker."""
 
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
 
     user = JobSeekerFactory(
         jobseeker_profile__birthdate=None,
@@ -531,7 +530,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
 class TestApplyAsJobSeeker:
     def test_apply_as_job_seeker_with_suspension_sanction(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
@@ -554,7 +553,7 @@ class TestApplyAsJobSeeker:
     def test_apply_as_jobseeker(self, client, pdf_file):
         """Apply as jobseeker."""
 
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
@@ -691,7 +690,7 @@ class TestApplyAsJobSeeker:
         """
         Full path is tested above. See test_apply_as_job_seeker.
         """
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
 
         user = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         client.force_login(user)
@@ -736,7 +735,7 @@ class TestApplyAsJobSeeker:
         )
 
     def test_apply_as_job_seeker_from_job_description(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         job_description = company.job_description_through.first()
         reset_url_job_description = reverse(
             "companies_views:job_description_card", kwargs={"job_description_id": job_description.pk}
@@ -782,7 +781,7 @@ class TestApplyAsJobSeeker:
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_job_seeker_sent_emails(self, client, pdf_file, mailoutbox):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
+        company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         employer = company.members.get()
         # Inactive user that should not receive an email
         CompanyMembershipFactory(company=company, user__is_active=False)
@@ -813,7 +812,7 @@ class TestApplyAsJobSeeker:
         assert mailoutbox[1].to == [user.email]
 
     def test_apply_as_job_seeker_resume_not_pdf(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
+        company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         user = JobSeekerFactory()
         client.force_login(user)
         apply_session = fake_session_initialization(client, company, user, {"selected_jobs": []})
@@ -847,7 +846,7 @@ class TestApplyAsJobSeeker:
         assert JobApplication.objects.exists() is False
 
     def test_apply_as_job_seeker_resume_not_pdf_disguised_as_pdf(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
+        company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         user = JobSeekerFactory()
         client.force_login(user)
         apply_session = fake_session_initialization(client, company, user, {"selected_jobs": []})
@@ -880,7 +879,7 @@ class TestApplyAsJobSeeker:
         assert JobApplication.objects.exists() is False
 
     def test_apply_as_job_seeker_resume_too_large(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
+        company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         user = JobSeekerFactory()
         client.force_login(user)
         apply_session = fake_session_initialization(client, company, user, {"selected_jobs": []})
@@ -927,7 +926,7 @@ class TestApplyAsAuthorizedPrescriber:
     def test_apply_as_prescriber_with_pending_authorization(self, client, pdf_file):
         """Apply as prescriber that has pending authorization."""
 
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         from_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
@@ -1221,7 +1220,7 @@ class TestApplyAsAuthorizedPrescriber:
     @freeze_time()
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_authorized_prescriber(self, client, pdf_file, snapshot):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), for_snapshot=True)
+        company = CompanyFactory(romes=("N1101", "N1105"), for_snapshot=True, with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         # test ZRR / QPV template loading
@@ -1608,7 +1607,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.context["eligibility_diagnosis"] is None
 
     def test_apply_with_temporary_nir(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=["N1101"])
+        company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         user = prescriber_organization.members.get()
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1668,7 +1667,7 @@ class TestApplyAsPrescriber:
         )
 
     def test_apply_as_prescriber_with_suspension_sanction(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
@@ -1690,7 +1689,7 @@ class TestApplyAsPrescriber:
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_prescriber(self, client, pdf_file):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         user = PrescriberFactory()
@@ -2067,7 +2066,7 @@ class TestApplyAsPrescriberNirExceptions:
     """
 
     def create_test_data(self):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         # Only authorized prescribers can add a NIR.
         # See User.can_add_nir
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
@@ -2274,7 +2273,7 @@ class TestApplyAsCompany:
         assert client.session[job_seeker_session_name].get("apply").get("company_pk") == company_2.pk
 
     def test_apply_as_siae_with_suspension_sanction(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
@@ -2595,7 +2594,7 @@ class TestApplyAsCompany:
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_employer(self, client, pdf_file):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         employer = company.members.first()
         client.force_login(employer)
 
@@ -2713,7 +2712,7 @@ class TestDirectHireFullProcess:
         assert response.status_code == 403
 
     def test_hire_as_siae_with_suspension_sanction(self, client):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
@@ -2735,7 +2734,7 @@ class TestDirectHireFullProcess:
     def test_hire_as_company(self, client, snapshot):
         """Apply as company (and create new job seeker)"""
 
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
 
         user = company.members.first()
@@ -3072,7 +3071,7 @@ class TestDirectHireFullProcess:
     @freeze_time()
     def test_hire_as_geiq(self, client):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
+        company = CompanyFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
         job_seeker = JobSeekerFactory()
 
@@ -4215,7 +4214,7 @@ class TestUpdateJobSeekerStep3View:
 
 
 def test_detect_existing_job_seeker(client):
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
     reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)

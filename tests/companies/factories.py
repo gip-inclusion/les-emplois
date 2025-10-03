@@ -182,11 +182,6 @@ class CompanyWith2MembershipsFactory(CompanyFactory):
     membership2 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False)
 
 
-class CompanyWithMembershipAndJobsFactory(CompanyFactory):
-    with_membership = True
-    with_jobs = True
-
-
 class JobDescriptionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobDescription

@@ -16,7 +16,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient, assertSnapshotQueries
 
@@ -357,12 +357,12 @@ class TestCompanySignup:
 
     def test_company_select_does_not_die_under_requests(self, client, snapshot):
         companies = (
-            CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
-            CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
-            CompanyWithMembershipAndJobsFactory(siret="40219166200003"),
-            CompanyWithMembershipAndJobsFactory(siret="40219166200004"),
-            CompanyWithMembershipAndJobsFactory(siret="40219166200005"),
-            CompanyWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
+            CompanyFactory(siret="40219166200001", with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200002", with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200003", with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200004", with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200005", with_membership=True, with_jobs=True),
+            CompanyFactory(siret="40219166200005", kind=CompanyKind.AI, with_membership=True, with_jobs=True),
         )
         # Add more than one member to all company to test prefetch and distinct
         for company in companies:

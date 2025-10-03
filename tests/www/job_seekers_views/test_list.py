@@ -15,7 +15,7 @@ from itou.asp.models import Commune
 from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -95,7 +95,7 @@ def test_refused_access(client, url):
     for user in [
         JobSeekerFactory(),
         LaborInspectorFactory(membership=True),
-        CompanyWithMembershipAndJobsFactory().members.first(),
+        CompanyFactory(with_membership=True, with_jobs=True).members.first(),
     ]:
         client.force_login(user)
         response = client.get(url)
@@ -383,7 +383,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
 
 def test_job_seeker_created_for_prescription_is_shown(client):
     organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
-    company = CompanyWithMembershipAndJobsFactory()
+    company = CompanyFactory(with_membership=True, with_jobs=True)
     company_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
     prescriber = organization.members.first()
     client.force_login(prescriber)

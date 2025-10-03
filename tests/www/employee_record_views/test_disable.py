@@ -5,7 +5,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 
@@ -16,7 +16,9 @@ class TestDisableEmployeeRecords:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         # User must be super user for UI first part (tmp)
-        self.company = CompanyWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
+        self.company = CompanyFactory(
+            name="Wanna Corp.", membership__user__first_name="Billy", with_membership=True, with_jobs=True
+        )
         self.user = self.company.members.get(first_name="Billy")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)

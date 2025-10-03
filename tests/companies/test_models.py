@@ -20,7 +20,6 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
-    CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
 )
 from tests.invitations.factories import EmployerInvitationFactory
@@ -38,7 +37,7 @@ class TestCompanyFactories:
         assert company.has_admin(user)
 
     def test_siae_with_membership_and_jobs_factory(self):
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         assert company.jobs.count() == 2
 
     def test_siae_with_2_memberships_factory(self):

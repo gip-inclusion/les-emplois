@@ -19,7 +19,6 @@ from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
-    CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
@@ -440,12 +439,13 @@ class TestSearchCompany:
 
     def test_is_not_open_to_spontaneous_applications_but_has_jobs(self, client):
         guerande = create_city_guerande()
-        searchable_company = CompanyWithMembershipAndJobsFactory(
+        searchable_company = CompanyFactory(
             department="44",
             coords=guerande.coords,
             post_code="44350",
             spontaneous_applications_open_since=None,
             with_membership=True,
+            with_jobs=True,
         )
 
         response = client.get(self.URL, {"city": guerande.slug})
@@ -466,8 +466,13 @@ class TestSearchCompany:
     def test_apply_button_is_not_shown_when_applications_are_blocked(self, client):
         guerande = create_city_guerande()
 
-        company = CompanyWithMembershipAndJobsFactory(
-            department="44", coords=guerande.coords, post_code="44350", block_job_applications=True
+        company = CompanyFactory(
+            department="44",
+            coords=guerande.coords,
+            post_code="44350",
+            block_job_applications=True,
+            with_membership=True,
+            with_jobs=True,
         )
         response = client.get(self.URL, {"city": guerande.slug})
 
