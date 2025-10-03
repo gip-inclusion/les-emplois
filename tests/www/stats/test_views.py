@@ -18,7 +18,7 @@ from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.www.stats import urls as stats_urls, utils as stats_utils
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
-from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import ItouStaffFactory, PrescriberFactory
 
@@ -165,7 +165,7 @@ def test_stats_siae_log_visit(client, settings, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_iae_")],
 )
 def test_stats_ddets_iae_log_visit(client, settings, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DDETS IAE", department="22")
+    institution = InstitutionFactory(kind="DDETS IAE", department="22", with_membership=True)
     user = institution.members.get()
 
     client.force_login(user)
@@ -201,7 +201,7 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_log_")],
 )
 def test_stats_ddets_log_log_visit(client, settings, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DDETS LOG")
+    institution = InstitutionFactory(kind="DDETS LOG", with_membership=True)
     user = institution.members.get()
     client.force_login(user)
 
@@ -234,7 +234,7 @@ def test_stats_ddets_log_log_visit(client, settings, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dreets_iae_")],
 )
 def test_stats_dreets_iae_log_visit(client, settings, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DREETS IAE", department="22")
+    institution = InstitutionFactory(kind="DREETS IAE", department="22", with_membership=True)
     user = institution.members.get()
 
     client.force_login(user)
@@ -271,7 +271,7 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
     ],
 )
 def test_stats_dgefp_iae_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE)
+    institution = InstitutionFactory(kind=InstitutionKind.DGEFP_IAE, with_membership=True)
     user = institution.members.get()
     client.force_login(user)
 
@@ -303,7 +303,7 @@ def test_stats_dgefp_iae_log_visit(client, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dihal_")],
 )
 def test_stats_dihal_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DIHAL")
+    institution = InstitutionFactory(kind="DIHAL", with_membership=True)
     user = institution.members.get()
     client.force_login(user)
 
@@ -335,7 +335,7 @@ def test_stats_dihal_log_visit(client, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_drihl_")],
 )
 def test_stats_drihl_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DRIHL")
+    institution = InstitutionFactory(kind="DRIHL", with_membership=True)
     user = institution.members.get()
     client.force_login(user)
 
@@ -367,7 +367,7 @@ def test_stats_drihl_log_visit(client, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_iae_network_")],
 )
 def test_stats_iae_network_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="Réseau IAE")
+    institution = InstitutionFactory(kind="Réseau IAE", with_membership=True)
     user = institution.members.get()
     client.force_login(user)
 
@@ -489,7 +489,7 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
 )
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 def test_stats_redirect_for_institution(client, institution_kind, dashboard_name):
-    institution = InstitutionWithMembershipFactory(kind=institution_kind)
+    institution = InstitutionFactory(kind=institution_kind, with_membership=True)
     client.force_login(institution.members.get())
 
     response = client.get(reverse("stats:redirect", kwargs={"dashboard_name": dashboard_name}), follow=True)

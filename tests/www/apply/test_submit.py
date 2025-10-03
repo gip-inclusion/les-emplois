@@ -55,7 +55,7 @@ from tests.companies.factories import (
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
-from tests.institutions.factories import InstitutionWithMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -3231,7 +3231,7 @@ class TestApplyAsOther:
 
     def test_labor_inspectors_are_not_allowed_to_submit_application(self, client, subtests):
         company = CompanyFactory()
-        institution = InstitutionWithMembershipFactory()
+        institution = InstitutionFactory(with_membership=True)
         client.force_login(institution.members.first())
 
         for route in self.ROUTES:

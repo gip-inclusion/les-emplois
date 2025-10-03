@@ -11,7 +11,6 @@ from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
-    InstitutionWithMembershipFactory,
     LaborInspectorFactory,
 )
 from tests.invitations.factories import LaborInspectorInvitationFactory
@@ -98,7 +97,7 @@ class TestMembers:
         assert inactive_member_inactive_user not in response.context["object_list"]
 
     def test_members_admin_warning_one_user(self, client):
-        institution = InstitutionWithMembershipFactory()
+        institution = InstitutionFactory(with_membership=True)
         user = institution.members.first()
         client.force_login(user)
         url = reverse("institutions_views:members")

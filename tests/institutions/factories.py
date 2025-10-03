@@ -11,6 +11,14 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Institution
+        skip_postgeneration_save = True
+
+    class Params:
+        with_membership = factory.Trait(
+            membership=factory.RelatedFactory(
+                "tests.institutions.factories.InstitutionMembershipFactory", "institution"
+            ),
+        )
 
     name = factory.Faker("name", locale="fr_FR")
     kind = InstitutionKind.DDETS_IAE
@@ -33,19 +41,6 @@ class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
     institution = factory.SubFactory(InstitutionFactory)
     is_admin = True
     is_active = True
-
-
-class InstitutionWithMembershipFactory(InstitutionFactory):
-    """
-    Returns a Institution() object with a related InstitutionMembership() object.
-
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
-    """
-
-    class Meta:
-        skip_postgeneration_save = True
-
-    membership = factory.RelatedFactory(InstitutionMembershipFactory, "institution")
 
 
 class InstitutionWith2MembershipFactory(InstitutionFactory):
