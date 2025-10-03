@@ -125,31 +125,6 @@
 # name: test_job_application_state_badge_processing[refused]
   '<span id="state_00000000-0000-0000-0000-000000000000" class="badge rounded-pill text-nowrap badge-sm mb-1 bg-danger">Candidature déclinée</span>'
 # ---
-# name: test_matomo_context_processor[matomo custom init 404]
-  '''
-  <script id="matomo-custom-init" nonce="NORMALIZED_CSP_NONCE">
-      /* beautify ignore:start */
-                  window._paq = window._paq || [];
-                  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-                  window._paq.push(['setCustomDimension', 1, "employer"]);
-                  window._paq.push(['setCustomDimension', 3, "EI"]);
-                  window._paq.push(['setCustomDimension', 4, "59"]);
-  
-                  window._paq.push(['setUserId', '99999']);
-  
-                  window._paq.push(['setCustomUrl', new URL('/doesnotexist?mtm_foo=truc', window.location.origin).href]);
-  
-                  
-                      /* defaults to a stripped version (no suffix) of the page title. */
-  
-                      const title = document.title.replace(/- Les emplois de l'inclusion/g,'').trim();
-                      window._paq.push(['setDocumentTitle', title]);
-                  
-                  /* beautify ignore:end */
-  </script>
-  
-  '''
-# ---
 # name: test_matomo_context_processor[matomo custom init siae card]
   '''
   <script id="matomo-custom-init" nonce="NORMALIZED_CSP_NONCE">

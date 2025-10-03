@@ -244,7 +244,7 @@
             });
         </script>
 
-        {% if MATOMO_BASE_URL %}
+        {% if MATOMO_BASE_URL and send_to_matomo %}
             {# Matomo/Piwik open source web analytics #}
             <script id="matomo-custom-init" nonce="{{ CSP_NONCE }}">
                 /* beautify ignore:start */

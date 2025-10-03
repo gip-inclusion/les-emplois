@@ -4,10 +4,11 @@ from itou.communications.cache import get_cached_active_announcement
 
 
 def matomo(request):
-    context = {}
-    url = request.path
-    if request.resolver_match:
-        url = request.resolver_match.route
+    if not request.resolver_match:
+        return {"send_to_matomo": False}
+
+    context = {"send_to_matomo": True}
+    url = request.resolver_match.route
     # Only keep Matomo-related params for now.
     params = {k: v for k, v in request.GET.lists() if k.startswith(("utm_", "mtm_", "piwik_"))}
     if params:
