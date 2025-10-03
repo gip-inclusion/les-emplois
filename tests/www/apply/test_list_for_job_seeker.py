@@ -18,7 +18,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
 )
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
@@ -169,7 +169,7 @@ def test_list_snapshot(client, snapshot):
 
     company = CompanyFactory(for_snapshot=True, with_membership=True)
     common_kwargs = {"job_seeker": job_seeker, "eligibility_diagnosis": None, "to_company": company}
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
+    prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
 
     job_applications = [
         JobApplicationFactory(

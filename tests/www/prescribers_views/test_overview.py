@@ -6,7 +6,7 @@ from factory.fuzzy import FuzzyChoice
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.prescribers.enums import PrescriberOrganizationKind
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 
 
@@ -63,10 +63,10 @@ def test_access(client, user_factory, status_code):
 
 def test_access_prescriber_with_multiple_organizations(client):
     user = PrescriberFactory()
-    current_org = PrescriberOrganizationWithMembershipFactory(
-        name="Orga courante", membership__user=user, authorized=True
+    current_org = PrescriberOrganizationFactory(
+        name="Orga courante", membership__user=user, authorized=True, with_membership=True
     )
-    PrescriberOrganizationWithMembershipFactory(name="Une autre orga", membership__user=user, authorized=True)
+    PrescriberOrganizationFactory(name="Une autre orga", membership__user=user, authorized=True, with_membership=True)
     client.force_login(user)
     client.post(reverse("dashboard:switch_organization"), data={"organization_id": current_org.pk})
     response = client.get(reverse("prescribers_views:overview"))
@@ -75,10 +75,11 @@ def test_access_prescriber_with_multiple_organizations(client):
 
 
 def test_content_ft(client):
-    organization = PrescriberOrganizationWithMembershipFactory(
+    organization = PrescriberOrganizationFactory(
         description="Mon activité",
         kind=PrescriberOrganizationKind.FT,
         authorized=True,
+        with_membership=True,
     )
     url = reverse("prescribers_views:overview")
 
@@ -91,10 +92,11 @@ def test_content_ft(client):
 
 
 def test_content_ft_empty_description(client):
-    organization = PrescriberOrganizationWithMembershipFactory(
+    organization = PrescriberOrganizationFactory(
         description="",
         kind=PrescriberOrganizationKind.FT,
         authorized=True,
+        with_membership=True,
     )
     url = reverse("prescribers_views:overview")
 
@@ -108,12 +110,13 @@ def test_content_ft_empty_description(client):
 
 @pytest.mark.parametrize("description", ["", "Mon activité"])
 def test_content(client, description):
-    organization = PrescriberOrganizationWithMembershipFactory(
+    organization = PrescriberOrganizationFactory(
         description=description,
         kind=FuzzyChoice(
             set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.OTHER}
         ),
         authorized=True,
+        with_membership=True,
     )
     url = reverse("prescribers_views:overview")
 
@@ -127,13 +130,14 @@ def test_content(client, description):
 
 
 def test_content_non_admin(client):
-    organization = PrescriberOrganizationWithMembershipFactory(
+    organization = PrescriberOrganizationFactory(
         membership__is_admin=False,
         description="",
         kind=FuzzyChoice(
             set(PrescriberOrganizationKind) - {PrescriberOrganizationKind.FT, PrescriberOrganizationKind.OTHER}
         ),
         authorized=True,
+        with_membership=True,
     )
     url = reverse("prescribers_views:overview")
 
@@ -144,7 +148,7 @@ def test_content_non_admin(client):
 
 @pytest.mark.parametrize("is_admin,assertion", [(False, assertNotContains), (True, assertContains)])
 def test_edit_button(client, is_admin, assertion):
-    organization = PrescriberOrganizationWithMembershipFactory(membership__is_admin=is_admin, authorized=True)
+    organization = PrescriberOrganizationFactory(membership__is_admin=is_admin, authorized=True, with_membership=True)
     client.force_login(organization.members.first())
     response = client.get(reverse("prescribers_views:overview"))
     assertion(response, "<span>Modifier</span>", html=True)

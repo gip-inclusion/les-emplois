@@ -23,7 +23,7 @@ from tests.companies.factories import (
     JobDescriptionFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
@@ -786,7 +786,7 @@ class TestJobDescriptionCard(JobDescriptionAbstract):
 
     def test_prescriber_card_actions(self, client, snapshot):
         # Checks if non-employers can apply to opened job descriptions
-        client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
+        client.force_login(PrescriberOrganizationFactory(with_membership=True).members.first())
 
         with assertSnapshotQueries(snapshot):
             response = client.get(self.url)

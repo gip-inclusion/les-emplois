@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
@@ -19,8 +19,8 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     hit_pit = CompanyFactory(pk=42, name="Hit Pit", with_membership=True, not_in_territorial_experimentation=True)
 
     now = timezone.now()
-    org = PrescriberOrganizationWithMembershipFactory(
-        membership__user__first_name="Max", membership__user__last_name="Throughput"
+    org = PrescriberOrganizationFactory(
+        membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
     )
     sender = org.active_members.get()
     job_seeker = JobSeekerFactory(

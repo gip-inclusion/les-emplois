@@ -32,7 +32,7 @@ from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 
 
@@ -294,7 +294,7 @@ class TestEligibilityDiagnosisModel:
     @freeze_time("2024-12-03")
     def test_create_diagnosis_prescriber(self):
         job_seeker = JobSeekerFactory()
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = PrescriberOrganizationFactory(with_membership=True)
         prescriber = organization.members.first()
 
         diagnosis = EligibilityDiagnosis.create_diagnosis(
@@ -321,7 +321,7 @@ class TestEligibilityDiagnosisModel:
 
     def test_create_diagnosis_with_administrative_criteria(self):
         job_seeker = JobSeekerFactory()
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.first()
 
         level1 = AdministrativeCriteriaLevel.LEVEL_1

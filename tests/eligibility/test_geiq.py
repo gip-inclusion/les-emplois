@@ -14,7 +14,7 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 
@@ -44,7 +44,7 @@ def new_geiq():
 
 
 def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory()
+    prescriber_org = PrescriberOrganizationFactory(with_membership=True)
     geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
 
     # good cops:
@@ -153,7 +153,7 @@ def test_geiq_eligibility_diagnosis_validation():
         GEIQEligibilityDiagnosis(
             author_geiq=geiq,
             job_seeker=JobSeekerFactory(),
-            author_prescriber_organization=PrescriberOrganizationWithMembershipFactory(),
+            author_prescriber_organization=PrescriberOrganizationFactory(with_membership=True),
         ).full_clean()
 
 

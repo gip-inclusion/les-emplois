@@ -27,9 +27,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
-)
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
@@ -875,7 +873,7 @@ def test_list_snapshot(client, snapshot):
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {"job_seeker": job_seeker, "to_company": company}
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(for_snapshot=True)
+    prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
 
     job_applications = [
         JobApplicationFactory(
@@ -2068,7 +2066,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True, for_snapshot=True)
+    prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {

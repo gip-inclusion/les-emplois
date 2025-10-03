@@ -6,7 +6,7 @@ from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationFactory,
 )
 from tests.users.factories import (
     EmployerFactory,
@@ -32,8 +32,8 @@ def test_can_view_stats_siae():
 
 
 def test_can_view_stats_ft_as_regular_ft_agency():
-    regular_fr_agency = PrescriberOrganizationWithMembershipFactory(
-        authorized=True, kind=PrescriberOrganizationKind.FT, department="93"
+    regular_fr_agency = PrescriberOrganizationFactory(
+        authorized=True, kind=PrescriberOrganizationKind.FT, department="93", with_membership=True
     )
     user = regular_fr_agency.members.get()
     assert not regular_fr_agency.is_dtft
@@ -45,8 +45,9 @@ def test_can_view_stats_ft_as_regular_ft_agency():
 
 
 def test_can_view_stats_ft_as_dtft_with_single_department():
-    dtft_with_single_department = PrescriberOrganizationWithMembershipFactory(
+    dtft_with_single_department = PrescriberOrganizationFactory(
         authorized=True,
+        with_membership=True,
         kind=PrescriberOrganizationKind.FT,
         code_safir_pole_emploi="49104",
         department="49",
@@ -61,8 +62,9 @@ def test_can_view_stats_ft_as_dtft_with_single_department():
 
 
 def test_can_view_stats_ft_as_dtft_with_multiple_departments():
-    dtft_with_multiple_departments = PrescriberOrganizationWithMembershipFactory(
+    dtft_with_multiple_departments = PrescriberOrganizationFactory(
         authorized=True,
+        with_membership=True,
         kind=PrescriberOrganizationKind.FT,
         code_safir_pole_emploi="72203",
         department="72",
@@ -77,8 +79,9 @@ def test_can_view_stats_ft_as_dtft_with_multiple_departments():
 
 
 def test_can_view_stats_ft_as_drft():
-    drft = PrescriberOrganizationWithMembershipFactory(
+    drft = PrescriberOrganizationFactory(
         authorized=True,
+        with_membership=True,
         kind=PrescriberOrganizationKind.FT,
         department="93",
         code_safir_pole_emploi="75980",
@@ -102,8 +105,9 @@ def test_can_view_stats_ft_as_drft():
 
 
 def test_can_view_stats_ft_as_dgft():
-    dgft = PrescriberOrganizationWithMembershipFactory(
+    dgft = PrescriberOrganizationFactory(
         authorized=True,
+        with_membership=True,
         kind=PrescriberOrganizationKind.FT,
         department="93",
         code_safir_pole_emploi="00162",
@@ -129,8 +133,9 @@ def test_can_view_stats_ft_as_dgft():
     ],
 )
 def can_view_stats_ph_whitelisted(kind):
-    organization = PrescriberOrganizationWithMembershipFactory(
+    organization = PrescriberOrganizationFactory(
         authorized=True,
+        with_membership=True,
         kind=kind,
     )
     request = get_request(organization.members.get())

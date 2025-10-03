@@ -27,7 +27,6 @@ from tests.eligibility.factories import (
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
 )
 from tests.users.factories import (
     JobSeekerFactory,
@@ -74,14 +73,14 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 author=factory.SelfAttribute("..sender"),
                 author_kind=AuthorKind.PRESCRIBER,
                 author_prescriber_organization=factory.SubFactory(
-                    PrescriberOrganizationWithMembershipFactory, authorized=True
+                    PrescriberOrganizationFactory, authorized=True, with_membership=True
                 ),
             ),
             eligibility_diagnosis=None,
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(
-                PrescriberOrganizationWithMembershipFactory, authorized=True
+                PrescriberOrganizationFactory, authorized=True, with_membership=True
             ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
@@ -217,7 +216,7 @@ class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
 class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object sent by a prescriber member of an organization."""
 
-    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
+    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
@@ -256,4 +255,4 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
         jobseeker_profile__with_education_level=True,
         born_in_france=True,
     )
-    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
+    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationFactory, with_membership=True)

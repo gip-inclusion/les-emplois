@@ -6,7 +6,7 @@ from pytest_django.asserts import assertNumQueries
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.testing import BASE_NUM_QUERIES
 
@@ -22,7 +22,7 @@ class TestApplicantsAPI:
         assert response.status_code == 403
 
     def test_login_as_prescriber_organisation(self, api_client):
-        user = PrescriberOrganizationWithMembershipFactory().members.first()
+        user = PrescriberOrganizationFactory(with_membership=True).members.first()
         api_client.force_authenticate(user)
 
         response = api_client.get(self.URL, format="json")

@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.testing import assert_previous_step, parse_response_to_soup, pretty_indented
 
 
@@ -86,8 +86,8 @@ class TestEditOrganization:
     def test_edit(self, client):
         """Edit a prescriber organization."""
 
-        organization = PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.CAP_EMPLOI
+        organization = PrescriberOrganizationFactory(
+            authorized=True, with_membership=True, kind=PrescriberOrganizationKind.CAP_EMPLOI
         )
         user = organization.members.first()
 
@@ -154,11 +154,11 @@ class TestEditOrganization:
         when user is member of multiple orgs with the same SIRET (and different types)
         (was a regression)
         """
-        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.ML)
+        organization = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.ML, with_membership=True)
         siret = organization.siret
         user = organization.members.first()
 
-        org2 = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.PLIE, siret=siret)
+        org2 = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PLIE, siret=siret, with_membership=True)
         org2.members.add(user)
         org2.save()
 
@@ -194,8 +194,9 @@ class TestEditOrganization:
         assert url == response.url
 
     def test_ft_cannot_edit(self, client, snapshot):
-        organization = PrescriberOrganizationWithMembershipFactory(
+        organization = PrescriberOrganizationFactory(
             authorized=True,
+            with_membership=True,
             kind=PrescriberOrganizationKind.FT,
             name="Pôle emploi",
             siret="12345678901234",
@@ -242,8 +243,8 @@ class TestEditOrganization:
     @pytest.mark.parametrize(
         "factory,assertion",
         [
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+            (partial(PrescriberOrganizationFactory, with_membership=True, authorized=True), assertContains),
+            (partial(PrescriberOrganizationFactory, with_membership=True, authorized=False), assertNotContains),
         ],
     )
     def test_mask_description(self, client, factory, assertion):
@@ -255,8 +256,8 @@ class TestEditOrganization:
     @pytest.mark.parametrize(
         "factory,assertion",
         [
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=True), assertContains),
-            (partial(PrescriberOrganizationWithMembershipFactory, authorized=False), assertNotContains),
+            (partial(PrescriberOrganizationFactory, with_membership=True, authorized=True), assertContains),
+            (partial(PrescriberOrganizationFactory, with_membership=True, authorized=False), assertNotContains),
         ],
     )
     def test_display_banner(self, client, factory, assertion):
@@ -285,7 +286,9 @@ class TestEditOrganization:
         ],
     )
     def test_redirect_after_edit(self, client, back_url, expected_redirect):
-        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.ML, authorized=True)
+        organization = PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.ML, authorized=True, with_membership=True
+        )
         user = organization.members.first()
 
         client.force_login(user)

@@ -80,7 +80,7 @@ from tests.institutions.factories import (
     InstitutionMembershipFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -304,7 +304,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_prescriber_with_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = PrescriberOrganizationFactory(with_membership=True)
         request.user = organization.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(1):  # retrieve user memberships
@@ -321,7 +321,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_prescriber_with_authorized_organization(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         request.user = organization.members.first()
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(1):  # retrieve user memberships
@@ -338,7 +338,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_prescriber_with_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
+        organization1 = PrescriberOrganizationFactory(name="1", with_membership=True)
         request.user = organization1.members.first()
         organization2 = PrescriberOrganizationFactory(name="2")
         organization2.members.add(request.user)
@@ -357,7 +357,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_prescriber_with_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        organization1 = PrescriberOrganizationWithMembershipFactory(name="1")
+        organization1 = PrescriberOrganizationFactory(name="1", with_membership=True)
         request.user = organization1.members.first()
         organization2 = PrescriberOrganizationFactory(name="2")
         organization2.members.add(request.user)

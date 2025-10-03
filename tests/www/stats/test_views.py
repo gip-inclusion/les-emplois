@@ -19,7 +19,7 @@ from itou.www.stats import urls as stats_urls, utils as stats_utils
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import ItouStaffFactory, PrescriberFactory
 
 
@@ -65,7 +65,9 @@ def assert_stats_dashboard_equal(values):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ft_")],
 )
 def test_stats_ft_log_visit(client, view_name):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.FT, authorized=True)
+    prescriber_org = PrescriberOrganizationFactory(
+        kind=PrescriberOrganizationKind.FT, authorized=True, with_membership=True
+    )
     user = prescriber_org.members.get()
     client.force_login(user)
 
@@ -97,7 +99,7 @@ def test_stats_ft_log_visit(client, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_cd_")],
 )
 def test_stats_cd_log_visit(client, settings, view_name):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True, department="22")
+    prescriber_org = PrescriberOrganizationFactory(kind="DEPT", authorized=True, department="22", with_membership=True)
     user = prescriber_org.members.get()
 
     client.force_login(user)
@@ -507,8 +509,8 @@ def test_stats_ph_state_main_for_prescriber_without_organization(client):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize("organization_kind", stats_utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
 def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
-    organization = PrescriberOrganizationWithMembershipFactory(
-        kind=organization_kind, department="75", authorized=True
+    organization = PrescriberOrganizationFactory(
+        kind=organization_kind, department="75", authorized=True, with_membership=True
     )
     client.force_login(organization.members.get())
 

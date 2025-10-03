@@ -12,7 +12,7 @@ from itou.utils.perms import employee_record
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -78,7 +78,7 @@ class TestEmployeeRecord:
 class TestUtils:
     def test_can_edit_personal_information(self):
         request = RequestFactory()
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()
@@ -141,7 +141,7 @@ class TestUtils:
 
     def test_can_view_personal_information(self):
         request = RequestFactory()
-        authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
         job_seeker = JobSeekerFactory()

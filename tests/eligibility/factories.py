@@ -15,7 +15,7 @@ from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.factory_boy import AutoNowOverrideMixin
 
@@ -31,7 +31,7 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
         from_prescriber = factory.Trait(
             author_kind=AuthorKind.PRESCRIBER,
             author_prescriber_organization=factory.SubFactory(
-                PrescriberOrganizationWithMembershipFactory, authorized=True
+                PrescriberOrganizationFactory, authorized=True, with_membership=True
             ),
             author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
         )

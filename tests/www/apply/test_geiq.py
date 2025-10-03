@@ -8,7 +8,7 @@ from itou.www.apply.views.process_views import _get_geiq_eligibility_diagnosis
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
 from tests.www.apply.test_submit import fake_session_initialization
 
@@ -335,7 +335,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_job_seeker_not_resident_in_qpv_or_zrr_for_prescriber(self, client):
         job_seeker = JobSeekerFactory()
         geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_jobs=True, with_membership=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.get()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, geiq, job_seeker, {"selected_jobs": []})
         response = client.get(
@@ -360,8 +360,8 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
     def test_job_seeker_qpv_details_display_for_prescriber(self, client):
         # Check QPV fragment is displayed for prescriber:
         job_seeker_in_qpv = JobSeekerFactory(with_address_in_qpv=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
         geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_jobs=True, with_membership=True)
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.get()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, geiq, job_seeker_in_qpv, {"selected_jobs": []})
         response = client.get(
@@ -388,7 +388,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         # Check QPV fragment is displayed for prescriber:
         job_seeker_in_zrr = JobSeekerFactory(with_city_in_zrr=True)
         geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_jobs=True, with_membership=True)
-        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.get()
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.get()
         client.force_login(prescriber)
         apply_session = fake_session_initialization(client, geiq, job_seeker_in_zrr, {"selected_jobs": []})
         response = client.get(

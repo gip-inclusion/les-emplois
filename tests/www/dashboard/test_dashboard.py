@@ -122,14 +122,16 @@ class TestDashboardView:
         assertContains(response, format_siret(company.siret))
 
     def test_dashboard_for_prescriber(self, client):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        prescriber_organization = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
         client.force_login(prescriber_organization.members.first())
 
         response = client.get(reverse("dashboard:index"))
         assertContains(response, format_siret(prescriber_organization.siret))
 
     def test_dashboard_for_authorized_prescriber(self, client):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
+        prescriber_organization = prescribers_factories.PrescriberOrganizationFactory(
+            authorized=True, with_membership=True
+        )
         client.force_login(prescriber_organization.members.first())
 
         response = client.get(reverse("dashboard:index"))
@@ -593,7 +595,7 @@ class TestDashboardView:
         assertContains(response, "Suggérer un service partenaire")
 
     def test_dora_card_is_shown_for_prescriber(self, client):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        prescriber_organization = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
         client.force_login(prescriber_organization.members.first())
 
         response = client.get(reverse("dashboard:index"))
@@ -720,8 +722,8 @@ class TestDashboardView:
         assertContains(response, reverse("signup:prescriber_check_already_exists"))
 
     def test_dashboard_delete_one_of_multiple_prescriber_orgs_while_logged_in(self, client):
-        org_1 = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
-        org_2 = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        org_1 = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
+        org_2 = prescribers_factories.PrescriberOrganizationFactory(with_membership=True)
         prescriber = org_1.members.first()
         org_2.members.add(prescriber)
 
@@ -754,16 +756,16 @@ class TestDashboardView:
         response = client.get(reverse("dashboard:index"))
         assertNotContains(response, self.SUSPEND_TEXT)
 
-        prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            kind=PrescriberOrganizationKind.CAP_EMPLOI
+        prescriber_org = prescribers_factories.PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.CAP_EMPLOI, with_membership=True
         )
         prescriber = prescriber_org.members.first()
         client.force_login(prescriber)
         response = client.get(reverse("dashboard:index"))
         assertNotContains(response, self.SUSPEND_TEXT)
 
-        prescriber_org_ft = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            authorized=True, kind=PrescriberOrganizationKind.FT
+        prescriber_org_ft = prescribers_factories.PrescriberOrganizationFactory(
+            authorized=True, kind=PrescriberOrganizationKind.FT, with_membership=True
         )
         prescriber_fr = prescriber_org_ft.members.first()
         client.force_login(prescriber_fr)
@@ -1050,9 +1052,10 @@ class TestDashboardView:
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):
-        prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
+        prescriber_org = prescribers_factories.PrescriberOrganizationFactory(
             kind=PrescriberOrganizationKind.OTHER,
             with_pending_authorization=True,
+            with_membership=True,
         )
 
         prescriber = prescriber_org.members.first()

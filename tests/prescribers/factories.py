@@ -88,19 +88,6 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     is_active = True
 
 
-class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory):
-    """
-    Returns a PrescriberOrganization() object with a related PrescriberMembership() object.
-
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
-    """
-
-    class Meta:
-        skip_postgeneration_save = True
-
-    membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
-
-
 class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory):
     """
     Returns a PrescriberOrganization() object with 2 PrescriberMembership() objects.

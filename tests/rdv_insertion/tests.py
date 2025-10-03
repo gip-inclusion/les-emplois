@@ -23,7 +23,7 @@ from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_AUTH_SUCCESS_HEADERS,
 )
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.rdv_insertion.factories import (
     InvitationFactory,
     InvitationRequestFactory,
@@ -126,8 +126,8 @@ class TestRdvInsertionApiUtils:
 
 class TestInvitationRequestModel:
     def setup_method(self, **kwargs):
-        organization = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max", membership__user__last_name="Throughput"
+        organization = PrescriberOrganizationFactory(
+            membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
         )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
@@ -210,8 +210,8 @@ class TestInvitationModel:
 @freeze_time("2024-08-01")
 class TestParticipationModel:
     def setup_method(self, freeze, **kwargs):
-        organization = PrescriberOrganizationWithMembershipFactory(
-            membership__user__first_name="Max", membership__user__last_name="Throughput"
+        organization = PrescriberOrganizationFactory(
+            membership__user__first_name="Max", membership__user__last_name="Throughput", with_membership=True
         )
         self.job_application = JobApplicationFactory(
             to_company__name="Hit Pit",
