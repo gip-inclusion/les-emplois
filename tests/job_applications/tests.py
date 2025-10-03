@@ -881,6 +881,8 @@ class TestJobApplicationNotifications:
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
+            job_seeker__first_name="Un autre joli prénom",
+            job_seeker__last_name="Un autre nom de famille original",
             selected_jobs=Appellation.objects.all(),
             **extra_kwargs,
         )
@@ -965,6 +967,8 @@ class TestJobApplicationNotifications:
         job_application = JobApplicationFactory(
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
+            job_seeker__first_name="Un autre joli prénom",
+            job_seeker__last_name="Un autre nom de famille original",
             **extra_kwargs,
         )
         email = job_application.notifications_accept_for_proxy.build()
@@ -1241,6 +1245,8 @@ class TestJobApplicationNotifications:
             state=JobApplicationState.ACCEPTED,
             sender__first_name="Un joli prénom",
             sender__last_name="Un nom de famille original",
+            job_seeker__first_name="Un autre joli prénom",
+            job_seeker__last_name="Un autre nom de famille original",
             **extra_kwargs,
         )
 
