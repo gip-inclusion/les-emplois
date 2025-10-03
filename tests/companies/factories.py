@@ -187,14 +187,6 @@ class CompanyWithMembershipAndJobsFactory(CompanyFactory):
     with_jobs = True
 
 
-class CompanyPendingGracePeriodFactory(CompanyFactory):
-    convention = factory.SubFactory(SiaeConventionFactory, pending_grace_period=True)
-
-
-class CompanyAfterGracePeriodFactory(CompanyFactory):
-    convention = factory.SubFactory(SiaeConventionFactory, after_grace_period=True)
-
-
 class JobDescriptionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobDescription

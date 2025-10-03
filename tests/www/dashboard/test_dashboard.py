@@ -31,10 +31,8 @@ from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import (
-    CompanyAfterGracePeriodFactory,
     CompanyFactory,
     CompanyMembershipFactory,
-    CompanyPendingGracePeriodFactory,
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -95,7 +93,7 @@ class TestDashboardView:
         assert pretty_indented(parse_response_to_soup(response, selector=".c-title__main")) == snapshot
 
     def test_user_with_inactive_company_can_still_login_during_grace_period(self, client):
-        company = CompanyPendingGracePeriodFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, convention__pending_grace_period=True)
         user = EmployerFactory()
         company.members.add(user)
         client.force_login(user)
@@ -105,7 +103,7 @@ class TestDashboardView:
         assert response.status_code == 200
 
     def test_user_with_inactive_company_cannot_login_after_grace_period(self, client):
-        company = CompanyAfterGracePeriodFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, convention__after_grace_period=True)
         user = EmployerFactory()
         company.members.add(user)
         client.force_login(user)
