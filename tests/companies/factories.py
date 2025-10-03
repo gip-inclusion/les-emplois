@@ -172,22 +172,6 @@ class CompanyWith2MembershipsFactory(CompanyFactory):
     membership2 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False)
 
 
-class CompanyWith4MembershipsFactory(CompanyFactory):
-    """
-    Generates a Company() object with 4 members for unit tests.
-    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
-    """
-
-    # active admin user
-    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "company")
-    # active normal user
-    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False)
-    # inactive admin user
-    membership3 = factory.RelatedFactory(CompanyMembershipFactory, "company", user__is_active=False)
-    # inactive normal user
-    membership4 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False, user__is_active=False)
-
-
 class CompanyWithMembershipAndJobsFactory(CompanyFactory):
     with_membership = True
     with_jobs = True

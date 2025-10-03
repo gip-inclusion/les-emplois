@@ -22,7 +22,6 @@ from tests.companies.factories import (
     CompanyMembershipFactory,
     CompanyPendingGracePeriodFactory,
     CompanyWith2MembershipsFactory,
-    CompanyWith4MembershipsFactory,
     CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
 )
@@ -59,7 +58,11 @@ class TestCompanyFactories:
         assert not company.has_admin(regular_user)
 
     def test_siae_with_4_memberships_factory(self):
-        company = CompanyWith4MembershipsFactory()
+        company = CompanyFactory()
+        CompanyMembershipFactory(company=company)
+        CompanyMembershipFactory(company=company, is_admin=False)
+        CompanyMembershipFactory(company=company, user__is_active=False)
+        CompanyMembershipFactory(company=company, is_admin=False, user__is_active=False)
         assert company.members.count() == 4
         assert company.active_members.count() == 2
         assert company.active_admin_members.count() == 1
