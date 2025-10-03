@@ -1488,11 +1488,12 @@ def test_matomo_context_processor(client, settings, snapshot):
     company = CompanyFactory(with_membership=True, membership__user__pk=99999, department="59")
     user = company.members.first()
     client.force_login(user)
+    matomo_script_id = "matomo-custom-init"
 
     # check that we don't crash when the route is not resolved
     response = client.get("/doesnotexist?token=blah&mtm_foo=truc")
     assert response.context["send_to_matomo"] is False
-    assertNotContains(response, "matomo-custom-init", status_code=404)
+    assertNotContains(response, matomo_script_id, status_code=404)
 
     # canonical case
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1502,7 +1503,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
-    script_content = parse_response_to_soup(response, selector="#matomo-custom-init")
+    script_content = parse_response_to_soup(response, selector=f"#{matomo_script_id}")
     assert pretty_indented(script_content) == snapshot(name="matomo custom init siae card")
 
 
