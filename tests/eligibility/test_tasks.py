@@ -23,13 +23,13 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 
 def fake_response_code(response):
     response = copy.deepcopy(response)
-    response["errors"][0]["code"] = "12345"
+    response["json"]["errors"][0]["code"] = "12345"
     return response
 
 
 def fake_multiple_errors(response):
     response = copy.deepcopy(response)
-    response["errors"].append(response["errors"][0])
+    response["json"]["errors"].append(response["json"]["errors"][0])
     return response
 
 
@@ -46,8 +46,9 @@ class TestCertifyCriteriaApiParticulier:
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
+        response = RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
         respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
-            json=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            status_code=response["status_code"], json=response["json"]
         )
 
         async_certify_criteria_by_api_particulier.call_local(
@@ -62,7 +63,7 @@ class TestCertifyCriteriaApiParticulier:
         ).get()
         assert criterion.certified is True
         assert criterion.certified_at is not None
-        assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+        assert criterion.data_returned_by_api == response["json"]
         assert criterion.certification_period == InclusiveDateRange(
             datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
@@ -138,7 +139,7 @@ class TestCertifyCriteriaApiParticulier:
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
-            status_code=502, json=response
+            status_code=response["status_code"], json=response["json"]
         )
         # Does not raise a RetryTask, this specific error is ignored.
         async_certify_criteria_by_api_particulier.call_local(
@@ -150,7 +151,7 @@ class TestCertifyCriteriaApiParticulier:
         )
         assert criterion.certified is None
         assert criterion.certified_at is None
-        assert criterion.data_returned_by_api == response
+        assert criterion.data_returned_by_api == response["json"]
         assert criterion.certification_period is None
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
@@ -162,7 +163,7 @@ class TestCertifyCriteriaApiParticulier:
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         response = mutate_response(RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR])
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
-            status_code=502, json=response
+            status_code=response["status_code"], json=response["json"]
         )
         with pytest.raises(httpx.HTTPStatusError):
             async_certify_criteria_by_api_particulier.call_local(

@@ -2367,7 +2367,7 @@ class TestProcessAcceptViews:
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
         )
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -2965,7 +2965,7 @@ class TestProcessAcceptViews:
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
         )
         ######### Case 1: if CRITERIA_KIND is one of the diagnosis criteria,
         ######### birth place and birth country are required.
@@ -3042,7 +3042,7 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
@@ -3055,7 +3055,7 @@ class TestProcessAcceptViews:
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
         )
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
@@ -3116,7 +3116,7 @@ class TestProcessAcceptViews:
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
             assert criterion.certified
-            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(
                 datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
             )
@@ -3127,7 +3127,7 @@ class TestProcessAcceptViews:
     def test_accept_no_siae_criteria_can_be_certified(self, client, mocker, from_kind):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -3208,7 +3208,7 @@ class TestProcessAcceptViews:
     def test_accept_updated_birthdate_invalidating_birth_place(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
