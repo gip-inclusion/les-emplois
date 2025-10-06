@@ -523,7 +523,9 @@ def render_stats_ddets(
 
 @check_request(utils.can_view_stats_ddets_iae)
 def stats_ddets_iae_auto_prescription(request):
-    return render_stats_ddets(request=request, page_title="Suivi des auto-prescriptions et de leur contrôle")
+    return render_stats_ddets(
+        request=request, page_title="Suivi des auto-prescriptions et de leur contrôle", with_department_name=False
+    )
 
 
 @check_request(utils.can_view_stats_ddets_iae)
@@ -597,7 +599,9 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None, with_dep
 
 @check_request(utils.can_view_stats_dreets_iae)
 def stats_dreets_iae_auto_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Suivi des auto-prescriptions et de leur contrôle")
+    return render_stats_dreets_iae(
+        request=request, page_title="Suivi des auto-prescriptions et de leur contrôle", with_department_name=False
+    )
 
 
 @check_request(utils.can_view_stats_dreets_iae)

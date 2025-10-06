@@ -48,7 +48,7 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "nG6J62",
     },
     "stats_siae_auto_prescription": {
-        "dashboard_id": 295,
+        "dashboard_id": 580,
         "tally_popup_form_id": "nW0zPj",
         "tally_embed_form_id": "waGd0v",
     },
@@ -128,7 +128,7 @@ METABASE_DASHBOARDS = {
     # Institution stats - DDETS IAE - department level.
     #
     "stats_ddets_iae_auto_prescription": {
-        "dashboard_id": 267,
+        "dashboard_id": 575,
         "tally_popup_form_id": "3qLpE2",
         "tally_embed_form_id": "nG6gBj",
     },
@@ -167,7 +167,7 @@ METABASE_DASHBOARDS = {
     # Institution stats - DREETS IAE - region level.
     #
     "stats_dreets_iae_auto_prescription": {
-        "dashboard_id": 267,
+        "dashboard_id": 575,
         "tally_popup_form_id": "3qLpE2",
         "tally_embed_form_id": "nG6gBj",
     },
