@@ -10,5 +10,6 @@ TABLE.add_columns(
         get_column_from_field(get_model_field(User, "kind"), name="type"),
         get_column_from_field(get_model_field(User, "first_name"), name="prenom"),
         get_column_from_field(get_model_field(User, "last_name"), name="nom"),
+        get_column_from_field(get_model_field(User, "last_login"), name="dernière_connexion"),
     ]
 )
