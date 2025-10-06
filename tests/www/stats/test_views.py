@@ -177,8 +177,6 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
     url = reverse(f"stats:{view_name}")
     response = client.get(url)
     assert response.status_code == 200
-    # Check that the base slash of the URL is not included; it's added by the Javascript.
-    assert response.context["matomo_custom_url"] == f"{url[1:]}/Bretagne/22---Cotes-d-Armor"
 
     assert_stats_dashboard_equal(
         (

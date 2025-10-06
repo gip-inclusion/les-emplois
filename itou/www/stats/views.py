@@ -29,8 +29,6 @@ from itou.common_apps.address.departments import (
     DEPARTMENT_TO_REGION,
     DEPARTMENTS,
     REGIONS,
-    format_region_and_department_for_matomo,
-    format_region_for_matomo,
 )
 from itou.companies import models as companies_models
 from itou.companies.models import Company
@@ -155,12 +153,6 @@ def render_stats(
         banner for banner in base_context["pilotage_webinar_banners"] if banner["is_displayable"]()
     ]
 
-    matomo_custom_url = request.resolver_match.route  # e.g. "stats/pe/delay/main"
-    if suffix := base_context.pop("matomo_custom_url_suffix", None):
-        # E.g. `/stats/ddets/iae/Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
-        matomo_custom_url += f"/{suffix}"
-    base_context["matomo_custom_url"] = matomo_custom_url
-
     if request.user.is_authenticated and metabase_dashboard:
         extra_data = {}
         if request.user.is_employer:
@@ -218,7 +210,6 @@ def stats_siae_etp(request):
     context = {
         "page_title": "Suivi des effectifs annuels et mensuels (ETP) de ma ou mes structures",
         "department": request.current_organization.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
     return render_stats(
         request=request,
@@ -242,7 +233,6 @@ def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY
     context = {
         "page_title": page_title,
         "department": request.current_organization.department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(request.current_organization.department),
     }
     match filter_param:
         case mb.C1_SIAE_FILTER_KEY:
@@ -311,7 +301,6 @@ def render_stats_cd(request, page_title, *, extra_context=None, with_department_
     context = {
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
         "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
     }
     if extra_context:
@@ -377,24 +366,17 @@ def render_stats_ft(request, page_title, extra_params=None, *, with_region_param
         "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
     }
     if request.current_organization.is_dgft:
-        context |= {
-            "matomo_custom_url_suffix": "dgpe",
-        }
+        pass
     elif request.current_organization.is_drft:
         context |= {
-            "matomo_custom_url_suffix": f"{format_region_for_matomo(request.current_organization.region)}/drpe",
             "region": request.current_organization.region,
         }
     elif request.current_organization.is_dtft:
-        matomo_base = format_region_and_department_for_matomo(request.current_organization.department)
         context |= {
-            "matomo_custom_url_suffix": f"{matomo_base}/dtpe",
             "department": request.current_organization.department,
         }
     else:
-        matomo_base = format_region_and_department_for_matomo(request.current_organization.department)
         context |= {
-            "matomo_custom_url_suffix": f"{matomo_base}/agence",
             "department": request.current_organization.department,
         }
     return render_stats(request=request, context=context, params=params)
@@ -467,7 +449,6 @@ def render_stats_ph(
 
     context = {
         "page_title": page_title,
-        "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(department)}/agence",
         "department": department,
     }
     if extra_context:
@@ -528,7 +509,6 @@ def render_stats_ddets(
         ),
         # Tracking is always based on department even if we show stats for the whole region.
         "department": department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     if extra_context:
         context.update(extra_context)
@@ -605,7 +585,6 @@ def render_stats_dreets_iae(request, page_title, *, extra_context=None, with_dep
     region = request.current_organization.region
     context = {
         "page_title": f"{page_title} ({region})",
-        "matomo_custom_url_suffix": format_region_for_matomo(region),
         "region": region,
     }
     context.update(extra_context or {})
