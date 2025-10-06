@@ -55,18 +55,18 @@
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
                       <div class="c-form">
                           <div class="c-box c-box--structure mb-3 mb-md-4">
-                              <div aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" role="button" tabindex="0">
+                              <button aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" type="button">
                                   <i aria-hidden="true" class="ri-community-line">
                                   </i>
                                   <div>
-                                      <button data-bs-title="Association intermédiaire" data-bs-toggle="tooltip" type="button">
+                                      <span data-bs-title="Association intermédiaire" data-bs-toggle="tooltip">
                                           AI
-                                      </button>
-                                      <h3>
+                                      </span>
+                                      <span class="d-block h3">
                                           Acme inc.
-                                      </h3>
+                                      </span>
                                   </div>
-                              </div>
+                              </button>
                               <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
                                   <hr class="my-4"/>
                                   <ul class="c-box--structure__list-contact">
