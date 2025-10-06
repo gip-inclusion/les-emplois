@@ -286,7 +286,7 @@ class TestIAEEligibilityDetail:
         """Information box about why some criteria are certifiable."""
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
         certified_help_text = "En savoir plus sur les badges de certification"
         # No certifiable criteria
@@ -349,7 +349,7 @@ class TestGEIQEligibilityDetail:
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(
             certifiable=True,
@@ -383,7 +383,7 @@ class TestGEIQEligibilityDetail:
         # Certifiable and certified.
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
-            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED],
+            return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         certify_criteria_by_api_particulier(diagnosis)

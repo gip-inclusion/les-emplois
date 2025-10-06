@@ -53,8 +53,9 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
+    response = RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
-        json=RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
+        status_code=response["status_code"], json=response["json"]
     )
 
     certify_criteria_by_api_particulier(eligibility_diagnosis)
@@ -67,15 +68,16 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     )
     assert criterion.certified is False
     assert criterion.certified_at == timezone.now()
-    assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
+    assert criterion.data_returned_by_api == response["json"]
     assert criterion.certification_period is None
     assert "https://fake-api-particulier.com/v3" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 
 
 def test_not_found(respx_mock, caplog):
+    response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
     respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
-        404, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
+        response["status_code"], json=response["json"]
     )
     diag = IAEEligibilityDiagnosisFactory(
         certifiable=True,
@@ -85,7 +87,7 @@ def test_not_found(respx_mock, caplog):
     )
     certify_criteria_by_api_particulier(diag)
     crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]
+    assert crit.data_returned_by_api == response["json"]
     assert crit.certified is None
     assert crit.certification_period is None
     assert "Le dossier allocataire n'a pas été trouvé auprès de la MSA." in caplog.text
@@ -94,8 +96,9 @@ def test_not_found(respx_mock, caplog):
 
 
 def test_service_unavailable(respx_mock, caplog):
+    response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
     respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
-        502, json=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
+        response["status_code"], json=response["json"]
     )
     diag = IAEEligibilityDiagnosisFactory(
         certifiable=True,
@@ -105,7 +108,7 @@ def test_service_unavailable(respx_mock, caplog):
     )
     certify_criteria_by_api_particulier(diag)
     crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
+    assert crit.data_returned_by_api == response["json"]
     assert crit.certified is None
     assert crit.certification_period is None
     assert (
