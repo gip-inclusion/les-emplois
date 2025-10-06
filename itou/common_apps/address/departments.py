@@ -1,8 +1,3 @@
-import re
-
-import unidecode
-
-
 REGIONS = {
     "Auvergne-Rhône-Alpes": ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"],
     "Bourgogne-Franche-Comté": ["21", "25", "39", "58", "70", "71", "89", "90"],
@@ -283,25 +278,3 @@ def format_district(post_code, department):
     # Could use ordinal from humanize but it would be overkill
     number = int(post_code) - (int(department) * 1000)
     return "1er" if number == 1 else f"{number}e"
-
-
-def format_region_for_matomo(region):
-    if not region:
-        return "Region-inconnue"
-    # E.g. `Provence-Alpes-Côte d&#x27;Azur` becomes `Provence-Alpes-Cote-d-Azur`.
-    return re.sub("[^A-Za-z0-9-]+", "-", unidecode.unidecode(region))
-
-
-def format_department_for_matomo(department):
-    if not department or department not in DEPARTMENTS:
-        return "Departement-inconnu"
-    # E.g. `13 - Bouches-du-Rhône` becomes `13---Bouches-du-Rhone`.
-    return re.sub("[^A-Za-z0-9-]+", "-", unidecode.unidecode(DEPARTMENTS[department]))
-
-
-def format_region_and_department_for_matomo(department):
-    formatted_department = format_department_for_matomo(department)
-    region = DEPARTMENT_TO_REGION.get(department)
-    formatted_region = format_region_for_matomo(region)
-    # E.g. `Provence-Alpes-Cote-d-Azur/04---Alpes-de-Haute-Provence`
-    return f"{formatted_region}/{formatted_department}"
