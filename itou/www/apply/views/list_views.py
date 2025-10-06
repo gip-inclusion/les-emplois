@@ -53,6 +53,8 @@ def _get_job_applications_qs(request, *, list_kind):
             return request.current_organization.job_applications_received
         case JobApplicationsListKind.SENT:
             return JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        case JobApplicationsListKind.SENT_FOR_ME:
+            return request.user.job_applications
         case _:
             raise ValueError(f"Unexpected list_kind: {list_kind}")
 
@@ -131,8 +133,9 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     """
     List of applications for a job seeker.
     """
+    list_kind = JobApplicationsListKind.SENT_FOR_ME
     filters_form = FilterJobApplicationsForm(request.GET)
-    job_applications = request.user.job_applications
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     job_applications = job_applications.with_list_related_data()
 
     try:
@@ -173,7 +176,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.SENT_FOR_ME,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
