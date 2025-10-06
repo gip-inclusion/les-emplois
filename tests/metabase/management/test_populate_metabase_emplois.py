@@ -815,6 +815,7 @@ def test_populate_users(snapshot):
                 "employer",
                 pro_user.first_name,
                 pro_user.last_name,
+                pro_user.last_login,
                 datetime.date(2023, 2, 1),
             ),
         ]
