@@ -49,6 +49,16 @@ class JobApplicationsListKind(enum.Enum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
+def _get_job_applications_qs(request, *, list_kind):
+    match list_kind:
+        case JobApplicationsListKind.RECEIVED:
+            return request.current_organization.job_applications_received
+        case JobApplicationsListKind.SENT:
+            return JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        case _:
+            raise ValueError(f"Unexpected list_kind: {list_kind}")
+
+
 class JobApplicationsDisplayKind(enum.StrEnum):
     LIST = "list"
     TABLE = "table"
@@ -195,10 +205,11 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for prescribers and employers.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    list_kind = JobApplicationsListKind.SENT
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
 
     filters_form = PrescriberFilterJobApplicationsForm(
-        job_applications, request.GET, list_kind=JobApplicationsListKind.SENT, request=request
+        job_applications, request.GET, list_kind=list_kind, request=request
     )
 
     # Add related data giving the criteria for adding the necessary annotations
@@ -246,7 +257,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.SENT,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -303,15 +314,14 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
+    list_kind = JobApplicationsListKind.RECEIVED
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     pending_states_job_applications_count = job_applications.filter(
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(
-        job_applications, company, request.GET, list_kind=JobApplicationsListKind.RECEIVED
-    )
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET, list_kind=list_kind)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
@@ -369,7 +379,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -509,14 +519,10 @@ def autocomplete_senders(request, list_kind):
     term = request.GET.get("term", "").strip()
     senders = []
 
-    match list_kind:
-        case JobApplicationsListKind.RECEIVED:
-            job_applications = get_current_company_or_404(request).job_applications_received
-        case JobApplicationsListKind.SENT:
-            job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
-        case _:
-            # Should not happen
-            raise Http404
+    if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
+        raise Http404
+
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
 
     if term:
         senders = [
