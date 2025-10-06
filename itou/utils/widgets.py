@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.gis.forms import widgets as gis_widgets
 from django.db.models import Q
 from django.forms.models import ModelChoiceIterator
-from django_select2.forms import Select2Widget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
@@ -84,7 +84,7 @@ class OSMWidget(gis_widgets.OSMWidget):
         js = ["vendor/ol/ol.js"]
 
 
-class RemoteAutocompleteSelect2Widget(Select2Widget):
+class RemoteAutocompleteSelect2WidgetMixin:
     def __init__(self, *args, label_from_instance=None, **kwargs):
         super().__init__(*args, **kwargs)
         # This function must match what the autocomplete view specified via data-ajax--url returns as text
@@ -118,6 +118,14 @@ class RemoteAutocompleteSelect2Widget(Select2Widget):
             subgroup = default[1]
             subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))
         return groups
+
+
+class RemoteAutocompleteSelect2Widget(RemoteAutocompleteSelect2WidgetMixin, Select2Widget):
+    pass
+
+
+class RemoteAutocompleteSelect2MultipleWidget(RemoteAutocompleteSelect2WidgetMixin, Select2MultipleWidget):
+    pass
 
 
 class AddressAutocompleteWidget(RemoteAutocompleteSelect2Widget):
