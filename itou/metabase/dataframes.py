@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from psycopg import sql
 
-from itou.metabase.db import create_table, get_connection, get_new_table_name, rename_table_atomically
+import itou.metabase.db as metabase_db
 
 
 logger = logging.getLogger(__name__)
@@ -51,10 +51,10 @@ def store_df(df, table_name, batch_size=10_000):
     columns = infer_columns_from_df(df)
     logger.info("Injecting %i rows with %i columns into %r", len(df), len(columns), table_name)
 
-    new_table_name = get_new_table_name(table_name)
-    create_table(new_table_name, columns, reset=True)
+    new_table_name = metabase_db.get_new_table_name(table_name)
+    metabase_db.create_table(new_table_name, columns, reset=True)
 
-    with get_connection() as conn, conn.cursor() as cursor:
+    with metabase_db.get_connection() as conn, conn.cursor() as cursor:
         written_rows = 0
         # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
         for df_chunk in [df[i : i + batch_size] for i in range(0, df.shape[0], batch_size)]:
@@ -80,7 +80,7 @@ def store_df(df, table_name, batch_size=10_000):
                 time.perf_counter() - chunk_start_time,
             )
 
-    rename_table_atomically(new_table_name, table_name)
+    metabase_db.rename_table_atomically(new_table_name, table_name)
     logger.info("%r created in %0.2f seconds", table_name, time.perf_counter() - start_time)
 
 

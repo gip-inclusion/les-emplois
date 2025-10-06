@@ -27,6 +27,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.utils import timezone
 
+import itou.metabase.db as metabase_db
 from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, Prolongation, ProlongationRequest, Suspension
 from itou.cities.models import City
@@ -41,7 +42,6 @@ from itou.job_applications.enums import JobApplicationState, Origin, RefusalReas
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
-from itou.metabase.db import populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
@@ -126,8 +126,8 @@ class Command(BaseCommand):
         parser.add_argument("--mode", required=True, choices=["all", *sorted(self.MODE_TO_OPERATION)])
 
     def populate_analytics(self):
-        populate_table(analytics.AnalyticsTable, batch_size=100_000, querysets=[Datum.objects.all()])
-        populate_table(
+        metabase_db.populate_table(analytics.AnalyticsTable, batch_size=100_000, querysets=[Datum.objects.all()])
+        metabase_db.populate_table(
             analytics.DashboardVisitTable, batch_size=100_000, querysets=[StatsDashboardVisit.objects.all()]
         )
 
@@ -267,7 +267,7 @@ class Command(BaseCommand):
             )
         )
 
-        populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(companies.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
@@ -279,7 +279,7 @@ class Command(BaseCommand):
             .with_job_applications_count()
             .all()
         )
-        populate_table(job_descriptions.TABLE, batch_size=50_000, querysets=[queryset])
+        metabase_db.populate_table(job_descriptions.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_organizations(self):
         """
@@ -357,7 +357,7 @@ class Command(BaseCommand):
             )
         )
 
-        populate_table(
+        metabase_db.populate_table(
             organizations.TABLE,
             batch_size=10_000,
             querysets=[queryset],
@@ -456,11 +456,11 @@ class Command(BaseCommand):
         )
         job_seekers_table = job_seekers.get_table()
 
-        populate_table(job_seekers_table, batch_size=20_000, querysets=[queryset])
+        metabase_db.populate_table(job_seekers_table, batch_size=20_000, querysets=[queryset])
 
     def populate_criteria(self):
         queryset = AdministrativeCriteria.objects.all()
-        populate_table(criteria.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(criteria.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_job_applications(self):
         queryset = (
@@ -528,7 +528,7 @@ class Command(BaseCommand):
             )
         )
 
-        populate_table(job_applications.TABLE, batch_size=20_000, querysets=[queryset])
+        metabase_db.populate_table(job_applications.TABLE, batch_size=20_000, querysets=[queryset])
 
     def populate_selected_jobs(self):
         """
@@ -538,7 +538,7 @@ class Command(BaseCommand):
             jobapplication__origin=Origin.PE_APPROVAL
         ).filter(jobapplication__to_company_id__in=Company.objects.active())
 
-        populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(selected_jobs.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_approvals(self):
         only_fields = {
@@ -562,62 +562,62 @@ class Command(BaseCommand):
                 "origin",
             )
         )
-        populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset])
+        metabase_db.populate_table(approvals.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_prolongations(self):
         queryset = Prolongation.objects.all()
-        populate_table(prolongations.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(prolongations.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_prolongation_requests(self):
         queryset = ProlongationRequest.objects.select_related(
             "prolongation",
             "deny_information",
         ).all()
-        populate_table(prolongation_requests.TABLE, batch_size=50_000, querysets=[queryset])
+        metabase_db.populate_table(prolongation_requests.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_suspensions(self):
         queryset = Suspension.objects.all()
-        populate_table(suspensions.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(suspensions.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_institutions(self):
         queryset = Institution.objects.all()
-        populate_table(institutions.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(institutions.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_evaluation_campaigns(self):
         queryset = EvaluationCampaign.objects.all()
-        populate_table(evaluation_campaigns.TABLE, batch_size=10_000, querysets=[queryset])
+        metabase_db.populate_table(evaluation_campaigns.TABLE, batch_size=10_000, querysets=[queryset])
 
     def populate_evaluated_siaes(self):
         queryset = EvaluatedSiae.objects.prefetch_related(
             "evaluated_job_applications__evaluated_administrative_criteria"
         ).all()
-        populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset])
+        metabase_db.populate_table(evaluated_siaes.TABLE, batch_size=5_000, querysets=[queryset])
 
     def populate_evaluated_job_applications(self):
         queryset = EvaluatedJobApplication.objects.prefetch_related("evaluated_administrative_criteria").all()
-        populate_table(evaluated_job_applications.TABLE, batch_size=20_000, querysets=[queryset])
+        metabase_db.populate_table(evaluated_job_applications.TABLE, batch_size=20_000, querysets=[queryset])
 
     def populate_evaluated_criteria(self):
         queryset = EvaluatedAdministrativeCriteria.objects.all()
-        populate_table(evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(evaluated_criteria.TABLE, batch_size=100_000, querysets=[queryset])
 
     def populate_users(self):
         queryset = User.objects.filter(kind__in=UserKind.professionals(), is_active=True)
-        populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
+        metabase_db.populate_table(users.TABLE, batch_size=50_000, querysets=[queryset])
 
     def populate_memberships(self):
         siae_queryset = CompanyMembership.objects.all()
         prescriber_queryset = PrescriberMembership.objects.all()
         institution_queryset = InstitutionMembership.objects.all()
 
-        populate_table(
+        metabase_db.populate_table(
             memberships.TABLE, batch_size=100_000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
         )
 
     def populate_references(self):
         # DB referential
-        populate_table(rome_codes.TABLE, batch_size=100_000, querysets=[Rome.objects.all()])
-        populate_table(insee_codes.TABLE, batch_size=50_000, querysets=[City.objects.all()])
+        metabase_db.populate_table(rome_codes.TABLE, batch_size=100_000, querysets=[Rome.objects.all()])
+        metabase_db.populate_table(insee_codes.TABLE, batch_size=50_000, querysets=[City.objects.all()])
         # Code referential
         rows = []
         for dpt_code, dpt_name in DEPARTMENTS.items():
@@ -648,7 +648,7 @@ class Command(BaseCommand):
 
     def populate_gps_groups(self):
         queryset = FollowUpGroup.objects.all().annotate(beneficiary_department=F("beneficiary__department"))
-        populate_table(gps.GroupsTable, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(gps.GroupsTable, batch_size=100_000, querysets=[queryset])
 
     def populate_gps_memberships(self):
         queryset = (
@@ -670,7 +670,7 @@ class Command(BaseCommand):
                 )
             )
         )
-        populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
+        metabase_db.populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
 
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
