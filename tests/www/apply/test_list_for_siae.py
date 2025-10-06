@@ -29,7 +29,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assert_previous_step,
@@ -37,6 +37,9 @@ from tests.utils.testing import (
     parse_response_to_soup,
     pretty_indented,
 )
+
+
+INVALID_VALUE_MESSAGE = "Sélectionnez un choix valide."
 
 
 class TestProcessListSiae:
@@ -333,6 +336,7 @@ class TestProcessListSiae:
             {"sender_prescriber_organizations": [job_app_1.sender_prescriber_organization.id]},
         )
         assert response.context["job_applications_page"].object_list == [job_app_1]
+        assertNotContains(response, INVALID_VALUE_MESSAGE)
 
         response = client.get(
             reverse("apply:list_for_siae"),
@@ -346,6 +350,13 @@ class TestProcessListSiae:
         applications = response.context["job_applications_page"].object_list
         assertQuerySetEqual(applications, [job_app_1, job_app_2], ordered=False)
 
+        # Test with invalid value
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {"sender_prescriber_organizations": [PrescriberOrganizationFactory().pk]},
+        )
+        assertContains(response, INVALID_VALUE_MESSAGE)
+
     def test_list_for_siae_filtered_by_sender_name(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
@@ -356,6 +367,14 @@ class TestProcessListSiae:
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"senders": [job_app.sender.id]})
         assert response.context["job_applications_page"].object_list == [job_app]
+        assertNotContains(response, INVALID_VALUE_MESSAGE)
+
+        # Test with invalid value
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {"senders": [PrescriberFactory().pk]},
+        )
+        assertContains(response, INVALID_VALUE_MESSAGE)
 
     def test_list_for_siae_filtered_by_job_seeker_cancels_other_filters(self, client):
         company = CompanyFactory(with_membership=True)
@@ -370,12 +389,20 @@ class TestProcessListSiae:
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"job_seeker": job_app.job_seeker.pk})
         assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
+        assertNotContains(response, INVALID_VALUE_MESSAGE)
 
         response = client.get(
             reverse("apply:list_for_siae"),
             {"job_seeker": job_app.job_seeker.pk, "states": [JobApplicationState.ACCEPTED]},
         )
         assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
+
+        # Test with invalid value
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {"job_seeker": [JobSeekerFactory().id]},
+        )
+        assertContains(response, INVALID_VALUE_MESSAGE)
 
     def test_list_for_siae_filtered_by_pass_state(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
@@ -2310,3 +2337,113 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications table")
+
+
+class TestAutocomplete:
+    ALLOWED_FIELDS = [
+        "job_seeker",
+        "sender",
+        "sender_company",
+        "sender_prescriber_organization",
+    ]
+
+    FORBIDDEN_FIELDS = [
+        "to_company",
+        "unknown_field",
+    ]
+
+    def test_invalid_access(self, client):
+        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
+                response = client.post(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
+                assert response.status_code == 403
+
+    def test_as_prescriber(self, client):
+        job_application = JobApplicationFactory()
+        client.force_login(job_application.sender)
+        for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
+            response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
+            assert response.status_code == 404
+
+    def test_as_employer(self, client, snapshot):
+        company = CompanyFactory()
+        employer = CompanyMembershipFactory(company=company).user
+        job_application = JobApplicationFactory(
+            to_company=company,
+            sender__first_name="Alice",
+            sender__last_name="Lewis",
+            job_seeker__first_name="Calvin",
+            job_seeker__last_name="Coolidge",
+        )
+        other_job_application = JobApplicationFactory(
+            to_company=company,
+            sender__first_name="Bob",
+            sender__last_name="Alice",
+            job_seeker__first_name="Robert",
+            job_seeker__last_name="Cooledge",
+        )
+        prescriber_org_application = JobApplicationFactory(
+            to_company=company,
+            sender_prescriber_organization__name="Association de Prescripteurs",
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker__first_name="Roger",
+            job_seeker__last_name="Smith",
+        )
+        sent_by_employer_application = JobApplicationFactory(
+            to_company=company,
+            sent_by_another_employer=True,
+            sender_company__brand="L'entreprise envoyeuse",
+            job_seeker__first_name="Samantha",
+            job_seeker__last_name="Brown",
+        )
+        JobApplicationFactory(to_company=company, sender__first_name="John", sender__last_name="Smith")
+        client.force_login(employer)
+
+        for field_name in self.FORBIDDEN_FIELDS:
+            response = client.get(reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name}))
+            assert response.status_code == 404
+
+        matching_terms_and_results = {
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
+            "sender": ("Ice lew", {"id": job_application.sender.pk, "text": "Alice LEWIS"}),
+            "sender_company": (
+                "envoy",
+                {"id": sent_by_employer_application.sender_company.pk, "text": "L'entreprise envoyeuse"},
+            ),
+            "sender_prescriber_organization": (
+                "tion de prescripteurs",
+                {
+                    "id": prescriber_org_application.sender_prescriber_organization.pk,
+                    "text": "Association De Prescripteurs",
+                },
+            ),
+        }
+
+        for field_name in self.ALLOWED_FIELDS:
+            autocomplete_url = reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": field_name})
+
+            # A term is needed to search
+            response = client.get(autocomplete_url)
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            # No results for unrelated term
+            response = client.get(autocomplete_url, {"term": "Nom sans aucun rapport"})
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            term, expected_result = matching_terms_and_results[field_name]
+            with assertSnapshotQueries(snapshot(name=f"SQL queries for {field_name} autocomplete")):
+                response = client.get(autocomplete_url, {"term": term})
+            assert response.status_code == 200
+            assert response.json() == {"results": [expected_result]}
+
+        # Test multiple results
+        response = client.get(
+            reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"}), {"term": "aLice"}
+        )
+        assert response.status_code == 200
+        assert len(response.json()["results"]) == 2
+        assert {"id": job_application.sender.pk, "text": "Alice LEWIS"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "Bob ALICE"} in response.json()["results"]

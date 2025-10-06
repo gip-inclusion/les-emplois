@@ -20,7 +20,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
@@ -28,7 +28,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
@@ -40,6 +40,7 @@ from tests.utils.testing import (
 
 
 BESOIN_DUN_CHIFFRE = "besoin-dun-chiffre"
+INVALID_VALUE_MESSAGE = "Sélectionnez un choix valide."
 
 
 def test_get(client):
@@ -176,6 +177,12 @@ def test_filtered_by_sender(client):
     assert len(applications) == 1
     assert applications[0].sender.id == another_prescriber.pk
 
+    assertNotContains(response, INVALID_VALUE_MESSAGE)
+
+    # Test with invalid value
+    response = client.get(reverse("apply:list_prescriptions"), {"senders": PrescriberFactory().pk})
+    assertContains(response, INVALID_VALUE_MESSAGE)
+
 
 def test_filtered_by_job_seeker(client):
     job_seeker = JobSeekerFactory()
@@ -188,50 +195,54 @@ def test_filtered_by_job_seeker(client):
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
     assert applications[0].job_seeker.pk == job_seeker.pk
+    assertContains(response, job_seeker.get_full_name())
+    assertNotContains(response, INVALID_VALUE_MESSAGE)
 
     response = client.get(reverse("apply:list_prescriptions"))
 
     filters_form = response.context["filters_form"]
-    assert len(filters_form.fields["job_seeker"].choices) == 3
+    assert filters_form.fields["job_seeker"].queryset.count() == 3
 
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 3
+
+    # Test with invalid value
+    response = client.get(reverse("apply:list_prescriptions"), {"job_seeker": JobSeekerFactory().pk})
+    assertContains(response, INVALID_VALUE_MESSAGE)
 
 
 def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     prescriber = PrescriberFactory()
-    a_b_job_seeker = JobApplicationFactory(
-        sender=prescriber, job_seeker__first_name="A_something", job_seeker__last_name="B_something"
-    ).job_seeker
-    created_job_seeker = JobApplicationFactory(
+    application = JobApplicationFactory(
         sender=prescriber,
         job_seeker__created_by=prescriber,
         job_seeker__first_name="Zorro",
         job_seeker__last_name="Martin",
-    ).job_seeker
-    c_d_job_seeker = JobApplicationFactory(
+    )
+    JobApplicationFactory(
         sender=prescriber,
-        job_seeker__created_by=prescriber,
-        job_seeker__last_login=timezone.now(),
-        job_seeker__first_name="C_something",
-        job_seeker__last_name="D_something",
-    ).job_seeker
+        job_seeker__first_name="Alice",
+        job_seeker__last_name="Lewis",
+    )
+    created_job_seeker = application.job_seeker
     client.force_login(prescriber)
-
-    response = client.get(reverse("apply:list_prescriptions"), {"job_seeker": created_job_seeker.pk})
+    full_name = "Zorro MARTIN"
+    url = reverse("apply:list_prescriptions")
+    response = client.get(url, {"job_seeker": created_job_seeker.pk})
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
-    assert applications[0].job_seeker.pk == created_job_seeker.pk
+    assert applications[0].pk == application.pk
+    assertContains(response, full_name)
 
-    response = client.get(reverse("apply:list_prescriptions"))
+    created_job_seeker.last_login = timezone.now()
+    created_job_seeker.save(update_fields=["last_login"])
+
+    response = client.get(url, {"job_seeker": created_job_seeker.pk})
     applications = response.context["job_applications_page"].object_list
-    assert len(applications) == 3
-    filters_form = response.context["filters_form"]
-    assert filters_form.fields["job_seeker"].choices == [
-        (a_b_job_seeker.pk, "A… B…"),
-        (c_d_job_seeker.pk, "C… D…"),
-        (created_job_seeker.pk, "Zorro MARTIN"),
-    ]
+    assert len(applications) == 1
+    assert applications[0].pk == application.pk
+    assertNotContains(response, full_name)
+    assertContains(response, "Z… M…")
 
 
 def test_filtered_by_company(client):
@@ -243,10 +254,15 @@ def test_filtered_by_company(client):
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
     assert applications[0].to_company.pk == job_application.to_company.pk
+    assertNotContains(response, INVALID_VALUE_MESSAGE)
 
     response = client.get(reverse("apply:list_prescriptions"))
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 3
+
+    # Test with invalid value
+    response = client.get(reverse("apply:list_prescriptions"), {"to_companies": CompanyFactory().pk})
+    assertContains(response, INVALID_VALUE_MESSAGE)
 
 
 def test_filtered_by_eligibility_state_prescriber(client):
@@ -1093,3 +1109,310 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications list")
+
+
+class TestListPrescriptionsSenders:
+    def test_as_prescriber(self, client, snapshot):
+        job_application = JobApplicationFactory()
+        client.force_login(job_application.sender)
+        senders_autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
+
+        # A term is needed to search
+        response = client.get(senders_autocomplete_url)
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(
+                senders_autocomplete_url,
+                {"term": job_application.sender.get_full_name()},
+            )
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {
+                    "id": job_application.sender.pk,
+                    "text": job_application.sender.get_full_name(),
+                },
+            ]
+        }
+        response = client.get(senders_autocomplete_url, {"term": "Nom sans aucun rapport"})
+        assert response.json() == {"results": []}
+
+    def test_as_employer(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        # Received application
+        JobApplicationFactory(to_company=company, sender__first_name="Alice", sender__last_name="Lewis")
+        job_application = JobApplicationFactory(
+            sender_company=company,
+            sender__first_name="Jean-Pierre",
+            sender__last_name="Alice",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        JobApplicationFactory(
+            sender_company=company,
+            to_company=company,
+            sender__first_name="Michel",
+            sender__last_name="Alice",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        JobApplicationFactory(
+            sender_company=company,
+            sender__first_name="John",
+            sender__last_name="Smith",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        client.force_login(employer)
+        senders_autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
+
+        # A term is needed to search
+        response = client.get(senders_autocomplete_url)
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(senders_autocomplete_url, {"term": "alice"})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {
+                    "id": job_application.sender.pk,
+                    "text": "Jean-Pierre ALICE",
+                },
+            ]
+        }
+
+        response = client.get(senders_autocomplete_url, {"term": "Nom sans aucun rapport"})
+        assert response.json() == {"results": []}
+
+
+class TestAutocomplete:
+    ALLOWED_FIELDS = [
+        "job_seeker",
+        "sender",
+        "to_company",
+    ]
+
+    FORBIDDEN_FIELDS = [
+        "sender_company",
+        "sender_prescriber_organization",
+        "unknown_field",
+    ]
+
+    def test_invalid_access(self, client):
+        for user in [JobSeekerFactory(), LaborInspectorFactory(membership=True)]:
+            client.force_login(user)
+            for field_name in self.ALLOWED_FIELDS + self.FORBIDDEN_FIELDS:
+                response = client.post(
+                    reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name})
+                )
+                assert response.status_code == 403
+
+    def test_as_prescriber(self, client, snapshot):
+        org = PrescriberOrganizationFactory(authorized=True)
+        prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
+        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        client.force_login(prescriber)
+
+        job_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender=prescriber,
+            job_seeker__first_name="Calvin",
+            job_seeker__last_name="Coolidge",
+            to_company__brand="Compagnie A",
+        )
+        other_job_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender=other_prescriber,
+            job_seeker__first_name="Robert",
+            job_seeker__last_name="Cooledge",
+            to_company__brand="Entreprise B",
+        )
+        third_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender__first_name="Rebecca",
+            sender__last_name="White",
+            job_seeker__first_name="Roger",
+            job_seeker__last_name="Smith",
+            to_company__brand="Société C",
+        )
+        for field_name in self.FORBIDDEN_FIELDS:
+            response = client.get(reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name}))
+            assert response.status_code == 404
+
+        matching_terms_and_results = {
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
+            "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
+            "to_company": (
+                "ciété c",
+                {"id": third_application.to_company.pk, "text": "Société C"},
+            ),
+        }
+
+        for field_name in self.ALLOWED_FIELDS:
+            autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name})
+
+            # A term is needed to search
+            response = client.get(autocomplete_url)
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            # No results for unrelated term
+            response = client.get(autocomplete_url, {"term": "Nom sans aucun rapport"})
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            term, expected_result = matching_terms_and_results[field_name]
+            with assertSnapshotQueries(snapshot(name=f"SQL queries for {field_name} autocomplete")):
+                response = client.get(autocomplete_url, {"term": term})
+            assert response.status_code == 200
+            assert response.json() == {"results": [expected_result]}
+
+        # Test multiple results
+        response = client.get(
+            reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"}), {"term": "doe"}
+        )
+        assert response.status_code == 200
+        assert len(response.json()["results"]) == 2
+        assert {"id": job_application.sender.pk, "text": "John DOE"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "Jane DOE"} in response.json()["results"]
+
+    def test_as_unauthorized_prescriber(self, client):
+        org = PrescriberOrganizationFactory()
+        prescriber = PrescriberMembershipFactory(organization=org, user__first_name="John", user__last_name="Doe").user
+        other_prescriber = PrescriberFactory(first_name="Jane", last_name="Doe")
+        client.force_login(prescriber)
+
+        job_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender=prescriber,
+            job_seeker__first_name="Yves",
+            job_seeker__last_name="Coolidger",
+            to_company__brand="Compagnie A",
+        )
+        other_job_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender=other_prescriber,
+            job_seeker__first_name="Robert",
+            job_seeker__last_name="Cooledge",
+            to_company__brand="Entreprise B",
+        )
+        job_seeker = JobSeekerFactory(first_name="Ethan", last_name="Cooper", created_by=prescriber, last_login=None)
+        third_application = JobApplicationFactory(
+            sender_prescriber_organization=org,
+            sender=PrescriberFactory(first_name="John", last_name="Black"),
+            job_seeker=job_seeker,
+        )
+
+        # job_seeker field
+        autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "job_seeker"})
+
+        response = client.get(autocomplete_url, {"term": "Y"})
+        assert response.json() == {"results": [{"id": job_application.job_seeker.pk, "text": "Y… C…"}]}
+
+        response = client.get(autocomplete_url, {"term": "r"})
+        assert response.json() == {
+            "results": [
+                {"id": other_job_application.job_seeker.pk, "text": "R… C…"},
+                {"id": third_application.job_seeker.pk, "text": "Ethan COOPER"},
+            ]
+        }
+        # User takes control of its account and prescriber cannot know anymore if it contains an 'r'
+        job_seeker.last_login = timezone.now()
+        job_seeker.save(update_fields=["last_login"])
+
+        response = client.get(autocomplete_url, {"term": "r"})
+        assert response.json() == {
+            "results": [
+                {"id": other_job_application.job_seeker.pk, "text": "R… C…"},
+            ]
+        }
+
+        # sender field
+        autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
+
+        response = client.get(autocomplete_url, {"term": "doe"})
+        assert response.json() == {
+            "results": [
+                {"id": other_job_application.sender.pk, "text": "Jane DOE"},
+                {"id": job_application.sender.pk, "text": "John DOE"},
+            ]
+        }
+        response = client.get(autocomplete_url, {"term": "c"})
+        assert response.json() == {
+            "results": [
+                {"id": third_application.sender.pk, "text": "John BLACK"},
+            ]
+        }
+
+    def test_as_employer(self, client, snapshot):
+        company = CompanyFactory()
+        employer = CompanyMembershipFactory(company=company, user__first_name="John", user__last_name="Doe").user
+        other_employer = EmployerFactory(first_name="Jane", last_name="Doe")
+        client.force_login(employer)
+
+        job_application = JobApplicationFactory(
+            sender_company=company,
+            sender=employer,
+            sender_kind=SenderKind.EMPLOYER,
+            job_seeker__first_name="Calvin",
+            job_seeker__last_name="Coolidge",
+            to_company__brand="Compagnie A",
+        )
+        other_job_application = JobApplicationFactory(
+            sender_company=company,
+            sender=other_employer,
+            sender_kind=SenderKind.EMPLOYER,
+            job_seeker__first_name="Robert",
+            job_seeker__last_name="Cooledge",
+            to_company__brand="Entreprise B",
+        )
+        third_application = JobApplicationFactory(
+            sender_company=company,
+            sender_kind=SenderKind.EMPLOYER,
+            sender=EmployerFactory(first_name="Jim", last_name="Beam"),
+            job_seeker__first_name="Roger",
+            job_seeker__last_name="Smith",
+            to_company__brand="Société C",
+        )
+        for field_name in self.FORBIDDEN_FIELDS:
+            response = client.get(reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name}))
+            assert response.status_code == 404
+
+        matching_terms_and_results = {
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
+            "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
+            "to_company": (
+                "ciété c",
+                {"id": third_application.to_company.pk, "text": "Société C"},
+            ),
+        }
+
+        for field_name in self.ALLOWED_FIELDS:
+            autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": field_name})
+
+            # A term is needed to search
+            response = client.get(autocomplete_url)
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            # No results for unrelated term
+            response = client.get(autocomplete_url, {"term": "Nom sans aucun rapport"})
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            term, expected_result = matching_terms_and_results[field_name]
+            with assertSnapshotQueries(snapshot(name=f"SQL queries for {field_name} autocomplete")):
+                response = client.get(autocomplete_url, {"term": term})
+            assert response.status_code == 200
+            assert response.json() == {"results": [expected_result]}
+
+        # Test multiple results
+        response = client.get(
+            reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"}), {"term": "doe"}
+        )
+        assert response.status_code == 200
+        assert len(response.json()["results"]) == 2
+        assert {"id": job_application.sender.pk, "text": "John DOE"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "Jane DOE"} in response.json()["results"]
