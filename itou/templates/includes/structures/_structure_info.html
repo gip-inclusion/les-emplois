@@ -1,21 +1,18 @@
 {% load url_add_query %}
 
 <div class="c-box c-box--structure {{ extra_box_class|default:'' }}">
-    <div class="c-box--structure__summary"
-         role="button"
-         data-bs-toggle="collapse"
-         data-bs-target="#collapseBoxStructure"
-         aria-expanded="{{ show|default:False|yesno:'true,false' }}"
-         aria-controls="collapseBoxStructure"
-         tabindex="0">
+    <button class="c-box--structure__summary w-100"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseBoxStructure"
+            aria-expanded="{{ show|default:False|yesno:'true,false' }}"
+            aria-controls="collapseBoxStructure">
         <i class="ri-community-line" aria-hidden="true"></i>
         <div>
-            <button type="button" data-bs-toggle="tooltip" data-bs-title="{{ structure.get_kind_display }}">
-                {{ structure.kind }}
-            </button>
-            <h3>{{ structure.display_name }}</h3>
+            <span data-bs-toggle="tooltip" data-bs-title="{{ structure.get_kind_display }}">{{ structure.kind }}</span>
+            <span class="d-block h3">{{ structure.display_name }}</span>
         </div>
-    </div>
+    </button>
     <div class="c-box--structure__detail collapse{% if show|default:False %} show{% endif %}" id="collapseBoxStructure">
         <hr class="my-4">
         <ul class="c-box--structure__list-contact">

@@ -58,7 +58,7 @@ def test_access(client, user_factory, status_code):
     response = client.get(reverse("prescribers_views:overview"))
     assert response.status_code == status_code
     if status_code == 200:
-        assertContains(response, "<h3>Orga courante</h3>")
+        assertContains(response, '<span class="d-block h3">Orga courante</span>')
 
 
 def test_access_prescriber_with_multiple_organizations(client):
@@ -70,8 +70,8 @@ def test_access_prescriber_with_multiple_organizations(client):
     client.force_login(user)
     client.post(reverse("dashboard:switch_organization"), data={"organization_id": current_org.pk})
     response = client.get(reverse("prescribers_views:overview"))
-    assertContains(response, "<h3>Orga courante</h3>")
-    assertNotContains(response, "<h3>Une autre orga</h3>")
+    assertContains(response, '<span class="d-block h3">Orga courante</span>')
+    assertNotContains(response, 'span class="d-block h3">Une autre orga</span>')
 
 
 def test_content_ft(client):
