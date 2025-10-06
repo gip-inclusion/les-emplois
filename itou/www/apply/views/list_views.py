@@ -47,6 +47,16 @@ class JobApplicationsListKind(enum.Enum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
+def _get_job_applications_qs(request, *, list_kind):
+    match list_kind:
+        case JobApplicationsListKind.RECEIVED:
+            return request.current_organization.job_applications_received
+        case JobApplicationsListKind.SENT:
+            return JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        case _:
+            raise ValueError(f"Unexpected list_kind: {list_kind}")
+
+
 class JobApplicationsDisplayKind(enum.StrEnum):
     LIST = "list"
     TABLE = "table"
@@ -193,7 +203,8 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for prescribers and employers.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    list_kind = JobApplicationsListKind.SENT
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
 
@@ -242,7 +253,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.SENT,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -263,7 +274,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    job_applications = _get_job_applications_qs(request, list_kind=JobApplicationsListKind.SENT)
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
@@ -283,8 +294,8 @@ def list_prescriptions_exports_download(request, month_identifier=None):
     List of applications for a prescriber for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    job_applications = JobApplication.objects.prescriptions_of(
-        request.user, request.current_organization
+    job_applications = _get_job_applications_qs(
+        request, list_kind=JobApplicationsListKind.SENT
     ).with_list_related_data()
     filename = "candidatures"
     if month_identifier:
@@ -299,8 +310,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
+    list_kind = JobApplicationsListKind.RECEIVED
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     pending_states_job_applications_count = job_applications.filter(
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
@@ -363,7 +375,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -386,7 +398,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     """
 
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received
+    job_applications = _get_job_applications_qs(request, list_kind=JobApplicationsListKind.RECEIVED)
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
@@ -406,7 +418,9 @@ def list_for_siae_exports_download(request, month_identifier=None):
     exported as a CSV file with immediate download
     """
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received.with_list_related_data()
+    job_applications = _get_job_applications_qs(
+        request, list_kind=JobApplicationsListKind.RECEIVED
+    ).with_list_related_data()
     filename = f"candidatures-{slugify(company.display_name)}"
     if month_identifier:
         year, month = month_identifier.split("-")
