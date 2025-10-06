@@ -27,7 +27,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2MultipleWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -781,7 +781,20 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to companies and Prescribers.
     """
 
-    senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
+    senders = forms.ModelMultipleChoiceField(
+        queryset=User.objects,
+        label="Nom de la personne",
+        required=False,
+        widget=RemoteAutocompleteSelect2MultipleWidget(
+            attrs={
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 3,
+                "data-dropdown-parent": "#offcanvasApplyFilters",
+            }
+        ),
+    )
     job_seeker = forms.ChoiceField(
         required=False,
         label="Nom du candidat",
@@ -814,20 +827,18 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     )
 
     @sentry_sdk.trace
-    def __init__(self, job_applications_qs, *args, **kwargs):
+    def __init__(self, job_applications_qs, *args, list_kind, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
-        senders = self.job_applications_qs.get_unique_fk_objects("sender")
-        self.fields["senders"].choices += self._get_choices_for_sender(senders)
+        self.fields["senders"].widget.attrs["data-ajax--url"] = {
+            list_kind.RECEIVED: reverse("apply:list_for_siae_senders"),
+            list_kind.SENT: reverse("apply:list_prescriptions_senders"),
+        }[list_kind]
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
         self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
-
-    def _get_choices_for_sender(self, users):
-        users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_full_name())]
-        return sorted(users, key=lambda user: user[1])
 
     def _get_choices_for_administrativecriteria(self):
         return [(c.pk, c.name) for c in AdministrativeCriteria.objects.all()]
@@ -870,7 +881,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 )
 
         if senders := self.cleaned_data.get("senders"):
-            queryset = queryset.filter(sender__id__in=senders)
+            queryset = queryset.filter(sender__in={sender.pk for sender in senders})
 
         match self.cleaned_data["archived"]:
             case ArchivedChoices.ACTIVE:

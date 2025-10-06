@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Concat, Lower
+from django.http import Http404, JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -16,6 +17,7 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
+from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
@@ -195,7 +197,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
+    filters_form = PrescriberFilterJobApplicationsForm(
+        job_applications, request.GET, list_kind=JobApplicationsListKind.SENT, request=request
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
@@ -305,7 +309,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
+    filters_form = CompanyFilterJobApplicationsForm(
+        job_applications, company, request.GET, list_kind=JobApplicationsListKind.RECEIVED
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
@@ -496,3 +502,31 @@ def list_for_siae_actions(request):
         context,
     )
     return response
+
+
+@check_user(lambda u: u.is_prescriber or u.is_employer)
+def autocomplete_senders(request, list_kind):
+    term = request.GET.get("term", "").strip()
+    senders = []
+
+    match list_kind:
+        case JobApplicationsListKind.RECEIVED:
+            job_applications = get_current_company_or_404(request).job_applications_received
+        case JobApplicationsListKind.SENT:
+            job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        case _:
+            # Should not happen
+            raise Http404
+
+    if term:
+        senders = [
+            {
+                "text": sender.autocomplete_display(),
+                "id": sender.pk,
+            }
+            for sender in User.objects.search_by_full_name(term).filter(
+                Exists(job_applications.filter(sender=OuterRef("pk")))
+            )[:20]
+        ]
+
+    return JsonResponse({"results": senders}, safe=False)

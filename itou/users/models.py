@@ -406,6 +406,9 @@ class User(AbstractUser, AddressMixin):
     def display_with_pii(self):
         return f"{self.get_full_name()} — {self.email}"
 
+    def autocomplete_display(self):
+        return self.get_full_name()
+
     def set_old_values(self):
         self._old_values = self.__dict__.copy()
 
