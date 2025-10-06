@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 2025-10-06
+
+### Ajouté
+
+- [Interface: Ajout d'un lien vers notre homologation de sécurité](https://github.com/gip-inclusion/les-emplois/pull/6913)
+- [Notifications: ajout du partenariat avec l'Afpa](https://github.com/gip-inclusion/les-emplois/pull/6937)
+
+### Modifié
+
+- [Accessibilité: Vérifier et corriger le markup des onglets](https://github.com/gip-inclusion/les-emplois/pull/6929)
+- [Admin: ajout de la date de création des diagnostics dans la vue des candidats](https://github.com/gip-inclusion/les-emplois/pull/6938)
+- [Prescripteur: Ajout d'un accès aux demandes de prolongation dans le menu de gauche pour les prescripteurs habilités](https://github.com/gip-inclusion/les-emplois/pull/6908)
+
 ## 2025-09-29
 
 ### Ajouté
