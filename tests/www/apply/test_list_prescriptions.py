@@ -796,3 +796,76 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications table")
+
+
+class TestListPrescriptionsSenders:
+    def test_as_prescriber(self, client, snapshot):
+        job_application = JobApplicationFactory()
+        client.force_login(job_application.sender)
+
+        # A term is needed to search
+        response = client.get(reverse("apply:list_prescriptions_senders"))
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(
+                reverse("apply:list_prescriptions_senders"), {"term": job_application.sender.get_full_name()}
+            )
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {
+                    "id": job_application.sender.pk,
+                    "text": job_application.sender.get_full_name(),
+                },
+            ]
+        }
+        response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "Nom sans aucun rapport"})
+        assert response.json() == {"results": []}
+
+    def test_as_employer(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        # Received application
+        JobApplicationFactory(to_company=company, sender__first_name="Alice", sender__last_name="Lewis")
+        job_application = JobApplicationFactory(
+            sender_company=company,
+            sender__first_name="Jean-Pierre",
+            sender__last_name="Alice",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        JobApplicationFactory(
+            sender_company=company,
+            to_company=company,
+            sender__first_name="Michel",
+            sender__last_name="Alice",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        JobApplicationFactory(
+            sender_company=company,
+            sender__first_name="John",
+            sender__last_name="Smith",
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        client.force_login(employer)
+
+        # A term is needed to search
+        response = client.get(reverse("apply:list_prescriptions_senders"))
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "alice"})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {
+                    "id": job_application.sender.pk,
+                    "text": "Jean-Pierre ALICE",
+                },
+            ]
+        }
+
+        response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "Nom sans aucun rapport"})
+        assert response.json() == {"results": []}
