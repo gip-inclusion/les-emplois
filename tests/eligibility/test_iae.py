@@ -603,9 +603,9 @@ def test_selected_administrative_criteria_certified(
 ):
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         certifiable=True,
-        criteria_kinds=[AdministrativeCriteriaKind.RSA],
+        criteria_kinds=[AdministrativeCriteriaKind.AAH],
     )
-    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
+    respx_mock.get("https://fake-api-particulier.com/v3/dss/allocation_adulte_handicape/identite").respond(
         response_status, json=response
     )
 
@@ -613,7 +613,7 @@ def test_selected_administrative_criteria_certified(
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.filter(
-        administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
+        administrative_criteria__kind=AdministrativeCriteriaKind.AAH,
         eligibility_diagnosis=eligibility_diagnosis,
     ).get()
     for attrname, value in expected.items():
