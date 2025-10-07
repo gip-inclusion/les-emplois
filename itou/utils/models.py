@@ -71,6 +71,7 @@ class AbstractSupportRemark(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField()
     content_object = GenericForeignKey("content_type", "object_id")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="mis à jour le", null=True)
 
 
 class PkSupportRemark(AbstractSupportRemark):
