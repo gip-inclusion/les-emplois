@@ -518,6 +518,7 @@
           SELECT "utils_pksupportremark"."id",
                  "utils_pksupportremark"."remark",
                  "utils_pksupportremark"."content_type_id",
+                 "utils_pksupportremark"."updated_at",
                  "utils_pksupportremark"."object_id"
           FROM "utils_pksupportremark"
           WHERE ("utils_pksupportremark"."content_type_id" = %s

@@ -43,6 +43,7 @@ class AbstractSupportRemarkInline(GenericStackedInline):
     max_num = 1
     extra = 1
     can_delete = False
+    readonly_fields = ("updated_at",)
 
 
 class PkSupportRemarkInline(AbstractSupportRemarkInline):
@@ -230,7 +231,7 @@ def add_support_remark_to_obj(obj, text):
         PkSupportRemark.objects.create(content_type=obj_content_type, object_id=obj.pk, remark=text)
     else:
         remark.remark += "\n" + text
-        remark.save(update_fields=("remark",))
+        remark.save(update_fields=("remark", "updated_at"))
 
 
 class ReadonlyMixin:
