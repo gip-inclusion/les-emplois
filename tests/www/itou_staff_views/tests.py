@@ -777,6 +777,33 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
+    def test_merge_last_login(self, client, caplog, subtests):
+        client.force_login(ItouStaffFactory(is_superuser=True))
+
+        old_last_login = timezone.now() - datetime.timedelta(days=10)
+        recent_last_login = timezone.now()
+
+        for last_login_1, last_login_2, expected_last_login in [
+            (None, None, None),
+            (None, recent_last_login, recent_last_login),
+            (recent_last_login, None, recent_last_login),
+            (old_last_login, recent_last_login, recent_last_login),
+            (recent_last_login, old_last_login, recent_last_login),
+        ]:
+            employer_1 = EmployerFactory(last_login=last_login_1)
+            employer_2 = EmployerFactory(last_login=last_login_2)
+            url = reverse("itou_staff_views:merge_users_confirm", args=(employer_1.public_id, employer_2.public_id))
+            caplog.clear()
+            client.post(url, data={"user_to_keep": "to_user"})
+            merged_user = User.objects.get(pk=employer_1.pk)
+            assert not User.objects.filter(pk=employer_2.pk).exists()
+            assert merged_user.last_login == expected_last_login
+
+            assert caplog.messages == [
+                f"Fusion utilisateurs {employer_1.pk} ← {employer_2.pk} — Done !",
+                "HTTP 302 Found",
+            ]
+
 
 class TestOTP:
     @pytest.mark.parametrize(
