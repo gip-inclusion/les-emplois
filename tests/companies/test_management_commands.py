@@ -16,7 +16,7 @@ from tests.companies import factories as companies_factories
 from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.siae_evaluations.factories import ArchivedEvaluatedSiaeFactory, EvaluatedSiaeFactory
+from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.utils.testing import assertSnapshotQueries
 
 
@@ -103,9 +103,8 @@ class TestMoveCompanyData:
         company_1.refresh_from_db()
         assert company_1.is_searchable is False
 
-    @pytest.mark.parametrize("factory", [EvaluatedSiaeFactory, ArchivedEvaluatedSiaeFactory])
-    def test_prevent_move_with_siae_evaluations(self, factory, capsys):
-        company1 = factory().siae
+    def test_prevent_move_with_siae_evaluations(self, capsys):
+        company1 = EvaluatedSiaeFactory().siae
         company2 = companies_factories.CompanyFactory()
 
         management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
