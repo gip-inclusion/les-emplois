@@ -5,7 +5,7 @@ from django.utils import timezone
 from sentry_sdk.crons import monitor
 
 from itou.siae_evaluations.enums import EvaluatedSiaeFinalState
-from itou.siae_evaluations.models import ArchivedEvaluatedSiae, EvaluatedJobApplication, EvaluatedSiae
+from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae
 from itou.utils.command import BaseCommand, dry_runnable
 
 
@@ -40,23 +40,17 @@ class Command(BaseCommand):
             EvaluatedSiae.objects.filter(
                 evaluation_campaign__ended_at__lt=timezone.now() - DELAY,
                 final_state=EvaluatedSiaeFinalState.ACCEPTED,
+                archive_accepted_job_applications_nb__isnull=True,
             ).annotate(count_evaluated_applications=Count("evaluated_job_applications__id"))
         )
+        self.logger.info("Found count=%d EvaluatedSiae to archive", len(evaluated_siaes))
+        if not evaluated_siaes:
+            return
 
-        archived_evaluated_siaes = [
-            ArchivedEvaluatedSiae(
-                evaluation_campaign=evaluated_siae.evaluation_campaign,
-                siae=evaluated_siae.siae,
-                reviewed_at=evaluated_siae.reviewed_at,
-                final_reviewed_at=evaluated_siae.final_reviewed_at,
-                final_state=evaluated_siae.final_state,
-                job_applications_count=evaluated_siae.count_evaluated_applications,
-            )
-            for evaluated_siae in evaluated_siaes
-        ]
-
-        ArchivedEvaluatedSiae.objects.bulk_create(archived_evaluated_siaes)
-        EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes).delete()
-        EvaluatedSiae.objects.filter(id__in=[evaluated_siae.id for evaluated_siae in evaluated_siaes]).delete()
-
-        self.logger.info("Archived evaluated_siae after campaign is closed, count: %d", len(evaluated_siaes))
+        for evaluated_siae in evaluated_siaes:
+            evaluated_siae.archive_accepted_job_applications_nb = evaluated_siae.count_evaluated_applications
+        EvaluatedSiae.objects.bulk_update(evaluated_siaes, ["archive_accepted_job_applications_nb"], batch_size=1000)
+        _, objs = EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes).delete()
+        deleted_job_applications_nb = objs.get("siae_evaluations.EvaluatedJobApplication", 0)
+        self.logger.info("Deleted count=%d linked EvaluatedJobApplication", deleted_job_applications_nb)
+        self.logger.info("Archived count=%d EvaluatedSiae", len(evaluated_siaes))

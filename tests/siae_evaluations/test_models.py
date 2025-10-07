@@ -18,9 +18,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.export import _eligible_to_siae_evaluations
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import (
-    ArchivedEvaluatedSiae,
     Calendar,
     CampaignAlreadyPopulatedException,
     EvaluatedAdministrativeCriteria,
@@ -45,7 +43,6 @@ from tests.institutions.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import (
-    ArchivedEvaluatedSiaeFactory,
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
@@ -1573,20 +1570,6 @@ def test_should_display_pending_action_warning(state, frozen, should_display_pen
     # Override state property for faster tests
     with mock.patch.object(EvaluatedSiae, "state", state):
         assert evaluated_siae.should_display_pending_action_warning == should_display_pending_action_warning
-
-
-class TestArchivedEvaluatedSiaeQuerySet:
-    def test_viewable(self):
-        institution = InstitutionFactory()
-        viewable_archived_evaluated_siae = ArchivedEvaluatedSiaeFactory(
-            for_snapshot=True, evaluation_campaign__institution=institution
-        )
-        ArchivedEvaluatedSiaeFactory(
-            for_snapshot=True,
-            evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
-            evaluation_campaign__institution=institution,
-        )
-        assertQuerySetEqual(ArchivedEvaluatedSiae.objects.viewable(), [viewable_archived_evaluated_siae])
 
 
 class TestEvaluatedJobApplicationModel:

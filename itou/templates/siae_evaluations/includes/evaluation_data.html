@@ -56,12 +56,6 @@
                         {% endif %}
                     </li>
                 {% endfor %}
-                {% for archived_evaluated_siae in archived_evaluation_history %}
-                    <li>
-                        Période du {{ archived_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ archived_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
-                        <b class="text-success">Positif</b>
-                    </li>
-                {% endfor %}
             </ul>
             <p>2021 : Campagne non concernée par les sanctions</p>
         </div>

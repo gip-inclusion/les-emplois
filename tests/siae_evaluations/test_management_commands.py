@@ -8,7 +8,7 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.management.commands.archive_accepted_evaluated_siae import DELAY
-from itou.siae_evaluations.models import ArchivedEvaluatedSiae, EvaluatedJobApplication, EvaluatedSiae
+from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -574,13 +574,22 @@ class TestArchivedAcceptedEvaluatedSiae:
         )
         EvaluatedJobApplicationFactory.create_batch(3, evaluated_siae=self.evaluated_siae)
 
-    def test_wet_run(self):
+    def test_wet_run(self, caplog):
         call_command("archive_accepted_evaluated_siae")
-        EvaluatedSiae.objects.get()
+        EvaluatedSiae.objects.get(archive_accepted_job_applications_nb__isnull=True)
         assert EvaluatedJobApplication.objects.count() == 3
-        assert not ArchivedEvaluatedSiae.objects.exists()
+        assert caplog.messages[:-1] == [
+            "Command launched with wet_run=False",
+            "Found count=1 EvaluatedSiae to archive",
+            "Deleted count=3 linked EvaluatedJobApplication",
+            "Archived count=1 EvaluatedSiae",
+            "Setting transaction to be rollback as wet_run=False",
+        ]
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.archive_accepted_evaluated_siae succeeded"
+        )
 
-    def test_archived_evaluated_siae(self, snapshot):
+    def test_archived_evaluated_siae(self, caplog):
         undesired_evaluated_siae = [
             # evaluated_siae_in_active_campaign
             EvaluatedSiaeFactory(evaluation_campaign__institution__department="76"),
@@ -599,14 +608,23 @@ class TestArchivedAcceptedEvaluatedSiae:
             EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
         call_command("archive_accepted_evaluated_siae", wet_run=True)
-        assertQuerySetEqual(EvaluatedSiae.objects.all(), undesired_evaluated_siae, ordered=False)
+        assert caplog.messages[:-1] == [
+            "Found count=1 EvaluatedSiae to archive",
+            "Deleted count=3 linked EvaluatedJobApplication",
+            "Archived count=1 EvaluatedSiae",
+        ]
+        assert caplog.messages[-1].startswith(
+            "Management command itou.siae_evaluations.management.commands.archive_accepted_evaluated_siae succeeded"
+        )
+        assertQuerySetEqual(
+            EvaluatedSiae.objects.filter(archive_accepted_job_applications_nb__isnull=True),
+            undesired_evaluated_siae,
+            ordered=False,
+        )
         assertQuerySetEqual(
             EvaluatedJobApplication.objects.all(),
             [evaluated_siae.evaluated_job_applications.first() for evaluated_siae in undesired_evaluated_siae],
             ordered=False,
         )
-
-        archived_evaluated_siaes = ArchivedEvaluatedSiae.objects.filter(
-            evaluation_campaign=self.evaluated_siae.evaluation_campaign, siae=self.evaluated_siae.siae
-        ).values("reviewed_at", "final_reviewed_at", "final_state", "job_applications_count")
-        assert archived_evaluated_siaes == snapshot(name="archived_evaluated_siae")
+        self.evaluated_siae.refresh_from_db()
+        assert self.evaluated_siae.archive_accepted_job_applications_nb == 3
