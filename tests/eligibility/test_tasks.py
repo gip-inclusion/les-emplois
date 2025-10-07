@@ -65,7 +65,7 @@ class TestCertifyCriteriaApiParticulier:
     def test_retry_task_rate_limits(self, factory, respx_mock):
         with freeze_time("2024-09-12T00:00:00Z"):
             eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-            respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").mock(
+            respx_mock.get("https://fake-api-particulier.com/api/v2/revenu-solidarite-active").mock(
                 return_value=httpx.Response(429, headers={"Retry-After": "1"}, json={}),
             )
 
@@ -113,7 +113,7 @@ class TestCertifyCriteriaApiParticulier:
         self, status_code, json_data, headers, retry_task_exception, factory, respx_mock
     ):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+        respx_mock.get("https://fake-api-particulier.com/api/v2/revenu-solidarite-active").respond(
             status_code, json=json_data, headers=headers
         )
         try:

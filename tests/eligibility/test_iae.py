@@ -3,7 +3,6 @@ from functools import partial
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
@@ -500,7 +499,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     ],
 )
 def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, EligibilityDiagnosisFactory):
-    RSA_ENDPOINT = f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active"
+    RSA_ENDPOINT = "https://fake-api-particulier.com/api/v2/revenu-solidarite-active"
     respx_mock.get(RSA_ENDPOINT).mock(side_effect=Exception)
     job_seeker = JobSeekerFactory()  # Missing data.
     eligibility_diagnosis = EligibilityDiagnosisFactory(
@@ -606,7 +605,7 @@ def test_selected_administrative_criteria_certified(
         certifiable=True,
         criteria_kinds=[AdministrativeCriteriaKind.RSA],
     )
-    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+    respx_mock.get("https://fake-api-particulier.com/api/v2/revenu-solidarite-active").respond(
         response_status, json=response
     )
 
