@@ -9,6 +9,7 @@ import pytest
 from allauth.account.models import EmailAddress
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual
@@ -48,6 +49,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.brevo import MalformedResponseException
+from itou.utils.models import PkSupportRemark
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import (
     create_city_geispolsheim,
@@ -1493,6 +1495,11 @@ class TestAnonymizeProfessionalManagementCommand:
         assert respx_mock.calls.call_count == 2
         assert "Anonymized professionals after grace period, count: 4" in caplog.messages
         assert "Included in this count: 2 to delete, 2 to remove from contact" in caplog.messages
+
+        remark = PkSupportRemark.objects.get(
+            content_type=ContentType.objects.get_for_model(User), object_id=prescriber.id
+        )
+        assert remark.remark.endswith("- Désactivation/archivage de l'utilisateur")
 
     def test_anonymize_professional_had_membership_in_authorized_organization(
         self, django_capture_on_commit_callbacks, caplog, respx_mock
