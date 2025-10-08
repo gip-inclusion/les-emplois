@@ -1499,74 +1499,104 @@
 # name: test_show_view
   '''
   <div class="c-box mb-3 mb-md-4">
-      <h2>
-          Détail de la demande
-      </h2>
-      <hr/>
-      <h3>
-          Adressé à
-          <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-              <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
-              </i>
-          </button>
-      </h3>
-      <p>
-          Pierre DUPONT a été sollicité pour cette demande.
-      </p>
-      <h3>
-          Date de fin de PASS IAE demandée : 31/01/2000
-      </h3>
-      <p>
-          La prolongation est demandée pour une durée de 30 jours.
-      </p>
-      <h3>
-          Motif sélectionné par l’employeur
-      </h3>
-      <p>
-          50 ans et plus
-      </p>
-      <h3>
-          Bilan des actions réalisées
-      </h3>
-      <p>
-          Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-      </p>
-      <p>
-          <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-              <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-              </i>
-              <span>
-                  Télécharger le bilan
-              </span>
-          </a>
-      </p>
-      <h3>
-          Explications supplémentaires
-      </h3>
-      <p>
-          L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-      </p>
-      <p>
-          <i aria-hidden="true" class="ri-mail-line">
-          </i>
-          <a class="btn-link me-3" href="mailto:email@example.com">
-              email@example.com
-          </a>
-          <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-              </i>
-              <span>
-                  Copier
-              </span>
-          </button>
-      </p>
-      <p>
-          <i aria-hidden="true" class="ri-phone-line">
-          </i>
-          <a class="btn-link" href="tel:+33123456789">
-              +33123456789
-          </a>
-      </p>
+      <div class="row mb-3">
+          <div class="col-12 col-sm">
+              <h3 class="mb-0">
+                  Détail de la demande
+              </h3>
+          </div>
+          <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+              <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                  </i>
+                  <span>
+                      Télécharger le bilan
+                  </span>
+              </a>
+          </div>
+      </div>
+      <ul class="list-data mt-3">
+          <li>
+              <small>
+                  Adressé à
+                  <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                      <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                      </i>
+                  </button>
+              </small>
+              <p>
+                  Pierre DUPONT
+              </p>
+          </li>
+          <li>
+              <small class="d-sm-block">
+                  Date de fin de PASS IAE demandée
+                  <button data-bs-title="La prolongation est demandée pour une durée de 30 jours." data-bs-toggle="tooltip" type="button">
+                      <i aria-label="La prolongation est demandée pour une durée de 30 jours." class="ri-information-line ri-xl text-info">
+                      </i>
+                  </button>
+              </small>
+              <strong>
+                  31/01/2000 (durée de 30 jours)
+              </strong>
+          </li>
+          <li>
+              <small>
+                  Motif sélectionné par l’employeur
+              </small>
+              <p>
+                  50 ans et plus
+              </p>
+          </li>
+          <li>
+              <small>
+                  Bilan des actions réalisées
+              </small>
+              <p>
+                  <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                      Bilan des actions réalisées et actions prévues avec le salarié
+                  </a>
+              </p>
+          </li>
+          <li>
+              <small>
+                  Explications supplémentaires
+              </small>
+              <p>
+                  L’employeur a fait une demande d'entretien téléphonique.
+              </p>
+          </li>
+          <li>
+              <small>
+                  Adresse e-mail de l'employeur
+              </small>
+              <strong>
+                  email@example.com
+              </strong>
+              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                  </i>
+                  <span class="visually-hidden">
+                      Copier
+                  </span>
+              </button>
+          </li>
+          <li>
+              <small>
+                  Téléphone de l'employeur
+              </small>
+              <strong>
+                  +33123456789
+              </strong>
+              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                  </i>
+                  <span class="visually-hidden">
+                      Copier
+                  </span>
+              </button>
+          </li>
+      </ul>
   </div>
   
   '''
@@ -1608,83 +1638,107 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <div class="c-box mb-3 mb-md-4">
-                          <h2>
-                              Décision
-                          </h2>
-                          <hr/>
-                          <p class="mb-2 fw-bold text-danger">
-                              Demande refusée le 01 janvier 2000 par Pierre DUPONT
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2>
-                              Détail de la demande
-                          </h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
-                                  </i>
-                              </button>
-                          </h3>
-                          <p>
-                              Pierre DUPONT a été sollicité pour cette demande.
-                          </p>
-                          <h3>
-                              Date de fin de PASS IAE demandée : 31/01/2000
-                          </h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>
-                              Motif sélectionné par l’employeur
-                          </h3>
-                          <p>
-                              50 ans et plus
-                          </p>
-                          <h3>
-                              Bilan des actions réalisées
-                          </h3>
-                          <p>
-                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                          </p>
-                          <p>
-                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-                                  </i>
-                                  <span>
-                                      Télécharger le bilan
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Détail de la demande
+                                  </h3>
+                                  <span class="text-danger fs-sm">
+                                      Demande refusée le 01 janvier 2000 par Pierre DUPONT
                                   </span>
-                              </a>
-                          </p>
-                          <h3>
-                              Explications supplémentaires
-                          </h3>
-                          <p>
-                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-mail-line">
-                              </i>
-                              <a class="btn-link me-3" href="mailto:email@example.com">
-                                  email@example.com
-                              </a>
-                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                  </i>
-                                  <span>
-                                      Copier
-                                  </span>
-                              </button>
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-phone-line">
-                              </i>
-                              <a class="btn-link" href="tel:+33123456789">
-                                  +33123456789
-                              </a>
-                          </p>
+                              </div>
+                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                      </i>
+                                      <span>
+                                          Télécharger le bilan
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                          <ul class="list-data mt-3">
+                              <li>
+                                  <small>
+                                      Adressé à
+                                      <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <p>
+                                      Pierre DUPONT
+                                  </p>
+                              </li>
+                              <li>
+                                  <small class="d-sm-block">
+                                      Date de fin de PASS IAE demandée
+                                      <button data-bs-title="La prolongation est demandée pour une durée de 30 jours." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="La prolongation est demandée pour une durée de 30 jours." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <strong>
+                                      31/01/2000 (durée de 30 jours)
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Motif sélectionné par l’employeur
+                                  </small>
+                                  <p>
+                                      50 ans et plus
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Bilan des actions réalisées
+                                  </small>
+                                  <p>
+                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                          Bilan des actions réalisées et actions prévues avec le salarié
+                                      </a>
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Explications supplémentaires
+                                  </small>
+                                  <p>
+                                      L’employeur a fait une demande d'entretien téléphonique.
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Adresse e-mail de l'employeur
+                                  </small>
+                                  <strong>
+                                      email@example.com
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <small>
+                                      Téléphone de l'employeur
+                                  </small>
+                                  <strong>
+                                      +33123456789
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -1747,7 +1801,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <button aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
@@ -1854,83 +1908,107 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <div class="c-box mb-3 mb-md-4">
-                          <h2>
-                              Décision
-                          </h2>
-                          <hr/>
-                          <p class="mb-2 fw-bold text-success">
-                              Demande acceptée le 01 janvier 2000 par Pierre DUPONT
-                          </p>
-                      </div>
-                      <div class="c-box mb-3 mb-md-4">
-                          <h2>
-                              Détail de la demande
-                          </h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
-                                  </i>
-                              </button>
-                          </h3>
-                          <p>
-                              Pierre DUPONT a été sollicité pour cette demande.
-                          </p>
-                          <h3>
-                              Date de fin de PASS IAE demandée : 31/01/2000
-                          </h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>
-                              Motif sélectionné par l’employeur
-                          </h3>
-                          <p>
-                              50 ans et plus
-                          </p>
-                          <h3>
-                              Bilan des actions réalisées
-                          </h3>
-                          <p>
-                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                          </p>
-                          <p>
-                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-                                  </i>
-                                  <span>
-                                      Télécharger le bilan
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Détail de la demande
+                                  </h3>
+                                  <span class="text-success fs-sm">
+                                      Demande acceptée le 01 janvier 2000 par Pierre DUPONT
                                   </span>
-                              </a>
-                          </p>
-                          <h3>
-                              Explications supplémentaires
-                          </h3>
-                          <p>
-                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-mail-line">
-                              </i>
-                              <a class="btn-link me-3" href="mailto:email@example.com">
-                                  email@example.com
-                              </a>
-                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                  </i>
-                                  <span>
-                                      Copier
-                                  </span>
-                              </button>
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-phone-line">
-                              </i>
-                              <a class="btn-link" href="tel:+33123456789">
-                                  +33123456789
-                              </a>
-                          </p>
+                              </div>
+                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                      </i>
+                                      <span>
+                                          Télécharger le bilan
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                          <ul class="list-data mt-3">
+                              <li>
+                                  <small>
+                                      Adressé à
+                                      <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <p>
+                                      Pierre DUPONT
+                                  </p>
+                              </li>
+                              <li>
+                                  <small class="d-sm-block">
+                                      Date de fin de PASS IAE demandée
+                                      <button data-bs-title="La prolongation est demandée pour une durée de 30 jours." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="La prolongation est demandée pour une durée de 30 jours." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <strong>
+                                      31/01/2000 (durée de 30 jours)
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Motif sélectionné par l’employeur
+                                  </small>
+                                  <p>
+                                      50 ans et plus
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Bilan des actions réalisées
+                                  </small>
+                                  <p>
+                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                          Bilan des actions réalisées et actions prévues avec le salarié
+                                      </a>
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Explications supplémentaires
+                                  </small>
+                                  <p>
+                                      L’employeur a fait une demande d'entretien téléphonique.
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Adresse e-mail de l'employeur
+                                  </small>
+                                  <strong>
+                                      email@example.com
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <small>
+                                      Téléphone de l'employeur
+                                  </small>
+                                  <strong>
+                                      +33123456789
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -1993,7 +2071,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <button aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
@@ -2128,74 +2206,104 @@
               <div class="s-section__row row">
                   <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
                       <div class="c-box mb-3 mb-md-4">
-                          <h2>
-                              Détail de la demande
-                          </h2>
-                          <hr/>
-                          <h3>
-                              Adressé à
-                              <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
-                                  <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
-                                  </i>
-                              </button>
-                          </h3>
-                          <p>
-                              Pierre DUPONT a été sollicité pour cette demande.
-                          </p>
-                          <h3>
-                              Date de fin de PASS IAE demandée : 31/01/2000
-                          </h3>
-                          <p>
-                              La prolongation est demandée pour une durée de 30 jours.
-                          </p>
-                          <h3>
-                              Motif sélectionné par l’employeur
-                          </h3>
-                          <p>
-                              50 ans et plus
-                          </p>
-                          <h3>
-                              Bilan des actions réalisées
-                          </h3>
-                          <p>
-                              Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                          </p>
-                          <p>
-                              <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
-                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-                                  </i>
-                                  <span>
-                                      Télécharger le bilan
-                                  </span>
-                              </a>
-                          </p>
-                          <h3>
-                              Explications supplémentaires
-                          </h3>
-                          <p>
-                              L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-mail-line">
-                              </i>
-                              <a class="btn-link me-3" href="mailto:email@example.com">
-                                  email@example.com
-                              </a>
-                              <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
-                                  <i aria-hidden="true" class="ri-file-copy-line fw-normal">
-                                  </i>
-                                  <span>
-                                      Copier
-                                  </span>
-                              </button>
-                          </p>
-                          <p>
-                              <i aria-hidden="true" class="ri-phone-line">
-                              </i>
-                              <a class="btn-link" href="tel:+33123456789">
-                                  +33123456789
-                              </a>
-                          </p>
+                          <div class="row mb-3">
+                              <div class="col-12 col-sm">
+                                  <h3 class="mb-0">
+                                      Détail de la demande
+                                  </h3>
+                              </div>
+                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                      </i>
+                                      <span>
+                                          Télécharger le bilan
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                          <ul class="list-data mt-3">
+                              <li>
+                                  <small>
+                                      Adressé à
+                                      <button data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <p>
+                                      Pierre DUPONT
+                                  </p>
+                              </li>
+                              <li>
+                                  <small class="d-sm-block">
+                                      Date de fin de PASS IAE demandée
+                                      <button data-bs-title="La prolongation est demandée pour une durée de 30 jours." data-bs-toggle="tooltip" type="button">
+                                          <i aria-label="La prolongation est demandée pour une durée de 30 jours." class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </button>
+                                  </small>
+                                  <strong>
+                                      31/01/2000 (durée de 30 jours)
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>
+                                      Motif sélectionné par l’employeur
+                                  </small>
+                                  <p>
+                                      50 ans et plus
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Bilan des actions réalisées
+                                  </small>
+                                  <p>
+                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                          Bilan des actions réalisées et actions prévues avec le salarié
+                                      </a>
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Explications supplémentaires
+                                  </small>
+                                  <p>
+                                      L’employeur a fait une demande d'entretien téléphonique.
+                                  </p>
+                              </li>
+                              <li>
+                                  <small>
+                                      Adresse e-mail de l'employeur
+                                  </small>
+                                  <strong>
+                                      email@example.com
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                              <li>
+                                  <small>
+                                      Téléphone de l'employeur
+                                  </small>
+                                  <strong>
+                                      +33123456789
+                                  </strong>
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="+33123456789" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </li>
+                          </ul>
                       </div>
                   </div>
                   <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
@@ -2269,7 +2377,7 @@
                               </li>
                           </ul>
                       </div>
-                      <div class="c-box c-box--structure">
+                      <div class="c-box c-box--structure mb-3 mb-md-4">
                           <button aria-controls="collapseBoxStructure" aria-expanded="false" class="c-box--structure__summary w-100" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse" type="button">
                               <i aria-hidden="true" class="ri-community-line">
                               </i>
