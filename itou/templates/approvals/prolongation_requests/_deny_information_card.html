@@ -1,26 +1,43 @@
 {% if prolongation_request.deny_information %}
     <div class="c-box mb-3 mb-md-4">
-        <h2>Détail du refus</h2>
-        <hr>
-        <h3>Traitement de la demande</h3>
-        <p>
-            Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
-        </p>
-        <h3>Motif du refus</h3>
-        <p>{{ prolongation_request.deny_information.get_reason_display }}</p>
-        <h3>Explications supplémentaires</h3>
-        <p>{{ prolongation_request.deny_information.reason_explanation }}</p>
-        {% if prolongation_request.deny_information.proposed_actions %}
-            <h3>Actions envisagées par le prescripteur habilité</h3>
-            <ul>
-                {% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
-                    <li>{{ proposed_action }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if prolongation_request.deny_information.proposed_actions_explanation %}
-            <h3>Précisions</h3>
-            <p>{{ prolongation_request.deny_information.proposed_actions_explanation }}</p>
-        {% endif %}
+        <h3>Détail du refus</h3>
+        <ul class="list-data">
+            <li>
+                <small>Traitement de la demande</small>
+                <strong>Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}</strong>
+            </li>
+            <li>
+                <small>Motif du refus</small>
+                <p>{{ prolongation_request.deny_information.get_reason_display }}</p>
+            </li>
+            <li class="has-forced-line-break">
+                <small>Explications supplémentaires</small>
+                <blockquote class="blockquote mt-2 mb-0">
+                    {{ prolongation_request.deny_information.reason_explanation|linebreaksbr }}
+                </blockquote>
+            </li>
+            {% if prolongation_request.deny_information.proposed_actions %}
+                <li>
+                    <small>Actions envisagées par le prescripteur habilité</small>
+                    {% if prolongation_request.deny_information.proposed_actions|length > 1 %}
+                        <ul>
+                            {% for proposed_action in prolongation_request.deny_information.get_proposed_actions_display %}
+                                <li>{{ proposed_action }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <strong>{{ prolongation_request.deny_information.get_proposed_actions_display.0 }}</strong>
+                    {% endif %}
+                </li>
+            {% endif %}
+            {% if prolongation_request.deny_information.proposed_actions_explanation %}
+                <li class="has-forced-line-break">
+                    <small>Précisions</small>
+                    <blockquote class="blockquote mt-2 mb-0">
+                        {{ prolongation_request.deny_information.proposed_actions_explanation|linebreaksbr }}
+                    </blockquote>
+                </li>
+            {% endif %}
+        </ul>
     </div>
 {% endif %}

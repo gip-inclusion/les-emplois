@@ -56,68 +56,79 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
-                    {% if prolongation_request.status == ProlongationRequestStatus.GRANTED %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2>Décision</h2>
-                            <hr>
-                            <p class="mb-2 fw-bold text-success">
-                                Demande acceptée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
-                            </p>
-                        </div>
-                    {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
-                        <div class="c-box mb-3 mb-md-4">
-                            <h2>Décision</h2>
-                            <hr>
-                            <p class="mb-2 fw-bold text-danger">
-                                Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
-                            </p>
-                        </div>
-                    {% endif %}
                     <div class="c-box mb-3 mb-md-4">
-                        <h2>Détail de la demande</h2>
-                        <hr>
-                        <h3>
-                            Adressé à
-                            <button type="button" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
-                                <i class="ri-information-line ri-xl text-info" aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
-                            </button>
-                        </h3>
-                        <p>{{ prolongation_request.assigned_to.get_full_name }} a été sollicité pour cette demande.</p>
-                        <h3>Date de fin de PASS IAE demandée : {{ prolongation_request.end_at|date:"d/m/Y" }}</h3>
-                        <p>
-                            La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}.
-                        </p>
-                        <h3>Motif sélectionné par l’employeur</h3>
-                        <p>{{ prolongation_request.get_reason_display }}</p>
-                        {% if prolongation_request.report_file %}
-                            <h3>Bilan des actions réalisées</h3>
-                            <p>
-                                Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
-                            </p>
-                            <p>
-                                <a class="btn btn-secondary btn-ico"
-                                   href="{% url "approvals:prolongation_request_report_file" prolongation_request_id=prolongation_request.pk %}"
-                                   download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx">
-                                    <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
-                                    <span>Télécharger le bilan</span>
-                                </a>
-                            </p>
-                        {% endif %}
-                        {% if prolongation_request.require_phone_interview %}
-                            <h3>Explications supplémentaires</h3>
-                            <p>
-                                L’employeur a fait une demande d'entretien téléphonique pour vous apporter des explications supplémentaires pour cette prolongation. Voici ses coordonnées :
-                            </p>
-                            <p>
-                                <i class="ri-mail-line" aria-hidden="true"></i>
-                                <a class="btn-link me-3" href="mailto:{{ prolongation_request.contact_email }}">{{ prolongation_request.contact_email }}</a>
-                                {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_email css_classes="btn btn-ico btn-secondary" %}
-                            </p>
-                            <p>
-                                <i class="ri-phone-line" aria-hidden="true"></i>
-                                <a class="btn-link" href="tel:{{ prolongation_request.contact_phone|cut:" " }}">{{ prolongation_request.contact_phone }}</a>
-                            </p>
-                        {% endif %}
+                        <div class="row mb-3">
+                            <div class="col-12 col-sm">
+                                <h3 class="mb-0">Détail de la demande</h3>
+                                {% if prolongation_request.status == ProlongationRequestStatus.GRANTED %}
+                                    <span class="text-success fs-sm">Demande acceptée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}</span>
+                                {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
+                                    <span class="text-danger fs-sm">Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}</span>
+                                {% endif %}
+                            </div>
+                            {% if prolongation_request.report_file %}
+                                <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                    <a class="btn btn-ico btn-outline-primary"
+                                       href="{% url "approvals:prolongation_request_report_file" prolongation_request_id=prolongation_request.pk %}"
+                                       download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx">
+                                        <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                                        <span>Télécharger le bilan</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <ul class="list-data mt-3">
+                            <li>
+                                <small>
+                                    Adressé à
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande.">
+                                        <i class="ri-information-line ri-xl text-info" aria-label="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                    </button>
+                                </small>
+                                <p>{{ prolongation_request.assigned_to.get_full_name }}</p>
+                            </li>
+                            <li>
+                                <small class="d-sm-block">
+                                    Date de fin de PASS IAE demandée
+                                    <button type="button"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-title="La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}.">
+                                        <i class="ri-information-line ri-xl text-info"
+                                           aria-label="La prolongation est demandée pour une durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }}."></i>
+                                    </button>
+                                </small>
+                                <strong>{{ prolongation_request.end_at|date:"d/m/Y" }} (durée de {{ prolongation_request.duration.days }} jour{{ prolongation_request.duration.days|pluralizefr }})</strong>
+                            </li>
+                            <li>
+                                <small>Motif sélectionné par l’employeur</small>
+                                <p>{{ prolongation_request.get_reason_display }}</p>
+                            </li>
+                            {% if prolongation_request.report_file %}
+                                <li>
+                                    <small>Bilan des actions réalisées</small>
+                                    <p>
+                                        <a href="{% url "approvals:prolongation_request_report_file" prolongation_request_id=prolongation_request.pk %}"
+                                           download="Bilan prolongation PASS IAE {{ prolongation_request.approval.number }} {{ prolongation_request.approval.user.get_full_name }}.xlsx (fichier excel)">Bilan des actions réalisées et actions prévues avec le salarié</a>
+                                    </p>
+                                </li>
+                            {% endif %}
+                            {% if prolongation_request.require_phone_interview %}
+                                <li>
+                                    <small>Explications supplémentaires</small>
+                                    <p>L’employeur a fait une demande d'entretien téléphonique.</p>
+                                </li>
+                                <li>
+                                    <small>Adresse e-mail de l'employeur</small>
+                                    <strong>{{ prolongation_request.contact_email }}</strong>
+                                    {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_email css_classes="btn-link" only_icon=True %}
+                                </li>
+                                <li>
+                                    <small>Téléphone de l'employeur</small>
+                                    <strong>{{ prolongation_request.contact_phone|cut:" " }}</strong>
+                                    {% include 'includes/copy_to_clipboard.html' with content=prolongation_request.contact_phone|cut:" " css_classes="btn-link" only_icon=True %}
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
                     {% include "approvals/prolongation_requests/_deny_information_card.html" %}
                 </div>
@@ -126,7 +137,7 @@
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
                         {% if siae %}
-                            {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True only %}
+                            {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class='mb-3 mb-md-4' only %}
                         {% endif %}
                     {% endwith %}
                 </div>
