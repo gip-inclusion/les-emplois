@@ -205,6 +205,7 @@ def merge_users(to_user, from_user, update_personal_data):
         migrate_field(model, field_name, from_user, to_user)
     # Keep the most recent last_login to prevent the kept account from being archived
     to_user.last_login = max(filter(None, [to_user.last_login, from_user.last_login]), default=None)
+    to_user.is_active |= from_user.is_active
     if update_personal_data:
         logger.info(get_log_prefix(to_user, from_user) + "Updated personal data")
         to_user.username = from_user.username

@@ -804,6 +804,30 @@ class TestMergeUsers:
                 "HTTP 302 Found",
             ]
 
+    def test_merge_is_active(self, client, caplog, subtests):
+        client.force_login(ItouStaffFactory(is_superuser=True))
+
+        for is_active_1, is_active_2, expected_is_active in [
+            (False, False, False),
+            (False, True, True),
+            (True, False, True),
+            (True, True, True),
+        ]:
+            caplog.clear()
+            with subtests.test(is_active_1=is_active_1, is_active_2=is_active_2):
+                user_1 = PrescriberFactory(is_active=is_active_1)
+                user_2 = PrescriberFactory(is_active=is_active_2)
+                url = reverse("itou_staff_views:merge_users_confirm", args=(user_1.public_id, user_2.public_id))
+                client.post(url, data={"user_to_keep": "to_user"})
+                merged_user = User.objects.get(pk=user_1.pk)
+                assert not User.objects.filter(pk=user_2.pk).exists()
+                assert merged_user.is_active == expected_is_active
+
+                assert caplog.messages == [
+                    f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — Done !",
+                    "HTTP 302 Found",
+                ]
+
 
 class TestOTP:
     @pytest.mark.parametrize(
