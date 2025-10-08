@@ -1,5 +1,6 @@
 import logging
 import os
+import urllib.parse
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -7,6 +8,15 @@ from sentry_sdk.integrations.httpx import HttpxIntegration
 from sentry_sdk.integrations.huey import HueyIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger
 from sentry_sdk.integrations.redis import RedisIntegration
+
+
+HTTP_QUERY_SENSITIVE_KEYS = [
+    "anneeDateNaissance",
+    "jourDateNaissance",
+    "moisDateNaissance",
+    "nomNaissance",
+    "prenoms[]",
+]
 
 
 def strip_sentry_sensitive_data(event, _hint):
@@ -17,6 +27,19 @@ def strip_sentry_sensitive_data(event, _hint):
     months before we realize a real error was silenced.
     Also, you cannot use the debugger here.
     """
+    for breadcrumb_value in event.get("breadcrumbs", {}).get("values", []):
+        if (
+            breadcrumb_value.get("type") == "http"
+            and breadcrumb_value.get("category") == "httplib"
+            and (query := breadcrumb_value.get("data", {}).get("http.query"))
+        ):
+            if any(sensitive_key in query for sensitive_key in HTTP_QUERY_SENSITIVE_KEYS):
+                parsed_query = urllib.parse.parse_qsl(query, keep_blank_values=True)
+                redacted_query = [
+                    (key, "_REDACTED_" if key in HTTP_QUERY_SENSITIVE_KEYS and value else value)
+                    for key, value in parsed_query
+                ]
+                breadcrumb_value["data"]["http.query"] = urllib.parse.urlencode(redacted_query)
     if "user" in event:
         # Unfortunately this does not work for the IP address
         # which keeps appearing. ¯\_(ツ)_/¯
