@@ -20,3 +20,13 @@ updates:
     allow:
       # Allow both direct and indirect updates for all packages
       - dependency-type: all
+    groups:
+      psycopg:
+        patterns:
+          - "psycopg*"
+      boto3:
+        patterns:
+          - "boto3"
+          - "botocore"
+          - "jmespath"
+          - "s3transfer"
