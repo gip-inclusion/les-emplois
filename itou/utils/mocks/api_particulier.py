@@ -8,6 +8,7 @@ class ResponseKind(enum.Enum):
     NOT_CERTIFIED = "not_certified"
     NOT_FOUND = "not_found"
     PROVIDER_UNKNOWN_ERROR = "provider_unknown_error"
+    UNPROCESSABLE_CONTENT = "unprocessable_entity"
 
 
 RESPONSES = {
@@ -45,6 +46,20 @@ RESPONSES = {
                         "meta": {"provider": "MSA"},
                     },
                 ],
+            },
+        },
+        ResponseKind.UNPROCESSABLE_CONTENT: {
+            "status_code": 422,
+            "json": {
+                "errors": [
+                    {
+                        "code": "00366",
+                        "title": "Entité non traitable",
+                        "detail": "Un ou plusieurs paramètres de civilité ne sont pas correctement formatés",
+                        "source": None,
+                        "meta": {},
+                    }
+                ]
             },
         },
         ResponseKind.PROVIDER_UNKNOWN_ERROR: {
