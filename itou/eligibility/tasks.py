@@ -54,10 +54,16 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
                     criterion.data_returned_by_api,
                 )
                 match exc.response.status_code:
-                    case 404:
+                    case (
+                        # Identity found, but not attached to a data provider
+                        # (no “caisse de rattachement”, or no entry for that
+                        # person in the “caisse de rattachement”).
+                        404
+                        # Identity not found, change the query parameters.
+                        | 422
+                    ):
                         if "errors" not in criterion.data_returned_by_api:
                             raise
-                        # Job seeker not found or missing profile information.
                         criterion.certified_at = timezone.now()
                     case 429:
                         # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie

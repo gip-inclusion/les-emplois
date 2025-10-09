@@ -109,6 +109,12 @@ class TestCertifyCriteriaApiParticulier:
             # "errors" is not in data, something went wrong, let the exception
             # bubble up for a retry.
             (404, {}, None, False),
+            (
+                RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["status_code"],
+                RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["json"],
+                None,
+                None,
+            ),
             (429, {}, None, False),
             (429, {}, {"Retry-After": "123"}, True),
             (502, {}, None, False),
