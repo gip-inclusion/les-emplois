@@ -53,7 +53,7 @@ from itou.utils.emails import get_email_message
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
-from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
+from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
 class UserQuerySet(models.QuerySet):
@@ -1126,9 +1126,9 @@ class JobSeekerProfile(models.Model):
             models.CheckConstraint(
                 condition=(
                     Q(birth_country=None, birth_place=None)
-                    | Q(birth_country__isnull=False, birth_country_id=Country.FRANCE_ID, birth_place__isnull=False)
+                    | Q(birth_country__isnull=False, birth_country=Country.FRANCE_ID, birth_place__isnull=False)
                     | Q(
-                        ~Q(birth_country__isnull=False, birth_country_id=Country.FRANCE_ID),
+                        ~Q(birth_country__isnull=False, birth_country=Country.FRANCE_ID),
                         Q(birth_place__isnull=True),
                     )
                 ),
@@ -1258,9 +1258,6 @@ class JobSeekerProfile(models.Model):
         if not self.user.title:
             raise ValidationError(self.ERROR_JOBSEEKER_TITLE)
 
-        # Check birth place and country
-        self._clean_birth_fields()
-
         if not self.education_level:
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
@@ -1294,14 +1291,6 @@ class JobSeekerProfile(models.Model):
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_COMMUNE)
-
-    def _clean_birth_fields(self):
-        """
-        Validation for FS
-        Mainly coherence checks for birth country / place.
-        Must be non blocking if these fields are not provided.
-        """
-        validate_birth_location(self.birth_country, self.birth_place)
 
     #  This used to be the `clean` method for the global model validation
     #  when using forms.

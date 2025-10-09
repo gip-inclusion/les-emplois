@@ -14,11 +14,9 @@ class Migration(migrations.Migration):
             constraint=models.CheckConstraint(
                 condition=models.Q(
                     models.Q(("birth_country", None), ("birth_place", None)),
+                    models.Q(("birth_country", 91), ("birth_country__isnull", False), ("birth_place__isnull", False)),
                     models.Q(
-                        ("birth_country__isnull", False), ("birth_country_id", 91), ("birth_place__isnull", False)
-                    ),
-                    models.Q(
-                        models.Q(("birth_country__isnull", False), ("birth_country_id", 91), _negated=True),
+                        models.Q(("birth_country", 91), ("birth_country__isnull", False), _negated=True),
                         models.Q(("birth_place__isnull", True)),
                     ),
                     _connector="OR",
