@@ -224,11 +224,15 @@ class ItouModelAdmin(ItouModelMixin, ModelAdmin):
 
 
 def add_support_remark_to_obj(obj, text):
+    if isinstance(obj._meta.pk, models.UUIDField):
+        remark_model = UUIDSupportRemark
+    else:
+        remark_model = PkSupportRemark
     obj_content_type = ContentType.objects.get_for_model(obj)
     try:
-        remark = PkSupportRemark.objects.filter(content_type=obj_content_type, object_id=obj.pk).get()
-    except PkSupportRemark.DoesNotExist:
-        PkSupportRemark.objects.create(content_type=obj_content_type, object_id=obj.pk, remark=text)
+        remark = remark_model.objects.filter(content_type=obj_content_type, object_id=obj.pk).get()
+    except remark_model.DoesNotExist:
+        remark_model.objects.create(content_type=obj_content_type, object_id=obj.pk, remark=text)
     else:
         remark.remark += "\n" + text
         remark.save(update_fields=("remark", "updated_at"))

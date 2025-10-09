@@ -43,8 +43,9 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
+from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.emails import redact_email_address
-from itou.utils.models import PkSupportRemark
+from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
@@ -1808,3 +1809,23 @@ def test_invalid_variable_in_template():
 
     # This should not fail with attrs tag
     assert Template("{% attrs invalid_variable %}").render(Context({})) == ""
+
+
+@pytest.mark.parametrize(
+    "remark_model,obj_factory",
+    [(PkSupportRemark, PrescriberFactory), (UUIDSupportRemark, JobApplicationFactory)],
+)
+def test_add_support_remark_to_obj(remark_model, obj_factory):
+    obj = obj_factory()
+    remark_qs = remark_model.objects.filter(
+        content_type=ContentType.objects.get_for_model(obj.__class__), object_id=obj.pk
+    )
+    assert not remark_qs.exists()
+    add_support_remark_to_obj(obj, "A remark")
+    remark = remark_qs.get()
+    assert remark.remark == "A remark"
+    add_support_remark_to_obj(obj, "Other remark")
+    updated_remark = remark_qs.get()
+    assert updated_remark.remark == "A remark\nOther remark"
+    assert remark.pk == updated_remark.pk
+    assert updated_remark.updated_at != remark.updated_at
