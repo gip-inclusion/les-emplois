@@ -102,8 +102,6 @@ class Command(BaseCommand):
                     else:
                         self.logger.info("[DRY RUN] Would delete contact: %s", email)
 
-                self.logger.info("Found %d emails to delete at offset %d", len(emails_to_delete), offset)
-
                 offset += limit
 
         self.logger.info("Found %d emails to delete", emails_to_delete_count)
