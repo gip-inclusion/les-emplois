@@ -879,29 +879,6 @@ class TestJobSeekerProfileModel:
         self.profile.unemployed_since = None
         assert self.profile.is_employed
 
-    def test_valid_birth_place_and_country(self):
-        """
-        Birth place and country are not mandatory except for ASP / FS
-        We must check that if the job seeker is born in France,
-        if the commune is provided
-
-        Otherwise, if the job seeker is born in another country,
-        the commune must remain empty.
-        """
-        profile = JobSeekerFactory().jobseeker_profile
-
-        # Valid use cases:
-
-        # No commune and no country
-        assert profile._clean_birth_fields() is None
-
-        # France and Commune filled
-        profile = JobSeekerFactory(born_in_france=True).jobseeker_profile
-        assert profile._clean_birth_fields() is None
-
-        profile = JobSeekerFactory(born_outside_france=True).jobseeker_profile
-        assert profile._clean_birth_fields() is None
-
     @pytest.mark.parametrize(
         "factory_kwargs",
         [
@@ -911,11 +888,17 @@ class TestJobSeekerProfileModel:
         ],
     )
     def test_valid_birth_place_and_country_constraint(self, factory_kwargs):
+        profile = JobSeekerFactory().jobseeker_profile
+        profile_values = JobSeekerFactory.build(**factory_kwargs).jobseeker_profile
         with pytest.raises(
             IntegrityError,
             match='new row for relation ".*" violates check constraint "jobseekerprofile_birth_country_and_place"',
         ):
-            JobSeekerFactory(**factory_kwargs)
+            # Use update query to bypass model validation
+            JobSeekerProfile.objects.filter(pk=profile.pk).update(
+                birth_place=profile_values.birth_place,
+                birth_country=profile_values.birth_country,
+            )
 
 
 def user_with_approval_in_waiting_period():

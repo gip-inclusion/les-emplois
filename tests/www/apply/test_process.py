@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.db.models import Exists, OuterRef, Q
+from django.forms.models import ALL_FIELDS
 from django.template.defaultfilters import urlencode as urlencode_filter
 from django.urls import reverse
 from django.utils import timezone
@@ -3290,7 +3291,12 @@ class TestProcessAcceptViews:
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
         )
 
-        assert response.context["form_personal_data"].errors == {"birth_place": [expected_msg]}
+        assert response.context["form_personal_data"].errors == {
+            "birth_place": [expected_msg],
+            ALL_FIELDS: [
+                "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la France."
+            ],
+        }
 
         # assert malformed birthdate does not crash view
         post_data["birthdate"] = "20240-001-001"
@@ -3334,7 +3340,10 @@ class TestProcessAcceptViews:
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
-                    <li>Si le pays de naissance est la France, la commune de naissance est obligatoire.</li>
+                    <li>
+                        La commune de naissance doit être spécifiée si et seulement si le pays de naissance
+                        est la France.
+                    </li>
                 </ul>
             </div>""",
             html=True,
@@ -3370,7 +3379,10 @@ class TestProcessAcceptViews:
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
-                    <li>Il n'est pas possible de saisir une commune de naissance hors de France.</li>
+                    <li>
+                        La commune de naissance doit être spécifiée si et seulement si le pays de naissance
+                        est la France.
+                    </li>
                 </ul>
             </div>""",
             html=True,
