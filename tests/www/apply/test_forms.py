@@ -202,7 +202,11 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         create_test_cities(["54", "57"], num_per_department=2)
 
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
+        job_application = JobApplicationFactory(
+            to_company__kind=CompanyKind.GEIQ,
+            state="processing",
+            job_seeker__born_outside_france=True,
+        )
         job_description = JobDescriptionFactory(company=job_application.to_company)
         city = City.objects.order_by("?").first()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -213,6 +217,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         assert response.status_code == 200
 
         post_data = {
+            "birth_country": job_application.job_seeker.jobseeker_profile.birth_country_id,
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "prehiring_guidance_days": faker.pyint(),
@@ -247,7 +252,11 @@ class TestJobApplicationAcceptFormWithGEIQFields:
 
     def test_geiq_inverted_vae_fields(self, client, faker):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
+        job_application = JobApplicationFactory(
+            to_company__kind=CompanyKind.GEIQ,
+            state="processing",
+            job_seeker__born_outside_france=True,
+        )
         job_description = JobDescriptionFactory(company=job_application.to_company)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -257,6 +266,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         assert response.status_code == 200
 
         post_data = {
+            "birth_country": job_application.job_seeker.jobseeker_profile.birth_country_id,
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "hired_job": job_description.pk,
@@ -286,7 +296,9 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
         # with a SIAE
-        job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI, state="processing")
+        job_application = JobApplicationFactory(
+            to_company__kind=CompanyKind.EI, state="processing", job_seeker__born_outside_france=True
+        )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(job_application.to_company.members.first())
@@ -295,6 +307,7 @@ class TestJobApplicationAcceptFormWithGEIQFields:
         assert response.status_code == 200
 
         post_data = {
+            "birth_country": job_application.job_seeker.jobseeker_profile.birth_country_id,
             "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
             "hiring_end_at": f"{faker.future_date(end_date='+3M'):%Y-%m-%d}",
             "prehiring_guidance_days": faker.pyint(),

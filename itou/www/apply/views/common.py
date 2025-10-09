@@ -51,12 +51,11 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             )
             forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
         elif self.company.kind == CompanyKind.GEIQ:
-            if self.geiq_eligibility_diagnosis and self.geiq_eligibility_diagnosis.criteria_can_be_certified():
-                forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
-                    instance=self.job_seeker.jobseeker_profile,
-                    birthdate=self.job_seeker.jobseeker_profile.birthdate,
-                    data=self.request.POST or None,
-                )
+            forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
+                instance=self.job_seeker.jobseeker_profile,
+                birthdate=self.job_seeker.jobseeker_profile.birthdate,
+                data=self.request.POST or None,
+            )
 
         forms["accept"] = AcceptForm(
             instance=self.job_application,
@@ -147,7 +146,8 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
                     form_user_address.save()
                 if form_birth_place := forms.get("birth_place"):
                     form_birth_place.save()
-                    self.geiq_eligibility_diagnosis.schedule_certification()
+                    if self.geiq_eligibility_diagnosis:
+                        self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = forms["accept"].save(commit=False)
                 if creating:
