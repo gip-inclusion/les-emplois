@@ -39,7 +39,7 @@ def context(**kwargs):
 
     with cm:
         yield
-    _context.data = previous_data
+    _context.data, _context.last_data_set = previous_data, None
 
 
 class FieldsHistory(core.Trigger):
