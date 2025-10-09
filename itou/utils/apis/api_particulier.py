@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.users.enums import Title
 
 
 logger = logging.getLogger("APIParticulierClient")
@@ -35,7 +36,7 @@ def _build_params_from(job_seeker):
         "moisDateNaissance": jobseeker_profile.birthdate.month,
         "jourDateNaissance": jobseeker_profile.birthdate.day,
         "codeCogInseePaysNaissance": f"99{jobseeker_profile.birth_country.code}",
-        "sexeEtatCivil": "F" if job_seeker.title == "MME" else job_seeker.title,
+        "sexeEtatCivil": "F" if job_seeker.title == Title.MME else job_seeker.title,
     }
     if jobseeker_profile.is_born_in_france:
         params["codeCogInseeCommuneNaissance"] = jobseeker_profile.birth_place.code
