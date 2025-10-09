@@ -237,6 +237,22 @@ def test_external_data_source_history(admin_client):
     assertContains(response, code, html=True)
 
 
+JOBSEEKERPROFILE_FORMSETS_PAYLOAD = {
+    "identity_certifications-TOTAL_FORMS": "0",
+    "identity_certifications-INITIAL_FORMS": "0",
+    "identity_certifications-MIN_NUM_FORMS": "0",
+    "identity_certifications-MAX_NUM_FORMS": "0",
+    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+    "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+    "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+    "utils-pksupportremark-content_type-object_id-0-remark": "",
+    "utils-pksupportremark-content_type-object_id-0-id": "",
+    "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+    "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+}
+
+
 def test_change_asp_uid(admin_client):
     profile = JobSeekerProfileFactory(asp_uid="000000000000000000000000000000")
 
@@ -271,18 +287,7 @@ def test_change_asp_uid(admin_client):
             "hexa_non_std_extension": "",
             "hexa_lane_name": "",
             "hexa_additional_address": "",
-            "identity_certifications-TOTAL_FORMS": "0",
-            "identity_certifications-INITIAL_FORMS": "0",
-            "identity_certifications-MIN_NUM_FORMS": "0",
-            "identity_certifications-MAX_NUM_FORMS": "0",
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
-            "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
-            "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
-            "utils-pksupportremark-content_type-object_id-0-remark": "",
-            "utils-pksupportremark-content_type-object_id-0-id": "",
-            "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
-            "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+            **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
         },
     )
     profile.refresh_from_db()
@@ -334,3 +339,45 @@ def test_change_display_with_pii(admin_client):
         reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker.jobseeker_profile.pk})
     )
     assertContains(response, f"<h2>{job_seeker.display_with_pii}</h2>")
+
+
+def test_change_birth_information(admin_client):
+    profile = JobSeekerFactory(born_in_france=True, with_birth_place=True).jobseeker_profile
+
+    response = admin_client.post(
+        reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk}),
+        {
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+            "user": profile.user.pk,
+            "asp_uid": profile.asp_uid,
+            "birthdate": profile.birthdate,
+            "birth_place": profile.birth_place.pk,
+            "birth_country": "",
+            "education_level": "",
+            "nir": "",
+            "lack_of_nir_reason": "",
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": "",
+            "pole_emploi_since": "",
+            "unemployed_since": "",
+            "created_by_prescriber_organization": "",
+            "has_rsa_allocation": "NON",
+            "rsa_allocation_since": "",
+            "ass_allocation_since": "",
+            "aah_allocation_since": "",
+            "are_allocation_since": "",
+            "activity_bonus_since": "",
+            "actor_met_for_business_creation": "",
+            "mean_monthly_income_before_process": "",
+            "eiti_contributions": "",
+            "hexa_lane_number": "",
+            "hexa_std_extension": "",
+            "hexa_non_std_extension": "",
+            "hexa_lane_name": "",
+            "hexa_additional_address": "",
+            **JOBSEEKERPROFILE_FORMSETS_PAYLOAD,
+        },
+    )
+    assertContains(
+        response, "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la France."
+    )
