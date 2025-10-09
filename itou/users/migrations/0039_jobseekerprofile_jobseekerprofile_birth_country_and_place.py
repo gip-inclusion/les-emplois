@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                     _connector="OR",
                 ),
                 name="jobseekerprofile_birth_country_and_place",
-                violation_error_message="La commune de naissance ne doit être spécifiée que quand le pays de naissance est la France.",  # noqa: E501
+                violation_error_message="La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la France.",  # noqa: E501
             ),
         ),
     ]
