@@ -582,9 +582,10 @@ class TestUtilsValidators:
         with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
             validate_pole_emploi_id("123412345654")
         with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
-            validate_pole_emploi_id("A234567É")
+            validate_pole_emploi_id("A234567E")
         validate_pole_emploi_id("12345678")
         validate_pole_emploi_id("1234567E")
+        validate_pole_emploi_id("1234567È")
 
     def test_validate_birthdate(self):
         # Min.
