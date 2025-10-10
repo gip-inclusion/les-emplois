@@ -37,7 +37,7 @@ from tests.approvals.factories import (
     ProlongationFactory,
     SuspensionFactory,
 )
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
@@ -1085,3 +1085,45 @@ def test_prolongation_inconsistency_check(admin_client):
             )
         ],
     )
+
+
+def test_prolongation_creation(admin_client):
+    company_membership = CompanyMembershipFactory()
+    approval = ApprovalFactory()
+    creation_data = {
+        "_save": "Enregistrer",
+        "approval": str(approval.pk),
+        "start_at": approval.end_at.strftime("%d/%m/%Y"),
+        "end_at": (approval.end_at + timedelta(days=10)).strftime("%d/%m/%Y"),
+        "reason": "COMPLETE_TRAINING",
+        "reason_explanation": "",
+        "declared_by": str(company_membership.user.pk),
+        "declared_by_siae": str(company_membership.company.pk),
+        "validated_by": "",
+        "prescriber_organization": "",
+        "contact_email": "",
+        "contact_phone": "",
+        "request": "",
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MIN_NUM_FORMS": "0",
+        "utils-pksupportremark-content_type-object_id-MAX_NUM_FORMS": "1",
+        "utils-pksupportremark-content_type-object_id-0-remark": "",
+        "utils-pksupportremark-content_type-object_id-0-id": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-remark": "",
+        "utils-pksupportremark-content_type-object_id-__prefix__-id": "",
+    }
+    url = reverse("admin:approvals_prolongation_add")
+
+    # Test typo in approval pk
+    response = admin_client.post(
+        url,
+        data={**creation_data, "approval": str(approval.pk + 1)},
+    )
+    assertContains(response, "Le PASS IAE est obligatoire.")
+    assert approval.prolongation_set.count() == 0
+
+    # Big success
+    response = admin_client.post(url, data=creation_data)
+    assert response.status_code == 302
+    assert approval.prolongation_set.count() == 1

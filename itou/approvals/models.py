@@ -1516,6 +1516,9 @@ class CommonProlongation(models.Model):
             ]:
                 raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
+        if not hasattr(self, "approval"):
+            raise ValidationError("Le PASS IAE est obligatoire.")
+
         # Avoid blocking updates in admin by limiting this check to only new instances.
         if not self.pk and self.start_at != self.approval.end_at:
             raise ValidationError(
