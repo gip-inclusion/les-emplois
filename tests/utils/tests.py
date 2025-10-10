@@ -575,13 +575,13 @@ class TestUtilsValidators:
         validate_post_code("12345")
 
     def test_validate_pole_emploi_id(self):
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
             validate_pole_emploi_id("A2345678")
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
             validate_pole_emploi_id("1234")
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
             validate_pole_emploi_id("123412345654")
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match="Le format de l’identifiant France Travail est invalide."):
             validate_pole_emploi_id("A234567É")
         validate_pole_emploi_id("12345678")
         validate_pole_emploi_id("1234567E")
