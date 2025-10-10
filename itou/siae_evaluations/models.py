@@ -565,6 +565,11 @@ class EvaluatedSiae(models.Model):
         null=True,
         editable=False,
     )
+    archive_accepted_job_applications_nb = models.PositiveSmallIntegerField(
+        verbose_name="nombre d'auto-prescriptions acceptées avant archivage",
+        editable=False,
+        null=True,
+    )
 
     objects = EvaluatedSiaeQuerySet.as_manager()
 

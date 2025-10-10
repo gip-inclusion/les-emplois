@@ -188,6 +188,7 @@
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
                  "siae_evaluations_evaluatedsiae"."final_state",
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb",
                  "siae_evaluations_evaluationcampaign"."id",
                  "siae_evaluations_evaluationcampaign"."name",
                  "siae_evaluations_evaluationcampaign"."created_at",
@@ -411,6 +412,7 @@
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
                  "siae_evaluations_evaluatedsiae"."final_state",
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb",
                  "siae_evaluations_evaluationcampaign"."id",
                  "siae_evaluations_evaluationcampaign"."name",
                  "siae_evaluations_evaluationcampaign"."created_at",
@@ -824,7 +826,8 @@
                  "siae_evaluations_evaluatedsiae"."notification_reason",
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
-                 "siae_evaluations_evaluatedsiae"."final_state"
+                 "siae_evaluations_evaluatedsiae"."final_state",
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           WHERE ("siae_evaluations_evaluationcampaign"."ended_at" IS NULL
@@ -1064,7 +1067,8 @@
                  "siae_evaluations_evaluatedsiae"."notification_reason",
                  "siae_evaluations_evaluatedsiae"."notification_text",
                  "siae_evaluations_evaluatedsiae"."reminder_sent_at",
-                 "siae_evaluations_evaluatedsiae"."final_state"
+                 "siae_evaluations_evaluatedsiae"."final_state",
+                 "siae_evaluations_evaluatedsiae"."archive_accepted_job_applications_nb"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
           WHERE ("siae_evaluations_evaluationcampaign"."ended_at" IS NULL
