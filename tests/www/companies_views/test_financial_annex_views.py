@@ -11,7 +11,7 @@ from tests.users.factories import EmployerFactory
 
 class TestShowAndSelectFinancialAnnex:
     def test_asp_source_siae_admin_can_see_but_cannot_select_af(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
         user = company.members.first()
         assert company.has_admin(user)
         assert company.should_have_convention
@@ -29,14 +29,11 @@ class TestShowAndSelectFinancialAnnex:
         assert response.status_code == 403
 
     def test_user_created_siae_admin_can_see_and_select_af(self, client):
-        company = CompanyFactory(
-            source=Company.SOURCE_USER_CREATED,
-            with_membership=True,
-        )
+        company = CompanyFactory(source=Company.SOURCE_USER_CREATED, with_membership=True, kind=CompanyKind.EI)
         user = company.members.first()
         old_convention = company.convention
         # Only conventions of the same SIREN can be selected.
-        new_convention = SiaeConventionFactory(siret_signature=f"{company.siren}12345")
+        new_convention = SiaeConventionFactory(siret_signature=f"{company.siren}12345", kind=CompanyKind.EI)
 
         assert company.has_admin(user)
         assert company.should_have_convention
@@ -67,7 +64,7 @@ class TestShowAndSelectFinancialAnnex:
         assert company.convention == new_convention
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self, client):
-        company = CompanyFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True)
+        company = CompanyFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True, kind=CompanyKind.EI)
         user = company.members.first()
         assert company.has_admin(user)
         assert company.should_have_convention
@@ -85,7 +82,7 @@ class TestShowAndSelectFinancialAnnex:
         assert response.status_code == 403
 
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
         user = EmployerFactory()
         company.members.add(user)
         assert not company.has_admin(user)

@@ -4,6 +4,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains
 
+from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordTransition
 from tests.companies.factories import CompanyFactory
@@ -21,7 +22,11 @@ class TestSummaryEmployeeRecords:
     def setup_method(self):
         # User must be super user for UI first part (tmp)
         self.company = CompanyFactory(
-            name="Wanna Corp.", membership__user__first_name="Billy", with_membership=True, with_jobs=True
+            name="Wanna Corp.",
+            membership__user__first_name="Billy",
+            with_membership=True,
+            with_jobs=True,
+            kind=CompanyKind.EI,
         )
         self.user = self.company.members.get(first_name="Billy")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(

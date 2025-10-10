@@ -534,6 +534,7 @@ def test_exports_download(client, snapshot):
         job_seeker__phone="3949",
         job_seeker__jobseeker_profile__birthdate=datetime.date(2000, 1, 2),
         to_company__name="Le fameux garage",
+        to_company__kind=CompanyKind.EI,
         sender=job_application.sender,
     )
     client.force_login(job_application.sender)

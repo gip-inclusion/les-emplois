@@ -7,6 +7,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries
 
+from itou.companies.enums import CompanyKind
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
@@ -31,6 +32,7 @@ class TestEvaluationCampaignAdmin:
             siae__siret="00000000000040",
             siae__convention__siret_signature="00000000000032",
             siae__phone="",
+            siae__kind=CompanyKind.EI,
         )
         CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+1@beta.gouv.fr")
         CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+2@beta.gouv.fr")
@@ -41,6 +43,7 @@ class TestEvaluationCampaignAdmin:
             siae__siret="12345678900040",
             siae__convention__siret_signature="12345678900032",
             siae__phone="0612345678",
+            siae__kind=CompanyKind.EI,
             reviewed_at=timezone.now(),
         )
         CompanyMembershipFactory(company=campaign2_siae.siae, user__email="campaign2@beta.gouv.fr")
@@ -53,6 +56,7 @@ class TestEvaluationCampaignAdmin:
             siae__siret="11111111100040",
             siae__convention__siret_signature="11111111100032",
             siae__phone="0611111111",
+            siae__kind=CompanyKind.EI,
             notified_at=timezone.now(),
             notification_text="Justificatifs mangés par le chat",
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
@@ -64,6 +68,7 @@ class TestEvaluationCampaignAdmin:
             siae__name="les machins",
             siae__convention__siret_signature="22222222200032",
             siae__phone="0622222222",
+            siae__kind=CompanyKind.EI,
             reviewed_at=timezone.now() - relativedelta(days=2),
             final_reviewed_at=timezone.now() - relativedelta(days=1),
         )
@@ -72,6 +77,7 @@ class TestEvaluationCampaignAdmin:
             siae__name="les machins le retour",
             siae__convention__siret_signature="22222222200033",
             siae__phone="0633333333",
+            siae__kind=CompanyKind.EI,
         )
         campaign4_jobapp = EvaluatedJobApplicationFactory.create(evaluated_siae=campaign4_siae)
         EvaluatedAdministrativeCriteriaFactory(

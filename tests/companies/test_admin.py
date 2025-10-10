@@ -55,7 +55,7 @@ class TestCompanyAdmin:
             data={
                 "id": company.id,
                 "siret": company.siret,
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
@@ -101,7 +101,7 @@ class TestCompanyAdmin:
             data={
                 "id": company.id,
                 "siret": company.siret,
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
@@ -149,7 +149,7 @@ class TestCompanyAdmin:
             data={
                 "id": company.id,
                 "siret": company.siret,
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
@@ -197,7 +197,7 @@ class TestCompanyAdmin:
             data={
                 "id": company.id,
                 "siret": company.siret,
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "name": company.name,
                 "phone": company.phone,
                 "email": company.email,
