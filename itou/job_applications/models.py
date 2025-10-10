@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from django.conf import settings
@@ -42,6 +43,9 @@ from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
@@ -1040,6 +1044,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.save(update_fields={"eligibility_diagnosis", "updated_at"})
             eligibility_diagnosis.delete()
 
+        # Delete comments
+        del_count, _ = JobApplicationComment.objects.filter(job_application=self.pk).delete()
+        if del_count:
+            logger.info("job_application=%s was transferred and %d comments were deleted", self.pk, del_count)
+
         notification_context = {
             "job_application": self,
             "transferred_by": user,
@@ -1424,6 +1433,26 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationState.choices)
         return choices[self.to_state]
+
+
+class JobApplicationComment(models.Model):
+    job_application = models.ForeignKey(
+        JobApplication,
+        verbose_name="candidature",
+        related_name="comments",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(verbose_name="posté le", auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="posté par", on_delete=models.RESTRICT)
+    message = models.TextField(verbose_name="commentaire")
+
+    class Meta:
+        verbose_name = "commentaire de candidature"
+        verbose_name_plural = "commentaires de candidature"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Commentaire {self.pk} sur la candidature {self.job_application}"
 
 
 class PriorAction(models.Model):
