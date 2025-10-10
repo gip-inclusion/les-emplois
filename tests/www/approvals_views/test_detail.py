@@ -13,6 +13,7 @@ from itou.approvals.enums import (
     ProlongationRequestStatus,
 )
 from itou.approvals.models import Approval
+from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
@@ -561,9 +562,19 @@ class TestContractView:
 
         # Displayed contracts
         ContractFactory(
-            company__name="Tif'any", job_seeker=approval.user, start_date="2025-01-01", end_date="2025-08-07"
+            company__name="Tif'any",
+            company__kind=CompanyKind.EI,
+            job_seeker=approval.user,
+            start_date="2025-01-01",
+            end_date="2025-08-07",
         )
-        ContractFactory(company__name="Tralal’Hair", job_seeker=approval.user, start_date="2025-02-01", end_date=None)
+        ContractFactory(
+            company__name="Tralal’Hair",
+            company__kind=CompanyKind.EI,
+            job_seeker=approval.user,
+            start_date="2025-02-01",
+            end_date=None,
+        )
 
         client.force_login(company.members.first())
         response = client.get(reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))

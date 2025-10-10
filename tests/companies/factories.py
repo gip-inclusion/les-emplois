@@ -57,8 +57,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     # factory.Sequence() start with 0 and an ASP ID should be greater than 0
     asp_id = factory.Sequence(lambda n: n + 1)
     is_active = True
@@ -125,6 +124,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             )
         )
         for_snapshot = factory.Trait(
+            kind=CompanyKind.EI,
             name="ACME Inc.",
             address_line_1="112 rue de la Croix-Nivert",
             post_code="75015",
@@ -145,8 +145,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

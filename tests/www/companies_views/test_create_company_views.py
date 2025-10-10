@@ -66,7 +66,7 @@ class TestCreateCompanyView:
         response = client.get(url)
         assert response.status_code == 200
 
-        preexisting_company = CompanyFactory()
+        preexisting_company = CompanyFactory(kind=company.kind)
         new_siret = preexisting_company.siret
         assert company.siren != preexisting_company.siren
         assert Company.objects.filter(siret=new_siret).exists()
