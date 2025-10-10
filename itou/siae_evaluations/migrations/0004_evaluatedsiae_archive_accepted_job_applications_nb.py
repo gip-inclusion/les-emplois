@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="evaluatedsiae",
             name="archive_accepted_job_applications_nb",
-            field=models.PositiveIntegerField(
+            field=models.PositiveSmallIntegerField(
                 editable=False, null=True, verbose_name="nombre d'auto-prescriptions acceptées avant archivage"
             ),
         ),
