@@ -36,21 +36,21 @@ class Command(BaseCommand):
     )
     @dry_runnable
     def handle(self, *args, wet_run, **options):
-        evaluated_siaes = list(
+        evaluated_siaes_to_archive = list(
             EvaluatedSiae.objects.filter(
                 evaluation_campaign__ended_at__lt=timezone.now() - DELAY,
                 final_state=EvaluatedSiaeFinalState.ACCEPTED,
                 archive_accepted_job_applications_nb__isnull=True,
             ).annotate(count_evaluated_applications=Count("evaluated_job_applications__id"))
         )
-        self.logger.info("Found count=%d EvaluatedSiae to archive", len(evaluated_siaes))
-        if not evaluated_siaes:
+        self.logger.info("Found count=%d EvaluatedSiae to archive", len(evaluated_siaes_to_archive))
+        if not evaluated_siaes_to_archive:
             return
 
-        for evaluated_siae in evaluated_siaes:
+        for evaluated_siae in evaluated_siaes_to_archive:
             evaluated_siae.archive_accepted_job_applications_nb = evaluated_siae.count_evaluated_applications
-        EvaluatedSiae.objects.bulk_update(evaluated_siaes, ["archive_accepted_job_applications_nb"], batch_size=1000)
-        _, objs = EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes).delete()
+        EvaluatedSiae.objects.bulk_update(evaluated_siaes_to_archive, ["archive_accepted_job_applications_nb"])
+        _, objs = EvaluatedJobApplication.objects.filter(evaluated_siae__in=evaluated_siaes_to_archive).delete()
         deleted_job_applications_nb = objs.get("siae_evaluations.EvaluatedJobApplication", 0)
         self.logger.info("Deleted count=%d linked EvaluatedJobApplication", deleted_job_applications_nb)
-        self.logger.info("Archived count=%d EvaluatedSiae", len(evaluated_siaes))
+        self.logger.info("Archived count=%d EvaluatedSiae", len(evaluated_siaes_to_archive))
