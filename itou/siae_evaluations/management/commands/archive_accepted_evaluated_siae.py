@@ -20,7 +20,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--wet-run",
             action="store_true",
-            help="Archive Siae evalutions whose final state is ACCEPTED, once the evaluation campaign is closed",
+            help="Archive SIAE evaluations whose final state is ACCEPTED, once the evaluation campaign is closed",
         )
 
     @monitor(
