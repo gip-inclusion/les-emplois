@@ -574,7 +574,7 @@ class TestArchivedAcceptedEvaluatedSiae:
         )
         EvaluatedJobApplicationFactory.create_batch(3, evaluated_siae=self.evaluated_siae)
 
-    def test_wet_run(self, caplog):
+    def test_dry_run(self, caplog):
         call_command("archive_accepted_evaluated_siae")
         EvaluatedSiae.objects.get(archive_accepted_job_applications_nb__isnull=True)
         assert EvaluatedJobApplication.objects.count() == 3
