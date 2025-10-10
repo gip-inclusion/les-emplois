@@ -1,8 +1,3 @@
-
-<p class="fs-sm">
-    <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
-</p>
-
 {% if eligibility_diagnosis.selected_administrative_criteria_for_display %}
     {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
         <p class="mb-2">
@@ -16,40 +11,30 @@
         </p>
         {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
         {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
-        <ul>
+        <ul class="list-data mb-3">
             {% for level, criteria in levels_list %}
                 {% comment %}
                 Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
                 {% endcomment %}
-                {% if not flat_criteria_list %}
-                    <li>
-                        <span class="fw-bold">{{ level }}</span>
-                        <ul>
-                        {% endif %}
+                <li>
+                    {% if not flat_criteria_list %}
+                        <small>{{ level }}</small>
+                    {% else %}
+                        <small>Critères</small>
+                    {% endif %}
+                    <ul>
                         {% for criterion in criteria %}
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            <li>
+                                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            </li>
                         {% endfor %}
-                        {% if not flat_criteria_list %}
-                        </ul>
-                    </li>
-                {% endif %}
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
     {% endwith %}
 {% endif %}
 
 {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis itou_help_center_url=itou_help_center_url request=request only %}
-
-<p class="mb-0">
-    <i>
-        {% if is_sent_by_authorized_prescriber %}
-            Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% else %}
-            Ce diagnostic expire le
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% endif %}
-    </i>
-</p>
