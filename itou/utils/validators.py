@@ -36,6 +36,8 @@ def validate_naf(naf):
 
 
 def validate_pole_emploi_id(pole_emploi_id):
+    if not pole_emploi_id.isascii():
+        raise ValidationError("L’identifiant France Travail ne doit pas contenir de caractères spéciaux.")
     is_old_format = len(pole_emploi_id) == 8 and pole_emploi_id[:7].isdigit() and pole_emploi_id[7:].isalnum()
     is_new_format = len(pole_emploi_id) == 11 and pole_emploi_id.isdigit()
     if not (is_new_format or is_old_format):
