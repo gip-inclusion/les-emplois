@@ -571,8 +571,15 @@ class TestArchivedAcceptedEvaluatedSiae:
             reviewed_at=timezone.make_aware(datetime.datetime(2024, 5, 17, 10, 10, 10)),
             final_reviewed_at=timezone.make_aware(datetime.datetime(2024, 7, 16, 11, 11, 11)),
             final_state=evaluation_enums.EvaluatedSiaeFinalState.ACCEPTED,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        EvaluatedJobApplicationFactory.create_batch(3, evaluated_siae=self.evaluated_siae)
+        EvaluatedJobApplicationFactory.create_batch(
+            2,
+            evaluated_siae=self.evaluated_siae,
+            complete=True,
+            criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
 
     def test_wet_run(self, caplog):
         call_command("archive_accepted_evaluated_siae")
@@ -592,20 +599,26 @@ class TestArchivedAcceptedEvaluatedSiae:
     def test_archived_evaluated_siae(self, caplog):
         undesired_evaluated_siae = [
             # evaluated_siae_in_active_campaign
-            EvaluatedSiaeFactory(evaluation_campaign__institution__department="76"),
+            EvaluatedSiaeFactory(
+                evaluation_campaign__institution__department="76",
+                complete=True,
+                job_app__criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            ),
             # evaluated_siae_in_recently_closed_campaign
             EvaluatedSiaeFactory(
-                evaluation_campaign__institution__department="54", evaluation_campaign__ended_at=timezone.now()
+                evaluation_campaign__institution__department="54",
+                evaluation_campaign__ended_at=timezone.now(),
+                complete=True,
+                job_app__criteria__review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
             ),
             # refused_evaluated_siae
             EvaluatedSiaeFactory(
                 evaluation_campaign__institution__department="38",
                 evaluation_campaign__ended_at=timezone.now() - DELAY,
                 final_state=evaluation_enums.EvaluatedSiaeFinalState.REFUSED,
+                complete=True,
             ),
         ]
-        for evaluated_siae in undesired_evaluated_siae:
-            EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
         call_command("archive_accepted_evaluated_siae", wet_run=True)
         assert caplog.messages[:-1] == [
