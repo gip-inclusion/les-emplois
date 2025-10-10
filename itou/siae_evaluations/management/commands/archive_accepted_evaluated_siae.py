@@ -26,7 +26,7 @@ class Command(BaseCommand):
     @monitor(
         monitor_slug="archive_accepted_evaluated_siae",
         monitor_config={
-            "schedule": {"type": "crontab", "value": "0 7 * * MON-FRI"},
+            "schedule": {"type": "crontab", "value": "0 7 * * *"},
             "checkin_margin": 5,
             "max_runtime": 10,
             "failure_issue_threshold": 2,
