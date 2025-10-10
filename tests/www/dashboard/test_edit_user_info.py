@@ -530,7 +530,10 @@ class TestEditUserInfoView:
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
-                    <li>Si le pays de naissance est la France, la commune de naissance est obligatoire.</li>
+                    <li>
+                        La commune de naissance doit être spécifiée si et seulement si le pays de naissance
+                        est la France.
+                    </li>
                 </ul>
             </div>""",
             html=True,
@@ -571,7 +574,10 @@ class TestEditUserInfoView:
                     <strong>Votre formulaire contient une erreur</strong>
                 </p>
                 <ul class="mb-0">
-                    <li>Il n'est pas possible de saisir une commune de naissance hors de France.</li>
+                    <li>
+                        La commune de naissance doit être spécifiée si et seulement si le pays de naissance
+                        est la France.
+                    </li>
                 </ul>
             </div>""",
             html=True,

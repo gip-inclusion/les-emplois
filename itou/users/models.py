@@ -15,7 +15,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, OuterRef, Q, Value
 from django.db.models.functions import Upper
 from django.urls import reverse
 from django.utils import timezone
@@ -53,7 +53,7 @@ from itou.utils.emails import get_email_message
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
-from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
+from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
 class UserQuerySet(models.QuerySet):
@@ -1134,7 +1134,8 @@ class JobSeekerProfile(models.Model):
                 ),
                 name="jobseekerprofile_birth_country_and_place",
                 violation_error_message=(
-                    "La commune de naissance ne doit être spécifiée que quand le pays de naissance est la France."
+                    "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la "
+                    "France."
                 ),
             ),
             models.UniqueConstraint(
@@ -1158,6 +1159,14 @@ class JobSeekerProfile(models.Model):
 
     def __str__(self):
         return f"JobSeekerProfile — pk={self.pk}"
+
+    def _get_field_expression_map(self, meta, exclude=None):
+        map = super()._get_field_expression_map(meta, exclude=exclude)
+        if exclude is None or "birth_country" not in exclude:
+            # jobseekerprofile_birth_country_and_place constraint is based on birth_country_id (and not birth_country)
+            # so we need to include it in the map for validate_constraints to work
+            map["birth_country_id"] = Value(self.birth_country_id, self._meta.get_field("birth_country"))
+        return map
 
     @property
     def display_with_pii(self):
@@ -1257,9 +1266,6 @@ class JobSeekerProfile(models.Model):
         if not self.user.title:
             raise ValidationError(self.ERROR_JOBSEEKER_TITLE)
 
-        # Check birth place and country
-        self._clean_birth_fields()
-
         if not self.education_level:
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
@@ -1293,14 +1299,6 @@ class JobSeekerProfile(models.Model):
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_COMMUNE)
-
-    def _clean_birth_fields(self):
-        """
-        Validation for FS
-        Mainly coherence checks for birth country / place.
-        Must be non blocking if these fields are not provided.
-        """
-        validate_birth_location(self.birth_country, self.birth_place)
 
     #  This used to be the `clean` method for the global model validation
     #  when using forms.

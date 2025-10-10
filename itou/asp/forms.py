@@ -1,10 +1,8 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, Country
 from itou.users.models import JobSeekerProfile
-from itou.utils.validators import validate_birth_location
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
@@ -57,11 +55,6 @@ class BirthPlaceModelForm(forms.ModelForm):
             else:
                 # Display the error above the field instead of top of page.
                 self.add_error("birth_country", "Le pays de naissance est obligatoire.")
-
-        try:
-            validate_birth_location(birth_country, birth_place)
-        except ValidationError as e:
-            self.add_error(None, e)
 
         # Country coherence is done at model level (users.User)
         # Here we must add coherence between birthdate and communes
