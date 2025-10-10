@@ -16,6 +16,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
+from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand, dry_runnable
 
 
@@ -162,6 +163,10 @@ class Command(BaseCommand):
             coords=None,
             insee_city=None,
         )
+        for user in users:
+            add_support_remark_to_obj(
+                user, f"{timezone.localtime().replace(microsecond=0)} - Désactivation/archivage de l'utilisateur"
+            )
 
     def remove_from_contact(self, users):
         for user in users:
