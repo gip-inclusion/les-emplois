@@ -63,11 +63,12 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
                         # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                         raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc
                     case 502:
-                        if (
-                            len(criterion.data_returned_by_api["errors"]) == 1
-                            and criterion.data_returned_by_api["errors"][0]["code"]
-                            == api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE
-                        ):
+                        if len(criterion.data_returned_by_api["errors"]) == 1 and criterion.data_returned_by_api[
+                            "errors"
+                        ][0]["code"] in {
+                            api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE,
+                            api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_SECURITE_SOCIALE_ERROR_CODE,
+                        }:
                             # Retrying won’t fix the issue.
                             logger.info(
                                 "Error certifying criterion %r, API Particulier got an unknown response "

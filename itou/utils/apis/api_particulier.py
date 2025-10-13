@@ -18,6 +18,7 @@ ENDPOINTS = {
 # From the docs for the 502 HTTP response content:
 # “La réponse retournée par le fournisseur de données est invalide et inconnue de notre service.”
 UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE = "37999"
+UNKNOWN_RESPONSE_FROM_PROVIDER_SECURITE_SOCIALE_ERROR_CODE = "36999"
 
 
 def client():
