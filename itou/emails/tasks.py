@@ -9,6 +9,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.db import ProgrammingError, connection, transaction
 from huey.contrib.djhuey import on_commit_task
+from huey.exceptions import CancelExecution
 from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
@@ -117,7 +118,7 @@ def _async_send_message(email_id, *, task=None):
         # Commit the email status to the DB.
     if not success:
         if task.retries:
-            raise Exception("Huey, please retry this task.")
+            raise CancelExecution(retry=True)
         # Last attempt failed, let’s get a report.
         sentry_sdk.capture_message(f"Could not send {email.pk=}.", "error")
         return 0
