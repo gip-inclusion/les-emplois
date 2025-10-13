@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2025-10-13
+
+### Ajouté
+
+- [Recherche employeur : Pouvoir sauvegarder ma recherche et y accéder depuis l'accueil](https://github.com/gip-inclusion/les-emplois/pull/6757)
+
+### Modifié
+
+- [Accessibilité: Correction du dropdown .c-box--structure](https://github.com/gip-inclusion/les-emplois/pull/6951)
+- [Admin: ajout de la date de modification de la remarque support](https://github.com/gip-inclusion/les-emplois/pull/6968)
+- [Admin: correction du statut "Actif" lors de la fusion de deux utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6974)
+- [Admin: garder la dernière date de connexion lors de la fusion de deux utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6964)
+- [Admin: gestion de l'erreur d'identifiant de PASS IAE lors de la création d'une prolongation](https://github.com/gip-inclusion/les-emplois/pull/6980)
+- [Candidat: empêcher la saisie de caractères spéciaux dans l'identifiant France Travail](https://github.com/gip-inclusion/les-emplois/pull/6983)
+- [Interface: Amélioration du résumé de la demande de prolongation](https://github.com/gip-inclusion/les-emplois/pull/6909)
+- [Pilotage: Ajout du sub ProConnect à la table des utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/6939)
+- [Tech: suppression automatique des commentaires support orphelins](https://github.com/gip-inclusion/les-emplois/pull/6969)
+
+### Tech
+
+- [api_particulier: Passage à la V3](https://github.com/gip-inclusion/les-emplois/pull/6932)
+
 ## 2025-10-06
 
 ### Ajouté
