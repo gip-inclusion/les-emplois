@@ -209,14 +209,24 @@ def company_select(request, template_name="signup/company_select.html"):
 
     if request.method == "POST" and company_select_form and company_select_form.is_valid():
         company_selected = company_select_form.cleaned_data["siaes"]
-        company_selected.new_signup_activation_email_to_official_contact(request).send()
-        message = (
-            f"Nous venons d'envoyer un e-mail à l'adresse {company_selected.obfuscated_auth_email} "
-            f"pour continuer votre inscription. Veuillez consulter votre boite "
-            f"de réception."
-        )
-        messages.success(request, message)
-        return HttpResponseRedirect(next_url or reverse("search:employers_home"))
+        obfuscated_auth_email = company_selected.obfuscated_auth_email
+        if not obfuscated_auth_email:
+            messages.error(
+                request,
+                (
+                    "L'adresse e-mail de contact du correspondant de cette structure n'est pas renseignée ou "
+                    "incorrecte. Merci de contacter l’assistance pour continuer l'inscription."
+                ),
+            )
+        else:
+            company_selected.new_signup_activation_email_to_official_contact(request).send()
+            message = (
+                f"Nous venons d'envoyer un e-mail à l'adresse {company_selected.obfuscated_auth_email} "
+                f"pour continuer votre inscription. Veuillez consulter votre boite "
+                f"de réception."
+            )
+            messages.success(request, message)
+            return HttpResponseRedirect(next_url or reverse("search:employers_home"))
 
     context = {
         "next_url": next_url,
