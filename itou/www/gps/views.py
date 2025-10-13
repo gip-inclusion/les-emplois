@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
 
-from itou.gps.grist import log_contact_info_display
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -305,8 +304,6 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
             "are_colleagues": are_colleagues,
         },
     )
-    # FIXME(alaurent) remove GRIST logging once we checked that the new logs allow the same level of analysis
-    log_contact_info_display(request.user, follow_up_group, target_participant, mode)
     return render(request, template_name, {"member": target_participant})
 
 
