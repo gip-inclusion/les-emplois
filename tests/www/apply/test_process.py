@@ -3152,12 +3152,14 @@ class TestProcessAcceptViews:
 
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
-    def test_accept_no_siae_criteria_can_be_certified(self, client, mocker, from_kind):
+    def test_accept_not_an_siae_or_geiq_cannot_be_certified(self, client, mocker, from_kind):
         mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
-        company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
+        # No eligibility diagnosis for other company kinds.
+        kind = random.choice([x for x in CompanyKind if x not in [*CompanyKind.siae_kinds(), CompanyKind.GEIQ]])
+        company = CompanyFactory(kind=kind, with_membership=True, with_jobs=True)
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
