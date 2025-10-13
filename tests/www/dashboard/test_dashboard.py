@@ -342,7 +342,7 @@ class TestDashboardView:
                 assertNotContains(response, self.apply_start_hire_url(company))
 
     def test_dashboard_agreements_with_suspension_sanction(self, client):
-        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),

@@ -339,7 +339,7 @@ class TestProcessViews:
                 assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
     def test_details_for_company_certified_criteria_after_expiration(self, client):
-        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         now = timezone.now()
         today = timezone.localdate(now)
         job_seeker = JobSeekerFactory()
@@ -1809,8 +1809,8 @@ class TestProcessViews:
     @pytest.mark.parametrize(
         "eligibility_trait,expected_msg",
         [
-            ("subject_to_eligibility", IAE_CANCELLATION_CONFIRMATION),
-            ("not_subject_to_eligibility", NON_IAE_CANCELLATION_CONFIRMATION),
+            ("subject_to_iae_rules", IAE_CANCELLATION_CONFIRMATION),
+            ("not_subject_to_iae_rules", NON_IAE_CANCELLATION_CONFIRMATION),
         ],
     )
     def test_cancel(self, client, eligibility_trait, expected_msg):
@@ -1837,7 +1837,7 @@ class TestProcessViews:
         assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
 
     def test_cancel_clean_back_url(self, client):
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_iae_rules=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 

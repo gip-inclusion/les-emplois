@@ -18,7 +18,7 @@ def tests_employers_without_company(client, snapshot):
 
 
 def tests_employers_with_inactive_company(client, snapshot):
-    user = CompanyMembershipFactory(company__subject_to_eligibility=True, company__convention=None).user
+    user = CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user
     client.force_login(user)
     response = client.get("dashboard:index", follow=True)
 

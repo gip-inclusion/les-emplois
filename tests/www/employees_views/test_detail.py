@@ -107,7 +107,7 @@ class TestEmployeeDetailView:
         assert response.status_code == 404
 
     def test_detail_view_no_approval(self, client):
-        company = CompanyFactory(with_membership=True, subject_to_eligibility=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         job_seeker = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED).job_seeker

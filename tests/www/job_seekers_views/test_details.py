@@ -68,7 +68,7 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
     )
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
 
-    iae_employer = CompanyMembershipFactory(company__subject_to_eligibility=True).user
+    iae_employer = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
 
     client.force_login(prescriber_membership.user)
     response = client.get(url)
@@ -80,7 +80,7 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
     soup = parse_response_to_soup(response, selector="#main")
     assert pretty_indented(soup) == snapshot(name="snapshot with diag")
 
-    non_iae_employer = CompanyMembershipFactory(company__not_subject_to_eligibility=True).user
+    non_iae_employer = CompanyMembershipFactory(company__not_subject_to_iae_rules=True).user
 
     client.force_login(non_iae_employer)
     response = client.get(url)
@@ -139,7 +139,7 @@ def test_single_geiq_diag_from_prescriber(client, snapshot):
     soup = parse_response_to_soup(response, selector="#main")
     assert pretty_indented(soup) == snapshot(name="snapshot with diag but without details")
 
-    non_geiq_employer = CompanyMembershipFactory(company__subject_to_eligibility=True).user
+    non_geiq_employer = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
     client.force_login(non_geiq_employer)
     response = client.get(url)
     soup = parse_response_to_soup(response, selector="#main")
@@ -190,7 +190,7 @@ def test_both_diag_from_company(client, snapshot):
         author=geiq_membership.user,
     )
     iae_membership = CompanyMembershipFactory(
-        company__subject_to_eligibility=True,
+        company__subject_to_iae_rules=True,
         company__for_snapshot=True,
         user__for_snapshot=True,
         user__public_id=uuid.uuid4(),

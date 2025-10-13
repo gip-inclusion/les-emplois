@@ -174,7 +174,7 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
 
 def test_create_then_accept_job_application(admin_client):
     job_seeker = JobSeekerFactory()
-    company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+    company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
     employer = company.members.first()
     post_data = {
         "job_seeker": job_seeker.pk,
@@ -334,7 +334,7 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
 
 def test_accept_job_application_not_subject_to_eligibility(admin_client):
     job_application = factories.JobApplicationFactory(
-        to_company__not_subject_to_eligibility=True,
+        to_company__not_subject_to_iae_rules=True,
         state=JobApplicationState.PROCESSING,
     )
 
@@ -429,7 +429,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
 
 def test_create_inconsistent_job_application(admin_client):
     job_seeker = JobSeekerFactory()
-    company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+    company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
     employer = company.members.first()
     approval = ApprovalFactory()
     post_data = {

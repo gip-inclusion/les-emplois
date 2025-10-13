@@ -1555,7 +1555,7 @@ def test_get_user_last_accepted_siae_job_application():
     now = timezone.now()
     job_application_1 = JobApplicationFactory(
         state=JobApplicationState.ACCEPTED,
-        to_company__subject_to_eligibility=True,
+        to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
         created_at=now + relativedelta(days=1),
     )
@@ -1565,7 +1565,7 @@ def test_get_user_last_accepted_siae_job_application():
     job_application_2 = JobApplicationFactory(
         job_seeker=user,
         state=JobApplicationState.ACCEPTED,
-        to_company__subject_to_eligibility=True,
+        to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
         created_at=now,
     )
@@ -1583,7 +1583,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
     now = timezone.now()
     job_application_1 = JobApplicationFactory(
         state=JobApplicationState.ACCEPTED,
-        to_company__subject_to_eligibility=True,
+        to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
         created_at=now,
         hiring_start_at=timezone.localdate(now) + relativedelta(days=1),
@@ -1594,7 +1594,7 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
     job_application_2 = JobApplicationFactory(
         job_seeker=user,
         state=JobApplicationState.ACCEPTED,
-        to_company__subject_to_eligibility=True,
+        to_company__subject_to_iae_rules=True,
         origin=Origin.PE_APPROVAL,
         created_at=now,
         hiring_start_at=timezone.localdate(now),
@@ -1607,12 +1607,12 @@ def test_get_user_last_accepted_siae_job_application_full_ordering():
 def test_last_hire_was_made_by_siae():
     siae_job_application = JobApplicationSentByJobSeekerFactory(
         state=JobApplicationState.ACCEPTED,
-        to_company__subject_to_eligibility=True,
+        to_company__subject_to_iae_rules=True,
     )
     user = siae_job_application.job_seeker
     newer_non_siae_job_application = JobApplicationSentByJobSeekerFactory(
         state=JobApplicationState.ACCEPTED,
-        to_company__not_subject_to_eligibility=True,
+        to_company__not_subject_to_iae_rules=True,
         job_seeker=user,
     )
     company_1 = siae_job_application.to_company
