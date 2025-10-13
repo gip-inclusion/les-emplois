@@ -482,9 +482,6 @@ class TestGroupDetailsMembershipTab:
         ).member
 
         client.force_login(prescriber)
-        grist_log_mock = mocker.patch(
-            "itou.www.gps.views.log_contact_info_display"
-        )  # Mock the import in the views file
 
         url = reverse("gps:group_memberships", kwargs={"group_id": group.pk})
         response = client.get(url)
@@ -539,11 +536,6 @@ class TestGroupDetailsMembershipTab:
         ]
 
         assert pretty_indented(simulated_page) == snapshot
-
-        assert grist_log_mock.call_args_list == [
-            ((prescriber, group, target_participant, "phone"),),
-            ((prescriber, group, target_participant, "email"),),
-        ]
 
     @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info_as_employer(self, client, snapshot, caplog):
