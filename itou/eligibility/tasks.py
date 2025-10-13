@@ -47,12 +47,6 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
                 data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
             except httpx.HTTPStatusError as exc:
                 criterion.data_returned_by_api = exc.response.json()
-                logger.error(
-                    "Error certifying criterion %r: code=%d json=%s",
-                    criterion,
-                    exc.response.status_code,
-                    criterion.data_returned_by_api,
-                )
                 match exc.response.status_code:
                     case (
                         # Identity found, but not attached to a data provider
@@ -74,9 +68,12 @@ def certify_criteria_by_api_particulier(eligibility_diagnosis):
                             and criterion.data_returned_by_api["errors"][0]["code"]
                             == api_particulier.UNKNOWN_RESPONSE_FROM_PROVIDER_CNAV_ERROR_CODE
                         ):
-                            # Retrying won’t fix the issue, and the error has
-                            # been logged already.
-                            pass
+                            # Retrying won’t fix the issue.
+                            logger.info(
+                                "Error certifying criterion %r, API Particulier got an unknown response "
+                                "from the data provider.",
+                                criterion,
+                            )
                         else:
                             raise
                     case _:

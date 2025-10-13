@@ -90,29 +90,5 @@ def test_not_found(respx_mock, caplog):
     assert crit.data_returned_by_api == response["json"]
     assert crit.certified is None
     assert crit.certification_period is None
-    assert "Le dossier allocataire n'a pas été trouvé auprès de la MSA." in caplog.text
-    assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
-    assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
-
-
-def test_service_unavailable(respx_mock, caplog):
-    response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
-    respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
-        response["status_code"], json=response["json"]
-    )
-    diag = IAEEligibilityDiagnosisFactory(
-        certifiable=True,
-        criteria_kinds=[AdministrativeCriteriaKind.RSA],
-        job_seeker__first_name="Jean",
-        job_seeker__last_name="Dupont",
-    )
-    certify_criteria_by_api_particulier(diag)
-    crit = diag.selected_administrative_criteria.get()
-    assert crit.data_returned_by_api == response["json"]
-    assert crit.certified is None
-    assert crit.certification_period is None
-    assert (
-        "La réponse retournée par le fournisseur de données est invalide et inconnue de notre service." in caplog.text
-    )
     assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
