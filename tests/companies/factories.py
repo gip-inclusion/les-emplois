@@ -81,8 +81,8 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     """Generate a Company() object for unit tests.
 
     Usage:
-        CompanyFactory(subject_to_eligibility=True, ...)
-        CompanyFactory(not_subject_to_eligibility=True, ...)
+        CompanyFactory(subject_to_iae_rules=True, ...)
+        CompanyFactory(not_subject_to_iae_rules=True, ...)
         CompanyFactory(with_membership=True, ...)
         CompanyFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), ...)
     """
@@ -92,10 +92,10 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True
 
     class Params:
-        subject_to_eligibility = factory.Trait(
+        subject_to_iae_rules = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
         )
-        not_subject_to_eligibility = factory.Trait(
+        not_subject_to_iae_rules = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in CompanyKind.siae_kinds()]),
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))

@@ -216,7 +216,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        request.user = CompanyMembershipFactory(company__subject_to_eligibility=True, company__convention=None).user
+        request.user = CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
