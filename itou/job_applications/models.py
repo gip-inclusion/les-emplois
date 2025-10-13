@@ -862,7 +862,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
-        return self.to_company.is_subject_to_eligibility_rules and not self.job_seeker.has_valid_diagnosis(
+        return self.to_company.is_subject_to_iae_rules and not self.job_seeker.has_valid_diagnosis(
             for_siae=self.to_company
         )
 
@@ -968,7 +968,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         Returns the eligibility diagnosis linked to this job application or None.
         """
-        if not self.to_company.is_subject_to_eligibility_rules:
+        if not self.to_company.is_subject_to_iae_rules:
             return None
         if self.eligibility_diagnosis:
             return self.eligibility_diagnosis
@@ -1067,7 +1067,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_hiring_start_at)
 
         # Link to the job seeker's eligibility diagnosis.
-        if self.to_company.is_subject_to_eligibility_rules:
+        if self.to_company.is_subject_to_iae_rules:
             # If request user is itou_staff keep the existing eligibility diagnosis
             if user.kind == UserKind.ITOU_STAFF and self.eligibility_diagnosis:
                 if not (
@@ -1082,7 +1082,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 )
 
         # Approval issuance logic.
-        if self.to_company.is_subject_to_eligibility_rules:
+        if self.to_company.is_subject_to_iae_rules:
             if self.job_seeker.has_latest_approval_in_waiting_period:
                 if self.job_seeker.new_approval_blocked_by_waiting_period(
                     siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization

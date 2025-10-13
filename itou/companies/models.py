@@ -431,7 +431,7 @@ class Company(AddressMixin, OrganizationAbstract):
         return self.siret[9:14]
 
     @property
-    def is_subject_to_eligibility_rules(self):
+    def is_subject_to_iae_rules(self):
         return self.kind in CompanyKind.siae_kinds()
 
     @property

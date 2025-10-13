@@ -87,7 +87,7 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
         return self.request.user.is_employer
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.company.is_subject_to_eligibility_rules:
+        if not self.company.is_subject_to_iae_rules:
             raise Http404()
 
         if suspension_explanation := self.company.get_active_suspension_text_with_dates():

@@ -9,7 +9,7 @@ Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_
 
 Ces dates sont uniquement pour information.
 
-{% if job_application.to_company.is_subject_to_eligibility_rules %}Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi.{% endif %}
+{% if job_application.to_company.is_subject_to_iae_rules %}Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi.{% endif %}
 
 {% if job_application.answer %}
 *Message de l'entreprise* :

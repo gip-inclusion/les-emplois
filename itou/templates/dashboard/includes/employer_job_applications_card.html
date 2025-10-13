@@ -23,7 +23,7 @@
                         <span class="badge rounded-pill badge-xs {{ category.badge }} text-info">{{ category.counter }}</span>
                     </li>
                 {% endfor %}
-                {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
+                {% if request.current_organization.is_subject_to_iae_rules or request.current_organization.kind == CompanyKind.GEIQ %}
                     {% if siae_suspension_text_with_dates %}
                         <button type="button"
                                 class="btn-link btn-ico"

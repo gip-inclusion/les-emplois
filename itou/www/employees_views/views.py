@@ -35,7 +35,7 @@ class EmployeeDetailView(DetailView):
         super().setup(request, *args, **kwargs)
         self.siae = get_current_company_or_404(request)
 
-        if not self.siae.is_subject_to_eligibility_rules:
+        if not self.siae.is_subject_to_iae_rules:
             raise PermissionDenied
 
     def get_queryset(self):

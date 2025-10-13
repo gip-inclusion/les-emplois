@@ -3251,7 +3251,7 @@ class TestProcessAcceptViews:
         job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
 
         # required assumptions for the test case
-        assert self.company.is_subject_to_eligibility_rules
+        assert self.company.is_subject_to_iae_rules
         ed = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker, for_siae=self.company)
         assert ed and ed.criteria_can_be_certified()
 

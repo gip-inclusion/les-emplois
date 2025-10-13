@@ -86,7 +86,7 @@
                                 {% endif %}
                             </div>
                         {% endif %}
-                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                        {% if job_application.to_company.is_subject_to_iae_rules %}
                             {% if request.user.is_employer %}
                                 {# Employers need to know the expiration date of an approval #}
                                 {# to decide whether they may accept a job application or not. #}

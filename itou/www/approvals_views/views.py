@@ -72,7 +72,7 @@ class ApprovalBaseViewMixin:
         super().setup(request, *args, **kwargs)
         self.siae = get_current_company_or_404(request)
 
-        if not self.siae.is_subject_to_eligibility_rules:
+        if not self.siae.is_subject_to_iae_rules:
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
@@ -264,7 +264,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         )
         context["can_be_prolonged_by_current_user"] = (
             self.request.user.is_employer
-            and self.request.current_organization.is_subject_to_eligibility_rules
+            and self.request.current_organization.is_subject_to_iae_rules
             and approval.can_be_prolonged
         )
 
@@ -337,7 +337,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
-    if not siae.is_subject_to_eligibility_rules or not approval.can_be_prolonged:
+    if not siae.is_subject_to_iae_rules or not approval.can_be_prolonged:
         raise PermissionDenied()
 
     back_url = prolongation_back_url(request)
@@ -421,7 +421,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         self.siae = get_current_company_or_404(request)
-        if not self.siae.is_subject_to_eligibility_rules:
+        if not self.siae.is_subject_to_iae_rules:
             raise PermissionDenied()
         self.approval = get_object_or_404(Approval, pk=approval_id)
 

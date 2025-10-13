@@ -214,7 +214,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
                     <div class="modal-body">
-                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                        {% if job_application.to_company.is_subject_to_iae_rules %}
                             <p>
                                 En validant, <strong>vous renoncez aux aides au poste</strong> liées à cette candidature pour tous les jours travaillés de ce salarié.
                                 Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE.

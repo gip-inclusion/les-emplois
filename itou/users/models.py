@@ -587,7 +587,7 @@ class User(AbstractUser, AddressMixin):
         has_valid_diagnosis = self.has_valid_diagnosis()
         return (
             self.has_latest_approval_in_waiting_period
-            and siae.is_subject_to_eligibility_rules
+            and siae.is_subject_to_iae_rules
             and not (is_sent_by_authorized_prescriber or has_valid_diagnosis)
         )
 

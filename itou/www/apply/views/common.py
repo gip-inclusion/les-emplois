@@ -42,7 +42,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
     def get_forms(self):
         forms = {}
 
-        if self.company.is_subject_to_eligibility_rules:
+        if self.company.is_subject_to_iae_rules:
             # Info that will be used to search for an existing Pôle emploi approval.
             forms["personal_data"] = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
@@ -167,7 +167,7 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             messages.error(request, "Action déjà effectuée.", extra_tags="toast")
             return HttpResponseClientRedirect(self.get_error_url())
 
-        if job_application.to_company.is_subject_to_eligibility_rules:
+        if job_application.to_company.is_subject_to_iae_rules:
             # Automatic approval delivery mode.
             if job_application.approval:
                 messages.success(request, "Candidature acceptée !", extra_tags="toast")

@@ -89,12 +89,12 @@ class TestCompanyModel:
         assert company.siren == "123456789"
         assert company.siret_nic == "00001"
 
-    def test_is_subject_to_eligibility_rules(self):
+    def test_is_subject_to_iae_rules(self):
         company = CompanyFactory(kind=CompanyKind.GEIQ)
-        assert not company.is_subject_to_eligibility_rules
+        assert not company.is_subject_to_iae_rules
 
         company = CompanyFactory(kind=CompanyKind.EI)
-        assert company.is_subject_to_eligibility_rules
+        assert company.is_subject_to_iae_rules
 
     def test_should_have_convention(self):
         company = CompanyFactory(kind=CompanyKind.GEIQ)

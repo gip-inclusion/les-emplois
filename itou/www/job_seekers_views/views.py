@@ -96,7 +96,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         iae_eligibility_diagnosis = None
         can_edit_iae_eligibility = False
         if self.request.user.is_prescriber or (
-            self.request.user.is_employer and self.request.current_organization.is_subject_to_eligibility_rules
+            self.request.user.is_employer and self.request.current_organization.is_subject_to_iae_rules
         ):
             approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
