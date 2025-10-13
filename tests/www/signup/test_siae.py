@@ -117,6 +117,38 @@ class TestCompanySignup:
         )
         assertContains(response, escape(expected_message))
 
+    @freeze_time("2022-09-15 15:53:54")
+    def test_join_a_company_without_members_but_invalid_auth_email(self, client, mailoutbox):
+        company = CompanyFactory(kind=CompanyKind.EA, auth_email="Non renseigné")  # Real case from production
+        assert 0 == company.members.count()
+
+        url = reverse("signup:company_select")
+        response = client.get(url)
+        assert response.status_code == 200
+
+        # Find a company by SIREN.
+        response = client.get(url, {"siren": company.siret[:9]})
+        assert response.status_code == 200
+
+        # Choose a company between results.
+        post_data = {"siaes": company.pk}
+        # Pass `siren` in request.GET
+        response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
+        assert response.status_code == 200
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "L'adresse e-mail de contact du correspondant de cette structure n'est pas renseignée ou "
+                        "incorrecte. Merci de contacter l’assistance pour continuer l'inscription."
+                    ),
+                )
+            ],
+        )
+        assert len(mailoutbox) == 0
+
     def test_join_company_with_member(self, client):
         company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True, for_snapshot=True)
         assert company.members.count() > 0
