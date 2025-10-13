@@ -3178,9 +3178,8 @@ class TestProcessAcceptViews:
         client.force_login(employer)
 
         response = client.get(url_accept)
-        assertion = assertContains if company.kind == CompanyKind.GEIQ else assertNotContains
-        assertion(response, self.BIRTH_COUNTRY_LABEL)
-        assertion(response, self.BIRTH_PLACE_LABEL)
+        assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertNotContains(response, self.BIRTH_PLACE_LABEL)
 
         post_data = self._accept_view_post_data(job_application=job_application)
         del post_data["birth_country"]
