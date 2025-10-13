@@ -16,7 +16,7 @@
         {% endfragment %}
         {% fragment as c_title__secondary %}
             {% if auto_prescription_process or hire_process %}
-                {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
+                {% if siae.is_subject_to_iae_rules or siae.kind == CompanyKind.GEIQ %}
                     <p>
                         {% if hire_process %}
                             Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.

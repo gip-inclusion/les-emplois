@@ -184,7 +184,7 @@ def transfer_company_data(
                 reporter.add(transfer_field, f"{model_field.name}: {old_to_value!r} remplacé par {from_value!r}")
         else:
             for item in get_transfer_queryset(from_company, to_company, spec):
-                if spec.get("iae_only") and not to_company.is_subject_to_eligibility_rules:
+                if spec.get("iae_only") and not to_company.is_subject_to_iae_rules:
                     raise TransferError(f"Objets impossibles à transférer hors-IAE: {transfer_field.label}")
                 elif spec.get("geiq_only") and to_company.kind != enums.CompanyKind.GEIQ:
                     raise TransferError(f"Objets impossibles à transférer hors-GEIQ: {transfer_field.label}")

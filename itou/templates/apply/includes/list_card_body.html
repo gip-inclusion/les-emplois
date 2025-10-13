@@ -22,8 +22,8 @@
                                 {{ job_application.job_seeker.city|title }}
                             </span>
                         {% endif %}
-                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
-                            {% include "apply/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
+                        {% if job_application.to_company.is_subject_to_iae_rules %}
+                            {% include "apply/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_iae_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
                         {% endif %}
                         {% include "apply/includes/next_appointment.html" with job_application=job_application only %}
                     </div>

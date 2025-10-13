@@ -214,7 +214,7 @@
 
                                 {% if user.is_employer %}
                                     {% include "dashboard/includes/employer_job_applications_card.html" %}
-                                    {% if request.current_organization.is_subject_to_eligibility_rules %}
+                                    {% if request.current_organization.is_subject_to_iae_rules %}
                                         {% include "dashboard/includes/employer_employees_card.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/employer_prescription_card.html" %}

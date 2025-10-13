@@ -42,7 +42,7 @@
     {% endfragment %}
     {% fragment as c_title__cta %}
         {% if user.is_employer %}
-            {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
+            {% if request.current_organization.is_subject_to_iae_rules or request.current_organization.kind == CompanyKind.GEIQ %}
                 {% comment %}
                 NOTE(vperron):
                 We currently do not allow OPCS users to apply for an offer.

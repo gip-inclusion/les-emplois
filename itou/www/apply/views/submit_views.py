@@ -318,7 +318,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, for_company
             ).first()
-        elif self.company.is_subject_to_eligibility_rules:
+        elif self.company.is_subject_to_iae_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, for_company
             )
@@ -329,7 +329,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         if self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis if the SIAE doesn't need it
-                not self.company.is_subject_to_eligibility_rules,
+                not self.company.is_subject_to_iae_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis
                 not self.request.from_authorized_prescriber,
                 # No need for eligibility diagnosis if the job seeker already has a PASS IAE
@@ -345,7 +345,7 @@ class ApplicationBaseView(ApplyStepBaseView):
 
         bypass_eligibility_conditions = [
             # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-            not self.company.is_subject_to_eligibility_rules,
+            not self.company.is_subject_to_iae_rules,
             # No need for eligibility diagnosis if the job seeker already has a PASS IAE
             self.job_seeker.has_valid_approval,
             # Job seeker must not have a diagnosis
@@ -360,7 +360,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
             "eligibility_diagnosis": self.eligibility_diagnosis,
-            "is_subject_to_eligibility_rules": self.company.is_subject_to_eligibility_rules,
+            "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
             "is_subject_to_geiq_eligibility_rules": self.company.kind == CompanyKind.GEIQ,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
@@ -447,7 +447,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         context["iae_eligibility_url"] = None
         if (
             self.request.from_authorized_prescriber
-            and self.company.is_subject_to_eligibility_rules
+            and self.company.is_subject_to_iae_rules
             and not self.job_seeker.approvals.valid().exists()
         ):
             context["iae_eligibility_url"] = reverse(
@@ -807,7 +807,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["hire_process"] = True
-        context["is_subject_to_eligibility_rules"] = False
+        context["is_subject_to_iae_rules"] = False
         return context
 
 
@@ -834,7 +834,7 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
         return self.request.get_full_path()
 
     def get_success_url(self):
-        if self.company.is_subject_to_eligibility_rules and self.job_application.approval:
+        if self.company.is_subject_to_iae_rules and self.job_application.approval:
             return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
         return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 

@@ -8,7 +8,7 @@
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
 {% block step_title %}Finaliser la candidature{% endblock %}
 {% block pre_step_title %}
-    {% if is_subject_to_eligibility_rules %}
+    {% if is_subject_to_iae_rules %}
         {% if not request.user.is_job_seeker and eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité à l'IAE du candidat a été validée par :</p>
@@ -133,7 +133,7 @@
                     Pour retenir l’attention du recruteur, décrivez votre situation,
                     votre parcours, vos compétences et expliquez les freins socio-professionnels rencontrés.
                 </p>
-                {% if is_subject_to_eligibility_rules %}
+                {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
                         <a class="has-external-link"
@@ -153,12 +153,12 @@
                     </p>
                 {% endif %}
                 <p class="mb-0">Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.</p>
-            {% elif is_subject_to_eligibility_rules or is_subject_to_geiq_eligibility_rules %}
+            {% elif is_subject_to_iae_rules or is_subject_to_geiq_eligibility_rules %}
                 <p class="mb-0">
                     Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
                     son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
                 </p>
-                {% if is_subject_to_eligibility_rules %}
+                {% if is_subject_to_iae_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur le document
                         <a class="has-external-link"

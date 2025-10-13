@@ -1605,7 +1605,7 @@ class TestJobApplicationWorkflow:
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
-        assert job_application.to_company.is_subject_to_eligibility_rules
+        assert job_application.to_company.is_subject_to_iae_rules
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1763,7 +1763,7 @@ class TestJobApplicationWorkflow:
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
-        assert not job_application.to_company.is_subject_to_eligibility_rules
+        assert not job_application.to_company.is_subject_to_iae_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == ""
@@ -1798,7 +1798,7 @@ class TestJobApplicationWorkflow:
         assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
         job_application.accept(user=to_employer_member)
-        assert job_application.to_company.is_subject_to_eligibility_rules
+        assert job_application.to_company.is_subject_to_iae_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
 
     def test_refuse(self, django_capture_on_commit_callbacks, mailoutbox):

@@ -121,7 +121,7 @@ def _employer_dashboard_context(request):
         "siae_suspension_text_with_dates": (
             current_org.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
-            if current_org.is_subject_to_eligibility_rules
+            if current_org.is_subject_to_iae_rules
             else None
         ),
         "states_to_process": states_to_process,
@@ -209,7 +209,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
         context["siae_suspension_text_with_dates"] = (
             request.current_organization.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
-            if request.current_organization.is_subject_to_eligibility_rules
+            if request.current_organization.is_subject_to_iae_rules
             else None
         )
         if stats_utils.can_view_stats_siae(request):

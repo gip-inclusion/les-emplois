@@ -487,7 +487,7 @@ class AcceptView(common_views.BaseAcceptView):
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
         )
 
-        if self.company.is_subject_to_eligibility_rules:
+        if self.company.is_subject_to_iae_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 job_seeker=self.job_seeker, for_siae=self.company
             )
