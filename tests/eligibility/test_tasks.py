@@ -9,7 +9,10 @@ from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import async_certify_criteria_by_api_particulier, certify_criteria_by_api_particulier
+from itou.eligibility.tasks import (
+    async_certify_eligibility_diagnosis_by_api_particulier,
+    certify_eligibility_diagnosis_by_api_particulier,
+)
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
@@ -51,7 +54,7 @@ class TestCertifyCriteriaApiParticulier:
             status_code=response["status_code"], json=response["json"]
         )
 
-        async_certify_criteria_by_api_particulier.call_local(
+        async_certify_eligibility_diagnosis_by_api_particulier.call_local(
             eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
         )
 
@@ -84,7 +87,7 @@ class TestCertifyCriteriaApiParticulier:
             )
 
             with pytest.raises(RetryTask) as exc_info:
-                async_certify_criteria_by_api_particulier.call_local(
+                async_certify_eligibility_diagnosis_by_api_particulier.call_local(
                     eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
                 )
 
@@ -128,7 +131,7 @@ class TestCertifyCriteriaApiParticulier:
             status_code, json=json_data, headers=headers
         )
         try:
-            certify_criteria_by_api_particulier(eligibility_diagnosis)
+            certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
         except RetryTask:
             retry_task = True
         except Exception:
@@ -148,7 +151,7 @@ class TestCertifyCriteriaApiParticulier:
             status_code=response["status_code"], json=response["json"]
         )
         # Does not raise a RetryTask, this specific error is ignored.
-        async_certify_criteria_by_api_particulier.call_local(
+        async_certify_eligibility_diagnosis_by_api_particulier.call_local(
             eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
         )
         assert len(respx_mock.calls) == 1
@@ -172,7 +175,7 @@ class TestCertifyCriteriaApiParticulier:
             status_code=response["status_code"], json=response["json"]
         )
         with pytest.raises(httpx.HTTPStatusError):
-            async_certify_criteria_by_api_particulier.call_local(
+            async_certify_eligibility_diagnosis_by_api_particulier.call_local(
                 eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
             )
         assert len(respx_mock.calls) == 1
@@ -189,5 +192,5 @@ class TestCertifyCriteriaApiParticulier:
     def test_no_retries_when_diag_does_not_exist(self, caplog, factory):
         eligibility_diagnosis_model = factory._meta.model
         modelname = eligibility_diagnosis_model._meta.model_name
-        async_certify_criteria_by_api_particulier.call_local(modelname, 0)
+        async_certify_eligibility_diagnosis_by_api_particulier.call_local(modelname, 0)
         assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]
