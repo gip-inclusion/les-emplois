@@ -683,7 +683,7 @@ class TestSiaeJobApplicationListView:
         assertNotContains(response, siae_upload_doc_url)
         assertContains(
             response,
-            """\
+            f"""\
             <div class="fs-sm">
               <p class="mb-1">
                 <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
@@ -697,17 +697,18 @@ class TestSiaeJobApplicationListView:
               <p class="mb-1">
                 Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
                 <br>
-                Toutefois, conformément à
-                <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864"
+                Cependant, conformément à l’article R5132-1-7 du Code du travail,
+                votre structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
+                <br>
+                Nous vous recommandons donc de garder
+                <a href="/apply/{job_application.pk}/siae/details"
                    target="_blank"
                    rel="noreferrer noopener"
-                   class="has-external-link"
-                   aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)">
-                    l’Arrêté du 12 avril 2022</a>,
-                un justificatif papier pourra être demandé si nécessaire.
+                   aria-label="Page de détails de la candidature correspondant à l’auto-prescription (ouverture dans un nouvel onglet)">la page de détails de la candidature</a>
+                mentionnant la certification, celle-ci valant pièce justificative.
               </p>
             </div>
-            """,
+            """,  # noqa: E501
             html=True,
         )
 
@@ -1554,7 +1555,7 @@ class TestSiaeEvaluatedJobApplicationView:
         )
         assertContains(
             response,
-            """\
+            f"""\
             <div class="fs-sm">
               <p class="mb-1">
                 <strong class="text-success"><i class="ri-check-line" aria-hidden="true"></i> Validé</strong>
@@ -1568,16 +1569,17 @@ class TestSiaeEvaluatedJobApplicationView:
               <p class="mb-1">
                 Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
                 <br>
-                Toutefois, conformément à
-                <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864"
+                Cependant, conformément à l’article R5132-1-7 du Code du travail,
+                votre structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
+                <br>
+                Nous vous recommandons donc de garder
+                <a href="/apply/{certified_job_app.pk}/siae/details"
                    target="_blank"
                    rel="noreferrer noopener"
-                   class="has-external-link"
-                   aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)">
-                    l’Arrêté du 12 avril 2022</a>,
-                un justificatif papier pourra être demandé si nécessaire.
+                   aria-label="Page de détails de la candidature correspondant à l’auto-prescription (ouverture dans un nouvel onglet)">la page de détails de la candidature</a>
+                mentionnant la certification, celle-ci valant pièce justificative.
               </p>
             </div>
-            """,
+            """,  # noqa: E501
             html=True,
         )
