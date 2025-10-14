@@ -176,6 +176,12 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
     data_returned_by_api = models.JSONField(
         blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"
     )
+    last_certification_attempt_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        editable=False,
+        verbose_name="dernière tentative de certification",
+    )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
