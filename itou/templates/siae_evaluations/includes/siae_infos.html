@@ -3,6 +3,7 @@
     <div class="c-box--results__summary flex-grow-1">
         <i class="ri-community-line" aria-hidden="true"></i>
         <div>
+            <span>{{ evaluated_siae.siae.kind }} - {{ evaluated_siae.siae.get_kind_display }}</span>
             <h3>{{ evaluated_siae }}</h3>
             {% if evaluated_siae.archive_accepted_job_applications_nb is not None %}
                 <div>

@@ -61,7 +61,9 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12">
-                    <p class="h2 mb-0">Liste des auto-prescriptions de {{ evaluated_siae }}</p>
+                    <p class="h2 mb-0">
+                        Liste des auto-prescriptions de {{ evaluated_siae }} ({{ evaluated_siae.siae.kind }} - {{ evaluated_siae.siae.get_kind_display }})
+                    </p>
                     <p>
                         Numéro de téléphone à utiliser au besoin :
                         {% if evaluated_siae.siae.phone %}
