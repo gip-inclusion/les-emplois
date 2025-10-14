@@ -52,7 +52,7 @@ class TestDataInclusionSiaeStructure:
         assert response.json()["results"] == [
             {
                 "id": str(company.uid),
-                "typologie": company.kind.value,
+                "typologie": company.kind,
                 "nom": company.display_name,
                 "siret": company.siret,
                 "rna": "",

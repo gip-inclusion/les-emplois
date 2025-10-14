@@ -174,6 +174,7 @@ def test_populate_job_seekers(snapshot):
         approval__eligibility_diagnosis=None,
         job_seeker=user_2,
         approval__origin=Origin.AI_STOCK,
+        to_company__kind=CompanyKind.EI,
     )
 
     job_application_2.eligibility_diagnosis.administrative_criteria.add(*list(AdministrativeCriteria.objects.all()))
@@ -195,7 +196,7 @@ def test_populate_job_seekers(snapshot):
         with_approval=True,
         eligibility_diagnosis__author_kind=UserKind.EMPLOYER,
         eligibility_diagnosis__author_prescriber_organization=None,
-        eligibility_diagnosis__author_siae=CompanyFactory(),
+        eligibility_diagnosis__author_siae=CompanyFactory(kind=CompanyKind.EI),
         eligibility_diagnosis__certifiable=True,
         eligibility_diagnosis__criteria_kinds=[AdministrativeCriteriaKind.RSA],
         to_company__kind="ETTI",
@@ -218,12 +219,14 @@ def test_populate_job_seekers(snapshot):
         approval=job_application_3.approval,
         eligibility_diagnosis=None,
         created_at=datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
+        to_company__kind=CompanyKind.EI,
     )
 
     IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker=user_3,
         created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC),
+        author_siae__kind=CompanyKind.EI,
     )
 
     with assertSnapshotQueries(snapshot):

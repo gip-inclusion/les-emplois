@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
 
+from itou.companies.enums import CompanyKind
 from itou.siae_evaluations.emails import CampaignEmailFactory, InstitutionEmailFactory, SIAEEmailFactory
 from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
@@ -64,7 +65,7 @@ class TestInstitutionEmailFactory:
     ):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(pk=1, institution=institution)
-        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins", kind=CompanyKind.EI)
         evaluated_siae = EvaluatedSiaeFactory(
             siae=company,
             evaluation_campaign=campaign,
@@ -121,7 +122,7 @@ class TestInstitutionEmailFactory:
     ):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
-        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
+        company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins", kind=CompanyKind.EI)
         evaluated_siae = EvaluatedSiaeFactory(
             siae=company,
             evaluation_campaign=campaign,
