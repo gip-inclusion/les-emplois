@@ -15,7 +15,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
-from itou.eligibility.tasks import certify_criteria_by_api_particulier
+from itou.eligibility.tasks import certify_eligibility_diagnosis_by_api_particulier
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
 from itou.users.enums import IdentityCertificationAuthorities
@@ -465,7 +465,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
-    certify_criteria_by_api_particulier(eligibility_diagnosis)
+    certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.get(
@@ -479,7 +479,7 @@ def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFact
     certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
     with freeze_time("2025-10-15"):
-        certify_criteria_by_api_particulier(eligibility_diagnosis)
+        certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
     updated_certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert updated_certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
     assert updated_certification.certified_at > certification.certified_at
@@ -507,7 +507,7 @@ def test_eligibility_diagnosis_certify_criteria_missing_info(respx_mock, Eligibi
         certifiable=True,
         criteria_kinds=[AdministrativeCriteriaKind.RSA],
     )
-    certify_criteria_by_api_particulier(eligibility_diagnosis)
+    certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
     assert len(respx_mock.calls) == 0
     jobseeker_profile = JobSeekerProfile.objects.get(pk=job_seeker.jobseeker_profile)
     assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
@@ -609,7 +609,7 @@ def test_selected_administrative_criteria_certified(
         response_status, json=response
     )
 
-    certify_criteria_by_api_particulier(eligibility_diagnosis)
+    certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
 
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
     criterion = SelectedAdministrativeCriteria.objects.filter(
