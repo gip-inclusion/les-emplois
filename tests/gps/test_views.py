@@ -550,7 +550,8 @@ class TestGroupDetailsMembershipTab:
         employer = EmployerFactory(
             membership=True,
             for_snapshot=True,
-            membership__company__name="Les Olivades",
+            membership__company__brand="Les Olivades",
+            membership__company__name="Les Olivades INC",
         )
         beneficiary = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=employer)

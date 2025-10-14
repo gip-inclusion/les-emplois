@@ -3,13 +3,10 @@ import datetime
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.www.gps.enums import EndReason
-from tests.companies.factories import CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -97,38 +94,6 @@ class TestFollowBeneficiary:
 
         with pytest.raises(AssertionError):
             FollowUpGroup.objects.follow_beneficiary(not_a_beneficiary, prescriber)
-
-
-@pytest.mark.parametrize(
-    "UserFactory,MembershipFactory,relation_name",
-    [
-        (EmployerFactory, CompanyMembershipFactory, "company"),
-        (PrescriberFactory, PrescriberMembershipFactory, "organization"),
-    ],
-)
-def test_manager_organizations_names(UserFactory, MembershipFactory, relation_name):
-    user = UserFactory()
-    first_membership = MembershipFactory(is_admin=False, user=user)
-    admin_membership = MembershipFactory(is_admin=True, user=user)
-    last_membership = MembershipFactory(is_admin=False, user=user)
-    FollowUpGroupFactory(memberships=True, memberships__member=user)
-    with assertNumQueries(1):
-        group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
-
-    # The organization we are admin of should come first
-    assert group_membership.organization_name == getattr(admin_membership, relation_name).name
-    admin_membership.delete()
-
-    group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
-    # Then it's ordered by membership creation date.
-    assert group_membership.organization_name == getattr(first_membership, relation_name).name
-
-    # No membership
-    first_membership.delete()
-    last_membership.delete()
-
-    group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
-    assert not group_membership.organization_name
 
 
 @freeze_time("2025-02-13T16:44:42")
