@@ -113,6 +113,9 @@ def _async_certify_criterion_by_api_particulier(model_name, selected_administrat
             )
             return
 
+        criterion.last_certification_attempt_at = timezone.now()
+        criterion.save(update_fields={"last_certification_attempt_at"})
+
         captured_exc = None
         retry = False
         try:
