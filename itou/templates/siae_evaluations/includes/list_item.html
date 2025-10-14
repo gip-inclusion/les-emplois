@@ -32,7 +32,7 @@
                                     <li>
                                         {% if evaluated_administrative_criteria.criteria_certified %}
                                             {# The criteria is certified, it has been accepted by default. #}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=True only %}
+                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=True request_user=request.user evaluated_job_application=item only %}
                                         {% elif item.evaluated_siae.reviewed_at %}
                                             {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state only %}
                                         {% else %}

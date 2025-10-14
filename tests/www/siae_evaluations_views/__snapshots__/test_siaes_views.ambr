@@ -605,12 +605,14 @@
          <p class="mb-1">
           Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
           <br/>
-          Toutefois, conformément à
-          <a aria-label="Arrêté du 12 avril 2022 sur Légifrance (ouverture dans un nouvel onglet)" class="has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045570864" rel="noreferrer noopener" target="_blank">
-           l’Arrêté du 12 avril 2022
+          Cependant, conformément à l’article R5132-1-7 du Code du travail,
+                      votre structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
+          <br/>
+          Nous vous recommandons donc de garder
+          <a aria-label="Page de détails de la candidature correspondant à l’auto-prescription (ouverture dans un nouvel onglet)" href="/apply/11111111-1111-1111-1111-111111111111/siae/details" rel="noreferrer noopener" target="_blank">
+           la page de détails de la candidature
           </a>
-          ,
-                  un justificatif papier pourra être demandé si nécessaire.
+          mentionnant la certification, celle-ci valant pièce justificative.
          </p>
         </div>
         <div class="text-md-end mt-2">
