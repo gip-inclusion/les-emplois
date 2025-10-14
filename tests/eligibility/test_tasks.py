@@ -62,6 +62,8 @@ class TestCertifyCriteriaApiParticulier:
         assert criterion.certification_period == InclusiveDateRange(
             datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
         )
+        # Was committed to the database.
+        assert criterion.last_certification_attempt_at is not None
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(
             jobseeker_profile.identity_certifications.all(),
@@ -89,6 +91,8 @@ class TestCertifyCriteriaApiParticulier:
             assert criterion.certified_at is None
             assert criterion.data_returned_by_api is None
             assert criterion.certification_period is None
+            # Was committed to the database.
+            assert criterion.last_certification_attempt_at is not None
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
