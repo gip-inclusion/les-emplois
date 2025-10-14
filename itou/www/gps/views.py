@@ -136,11 +136,14 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         memberships = (
-            FollowUpGroupMembership.objects.with_members_organizations_names()
-            .filter(follow_up_group=self.group)
+            FollowUpGroupMembership.objects.filter(follow_up_group=self.group)
             .filter(is_active=True)
             .order_by("-is_referent_certified", "-created_at")
             .select_related("member")
+            .prefetch_related(
+                "member__prescriberorganization_set",
+                "member__company_set",
+            )
         )
 
         request_new_participant_form_url = add_url_params(

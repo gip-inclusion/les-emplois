@@ -1,6 +1,5 @@
 import logging
 
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
@@ -96,20 +95,7 @@ class FollowUpGroup(models.Model):
 
 
 class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
-    def with_members_organizations_names(self):
-        qs = self.annotate(
-            prescriber_org_names=ArrayAgg(
-                "member__prescribermembership__organization__name",
-                order_by=("-member__prescribermembership__is_admin", "member__prescribermembership__joined_at"),
-            )
-        ).annotate(
-            companies_names=ArrayAgg(
-                "member__companymembership__company__name",
-                order_by=("-member__companymembership__is_admin", "member__companymembership__joined_at"),
-            )
-        )
-
-        return qs
+    pass
 
 
 class FollowUpGroupMembership(models.Model):
@@ -186,7 +172,9 @@ class FollowUpGroupMembership(models.Model):
 
     @property
     def organization_name(self):
-        return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)
+        return next((org.name for org in self.member.prescriberorganization_set.all()), None) or next(
+            (company.display_name for company in self.member.company_set.all()), None
+        )
 
     @property
     def human_readable_followed_for(self):
