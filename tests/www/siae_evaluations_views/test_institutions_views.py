@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
@@ -1030,6 +1031,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         pending_status = "En attente"
         response = client.get(add_url_params(url, {"back_url": back_url}))
         assertContains(response, evaluated_siae)
+        assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         assertContains(response, formatted_number, html=True, count=1)
         assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
@@ -1313,6 +1315,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         not_transmitted_status = "Justificatifs non transmis"
         response = client.get(add_url_params(url, {"back_url": back_url}))
         assertContains(response, evaluated_siae)
+        assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         assertContains(response, formatted_number, html=True, count=1)
         assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
