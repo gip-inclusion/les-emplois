@@ -42,6 +42,7 @@ class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
         "certified_display",
         "certified_at",
         "certification_period",
+        "last_certification_attempt_at",
         "data_returned_by_api",
         "created_at",
     )
