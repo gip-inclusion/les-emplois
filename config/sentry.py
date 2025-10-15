@@ -65,6 +65,11 @@ def sentry_init():
     except ValueError:
         traces_sample_rate = 0
 
+    try:
+        shutdown_timeout_option = {"shutdown_timeout": int(os.getenv("SENTRY_SHUTDOWN_TIMEOUT", ""))}
+    except ValueError:
+        shutdown_timeout_option = {}
+
     sentry_sdk.init(
         # DSN is read from the SENTRY_DSN environment variable.
         #
@@ -90,6 +95,7 @@ def sentry_init():
         # https://docs.sentry.io/enriching-error-data/additional-data/?platform=python#capturing-the-user
         # only ever works here (without access to `request.user`)
         # and is silently ignored when used in `context_processors.py` to get access to `request.user`.
+        **shutdown_timeout_option,
     )
     ignore_logger("django.security.DisallowedHost")
     ignore_logger("django_datadog_logger.middleware.request_log")
