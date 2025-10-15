@@ -4219,10 +4219,19 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
 
     # Check when posting with missing fields
     response = client.post(
-        add_prior_action_url, data={"action": job_applications_enums.Prequalification.AFPR, "start_at": ""}
+        add_prior_action_url,
+        data={"action": job_applications_enums.Prequalification.AFPR, "start_at": "", "end_at": timezone.localdate()},
     )
     assertContains(response, END_AT_LABEL)
     assert response.context["form"].has_error("start_at")
+    assertContains(response, MISSING_FIELD_MESSAGE)
+    update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
+
+    # Check again posting with other missing field
+    response = client.post(
+        add_prior_action_url,
+        data={"action": job_applications_enums.Prequalification.AFPR, "start_at": timezone.localdate(), "end_at": ""},
+    )
     assert response.context["form"].has_error("end_at")
     assertContains(response, MISSING_FIELD_MESSAGE)
     update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
