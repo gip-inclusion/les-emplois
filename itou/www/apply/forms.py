@@ -579,7 +579,7 @@ class PriorActionForm(forms.ModelForm):
             start_at = self.cleaned_data.get("start_at")
             end_at = self.cleaned_data.get("end_at")
 
-            if end_at and end_at < start_at:
+            if end_at and start_at and end_at < start_at:
                 raise forms.ValidationError("La date de fin prévisionnelle doit être postérieure à la date de début.")
 
     def save(self, commit=True):
