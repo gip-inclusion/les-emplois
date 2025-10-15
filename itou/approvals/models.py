@@ -389,7 +389,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
     # The period of time during which it is possible to prolong a PASS IAE.
-    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END = 7
+    IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END = 12
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = (

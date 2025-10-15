@@ -366,7 +366,7 @@ class TestApprovalDetailView:
 
     def test_prolongation_button(self, client):
         TOO_SOON = (
-            "Les prolongations ne sont possibles qu’entre le 7ème mois avant la "
+            "Les prolongations ne sont possibles qu’entre le 12ème mois avant la "
             "fin d’un PASS IAE et jusqu’à son dernier jour de validité."
         )
         REQUEST_PENDING = "Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois."
