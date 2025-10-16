@@ -22,7 +22,6 @@ from pytest_django.asserts import (
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
-from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
@@ -255,7 +254,8 @@ class TestPrescriberOrganizationModel:
         with pytest.raises(ValidationError):
             org.add_or_activate_membership(non_prescriber)
 
-    def test_merge_two_organizations(self):
+    @pytest.mark.parametrize("wet_run", [True, False])
+    def test_merge_two_organizations(self, wet_run):
         job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory(
             eligibility_diagnosis=None
         )
@@ -273,11 +273,15 @@ class TestPrescriberOrganizationModel:
         count_job_applications = job_applications_models.JobApplication.objects.count()
         assert PrescriberOrganization.objects.count() == 2
         assert count_job_applications == 2
-        organization_merge_into(organization_1.id, organization_2.id, wet_run=True)
+        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
         assert count_job_applications == job_applications_models.JobApplication.objects.count()
-        assert PrescriberOrganization.objects.count() == 1
         geiq_diagnosis.refresh_from_db()
-        assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
+        if wet_run:
+            assert PrescriberOrganization.objects.count() == 1
+            assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
+        else:
+            assert PrescriberOrganization.objects.count() == 2
+            assert geiq_diagnosis.author_prescriber_organization_id == organization_1.pk
 
 
 class TestPrescriberOrganizationAdmin:
