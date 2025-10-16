@@ -706,6 +706,10 @@ class TestInstitutionEvaluatedSiaeDetailView:
         "Les petits jardins n’a pas soumis de justificatifs avant la fin de la campagne « Contrôle Test », "
         "<b>le résultat du contrôle est négatif</b>."
     )
+    certified_text = (
+        "Cette auto-prescription répond à un critère de niveau 1 certifié. "
+        "Aucun justificatif n’est demandé pour le moment."
+    )
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
@@ -1117,6 +1121,34 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, evaluated_job_application_url)
         assertNotContains(response, self.submit_text)
         assertNotContains(response, self.control_text)
+        assertNotContains(response, self.certified_text, html=True)
+        assertContains(
+            response,
+            """
+            <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
+             Validé
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
+
+        # EvaluatedAdministrativeCriteria Accepted via certification
+        evaluated_administrative_criteria.criteria_certified = True
+        evaluated_administrative_criteria.save(update_fields=["criteria_certified"])
+        response = client.get(url)
+        assertContains(response, evaluated_job_application_url)
+        assertNotContains(response, self.submit_text)
+        assertNotContains(response, self.control_text)
+        assertContains(response, self.certified_text, html=True, count=1)
+        assertContains(
+            response,
+            (
+                "La structure doit toutefois, conserver une pièce justifiant du critère pendant une période "
+                "de deux ans (Article R5132-1-7 du code du travail)."
+            ),
+        )
+
         assertContains(
             response,
             """
@@ -1130,8 +1162,9 @@ class TestInstitutionEvaluatedSiaeDetailView:
 
         # EvaluatedAdministrativeCriteria Refused
         refused_status = "Problème constaté"
+        evaluated_administrative_criteria.criteria_certified = False
         evaluated_administrative_criteria.review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
-        evaluated_administrative_criteria.save(update_fields=["review_state"])
+        evaluated_administrative_criteria.save(update_fields=["criteria_certified", "review_state"])
         evaluated_siae.reviewed_at = None
         evaluated_siae.final_reviewed_at = None
         evaluated_siae.save(update_fields=["reviewed_at", "final_reviewed_at"])
@@ -1140,6 +1173,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, evaluated_job_application_url)
         assertContains(response, validation_button, html=True, count=2)
         assertContains(response, self.control_text)
+        assertNotContains(response, self.certified_text, html=True)
         assertContains(
             response,
             f"""

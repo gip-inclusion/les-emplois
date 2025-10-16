@@ -1468,6 +1468,23 @@ class TestSiaeEvaluatedSiaeDetailView:
             '<div><span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span></div>',
             html=True,
         )
+        assertContains(
+            response,
+            (
+                "Cette auto-prescription répond à un critère de niveau 1 certifié. "
+                "Aucun justificatif n’est demandé pour le moment."
+            ),
+            html=True,
+            count=1,
+        )
+        assertContains(
+            response,
+            (
+                "Attention, votre structure doit toutefois, conserver une pièce justifiant du critère "
+                "pendant une période de deux ans (Article R5132-1-7 du code du travail)."
+            ),
+        )
+        assertContains(response, reverse("apply:details_for_company", args=[certified_job_app.pk]))
 
 
 class TestSiaeEvaluatedJobApplicationView:
