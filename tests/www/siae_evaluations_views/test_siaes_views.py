@@ -1452,6 +1452,7 @@ class TestSiaeEvaluatedSiaeDetailView:
             uploaded_at=campaign_start,
             submitted_at=campaign_start,
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+            administrative_criteria=rsa,
             criteria_certified=True,
         )
 
