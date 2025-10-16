@@ -1,15 +1,13 @@
 import argparse
 import logging
 
-from django.db import transaction
-
 from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.prescribers import models as prescribers_models
 from itou.users import models as users_models
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +45,7 @@ def _model_sanity_check():
         )
 
 
-def organization_merge_into(from_id, to_id, *, wet_run):
+def organization_merge_into(from_id, to_id):
     _model_sanity_check()
 
     if from_id == to_id:
@@ -114,21 +112,19 @@ def organization_merge_into(from_id, to_id, *, wet_run):
     prolongation_requests = approvals_models.ProlongationRequest.objects.filter(prescriber_organization_id=from_id)
     logger.info("| Prolongation Requests: %s", prolongation_requests.count())
 
-    if wet_run:
-        with transaction.atomic():
-            job_applications.update(sender_prescriber_organization_id=to_id)
-            members.update(organization_id=to_id)
-            diagnoses.update(author_prescriber_organization_id=to_id)
-            geiq_diagnoses.update(author_prescriber_organization_id=to_id)
-            invitations.update(organization_id=to_id)
-            prolongations.update(prescriber_organization_id=to_id)
-            prolongation_requests.update(prescriber_organization_id=to_id)
-            from_organization.delete()
-    else:
-        logger.info("Nothing to do in dry run mode.")
+    job_applications.update(sender_prescriber_organization_id=to_id)
+    members.update(organization_id=to_id)
+    diagnoses.update(author_prescriber_organization_id=to_id)
+    geiq_diagnoses.update(author_prescriber_organization_id=to_id)
+    invitations.update(organization_id=to_id)
+    prolongations.update(prescriber_organization_id=to_id)
+    prolongation_requests.update(prescriber_organization_id=to_id)
+    _, deleted_objs = from_organization.delete()
+    logger.info("Deleted organization ID %s, deleted objects: %s", from_id, deleted_objs)
 
 
 class Command(BaseCommand):
+    ATOMIC_HANDLE = True
     help = HELP_TEXT
 
     def add_arguments(self, parser):
@@ -150,5 +146,6 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
-    def handle(self, from_id, to_id, *, wet_run, **options):
-        organization_merge_into(from_id, to_id, wet_run=wet_run)
+    @dry_runnable
+    def handle(self, from_id, to_id, **options):
+        organization_merge_into(from_id, to_id)
