@@ -1,3 +1,4 @@
+import logging
 from pprint import pformat
 
 from django.contrib import admin, messages
@@ -26,6 +27,9 @@ from itou.utils.admin import (
 )
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.export import to_streaming_response
+
+
+logger = logging.getLogger(__name__)
 
 
 class CompanyMembersInline(MembersInline):
@@ -350,13 +354,16 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                         ),
                     )
                 else:
+                    fields_to_transfer = form.cleaned_data["fields_to_transfer"]
+                    disable_from_company = form.cleaned_data["disable_from_company"]
+                    ignore_siae_evaluations = form.cleaned_data.get("ignore_siae_evaluations", False)
                     try:
                         reporter = transfer.transfer_company_data(
                             from_company,
                             to_company,
-                            form.cleaned_data["fields_to_transfer"],
-                            disable_from_company=form.cleaned_data["disable_from_company"],
-                            ignore_siae_evaluations=form.cleaned_data.get("ignore_siae_evaluations", False),
+                            fields_to_transfer=fields_to_transfer,
+                            disable_from_company=disable_from_company,
+                            ignore_siae_evaluations=ignore_siae_evaluations,
                         )
                     except transfer.TransferError as e:
                         messages.error(request, e.args[0])
@@ -379,6 +386,16 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                             to_company=to_company,
                         )
                         messages.info(request, message)
+                        logger.info(
+                            "staff user=%d tranferred company=%d to company=%d with fields_to_tranfer=%s, "
+                            "disable_from_company=%s, ignore_siae_evaluations=%s",
+                            request.user.pk,
+                            from_company.pk,
+                            to_company.pk,
+                            fields_to_transfer,
+                            disable_from_company,
+                            ignore_siae_evaluations,
+                        )
 
                         return redirect(
                             reverse(
