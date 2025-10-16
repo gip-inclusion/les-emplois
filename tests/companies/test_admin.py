@@ -288,7 +288,7 @@ class TestTransferCompanyData:
         assert response.status_code == 403
 
     @freeze_time("2023-08-31 12:34:56")
-    def test_transfer_data(self, admin_client, snapshot):
+    def test_transfer_data(self, admin_client, snapshot, caplog):
         job_application = JobApplicationFactory(with_approval=True)
 
         from_company = job_application.to_company
@@ -335,6 +335,11 @@ class TestTransferCompanyData:
         remark = to_user_remark.remark
         assert "Transfert du 2023-08-31 12:34:56 effectué par" in remark
         assert "Candidatures reçues" in remark
+        assert (
+            f"staff user={get_user(admin_client).pk} tranferred company={from_company.pk} to company={to_company.pk}"
+            " with fields_to_tranfer=['job_applications_received'], disable_from_company=False,"
+            " ignore_siae_evaluations=False" in caplog.messages
+        )
 
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data_is_searchable_and_disable_from_company(self, admin_client, snapshot):
