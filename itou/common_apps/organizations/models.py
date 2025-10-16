@@ -316,7 +316,7 @@ class MembershipAbstract(models.Model):
 
     def clean(self, *args, **kwargs):
         super().clean()
-        if self.user.kind != self.user_kind:
+        if getattr(self, "user", None) and self.user.kind != self.user_kind:
             raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être {self.user_kind.label}")
 
     def save(self, *args, **kwargs):
