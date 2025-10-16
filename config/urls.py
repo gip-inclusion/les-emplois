@@ -107,6 +107,16 @@ urlpatterns = [
         login_not_required(TemplateView.as_view(template_name="static/legal/terms.html")),
         name="legal-terms",
     ),
+    path(
+        "legal/terms/05022024/",
+        login_not_required(TemplateView.as_view(template_name="static/legal/terms-05022024.html")),
+        name="legal-terms-05022024",
+    ),
+    path(
+        "legal/terms/14102022/",
+        login_not_required(TemplateView.as_view(template_name="static/legal/terms-14102022.html")),
+        name="legal-terms-14102022",
+    ),
     path("", include("itou.www.security.urls")),
     path("gps/", include("itou.www.gps.urls")),
     path("rdvi/", include("itou.www.rdv_insertion.urls")),
