@@ -1435,7 +1435,12 @@ class JobApplicationComment(models.Model):
     )
     company = models.ForeignKey("companies.Company", verbose_name="ID de l'entreprise", on_delete=models.CASCADE)
     created_at = models.DateTimeField(verbose_name="posté le", auto_now=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="posté par", on_delete=models.RESTRICT)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="posté par",
+        on_delete=models.RESTRICT,
+        limit_choices_to={"kind": UserKind.EMPLOYER},
+    )
     message = models.TextField(verbose_name="commentaire")
 
     class Meta:

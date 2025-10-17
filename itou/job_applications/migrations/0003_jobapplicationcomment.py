@@ -36,6 +36,7 @@ class Migration(migrations.Migration):
                 (
                     "created_by",
                     models.ForeignKey(
+                        limit_choices_to={"kind": "employer"},
                         on_delete=django.db.models.deletion.RESTRICT,
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="posté par",
