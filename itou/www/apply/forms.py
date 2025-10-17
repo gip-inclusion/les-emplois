@@ -1063,14 +1063,13 @@ class JobApplicationAddCommentForCompanyForm(forms.ModelForm):
         model = JobApplicationComment
         fields = ["message"]
 
-    def __init__(self, *args, job_application, created_by, company, **kwargs):
+    def __init__(self, *args, job_application, created_by, **kwargs):
         self.job_application = job_application
         self.created_by = created_by
-        self.company = company
         super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         self.instance.job_application = self.job_application
         self.instance.created_by = self.created_by
-        self.instance.company = self.company
+        self.instance.company = self.job_application.to_company
         return super().save()

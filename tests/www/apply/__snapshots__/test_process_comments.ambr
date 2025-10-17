@@ -451,7 +451,7 @@
                                                   <i aria-hidden="true" class="ri-close-line">
                                                   </i>
                                               </button>
-                                              <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire" type="submit">
+                                              <button class="btn btn-outline-primary btn-sm btn-ico-only bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire-sidebar" type="submit">
                                                   <span class="visually-hidden">
                                                       Valider l'ajout d'un commentaire partagé avec tous les membres de la structure
                                                   </span>
@@ -547,7 +547,7 @@
                                                   <div class="form-group col-12 col-lg order-3 order-lg-1">
                                                   </div>
                                                   <div class="form-group col col-lg-auto order-2 order-lg-3">
-                                                      <button aria-label="Envoyer votre commentaire partagé avec tous les membres de la structure" class="btn btn-block btn-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire" type="submit">
+                                                      <button aria-label="Envoyer votre commentaire partagé avec tous les membres de la structure" class="btn btn-block btn-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="ajout-commentaire-onglet" type="submit">
                                                           <span>
                                                               Envoyer
                                                           </span>
@@ -635,7 +635,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -1426,23 +1426,6 @@
           WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplicationcomment"."id",
-                 "job_applications_jobapplicationcomment"."job_application_id",
-                 "job_applications_jobapplicationcomment"."company_id",
-                 "job_applications_jobapplicationcomment"."created_at",
-                 "job_applications_jobapplicationcomment"."created_by_id",
-                 "job_applications_jobapplicationcomment"."message"
-          FROM "job_applications_jobapplicationcomment"
-          WHERE "job_applications_jobapplicationcomment"."job_application_id" IN (%s)
-          ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
         ''',
       }),
       dict({

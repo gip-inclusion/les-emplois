@@ -2378,7 +2378,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[job application detail for company]
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -3173,23 +3173,6 @@
       }),
       dict({
         'origin': list([
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplicationcomment"."id",
-                 "job_applications_jobapplicationcomment"."job_application_id",
-                 "job_applications_jobapplicationcomment"."company_id",
-                 "job_applications_jobapplicationcomment"."created_at",
-                 "job_applications_jobapplicationcomment"."created_by_id",
-                 "job_applications_jobapplicationcomment"."message"
-          FROM "job_applications_jobapplicationcomment"
-          WHERE "job_applications_jobapplicationcomment"."job_application_id" IN (%s)
-          ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'User.latest_approval[users/models.py]',
           'User.has_valid_approval[users/models.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.has_considered_valid[eligibility/models/iae.py]',
@@ -3752,7 +3735,7 @@
 # ---
 # name: TestProcessViews.test_details_for_company_from_list[job application detail for company]
   dict({
-    'num_queries': 28,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -4563,23 +4546,6 @@
                  "eligibility_administrativecriteria"."created_at"
           FROM "eligibility_administrativecriteria"
           WHERE ("eligibility_administrativecriteria"."id") IN ((%s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplicationcomment"."id",
-                 "job_applications_jobapplicationcomment"."job_application_id",
-                 "job_applications_jobapplicationcomment"."company_id",
-                 "job_applications_jobapplicationcomment"."created_at",
-                 "job_applications_jobapplicationcomment"."created_by_id",
-                 "job_applications_jobapplicationcomment"."message"
-          FROM "job_applications_jobapplicationcomment"
-          WHERE "job_applications_jobapplicationcomment"."job_application_id" IN (%s)
-          ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
         ''',
       }),
       dict({

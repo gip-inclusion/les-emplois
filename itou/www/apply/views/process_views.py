@@ -221,7 +221,6 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "selected_jobs__appellation",
             "eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
             "geiq_eligibility_diagnosis__selected_administrative_criteria__administrative_criteria",
-            "comments",
         )
         .annotate(
             has_pending_rdv_insertion_invitation_request=Exists(
@@ -265,7 +264,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
     can_be_cancelled = job_application.state.is_accepted and job_application.can_be_cancelled
 
-    comments = job_application.comments.select_related("created_by").filter(company=request.current_organization)
+    comments = job_application.comments.select_related("created_by").filter(company=job_application.to_company)
     context = (
         {
             "can_be_cancelled": can_be_cancelled,
@@ -286,7 +285,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "comments": comments,
             "last_comments": comments[:LAST_COMMENTS_COUNT],
             "add_comment_form": JobApplicationAddCommentForCompanyForm(
-                job_application=job_application, created_by=request.user, company=request.current_organization
+                job_application=job_application, created_by=request.user
             ),
             "matomo_custom_title": "Candidature",
             "job_application_sender_left_org": job_application_sender_left_org(job_application),
@@ -305,21 +304,16 @@ def add_comment_for_company(request, job_application_id):
     location = "tab" if request.POST.get("location") == "tab" else "sidebar"
 
     form = JobApplicationAddCommentForCompanyForm(
-        request.POST or None,
-        job_application=job_application,
-        created_by=request.user,
-        company=request.current_organization,
+        request.POST or None, job_application=job_application, created_by=request.user
     )
 
     if form.is_valid():
         form.save()
         logger.info("user=%d added a new comment on job_application=%s", request.user.pk, job_application_id)
         # Serve an empty form
-        form = JobApplicationAddCommentForCompanyForm(
-            job_application=job_application, created_by=request.user, company=request.current_organization
-        )
+        form = JobApplicationAddCommentForCompanyForm(job_application=job_application, created_by=request.user)
 
-    comments = job_application.comments.select_related("created_by").filter(company=request.current_organization)
+    comments = job_application.comments.select_related("created_by").filter(company=job_application.to_company)
     context = {
         "job_application": job_application,
         "form": form,
