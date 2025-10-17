@@ -1,15 +1,13 @@
 import datetime
 import time
 
-from django.db import transaction
-
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, ContractType, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.apis import pe_api_enums
 from itou.utils.apis.pole_emploi import pole_emploi_partenaire_api_client
-from itou.utils.command import BaseCommand
+from itou.utils.command import BaseCommand, dry_runnable
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 
@@ -111,11 +109,14 @@ def pe_offer_to_job_description(data, logger):
 class Command(BaseCommand):
     help = "Synchronizes the list of PEC offers from FT"
 
+    ATOMIC_HANDLE = True
+
     def add_arguments(self, parser):
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
         parser.add_argument("--delay", action="store", dest="delay", default=1, type=int, choices=range(0, 5))
 
-    def handle(self, *, wet_run, delay, **options):
+    @dry_runnable
+    def handle(self, *, delay, **options):
         pe_client = pole_emploi_partenaire_api_client()
         pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
 
@@ -146,50 +147,48 @@ class Command(BaseCommand):
         updated_offers = []
         offers_to_remove = set()
 
-        with transaction.atomic():
-            # get the weakest possible lock on these rows, as we don't want to block the entire system
-            # but still avoid creating concurrent rows in the same time while we inspect their keys
-            pe_offers = JobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
-                of=["self"], skip_locked=True, no_key=True
-            )
-            for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
-                if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
-                    job = pe_offer_to_job_description(item.raw, self.logger)
-                    if job:
-                        job.company = pe_siae
-                        if item.kind == DiffItemKind.ADDITION:
-                            added_offers.append(job)
-                        else:
-                            job.pk = item.db_obj.pk
-                            updated_offers.append(job)
-                elif item.kind == DiffItemKind.DELETION:
-                    offers_to_remove.add(item.key)
+        # get the weakest possible lock on these rows, as we don't want to block the entire system
+        # but still avoid creating concurrent rows in the same time while we inspect their keys
+        pe_offers = JobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
+            of=["self"], skip_locked=True, no_key=True
+        )
+        for item in yield_sync_diff(raw_offers, "id", pe_offers, "source_id", []):
+            if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
+                job = pe_offer_to_job_description(item.raw, self.logger)
+                if job:
+                    job.company = pe_siae
+                    if item.kind == DiffItemKind.ADDITION:
+                        added_offers.append(job)
+                    else:
+                        job.pk = item.db_obj.pk
+                        updated_offers.append(job)
+            elif item.kind == DiffItemKind.DELETION:
+                offers_to_remove.add(item.key)
 
-            if wet_run:
-                objs = JobDescription.objects.bulk_create(added_offers)
-                self.logger.info("successfully created count=%d PE job offers", len(objs))
-                n_objs = JobDescription.objects.bulk_update(
-                    updated_offers,
-                    fields=[
-                        "appellation",
-                        "created_at",
-                        "updated_at",
-                        "custom_name",
-                        "description",
-                        "contract_type",
-                        "other_contract_type",
-                        "location",
-                        "open_positions",
-                        "profile_description",
-                        "market_context_description",
-                        "source_url",
-                    ],
-                )
-                self.logger.info("successfully updated count=%d PE job offers", n_objs)
-                # Do not deactivate: for now it's not very relevant to keep objects that we
-                # are not the source or master of. We'll see if that makes sense on the analytics
-                # side someday, but remove them entirely for now.
-                n_objs, _ = JobDescription.objects.filter(
-                    source_kind=JobSource.PE_API, source_id__in=offers_to_remove
-                ).delete()
-                self.logger.info("successfully deleted count=%d PE job offers", n_objs)
+        objs = JobDescription.objects.bulk_create(added_offers)
+        self.logger.info("successfully created count=%d PE job offers", len(objs))
+        n_objs = JobDescription.objects.bulk_update(
+            updated_offers,
+            fields=[
+                "appellation",
+                "created_at",
+                "updated_at",
+                "custom_name",
+                "description",
+                "contract_type",
+                "other_contract_type",
+                "location",
+                "open_positions",
+                "profile_description",
+                "market_context_description",
+                "source_url",
+            ],
+        )
+        self.logger.info("successfully updated count=%d PE job offers", n_objs)
+        # Do not deactivate: for now it's not very relevant to keep objects that we
+        # are not the source or master of. We'll see if that makes sense on the analytics
+        # side someday, but remove them entirely for now.
+        n_objs, _ = JobDescription.objects.filter(
+            source_kind=JobSource.PE_API, source_id__in=offers_to_remove
+        ).delete()
+        self.logger.info("successfully deleted count=%d PE job offers", n_objs)
