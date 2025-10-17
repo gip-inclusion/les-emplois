@@ -46,7 +46,7 @@ from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -208,6 +208,83 @@ class TestJobApplicationModel:
         membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
         assert membership.member == user
         assert membership.creator == user
+
+    def test_get_geiq_eligibility_diagnosis(self):
+        expired_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            expired=True,
+        )
+        job_seeker = expired_prescriber_diagnosis.job_seeker
+        expired_company_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            expired=True,
+            job_seeker=job_seeker,
+        )
+        geiq = expired_company_diagnosis.author_geiq
+        newer_company_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            job_seeker=job_seeker,
+            author_geiq=geiq,
+        )
+        valid_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            job_seeker=job_seeker,
+        )
+
+        # The new prescriber diagnosis changed the valid_company_diagnosis expiry date : it's now expired
+        newer_company_diagnosis.refresh_from_db()
+        assert not newer_company_diagnosis.is_valid
+
+        new_job_application = JobApplicationFactory(
+            to_company=geiq,
+            job_seeker=job_seeker,
+            eligibility_diagnosis=None,
+        )
+        accepted_job_application_with_company_diagnosis = JobApplicationFactory(
+            to_company=geiq,
+            job_seeker=job_seeker,
+            geiq_eligibility_diagnosis=expired_company_diagnosis,
+            eligibility_diagnosis=None,
+            state=JobApplicationState.ACCEPTED,
+        )
+        accepted_job_application_with_prescriber_diagnosis = JobApplicationFactory(
+            to_company=geiq,
+            job_seeker=job_seeker,
+            geiq_eligibility_diagnosis=expired_prescriber_diagnosis,
+            eligibility_diagnosis=None,
+            state=JobApplicationState.ACCEPTED,
+        )
+
+        # on accepted job application:
+        # the hiring company and jobseeker get the linked diagnosis
+        # a prescriber only sees the diagnosis if it was created by a prescriber
+        assert (
+            accepted_job_application_with_company_diagnosis.get_geiq_eligibility_diagnosis()
+            == expired_company_diagnosis
+        )
+        assert (
+            accepted_job_application_with_company_diagnosis.get_geiq_eligibility_diagnosis(for_prescriber=True) is None
+        )
+        assert (
+            accepted_job_application_with_prescriber_diagnosis.get_geiq_eligibility_diagnosis()
+            == expired_prescriber_diagnosis
+        )
+        assert (
+            accepted_job_application_with_prescriber_diagnosis.get_geiq_eligibility_diagnosis(for_prescriber=True)
+            == expired_prescriber_diagnosis
+        )
+
+        # On not accepted job application: if there's a valid prescriber diagnosis, return it
+        assert new_job_application.get_geiq_eligibility_diagnosis() == valid_prescriber_diagnosis
+        assert new_job_application.get_geiq_eligibility_diagnosis(for_prescriber=True) == valid_prescriber_diagnosis
+
+        # If there's no prescriber valid diagnosis:
+        # the hiring company and jobseeker get the most recent diagnosis
+        # a prescriber gets the most recent among prescriber diagnoses
+        valid_prescriber_diagnosis.delete()
+        _valid_diagnois_from_other_company = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
+        assert new_job_application.get_geiq_eligibility_diagnosis() == newer_company_diagnosis
+        assert new_job_application.get_geiq_eligibility_diagnosis(for_prescriber=True) == expired_prescriber_diagnosis
 
 
 @pytest.mark.parametrize(

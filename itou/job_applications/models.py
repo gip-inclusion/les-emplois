@@ -18,6 +18,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
@@ -983,6 +984,22 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # As long as the job application has not been accepted, diagnosis-related
         # business rules may still prioritize one diagnosis over another.
         return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
+
+    def get_geiq_eligibility_diagnosis(self, for_prescriber=False):
+        """
+        Returns the GEIQ eligibility diagnosis linked to this job application if it is accepted,
+        or None if the viewer is a prescriber and the diagnosis was made by the company.
+        """
+        if not self.to_company.kind == CompanyKind.GEIQ:
+            return None
+
+        if self.state.is_accepted:
+            if for_prescriber and getattr(self.geiq_eligibility_diagnosis, "author_geiq", None):
+                return None
+            return self.geiq_eligibility_diagnosis
+        return GEIQEligibilityDiagnosis.objects.diagnoses_for(
+            self.job_seeker, self.to_company if not for_prescriber else None
+        ).first()
 
     # Workflow transitions.
     @before_transition(
