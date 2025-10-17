@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Concat, Lower
+from django.http import Http404, JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -45,6 +46,16 @@ class JobApplicationsListKind(enum.Enum):
     # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
     # - https://github.com/django/django/pull/12304
     do_not_call_in_templates = enum.nonmember(True)
+
+
+def _get_job_applications_qs(request, *, list_kind):
+    match list_kind:
+        case JobApplicationsListKind.RECEIVED:
+            return request.current_organization.job_applications_received
+        case JobApplicationsListKind.SENT:
+            return JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+        case JobApplicationsListKind.SENT_FOR_ME:
+            return request.user.job_applications
 
 
 class JobApplicationsDisplayKind(enum.StrEnum):
@@ -121,8 +132,9 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     """
     List of applications for a job seeker.
     """
+    list_kind = JobApplicationsListKind.SENT_FOR_ME
     filters_form = FilterJobApplicationsForm(request.GET)
-    job_applications = request.user.job_applications
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     job_applications = job_applications.with_list_related_data()
 
     try:
@@ -163,7 +175,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.SENT_FOR_ME,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -193,9 +205,12 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for prescribers and employers.
     """
-    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+    list_kind = JobApplicationsListKind.SENT
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
+    filters_form = PrescriberFilterJobApplicationsForm(
+        job_applications, request.GET, list_kind=list_kind, request=request
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
@@ -242,7 +257,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.SENT,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -299,13 +314,14 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
+    list_kind = JobApplicationsListKind.RECEIVED
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     pending_states_job_applications_count = job_applications.filter(
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET, list_kind=list_kind)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
@@ -363,7 +379,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "job_applications_page": job_applications_page,
         "display_kind": display_kind,
         "order": order,
-        "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+        "job_applications_list_kind": list_kind,
         "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -496,3 +512,35 @@ def list_for_siae_actions(request):
         context,
     )
     return response
+
+
+@check_user(lambda u: u.is_prescriber or u.is_employer)
+def autocomplete(request, list_kind, field_name):
+    term = request.GET.get("term", "").strip()
+    fields_display = {
+        "sender": lambda sender: sender.get_full_name(),
+        "sender_prescriber_organization": lambda org: org.display_name.title(),
+        "sender_company": lambda company: company.display_name.title(),
+        "to_company": lambda company: company.display_name.title(),
+    }
+    if field_name not in fields_display:
+        raise Http404
+
+    if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
+        raise Http404
+
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
+    objects = job_applications.get_unique_fk_objects(field_name)
+
+    results = []
+    if term:
+        matches = [obj for obj in objects if term.lower() in fields_display[field_name](obj).lower()]
+        results = [
+            {
+                "text": fields_display[field_name](obj),
+                "id": obj.pk,
+            }
+            for obj in matches[:20]
+        ]
+
+    return JsonResponse({"results": results}, safe=False)
