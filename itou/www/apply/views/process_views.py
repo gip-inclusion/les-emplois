@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, F, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
@@ -334,13 +334,15 @@ def add_comment_for_company(request, job_application_id):
 @check_user(lambda user: user.is_employer)
 def delete_comment_for_company(request, job_application_id, comment_id):
     comment = JobApplicationComment.objects.filter(
-        job_application__id=job_application_id, created_by=request.user, id=comment_id
+        job_application_id=job_application_id, created_by=request.user, id=comment_id
     )
+
     del_count, _ = comment.delete()
     logger.info("user=%d deleted %d comment on job_application=%s", request.user.pk, del_count, job_application_id)
 
     comments = JobApplicationComment.objects.select_related("created_by").filter(
-        job_application=job_application_id, company=request.current_organization
+        job_application=job_application_id,
+        company=F("job_application__to_company"),
     )
     context = {
         "comments": comments,
