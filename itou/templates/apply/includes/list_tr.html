@@ -80,6 +80,7 @@
         {% if job_applications_list_kind is JobApplicationsListKind.SENT and not job_application.to_company.is_subject_to_iae_rules %}
             <td>
                 <i class="text-disabled">Candidature hors IAE</i>
+                {{ job_application.to_company.kind }}
             </td>
             <td>
                 <i class="text-disabled">Candidature hors IAE</i>

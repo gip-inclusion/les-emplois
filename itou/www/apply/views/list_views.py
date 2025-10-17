@@ -94,6 +94,13 @@ def _add_administrative_criteria(job_applications):
         if job_application.jobseeker_eligibility_diagnosis is not None
     )
 
+    geiq_diagnoses_ids = tuple(
+        job_application.jobseeker_geiq_eligibility_diagnosis
+        for job_application in job_applications
+        if job_application.jobseeker_geiq_eligibility_diagnosis is not None
+    )
+    print(geiq_diagnoses_ids)
+
     diagnosis_criteria = defaultdict(list)
     for selected_criteria in (
         SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)

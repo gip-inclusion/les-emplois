@@ -299,6 +299,36 @@ class JobApplicationQuerySet(models.QuerySet):
         )
         return self.annotate(**{f"eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
 
+    def with_jobseeker_geiq_eligibility_diagnosis(self):
+        """
+        Gives the "geiq_eligibility_diagnosis" linked to the job application or if none,
+        the last valid GEIQ eligibility diagnosis for this job seeker and this GEIQ.
+        Returns a queryset with the following annotations to use:
+        - jobseeker_geiq_eligibility_diagnosis
+        - jobseeker_geiq_eligibility_diagnosis_author_kind
+        """
+        valid_diag_subquery = Subquery(
+            GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                job_seeker=OuterRef("job_seeker"),
+                for_geiq=OuterRef("to_company"),
+            ).values("id")[:1],
+            output_field=models.IntegerField(),
+        )
+
+        qs = self.annotate(jobseeker_valid_geiq_eligibility_diagnosis=valid_diag_subquery)
+        qs = qs.annotate(
+            jobseeker_geiq_eligibility_diagnosis=Coalesce(
+                F("geiq_eligibility_diagnosis"), F("jobseeker_valid_geiq_eligibility_diagnosis")
+            )
+        )
+        author_kind_subquery = Subquery(
+            GEIQEligibilityDiagnosis.objects.filter(pk=OuterRef("jobseeker_geiq_eligibility_diagnosis")).values(
+                "author_kind"
+            ),
+            output_field=models.CharField(),
+        )
+        return qs.annotate(jobseeker_geiq_eligibility_diagnosis_author_kind=author_kind_subquery)
+
     def with_list_related_data(self, criteria=None):
         """
         Stop the deluge of database queries that is caused by accessing related
@@ -324,7 +354,11 @@ class JobApplicationQuerySet(models.QuerySet):
             ),
         )
 
-        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis_author_kind()
+        qs = (
+            qs.with_last_change()
+            .with_jobseeker_eligibility_diagnosis_author_kind()
+            .with_jobseeker_geiq_eligibility_diagnosis()
+        )
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
