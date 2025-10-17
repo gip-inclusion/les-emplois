@@ -31,7 +31,7 @@ from itou.www.apply.forms import (
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
 )
-from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER, _get_geiq_eligibility_diagnosis
+from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER
 from itou.www.stats.utils import can_view_stats_ft
 
 
@@ -462,9 +462,9 @@ def list_for_siae_actions(request):
         cannot_accept_reason = "Cette candidature est déjà acceptée."
     can_accept = cannot_accept_reason is None
     if can_accept and company.kind == CompanyKind.GEIQ:
-        selected_job_applications[0].geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(
-            selected_job_applications[0], only_prescriber=False
-        )
+        selected_job_applications[0].geiq_eligibility_diagnosis = selected_job_applications[
+            0
+        ].get_geiq_eligibility_diagnosis()
     job_seeker_nb = len(set(job_application.job_seeker_id for job_application in selected_job_applications))
     prescriber_nb = len(
         set(
