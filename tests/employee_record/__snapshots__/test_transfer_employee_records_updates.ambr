@@ -59,7 +59,7 @@
 # ---
 # name: test_upload_and_download[download]
   dict({
-    'num_queries': 4,
+    'num_queries': 6,
     'queries': list([
       dict({
         'origin': list([
@@ -98,6 +98,16 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.download_json_file[employee_record/common_management.py]',
+          'Command.download[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'EmployeeRecordUpdateNotification.save[<site-packages>/django/db/models/base.py]',
           'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records_updates.py]',
           'Command.download_json_file[employee_record/common_management.py]',
@@ -117,6 +127,16 @@
               "employee_record_id" = %s
           WHERE "employee_record_employeerecordupdatenotification"."id" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command._parse_feedback_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.download_json_file[employee_record/common_management.py]',
+          'Command.download[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -147,7 +167,7 @@
 # ---
 # name: test_upload_and_download[upload]
   dict({
-    'num_queries': 2,
+    'num_queries': 4,
     'queries': list([
       dict({
         'origin': list([
@@ -256,6 +276,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -430,6 +451,15 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command._upload_batch_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.upload[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'EmployeeRecordUpdateNotification.save[<site-packages>/django/db/models/base.py]',
           'Command._upload_batch_file[employee_record/management/commands/transfer_employee_records_updates.py]',
           'Command.upload[employee_record/management/commands/transfer_employee_records_updates.py]',
@@ -448,6 +478,15 @@
               "employee_record_id" = %s
           WHERE "employee_record_employeerecordupdatenotification"."id" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command._upload_batch_file[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.upload[employee_record/management/commands/transfer_employee_records_updates.py]',
+          'Command.handle[employee_record/management/commands/transfer_employee_records_updates.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

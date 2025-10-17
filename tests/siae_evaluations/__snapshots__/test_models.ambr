@@ -91,8 +91,15 @@
 # ---
 # name: TestEvaluationCampaignManager.test_populate
   dict({
-    'num_queries': 21,
+    'num_queries': 31,
     'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
@@ -111,6 +118,13 @@
               "evaluations_asked_at" = %s
           WHERE "siae_evaluations_evaluationcampaign"."id" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -417,15 +431,10 @@
       }),
       dict({
         'origin': list([
-          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
-        'sql': '''
-          INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
-                                                                  "evaluated_siae_id",
-                                                                  "labor_inspector_explanation")
-          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
-        ''',
+        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -438,6 +447,39 @@
                                                                   "labor_inspector_explanation")
           VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.save[<site-packages>/django/db/models/base.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "siae_evaluations_evaluatedjobapplication" ("job_application_id",
+                                                                  "evaluated_siae_id",
+                                                                  "labor_inspector_explanation")
+          VALUES (%s, %s, %s) RETURNING "siae_evaluations_evaluatedjobapplication"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -640,23 +682,12 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
           'EvaluationCampaign.populate[siae_evaluations/models.py]',
         ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
-        ''',
+        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -677,6 +708,53 @@
                                       "esp_response")
           VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([

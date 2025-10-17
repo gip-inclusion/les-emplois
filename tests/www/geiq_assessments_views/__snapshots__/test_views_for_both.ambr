@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAssessmentContractsExportView.test_export[SQL queries]
   dict({
-    'num_queries': 12,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -51,6 +51,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -236,6 +237,13 @@
       }),
       dict({
         'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
           'Session.save[<site-packages>/django/db/models/base.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -245,6 +253,13 @@
               "expire_date" = %s
           WHERE "django_session"."session_key" = %s
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -516,6 +531,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
@@ -1419,6 +1435,7 @@
                  "users_user"."has_completed_welcoming_tour",
                  "users_user"."created_by_id",
                  "users_user"."external_data_source_history",
+                 "users_user"."fields_history",
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
