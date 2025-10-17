@@ -59,25 +59,43 @@ def test_sync_ft_offers(caplog, respx_mock):
     respx_mock.get(f"{ea_base_url}&range=0-149").respond(206, json={"resultats": EA_OFFERS})
     respx_mock.get(f"{ea_base_url}&range=150-299").respond(206, json={"resultats": []})
 
-    management.call_command("sync_ft_offers", wet_run=True, delay=0)
-    assert caplog.messages[-1].startswith(
-        "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
-    )
-    assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == [
-        "retrieved count=2 offers from FT API",
-        "retrieved count=0 offers from FT API",
-        "retrieved count=2 PEC offers from FT API",
-        "retrieved count=2 offers from FT API",
-        "retrieved count=0 offers from FT API",
-        "retrieved count=2 EA offers from FT API",
-        "retrieved count=4 unique offers from FT API",
-        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='OHNOES'",
-        "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') skipping source_id='SEONHO'",
-        "successfully created count=2 PE job offers",
-        "successfully updated count=0 PE job offers",
-        "successfully deleted count=0 PE job offers",
-    ]
+    # Try dry run first then real run
+    for wet_run in [False, True]:
+        caplog.clear()
+        management.call_command("sync_ft_offers", wet_run=wet_run, delay=0)
+        assert caplog.messages[-1].startswith(
+            "Management command itou.companies.management.commands.sync_ft_offers succeeded in "
+        )
+        expected_logs = [
+            "retrieved count=2 offers from FT API",
+            "retrieved count=0 offers from FT API",
+            "retrieved count=2 PEC offers from FT API",
+            "retrieved count=2 offers from FT API",
+            "retrieved count=0 offers from FT API",
+            "retrieved count=2 EA offers from FT API",
+            "retrieved count=4 unique offers from FT API",
+            (
+                "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') "
+                "skipping source_id='OHNOES'"
+            ),
+            (
+                "no appellation match found (rome_code='M1607' appellation_label='Secrétaire') "
+                "skipping source_id='SEONHO'"
+            ),
+            "successfully created count=2 PE job offers",
+            "successfully updated count=0 PE job offers",
+            "successfully deleted count=0 PE job offers",
+        ]
+        if not wet_run:
+            expected_logs = (
+                ["Command launched with wet_run=False"]
+                + expected_logs
+                + ["Setting transaction to be rollback as wet_run=False"]
+            )
+        assert [message for message in caplog.messages[:-1] if not message.startswith("HTTP Request")] == expected_logs
+        assert JobDescription.objects.count() == (2 if wet_run else 0)
 
+    # Here the command has been run in wet mode, we can check the created objects
     [pec_job_description, ea_job_description] = JobDescription.objects.order_by("source_id").all()
     assert pec_job_description.custom_name == "Mécanicien de maintenance (F/H)."
     assert pec_job_description.location == city
