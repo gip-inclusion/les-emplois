@@ -118,7 +118,6 @@ class Command(BaseCommand):
     @dry_runnable
     def handle(self, *, delay, **options):
         pe_client = pole_emploi_partenaire_api_client()
-        pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
 
         # NOTE: using this unfiltered API we can only sync at most 1149 PEC offers. If someday there are more offers,
         # we will need to setup a much more complicated sync mechanism, for instance by requesting every department one
@@ -147,6 +146,8 @@ class Command(BaseCommand):
         updated_offers = []
         offers_to_remove = set()
 
+        # Start DB queries
+        pe_siae = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
         # get the weakest possible lock on these rows, as we don't want to block the entire system
         # but still avoid creating concurrent rows in the same time while we inspect their keys
         pe_offers = JobDescription.objects.filter(source_kind=JobSource.PE_API).select_for_update(
