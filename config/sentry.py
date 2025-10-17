@@ -19,6 +19,22 @@ HTTP_QUERY_SENSITIVE_KEYS = [
 ]
 
 
+def strip_sensitive_data_from_breadcrumb(breadcrumb, _hint):
+    if (
+        breadcrumb.get("type") == "http"
+        and breadcrumb.get("category") == "httplib"
+        and (query := breadcrumb.get("data", {}).get("http.query"))
+    ):
+        if any(sensitive_key in query for sensitive_key in HTTP_QUERY_SENSITIVE_KEYS):
+            parsed_query = urllib.parse.parse_qsl(query, keep_blank_values=True)
+            redacted_query = [
+                (key, "_REDACTED_" if key in HTTP_QUERY_SENSITIVE_KEYS and value else value)
+                for key, value in parsed_query
+            ]
+            breadcrumb["data"]["http.query"] = urllib.parse.urlencode(redacted_query)
+    return breadcrumb
+
+
 def strip_sentry_sensitive_data(event, _hint):
     """
     Be very cautious about not raising any exception in this method,
@@ -27,24 +43,6 @@ def strip_sentry_sensitive_data(event, _hint):
     months before we realize a real error was silenced.
     Also, you cannot use the debugger here.
     """
-    breadcrumbs = event.get("breadcrumbs", {})
-    # It should be a dict with a "values" key but for some reason it sometimes is a list.
-    # https://github.com/getsentry/sentry-python/issues/4951
-    if isinstance(breadcrumbs, dict):
-        breadcrumbs = breadcrumbs.get("values", [])
-    for breadcrumb_value in breadcrumbs:
-        if (
-            breadcrumb_value.get("type") == "http"
-            and breadcrumb_value.get("category") == "httplib"
-            and (query := breadcrumb_value.get("data", {}).get("http.query"))
-        ):
-            if any(sensitive_key in query for sensitive_key in HTTP_QUERY_SENSITIVE_KEYS):
-                parsed_query = urllib.parse.parse_qsl(query, keep_blank_values=True)
-                redacted_query = [
-                    (key, "_REDACTED_" if key in HTTP_QUERY_SENSITIVE_KEYS and value else value)
-                    for key, value in parsed_query
-                ]
-                breadcrumb_value["data"]["http.query"] = urllib.parse.urlencode(redacted_query)
     if "user" in event:
         # Unfortunately this does not work for the IP address
         # which keeps appearing. ¯\_(ツ)_/¯
@@ -92,6 +90,8 @@ def sentry_init():
         # Associate users (ID+email+username+IP) to errors.
         # https://docs.sentry.io/platforms/python/django/
         send_default_pii=True,
+        # Filter out sensitive data from http breadcrumbs.
+        before_breadcrumb=strip_sensitive_data_from_breadcrumb,
         # Filter out sensitive email and username.
         # Unfortunately ip_address cannot be filtered out.
         # https://docs.sentry.io/error-reporting/configuration/filtering/?platform=python
