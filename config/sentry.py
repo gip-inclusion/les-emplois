@@ -27,7 +27,12 @@ def strip_sentry_sensitive_data(event, _hint):
     months before we realize a real error was silenced.
     Also, you cannot use the debugger here.
     """
-    for breadcrumb_value in event.get("breadcrumbs", {}).get("values", []):
+    breadcrumbs = event.get("breadcrumbs", {})
+    # It should be a dict with a "values" key but for some reason it sometimes is a list.
+    # https://github.com/getsentry/sentry-python/issues/4951
+    if isinstance(breadcrumbs, dict):
+        breadcrumbs = breadcrumbs.get("values", [])
+    for breadcrumb_value in breadcrumbs:
         if (
             breadcrumb_value.get("type") == "http"
             and breadcrumb_value.get("category") == "httplib"
