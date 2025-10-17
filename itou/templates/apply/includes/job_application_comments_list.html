@@ -1,0 +1,104 @@
+{% load matomo %}
+<div class="{% if location == "sidebar" %}c-box{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-list-{{ location }}"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+    <h3>
+        {% if location == "sidebar" %}
+            Derniers commentaires
+        {% else %}
+            Liste des commentaires ({{ comments.count }})
+        {% endif %}
+    </h3>
+    <ul class="list-note">
+        {% for comment in comments %}
+            <li {% if request.user == comment.created_by %}class="is-current-user"{% endif %}>
+                {% if location == "tab" %}<i class="ri-user-line"></i>{% endif %}
+                <div>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <time datetime="{{ comment.created_at.isoformat }}">Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</time>
+                            <strong>
+                                {{ comment.created_by.get_full_name }}
+                                {% if comment.created_by == request.user %}(vous){% endif %}
+                            </strong>
+                        </div>
+                        {% if location == "tab" and request.user == comment.created_by %}
+                            {# Delete button with its confirmation modal #}
+                            <button class="btn btn-sm btn-link btn-ico-only" data-bs-toggle="modal" data-bs-target="#delete_comment_{{ comment.id }}_modal">
+                                <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer" aria-label="Supprimer ce commentaire"></i>
+                            </button>
+
+                            <div id="delete_comment_{{ comment.id }}_modal" class="modal fade" tabindex="-1" aria-labelledby="delete_comment_{{ comment.id }}_title" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 id="delete_comment_{{ comment.id }}_title">Suppression du commentaire</h3>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <p>Voulez-vous supprimer ce commentaire ?</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            {# Comment deletion form #}
+                                            <form hx-post="{% url 'apply:delete_comment_for_company' job_application_id=comment.job_application.pk comment_id=comment.id %}"
+                                                  hx-target="#comments-list-tab"
+                                                  hx-indicator="#comments-list-tab"
+                                                  hx-swap="outerHTML"
+                                                  class="d-block js-prevent-multiple-submit">
+                                                {% csrf_token %}
+                                                <div class="text-end">
+                                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression du commentaire" type="button">
+                                                        Annuler
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer le commentaire">
+                                                        <i class="ri-delete-bin-line fw-normal" aria-hidden="true"></i>
+                                                        <span>Supprimer</span>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <blockquote class="blockquote">
+                        {% if location == "sidebar" and comment.message|length > 200 %}
+                            <div class="collapse show has-no-transition" id="collapse-comment-{{ comment.id }}">
+                                <p class="mb-0">{{ comment.message|truncatechars:200 }}</p>
+                                <button class="btn-link d-inline-block mt-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-comment-{{ comment.id }}"
+                                        aria-expanded="false"
+                                        aria-controls="collapse-comment-{{ comment.id }}">Voir +</button>
+                            </div>
+                            <div class="collapse has-no-transition" id="collapse-comment-{{ comment.id }}">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% else %}
+                            <div class="collapse show">
+                                <p class="mb-0">{{ comment.message|linebreaksbr }}</p>
+                            </div>
+                        {% endif %}
+                    </blockquote>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if location == "sidebar" %}
+        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
+            Voir tous les commentaires
+        </button>
+    {% endif %}
+</div>
+
+
+{% if request.htmx %}
+    {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
+    {% if location == "tab" %}
+        {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments|default:None request=request hx_swap_oob=True only %}
+    {% endif %}
+{% endif %}
