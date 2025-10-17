@@ -17,7 +17,6 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
-from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
@@ -516,24 +515,32 @@ def list_for_siae_actions(request):
 
 
 @check_user(lambda u: u.is_prescriber or u.is_employer)
-def autocomplete_senders(request, list_kind):
+def autocomplete(request, list_kind, field_name):
     term = request.GET.get("term", "").strip()
-    senders = []
+    fields_display = {
+        "sender": lambda sender: sender.get_full_name(),
+        "sender_prescriber_organization": lambda org: org.display_name.title(),
+        "sender_company": lambda company: company.display_name.title(),
+        "to_company": lambda company: company.display_name.title(),
+    }
+    if field_name not in fields_display:
+        raise Http404
 
     if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
         raise Http404
 
     job_applications = _get_job_applications_qs(request, list_kind=list_kind)
+    objects = job_applications.get_unique_fk_objects(field_name)
 
+    results = []
     if term:
-        senders = [
+        matches = [obj for obj in objects if term.lower() in fields_display[field_name](obj).lower()]
+        results = [
             {
-                "text": sender.autocomplete_display(),
-                "id": sender.pk,
+                "text": fields_display[field_name](obj),
+                "id": obj.pk,
             }
-            for sender in User.objects.search_by_full_name(term).filter(
-                Exists(job_applications.filter(sender=OuterRef("pk")))
-            )[:20]
+            for obj in matches[:20]
         ]
 
-    return JsonResponse({"results": senders}, safe=False)
+    return JsonResponse({"results": results}, safe=False)
