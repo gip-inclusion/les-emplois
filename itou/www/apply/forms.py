@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
@@ -16,11 +16,12 @@ from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
-from itou.companies.models import JobDescription
+from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -790,7 +791,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 "data-ajax--cache": "true",
                 "data-ajax--delay": 250,
                 "data-ajax--type": "GET",
-                "data-minimum-input-length": 3,
+                "data-minimum-input-length": 1,
                 "data-dropdown-parent": "#offcanvasApplyFilters",
             }
         ),
@@ -831,8 +832,8 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         self.fields["senders"].widget.attrs["data-ajax--url"] = {
-            list_kind.RECEIVED: reverse("apply:list_for_siae_senders"),
-            list_kind.SENT: reverse("apply:list_prescriptions_senders"),
+            list_kind.RECEIVED: reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"}),
+            list_kind.SENT: reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"}),
         }[list_kind]
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)
@@ -897,22 +898,44 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
     Job applications filters for companies only.
     """
 
-    sender_prescriber_organizations = forms.MultipleChoiceField(
-        required=False,
+    sender_prescriber_organizations = forms.ModelMultipleChoiceField(
+        queryset=PrescriberOrganization.objects,
         label="Nom de l'organisme prescripteur",
-        widget=Select2MultipleWidget,
+        required=False,
+        widget=RemoteAutocompleteSelect2MultipleWidget(
+            attrs={
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-ajax--url": reverse_lazy(
+                    "apply:list_for_siae_autocomplete", kwargs={"field_name": "sender_prescriber_organization"}
+                ),
+                "data-minimum-input-length": 1,
+                "data-dropdown-parent": "#offcanvasApplyFilters",
+            }
+        ),
     )
 
-    sender_companies = forms.MultipleChoiceField(
-        required=False,
+    sender_companies = forms.ModelMultipleChoiceField(
+        queryset=Company.objects,
         label="Nom de l’employeur orienteur",
-        widget=Select2MultipleWidget,
+        required=False,
+        widget=RemoteAutocompleteSelect2MultipleWidget(
+            attrs={
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-ajax--url": reverse_lazy(
+                    "apply:list_for_siae_autocomplete", kwargs={"field_name": "sender_company"}
+                ),
+                "data-minimum-input-length": 1,
+                "data-dropdown-parent": "#offcanvasApplyFilters",
+            }
+        ),
     )
 
     def __init__(self, job_applications_qs, company, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields["sender_prescriber_organizations"].choices += self.get_sender_prescriber_organization_choices()
-        self.fields["sender_companies"].choices += self.get_sender_companies_choices()
 
         if company.kind not in CompanyKind.siae_kinds():
             del self.fields["eligibility_validated"]
@@ -942,30 +965,33 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         users = [(user.id, user_full_name) for user in users if (user_full_name := user.get_full_name())]
         return sorted(users, key=lambda user: user[1])
 
-    def get_sender_prescriber_organization_choices(self):
-        sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
-        sender_orgs = [sender for sender in sender_orgs if sender.display_name]
-        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
-        return sorted(sender_orgs, key=lambda org: org[0])
-
-    def get_sender_companies_choices(self):
-        sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_company")
-        sender_orgs = [sender for sender in sender_orgs if sender.display_name]
-        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
-        return sorted(sender_orgs, key=lambda org: org[0])
-
 
 class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):
     """
     Job applications filters for Prescribers only.
     """
 
-    to_companies = forms.MultipleChoiceField(required=False, label="Organisation", widget=Select2MultipleWidget)
+    to_companies = forms.ModelMultipleChoiceField(
+        queryset=Company.objects,
+        label="Organisation",
+        required=False,
+        widget=RemoteAutocompleteSelect2MultipleWidget(
+            attrs={
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-ajax--url": reverse_lazy(
+                    "apply:list_prescriptions_autocomplete", kwargs={"field_name": "to_company"}
+                ),
+                "data-minimum-input-length": 1,
+                "data-dropdown-parent": "#offcanvasApplyFilters",
+            }
+        ),
+    )
 
     def __init__(self, job_applications_qs, *args, request, **kwargs):
         self.request = request
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields["to_companies"].choices += self.get_to_companies_choices()
 
     def _get_choices_for_job_seeker(self, users):
         users = [
@@ -984,12 +1010,6 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         if to_companies := self.cleaned_data.get("to_companies"):
             queryset = queryset.filter(to_company__id__in=to_companies)
         return queryset
-
-    def get_to_companies_choices(self):
-        to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
-        to_companies = [company for company in to_companies if company.display_name]
-        to_companies = [(company.id, company.display_name.title()) for company in to_companies]
-        return sorted(to_companies, key=lambda company: company[1])
 
 
 class CheckJobSeekerGEIQEligibilityForm(forms.Form):
