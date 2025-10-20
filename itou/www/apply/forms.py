@@ -10,7 +10,7 @@ from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django_select2.forms import Select2MultipleWidget, Select2Widget
+from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -22,6 +22,7 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -796,14 +797,19 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             }
         ),
     )
-    job_seeker = forms.ChoiceField(
-        required=False,
+    job_seeker = forms.ModelChoiceField(
+        queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
         label="Nom du candidat",
-        widget=Select2Widget(
-            attrs={"data-placeholder": "Nom du candidat"},
+        required=False,
+        widget=RemoteAutocompleteSelect2MultipleWidget(
+            attrs={
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 1,
+            }
         ),
     )
-
     pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
     pass_iae_active = forms.BooleanField(label="Actif", required=False)
     pass_iae_expired = forms.BooleanField(label="Expiré", required=False)
@@ -834,6 +840,10 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         self.fields["senders"].widget.attrs["data-ajax--url"] = {
             list_kind.RECEIVED: reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"}),
             list_kind.SENT: reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"}),
+        }[list_kind]
+        self.fields["job_seeker"].widget.attrs["data-ajax--url"] = {
+            list_kind.RECEIVED: reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "job_seeker"}),
+            list_kind.SENT: reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "job_seeker"}),
         }[list_kind]
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)

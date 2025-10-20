@@ -22,6 +22,7 @@ from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_view_personal_information
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ArchivedChoices,
@@ -522,9 +523,15 @@ def autocomplete(request, list_kind, field_name):
         "sender_prescriber_organization": lambda org: org.display_name.title(),
         "sender_company": lambda company: company.display_name.title(),
         "to_company": lambda company: company.display_name.title(),
+        "job_seeker": lambda js: js.get_full_name(),
     }
     if field_name not in fields_display:
         raise Http404
+    field_display = fields_display[field_name]
+    if request.user.is_prescriber and field_name == "job_seeker":
+
+        def field_display(js):
+            return mask_unless(js.get_full_name(), predicate=can_view_personal_information(request, js))
 
     if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
         raise Http404
@@ -534,10 +541,10 @@ def autocomplete(request, list_kind, field_name):
 
     results = []
     if term:
-        matches = [obj for obj in objects if term.lower() in fields_display[field_name](obj).lower()]
+        matches = [obj for obj in objects if term.lower() in field_display(obj).lower()]
         results = [
             {
-                "text": fields_display[field_name](obj),
+                "text": field_display(obj),
                 "id": obj.pk,
             }
             for obj in matches[:20]
