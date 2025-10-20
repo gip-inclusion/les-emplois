@@ -6,7 +6,7 @@
         {% else %}
             {% iae_eligibility_badge is_eligible=eligibility_diagnosis extra_classes=badge_class %}
         {% endif %}
-    {% elif is_subject_to_geiq_eligibility_rules %}
+    {% elif is_subject_to_geiq_rules %}
         {% if geiq_eligibility_diagnosis.is_valid and geiq_eligibility_diagnosis.allowance_amount %}
             {% geiq_eligibility_badge is_eligible=True extra_classes=badge_class %}
         {% else %}
