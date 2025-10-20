@@ -11,6 +11,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from tests.api.utils import _str_with_tz
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import assertSnapshotQueries
 
 
@@ -233,10 +234,19 @@ class TestSiaeAPIFetchList:
             company56.siret,
         }
 
-    def test_fetch_siae_list_rate_limits(self, api_client):
+    @pytest.mark.parametrize(
+        "user_factory,max_requests",
+        [
+            (None, 12),
+            (JobSeekerFactory, 120),
+        ],
+    )
+    def test_fetch_siae_list_rate_limits(self, api_client, user_factory, max_requests):
+        if user_factory:
+            api_client.force_authenticate(user=user_factory())
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
         # Declared in itou.api.siae_api.viewsets.RestrictedUserRateThrottle.
-        for _ in range(12):
+        for _ in range(max_requests):
             api_client.get(ENDPOINT_URL, query_params, format="json")
         response = api_client.get(ENDPOINT_URL, query_params, format="json")
         # Rate limited.
