@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.http import Http404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget
@@ -29,7 +30,11 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
-from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2MultipleWidget
+from itou.utils.widgets import (
+    DuetDatePickerWidget,
+    RemoteAutocompleteSelect2MultipleWidget,
+    RemoteAutocompleteSelect2Widget,
+)
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -667,6 +672,33 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
         fields = []
 
 
+def get_field_label_from_instance(field_name, request):
+    fields_display = {
+        "sender": lambda sender: sender.get_full_name(),
+        "sender_prescriber_organization": lambda org: org.display_name.title(),
+        "sender_company": lambda company: company.display_name.title(),
+        "to_company": lambda company: company.display_name.title(),
+        "job_seeker": lambda job_seeker: job_seeker.get_full_name(),
+    }
+    if request.user.is_employer:
+        if field_name not in ("job_seeker", "sender", "sender_prescriber_organization", "sender_company"):
+            raise Http404
+        return fields_display[field_name]
+    elif request.user.is_prescriber:
+        if field_name not in ("job_seeker", "sender", "to_company"):
+            raise Http404
+        if field_name == "job_seeker":
+
+            def field_display(job_seeker):
+                return mask_unless(
+                    job_seeker.get_full_name(), predicate=can_view_personal_information(request, job_seeker)
+                )
+
+            return field_display
+        return fields_display[field_name]
+    raise Http404
+
+
 class FilterJobApplicationsForm(forms.Form):
     """
     Allow users to filter job applications based on specific fields.
@@ -772,7 +804,7 @@ def cancel_other_filters_if_filter_by_job_seeker(f):
     @wraps(f)
     def wrap(self, queryset):
         if job_seeker := self.cleaned_data.get("job_seeker"):
-            return queryset.filter(job_seeker__id=job_seeker)
+            return queryset.filter(job_seeker=job_seeker)
         return f(self, queryset)
 
     return wrap
@@ -801,7 +833,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
         label="Nom du candidat",
         required=False,
-        widget=RemoteAutocompleteSelect2MultipleWidget(
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
                 "data-ajax--cache": "true",
                 "data-ajax--delay": 250,
@@ -834,19 +866,20 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     )
 
     @sentry_sdk.trace
-    def __init__(self, job_applications_qs, *args, list_kind, **kwargs):
+    def __init__(self, job_applications_qs, *args, list_kind, request, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         self.fields["senders"].widget.attrs["data-ajax--url"] = {
             list_kind.RECEIVED: reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"}),
             list_kind.SENT: reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"}),
         }[list_kind]
+        self.fields["senders"].widget.label_from_instance = get_field_label_from_instance("sender", request)
         self.fields["job_seeker"].widget.attrs["data-ajax--url"] = {
             list_kind.RECEIVED: reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "job_seeker"}),
             list_kind.SENT: reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "job_seeker"}),
         }[list_kind]
+        self.fields["job_seeker"].widget.label_from_instance = get_field_label_from_instance("job_seeker", request)
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
-        self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
         self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
@@ -944,9 +977,15 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         ),
     )
 
-    def __init__(self, job_applications_qs, company, *args, **kwargs):
-        super().__init__(job_applications_qs, *args, **kwargs)
+    def __init__(self, job_applications_qs, company, *args, request, **kwargs):
+        super().__init__(job_applications_qs, *args, request=request, **kwargs)
 
+        self.fields["sender_prescriber_organizations"].widget.label_from_instance = get_field_label_from_instance(
+            "sender_prescriber_organization", request
+        )
+        self.fields["sender_companies"].widget.label_from_instance = get_field_label_from_instance(
+            "sender_company", request
+        )
         if company.kind not in CompanyKind.siae_kinds():
             del self.fields["eligibility_validated"]
             del self.fields["eligibility_pending"]
@@ -1000,19 +1039,8 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
     )
 
     def __init__(self, job_applications_qs, *args, request, **kwargs):
-        self.request = request
-        super().__init__(job_applications_qs, *args, **kwargs)
-
-    def _get_choices_for_job_seeker(self, users):
-        users = [
-            (
-                user.id,
-                mask_unless(user_full_name, predicate=can_view_personal_information(self.request, user)),
-            )
-            for user in users
-            if (user_full_name := user.get_full_name())
-        ]
-        return sorted(users, key=lambda user: user[1])
+        super().__init__(job_applications_qs, *args, request=request, **kwargs)
+        self.fields["to_companies"].widget.label_from_instance = get_field_label_from_instance("to_company", request)
 
     @cancel_other_filters_if_filter_by_job_seeker
     def filter(self, queryset):

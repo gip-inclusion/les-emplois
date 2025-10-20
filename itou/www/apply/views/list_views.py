@@ -22,7 +22,6 @@ from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.utils import can_view_personal_information
-from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     ArchivedChoices,
@@ -32,6 +31,7 @@ from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
+    get_field_label_from_instance,
 )
 from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER, _get_geiq_eligibility_diagnosis
 from itou.www.stats.utils import can_view_stats_ft
@@ -322,7 +322,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET, list_kind=list_kind)
+    filters_form = CompanyFilterJobApplicationsForm(
+        job_applications, company, request.GET, list_kind=list_kind, request=request
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
@@ -517,24 +519,10 @@ def list_for_siae_actions(request):
 
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def autocomplete(request, list_kind, field_name):
-    term = request.GET.get("term", "").strip()
-    fields_display = {
-        "sender": lambda sender: sender.get_full_name(),
-        "sender_prescriber_organization": lambda org: org.display_name.title(),
-        "sender_company": lambda company: company.display_name.title(),
-        "to_company": lambda company: company.display_name.title(),
-        "job_seeker": lambda js: js.get_full_name(),
-    }
-    if field_name not in fields_display:
-        raise Http404
-    field_display = fields_display[field_name]
-    if request.user.is_prescriber and field_name == "job_seeker":
-
-        def field_display(js):
-            return mask_unless(js.get_full_name(), predicate=can_view_personal_information(request, js))
-
     if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
         raise Http404
+    term = request.GET.get("term", "").strip()
+    field_display = get_field_label_from_instance(field_name, request)
 
     job_applications = _get_job_applications_qs(request, list_kind=list_kind)
     objects = job_applications.get_unique_fk_objects(field_name)
