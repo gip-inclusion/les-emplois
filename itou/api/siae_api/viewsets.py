@@ -8,7 +8,6 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schem
 from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.throttling import UserRateThrottle
 
 from itou.api.auth import DepartmentTokenAuthentication
 from itou.api.siae_api.serializers import SiaeSerializer
@@ -107,18 +106,6 @@ class CompanyFilterSet(FilterSet):
         return filtered_queryset
 
 
-class RestrictedUserRateThrottle(UserRateThrottle):
-    """
-    Very restrictive rate limits
-
-    Historical limitation, a company made a business of crawling this
-    API and selling the data. The data is meant to be available to
-    the public, for free.
-    """
-
-    rate = "12/minute"
-
-
 class SiaeViewSet(LoginNotRequiredMixin, viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     """
     # Liste des SIAE
@@ -141,7 +128,6 @@ class SiaeViewSet(LoginNotRequiredMixin, viewsets.mixins.ListModelMixin, viewset
     authentication_classes = [DepartmentTokenAuthentication, TokenAuthentication, SessionAuthentication]
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
-    throttling_classes = [RestrictedUserRateThrottle]
 
     queryset = Company.objects.prefetch_related(
         Prefetch(
