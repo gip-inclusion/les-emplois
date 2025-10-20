@@ -1,5 +1,33 @@
 # Journal des modifications
 
+## 2025-10-20
+
+### Ajouté
+
+- [Contrôle a posteriori : archiver les SIAE dont le contrôle est positif](https://github.com/gip-inclusion/les-emplois/pull/6797)
+
+### Modifié
+
+- [Admin: afficher un message d'erreur en cas d'incohérence ville/pays de naissance](https://github.com/gip-inclusion/les-emplois/pull/6978) 🖼
+- [Admin: gérer le cas de l'ajout d'un membre sans spécifier l'utilisateur ou avec un utilisateur invalide](https://github.com/gip-inclusion/les-emplois/pull/7018)
+- [api_particulier: Gérer les erreurs 422](https://github.com/gip-inclusion/les-emplois/pull/6979)
+- [Candidature: Ajout d'une précision lorsque le Prescripteur Habilité n'a pas renseigné de critère administratif](https://github.com/gip-inclusion/les-emplois/pull/6786)
+- [Candidature: ne pas renvoyer une 500 si la date de début d'une action préalable à l'embauche n'est pas renseignée](https://github.com/gip-inclusion/les-emplois/pull/7006)
+- [Contrôle a posteriori : Retrait des références à la campagne de 2021 dans l’encart d’aide à la décision de sanctions](https://github.com/gip-inclusion/les-emplois/pull/6981)
+- [Contrôle a posteriori: ajout du type de la SIAE contrôlée dans la liste des structures contrôlées par la DDETS](https://github.com/gip-inclusion/les-emplois/pull/7002)
+- [Contrôle a posteriori: ajout d’une mention pour améliorer la compréhension de la validation auto d’une candidature avec un critère niveau 1 certifié](https://github.com/gip-inclusion/les-emplois/pull/7009)
+- [GEIQ : Toujours permettre la modification du pays et de la commune de naissance du candidat à l’embauche](https://github.com/gip-inclusion/les-emplois/pull/6933)
+- [GPS: Correction du nom affiché de l'entreprise des intervenants](https://github.com/gip-inclusion/les-emplois/pull/7001)
+- [Inscription: gérer le cas d'un email de contact d'une entreprise invalide ou absent](https://github.com/gip-inclusion/les-emplois/pull/7000)
+- [Interface : correction mineure de l'affichage de la barre de recherche lors d'un transfert externe](https://github.com/gip-inclusion/les-emplois/pull/6998)
+- [Mise à jour des CGU](https://github.com/gip-inclusion/les-emplois/pull/7008)
+- [PASS IAE: permettre les demandes de prolongations 12 mois avant la fin du PASS](https://github.com/gip-inclusion/les-emplois/pull/7004)
+- [Vie privée: ajout d'une remarque support sur les comptes des professionnels archivés](https://github.com/gip-inclusion/les-emplois/pull/6977)
+
+### Tech
+
+- [api_particulier: Arrêter de logguer toutes les erreurs dans Sentry](https://github.com/gip-inclusion/les-emplois/pull/6988)
+
 ## 2025-10-13
 
 ### Ajouté
