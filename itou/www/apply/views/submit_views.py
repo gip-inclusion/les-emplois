@@ -362,7 +362,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             "eligibility_diagnosis": self.eligibility_diagnosis,
             "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
-            "is_subject_to_geiq_eligibility_rules": self.company.kind == CompanyKind.GEIQ,
+            "is_subject_to_geiq_rules": self.company.kind == CompanyKind.GEIQ,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
             # Do not show the warning for job seekers
