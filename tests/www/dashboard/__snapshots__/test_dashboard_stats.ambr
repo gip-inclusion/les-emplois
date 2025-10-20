@@ -1139,31 +1139,6 @@
 # name: test_index_stats_for_employer
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
-      <div class="alert alert-info alert-dismissible fade show" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Enquête SIAE : construisons ensemble les outils de demain
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Partagez votre expérience sur vos défis quotidiens et vos pratiques de pilotage. Aidez-nous à développer de meilleurs outils, adaptés à vos besoins.
-                  </p>
-              </div>
-              <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                  <a class="btn btn-sm btn-primary has-external-link" href="https://etudes.inclusion.gouv.fr/siae-2025" rel="noopener" target="_blank">
-                      Participer à l'enquête
-                  </a>
-              </div>
-          </div>
-      </div>
       <h2>
           Statistiques
       </h2>

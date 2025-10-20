@@ -130,15 +130,7 @@ def render_stats(
     base_context.update(context)
     if request.user.is_authenticated and request.user.is_employer:
         base_context.setdefault("pilotage_webinar_banners", [])
-        base_context["pilotage_webinar_banners"].append(
-            {
-                "title": "Enquête SIAE : construisons ensemble les outils de demain",
-                "description": "Partagez votre expérience sur vos défis quotidiens et vos pratiques de pilotage. Aidez-nous à développer de meilleurs outils, adaptés à vos besoins.",  # noqa: E501
-                "call_to_action": "Participer à l'enquête",
-                "url": "https://etudes.inclusion.gouv.fr/siae-2025",
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2025, 7, 18),
-            }
-        )
+
     if "pilotage_webinar_banners" not in base_context:
         base_context["pilotage_webinar_banners"] = [
             {
