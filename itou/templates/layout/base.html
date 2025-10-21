@@ -189,7 +189,7 @@
             {% if ITOU_ENVIRONMENT == "DEMO" or ITOU_ENVIRONMENT == "PENTEST" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
             tarteaucitron.user.HotjarSv = 6;
 
-            {% if MATOMO_BASE_URL %}
+            {% if MATOMO_BASE_URL and send_to_matomo %}
             // Matomo :
             tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
             tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
