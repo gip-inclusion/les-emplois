@@ -20,7 +20,7 @@ from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company
-from itou.eligibility.enums import AdministrativeCriteriaLevel
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition, EmployeeRecordTransitionLog
@@ -689,9 +689,121 @@ class TestJobApplicationQuerySet:
         assert not getattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
         assert getattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
+    def test_with_jobseeker_geiq_eligibility_diagnosis(self):
+        job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
+        diagnosis = job_app.geiq_eligibility_diagnosis
+        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis().get(pk=job_app.pk)
+        assert qs.jobseeker_geiq_eligibility_diagnosis == diagnosis.pk
+
+    def test_with_jobseeker_geiq_eligibility_diagnosis_with_a_denormalized_diagnosis_from_the_prescriber(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company__kind=CompanyKind.GEIQ,
+            geiq_eligibility_diagnosis=None,
+        )
+        eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=job_application.job_seeker
+        )
+
+        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_geiq_eligibility_diagnosis == eligibility_diagnosis.pk
+
+    def test_with_jobseeker_geiq_eligibility_diagnosis_with_a_denormalized_diagnosis_from_current_employer(self):
+        job_application = JobApplicationFactory(
+            sent_by_company=True, to_company__kind=CompanyKind.GEIQ, geiq_eligibility_diagnosis=None
+        )
+        eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            author_geiq=job_application.sender_company,
+            job_seeker=job_application.job_seeker,
+            # for a GEIQ diagnosis to be considered valid in these querysets, an allowance must be granted
+            # cf. itou.eligibility.utils.geiq_allowance_amount for the rules
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+            ],
+        )
+
+        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_geiq_eligibility_diagnosis == eligibility_diagnosis.pk
+
+    def test_with_jobseeker_geiq_eligibility_diagnosis_with_a_denormalized_diagnosis_from_another_employer(self):
+        job_application = JobApplicationFactory(
+            sent_by_company=True, to_company__kind=CompanyKind.GEIQ, geiq_eligibility_diagnosis=None
+        )
+        GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            job_seeker=job_application.job_seeker,
+            # for a GEIQ diagnosis to be considered valid in these querysets, an allowance must be granted
+            # cf. itou.eligibility.utils.geiq_allowance_amount for the rules
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+            ],
+        )
+
+        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_geiq_eligibility_diagnosis is None
+
+    @pytest.mark.parametrize(
+        "diagnosis_author",
+        [
+            "prescriber",
+            "employer",
+        ],
+    )
+    @pytest.mark.parametrize(
+        "criteria_kinds",
+        [
+            # Allowance granted
+            [AdministrativeCriteriaKind.RSA],  # one level 1 criterion
+            [AdministrativeCriteriaKind.JEUNE, AdministrativeCriteriaKind.PI],  # two level 2 criteria
+            [AdministrativeCriteriaKind.SANS_TRAVAIL_12],  # one annex 1 criterion
+            # No allowance granted
+            [],
+            [AdministrativeCriteriaKind.JEUNE],  # two level 2 criteria
+        ],
+    )
+    def test_with_jobseeker_geiq_eligibility_diagnosis_with_or_without_allowance(
+        self, diagnosis_author, criteria_kinds
+    ):
+        job_application = JobApplicationFactory(
+            sent_by_company=diagnosis_author == "employer",
+            to_company__kind=CompanyKind.GEIQ,
+            geiq_eligibility_diagnosis=None,
+        )
+        author_prescriber_organization = (
+            PrescriberOrganizationFactory(with_membership=True) if diagnosis_author != "employer" else None
+        )
+        author = (
+            job_application.sender
+            if diagnosis_author == "employer"
+            else author_prescriber_organization.members.first()
+        )
+        eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
+            author=author,
+            from_employer=diagnosis_author == "employer",
+            author_geiq=job_application.sender_company,
+            from_prescriber=diagnosis_author != "employer",
+            author_prescriber_organization=author_prescriber_organization,
+            job_seeker=job_application.job_seeker,
+            criteria_kinds=criteria_kinds,
+        )
+
+        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis()
+
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_geiq_eligibility_diagnosis == (
+            eligibility_diagnosis.pk if eligibility_diagnosis.allowance_amount else None
+        )
+
     def test_with_list_related_data(self):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
+
+        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, job_seeker=job_app.job_seeker)
+        GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -720,6 +832,7 @@ class TestJobApplicationQuerySet:
             assert hasattr(obj, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
             assert hasattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
             assert hasattr(obj, "jobseeker_eligibility_diagnosis")
+            assert hasattr(obj, "jobseeker_geiq_eligibility_diagnosis")
 
     def test_eligible_as_employee_record(self):
         # A valid job application:
