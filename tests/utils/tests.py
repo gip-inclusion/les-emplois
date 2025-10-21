@@ -1493,11 +1493,13 @@ def test_matomo_context_processor(client, settings, snapshot):
     user = company.members.first()
     client.force_login(user)
     matomo_script_id = "matomo-custom-init"
+    matomo_tarteaucitron_integration = "tarteaucitron.user.matomoId"
 
     # check that we don't crash when the route is not resolved
     response = client.get("/doesnotexist?token=blah&mtm_foo=truc")
     assert response.context["send_to_matomo"] is False
     assertNotContains(response, matomo_script_id, status_code=404)
+    assertNotContains(response, matomo_tarteaucitron_integration, status_code=404)
 
     # canonical case
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
@@ -1509,6 +1511,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector=f"#{matomo_script_id}")
     assert pretty_indented(script_content) == snapshot(name="matomo custom init siae card")
+    assertContains(response, matomo_tarteaucitron_integration)
 
 
 @pytest.mark.parametrize("state", JobApplicationState.values)
