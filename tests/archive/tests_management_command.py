@@ -796,6 +796,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 3, 15)),
                 "sent_by_another_employer": True,
+                "sender_company__kind": CompanyKind.EI,
                 "to_company__kind": CompanyKind.EI,
                 "to_company__department": 72,
                 "to_company__naf": "4572A",
@@ -840,6 +841,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 5, 15)),
                 "sent_by_another_employer": True,
+                "sender_company__kind": CompanyKind.EI,
                 "to_company__kind": CompanyKind.EI,
                 "to_company__department": 74,
                 "to_company__naf": "4574A",
@@ -862,6 +864,7 @@ class TestAnonymizeJobseekersManagementCommand:
             },
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "to_company__kind": CompanyKind.EI,
                 "to_company__department": 78,
                 "to_company__naf": "4578A",
                 "sent_by_job_seeker": True,
@@ -1012,6 +1015,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 else None,
                 to_company__department=76,
                 to_company__naf="4567A",
+                to_company__kind=CompanyKind.EI,
                 state=state,
                 hiring_start_at=datetime.date(2023, 3, 2),
             )

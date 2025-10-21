@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.companies.enums import CompanyKind
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -16,7 +17,9 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 @freeze_time("2023-04-13")
 def test_list_warns_about_long_awaiting_applications(client, snapshot):
-    hit_pit = CompanyFactory(pk=42, name="Hit Pit", with_membership=True, not_in_territorial_experimentation=True)
+    hit_pit = CompanyFactory(
+        pk=42, name="Hit Pit", with_membership=True, not_in_territorial_experimentation=True, kind=CompanyKind.EI
+    )
 
     now = timezone.now()
     org = PrescriberOrganizationFactory(
