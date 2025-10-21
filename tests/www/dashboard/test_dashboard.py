@@ -841,16 +841,14 @@ class TestDashboardView:
 
     @freeze_time("2025-05-19")
     def test_jobseeker_iae_eligibility_diagnosis(self, client):
-        DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE valide"
-        DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+        DIAG_TITLE = "Diagnostic d'éligibilité à l'IAE"
+        DIAG_BADGE = """<span class="badge badge-sm rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE</span>"""
-        VALIDATED_CRITERIA = """<p class="text-success mb-1">Critères validés le
-            <span class="fw-bold">%(date)s</span> par <strong>%(author)s</strong> (%(org)s).</p>"""
-        NO_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE non renseigné"
+        VALIDATED_CRITERIA = """<span class="text-success fs-sm">Critères validés le
+            %(date)s par %(author)s (%(org)s)</span>"""
         NO_DIAG_TEXT = "Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE."
-        NO_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
+        NO_DIAG_BADGE = """<span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité IAE à valider</span>"""
-        EXPIRED_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE expiré"
         EXPIRED_DIAG_TEXT = (
             "Votre diagnostic d’éligibilité IAE a expiré le %s. Pour en savoir plus, veuillez vous rapprocher "
             "d’un prescripteur habilité."
@@ -863,9 +861,8 @@ class TestDashboardView:
 
         # No diagnosis
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE, html=True)
         assertNotContains(response, DIAG_BADGE, html=True)
-        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
+        assertContains(response, DIAG_TITLE, html=True)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
         assertNotContains(response, INFO_BOX)
@@ -877,9 +874,8 @@ class TestDashboardView:
             criteria_kinds=[random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))],
         )
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE, html=True)
         assertNotContains(response, DIAG_BADGE, html=True)
-        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
+        assertContains(response, DIAG_TITLE, html=True)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
         assertNotContains(response, INFO_BOX)
@@ -905,7 +901,6 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
         assertNotContains(response, INFO_BOX)
@@ -927,7 +922,6 @@ class TestDashboardView:
                 html=True,
                 count=1,
             )
-            assertNotContains(response, NO_DIAG_TITLE, html=True)
             assertNotContains(response, NO_DIAG_TEXT, html=True)
             assertNotContains(response, NO_DIAG_BADGE, html=True)
             assertNotContains(response, INFO_BOX)
@@ -937,9 +931,8 @@ class TestDashboardView:
         with freeze_time(approval.end_at + timedelta(days=1)):
             client.force_login(user)
             response = client.get(url)
-            assertNotContains(response, DIAG_TITLE, html=True)
             assertNotContains(response, DIAG_BADGE, html=True)
-            assertContains(response, EXPIRED_DIAG_TITLE, html=True, count=1)
+            assertContains(response, DIAG_TITLE, html=True)
             assertContains(response, EXPIRED_DIAG_TEXT % "19/11/2025", html=True, count=1)
             assertContains(response, NO_DIAG_BADGE, html=True, count=1)
             assertNotContains(response, INFO_BOX)
@@ -963,22 +956,19 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
         assertNotContains(response, INFO_BOX)
 
     @freeze_time("2025-05-19")
     def test_jobseeker_geiq_eligibility_diagnosis(self, client, administrative_criteria_annex_1):
-        DIAG_TITLE = "Diagnostic public prioritaire GEIQ valide"
-        DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+        DIAG_TITLE = "Diagnostic d'éligibilité à l'IAE"
+        DIAG_BADGE = """<span class="badge badge-sm rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ confirmée</span>"""
-        DIAG_EXPIRATION = "<i>Ce diagnostic expire le %s.</i>"
         VALIDATED_ELIGIBILITY = """<p>Éligibilité GEIQ confirmée par <b>%(author)s (%(structure)s)</b></p>"""
-        EXPIRED_DIAG_TITLE = "Diagnostic public prioritaire GEIQ expiré"
-        EXPIRED_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
+        EXPIRED_DIAG_BADGE = """<span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée</span>"""
-        EXPIRED_DIAG_EXPIRATION = "<i>Ce diagnostic a expiré le %s.</i>"
+        EXPIRED_DIAG_EXPIRATION = """<p class="fs-sm mb-lg-5">Ce diagnostic a expiré le %s.</p>"""
         INFO_BOX = "Pourquoi certains critères peuvent-ils être certifiés"
 
         user = JobSeekerFactory(with_address=True)
@@ -987,7 +977,7 @@ class TestDashboardView:
 
         # No diagnosis
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE)
+        assertContains(response, DIAG_TITLE)
         assertNotContains(response, DIAG_BADGE, html=True)
 
         # A diagnosis from an employer without criteria (hence without allowance)
@@ -996,7 +986,7 @@ class TestDashboardView:
             job_seeker=user,
         )
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE)
+        assertContains(response, DIAG_TITLE)
         assertNotContains(response, DIAG_BADGE, html=True)
         assertNotContains(
             response,
@@ -1021,19 +1011,12 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertContains(
-            response,
-            DIAG_EXPIRATION % "19/11/2025",
-            html=True,
-            count=1,
-        )
         assertNotContains(response, INFO_BOX)
 
         # An expired diagnosis from an employer with criteria (hence with allowance)
         with freeze_time(diagnosis.expires_at + timedelta(days=1)):
             client.force_login(user)
             response = client.get(url)
-            assertContains(response, EXPIRED_DIAG_TITLE, count=1)
             assertContains(response, EXPIRED_DIAG_BADGE, html=True, count=1)
             assertContains(
                 response,
