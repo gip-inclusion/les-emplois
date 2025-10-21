@@ -1,8 +1,9 @@
 import datetime
 
+from django.db.models import Prefetch
 from django.utils import timezone
 
-from itou.companies.models import JobDescription
+from itou.companies.models import CompanyMembership, JobDescription
 from itou.companies.notifications import OldJobDescriptionDeactivationNotification
 from itou.utils.command import BaseCommand
 
@@ -22,16 +23,19 @@ class Command(BaseCommand):
         )
         old_job_descriptions = list(
             old_job_descriptions_qs.select_related("company", "appellation", "location")
-            .prefetch_related("company__members")
+            .prefetch_related(
+                Prefetch("company__memberships", queryset=CompanyMembership.objects.select_related("user"))
+            )
             .order_by("last_employer_update_at")[:BATCH_SIZE]
         )
         deactivated_nb = JobDescription.objects.filter(
             pk__in=[old_job_desc.pk for old_job_desc in old_job_descriptions]
         ).update(is_active=False)
         for old_job_description in old_job_descriptions:
-            for member in old_job_description.company.members.all():
+            # Only send to active members (the default manager checks both the user and membership is_active statuses)
+            for membership in old_job_description.company.memberships.all():
                 OldJobDescriptionDeactivationNotification(
-                    member,
+                    membership.user,
                     old_job_description.company,
                     job_description=old_job_description,
                 ).send()

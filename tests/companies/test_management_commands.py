@@ -220,6 +220,13 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
         company__with_membership=True,
         location=create_city_guerande(),
     )
+    # Inactive memberships or users should not receive the mail
+    companies_factories.CompanyMembershipFactory(
+        company=old_job_description_2.company, is_admin=False, is_active=False
+    )
+    companies_factories.CompanyMembershipFactory(
+        company=old_job_description_2.company, is_admin=False, user__is_active=False
+    )
     ft_job_description = companies_factories.JobDescriptionFactory(
         last_employer_update_at=None,
         location=None,
@@ -242,10 +249,10 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
     assert caplog.messages[:-1] == ["Deactivated 2 JobDescriptions"]
     assert len(mailoutbox) == 2
 
-    assert set(sum((mail.to for mail in mailoutbox), [])) == {
-        old_job_description_1.company.members.get().email,
-        old_job_description_2.company.members.get().email,
-    }
+    assert set(sum((mail.to for mail in mailoutbox), [])) == set(
+        old_job_description_1.company.memberships.values_list("user__email", flat=True)
+        | old_job_description_2.company.memberships.values_list("user__email", flat=True)
+    )
     mail = next(mail for mail in mailoutbox if mail.to == [old_job_description_1.company.members.get().email])
     assert mail.subject == snapshot(name="email subject")
     assert mail.body == snapshot(name="email body")
