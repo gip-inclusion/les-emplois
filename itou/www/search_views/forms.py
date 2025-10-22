@@ -1,4 +1,5 @@
 from django import forms
+from django.http import QueryDict
 from django.urls import reverse_lazy
 from django.utils.datastructures import MultiValueDict
 from django.utils.text import format_lazy
@@ -179,6 +180,16 @@ class NewSavedSearchForm(forms.ModelForm):
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance.user = user
+
+    def clean_query_params(self):
+        query_params = self.cleaned_data["query_params"]
+        query_dict = QueryDict(query_params, mutable=True)
+
+        # We don’t want to save the page number nor the job seeker for whom we might be applying
+        query_dict.pop("page", None)
+        query_dict.pop("job_seeker_public_id", None)
+
+        return query_dict.urlencode()
 
     def clean(self):
         super().clean()
