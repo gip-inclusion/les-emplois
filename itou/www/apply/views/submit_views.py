@@ -421,7 +421,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+                "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name}
             )
         else:
             view_name = "apply:application_jobs"
@@ -768,7 +768,7 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
 
     def get_cancel_url(self):
         return reverse(
@@ -797,7 +797,7 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
 
     def get_back_url(self):
         return reverse(
@@ -815,12 +815,80 @@ class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGE
     pass
 
 
+class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJobSeekerInfosView):
+    template_name = "apply/submit/fill_job_seeker_infos.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.job_application = None
+        return super().setup(request, *args, **kwargs)
+
+    def get_session(self):
+        return self.apply_session
+
+    def get_back_url(self):
+        return self.get_eligibility_for_hire_step_url() or reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+        )
+
+    def get_success_url(self):
+        return reverse("apply:hire_contract", kwargs={"session_uuid": self.apply_session.name})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.eligibility_diagnosis:
+            # The job_seeker object already contains a lot of information: no need to re-retrieve it
+            self.eligibility_diagnosis.job_seeker = self.job_seeker
+
+        context["expired_eligibility_diagnosis"] = None
+        return context
+
+
+class ContractForHireView(ApplicationBaseView, common_views.BaseAcceptView):
+    template_name = "apply/submit/hire_confirmation.html"
+    only_accept_form = True
+
+    def setup(self, request, *args, **kwargs):
+        self.job_application = None
+        return super().setup(request, *args, **kwargs)
+
+    def get_session(self):
+        return self.apply_session
+
+    def clean_session(self):
+        self.apply_session.delete()
+
+    def get_back_url(self):
+        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+
+    def get_error_url(self):
+        return self.request.get_full_path()
+
+    def get_success_url(self):
+        if self.company.is_subject_to_iae_rules and self.job_application.approval:
+            return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
+        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.eligibility_diagnosis:
+            # The job_seeker object already contains a lot of information: no need to re-retrieve it
+            self.eligibility_diagnosis.job_seeker = self.job_seeker
+
+        context["expired_eligibility_diagnosis"] = None
+        return context
+
+
 class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
     template_name = "apply/submit/hire_confirmation.html"
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
         return super().setup(request, *args, **kwargs)
+
+    def get_session(self):
+        return self.apply_session
 
     def clean_session(self):
         self.apply_session.delete()
