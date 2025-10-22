@@ -585,6 +585,9 @@ class AcceptView(common_views.BaseAcceptView):
             return HttpResponseRedirect(self.next_url)
         return super().dispatch(request, *args, **kwargs)
 
+    def get_session(self):
+        return None
+
     def get_back_url(self):
         return self.next_url
 

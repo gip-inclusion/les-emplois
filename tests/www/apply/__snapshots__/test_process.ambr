@@ -806,7 +806,9 @@
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'AcceptView.get_forms[www/apply/views/common.py]',
+          'AcceptView.get_forms[www/apply/views/common.py]',
           'AcceptView.get_context_data[www/apply/views/common.py]',
+          'AcceptView.get[www/apply/views/common.py]',
           'AcceptView.dispatch[www/apply/views/process_views.py]',
         ]),
         'sql': '''
@@ -824,6 +826,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           'AcceptView.get_forms[www/apply/views/common.py]',
           'AcceptView.get_context_data[www/apply/views/common.py]',
+          'AcceptView.get[www/apply/views/common.py]',
           'AcceptView.dispatch[www/apply/views/process_views.py]',
         ]),
         'sql': '''

@@ -78,6 +78,19 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     path(
+        "<uuid:session_uuid>/hire/job-seeker-infos",
+        submit_views.FillJobSeekerInfosForHireView.as_view(),
+        name="hire_fill_job_seeker_infos",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<uuid:session_uuid>/hire/contract",
+        submit_views.ContractForHireView.as_view(),
+        name="hire_contract",
+        kwargs={"hire_process": True},
+    ),
+    # Legacy view: this will be dropped in a few days
+    path(
         "<uuid:session_uuid>/hire/confirm",
         submit_views.HireConfirmationView.as_view(),
         name="hire_confirmation",
