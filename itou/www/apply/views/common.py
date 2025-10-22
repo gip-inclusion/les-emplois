@@ -27,8 +27,103 @@ from itou.www.apply.forms import (
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
-class BaseAcceptView(UserPassesTestMixin, TemplateView):
+class CommonUserInfoFormsMixin:
+    def get_session(self):
+        raise NotImplementedError
+
+    def get_forms(self):
+        forms = {}
+        session = self.get_session()
+        if session is None:
+            session_forms_data = {}
+        else:
+            session_forms_data = session.get("job_seeker_info_forms_data", {})
+
+        if self.company.is_subject_to_iae_rules:
+            # Info that will be used to search for an existing Pôle emploi approval.
+            forms["personal_data"] = JobSeekerPersonalDataForm(
+                instance=self.job_seeker,
+                initial=session_forms_data.get("personal_data", {}),
+                data=self.request.POST or None,
+                back_url=self.request.get_full_path(),
+            )
+            forms["user_address"] = JobSeekerAddressForm(
+                instance=self.job_seeker,
+                initial=session_forms_data.get("user_address", {}),
+                data=self.request.POST or None,
+            )
+        elif self.company.kind == CompanyKind.GEIQ:
+            forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
+                instance=self.job_seeker.jobseeker_profile,
+                initial=session_forms_data.get("birth_place", {}),
+                birthdate=self.job_seeker.jobseeker_profile.birthdate,
+                data=self.request.POST or None,
+            )
+
+        return forms
+
+
+class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
     template_name = None
+
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def get_back_url(self):
+        raise NotImplementedError
+
+    def get_success_url(self):
+        raise NotImplementedError
+
+    def get_context_data(
+        self,
+        **kwargs,
+    ):
+        context = super().get_context_data(**kwargs)
+
+        forms = self.get_forms()
+        form_user_address = forms.get("user_address")
+        form_personal_data = forms.get("personal_data")
+        form_birth_place = forms.get("birth_place")
+
+        context["form_user_address"] = form_user_address
+        context["form_personal_data"] = form_personal_data
+        context["form_birth_place"] = form_birth_place
+        context["has_form_error"] = any(
+            form.errors for form in [form_user_address, form_birth_place, form_personal_data] if form is not None
+        )
+
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["matomo_custom_title"] = "Acceptation de la candidature - Informations du candidat"
+        context["job_application"] = self.job_application
+        context["job_seeker"] = self.job_seeker
+        context["company"] = self.company
+        context["back_url"] = self.get_back_url()
+        context["hire_process"] = self.job_application is None
+        return context
+
+    def get(self, request, *args, **kwargs):
+        forms = self.get_forms()
+        if not forms:
+            return HttpResponseRedirect(self.get_success_url())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        forms = self.get_forms()
+        if not all([form.is_valid() for form in forms.values()]):
+            context = self.get_context_data(**kwargs)
+            return self.render_to_response(context)
+
+        session = self.get_session()
+        form_data = {form_name: form.cleaned_data for form_name, form in forms.items()}
+        session.set("job_seeker_info_forms_data", form_data)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
+    template_name = None
+    only_accept_form = False
 
     def test_func(self):
         return self.request.user.is_employer
@@ -40,22 +135,13 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
         self.geiq_eligibility_diagnosis = None
 
     def get_forms(self):
-        forms = {}
+        forms = super().get_forms()
 
-        if self.company.is_subject_to_iae_rules:
-            # Info that will be used to search for an existing Pôle emploi approval.
-            forms["personal_data"] = JobSeekerPersonalDataForm(
-                instance=self.job_seeker,
-                data=self.request.POST or None,
-                back_url=self.request.get_full_path(),
-            )
-            forms["user_address"] = JobSeekerAddressForm(instance=self.job_seeker, data=self.request.POST or None)
-        elif self.company.kind == CompanyKind.GEIQ:
-            forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
-                instance=self.job_seeker.jobseeker_profile,
-                birthdate=self.job_seeker.jobseeker_profile.birthdate,
-                data=self.request.POST or None,
-            )
+        if self.only_accept_form:
+            # Make the other forms appear as bound with initial data to trigger validation
+            for form in forms.values():
+                form.is_bound = True
+                form.data = form.initial
 
         forms["accept"] = AcceptForm(
             instance=self.job_application,
@@ -90,6 +176,11 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             form_personal_data = forms.get("personal_data")
             form_birth_place = forms.get("birth_place")
 
+        if self.only_accept_form:
+            # Hide the other forms in the HTML
+            form_user_address = None
+            form_personal_data = None
+            form_birth_place = None
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
         context["form_user_address"] = form_user_address
@@ -115,8 +206,24 @@ class BaseAcceptView(UserPassesTestMixin, TemplateView):
             return "apply/includes/job_application_accept_form.html"
         return super().get_template_names()
 
+    def missing_or_invalid_job_seeker_infos(self, forms):
+        other_forms = {k: v for k, v in forms.items() if k != "accept"}
+        return bool(other_forms and not all([form.is_valid() for form in other_forms.values()]))
+
+    def get(self, request, *args, **kwargs):
+        if self.only_accept_form:
+            forms = self.get_forms()
+            if self.missing_or_invalid_job_seeker_infos(forms):
+                messages.error(request, "Certaines informations sont manquantes ou invalides")
+                return HttpResponseRedirect(self.get_back_url())
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         forms = self.get_forms()
+        if self.only_accept_form and self.missing_or_invalid_job_seeker_infos(forms):
+            messages.error(request, "Certaines informations sont manquantes ou invalides")
+            return HttpResponseRedirect(self.get_back_url())
+
         if not all([form.is_valid() for form in forms.values()]):
             context = self.get_context_data(**kwargs)
             return self.render_to_response(context)

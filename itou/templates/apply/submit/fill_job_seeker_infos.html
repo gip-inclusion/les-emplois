@@ -1,0 +1,45 @@
+{% extends "apply/submit_base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load str_filters %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {% include 'apply/includes/_submit_title.html' %}
+                {% include 'apply/includes/eligibility_badge.html' with force_valid_approval=True %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content_extend %}
+    <div class="c-form">
+        <form method="post" class="js-format-nir">
+            {% if has_form_error %}
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p class="mb-0">Merci de corriger les erreurs ci-dessous.</p>
+                </div>
+            {% endif %}
+
+            {% csrf_token %}
+
+            {% include "apply/includes/job_application_fill_user_infos_form.html" with form_personal_data=form_personal_data form_user_address=form_user_address form_birth_place=form_birth_place request=request only %}
+
+            {% itou_buttons_form primary_label="Valider les informations" primary_aria_label="Valider les informations de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information reset_url=back_url %}
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    {# Needed to use the Datepicker JS widget #}
+    {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
+
+    {% if form_user_address %}
+        {# Needed for the AddressAutocompleteWidget #}
+        {{ form_user_address.media.js }}
+    {% endif %}
+{% endblock %}
