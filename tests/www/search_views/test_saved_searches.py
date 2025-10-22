@@ -219,6 +219,18 @@ class TestSavedSearches:
         assertContains(response, "Le nombre maximum de recherches enregistrées (1) a été atteint.")
         assert SavedSearch.objects.count() == 1
 
+    def test_add_saved_search_strip_unwanted_params(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        data = {
+            "saved_search-name": "Argenteuil",
+            "saved_search-query_params": "job_seeker_public_id=558071c0-af88-4a14-8bc6-fb3c8343dc4&distance=25"
+            "&domains=M&city=argenteuil-95&page=5",  # Real case from production
+        }
+        client.post(self.ADD_SAVED_SEARCH_URL, data)
+        assert SavedSearch.objects.first().query_params == "distance=25&domains=M&city=argenteuil-95"
+
     def test_details_delete_modal_content(self, client, snapshot):
         user = PrescriberFactory()
         client.force_login(user)
