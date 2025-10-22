@@ -387,7 +387,7 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
                         )
                         messages.info(request, message)
                         logger.info(
-                            "staff user=%d tranferred company=%d to company=%d with fields_to_tranfer=%s, "
+                            "staff user=%d transferred company=%d to company=%d with fields_to_transfer=%s, "
                             "disable_from_company=%s, ignore_siae_evaluations=%s",
                             request.user.pk,
                             from_company.pk,

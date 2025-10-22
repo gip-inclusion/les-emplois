@@ -839,7 +839,7 @@ class JobApplicationExternalTransferStepEndView(ApplicationEndView):
         }
 
 
-class JobApplicationInternalTranferView(TemplateView):
+class JobApplicationInternalTransferView(TemplateView):
     template_name = "apply/process_internal_transfer.html"
 
     def setup(self, request, *args, **kwargs):
