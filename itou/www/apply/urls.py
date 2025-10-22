@@ -193,7 +193,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:job_application_id>/siae/transfer/<int:company_pk>",
-        process_views.JobApplicationInternalTranferView.as_view(),
+        process_views.JobApplicationInternalTransferView.as_view(),
         name="job_application_internal_transfer",
     ),
     path(
