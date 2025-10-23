@@ -66,7 +66,7 @@
                 </div>
             </div>
         {% endif %}
-    {% elif is_subject_to_geiq_eligibility_rules %}
+    {% elif is_subject_to_geiq_rules %}
         {% if not request.user.is_job_seeker and geiq_eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité GEIQ du candidat a été validée par :</p>
@@ -142,7 +142,7 @@
                            rel="noreferrer noopener"
                            aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
-                {% elif is_subject_to_geiq_eligibility_rules %}
+                {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur les conseils donnés sur
                         <a class="has-external-link"
@@ -153,7 +153,7 @@
                     </p>
                 {% endif %}
                 <p class="mb-0">Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.</p>
-            {% elif is_subject_to_iae_rules or is_subject_to_geiq_eligibility_rules %}
+            {% elif is_subject_to_iae_rules or is_subject_to_geiq_rules %}
                 <p class="mb-0">
                     Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
                     son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
@@ -167,7 +167,7 @@
                            rel="noreferrer noopener"
                            aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
                     </p>
-                {% elif is_subject_to_geiq_eligibility_rules %}
+                {% elif is_subject_to_geiq_rules %}
                     <p class="mb-0">
                         Vous pouvez vous appuyer sur les conseils donnés sur
                         <a class="has-external-link"

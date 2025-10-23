@@ -20,7 +20,7 @@ from itou.utils.urls import add_url_params
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -385,7 +385,7 @@ def test_htmx_filters(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_list_snapshot(client, snapshot):
+def test_list_and_table_empty_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
@@ -399,79 +399,6 @@ def test_list_snapshot(client, snapshot):
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert pretty_indented(page) == snapshot(name="empty")
-
-    job_seeker = JobSeekerFactory(for_snapshot=True)
-    company = CompanyFactory(for_snapshot=True, with_membership=True)
-    common_kwargs = {
-        "job_seeker": job_seeker,
-        "eligibility_diagnosis": None,
-        "to_company": company,
-        "sender_kind": SenderKind.PRESCRIBER,
-        "sender": prescriber,
-    }
-
-    job_applications = [
-        JobApplicationFactory(state=JobApplicationState.ACCEPTED, **common_kwargs),
-        JobApplicationFactory(
-            state=JobApplicationState.NEW,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            state=JobApplicationState.REFUSED,
-            **common_kwargs,
-        ),
-    ]
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            [("href", f"/company/{company.pk}/card", "/company/[PK of Company]/card")],
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            ),
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_exports_without_organization(client):
@@ -676,7 +603,7 @@ def test_htmx_order(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_table_iae_state_and_criteria(client, snapshot):
+def test_table_and_list_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
@@ -684,6 +611,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
+    geiq = CompanyFactory(with_membership=True, name="Tartempion", kind=CompanyKind.GEIQ)
     common_kwargs = {
         "sender_kind": SenderKind.PRESCRIBER,
         "sender": prescriber,
@@ -707,6 +635,37 @@ def test_table_iae_state_and_criteria(client, snapshot):
         author_prescriber_organization=prescriber_org,
         author=prescriber,
         criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.QPV],
+    )
+
+    geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq diag geiq",
+        author_kind=AuthorKind.GEIQ,
+        author_geiq=geiq,
+        author=geiq.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.PM],
+    )
+    geiq_diag_without_allowance = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq sans aide",
+        author_kind=AuthorKind.GEIQ,
+        author_geiq=geiq,
+        author=geiq.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASE],  # not enough to get the allowance
+    )
+    no_criteria_prescriber_geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+    )
+    prescriber_geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq diag prescripteur",
+        author_kind=AuthorKind.PRESCRIBER,  # the allowance is granted as it comes from a prescriber
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+        criteria_kinds=[AdministrativeCriteriaKind.ASE],
     )
 
     prescriber_approval = ApprovalFactory(
@@ -764,15 +723,48 @@ def test_table_iae_state_and_criteria(client, snapshot):
             **common_kwargs,
         ),
         JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
+            state=JobApplicationState.POOL,
             eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
             to_company__name="Tartempion",
             to_company__kind=CompanyKind.GEIQ,
             **common_kwargs,
         ),
+        JobApplicationFactory(
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=geiq_diag,
+            job_seeker=geiq_diag.job_seeker,
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.REFUSED,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=no_criteria_prescriber_geiq_diag,
+            job_seeker=job_seeker,  # job_seeker has IAE and GEIQ diags, we should show the corresponding criteria
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.POSTPONED,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=prescriber_geiq_diag,
+            job_seeker=prescriber_geiq_diag.job_seeker,
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=geiq_diag_without_allowance,
+            job_seeker=geiq_diag_without_allowance.job_seeker,
+            to_company=geiq,
+            **common_kwargs,
+        ),
     ]
 
+    # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
     page = parse_response_to_soup(
         response,
@@ -796,3 +788,29 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications table")
+
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/prescriber/details",
+                        "/apply/[PK of JobApplication]/prescriber/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications list")

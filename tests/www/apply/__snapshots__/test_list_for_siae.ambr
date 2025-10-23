@@ -4214,6 +4214,7 @@
           'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
           'ForNode[apply/includes/list_table.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -5525,6 +5526,7 @@
           'IfNode[apply/includes/eligibility_badge.html]',
           'WithNode[apply/includes/eligibility_badge.html]',
           'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
@@ -7646,10 +7648,10 @@
                               Émetteur
                           </th>
                           <th class="text-nowrap" scope="col">
-                              Critères administratifs IAE
+                              Critères administratifs
                           </th>
                           <th scope="col">
-                              Statut IAE
+                              Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
                           </th>
@@ -7937,10 +7939,10 @@
                               Émetteur
                           </th>
                           <th class="text-nowrap" scope="col">
-                              Critères administratifs IAE
+                              Critères administratifs
                           </th>
                           <th scope="col">
-                              Statut IAE
+                              Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
                           </th>
