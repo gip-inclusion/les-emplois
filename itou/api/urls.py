@@ -52,8 +52,8 @@ urlpatterns = [
 urlpatterns += router.urls
 
 urlpatterns += [
-    path("structures/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
     path("candidatures/recherche/", JobApplicationSearchView.as_view(), name="job-applications-search"),
+    path("data-inclusion/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("marche/", C4CompanyView.as_view(), name="marche-company-list"),
 ]
