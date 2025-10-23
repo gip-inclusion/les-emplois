@@ -421,7 +421,7 @@ class CheckPreviousApplications(ApplicationBaseView):
     def get_next_url(self):
         if self.hire_process:
             return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+                "apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name}
             )
         else:
             view_name = "apply:application_jobs"
@@ -759,8 +759,11 @@ class ApplicationEndView(TemplateView):
         }
 
 
-class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityForHireView(
+    common_views.CheckJobSeekerMissingPersonalInfoMixin, ApplicationBaseView, BaseIAEEligibilityViewForEmployer
+):
     template_name = "apply/submit/eligibility_for_hire.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour accepter l'embauche"
 
     def dispatch(self, request, *args, **kwargs):
         if self.get_eligibility_for_hire_step_url() is None:
@@ -768,12 +771,15 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name})
 
     def get_cancel_url(self):
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
+
+    def get_required_personal_data_redirect_url(self):
+        return self.get_cancel_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -781,8 +787,11 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return context
 
 
-class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityView):
+class GEIQEligibilityForHireView(
+    common_views.CheckJobSeekerMissingPersonalInfoMixin, ApplicationBaseView, common_views.BaseGEIQEligibilityView
+):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour déclarer l'embauche"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -797,12 +806,15 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:contract_for_hire", kwargs={"session_uuid": self.apply_session.name})
 
     def get_back_url(self):
         return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
+
+    def get_required_personal_data_redirect_url(self):
+        return self.get_back_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -815,8 +827,11 @@ class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGE
     pass
 
 
-class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
+class HireConfirmationView(
+    common_views.CheckJobSeekerMissingPersonalInfoMixin, ApplicationBaseView, common_views.BaseAcceptView
+):
     template_name = "apply/submit/hire_confirmation.html"
+    required_personal_data_msg = "Les données suivantes sont manquantes pour déclarer l'embauche"
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
@@ -837,6 +852,12 @@ class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
         if self.company.is_subject_to_iae_rules and self.job_application.approval:
             return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
         return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
+
+    def get_required_personal_data_redirect_url(self):
+        return reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire",
+            kwargs={"session_uuid": self.apply_session.name},
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

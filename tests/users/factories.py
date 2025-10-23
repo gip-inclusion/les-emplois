@@ -261,6 +261,13 @@ class JobSeekerFactory(UserFactory):
             department="35",
             jobseeker_profile__for_snapshot=True,
         )
+        with_required_personal_info_for_hire = factory.Trait(
+            address_line_1="12 rue Georges Bizet",
+            post_code="35000",
+            city="Rennes",
+            department="35",
+            born_in_france=True,
+        )
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):

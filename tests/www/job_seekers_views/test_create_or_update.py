@@ -1056,6 +1056,100 @@ class TestUpdateForSender:
             ),
         )
 
+    @pytest.mark.parametrize(
+        "job_seeker_kwargs",
+        [
+            pytest.param(
+                {"title": "", "first_name": "", "last_name": "", "jobseeker_profile__nir": ""},
+                id="job_seeker_with_few_data",
+            ),
+            pytest.param({"for_snapshot": True, "born_in_france": True}, id="job_seeker_with_all_data"),
+        ],
+    )
+    def test_update_step_1_formfields(self, client, snapshot, job_seeker_kwargs):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        job_seeker = JobSeekerFactory(created_by=user, last_login=timezone.now(), **job_seeker_kwargs)
+        client.force_login(user)
+
+        # Init session
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+        params = {
+            "job_seeker_public_id": job_seeker.public_id,
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
+        }
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
+        client.get(start_url)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
+
+        url = reverse("job_seekers_views:update_job_seeker_step_1", kwargs={"session_uuid": job_seeker_session_name})
+        response = client.get(url)
+
+        # check whether fields are disabled or not
+        ds = "disabled " if "for_snapshot" in job_seeker_kwargs else ""
+        fields = [
+            f'class="form-select" required {ds}id="id_title"',
+            f'class="form-control" required {ds}id="id_first_name"',
+            f'class="form-control" required {ds}id="id_last_name"',
+            f'class="form-control" {ds}aria-describedby="id_nir_helptext" id="id_nir"',
+            'name="lack_of_nir" disabled id="id_lack_of_nir"'
+            if "for_snapshot" in job_seeker_kwargs
+            else 'name="lack_of_nir" aria-expanded="false" aria-controls="id_lack_of_nir_reason"',
+            f'class="form-select" {ds}aria-describedby="id_lack_of_nir_reason_helptext" id="id_lack_of_nir_reason"',
+            f'class="form-select django-select2" {ds}aria-describedby="id_birth_place_helptext" id="id_birth_place"',
+            f'class="form-select" {ds}id="id_birth_country"',
+        ]
+        for field in fields:
+            assertContains(response, field)
+
+    def test_update_step_2_formfields(self, client, subtests):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.get()
+        job_seeker = JobSeekerFactory(
+            created_by=user, last_login=timezone.now(), for_snapshot=True, born_in_france=True
+        )
+        client.force_login(user)
+
+        # Init session
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+        params = {
+            "job_seeker_public_id": job_seeker.public_id,
+            "from_url": reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name}),
+        }
+        start_url = reverse("job_seekers_views:update_job_seeker_start", query=params)
+        client.get(start_url)
+        job_seeker_session_name = get_session_name(client.session, JobSeekerSessionKinds.UPDATE)
+
+        url = reverse("job_seekers_views:update_job_seeker_step_2", kwargs={"session_uuid": job_seeker_session_name})
+
+        response = client.get(url)
+        assertContains(
+            response,
+            'class="form-select django-select2" disabled aria-describedby="id_address_for_autocomplete_helptext" '
+            'id="id_address_for_autocomplete"',
+        )
+        assertContains(
+            response,
+            'class="form-control js-address-line-2" disabled aria-describedby="id_address_line_2_helptext" '
+            'id="id_address_line_2"',
+        )
+
+        for prop in ["address_line_1", "post_code", "city"]:
+            with subtests.test(prop=prop):
+                setattr(job_seeker, prop, "")
+                job_seeker.save()
+                response = client.get(url)
+                assertContains(
+                    response,
+                    'class="form-select django-select2" aria-describedby="id_address_for_autocomplete_helptext" '
+                    'id="id_address_for_autocomplete"',
+                )
+                assertContains(
+                    response,
+                    'class="form-control js-address-line-2" aria-describedby="id_address_line_2_helptext" '
+                    'id="id_address_line_2"',
+                )
+
     def test_birth_country_not_france_and_birthplace(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()

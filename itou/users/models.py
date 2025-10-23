@@ -1354,6 +1354,33 @@ class JobSeekerProfile(models.Model):
 
         self.save()
 
+    def get_missing_personal_info_for_hire(self):
+        user_required_fields = {
+            "title": self.user.title,
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "address_line_1": self.user.address_line_1,
+            "post_code": self.user.post_code,
+            "city": self.user.city,
+        }
+        jobseeker_profile_required_fields = {
+            "birthdate": self.birthdate,
+            "birth_country": self.birth_country_id,
+            "birth_place": self.birth_country_id,  # un-disable birth_place form field when birth_country is missing
+        }
+        if not (self.nir or self.lack_of_nir_reason):
+            jobseeker_profile_required_fields["nir"] = None
+            jobseeker_profile_required_fields["lack_of_nir_reason"] = None
+        return {
+            (field, self.user._meta.get_field(field).verbose_name)
+            for field, value in user_required_fields.items()
+            if not value
+        } | {
+            (field, self._meta.get_field(field).verbose_name)
+            for field, value in jobseeker_profile_required_fields.items()
+            if not value
+        }
+
     @property
     def is_employed(self):
         return not self.unemployed_since
