@@ -16,9 +16,12 @@ from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.models.geiq import (
+    GEIQEligibilityDiagnosis,
+    GEIQSelectedAdministrativeCriteria,
+)
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
@@ -302,6 +305,80 @@ class JobApplicationQuerySet(models.QuerySet):
             eligibility_diagnosis=OuterRef("jobseeker_eligibility_diagnosis"), administrative_criteria=criterion
         )
         return self.annotate(**{f"eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
+
+    def with_jobseeker_valid_geiq_eligibility_diagnosis(self):
+        """
+        Gives the last valid GEIQ eligibility diagnosis *with allowance* for this job seeker and this GEIQ.
+        Valid and with allowance because the eligibility badges depend on these two factors.
+        """
+        subquery = Subquery(
+            GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                job_seeker=OuterRef("job_seeker"),
+                for_geiq=OuterRef("to_company"),
+            )
+            .annotate(
+                level_two_criteria_count=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
+                ),
+            )
+            .filter(
+                # Authorized prescriber diagnosis (only authorized prescribers may create a GEIQ diagnosis,
+                # so if the author is a prescriber he was authorized when he created it)
+                Q(
+                    author_kind=AuthorKind.PRESCRIBER,
+                )
+                # >=1 level 1 criterion
+                | Exists(
+                    GEIQSelectedAdministrativeCriteria.objects.filter(
+                        administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1,
+                        eligibility_diagnosis=OuterRef("pk"),
+                    )
+                )
+                # >=2 level 2 criteria
+                | Q(level_two_criteria_count__gt=1)
+                # # >=1 annex 1 and 1+2 criterion
+                | Exists(
+                    GEIQSelectedAdministrativeCriteria.objects.filter(
+                        administrative_criteria__annex__in=[
+                            AdministrativeCriteriaAnnex.ANNEX_1,
+                            AdministrativeCriteriaAnnex.BOTH_ANNEXES,
+                        ],
+                        eligibility_diagnosis=OuterRef("pk"),
+                    ),
+                ),
+            )
+            .values("id")[:1],
+            output_field=models.IntegerField(),
+        )
+        return self.annotate(jobseeker_valid_geiq_eligibility_diagnosis=subquery)
+
+    def with_jobseeker_geiq_eligibility_diagnosis(self):
+        """
+        Gives the "geiq_eligibility_diagnosis" linked to the job application or if none is found,
+        the last valid GEIQ eligibility diagnosis for this job seeker and this GEIQ.
+        """
+
+        return self.with_jobseeker_valid_geiq_eligibility_diagnosis().annotate(
+            jobseeker_geiq_eligibility_diagnosis=Coalesce(
+                F("geiq_eligibility_diagnosis"), F("jobseeker_valid_geiq_eligibility_diagnosis")
+            )
+        )
+
+    def with_jobseeker_geiq_eligibility_diagnosis_author_kind(self):
+        """
+        Gives the author kind of the jobseeker GEIQ eligibility diagnosis
+        (cf with_jobseeker_geiq_eligibility_diagnosis).
+        """
+        subquery = Subquery(
+            GEIQEligibilityDiagnosis.objects.filter(pk=OuterRef("jobseeker_geiq_eligibility_diagnosis")).values(
+                "author_kind"
+            ),
+            output_field=models.CharField(),
+        )
+        return self.with_jobseeker_geiq_eligibility_diagnosis().annotate(
+            jobseeker_geiq_eligibility_diagnosis_author_kind=subquery
+        )
 
     def with_list_related_data(self, criteria=None):
         """
