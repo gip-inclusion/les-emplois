@@ -355,7 +355,7 @@ def delete_comment_for_company(request, job_application_id, comment_id):
 
     return render(
         request,
-        "apply/includes/job_application_comments_list.html",
+        "apply/includes/job_application_delete_comment.html",
         context,
     )
 

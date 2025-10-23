@@ -123,7 +123,7 @@
                                   <span id="comments-counter">
                                       Commentaires
                                       <span class="badge badge-base rounded-pill bg-info-lighter text-info ms-2">
-                                          2
+                                          5
                                       </span>
                                       <span class="badge badge-sm rounded-pill bg-important text-white ms-3">
                                           Nouveau
@@ -488,7 +488,7 @@
                                               </blockquote>
                                           </div>
                                       </li>
-                                      <li class="is-current-user">
+                                      <li>
                                           <div>
                                               <div class="d-flex justify-content-between align-items-start">
                                                   <div>
@@ -496,15 +496,35 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Bob BANANA
-                                  (vous)
+                                                          Alice ABOLIVIER
                                                       </strong>
                                                   </div>
                                               </div>
                                               <blockquote class="blockquote">
                                                   <div class="collapse show">
                                                       <p class="mb-0">
-                                                          Candidate rencontrée en entretien. A recontacter dans 2 semaines.
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li>
+                                          <div>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
                                                       </p>
                                                   </div>
                                               </blockquote>
@@ -567,11 +587,11 @@
                                   </form>
                               </div>
                               <div class="c-form mb-3 mb-md-4" id="comments-list-tab">
-                                  <h3>
-                                      Liste des commentaires (2)
+                                  <h3 id="comments-list-tab-counter">
+                                      Liste des commentaires (5)
                                   </h3>
                                   <ul class="list-note">
-                                      <li>
+                                      <li id="comment-[Pk of JobApplicationComment]">
                                           <i class="ri-user-line">
                                           </i>
                                           <div>
@@ -594,7 +614,76 @@
                                               </blockquote>
                                           </div>
                                       </li>
-                                      <li class="is-current-user">
+                                      <li id="comment-[Pk of JobApplicationComment]">
+                                          <i class="ri-user-line">
+                                          </i>
+                                          <div>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li id="comment-[Pk of JobApplicationComment]">
+                                          <i class="ri-user-line">
+                                          </i>
+                                          <div>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li id="comment-[Pk of JobApplicationComment]">
+                                          <i class="ri-user-line">
+                                          </i>
+                                          <div>
+                                              <div class="d-flex justify-content-between align-items-start">
+                                                  <div>
+                                                      <time datetime="2025-09-26T12:12:12+00:00">
+                                                          Le 26 septembre 2025 à 14:12
+                                                      </time>
+                                                      <strong>
+                                                          Alice ABOLIVIER
+                                                      </strong>
+                                                  </div>
+                                              </div>
+                                              <blockquote class="blockquote">
+                                                  <div class="collapse show">
+                                                      <p class="mb-0">
+                                                          Cette candidate est venue 3 fois, elle est motivée.
+                                                      </p>
+                                                  </div>
+                                              </blockquote>
+                                          </div>
+                                      </li>
+                                      <li class="is-current-user" id="comment-[Pk of JobApplicationComment]">
                                           <i class="ri-user-line">
                                           </i>
                                           <div>
@@ -632,7 +721,7 @@
                                                                   </div>
                                                               </div>
                                                               <div class="modal-footer">
-                                                                  <form class="d-block js-prevent-multiple-submit" hx-indicator="#comments-list-tab" hx-post="/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete" hx-swap="outerHTML" hx-target="#comments-list-tab">
+                                                                  <form class="d-block js-prevent-multiple-submit" hx-indicator="#comments-list-tab" hx-post="/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete" hx-swap="outerHTML" hx-target="#comment-[Pk of JobApplicationComment]">
                                                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                                                       <div class="text-end">
                                                                           <button aria-label="Annuler la suppression du commentaire" class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" type="button">

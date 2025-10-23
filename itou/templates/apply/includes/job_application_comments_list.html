@@ -1,15 +1,13 @@
 {% load matomo %}
 <div class="{% if location == "sidebar" %}c-box{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-list-{{ location }}"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
-    <h3>
-        {% if location == "sidebar" %}
-            Derniers commentaires
-        {% else %}
-            Liste des commentaires ({{ comments|length }})
-        {% endif %}
-    </h3>
+    {% if location == "sidebar" %}
+        <h3>Derniers commentaires</h3>
+    {% else %}
+        <h3 id="comments-list-tab-counter">Liste des commentaires ({{ comments|length }})</h3>
+    {% endif %}
     <ul class="list-note">
         {% for comment in comments %}
-            <li {% if comment.created_by == request.user %}class="is-current-user"{% endif %}>
+            <li {% if comment.created_by == request.user %}class="is-current-user"{% endif %}{% if location == "tab" %} id="comment-{{ comment.pk }}"{% endif %}>
                 {% if location == "tab" %}<i class="ri-user-line"></i>{% endif %}
                 <div>
                     <div class="d-flex justify-content-between align-items-start">
@@ -43,7 +41,7 @@
                                         <div class="modal-footer">
                                             {# Comment deletion form #}
                                             <form hx-post="{% url 'apply:delete_comment_for_company' job_application_id=comment.job_application.pk comment_id=comment.id %}"
-                                                  hx-target="#comments-list-tab"
+                                                  hx-target="#comment-{{ comment.pk }}"
                                                   hx-indicator="#comments-list-tab"
                                                   hx-swap="outerHTML"
                                                   class="d-block js-prevent-multiple-submit">
@@ -94,11 +92,3 @@
         </button>
     {% endif %}
 </div>
-
-
-{% if request.htmx %}
-    {% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
-    {% if location == "tab" %}
-        {% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments|default:None request=request hx_swap_oob=True only %}
-    {% endif %}
-{% endif %}
