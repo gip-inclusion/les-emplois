@@ -16,9 +16,12 @@ from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import CompanyMembership
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
-from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.eligibility.models.geiq import (
+    GEIQEligibilityDiagnosis,
+    GEIQSelectedAdministrativeCriteria,
+)
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.gps.models import FollowUpGroup
@@ -303,6 +306,73 @@ class JobApplicationQuerySet(models.QuerySet):
             eligibility_diagnosis=OuterRef("jobseeker_eligibility_diagnosis"), administrative_criteria=criterion
         )
         return self.annotate(**{f"eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
+
+    def with_jobseeker_valid_geiq_eligibility_diagnosis_id(self, for_prescriber=False):
+        """
+        Gives the ID of the last valid GEIQ eligibility diagnosis *with allowance* for this job seeker and this GEIQ.
+        Valid and with allowance because the eligibility badges depend on these two factors.
+        If a the viewer is a precriber, only fetch prescriber diagnoses.
+
+        Note: this queryset logic was meant to be used in apply:list_prescriptions as well as in
+        apply:list_for_siae. Due to lack of time, the latter was not completed, therefore, only the
+        for_prescriber=True version is actually in use.
+        """
+
+        qs = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+            job_seeker=OuterRef("job_seeker"),
+            for_geiq=None if for_prescriber else OuterRef("to_company"),
+        )
+
+        if not for_prescriber:
+            # Possibly fetching diagnoses made by a GEIQ, we need to check whether an allowance is granted
+            qs = qs.annotate(
+                level_two_criteria_count=Count(
+                    "selected_administrative_criteria",
+                    filter=Q(administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_2),
+                ),
+            ).filter(
+                # Authorized prescriber diagnosis (only authorized prescribers may create a GEIQ diagnosis,
+                # so if the author is a prescriber he was authorized when he created it)
+                Q(author_kind=AuthorKind.PRESCRIBER)
+                # >=1 level 1 criterion
+                | Exists(
+                    GEIQSelectedAdministrativeCriteria.objects.filter(
+                        administrative_criteria__level=AdministrativeCriteriaLevel.LEVEL_1,
+                        eligibility_diagnosis=OuterRef("pk"),
+                    )
+                )
+                # >=2 level 2 criteria
+                | Q(level_two_criteria_count__gt=1)
+                # # >=1 annex 1 and 1+2 criterion
+                | Exists(
+                    GEIQSelectedAdministrativeCriteria.objects.filter(
+                        administrative_criteria__annex__in=[
+                            AdministrativeCriteriaAnnex.ANNEX_1,
+                            AdministrativeCriteriaAnnex.BOTH_ANNEXES,
+                        ],
+                        eligibility_diagnosis=OuterRef("pk"),
+                    ),
+                ),
+            )
+
+        return self.annotate(
+            jobseeker_valid_geiq_eligibility_diagnosis_id=Subquery(
+                qs.values("id")[:1],
+                output_field=models.IntegerField(),
+            )
+        )
+
+    def with_jobseeker_geiq_eligibility_diagnosis_id(self, for_prescriber=False):
+        """
+        Gives the ID of the "geiq_eligibility_diagnosis" linked to the job application if valid. If none is found,
+        gives the ID of the last valid GEIQ eligibility diagnosis for this job seeker and this GEIQ.
+        """
+
+        return self.with_jobseeker_valid_geiq_eligibility_diagnosis_id(for_prescriber=for_prescriber).annotate(
+            jobseeker_geiq_eligibility_diagnosis_id=Coalesce(
+                F("geiq_eligibility_diagnosis"), F("jobseeker_valid_geiq_eligibility_diagnosis_id")
+            )
+        )
 
     def with_list_related_data(self, criteria=None):
         """
