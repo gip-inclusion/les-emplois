@@ -139,14 +139,8 @@ def _async_certify_eligibility_diagnosis_by_api_particulier(model_name, eligibil
         logger.exception(e)
 
 
-# TODO: Deprecated, use async_certify_eligibility_diagnosis_by_api_particulier.
 # Retry every 10 minutes for 24h.
-async_certify_criteria_by_api_particulier = on_commit_task(
-    retries=24 * 6, retry_delay=10 * 60, name="async_certify_criteria_by_api_particulier"
-)(_async_certify_eligibility_diagnosis_by_api_particulier)
-async_certify_eligibility_diagnosis_by_api_particulier = on_commit_task(
-    retries=24 * 6, retry_delay=10 * 60, name="async_certify_eligibility_diagnosis_by_api_particulier"
-)(
+async_certify_eligibility_diagnosis_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
     _async_certify_eligibility_diagnosis_by_api_particulier,
 )
 # TODO: Use the decorator and drop assignment of call_local if
