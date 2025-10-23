@@ -382,6 +382,47 @@ class TestPoleEmploiConnect:
         user.refresh_from_db()
         assert user.allow_next_sso_sub_update is False
 
+    @respx.mock
+    def test_callback_redirect_on_unavailable_endpoint_token(self, client):
+        respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(side_effect=httpx.ConnectTimeout("Timeout"))
+
+        state = PoleEmploiConnectState.save_state()
+        url = reverse("pe_connect:callback")
+        response = client.get(url, data={"code": "123", "state": state}, follow=True)
+        assertRedirects(response, reverse("login:job_seeker"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Impossible d'obtenir le jeton de PôleEmploiConnect. Réessayez dans quelques minutes.",
+                )
+            ],
+        )
+
+    @respx.mock
+    def test_callback_redirect_on_unavailable_endpoint_user_info(self, client):
+        token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(constants.PE_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+        respx.get(constants.PE_CONNECT_ENDPOINT_USERINFO).mock(side_effect=httpx.ConnectTimeout("Timeout"))
+
+        state = PoleEmploiConnectState.save_state()
+        url = reverse("pe_connect:callback")
+        response = client.get(url, data={"code": "123", "state": state}, follow=True)
+        assertRedirects(response, reverse("login:job_seeker"))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    (
+                        "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect. "
+                        "Réessayez dans quelques minutes."
+                    ),
+                )
+            ],
+        )
+
     def test_logout_no_id_token(self, client):
         url = reverse("pe_connect:logout")
         response = client.get(url + "?")
