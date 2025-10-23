@@ -9,10 +9,7 @@ from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import (
-    async_certify_eligibility_diagnosis_by_api_particulier,
-    certify_eligibility_diagnosis_by_api_particulier,
-)
+from itou.eligibility.tasks import async_certify_criterion_with_api_particulier, certify_criterion_with_api_particulier
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
@@ -49,21 +46,16 @@ class TestCertifyCriteriaApiParticulier:
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         response = RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
         respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
             status_code=response["status_code"], json=response["json"]
         )
 
-        async_certify_eligibility_diagnosis_by_api_particulier.call_local(
-            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-        )
+        async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
 
+        criterion.refresh_from_db()
         assert len(respx_mock.calls) == 1
-        SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
-        criterion = SelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind=criteria_kind,
-            eligibility_diagnosis=eligibility_diagnosis,
-        ).get()
         assert criterion.certified is True
         assert criterion.certified_at is not None
         assert criterion.data_returned_by_api == response["json"]
@@ -82,22 +74,17 @@ class TestCertifyCriteriaApiParticulier:
     def test_retry_task_rate_limits(self, factory, respx_mock):
         with freeze_time("2024-09-12T00:00:00Z"):
             eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+            criterion = eligibility_diagnosis.selected_administrative_criteria.get()
             respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").mock(
                 return_value=httpx.Response(429, headers={"Retry-After": "1"}, json={}),
             )
 
             with pytest.raises(RetryTask) as exc_info:
-                async_certify_eligibility_diagnosis_by_api_particulier.call_local(
-                    eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-                )
+                async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
 
+            criterion.refresh_from_db()
             assert exc_info.value.delay == 1
             assert len(respx_mock.calls) == 1
-            SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
-            criterion = SelectedAdministrativeCriteria.objects.filter(
-                administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
-                eligibility_diagnosis=eligibility_diagnosis,
-            ).get()
             assert criterion.certified is None
             assert criterion.certified_at is None
             assert criterion.data_returned_by_api is None
@@ -127,11 +114,12 @@ class TestCertifyCriteriaApiParticulier:
         self, status_code, json_data, headers, retry_task_exception, factory, respx_mock
     ):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
             status_code, json=json_data, headers=headers
         )
         try:
-            certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
+            certify_criterion_with_api_particulier(criterion)
         except RetryTask:
             retry_task = True
         except Exception:
@@ -146,18 +134,15 @@ class TestCertifyCriteriaApiParticulier:
 
     def test_ignores_api_particulier_internal_error(self, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
             status_code=response["status_code"], json=response["json"]
         )
         # Does not raise a RetryTask, this specific error is ignored.
-        async_certify_eligibility_diagnosis_by_api_particulier.call_local(
-            eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-        )
+        async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
         assert len(respx_mock.calls) == 1
-        criterion = eligibility_diagnosis.selected_administrative_criteria.get(
-            administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
-        )
+        criterion.refresh_from_db()
         assert criterion.certified is None
         assert criterion.certified_at is None
         assert criterion.data_returned_by_api == response["json"]
@@ -170,18 +155,15 @@ class TestCertifyCriteriaApiParticulier:
         self, factory, mutate_response, respx_mock
     ):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
         response = mutate_response(RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR])
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
             status_code=response["status_code"], json=response["json"]
         )
         with pytest.raises(httpx.HTTPStatusError):
-            async_certify_eligibility_diagnosis_by_api_particulier.call_local(
-                eligibility_diagnosis._meta.model_name, eligibility_diagnosis.pk
-            )
+            async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
         assert len(respx_mock.calls) == 1
-        criterion = eligibility_diagnosis.selected_administrative_criteria.get(
-            administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
-        )
+        criterion.refresh_from_db()
         assert criterion.certified is None
         assert criterion.certified_at is None
         assert criterion.data_returned_by_api is None
@@ -189,8 +171,9 @@ class TestCertifyCriteriaApiParticulier:
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
 
-    def test_no_retries_when_diag_does_not_exist(self, caplog, factory):
-        eligibility_diagnosis_model = factory._meta.model
-        modelname = eligibility_diagnosis_model._meta.model_name
-        async_certify_eligibility_diagnosis_by_api_particulier.call_local(modelname, 0)
+    def test_no_retries_when_criterion_does_not_exist(self, caplog, factory):
+        eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = eligibility_diagnosis.selected_administrative_criteria.get()
+        modelname = criterion._meta.model_name
+        async_certify_criterion_with_api_particulier.call_local(modelname, 0)
         assert caplog.messages == [f"{modelname} with pk 0 does not exist, it cannot be certified."]
