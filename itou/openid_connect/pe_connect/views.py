@@ -86,10 +86,16 @@ def pe_connect_callback(request):
     }
 
     url = add_url_params(constants.PE_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
-    response = httpx.post(url, data=data, timeout=30)
-
-    if response.status_code not in [200, 201]:
-        error_msg = "Impossible d'obtenir le jeton de PôleEmploiConnect."
+    try:
+        response = httpx.post(url, data=data, timeout=30)
+        response.raise_for_status()
+        if response.status_code not in [200, 201]:
+            raise httpx.HTTPStatusError(
+                f"Unexpected status code: {response.status_code}", request=response._request, response=response
+            )
+    except httpx.HTTPError:
+        logger.error("PE Connect token request failed", exc_info=True)
+        error_msg = "Impossible d'obtenir le jeton de PôleEmploiConnect. Réessayez dans quelques minutes."
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     token_data = response.json()
@@ -104,14 +110,23 @@ def pe_connect_callback(request):
     # because the token is only valid for 5 seconds.
     url = constants.PE_CONNECT_ENDPOINT_USERINFO
 
-    response = httpx.get(
-        url,
-        params={"schema": "openid"},
-        headers={"Authorization": "Bearer " + access_token},
-        timeout=60,
-    )
-    if response.status_code != 200:
-        error_msg = "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect."
+    try:
+        response = httpx.get(
+            url,
+            params={"schema": "openid"},
+            headers={"Authorization": "Bearer " + access_token},
+            timeout=60,
+        )
+        response.raise_for_status()
+        if response.status_code != 200:
+            raise httpx.HTTPStatusError(
+                f"Unexpected status code: {response.status_code}", request=response._request, response=response
+            )
+    except httpx.HTTPError:
+        logger.error("PE Connect user info request failed", exc_info=True)
+        error_msg = (
+            "Impossible d'obtenir les informations utilisateur de PôleEmploiConnect. Réessayez dans quelques minutes."
+        )
         return _redirect_to_job_seeker_login_on_error(error_msg, request)
 
     try:
