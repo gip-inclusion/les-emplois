@@ -2852,8 +2852,9 @@
       dict({
         'origin': list([
           'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
-          'SimpleNode[apply/includes/job_application_accept_form.html]',
-          'IfNode[apply/includes/job_application_accept_form.html]',
+          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IncludeNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
           'IncludeNode[apply/submit/hire_confirmation.html]',
           'BlockNode[apply/submit_base.html]',
@@ -2879,8 +2880,9 @@
       }),
       dict({
         'origin': list([
-          'SimpleNode[apply/includes/job_application_accept_form.html]',
-          'IfNode[apply/includes/job_application_accept_form.html]',
+          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IncludeNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
           'IncludeNode[apply/submit/hire_confirmation.html]',
           'BlockNode[apply/submit_base.html]',
