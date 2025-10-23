@@ -1074,6 +1074,7 @@ def test_populate_gps_groups(snapshot):
         assert rows == [
             (
                 group.pk,
+                group.beneficiary_id,
                 group.created_at,
                 group.updated_at,
                 group.created_in_bulk,

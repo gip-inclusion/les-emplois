@@ -8,6 +8,7 @@ GroupsTable = MetabaseTable(name="gps_groups_v1")
 GroupsTable.add_columns(
     [
         get_column_from_field(get_model_field(FollowUpGroup, "pk"), "id"),
+        get_column_from_field(get_model_field(FollowUpGroup, "beneficiary_id"), "beneficiary_id"),
         get_column_from_field(get_model_field(FollowUpGroup, "created_at"), "created_at"),
         get_column_from_field(get_model_field(FollowUpGroup, "updated_at"), "updated_at"),
         get_column_from_field(get_model_field(FollowUpGroup, "created_in_bulk"), "created_in_bulk"),

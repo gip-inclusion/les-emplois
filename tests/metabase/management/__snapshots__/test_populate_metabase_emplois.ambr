@@ -2961,7 +2961,7 @@
 # ---
 # name: test_populate_gps_groups
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -3005,9 +3005,9 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          CREATE TABLE IF NOT EXISTS "z_new_gps_groups_v1" ("id" integer,"created_at" timestamp WITH TIME ZONE,
-                                                                                                          "updated_at" timestamp WITH TIME ZONE,
-                                                                                                                                           "created_in_bulk" integer,"department" text,"date_mise_à_jour_metabase" date)
+          CREATE TABLE IF NOT EXISTS "z_new_gps_groups_v1" ("id" integer,"beneficiary_id" integer,"created_at" timestamp WITH TIME ZONE,
+                                                                                                                                   "updated_at" timestamp WITH TIME ZONE,
+                                                                                                                                                                    "created_in_bulk" integer,"department" text,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -3018,6 +3018,15 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_gps_groups_v1"."id" IS \'ID\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_gps_groups[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_gps_groups_v1"."beneficiary_id" IS \'bénéficiaire\'',
       }),
       dict({
         'origin': list([
@@ -3093,6 +3102,7 @@
         ]),
         'sql': '''
           COPY "z_new_gps_groups_v1" ("id",
+                                      "beneficiary_id",
                                       "created_at",
                                       "updated_at",
                                       "created_in_bulk",
