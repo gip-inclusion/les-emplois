@@ -14,7 +14,7 @@ from itou.eligibility.enums import (
     AdministrativeCriteriaKind,
     AdministrativeCriteriaLevel,
 )
-from itou.eligibility.tasks import certify_eligibility_diagnosis_by_api_particulier
+from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
@@ -304,7 +304,8 @@ class TestIAEEligibilityDetail:
 
         # Certifiable and certified.
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        certify_eligibility_diagnosis_by_api_particulier(diagnosis)
+        criterion = diagnosis.selected_administrative_criteria.get()
+        certify_criterion_with_api_particulier(criterion)
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert certified_help_text in rendered
 
@@ -355,8 +356,9 @@ class TestGEIQEligibilityDetail:
             certifiable=True,
             criteria_kinds=[criteria_kind],
         )
+        criterion = diagnosis.selected_administrative_criteria.get()
         self.create_job_application(diagnosis)
-        certify_eligibility_diagnosis_by_api_particulier(diagnosis)
+        certify_criterion_with_api_particulier(criterion)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
@@ -386,7 +388,8 @@ class TestGEIQEligibilityDetail:
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        certify_eligibility_diagnosis_by_api_particulier(diagnosis)
+        criterion = diagnosis.selected_administrative_criteria.get()
+        certify_criterion_with_api_particulier(criterion)
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert certified_help_text in rendered
@@ -398,7 +401,7 @@ class TestCertifiedBadge:
         kwargs.setdefault("request", {"from_authorized_prescriber": True})
         return load_template("apply/includes/selected_administrative_criteria_display.html").render(Context(kwargs))
 
-    def test_certifiable_diagnosis_without_certifiable_criteria(self, factory):
+    def test_certifiable_job_seeker_without_certifiable_criteria(self, factory):
         # No certifiable criteria
         diagnosis = factory(
             certifiable=True,

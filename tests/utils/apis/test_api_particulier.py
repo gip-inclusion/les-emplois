@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from itou.asp.models import Commune
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.tasks import certify_eligibility_diagnosis_by_api_particulier
+from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
     RESPONSES,
@@ -53,12 +53,13 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
+    criterion = eligibility_diagnosis.selected_administrative_criteria.get()
     response = RESPONSES[criteria_kind][ResponseKind.NOT_CERTIFIED]
     respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
         status_code=response["status_code"], json=response["json"]
     )
 
-    certify_eligibility_diagnosis_by_api_particulier(eligibility_diagnosis)
+    certify_criterion_with_api_particulier(criterion)
 
     assert len(respx_mock.calls) == 1
     SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
@@ -85,7 +86,8 @@ def test_not_found(respx_mock, caplog):
         job_seeker__first_name="Jean",
         job_seeker__last_name="Dupont",
     )
-    certify_eligibility_diagnosis_by_api_particulier(diag)
+    criterion = diag.selected_administrative_criteria.get()
+    certify_criterion_with_api_particulier(criterion)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == response["json"]
     assert crit.certified is None
