@@ -1,5 +1,9 @@
 # Journal des changements techniques majeurs
 
+## 2025-10-23
+
+- L'API data⋅inclusion est totalement changée sans rétrocompatibilité.
+
 ## 2025-08-26
 
 - Changement de préfixe (`METABASE_*` -> `PILOTAGE_DATA*`.) pour les
