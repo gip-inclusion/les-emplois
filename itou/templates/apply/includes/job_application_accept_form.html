@@ -16,41 +16,7 @@
 
         {% csrf_token %}
 
-        {% if form_user_address or form_personal_data or form_birth_place %}<h2>Candidat</h2>{% endif %}
-
-        {% if form_personal_data %}
-            {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
-            {% if form_personal_data.pole_emploi_id_error %}{{ form_personal_data.pole_emploi_id_error }}{% endif %}
-
-            {% include "includes/job_seekers/readonly_form.html" with form=form_personal_data request=request only %}
-            {% bootstrap_form_errors form_personal_data type='non_fields' %}
-            {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
-            {% bootstrap_field form_personal_data.lack_of_nir %}
-            <div class="ps-3 pb-1 mb-3 border-start border-primary collapse lack_of_nir_reason_group">
-                {% bootstrap_field form_personal_data.lack_of_nir_reason %}
-            </div>
-            {% bootstrap_field form_personal_data.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
-            {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
-            {% bootstrap_field form_personal_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
-            {% bootstrap_field form_personal_data.birth_place %}
-            {% bootstrap_field form_personal_data.birth_country %}
-        {% endif %}
-
-        {% if form_birth_place %}
-            {% bootstrap_form form_birth_place %}
-        {% endif %}
-
-        {% if form_user_address %}
-            {% bootstrap_field form_user_address.address_for_autocomplete %}
-            {% bootstrap_field form_user_address.address_line_1 %}
-            {% bootstrap_field form_user_address.address_line_2 %}
-            {% bootstrap_field form_user_address.post_code wrapper_class="form-group form-group-input-w-lg-33" %}
-            {% bootstrap_field form_user_address.city %}
-
-            {% bootstrap_field form_user_address.insee_code %}
-            {% bootstrap_field form_user_address.ban_api_resolved_address %}
-            {% bootstrap_field form_user_address.fill_mode %}
-        {% endif %}
+        {% include "apply/includes/job_application_fill_user_infos_form.html" with form_personal_data=form_personal_data form_user_address=form_user_address form_birth_place=form_birth_place request=request only %}
 
         {% if form_user_address or form_personal_data or form_birth_place %}<hr>{% endif %}
         <h2>Contrat</h2>

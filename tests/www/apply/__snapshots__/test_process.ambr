@@ -928,8 +928,9 @@
       }),
       dict({
         'origin': list([
-          'SimpleNode[apply/includes/job_application_accept_form.html]',
-          'IfNode[apply/includes/job_application_accept_form.html]',
+          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IncludeNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
           'IncludeNode[apply/process_accept.html]',
           'BlockNode[apply/process_base.html]',
