@@ -87,7 +87,7 @@ def pe_connect_callback(request):
 
     url = add_url_params(constants.PE_CONNECT_ENDPOINT_TOKEN, {"realm": "/individu"})
     try:
-        response = httpx.post(url, data=data, timeout=30)
+        response = httpx.post(url, data=data, timeout=5)
         response.raise_for_status()
         if response.status_code not in [200, 201]:
             raise httpx.HTTPStatusError(
@@ -115,7 +115,7 @@ def pe_connect_callback(request):
             url,
             params={"schema": "openid"},
             headers={"Authorization": "Bearer " + access_token},
-            timeout=60,
+            timeout=10,
         )
         response.raise_for_status()
         if response.status_code != 200:
