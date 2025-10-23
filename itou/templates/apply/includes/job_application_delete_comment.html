@@ -1,0 +1,4 @@
+<h3 id="comments-list-tab-counter" hx-swap-oob="true">Liste des commentaires ({{ comments|length }})</h3>
+
+{% include "apply/includes/job_application_comments_counter.html" with comments=comments request=request only %}
+{% include "apply/includes/job_application_comments_list.html" with location="sidebar" comments=last_comments|default:None request=request hx_swap_oob=True only %}

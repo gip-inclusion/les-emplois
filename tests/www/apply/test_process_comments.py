@@ -1,3 +1,4 @@
+import itertools
 import random
 
 import pytest
@@ -6,6 +7,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.job_applications.models import JobApplicationComment
+from itou.www.apply.views.process_views import LAST_COMMENTS_COUNT
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.job_applications.factories import JobApplicationCommentFactory, JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -46,7 +48,11 @@ def test_display_in_sidebar_and_tab(client, snapshot):
     assertContains(
         response, '<label class="form-label" for="id_message">Ajouter un commentaire</label>', html=True, count=1
     )
-    assertContains(response, f"<h3> Liste des commentaires ({VISIBLE_COMMENTS_COUNT})</h3>", html=True)
+    assertContains(
+        response,
+        f'<h3 id="comments-list-tab-counter">Liste des commentaires ({VISIBLE_COMMENTS_COUNT})</h3>',
+        html=True,
+    )
     for comment in comments:
         assertContains(response, comment.message, html=True)
     assertNotContains(response, hidden_comment.message, html=True)
@@ -67,7 +73,9 @@ def test_add_comment_htmx(client, snapshot, caplog):
     job_app = JobApplicationFactory(
         for_snapshot=True, to_company=company, eligibility_diagnosis=None, resume=None, answer="👋"
     )
-    JobApplicationCommentFactory(
+    # Create a bunch of comments to have different comments and last_comments counts.
+    other_comments = JobApplicationCommentFactory.create_batch(
+        LAST_COMMENTS_COUNT + 1,
         job_application=job_app,
         created_by=company.members.first(),
         message="Cette candidate est venue 3 fois, elle est motivée.",
@@ -94,34 +102,51 @@ def test_add_comment_htmx(client, snapshot, caplog):
     soup = parse_response_to_soup(
         response,
         selector="#main",
-        replace_in_attr=[
-            ("href", f"/apply/{job_app.id}/siae/accept", "/apply/[Pk of JobApplication]/siae/accept"),
-            (
-                "hx-post",
-                f"/apply/{job_app.id}/siae/comment/{comment.id}/delete",
-                "/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete",
+        replace_in_attr=itertools.chain(
+            [
+                ("href", f"/apply/{job_app.id}/siae/accept", "/apply/[Pk of JobApplication]/siae/accept"),
+                (
+                    "hx-post",
+                    f"/apply/{job_app.id}/siae/comment/{comment.id}/delete",
+                    "/apply/[Pk of JobApplication]/siae/comment/[Pk of JobApplicationComment]/delete",
+                ),
+                (
+                    "hx-target",
+                    f"#comment-{comment.id}",
+                    "#comment-[Pk of JobApplicationComment]",
+                ),
+                (
+                    "data-bs-target",
+                    f"#delete_comment_{comment.id}_modal",
+                    "#delete_comment_[Pk of JobApplicationComment]_modal",
+                ),
+                (
+                    "aria-labelledby",
+                    f"delete_comment_{comment.id}_title",
+                    "delete_comment_[Pk of JobApplicationComment]_title",
+                ),
+                (
+                    "id",
+                    f"delete_comment_{comment.id}_modal",
+                    "delete_comment_[Pk of JobApplicationComment]_modal",
+                ),
+                (
+                    "id",
+                    f"delete_comment_{comment.id}_title",
+                    "delete_comment_[Pk of JobApplicationComment]_title",
+                ),
+            ],
+            *(
+                [
+                    (
+                        "id",
+                        f"comment-{list_comment.id}",
+                        "comment-[Pk of JobApplicationComment]",
+                    )
+                ]
+                for list_comment in other_comments + [comment]
             ),
-            (
-                "data-bs-target",
-                f"#delete_comment_{comment.id}_modal",
-                "#delete_comment_[Pk of JobApplicationComment]_modal",
-            ),
-            (
-                "aria-labelledby",
-                f"delete_comment_{comment.id}_title",
-                "delete_comment_[Pk of JobApplicationComment]_title",
-            ),
-            (
-                "id",
-                f"delete_comment_{comment.id}_modal",
-                "delete_comment_[Pk of JobApplicationComment]_modal",
-            ),
-            (
-                "id",
-                f"delete_comment_{comment.id}_title",
-                "delete_comment_[Pk of JobApplicationComment]_title",
-            ),
-        ],
+        ),
     )
     assert pretty_indented(soup) == snapshot(name="add comment")
     assert f"user={user.pk} added a new comment on job_application={job_app.pk}" in caplog.messages
@@ -192,10 +217,9 @@ def test_delete_comment_htmx(client, caplog):
     job_app = JobApplicationFactory(
         for_snapshot=True, to_company=company, eligibility_diagnosis=None, resume=None, answer="👋"
     )
-    other_user_comment = JobApplicationCommentFactory(
-        job_application=job_app,
-        created_by=company.members.first(),
-        message="Cette candidate est venue 3 fois, elle est motivée.",
+    # Create a bunch of comments to have different comments and last_comments counts.
+    other_user_comments = JobApplicationCommentFactory.create_batch(
+        LAST_COMMENTS_COUNT + 2, job_application=job_app, created_by=company.members.first()
     )
     comment = JobApplicationCommentFactory(job_application=job_app, created_by=user, message="Rdv le 2/9.")
 
@@ -210,7 +234,7 @@ def test_delete_comment_htmx(client, caplog):
     )
     delete_other_user_comment_url = reverse(
         "apply:delete_comment_for_company",
-        kwargs={"job_application_id": job_app.id, "comment_id": other_user_comment.id},
+        kwargs={"job_application_id": job_app.id, "comment_id": other_user_comments[0].id},
     )
     assertContains(response, delete_comment_url, count=1)
     assertNotContains(response, delete_other_user_comment_url)
