@@ -385,7 +385,7 @@ def test_htmx_filters(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_list_snapshot(client, snapshot):
+def test_list_and_table_empty_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
@@ -399,79 +399,6 @@ def test_list_snapshot(client, snapshot):
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert pretty_indented(page) == snapshot(name="empty")
-
-    job_seeker = JobSeekerFactory(for_snapshot=True)
-    company = CompanyFactory(for_snapshot=True, with_membership=True)
-    common_kwargs = {
-        "job_seeker": job_seeker,
-        "eligibility_diagnosis": None,
-        "to_company": company,
-        "sender_kind": SenderKind.PRESCRIBER,
-        "sender": prescriber,
-    }
-
-    job_applications = [
-        JobApplicationFactory(state=JobApplicationState.ACCEPTED, **common_kwargs),
-        JobApplicationFactory(
-            state=JobApplicationState.NEW,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            state=JobApplicationState.REFUSED,
-            **common_kwargs,
-        ),
-    ]
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            [("href", f"/company/{company.pk}/card", "/company/[PK of Company]/card")],
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            ),
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/prescriber/details",
-                        "/apply/[PK of JobApplication]/prescriber/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_exports_without_organization(client):
@@ -676,7 +603,7 @@ def test_htmx_order(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_table_iae_state_and_criteria(client, snapshot):
+def test_table_and_list_snapshot(client, snapshot):
     prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
     prescriber = prescriber_org.members.get()
     client.force_login(prescriber)
@@ -764,7 +691,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
             **common_kwargs,
         ),
         JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
+            state=JobApplicationState.POOL,
             eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
             to_company__name="Tartempion",
@@ -773,6 +700,7 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     ]
 
+    # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
     page = parse_response_to_soup(
         response,
@@ -796,3 +724,29 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications table")
+
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    ("href", f"/company/{job_application.to_company.pk}/card", "/company/[PK of Company]/card"),
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/prescriber/details",
+                        "/apply/[PK of JobApplication]/prescriber/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications list")
