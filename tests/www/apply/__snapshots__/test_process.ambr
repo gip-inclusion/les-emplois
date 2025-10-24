@@ -806,7 +806,9 @@
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'AcceptView.get_forms[www/apply/views/common.py]',
+          'AcceptView.get_forms[www/apply/views/common.py]',
           'AcceptView.get_context_data[www/apply/views/common.py]',
+          'AcceptView.get[www/apply/views/common.py]',
           'AcceptView.dispatch[www/apply/views/process_views.py]',
         ]),
         'sql': '''
@@ -824,6 +826,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           'AcceptView.get_forms[www/apply/views/common.py]',
           'AcceptView.get_context_data[www/apply/views/common.py]',
+          'AcceptView.get[www/apply/views/common.py]',
           'AcceptView.dispatch[www/apply/views/process_views.py]',
         ]),
         'sql': '''
@@ -928,8 +931,9 @@
       }),
       dict({
         'origin': list([
-          'SimpleNode[apply/includes/job_application_accept_form.html]',
-          'IfNode[apply/includes/job_application_accept_form.html]',
+          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
+          'IncludeNode[apply/includes/job_application_accept_form.html]',
           'IncludeNode[apply/includes/accept_section.html]',
           'IncludeNode[apply/process_accept.html]',
           'BlockNode[apply/process_base.html]',
