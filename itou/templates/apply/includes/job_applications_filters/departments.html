@@ -1,10 +1,16 @@
 {% load django_bootstrap5 %}
 
-{% if filters_form.departments and filters_form.fields.departments.choices %}
-    {% if btn_dropdown_filter|default:False %}
-        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.departments id_suffix="-top" only %}
-    {% else %}
-        <hr>
-        {% include "apply/includes/job_applications_filters/field_collapse_checkbox.html" with field=filters_form.departments only %}
-    {% endif %}
+{% if filters_form.departments %}
+    <hr>
+    <fieldset>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseDepartments"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="collapseDepartments">Départements</button>
+        </legend>
+        <div class="mt-3 collapse" id="collapseDepartments">{% bootstrap_field filters_form.departments %}</div>
+    </fieldset>
 {% endif %}
