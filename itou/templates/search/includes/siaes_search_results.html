@@ -16,7 +16,7 @@
 </div>
 
 {% if request.htmx %}
-    <title hx-swap-oob="outerHTML,title">
+    <title>
         {% include "search/includes/siaes_search_title.html" %}
         {# Cannot use block in includes #}
         - Les emplois de l'inclusion

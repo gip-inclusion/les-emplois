@@ -41,7 +41,7 @@
 
 {% if request.htmx %}
     {% include "search/includes/prescribers_search_summary.html" %}
-    <title hx-swap-oob="outerHTML,title">
+    <title>
         {% include "search/includes/prescribers_search_title.html" with city=city distance=distance only %}
         {# Cannot use block in includes #}
         - Les emplois de l'inclusion
