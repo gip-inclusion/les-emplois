@@ -101,10 +101,15 @@ def remove_static_hash(content):
 def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_attr=None):
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     if no_html_body:
+        # If a title is in the response, keep it by injecting it in the body
+        # to be processed by update_page_with_htmx
+        title = soup.find("title")
         # If the provided HTML does not contain <html><body> tags
         # html5lib will always add them around the response:
         # ignore them
         soup = soup.body
+        if title:
+            soup.append(title)
     if selector is not None:
         [soup] = soup.select(selector)
     title = soup.title

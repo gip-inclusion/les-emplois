@@ -1605,6 +1605,13 @@ class TestUtilsParseResponseToSoup:
         response = HttpResponse('<html><head></head><body><div id="foo">bar</div></body></html>')
         assert str(parse_response_to_soup(response, selector="#foo")) == '<div id="foo">bar</div>'
 
+    def test_parse_with_title(self):
+        response = HttpResponse('<html><head><title>Title</title></head><body><div id="foo">bar</div></body></html>')
+        assert (
+            str(parse_response_to_soup(response, no_html_body=True))
+            == '<body><div id="foo">bar</div><title>Title</title></body>'
+        )
+
     def test_replace_in_href(self):
         response = HttpResponse(
             "<html><head></head><body>"
