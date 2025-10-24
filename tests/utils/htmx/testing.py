@@ -67,8 +67,6 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
         target_selector = None
         if oob_swap == "true":
             mode = "outerHTML"
-        elif "," in oob_swap:
-            mode, target_selector = oob_swap.split(",", maxsplit=1)
         else:
             mode = oob_swap
         del out_of_band_swap["hx-swap-oob"]
@@ -78,11 +76,19 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
         targets = page.select(target_selector)
         for target in targets:
             _handle_swap(page, target=target, new_elements=[out_of_band_swap], mode=mode)
+    mode, _, modifiers = _get_hx_attribute(htmx_element, "hx-swap", default="innerHTML").partition(" ")
+    # If a title tag is at the root level of the response, swap it unless ignoreTitle is set to true
+    # https://htmx.org/attributes/hx-swap/#title-ignoretitle
+    title = parsed_response.find("title")
+    if title and title.parent == parsed_response:
+        title = title.extract()
+        if "ignoreTitle:true" not in modifiers:
+            _handle_swap(page, target=page.find("title"), new_elements=[title], mode="outerHTML")
     _handle_swap(
         page,
         target=_get_hx_attribute(htmx_element, "hx-target", default=htmx_element),
         new_elements=parsed_response.contents,
-        mode=_get_hx_attribute(htmx_element, "hx-swap", default="innerHTML"),
+        mode=mode,
     )
 
 

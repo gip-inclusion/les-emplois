@@ -184,6 +184,68 @@ def test_update_page_with_htmx_empty_response():
     )
 
 
+@pytest.mark.parametrize("modifier,expected_title", [["", "Updated title"], ["ignoreTitle:true", "Old title"]])
+def test_update_page_with_htmx_title(modifier, expected_title):
+    simulated_page = parse_response_to_soup(
+        FakeResponse(
+            f"""
+              <html>
+                <head>
+                  <title>Old title</title>
+                </head>
+                <body>
+                  <div id="main">
+                    <div id="div-to-swap">
+                      <form hx-post="/somewhere?with_query_string=" hx-swap="outerHTML {modifier}"
+                       hx-target="#div-to-swap">
+                        <input name="some_input"/>
+                      </form>
+                    </div>
+
+                    <div id="other-div-for-oob-test">
+                    </div>
+                  </div>
+                </body>
+              </html>
+            """.encode()
+        )
+    )
+
+    htmx_response = FakeResponse(
+        b"""
+          <title>Updated title</title>
+          <div id="swapped-div">No more form !</div>
+          <a href="#">Here is a link instead</a>
+          <div id="other-div-for-oob-test" hx-swap-oob="true">OOB Swap successful</div>
+        """,
+        request={"PATH_INFO": "/somewhere", "REQUEST_METHOD": "POST", "QUERY_STRING": "with_query_string="},
+    )
+
+    update_page_with_htmx(simulated_page, "#div-to-swap > form", htmx_response)
+
+    assertSoupEqual(
+        simulated_page,
+        BeautifulSoup(
+            f"""
+              <html>
+                <head>
+                  <title>{expected_title}</title>
+                </head>
+                <body>
+                  <div id="main">
+                    <div id="swapped-div">No more form !</div>
+                    <a href="#">Here is a link instead</a>
+
+                    <div id="other-div-for-oob-test">OOB Swap successful</div>
+                  </div>
+                </body>
+              </html>
+            """.encode(),
+            "html5lib",
+        ),
+    )
+
+
 def test_update_page_with_none_hx_swap_and_oob():
     simulated_page = parse_response_to_soup(
         FakeResponse(
