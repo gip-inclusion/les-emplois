@@ -933,6 +933,28 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             .values_list("code", "name")
         )
 
+    def get_autocomplete_fields_to_clean(self):
+        return {
+            "senders": "sender",
+            "job_seeker": "job_seeker",
+        }
+
+    def clean(self):
+        super().clean()
+        for form_field_name, job_application_field_name in self.get_autocomplete_fields_to_clean().items():
+            # Prevent user enumeration by checking that selected values are valid
+            if instances := self.cleaned_data.get(form_field_name):
+                if not isinstance(instances, list):
+                    instances = [instances]
+                valid_values = self.job_applications_qs.filter(
+                    **{f"{job_application_field_name}__in": instances}
+                ).get_unique_fk_objects(job_application_field_name)
+                if len(valid_values) != len(instances):
+                    self.add_error(
+                        form_field_name,
+                        "Certains choix ne sont pas valides.",
+                    )
+
     def filter(self, queryset):
         queryset = super().filter(queryset)
 
@@ -1033,6 +1055,12 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
                 if k != job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
             ]
 
+    def get_fields_to_clean(self):
+        return super().get_fields_to_clean() | {
+            "sender_prescriber_organizations": "sender_prescriber_organization",
+            "sender_companies": "sender_company",
+        }
+
     @cancel_other_filters_if_filter_by_job_seeker
     def filter(self, queryset):
         queryset = super().filter(queryset)
@@ -1073,6 +1101,11 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
     def __init__(self, job_applications_qs, *args, request, **kwargs):
         super().__init__(job_applications_qs, *args, request=request, **kwargs)
         self.fields["to_companies"].widget.label_from_instance = get_field_label_from_instance("to_company", request)
+
+    def get_fields_to_clean(self):
+        return super().get_fields_to_clean() | {
+            "to_companies": "to_company",
+        }
 
     @cancel_other_filters_if_filter_by_job_seeker
     def filter(self, queryset):
