@@ -17,7 +17,7 @@
 {% block content_extend %}
     {% if form_user_address or form_personal_data or form_birth_place %}
         {% comment %}legacy hiring process. to be removed{% endcomment %}
-        <div class="c-box my-4">
+        <div class="c-box mb-3 mb-md-4">
             <h2>Candidat</h2>
             <hr>
             {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
