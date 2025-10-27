@@ -170,6 +170,17 @@ urlpatterns = [
     ),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.AcceptView.as_view(), name="accept"),
+    path("<uuid:job_application_id>/siae/start-accept", process_views.start_accept_wizard, name="start-accept"),
+    path(
+        "<uuid:session_uuid>/accept/job-seeker-infos",
+        process_views.FillJobSeekerInfosForAcceptView.as_view(),
+        name="accept_fill_job_seeker_infos",
+    ),
+    path(
+        "<uuid:session_uuid>/accept/contract",
+        process_views.ContractForAcceptView.as_view(),
+        name="accept_contract_infos",
+    ),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
     path("<uuid:job_application_id>/siae/transfer", transfer_views.transfer, name="transfer"),
     path(
