@@ -236,7 +236,7 @@
             </div>
         {% endif %}
         {% if can_accept and acceptable_job_application.to_company.kind == CompanyKind.GEIQ and not acceptable_job_application.geiq_eligibility_diagnosis.is_valid %}
-            {% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
+            {% url 'apply:start-accept' job_application_id=job_application.pk as accept_url %}
             {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
         {% endif %}
     </div>
