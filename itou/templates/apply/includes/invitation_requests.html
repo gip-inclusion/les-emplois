@@ -2,7 +2,7 @@
     <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3">
         <h2 class="mb-0">Invitations envoyées</h2>
         <div class="d-flex flex-column flex-md-row gap-2">
-            {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True only %}
+            {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True invite_btn_state=invite_btn_state only %}
         </div>
     </div>
 
