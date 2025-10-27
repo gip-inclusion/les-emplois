@@ -15,8 +15,10 @@ from django.shortcuts import Http404, get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
 from django.utils import formats, timezone
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.http import require_POST, require_safe
-from django.views.generic.base import TemplateView
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, TemplateView
 from django_xworkflows import models as xwf_models
 
 from itou.companies.enums import CompanyKind, ContractType
@@ -946,54 +948,63 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
     return render(request, "apply/includes/job_application_prior_action_form.html", context)
 
 
-@require_POST
-@check_user(lambda user: user.is_employer)
-def rdv_insertion_invite(request, job_application_id, for_detail=False):
-    if for_detail:
-        template_name = "apply/includes/invitation_requests.html"
-    else:
-        template_name = "apply/includes/buttons/rdv_insertion_invite.html"
+@method_decorator(check_user(lambda user: user.is_employer), name="dispatch")
+class RdvInsertionInviteView(TemplateResponseMixin, ContextMixin, View):
+    for_detail = False
+    template_name = "apply/includes/buttons/rdv_insertion_invite.html"
+    detail_template_name = "apply/includes/invitation_requests.html"
 
-    try:
-        job_application = (
-            JobApplication.objects.is_active_company_member(request.user)
-            .select_related("job_seeker__jobseeker_profile", "to_company")
-            .annotate(
-                has_pending_rdv_insertion_invitation_request=Exists(
-                    InvitationRequest.objects.filter(
-                        company=OuterRef("to_company"),
-                        job_seeker=OuterRef("job_seeker"),
-                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+    def get_template_names(self):
+        if self.for_detail:
+            return [self.detail_template_name]
+        return [self.template_name]
+
+    def get_context_data(self, invite_btn_state="idle", **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_application = kwargs.get("job_application") or context.get("job_application")
+        context["invite_btn_state"] = invite_btn_state
+        context["job_application"] = job_application
+        context["for_detail"] = self.for_detail
+        if job_application and self.for_detail:
+            context["invitation_requests"] = InvitationRequest.objects.filter(
+                job_seeker=job_application.job_seeker,
+                company=job_application.to_company,
+                created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+            )
+        else:
+            context["invitation_requests"] = None
+        return context
+
+    def post(self, request, job_application_id, *args, **kwargs):
+        try:
+            job_application = (
+                JobApplication.objects.is_active_company_member(request.user)
+                .select_related("job_seeker__jobseeker_profile", "to_company")
+                .annotate(
+                    has_pending_rdv_insertion_invitation_request=Exists(
+                        InvitationRequest.objects.filter(
+                            company=OuterRef("to_company"),
+                            job_seeker=OuterRef("job_seeker"),
+                            created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                        )
                     )
                 )
+                .get(id=job_application_id)
             )
-            .get(id=job_application_id)
-        )
-    except JobApplication.DoesNotExist:
-        return render(
-            request,
-            template_name,
-            {"job_application": None, "invitation_requests": None, "state": "error"},
-        )
+        except JobApplication.DoesNotExist:
+            return self.render_to_response(self.get_context_data(invite_btn_state="fatal"))
 
-    # Ensure company has RDV-I configured
-    if not job_application.to_company.rdv_solidarites_id:
-        return render(
-            request,
-            template_name,
-            {"job_application": None, "invitation_requests": None, "state": "error"},
-        )
+        if not job_application.to_company.rdv_solidarites_id:
+            return self.render_to_response(self.get_context_data(invite_btn_state="fatal"))
 
-    if for_detail:
-        invitation_requests = InvitationRequest.objects.filter(
-            job_seeker=job_application.job_seeker,
-            company=job_application.to_company,
-            created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-        )
-    else:
-        invitation_requests = None
+        if job_application.has_pending_rdv_insertion_invitation_request:
+            return self.render_to_response(
+                self.get_context_data(
+                    job_application=job_application,
+                    invite_btn_state="pending",
+                )
+            )
 
-    if not job_application.has_pending_rdv_insertion_invitation_request:
         try:
             with transaction.atomic():
                 url = urljoin(
@@ -1061,25 +1072,19 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                     )
                 Invitation.objects.bulk_create(invitations)
 
-                if for_detail:
-                    # Refresh invitation requests
-                    invitation_requests = InvitationRequest.objects.filter(
-                        job_seeker=job_application.job_seeker,
-                        company=job_application.to_company,
-                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-                    )
         except Exception as e:
             sentry_sdk.capture_exception(e)
-            return render(
-                request,
-                template_name,
-                {"job_application": job_application, "invitation_requests": invitation_requests, "state": "error"},
+            return self.render_to_response(
+                self.get_context_data(
+                    job_application=job_application,
+                    invite_btn_state="retry",
+                )
             )
 
-    job_application.has_pending_rdv_insertion_invitation_request = True
-
-    return render(
-        request,
-        template_name,
-        {"job_application": job_application, "invitation_requests": invitation_requests, "state": "ok"},
-    )
+        job_application.has_pending_rdv_insertion_invitation_request = True
+        return self.render_to_response(
+            self.get_context_data(
+                job_application=job_application,
+                invite_btn_state="pending",
+            )
+        )

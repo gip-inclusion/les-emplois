@@ -1,7 +1,7 @@
 <div id="rdvi-invitation-requests" class="mb-6">
     <div class="d-flex justify-content-between mb-3">
         <h3 class="mb-0">Invitations envoyées</h3>
-        {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True only %}
+        {% include "apply/includes/buttons/rdv_insertion_invite.html" with csrf_token=csrf_token job_application=job_application for_detail=True invite_btn_state=invite_btn_state only %}
     </div>
     {% if invitation_requests %}
         <div class="table-responsive mt-3 mt-md-4">
