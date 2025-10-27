@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2025-10-27
+
+### Ajouté
+
+- [Candidature : Fil de commentaires partagé dans la candidature](https://github.com/gip-inclusion/les-emplois/pull/6900)
+
+### Modifié
+
+- [Candidature : Correction du compteur de commentaires parfois bloqué à 3](https://github.com/gip-inclusion/les-emplois/pull/7040)
+- [Connexion : amélioration du message d'erreur en cas d'indisponibilité de PEConnect](https://github.com/gip-inclusion/les-emplois/pull/7038)
+- [Recherche employeur : Ne pas enregistrer la page ni le candidat pour qui l’on postule dans les recherches enregistrées](https://github.com/gip-inclusion/les-emplois/pull/7034)
+- [Stats : Ajout du bénéficiaire dans les données GPS envoyées à Metabase](https://github.com/gip-inclusion/les-emplois/pull/7041)
+
+### Tech
+
+- [API : Rendre l'API data⋅inclusion compatible avec le schéma V1](https://github.com/gip-inclusion/les-emplois/pull/7039)
+
 ## 2025-10-20
 
 ### Ajouté
