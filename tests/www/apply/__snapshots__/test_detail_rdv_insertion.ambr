@@ -2463,6 +2463,15 @@
           Aucune invitation en attente de réponse actuellement
       </p>
   </div>
+  '''
+# ---
+# name: TestRdvInsertionInvitationRequestsList.test_invite_fails_for_invalid_job_application
+  '''
+  <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
+      <i aria-hidden="true" class="ri-alert-line fw-medium">
+      </i>
+      Une erreur s’est produite, l’envoi n’a pas abouti
+  </span>
   
   '''
 # ---
