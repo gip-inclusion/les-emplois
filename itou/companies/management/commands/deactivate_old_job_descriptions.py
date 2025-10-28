@@ -29,9 +29,10 @@ class Command(BaseCommand):
             pk__in=[old_job_desc.pk for old_job_desc in old_job_descriptions]
         ).update(is_active=False)
         for old_job_description in old_job_descriptions:
-            for member in old_job_description.company.members.all():
+            # Only send to active members (the default manager checks both the user and membership is_active statuses)
+            for membership in old_job_description.company.memberships.select_related("user"):
                 OldJobDescriptionDeactivationNotification(
-                    member,
+                    membership.user,
                     old_job_description.company,
                     job_description=old_job_description,
                 ).send()
