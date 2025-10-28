@@ -904,6 +904,7 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         self.fields["sender_companies"].choices += self.get_sender_companies_choices()
 
         if company.kind not in CompanyKind.siae_kinds():
+            del self.fields["criteria"]
             del self.fields["eligibility_validated"]
             del self.fields["eligibility_pending"]
             del self.fields["pass_iae_active"]
