@@ -17,6 +17,7 @@ YOUR_ORGA_EMPTY_MARKUP = """<i>Vous n’avez pas encore renseigné d’informati
 ADMIN_ORGA_EMPTY_MARKUP = "<i>L'administrateur n’a pas encore renseigné l’activité de l’organisation.</i>"
 
 PUBLIC_PAGE_MARKUP = "<span>Voir la fiche publique</span>"
+ACTIVITY_MARKUP = "<h3>Son activité</h3>"
 
 
 @pytest.mark.parametrize(
@@ -85,7 +86,7 @@ def test_content_ft(client):
 
     client.force_login(organization.members.first())
     response = client.get(url)
-    assertContains(response, "<h3>Son activité</h3><p>Mon activité</p>", html=True)
+    assertContains(response, f"{ACTIVITY_MARKUP}<p>Mon activité</p>", html=True)
     assertNotContains(response, NO_INFO_MARKUP, html=True)
     assertNotContains(response, YOUR_ORGA_EMPTY_MARKUP, html=True)
     assertContains(response, PUBLIC_PAGE_MARKUP, html=True)
@@ -102,7 +103,7 @@ def test_content_ft_empty_description(client):
 
     client.force_login(organization.members.first())
     response = client.get(url)
-    assertNotContains(response, "<h3>Son activité</h3><p>Mon activité</p>", html=True)
+    assertNotContains(response, ACTIVITY_MARKUP, html=True)
     assertContains(response, NO_INFO_MARKUP, html=True)
     assertNotContains(response, YOUR_ORGA_EMPTY_MARKUP, html=True)
     assertContains(response, PUBLIC_PAGE_MARKUP, html=True)
@@ -123,7 +124,7 @@ def test_content(client, description):
     client.force_login(organization.members.first())
     response = client.get(url)
     assertion = [assertContains, assertNotContains] if description else [assertNotContains, assertContains]
-    assertion[0](response, "<h3>Son activité</h3><p>Mon activité</p>", html=True)
+    assertion[0](response, ACTIVITY_MARKUP, html=True)
     assertion[1](response, NO_INFO_MARKUP, html=True)
     assertion[1](response, YOUR_ORGA_EMPTY_MARKUP, html=True)
     assertContains(response, PUBLIC_PAGE_MARKUP, html=True)
