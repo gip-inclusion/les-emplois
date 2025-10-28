@@ -87,7 +87,7 @@
         {% endfor %}
     </ul>
     {% if location == "sidebar" %}
-        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic-onglet" "commentaires" %}>
+        <button class="btn btn-outline-primary btn-block bg-white mt-3" id="comments-btn" role="presentation" hx-preserve="true" {% matomo_event "candidature" "clic" "commentaires-voir-tous" %}>
             Voir tous les commentaires
         </button>
     {% endif %}
