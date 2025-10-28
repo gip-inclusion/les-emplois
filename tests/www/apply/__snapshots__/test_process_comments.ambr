@@ -531,7 +531,7 @@
                                           </div>
                                       </li>
                                   </ul>
-                                  <button class="btn btn-outline-primary btn-block bg-white mt-3" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="commentaires" hx-preserve="true" id="comments-btn" role="presentation">
+                                  <button class="btn btn-outline-primary btn-block bg-white mt-3" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="commentaires-voir-tous" hx-preserve="true" id="comments-btn" role="presentation">
                                       Voir tous les commentaires
                                   </button>
                               </div>
