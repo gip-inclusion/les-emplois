@@ -890,6 +890,7 @@
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_accept_base.html]',
           'ExtendsNode[apply/process_accept.html]',
         ]),
         'sql': '''
@@ -910,6 +911,7 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_accept_base.html]',
           'ExtendsNode[apply/process_accept.html]',
         ]),
         'sql': '''
@@ -939,6 +941,7 @@
           'BlockNode[apply/process_base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_accept_base.html]',
           'ExtendsNode[apply/process_accept.html]',
         ]),
         'sql': '''
