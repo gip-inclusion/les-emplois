@@ -58,19 +58,12 @@ def _command_info_manager(command, *, wet_run=None):
 
 
 class LoggedCommandMixin:
-    ATOMIC_HANDLE = False
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(self.__class__.__module__)
 
     def execute(self, *args, **kwargs):
-        with contextlib.ExitStack() as stack:
-            command_info = stack.enter_context(_command_info_manager(self, wet_run=kwargs.get("wet_run")))
-            stack.enter_context(_command_duration_logger(self))
-            if self.ATOMIC_HANDLE:
-                stack.enter_context(transaction.atomic())
-            stack.enter_context(triggers.context(user=os.getenv("CC_USER_ID"), run_uid=command_info.run_uid))
+        with _command_info_manager(self, wet_run=kwargs.get("wet_run")), _command_duration_logger(self):
             try:
                 return super().execute(*args, **kwargs)
             except Exception:
@@ -84,7 +77,21 @@ class LoggedCommandMixin:
                 raise
 
 
-class BaseCommand(LoggedCommandMixin, base.BaseCommand):
+class AtomicHandleMixin:
+    ATOMIC_HANDLE = False
+
+    def execute(self, *args, **kwargs):
+        with transaction.atomic() if self.ATOMIC_HANDLE else contextlib.nullcontext():
+            return super().execute(*args, **kwargs)
+
+
+class TriggerContextMixin:
+    def execute(self, *args, **kwargs):
+        with triggers.context(user=os.getenv("CC_USER_ID"), run_uid=get_current_command_info().run_uid):
+            return super().execute(*args, **kwargs)
+
+
+class BaseCommand(LoggedCommandMixin, AtomicHandleMixin, TriggerContextMixin, base.BaseCommand):
     def handle(self, *args, **options):
         raise NotImplementedError()
 

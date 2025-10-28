@@ -950,6 +950,8 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -957,6 +959,8 @@
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
@@ -966,6 +970,8 @@
           'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -984,6 +990,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -993,6 +1001,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1050,6 +1060,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1187,6 +1199,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -1218,6 +1232,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -1248,6 +1264,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1282,28 +1300,7 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'ArchiveUser.send[communications/dispatch/email.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1328,28 +1325,7 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'ArchiveUser.send[communications/dispatch/email.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1374,28 +1350,7 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'ArchiveUser.send[communications/dispatch/email.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1420,28 +1375,7 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
-        ]),
-        'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'ArchiveUser.send[communications/dispatch/email.py]',
-          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
-          'Command.handle[archive/management/commands/anonymize_professionals.py]',
-          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1465,6 +1399,108 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1486,6 +1522,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1512,6 +1550,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1569,6 +1609,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "account_emailaddress"."id"
@@ -1592,6 +1634,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id"
@@ -1614,6 +1658,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1646,6 +1692,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_siaeconvention"."id"
@@ -1668,6 +1716,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1692,6 +1742,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id"
@@ -1714,6 +1766,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1743,6 +1797,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id"
@@ -1766,6 +1822,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id"
@@ -1788,6 +1846,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1820,6 +1880,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "institutions_institutionmembership"."id",
@@ -1851,6 +1913,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -1873,6 +1937,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1897,6 +1963,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -1919,6 +1987,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -1943,6 +2013,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -1966,6 +2038,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id"
@@ -1988,6 +2062,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2019,6 +2095,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplicationcomment"."id",
@@ -2047,6 +2125,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id"
@@ -2070,6 +2150,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id"
@@ -2092,6 +2174,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2126,6 +2210,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -2159,6 +2245,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2181,6 +2269,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2205,6 +2295,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2227,6 +2319,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2251,6 +2345,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id"
@@ -2273,6 +2369,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2315,6 +2413,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2355,6 +2455,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2397,6 +2499,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2438,6 +2542,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id"
@@ -2460,6 +2566,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2484,6 +2592,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id"
@@ -2506,6 +2616,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2530,6 +2642,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "external_data_externaldataimport"."id"
@@ -2552,6 +2666,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2588,6 +2704,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -2610,6 +2728,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2634,6 +2754,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id"
@@ -2656,6 +2778,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2680,6 +2804,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "communications_notificationsettings"."id"
@@ -2703,6 +2829,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "gps_followupgroup"."id"
@@ -2725,6 +2853,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2763,6 +2893,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "rdv_insertion_invitationrequest"."id"
@@ -2786,6 +2918,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -2807,6 +2941,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2830,6 +2966,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -2851,6 +2989,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2874,6 +3014,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -2895,6 +3037,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2918,6 +3062,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -2939,6 +3085,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -2962,6 +3110,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -2983,6 +3133,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -3006,6 +3158,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3027,6 +3181,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -3050,6 +3206,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3071,6 +3229,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -3094,6 +3254,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3115,6 +3277,8 @@
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -3138,6 +3302,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           DELETE
@@ -3159,6 +3325,8 @@
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'wrapper[utils/command.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -3166,6 +3334,8 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'wrapper[utils/command.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
