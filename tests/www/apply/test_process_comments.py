@@ -17,19 +17,28 @@ from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, p
 def test_display_in_sidebar_and_tab(client, snapshot):
     company = CompanyWith2MembershipsFactory()
     job_app = JobApplicationFactory(to_company=company)
-    VISIBLE_COMMENTS_COUNT = 3
-    comments = JobApplicationCommentFactory.create_batch(VISIBLE_COMMENTS_COUNT, job_application=job_app)
+    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
+    client.force_login(company.members.first())
+
     # A comment linked to the job app but not supposed to be seen with members of that company
     # (for various reasons such as a faulty transfer in admin)
     hidden_comment = JobApplicationCommentFactory(
         message="Un commentaire qui ne doit pas être lu.", job_application=job_app, company=CompanyFactory()
     )
-    client.force_login(company.members.first())
 
-    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
+    # No visible comment yet:
+    response = client.get(url)
+    soup = parse_response_to_soup(response, "#comments-list-sidebar")
+    assert "d-none" in soup.attrs["class"]  # sidebar comments list is hidden
+
+    VISIBLE_COMMENTS_COUNT = 3
+    comments = JobApplicationCommentFactory.create_batch(VISIBLE_COMMENTS_COUNT, job_application=job_app)
+
     with assertSnapshotQueries(snapshot):
         response = client.get(url)
 
+    soup = parse_response_to_soup(response, "#comments-list-sidebar")
+    assert "d-none" not in soup.attrs["class"]  # sidebar comments list is displayed
     assertContains(
         response,
         (

@@ -1,5 +1,7 @@
 {% load matomo %}
-<div class="{% if location == "sidebar" %}c-box{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-list-{{ location }}"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
+<div class="{% if location == "sidebar" %}c-box{% if not comments %} d-none{% endif %}{% else %}c-form{% endif %} mb-3 mb-md-4"
+     id="comments-list-{{ location }}"
+     {% if hx_swap_oob %}hx-swap-oob="true"{% endif %}>
     {% if location == "sidebar" %}
         <h3>Derniers commentaires</h3>
     {% else %}
