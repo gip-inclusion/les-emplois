@@ -2185,6 +2185,9 @@ class TestProcessViews:
 class TestProcessAcceptViews:
     BIRTH_COUNTRY_LABEL = "Pays de naissance"
     BIRTH_PLACE_LABEL = "Commune de naissance"
+    OPEN_JOBS_TEXT = "Postes ouverts au recrutement"
+    CLOSED_JOBS_TEXT = "Postes fermés au recrutement"
+    SPECIFY_JOB_TEXT = "Préciser le nom du poste (code ROME)"
 
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
@@ -2414,9 +2417,9 @@ class TestProcessAcceptViews:
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
-        assertContains(response, "Postes ouverts au recrutement")
-        assertNotContains(response, "Postes fermés au recrutement")
-        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+        assertContains(response, self.OPEN_JOBS_TEXT)
+        assertNotContains(response, self.CLOSED_JOBS_TEXT)
+        assertNotContains(response, self.SPECIFY_JOB_TEXT)
 
         # Selecting "Autre" must enable the employer to create a new job description
         # linked to the accepted job application.
@@ -2427,7 +2430,7 @@ class TestProcessAcceptViews:
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
         response = client.post(url, data=post_data)
         assertContains(response, "Localisation du poste")
-        assertContains(response, "Préciser le nom du poste (code ROME)")
+        assertContains(response, self.SPECIFY_JOB_TEXT)
 
         city = City.objects.order_by("?").first()
         appellation = Appellation.objects.get(rome_id="M1805")
@@ -2467,9 +2470,9 @@ class TestProcessAcceptViews:
         response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
-        assertContains(response, "Postes ouverts au recrutement")
-        assertNotContains(response, "Postes fermés au recrutement")
-        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+        assertContains(response, self.OPEN_JOBS_TEXT)
+        assertNotContains(response, self.CLOSED_JOBS_TEXT)
+        assertNotContains(response, self.SPECIFY_JOB_TEXT)
 
         # Inactive job description must also appear in select
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
@@ -2477,9 +2480,9 @@ class TestProcessAcceptViews:
             response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
-        assertContains(response, "Postes ouverts au recrutement")
-        assertContains(response, "Postes fermés au recrutement")
-        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+        assertContains(response, self.OPEN_JOBS_TEXT)
+        assertContains(response, self.CLOSED_JOBS_TEXT)
+        assertNotContains(response, self.SPECIFY_JOB_TEXT)
 
     def test_no_job_description_for_job_application(self, client):
         self.company.jobs.clear()
@@ -2487,9 +2490,9 @@ class TestProcessAcceptViews:
         employer = self.company.members.first()
         client.force_login(employer)
         response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
-        assertNotContains(response, "Postes ouverts au recrutement")
-        assertNotContains(response, "Postes fermés au recrutement")
-        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+        assertNotContains(response, self.OPEN_JOBS_TEXT)
+        assertNotContains(response, self.CLOSED_JOBS_TEXT)
+        assertNotContains(response, self.SPECIFY_JOB_TEXT)
 
     def test_wrong_dates(self, client):
         today = timezone.localdate()
