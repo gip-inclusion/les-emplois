@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.www.apply.views import batch_views, edit_views, list_views, process_views, submit_views
+from itou.www.apply.views import batch_views, edit_views, list_views, process_views, submit_views, transfer_views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -178,45 +178,45 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.AcceptView.as_view(), name="accept"),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
-    path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
+    path("<uuid:job_application_id>/siae/transfer", transfer_views.transfer, name="transfer"),
     path(
         "<uuid:job_application_id>/siae/external-transfer/1",
-        process_views.JobApplicationExternalTransferStep1View.as_view(),
+        transfer_views.JobApplicationExternalTransferStep1View.as_view(),
         name="job_application_external_transfer_step_1",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/1/company/<int:company_pk>",
-        process_views.JobApplicationExternalTransferStep1CompanyCardView.as_view(),
+        transfer_views.JobApplicationExternalTransferStep1CompanyCardView.as_view(),
         name="job_application_external_transfer_step_1_company_card",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/1/job_description/<int:job_description_id>",
-        process_views.JobApplicationExternalTransferStep1JobDescriptionCardView.as_view(),
+        transfer_views.JobApplicationExternalTransferStep1JobDescriptionCardView.as_view(),
         name="job_application_external_transfer_step_1_job_description_card",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/2/start_session/<int:company_pk>",
-        process_views.job_application_external_transfer_start_view,
+        transfer_views.job_application_external_transfer_start_view,
         name="job_application_external_transfer_start_session",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/2/<uuid:session_uuid>",
-        process_views.JobApplicationExternalTransferStep2View.as_view(),
+        transfer_views.JobApplicationExternalTransferStep2View.as_view(),
         name="job_application_external_transfer_step_2",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/3/<uuid:session_uuid>",
-        process_views.JobApplicationExternalTransferStep3View.as_view(),
+        transfer_views.JobApplicationExternalTransferStep3View.as_view(),
         name="job_application_external_transfer_step_3",
     ),
     path(
         "<uuid:job_application_id>/siae/external-transfer/end",
-        process_views.JobApplicationExternalTransferStepEndView.as_view(),
+        transfer_views.JobApplicationExternalTransferStepEndView.as_view(),
         name="job_application_external_transfer_step_end",
     ),
     path(
         "<uuid:job_application_id>/siae/transfer/<int:company_pk>",
-        process_views.JobApplicationInternalTransferView.as_view(),
+        transfer_views.JobApplicationInternalTransferView.as_view(),
         name="job_application_internal_transfer",
     ),
     path(
