@@ -77,11 +77,13 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
 
     def get_context_data(
         self,
+        forms=None,
         **kwargs,
     ):
         context = super().get_context_data(**kwargs)
 
-        forms = self.get_forms()
+        if forms is None:
+            forms = self.get_forms()
         form_user_address = forms.get("user_address")
         form_personal_data = forms.get("personal_data")
         form_birth_place = forms.get("birth_place")
@@ -111,7 +113,7 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
     def post(self, request, *args, **kwargs):
         forms = self.get_forms()
         if not all([form.is_valid() for form in forms.values()]):
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(forms=forms, **kwargs)
             return self.render_to_response(context)
 
         session = self.get_session()
