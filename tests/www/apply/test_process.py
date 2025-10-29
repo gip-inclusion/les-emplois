@@ -31,7 +31,10 @@ from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models import (
+    AdministrativeCriteria,
+    EligibilityDiagnosis,
+)
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
@@ -44,7 +47,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import IdentityCertification, User
-from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
@@ -59,7 +62,7 @@ from itou.www.apply.views.process_views import (
     job_application_sender_left_org,
 )
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
-from tests.cities.factories import create_test_cities
+from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -4964,6 +4967,185 @@ class TestProcessAcceptViewsInWizard:
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
         assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+
+
+class TestFillJobSeekerInfosForAccept:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        self.job_seeker = JobSeekerFactory(
+            first_name="Clara",
+            last_name="Sion",
+            with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+            born_in_france=True,
+        )
+        # This is the city matching with_ban_geoloc_address trait
+        self.city = create_city_geispolsheim()
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_first_geocoding_data,
+        )
+
+    def test_as_iae_company(self, client, snapshot):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        client.force_login(company.members.first())
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
+            "address_line_1": self.job_seeker.address_line_1,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
+            "city": self.city.name,
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "0",
+        }
+        # Test with invalid data
+        response = client.post(
+            fill_job_seeker_infos_url,
+            data=post_data | {"pole_emploi_id": "", "lack_of_pole_emploi_id_reason": ""},  # both empty
+        )
+        assert response.status_code == 200
+        assertFormError(
+            response.context["form_personal_data"],
+            None,
+            "Renseignez soit un identifiant France Travail, soit la raison de son absence.",
+        )
+        # Then with valid data
+        NEW_POLE_EMPLOI_ID = "1234567A"
+        response = client.post(
+            fill_job_seeker_infos_url,
+            data=post_data | {"pole_emploi_id": NEW_POLE_EMPLOI_ID, "lack_of_pole_emploi_id_reason": ""},
+        )
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "pole_emploi_id": NEW_POLE_EMPLOI_ID,
+                "lack_of_pole_emploi_id_reason": "",
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+                "nir": self.job_seeker.jobseeker_profile.nir,
+            },
+            "user_address": {
+                "ban_api_resolved_address": self.job_seeker.geocoding_address,
+                "address_line_1": self.job_seeker.address_line_1,
+                "address_line_2": "",
+                "post_code": self.city.post_codes[0],
+                "insee_code": self.city.code_insee,
+                "city": self.city.name,
+                "fill_mode": "ban_api",
+                # Select the first and only one option
+                "address_for_autocomplete": "0",
+            },
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, NEW_POLE_EMPLOI_ID)
+
+    def test_as_geiq_company(self, client):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
+        GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        client.force_login(company.members.first())
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+
+        post_data = {
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+        }
+        response = client.post(fill_job_seeker_infos_url, data=post_data)
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "birth_place": {
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+            },
+        }
+
+    def test_as_non_iae_geiq_company(self, client):
+        company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        client.force_login(company.members.first())
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        assertRedirects(
+            response,
+            reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}),
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}))
+        # No form to fill, so redirect to apply:accept_contract_infos
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
 
 
 class TestProcessTemplates:
