@@ -34,8 +34,8 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
-from itou.users.models import JobSeekerProfile, User
+from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.models import IdentityCertification, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -5911,6 +5911,53 @@ class TestFillJobSeekerInfosForHire:
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
         # No form to fill, so redirect to apply:hire_contract
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
+
+    def test_no_country_disable_with_certification(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        IdentityCertification.objects.create(
+            jobseeker_profile=self.job_seeker.jobseeker_profile,
+            certifier=IdentityCertificationAuthorities.API_PARTICULIER,
+        )
+        self.job_seeker.jobseeker_profile.birth_country = None
+        self.job_seeker.jobseeker_profile.birth_place = None
+        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
+
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+
+        birth_country = Country.objects.get(name="BORA-BORA")
+
+        fill_job_seeker_infos_url = reverse(
+            "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}
+        )
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, "Éligible à l’IAE")
+
+        post_data = {
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
+            "address_line_1": self.job_seeker.address_line_1,
+            "post_code": self.job_seeker.post_code,
+            "city": self.job_seeker.city,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
+            "geocoding_score": 0.9714,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+            # Provide country
+            "birth_country": birth_country.pk,
+            # Invalid data
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": "",
+        }
+        # Test with invalid data
+        response = client.post(fill_job_seeker_infos_url, data=post_data)
+        assert response.status_code == 200
+        soup = parse_response_to_soup(response, selector="#id_birth_country")
+        assert soup.attrs.get("disabled", False) is False
+        [selected_option] = soup.find_all(attrs={"selected": True})
+        assert selected_option.text == "BORA-BORA"
 
 
 class TestHireContract:
