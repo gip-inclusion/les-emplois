@@ -6,16 +6,29 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertNotContains,
+    assertRedirects,
+)
 
+from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
-from tests.job_applications.factories import JobApplicationCommentFactory, JobApplicationFactory
+from tests.job_applications.factories import (
+    JobApplicationCommentFactory,
+    JobApplicationFactory,
+)
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
+from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import (
+    get_session_name,
+    parse_response_to_soup,
+    pretty_indented,
+)
 from tests.www.apply.test_submit import fake_session_initialization
 from tests.www.companies_views.test_job_description_views import POSTULER
 
@@ -26,6 +39,158 @@ INTERNAL_TRANSFER_CONFIRM_BUTTON = """
 </button>"""
 
 PREVIOUS_RESUME_TEXT = "Souhaitez-vous conserver le CV présent dans la candidature d’origine ?"
+
+
+class TestProcessTransferJobApplication:
+    TRANSFER_MODAL_ID = "transfer_confirmation_modal"
+    TRANSFER_BUTTON_ID = "transfer_to_button"
+
+    def test_job_application_external_transfer_only_for_lone_users(self, client, snapshot):
+        # A user member of only one company. The dropdown item is enabled and sends to external transfer first step
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.REFUSED,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    f"#{self.TRANSFER_BUTTON_ID}",
+                    replace_in_attr=[("href", str(job_application.pk), "[PK of JobApplication]")],
+                )
+            )
+            == snapshot
+        )
+
+    def test_job_application_external_transfer_disabled_for_bad_state(self, client, snapshot):
+        # external transfer is disabled for non refused job applications
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot
+
+    def test_job_application_transfer_disabled_for_bad_state(self, client):
+        # A user member of multiple companies must not be able to transfer
+        # an accepted job application to another company
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        CompanyMembershipFactory(user=user)
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.ACCEPTED,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertNotContains(response, self.TRANSFER_MODAL_ID)
+        assertNotContains(response, self.TRANSFER_BUTTON_ID)
+
+    def test_job_application_transfer_enabled(self, client, snapshot):
+        # A user member of several company can transfer a job application
+        company = CompanyFactory(with_membership=True)
+        other_company = CompanyFactory(with_membership=True, for_snapshot=True)
+        user = company.members.first()
+        other_company.members.add(user)
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            job_seeker__for_snapshot=True,
+            job_seeker__first_name="<>html escaped<>",
+        )
+        JobApplicationCommentFactory(job_application=job_application)
+
+        assert 2 == user.companymembership_set.count()
+        assert 1 == job_application.comments.count()
+
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot(
+            name="button"
+        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                f"#{self.TRANSFER_MODAL_ID}",
+                replace_in_attr=[
+                    ("href", str(job_application.pk), "[PK of JobApplication]"),
+                    ("action", str(job_application.pk), "[PK of JobApplication]"),
+                    ("value", str(other_company.pk), "[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="modal")
+
+        # enable external transfer button if refused
+        job_application.refuse(user=user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_MODAL_ID)
+        assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot(
+            name="button"
+        )
+        assert pretty_indented(
+            parse_response_to_soup(
+                response,
+                f"#{self.TRANSFER_MODAL_ID}",
+                replace_in_attr=[
+                    ("href", str(job_application.pk), "[PK of JobApplication]"),
+                    ("action", str(job_application.pk), "[PK of JobApplication]"),
+                    ("value", str(other_company.pk), "[PK of Company]"),
+                ],
+            )
+        ) == snapshot(name="modal_with_external")
+
+        # Test redirection
+        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+        assertContains(response, transfer_url)
+
+        # Confirm from modal window
+        post_data = {"target_company_id": other_company.pk}
+        response = client.post(transfer_url, data=post_data, follow=True)
+        messages = list(response.context.get("messages"))
+
+        assertRedirects(response, reverse("apply:list_for_siae"))
+        assert messages
+        assert len(messages) == 1
+        assert str(messages[0]) == snapshot(name="transfer message")
+
+        job_application.refresh_from_db()
+        assert job_application.state == job_applications_enums.JobApplicationState.NEW
+        assert job_application.logs.order_by("timestamp").last().transition == "transfer"
+        assert job_application.to_company_id == other_company.pk
+        assert 0 == job_application.comments.count()
+
+    def test_job_application_transfer_without_rights(self, client):
+        company = CompanyFactory()
+        other_company = CompanyFactory()
+        user = JobSeekerFactory()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+        )
+        # Forge query
+        client.force_login(user)
+        post_data = {"target_company_id": other_company.pk}
+        transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
+        response = client.post(transfer_url, data=post_data)
+        assert response.status_code == 403
 
 
 def test_anonymous_access(client):
