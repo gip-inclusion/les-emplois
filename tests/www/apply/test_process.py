@@ -110,6 +110,8 @@ NON_IAE_CANCELLATION_CONFIRMATION = (
     "En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure."
 )
 
+EMPLOYER_PRIVATE_COMMENT_MARKUP = "<small>Commentaire privé de l'employeur</small>"
+
 
 class TestProcessViews:
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
@@ -875,7 +877,7 @@ class TestProcessViews:
         assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
         assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        assertNotContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertNotContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
@@ -903,7 +905,7 @@ class TestProcessViews:
         assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
         assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        assertContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
@@ -931,7 +933,7 @@ class TestProcessViews:
         assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
         assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        assertContains(response, "<small>Commentaire privé de l'employeur</small>")
+        assertContains(response, EMPLOYER_PRIVATE_COMMENT_MARKUP)
         assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
 
         # Test with refusal reason shared with job seeker
