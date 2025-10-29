@@ -786,6 +786,7 @@ class TestDashboardView:
             "Pour obtenir un PASS IAE, vous devez avoir un diagnostic d’éligibilité à l’IAE valide et avoir une "
             "candidature acceptée dans une SIAE (Structure d’insertion par l’activité économique)."
         )
+        NUMBER_LABEL = "Numéro de PASS IAE"
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -793,14 +794,14 @@ class TestDashboardView:
         response = client.get(url)
         assertContains(response, "PASS IAE inexistant")
         assertContains(response, HOW_TO_GET_PASS, html=True)
-        assertNotContains(response, "Numéro de PASS IAE")
+        assertNotContains(response, NUMBER_LABEL)
         assertNotContains(response, WAITING_PERIOD_WITHOUT_DIAGNOSIS, html=True)
         assertNotContains(response, WAITING_PERIOD_WITH_VALID_DIAGNOSIS, html=True)
 
         approval = ApprovalFactory(user=user, start_at=date(2022, 6, 21), end_at=date(2022, 12, 6))
         with assertSnapshotQueries(snapshot(name="job seeker with approval queries")):
             response = client.get(url)
-        assertContains(response, "Numéro de PASS IAE")
+        assertContains(response, NUMBER_LABEL)
         assertContains(response, format_approval_number(approval))
         assertContains(response, "<small>Date de début</small><strong>21/06/2022</strong>", html=True)
         assertContains(response, "<strong>06/12/2022</strong>")  # Date de fin prévisionnelle
