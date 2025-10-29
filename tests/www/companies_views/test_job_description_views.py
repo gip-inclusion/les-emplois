@@ -41,6 +41,7 @@ REMINDER_BANNER = (
     f'<a href="{reverse("companies_views:job_description_list")}">Pensez à les mettre à jour pour maintenir '
     "leur visibilité</a>.</p>"
 )
+SPONTANEOUS_APPLICATIONS_MARKUP = "<td><strong>Candidatures spontanées</strong></td>"
 
 
 class JobDescriptionAbstract:
@@ -144,13 +145,13 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         client.force_login(self.user)
         url = reverse("companies_views:job_description_list", query={"page": 2})
         response = client.get(url)
-        assertNotContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+        assertNotContains(response, SPONTANEOUS_APPLICATIONS_MARKUP, html=True)
 
     def test_response_content_with_no_job_descriptions(self, client):
         JobDescription.objects.all().delete()
         client.force_login(self.user)
         response = client.get(self.url)
-        assertContains(response, "<td><strong>Candidatures spontanées</strong></td>", html=True)
+        assertContains(response, SPONTANEOUS_APPLICATIONS_MARKUP, html=True)
 
     def test_ordering(self, client, subtests):
         self.company.job_description_through.all().delete()
