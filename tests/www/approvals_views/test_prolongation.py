@@ -21,6 +21,9 @@ from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
+PRESCRIBER_ORGANIZATION_EMPTY_LABEL = "Sélectionnez l'organisation du prescripteur habilité"
+
+
 class TestApprovalProlongation:
     PROLONGATION_EMAIL_REPORT_TEXT = "- Fiche bilan :"
 
@@ -449,7 +452,7 @@ class TestApprovalProlongation:
         response = client.post(url, data=post_data)
 
         assertContains(response, self.prescriber_organization)
-        assertNotContains(response, "Sélectionnez l'organisation du prescripteur habilité")
+        assertNotContains(response, PRESCRIBER_ORGANIZATION_EMPTY_LABEL, html=True)
 
     def test_check_multiple_prescriber_organization(self, client, snapshot, faker):
         # Link prescriber to another prescriber organization
@@ -479,6 +482,7 @@ class TestApprovalProlongation:
             "edit": "1",
         }
         response = client.post(url, data=post_data)
+        assertContains(response, PRESCRIBER_ORGANIZATION_EMPTY_LABEL, html=True)
 
         assertContains(response, self.prescriber_organization)
         assertContains(response, other_prescriber_organization)
