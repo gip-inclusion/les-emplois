@@ -122,10 +122,10 @@
                               <a aria-controls="comments" aria-selected="false" class="nav-link" data-bs-toggle="tab" data-matomo-action="clic-onglet" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="commentaires" href="#comments" id="comments-tab" role="tab">
                                   <span id="comments-counter">
                                       Commentaires
-                                      <span class="badge badge-base rounded-pill bg-info-lighter text-info ms-2">
+                                      <span class="badge badge-sm rounded-pill bg-info-lighter text-info ms-2">
                                           5
                                       </span>
-                                      <span class="badge badge-sm rounded-pill bg-important text-white ms-3">
+                                      <span class="badge badge-sm rounded-pill bg-important text-white ms-2">
                                           Nouveau
                                       </span>
                                   </span>
