@@ -81,6 +81,11 @@ LINK_RESET_MARKUP = (
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+ACCEPT_BUTTON_MARKUP = (
+    '<button type="submit" class="btn btn-block btn-primary" aria-label="Valider l’embauche de %s">'
+    "<span>Valider l’embauche</span>"
+    "</button>"
+)
 
 
 def fake_session_initialization(client, company, job_seeker, data):
@@ -3010,7 +3015,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Valider l’embauche")
+        assertContains(response, ACCEPT_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
@@ -3164,7 +3169,7 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Valider l’embauche")
+        assertContains(response, ACCEPT_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
