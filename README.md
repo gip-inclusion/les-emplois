@@ -219,7 +219,7 @@ Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
 
 ## Front-end
 
-- https://getbootstrap.com/docs/4.3/getting-started/introduction/
+- https://github.com/gip-inclusion/itou-theme
 
 - https://django-bootstrap5.readthedocs.io/en/latest/index.html
 
