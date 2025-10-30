@@ -402,7 +402,6 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
-            "apply:hire_confirmation",
             "apply:hire_fill_job_seeker_infos",
             "apply:hire_contract",
         ):
@@ -460,7 +459,6 @@ class TestHire:
             "apply:iae_eligibility_for_hire",
             "apply:geiq_eligibility_for_hire",
             "apply:geiq_eligibility_criteria_for_hire",
-            "apply:hire_confirmation",
             "apply:hire_fill_job_seeker_infos",
             "apply:hire_contract",
         ):
@@ -477,7 +475,6 @@ class TestHire:
             "job_seekers_views:check_job_seeker_info_for_hire",
             "apply:check_prev_applications_for_hire",
             "apply:iae_eligibility_for_hire",
-            "apply:hire_confirmation",
             "apply:hire_fill_job_seeker_infos",
             "apply:hire_contract",
         ):
@@ -5497,237 +5494,6 @@ class TestGEIQEligibilityForHire:
             response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         )
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, company).exists()
-
-
-class TestHireConfirmation:
-    @pytest.fixture(autouse=True)
-    def setup_method(self, settings, mocker):
-        self.job_seeker = JobSeekerFactory(
-            first_name="Clara",
-            last_name="Sion",
-            with_pole_emploi_id=True,
-            with_ban_geoloc_address=True,
-            born_in_france=True,
-        )
-        # This is the city matching with_ban_geoloc_address trait
-        self.city = create_city_geispolsheim()
-
-        settings.API_BAN_BASE_URL = "http://ban-api"
-        mocker.patch(
-            "itou.utils.apis.geocoding.get_geocoding_data",
-            side_effect=mock_get_first_geocoding_data,
-        )
-
-    def test_as_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        with assertSnapshotQueries(snapshot(name="view queries")):
-            response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
-
-        hiring_start_at = timezone.localdate()
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "answer": "",
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
-        }
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
-            headers={"hx-request": "true"},
-            data=post_data,
-        )
-
-        job_application = JobApplication.objects.select_related("job_seeker").get(
-            sender=company.members.first(), to_company=company
-        )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200)
-
-        assert job_application.job_seeker == self.job_seeker
-        assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_company == company
-        assert job_application.sender_prescriber_organization is None
-        assert job_application.state == JobApplicationState.ACCEPTED
-        assert job_application.message == ""
-        assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume is None
-
-        assert apply_session.name not in client.session
-
-    def test_cannot_hire_start_date_after_approval_expires(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        today = timezone.localdate()
-        approval = ApprovalFactory(end_at=today + datetime.timedelta(days=1))
-        self.job_seeker.approvals.add(approval)
-
-        hiring_start_at = today + datetime.timedelta(days=2)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "answer": "",
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
-        }
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}), data=post_data
-        )
-        assert response.status_code == 200
-        assertFormError(
-            response.context["form_accept"],
-            "hiring_start_at",
-            JobApplication.ERROR_HIRES_AFTER_APPROVAL_EXPIRES,
-        )
-        assert apply_session.name in client.session
-
-    def test_as_company_elibility_diagnosis_from_another_company(self, client, snapshot):
-        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
-        ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        client.force_login(company.members.get())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "PASS IAE valide")
-
-        hiring_start_at = timezone.localdate()
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "answer": "",
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
-            "confirmed": "True",
-        }
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-
-        job_application = JobApplication.objects.select_related("job_seeker").get(
-            sender=company.members.first(), to_company=company
-        )
-        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200)
-
-        assert job_application.job_seeker == self.job_seeker
-        assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_company == company
-        assert job_application.sender_prescriber_organization is None
-        assert job_application.state == JobApplicationState.ACCEPTED
-        assert job_application.message == ""
-        assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume is None
-
-        assert apply_session.name not in client.session
-
-    def test_as_geiq(self, client):
-        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)
-        diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
-        company = diagnosis.author_geiq
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligibilité GEIQ confirmée")
-
-        hiring_start_at = timezone.localdate()
-        post_data = {
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "answer": "",
-            # GEIQ specific fields
-            "hired_job": company.job_description_through.first().pk,
-            "prehiring_guidance_days": 3,
-            "nb_hours_per_week": 4,
-            "planned_training_hours": 5,
-            "contract_type": ContractType.APPRENTICESHIP,
-            "qualification_type": QualificationType.STATE_DIPLOMA,
-            "qualification_level": QualificationLevel.LEVEL_4,
-        }
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(
-            reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}),
-            headers={"hx-request": "true"},
-            data=post_data,
-        )
-
-        job_application = JobApplication.objects.get(sender=company.members.first(), to_company=company)
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        assert response.url == next_url
-
-        assert job_application.job_seeker == self.job_seeker
-        assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_company == company
-        assert job_application.sender_prescriber_organization is None
-        assert job_application.state == JobApplicationState.ACCEPTED
-        assert job_application.message == ""
-        assert list(job_application.selected_jobs.all()) == []
-        assert job_application.resume is None
-
-        assert apply_session.name not in client.session
 
 
 class TestFillJobSeekerInfosForHire:
