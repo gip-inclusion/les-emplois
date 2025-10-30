@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis, GEIQSelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
@@ -99,16 +100,23 @@ def _add_pending_for_weeks(job_applications):
         job_app.pending_for_weeks = pending_for_weeks
 
 
-def _add_administrative_criteria(job_applications):
+def _add_administrative_criteria(job_applications, for_geiq=False):
+    SelectedAdministrativeCriteriaClass = (
+        GEIQSelectedAdministrativeCriteria if for_geiq else SelectedAdministrativeCriteria
+    )
+    jobseeker_eligibility_diagnosis_attr = (
+        "jobseeker_geiq_eligibility_diagnosis_id" if for_geiq else "jobseeker_eligibility_diagnosis"
+    )
+
     diagnoses_ids = tuple(
-        job_application.jobseeker_eligibility_diagnosis
+        getattr(job_application, jobseeker_eligibility_diagnosis_attr)
         for job_application in job_applications
-        if job_application.jobseeker_eligibility_diagnosis is not None
+        if getattr(job_application, jobseeker_eligibility_diagnosis_attr, None) is not None
     )
 
     diagnosis_criteria = defaultdict(list)
     for selected_criteria in (
-        SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
+        SelectedAdministrativeCriteriaClass.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
         .select_related("administrative_criteria")
         .order_by("administrative_criteria__level", "administrative_criteria__name")
     ):
@@ -117,15 +125,41 @@ def _add_administrative_criteria(job_applications):
         )
 
     for job_application in job_applications:
-        ja_criteria = diagnosis_criteria[job_application.jobseeker_eligibility_diagnosis]
-        if len(ja_criteria) > 4:
-            # Only show the 3 first
-            extra_nb = len(ja_criteria) - 3
-            ja_criteria = ja_criteria[:3]
-        else:
-            extra_nb = 0
-        job_application.preloaded_administrative_criteria = ja_criteria
-        job_application.preloaded_administrative_criteria_extra_nb = extra_nb
+        if (
+            for_geiq
+            and job_application.to_company.kind == CompanyKind.GEIQ
+            or not for_geiq
+            and job_application.to_company.kind != CompanyKind.GEIQ
+        ):
+            ja_criteria = []
+            if job_application.to_company.is_subject_to_eligibility_rules:
+                ja_criteria = diagnosis_criteria[getattr(job_application, jobseeker_eligibility_diagnosis_attr)]
+            if len(ja_criteria) > 4:
+                # Only show the 3 first
+                extra_nb = len(ja_criteria) - 3
+                ja_criteria = ja_criteria[:3]
+            else:
+                extra_nb = 0
+            job_application.preloaded_administrative_criteria = ja_criteria
+            job_application.preloaded_administrative_criteria_extra_nb = extra_nb
+
+
+def _add_geiq_eligibility_diagnoses(job_applications):
+    diagnoses_ids = tuple(
+        job_application.jobseeker_geiq_eligibility_diagnosis_id
+        for job_application in job_applications
+        if job_application.jobseeker_geiq_eligibility_diagnosis_id is not None
+    )
+
+    diagnoses = {}
+    for diagnosis in GEIQEligibilityDiagnosis.objects.select_related("author").filter(pk__in=diagnoses_ids):
+        diagnoses[diagnosis.pk] = diagnosis
+
+    for job_application in job_applications:
+        if job_application.to_company.kind == CompanyKind.GEIQ:
+            job_application.jobseeker_geiq_eligibility_diagnosis = diagnoses.get(
+                job_application.jobseeker_geiq_eligibility_diagnosis_id, None
+            )
 
 
 @check_user(lambda u: u.is_job_seeker)
@@ -212,7 +246,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
+    job_applications = job_applications.with_list_related_data(
+        criteria=filters_form.data.getlist("criteria", [])
+    ).with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True)
 
     title = "Candidatures envoyées"
     filters_counter = 0
@@ -250,6 +286,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         job_applications_page, functools.partial(can_view_personal_information, request)
     )
     _add_administrative_criteria(job_applications_page)
+    # Fetch GEIQ diagnoses details
+    _add_administrative_criteria(job_applications_page, for_geiq=True)
+    _add_geiq_eligibility_diagnoses(job_applications_page)
 
     context = {
         "title": title,
