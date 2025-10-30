@@ -857,7 +857,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_list_snapshot(client, snapshot):
+def test_list_and_table_empty_snapshot(client, snapshot):
     company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
@@ -870,95 +870,6 @@ def test_list_snapshot(client, snapshot):
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert pretty_indented(page) == snapshot(name="empty")
-
-    job_seeker = JobSeekerFactory(for_snapshot=True)
-    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
-    prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
-
-    job_applications = [
-        JobApplicationFactory(
-            sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, sender=job_seeker, **common_kwargs
-        ),
-        JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER,
-            sender=company.members.first(),
-            sender_company=company,
-            state=JobApplicationState.NEW,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            sender_kind=SenderKind.PRESCRIBER,
-            sender=prescriber_org.members.first(),
-            sender_prescriber_organization=prescriber_org,
-            state=JobApplicationState.REFUSED,
-            **common_kwargs,
-        ),
-    ]
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/siae/details",
-                        "/apply/[PK of JobApplication]/siae/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/siae/details",
-                        "/apply/[PK of JobApplication]/siae/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                    (
-                        "value",
-                        str(job_application.pk),
-                        "[PK of JobApplication]",
-                    ),
-                    (
-                        "id",
-                        f"select-{job_application.pk}",
-                        "select-[PK of JobApplication]",
-                    ),
-                    (
-                        "for",
-                        f"select-{job_application.pk}",
-                        "select-[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_list_for_siae_exports(client, snapshot):
@@ -2060,20 +1971,24 @@ def test_htmx_order(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_table_iae_state_and_criteria(client, snapshot):
+def test_table_and_list_snapshot(client, snapshot):
     company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
     employer = company.members.first()
+    other_company = CompanyFactory(name="L'autre, Inc.", with_membership=True)
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
-    prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
+    prescriber_org = PrescriberOrganizationFactory(
+        authorized=True,
+        for_snapshot=True,
+        with_membership=True,
+        membership__user__first_name="Yvon",
+        membership__user__last_name="Iva",
+    )
     prescriber = prescriber_org.members.get()
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {
         "to_company": company,
-        "sender_kind": SenderKind.EMPLOYER,
-        "sender": employer,
-        "sender_company": company,
     }
     company_diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
@@ -2124,46 +2039,92 @@ def test_table_iae_state_and_criteria(client, snapshot):
             eligibility_diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=company_diag,
             job_seeker=job_seeker,
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
             eligibility_diagnosis=no_criteria_prescriber_diag,
             job_seeker=job_seeker,
+            sender_kind=SenderKind.PRESCRIBER,
+            sender=prescriber,
+            sender_prescriber_organization=prescriber_org,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
             eligibility_diagnosis=prescriber_diag,
             job_seeker=job_seeker,
+            sender_kind=SenderKind.PRESCRIBER,
+            sender=prescriber,
+            sender_prescriber_organization=None,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=employer_approval.eligibility_diagnosis,
             job_seeker=employer_approval.user,
+            sender_kind=SenderKind.EMPLOYER,
+            sender=other_company.members.last(),
+            sender_company=other_company,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
             job_seeker=prescriber_approval.user,
+            sender_kind=SenderKind.JOB_SEEKER,
+            sender=prescriber_approval.user,
             **common_kwargs,
         ),
         JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
+            state=JobApplicationState.POOL,
             eligibility_diagnosis=company_approval_diag,
             job_seeker=company_approval_diag.job_seeker,
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
             **common_kwargs,
         ),
     ]
 
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/siae/details",
+                        "/apply/[PK of JobApplication]/siae/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications list")
+
+    # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
     page = parse_response_to_soup(
         response,
