@@ -9,7 +9,6 @@
 
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form_accept.media.js }}
-    {% if form_personal_data %}{{ form_personal_data.media.js }}{% endif %}
 
     {# HTMX: dynamic contract type details field, must be reloaded at each DOM swap (otherwise invalidated) #}
     <script nonce="{{ CSP_NONCE }}">
@@ -26,8 +25,4 @@
             });
         });
     </script>
-    {% if form_user_address %}
-        {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
-        {{ form_user_address.media.js }}
-    {% endif %}
 {% endblock %}

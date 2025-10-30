@@ -1964,7 +1964,7 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
         )
         # Check that the next_url is correctly transmitted
         assert accept_button["href"] == reverse(
-            "apply:accept", kwargs={"job_application_id": acceptable_app.pk}, query={"next_url": table_url}
+            "apply:start-accept", kwargs={"job_application_id": acceptable_app.pk}, query={"next_url": table_url}
         )
 
     # Test with unacceptable batches
