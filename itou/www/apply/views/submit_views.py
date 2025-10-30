@@ -880,43 +880,6 @@ class ContractForHireView(ApplicationBaseView, common_views.BaseAcceptView):
         return context
 
 
-class HireConfirmationView(ApplicationBaseView, common_views.BaseAcceptView):
-    template_name = "apply/submit/hire_confirmation.html"
-
-    def setup(self, request, *args, **kwargs):
-        self.job_application = None
-        return super().setup(request, *args, **kwargs)
-
-    def get_session(self):
-        return self.apply_session
-
-    def clean_session(self):
-        self.apply_session.delete()
-
-    def get_back_url(self):
-        return self.get_eligibility_for_hire_step_url() or reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
-        )
-
-    def get_error_url(self):
-        return self.request.get_full_path()
-
-    def get_success_url(self):
-        if self.company.is_subject_to_iae_rules and self.job_application.approval:
-            return reverse("employees:detail", kwargs={"public_id": self.job_seeker.public_id})
-        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        if self.eligibility_diagnosis:
-            # The job_seeker object already contains a lot of information: no need to re-retrieve it
-            self.eligibility_diagnosis.job_seeker = self.job_seeker
-
-        context["expired_eligibility_diagnosis"] = None
-        return context
-
-
 class ApplyForJobSeekerMixin:
     def __init__(self):
         super().__init__()
