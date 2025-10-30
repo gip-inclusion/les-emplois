@@ -3936,6 +3936,7 @@
           'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
           'ForNode[apply/includes/list_table.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -5169,6 +5170,7 @@
           'IncludeNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
           'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
           'IncludeNode[apply/includes/list_table.html]',
           'ForNode[apply/includes/list_table.html]',
           'IncludeNode[apply/includes/list_job_applications.html]',
@@ -5687,7 +5689,7 @@
           <fieldset>
               <legend>
                   <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">
-                      Critères administratifs déclarés
+                      Critères administratifs IAE déclarés
                   </button>
               </legend>
               <div class="mt-3 collapse" id="collapse-criteria">
@@ -7152,10 +7154,10 @@
                               Émetteur
                           </th>
                           <th class="text-nowrap" scope="col">
-                              Critères administratifs IAE
+                              Critères administratifs
                           </th>
                           <th scope="col">
-                              Statut IAE
+                              Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
                           </th>
@@ -7443,10 +7445,10 @@
                               Émetteur
                           </th>
                           <th class="text-nowrap" scope="col">
-                              Critères administratifs IAE
+                              Critères administratifs
                           </th>
                           <th scope="col">
-                              Statut IAE
+                              Statut éligibilité
                           </th>
                           <th class="text-end w-50px" scope="col">
                           </th>

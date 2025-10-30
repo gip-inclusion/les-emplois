@@ -437,6 +437,10 @@ class Company(AddressMixin, OrganizationAbstract):
         return self.kind in CompanyKind.siae_kinds()
 
     @property
+    def is_subject_to_eligibility_rules(self):
+        return self.is_subject_to_iae_rules or self.kind == CompanyKind.GEIQ
+
+    @property
     def should_have_convention(self):
         # .values is needed since Python considers the members of CompanyKind to be different
         # instances than SiaeWithConventionKind

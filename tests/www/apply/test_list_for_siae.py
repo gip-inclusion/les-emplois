@@ -827,7 +827,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
         eligibility_diagnosis=None,  # fallback on the jobseeker's
     )
 
-    TITLE = '<th scope="col" class="text-nowrap">Critères administratifs IAE</th>'
+    TITLE = '<th scope="col" class="text-nowrap">Critères administratifs</th>'
     CRITERION = "<li>Allocataire AAH</li>"
 
     client.force_login(employer)
