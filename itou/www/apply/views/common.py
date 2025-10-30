@@ -75,15 +75,9 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
     def get_success_url(self):
         raise NotImplementedError
 
-    def get_context_data(
-        self,
-        forms=None,
-        **kwargs,
-    ):
+    def get_context_data(self, *, forms, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if forms is None:
-            forms = self.get_forms()
         form_user_address = forms.get("user_address")
         form_personal_data = forms.get("personal_data")
         form_birth_place = forms.get("birth_place")
@@ -108,7 +102,7 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
         forms = self.get_forms()
         if not forms:
             return HttpResponseRedirect(self.get_success_url())
-        return super().get(request, *args, **kwargs)
+        return super().get(request, *args, forms=forms, **kwargs)
 
     def post(self, request, *args, **kwargs):
         forms = self.get_forms()
