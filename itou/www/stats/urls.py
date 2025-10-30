@@ -16,6 +16,12 @@ urlpatterns = [
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),
     path("siae/auto_prescription", views.stats_siae_auto_prescription, name="stats_siae_auto_prescription"),
     path("siae/beneficiaries", views.stats_siae_beneficiaries, name="stats_siae_beneficiaries"),
+    path("siae/raw", views.stats_siae_raw, name="stats_siae_raw"),
+    path("siae/raw_hiring", views.stats_siae_raw_hiring, name="stats_siae_raw_hiring"),
+    path(
+        "siae/raw_auto_prescription", views.stats_siae_raw_auto_prescription, name="stats_siae_raw_auto_prescription"
+    ),
+    path("siae/raw_beneficiaires", views.stats_siae_raw_beneficiaires, name="stats_siae_raw_beneficiaires"),
     # Prescriber stats - CD.
     path("cd/iae", views.stats_cd_iae, name="stats_cd_iae"),
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),

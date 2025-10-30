@@ -3,7 +3,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -94,7 +94,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -205,7 +205,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -316,7 +316,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -427,7 +427,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -538,7 +538,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -649,7 +649,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -760,7 +760,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -871,7 +871,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1011,7 +1011,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1140,138 +1140,30 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
-      <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-          <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
-      </div>
-      <section class="s-section mb-3 mb-lg-5">
-          <div class="s-section__container">
-              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
-                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
-                      <h3>
-                          Mes données
-                      </h3>
-                      <div class="c-box p-0 flex-grow-1">
-                          <div class="p-3 p-lg-4">
-                              <h4 class="mb-0">
-                                  Conventionnement
-                              </h4>
-                          </div>
-                          <div class="px-3 px-lg-4">
-                              <ul class="list-unstyled mb-lg-5">
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                          </i>
-                                          <span>
-                                              Suivi des effectifs annuels et mensuels (ETP)
-                                          </span>
-                                      </a>
-                                  </li>
-                              </ul>
-                          </div>
-                      </div>
-                      <div class="c-box p-0 mt-3 mt-lg-4">
-                          <div class="p-3 p-lg-4">
-                              <h4 class="mb-0">
-                                  Recrutement
-                              </h4>
-                          </div>
-                          <div class="px-3 px-lg-4">
-                              <ul class="list-unstyled mb-lg-5">
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/siae/hiring">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Analyse des candidatures reçues et de leur traitement
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Suivi de l’activité d’auto-prescription et du contrôle à posteriori
-                                          </span>
-                                      </a>
-                                  </li>
-                              </ul>
-                          </div>
-                      </div>
-                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
-                          <div class="p-3 p-lg-4">
-                              <h4 class="mb-0">
-                                  Parcours en IAE
-                              </h4>
-                          </div>
-                          <div class="px-3 px-lg-4">
-                              <ul class="list-unstyled mb-lg-5">
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="/stats/siae/beneficiaries">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
-                                          </span>
-                                      </a>
-                                  </li>
-                              </ul>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
-                      <h3>
-                          Données nationales publiques
-                      </h3>
-                      <div class="c-box p-0 flex-grow-1">
-                          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                              <ul class="list-unstyled mb-lg-5">
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/conventionnements-iae/">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Cartographie du conventionnement IAE
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Bilan territorial des orientations
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Pratiques d'auto-prescription en SIAE
-                                          </span>
-                                      </a>
-                                  </li>
-                                  <li class="d-flex justify-content-between align-items-center mb-3">
-                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
-                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
-                                          </i>
-                                          <span>
-                                              Profil des prescripteurs
-                                          </span>
-                                      </a>
-                                  </li>
-                              </ul>
-                          </div>
-                      </div>
-                  </div>
+      <div class="alert alert-info alert-dismissible fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status">
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+          </button>
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Nouveauté
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
+                      <br/>
+                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
+                  </p>
               </div>
           </div>
-      </section>
+      </div>
   </div>
   
   '''
@@ -1280,7 +1172,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1342,7 +1234,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1416,7 +1308,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1478,7 +1370,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1591,7 +1483,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1656,7 +1548,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -1718,7 +1610,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2157,7 +2049,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2222,7 +2114,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2284,7 +2176,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2397,7 +2289,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2462,7 +2354,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
@@ -2527,7 +2419,7 @@
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
       <h2>
-          Statistiques
+          Pilotage de mon activité
       </h2>
       <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
           <img alt="Le pilotage de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion.svg"/>
