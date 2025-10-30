@@ -585,6 +585,15 @@
                                              ORDER BY V0."created_at" DESC
                                              LIMIT 1)))
                 ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+               (SELECT U0."id" AS "id"
+                FROM "eligibility_geiqeligibilitydiagnosis" U0
+                WHERE (U0."expires_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                            OR U0."author_prescriber_organization_id" IS NOT NULL))
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                     (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
                (SELECT U1."start_at" AS "appointment__start_at"
@@ -622,8 +631,8 @@
              GROUP BY "job_applications_jobapplication"."id",
                       3,
                       6,
-                      8,
-                      11) subquery
+                      9,
+                      12) subquery
         ''',
       }),
       dict({
@@ -802,6 +811,15 @@
                                           ORDER BY V0."created_at" DESC
                                           LIMIT 1)))
              ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+            (SELECT U0."id" AS "id"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                         OR U0."author_prescriber_organization_id" IS NOT NULL))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                  (COALESCE(LOWER(T5."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T5."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
             (SELECT U1."start_at" AS "appointment__start_at"
@@ -1090,8 +1108,8 @@
           GROUP BY "job_applications_jobapplication"."id",
                    48,
                    51,
-                   53,
-                   56,
+                   54,
+                   57,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -3175,6 +3193,15 @@
                                              ORDER BY V0."created_at" DESC
                                              LIMIT 1)))
                 ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+               (SELECT U0."id" AS "id"
+                FROM "eligibility_geiqeligibilitydiagnosis" U0
+                WHERE (U0."expires_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                            OR U0."author_prescriber_organization_id" IS NOT NULL))
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                     (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
                (SELECT U1."start_at" AS "appointment__start_at"
@@ -3214,8 +3241,8 @@
              GROUP BY "job_applications_jobapplication"."id",
                       3,
                       6,
-                      8,
-                      11) subquery
+                      9,
+                      12) subquery
         ''',
       }),
       dict({
@@ -3394,6 +3421,15 @@
                                           ORDER BY V0."created_at" DESC
                                           LIMIT 1)))
              ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+            (SELECT U0."id" AS "id"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                         OR U0."author_prescriber_organization_id" IS NOT NULL))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                  (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
           
             (SELECT U1."start_at" AS "appointment__start_at"
@@ -3684,8 +3720,8 @@
           GROUP BY "job_applications_jobapplication"."id",
                    48,
                    51,
-                   53,
-                   56,
+                   54,
+                   57,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -4445,6 +4481,15 @@
                                              ORDER BY V0."created_at" DESC
                                              LIMIT 1)))
                 ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+               (SELECT U0."id" AS "id"
+                FROM "eligibility_geiqeligibilitydiagnosis" U0
+                WHERE (U0."expires_at" > %s
+                       AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                       AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                            OR U0."author_prescriber_organization_id" IS NOT NULL))
+                ORDER BY U0."created_at" DESC
+                LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                     (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name"
              FROM "job_applications_jobapplication"
              LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("job_applications_jobapplication"."id" = "job_applications_jobapplicationtransitionlog"."job_application_id")
@@ -4456,7 +4501,7 @@
              GROUP BY "job_applications_jobapplication"."id",
                       3,
                       6,
-                      8) subquery
+                      9) subquery
         ''',
       }),
       dict({
@@ -4635,6 +4680,15 @@
                                           ORDER BY V0."created_at" DESC
                                           LIMIT 1)))
              ORDER BY RANDOM() ASC) AS "jobseeker_geiq_eligibility_diagnosis_author_kind",
+          
+            (SELECT U0."id" AS "id"
+             FROM "eligibility_geiqeligibilitydiagnosis" U0
+             WHERE (U0."expires_at" > %s
+                    AND U0."job_seeker_id" = ("job_applications_jobapplication"."job_seeker_id")
+                    AND (U0."author_geiq_id" = ("job_applications_jobapplication"."to_company_id")
+                         OR U0."author_prescriber_organization_id" IS NOT NULL))
+             ORDER BY U0."created_at" DESC
+             LIMIT 1) AS "jobseeker_valid_geiq_eligibility_diagnosis",
                  (COALESCE(LOWER(T6."first_name"), %s) || COALESCE((COALESCE(%s, %s) || COALESCE(LOWER(T6."last_name"), %s)), %s)) AS "job_seeker_full_name",
                  T6."id",
                  T6."password",
@@ -4897,7 +4951,7 @@
           GROUP BY "job_applications_jobapplication"."id",
                    48,
                    51,
-                   53,
+                   54,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
                    "users_user"."id",
@@ -5133,10 +5187,10 @@
                           Jean GEIQ SANS AIDE
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
-                              <i aria-hidden="true" class="ri-error-warning-line">
+                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-check-line">
                               </i>
-                              Éligibilité GEIQ non confirmée
+                              Éligibilité GEIQ confirmée
                           </span>
                       </div>
                   </div>

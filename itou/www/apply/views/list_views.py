@@ -105,7 +105,7 @@ def _add_administrative_criteria(job_applications, for_geiq=False):
         GEIQSelectedAdministrativeCriteria if for_geiq else SelectedAdministrativeCriteria
     )
     jobseeker_eligibility_diagnosis_attr = (
-        "jobseeker_geiq_eligibility_diagnosis" if for_geiq else "jobseeker_eligibility_diagnosis"
+        "jobseeker_valid_geiq_eligibility_diagnosis" if for_geiq else "jobseeker_eligibility_diagnosis"
     )
 
     diagnoses_ids = tuple(
@@ -223,9 +223,11 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(
-        criteria=filters_form.data.getlist("criteria", [])
-    ).with_jobseeker_geiq_eligibility_diagnosis_author_kind()
+    job_applications = (
+        job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
+        .with_jobseeker_geiq_eligibility_diagnosis_author_kind()
+        .with_jobseeker_valid_geiq_eligibility_diagnosis()
+    )
 
     title = "Candidatures envoyées"
     filters_counter = 0
@@ -337,7 +339,11 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
+    job_applications = (
+        job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
+        .with_jobseeker_geiq_eligibility_diagnosis_author_kind()
+        .with_jobseeker_valid_geiq_eligibility_diagnosis()
+    )
 
     title = "Candidatures reçues"
     filters_counter = 0
@@ -382,9 +388,10 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
-    iae_company = company.kind in CompanyKind.siae_kinds()
-    if iae_company:
+    if company.is_subject_to_iae_rules:
         _add_administrative_criteria(job_applications_page)
+    elif company.kind == CompanyKind.GEIQ:
+        _add_administrative_criteria(job_applications_page, for_geiq=True)
 
     context = {
         "title": title,
