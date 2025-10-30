@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Concat, Lower
+from django.http import Http404, JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -30,6 +31,7 @@ from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
+    get_field_label_from_instance,
 )
 from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER, _get_geiq_eligibility_diagnosis
 from itou.www.stats.utils import can_view_stats_ft
@@ -209,7 +211,9 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     list_kind = JobApplicationsListKind.SENT
     job_applications = _get_job_applications_qs(request, list_kind=list_kind)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
+    filters_form = PrescriberFilterJobApplicationsForm(
+        job_applications, request.GET, list_kind=list_kind, request=request
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
@@ -320,7 +324,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
+    filters_form = CompanyFilterJobApplicationsForm(
+        job_applications, company, request.GET, list_kind=list_kind, request=request
+    )
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
@@ -513,3 +519,34 @@ def list_for_siae_actions(request):
         context,
     )
     return response
+
+
+@check_user(lambda u: u.is_prescriber or u.is_employer)
+def autocomplete(request, list_kind, field_name):
+    if list_kind == JobApplicationsListKind.RECEIVED and not request.user.is_employer:
+        raise Http404
+    term = request.GET.get("term", "").strip()
+    field_display = get_field_label_from_instance(field_name, request)
+
+    job_applications = _get_job_applications_qs(request, list_kind=list_kind)
+    objects = job_applications.get_unique_fk_objects(field_name)
+
+    results = []
+    if term:
+        case_folded_term = term.casefold()
+        matches = []
+        for obj in objects:
+            obj_display = field_display(obj)  # This can be expensive
+            case_folded_display = obj_display.casefold()
+            if case_folded_term in case_folded_display:
+                # Store results in sorting order
+                matches.append((case_folded_display.index(case_folded_term), obj_display, obj.pk))
+        results = [
+            {
+                "text": match[1],
+                "id": match[2],
+            }
+            for match in sorted(matches)[:20]
+        ]
+
+    return JsonResponse({"results": results}, safe=False)

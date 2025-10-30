@@ -1,7 +1,243 @@
 # serializer version: 1
+# name: TestListForSiaeSenders.test_as_employer[SQL queries]
+  dict({
+    'num_queries': 7,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id"
+          FROM "companies_companymembership"
+          WHERE ("companies_companymembership"."is_active"
+                 AND "companies_companymembership"."user_id" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 EXISTS
+            (SELECT %s AS "a"
+             FROM "companies_siaeconvention" U0
+             WHERE (U0."deactivated_at" >= %s
+                    AND U0."id" = ("companies_company"."convention_id"))
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND "companies_companymembership"."user_id" = %s
+                 AND "companies_company"."id" IN (%s)
+                 AND (NOT ("companies_company"."kind" IN (%s,
+                                                          %s,
+                                                          %s,
+                                                          %s,
+                                                          %s))
+                      OR "companies_company"."source" = %s
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."id" = ("companies_company"."convention_id")
+                                AND U0."is_active")
+                         LIMIT 1)
+                      OR EXISTS
+                        (SELECT %s AS "a"
+                         FROM "companies_siaeconvention" U0
+                         WHERE (U0."deactivated_at" >= %s
+                                AND U0."id" = ("companies_company"."convention_id"))
+                         LIMIT 1)))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'autocomplete_senders[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 ts_rank(to_tsvector(COALESCE(("users_user"."full_name_search_vector")::text, %s)), plainto_tsquery(%s::regconfig, %s)) AS "rank"
+          FROM "users_user"
+          WHERE ("users_user"."full_name_search_vector" @@ (plainto_tsquery(%s::regconfig, %s))
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."to_company_id" = %s
+                           AND U0."sender_id" = ("users_user"."id"))
+                    LIMIT 1))
+          ORDER BY 36 DESC
+          LIMIT 20
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 28,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -183,100 +419,6 @@
                  AND "job_applications_jobapplication"."state" IN (%s,
                                                                    %s,
                                                                    %s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "users_user"."id",
-                             "users_user"."password",
-                             "users_user"."last_login",
-                             "users_user"."is_superuser",
-                             "users_user"."username",
-                             "users_user"."first_name",
-                             "users_user"."last_name",
-                             "users_user"."is_staff",
-                             "users_user"."is_active",
-                             "users_user"."date_joined",
-                             "users_user"."address_line_1",
-                             "users_user"."address_line_2",
-                             "users_user"."post_code",
-                             "users_user"."city",
-                             "users_user"."department",
-                             "users_user"."coords",
-                             "users_user"."geocoding_score",
-                             "users_user"."geocoding_updated_at",
-                             "users_user"."ban_api_resolved_address",
-                             "users_user"."insee_city_id",
-                             "users_user"."title",
-                             "users_user"."full_name_search_vector",
-                             "users_user"."email",
-                             "users_user"."phone",
-                             "users_user"."kind",
-                             "users_user"."identity_provider",
-                             "users_user"."has_completed_welcoming_tour",
-                             "users_user"."created_by_id",
-                             "users_user"."external_data_source_history",
-                             "users_user"."last_checked_at",
-                             "users_user"."public_id",
-                             "users_user"."address_filled_at",
-                             "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at",
-                             "users_user"."allow_next_sso_sub_update"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
         ''',
       }),
       dict({
@@ -513,191 +655,6 @@
                  "jobs_appellation"."full_text"
           FROM "jobs_appellation"
           WHERE ("jobs_appellation"."code") IN ((%s), (%s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_prescriber_organization_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_prescriber_organization_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "prescribers_prescriberorganization"."id",
-                             "prescribers_prescriberorganization"."address_line_1",
-                             "prescribers_prescriberorganization"."address_line_2",
-                             "prescribers_prescriberorganization"."post_code",
-                             "prescribers_prescriberorganization"."city",
-                             "prescribers_prescriberorganization"."department",
-                             "prescribers_prescriberorganization"."coords",
-                             "prescribers_prescriberorganization"."geocoding_score",
-                             "prescribers_prescriberorganization"."geocoding_updated_at",
-                             "prescribers_prescriberorganization"."ban_api_resolved_address",
-                             "prescribers_prescriberorganization"."insee_city_id",
-                             "prescribers_prescriberorganization"."name",
-                             "prescribers_prescriberorganization"."created_at",
-                             "prescribers_prescriberorganization"."updated_at",
-                             "prescribers_prescriberorganization"."uid",
-                             "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                             "prescribers_prescriberorganization"."automatic_geocoding_update",
-                             "prescribers_prescriberorganization"."siret",
-                             "prescribers_prescriberorganization"."kind",
-                             "prescribers_prescriberorganization"."is_brsa",
-                             "prescribers_prescriberorganization"."phone",
-                             "prescribers_prescriberorganization"."email",
-                             "prescribers_prescriberorganization"."website",
-                             "prescribers_prescriberorganization"."description",
-                             "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                             "prescribers_prescriberorganization"."created_by_id",
-                             "prescribers_prescriberorganization"."authorization_status",
-                             "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id",
-                             "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_prescriber_organization_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_companies_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_company_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             T3."id",
-                             T3."address_line_1",
-                             T3."address_line_2",
-                             T3."post_code",
-                             T3."city",
-                             T3."department",
-                             T3."coords",
-                             T3."geocoding_score",
-                             T3."geocoding_updated_at",
-                             T3."ban_api_resolved_address",
-                             T3."insee_city_id",
-                             T3."name",
-                             T3."created_at",
-                             T3."updated_at",
-                             T3."uid",
-                             T3."active_members_email_reminder_last_sent_at",
-                             T3."automatic_geocoding_update",
-                             T3."siret",
-                             T3."naf",
-                             T3."kind",
-                             T3."brand",
-                             T3."phone",
-                             T3."email",
-                             T3."auth_email",
-                             T3."website",
-                             T3."description",
-                             T3."provided_support",
-                             T3."source",
-                             T3."created_by_id",
-                             T3."block_job_applications",
-                             T3."job_applications_blocked_at",
-                             T3."spontaneous_applications_open_since",
-                             T3."convention_id",
-                             T3."job_app_score",
-                             T3."is_searchable",
-                             T3."rdv_solidarites_id",
-                             T3."fields_history"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_company_id" ASC
         ''',
       }),
       dict({
@@ -1460,7 +1417,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 25,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -1642,100 +1599,6 @@
                  AND "job_applications_jobapplication"."state" IN (%s,
                                                                    %s,
                                                                    %s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "users_user"."id",
-                             "users_user"."password",
-                             "users_user"."last_login",
-                             "users_user"."is_superuser",
-                             "users_user"."username",
-                             "users_user"."first_name",
-                             "users_user"."last_name",
-                             "users_user"."is_staff",
-                             "users_user"."is_active",
-                             "users_user"."date_joined",
-                             "users_user"."address_line_1",
-                             "users_user"."address_line_2",
-                             "users_user"."post_code",
-                             "users_user"."city",
-                             "users_user"."department",
-                             "users_user"."coords",
-                             "users_user"."geocoding_score",
-                             "users_user"."geocoding_updated_at",
-                             "users_user"."ban_api_resolved_address",
-                             "users_user"."insee_city_id",
-                             "users_user"."title",
-                             "users_user"."full_name_search_vector",
-                             "users_user"."email",
-                             "users_user"."phone",
-                             "users_user"."kind",
-                             "users_user"."identity_provider",
-                             "users_user"."has_completed_welcoming_tour",
-                             "users_user"."created_by_id",
-                             "users_user"."external_data_source_history",
-                             "users_user"."last_checked_at",
-                             "users_user"."public_id",
-                             "users_user"."address_filled_at",
-                             "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at",
-                             "users_user"."allow_next_sso_sub_update"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
         ''',
       }),
       dict({
@@ -1972,191 +1835,6 @@
                  "jobs_appellation"."full_text"
           FROM "jobs_appellation"
           WHERE ("jobs_appellation"."code") IN ((%s), (%s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_prescriber_organization_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_prescriber_organization_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "prescribers_prescriberorganization"."id",
-                             "prescribers_prescriberorganization"."address_line_1",
-                             "prescribers_prescriberorganization"."address_line_2",
-                             "prescribers_prescriberorganization"."post_code",
-                             "prescribers_prescriberorganization"."city",
-                             "prescribers_prescriberorganization"."department",
-                             "prescribers_prescriberorganization"."coords",
-                             "prescribers_prescriberorganization"."geocoding_score",
-                             "prescribers_prescriberorganization"."geocoding_updated_at",
-                             "prescribers_prescriberorganization"."ban_api_resolved_address",
-                             "prescribers_prescriberorganization"."insee_city_id",
-                             "prescribers_prescriberorganization"."name",
-                             "prescribers_prescriberorganization"."created_at",
-                             "prescribers_prescriberorganization"."updated_at",
-                             "prescribers_prescriberorganization"."uid",
-                             "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                             "prescribers_prescriberorganization"."automatic_geocoding_update",
-                             "prescribers_prescriberorganization"."siret",
-                             "prescribers_prescriberorganization"."kind",
-                             "prescribers_prescriberorganization"."is_brsa",
-                             "prescribers_prescriberorganization"."phone",
-                             "prescribers_prescriberorganization"."email",
-                             "prescribers_prescriberorganization"."website",
-                             "prescribers_prescriberorganization"."description",
-                             "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                             "prescribers_prescriberorganization"."created_by_id",
-                             "prescribers_prescriberorganization"."authorization_status",
-                             "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id",
-                             "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_prescriber_organization_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_companies_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_company_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             T3."id",
-                             T3."address_line_1",
-                             T3."address_line_2",
-                             T3."post_code",
-                             T3."city",
-                             T3."department",
-                             T3."coords",
-                             T3."geocoding_score",
-                             T3."geocoding_updated_at",
-                             T3."ban_api_resolved_address",
-                             T3."insee_city_id",
-                             T3."name",
-                             T3."created_at",
-                             T3."updated_at",
-                             T3."uid",
-                             T3."active_members_email_reminder_last_sent_at",
-                             T3."automatic_geocoding_update",
-                             T3."siret",
-                             T3."naf",
-                             T3."kind",
-                             T3."brand",
-                             T3."phone",
-                             T3."email",
-                             T3."auth_email",
-                             T3."website",
-                             T3."description",
-                             T3."provided_support",
-                             T3."source",
-                             T3."created_by_id",
-                             T3."block_job_applications",
-                             T3."job_applications_blocked_at",
-                             T3."spontaneous_applications_open_since",
-                             T3."convention_id",
-                             T3."job_app_score",
-                             T3."is_searchable",
-                             T3."rdv_solidarites_id",
-                             T3."fields_history"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_company_id" ASC
         ''',
       }),
       dict({
@@ -2821,7 +2499,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with all filters but job_seeker]
   dict({
-    'num_queries': 25,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -3003,100 +2681,6 @@
                  AND "job_applications_jobapplication"."state" IN (%s,
                                                                    %s,
                                                                    %s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "users_user"."id",
-                             "users_user"."password",
-                             "users_user"."last_login",
-                             "users_user"."is_superuser",
-                             "users_user"."username",
-                             "users_user"."first_name",
-                             "users_user"."last_name",
-                             "users_user"."is_staff",
-                             "users_user"."is_active",
-                             "users_user"."date_joined",
-                             "users_user"."address_line_1",
-                             "users_user"."address_line_2",
-                             "users_user"."post_code",
-                             "users_user"."city",
-                             "users_user"."department",
-                             "users_user"."coords",
-                             "users_user"."geocoding_score",
-                             "users_user"."geocoding_updated_at",
-                             "users_user"."ban_api_resolved_address",
-                             "users_user"."insee_city_id",
-                             "users_user"."title",
-                             "users_user"."full_name_search_vector",
-                             "users_user"."email",
-                             "users_user"."phone",
-                             "users_user"."kind",
-                             "users_user"."identity_provider",
-                             "users_user"."has_completed_welcoming_tour",
-                             "users_user"."created_by_id",
-                             "users_user"."external_data_source_history",
-                             "users_user"."last_checked_at",
-                             "users_user"."public_id",
-                             "users_user"."address_filled_at",
-                             "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at",
-                             "users_user"."allow_next_sso_sub_update"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
         ''',
       }),
       dict({
@@ -3318,187 +2902,87 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_prescriber_organization_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_prescriber_organization_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "prescribers_prescriberorganization"."id",
-                             "prescribers_prescriberorganization"."address_line_1",
-                             "prescribers_prescriberorganization"."address_line_2",
-                             "prescribers_prescriberorganization"."post_code",
-                             "prescribers_prescriberorganization"."city",
-                             "prescribers_prescriberorganization"."department",
-                             "prescribers_prescriberorganization"."coords",
-                             "prescribers_prescriberorganization"."geocoding_score",
-                             "prescribers_prescriberorganization"."geocoding_updated_at",
-                             "prescribers_prescriberorganization"."ban_api_resolved_address",
-                             "prescribers_prescriberorganization"."insee_city_id",
-                             "prescribers_prescriberorganization"."name",
-                             "prescribers_prescriberorganization"."created_at",
-                             "prescribers_prescriberorganization"."updated_at",
-                             "prescribers_prescriberorganization"."uid",
-                             "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                             "prescribers_prescriberorganization"."automatic_geocoding_update",
-                             "prescribers_prescriberorganization"."siret",
-                             "prescribers_prescriberorganization"."kind",
-                             "prescribers_prescriberorganization"."is_brsa",
-                             "prescribers_prescriberorganization"."phone",
-                             "prescribers_prescriberorganization"."email",
-                             "prescribers_prescriberorganization"."website",
-                             "prescribers_prescriberorganization"."description",
-                             "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                             "prescribers_prescriberorganization"."created_by_id",
-                             "prescribers_prescriberorganization"."authorization_status",
-                             "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id",
-                             "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_prescriber_organization_id" ASC
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_companies_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_company_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             T3."id",
-                             T3."address_line_1",
-                             T3."address_line_2",
-                             T3."post_code",
-                             T3."city",
-                             T3."department",
-                             T3."coords",
-                             T3."geocoding_score",
-                             T3."geocoding_updated_at",
-                             T3."ban_api_resolved_address",
-                             T3."insee_city_id",
-                             T3."name",
-                             T3."created_at",
-                             T3."updated_at",
-                             T3."uid",
-                             T3."active_members_email_reminder_last_sent_at",
-                             T3."automatic_geocoding_update",
-                             T3."siret",
-                             T3."naf",
-                             T3."kind",
-                             T3."brand",
-                             T3."phone",
-                             T3."email",
-                             T3."auth_email",
-                             T3."website",
-                             T3."description",
-                             T3."provided_support",
-                             T3."source",
-                             T3."created_by_id",
-                             T3."block_job_applications",
-                             T3."job_applications_blocked_at",
-                             T3."spontaneous_applications_open_since",
-                             T3."convention_id",
-                             T3."job_app_score",
-                             T3."is_searchable",
-                             T3."rdv_solidarites_id",
-                             T3."fields_history"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_company_id" ASC
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" IN (%s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -3616,7 +3100,10 @@
                        LIMIT 1)
                     AND "job_applications_jobapplication"."sender_id" IN (%s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL
-                    AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN (%s))
+                    AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN
+                      (SELECT U0."id"
+                       FROM "prescribers_prescriberorganization" U0
+                       WHERE U0."id" IN (%s)))
              GROUP BY "job_applications_jobapplication"."id",
                       3,
                       7) subquery
@@ -4029,7 +3516,10 @@
                     LIMIT 1)
                  AND "job_applications_jobapplication"."sender_id" IN (%s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL
-                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN (%s))
+                 AND "job_applications_jobapplication"."sender_prescriber_organization_id" IN
+                   (SELECT U0."id"
+                    FROM "prescribers_prescriberorganization" U0
+                    WHERE U0."id" IN (%s)))
           GROUP BY "job_applications_jobapplication"."id",
                    48,
                    52,
@@ -4204,6 +3694,111 @@
       }),
       dict({
         'origin': list([
+          'RemoteAutocompleteSelect2MultipleWidget.optgroups[utils/widgets.py]',
+          'SimpleNode[apply/includes/job_applications_filters/sender.html]',
+          'IfNode[apply/includes/job_applications_filters/sender.html]',
+          'IfNode[apply/includes/job_applications_filters/sender.html]',
+          'IncludeNode[apply/includes/job_applications_filters/offcanvas_body.html]',
+          'IfNode[apply/includes/job_applications_filters/offcanvas_body.html]',
+          'IncludeNode[apply/includes/job_applications_filters/offcanvas.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'RemoteAutocompleteSelect2MultipleWidget.optgroups[utils/widgets.py]',
+          'SimpleNode[apply/includes/job_applications_filters/sender.html]',
+          'IfNode[apply/includes/job_applications_filters/sender.html]',
+          'IfNode[apply/includes/job_applications_filters/sender.html]',
+          'IncludeNode[apply/includes/job_applications_filters/offcanvas_body.html]',
+          'IfNode[apply/includes/job_applications_filters/offcanvas_body.html]',
+          'IncludeNode[apply/includes/job_applications_filters/offcanvas.html]',
+          'IncludeNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescriberorganization"
+          WHERE "prescribers_prescriberorganization"."id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Approval.is_suspended[approvals/models.py]',
           'Approval.state[approvals/models.py]',
           'approval_state_badge[utils/templatetags/badges.py]',
@@ -4271,7 +3866,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with only job_seeker filter]
   dict({
-    'num_queries': 22,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -4453,100 +4048,6 @@
                  AND "job_applications_jobapplication"."state" IN (%s,
                                                                    %s,
                                                                    %s))
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "users_user"."id",
-                             "users_user"."password",
-                             "users_user"."last_login",
-                             "users_user"."is_superuser",
-                             "users_user"."username",
-                             "users_user"."first_name",
-                             "users_user"."last_name",
-                             "users_user"."is_staff",
-                             "users_user"."is_active",
-                             "users_user"."date_joined",
-                             "users_user"."address_line_1",
-                             "users_user"."address_line_2",
-                             "users_user"."post_code",
-                             "users_user"."city",
-                             "users_user"."department",
-                             "users_user"."coords",
-                             "users_user"."geocoding_score",
-                             "users_user"."geocoding_updated_at",
-                             "users_user"."ban_api_resolved_address",
-                             "users_user"."insee_city_id",
-                             "users_user"."title",
-                             "users_user"."full_name_search_vector",
-                             "users_user"."email",
-                             "users_user"."phone",
-                             "users_user"."kind",
-                             "users_user"."identity_provider",
-                             "users_user"."has_completed_welcoming_tour",
-                             "users_user"."created_by_id",
-                             "users_user"."external_data_source_history",
-                             "users_user"."last_checked_at",
-                             "users_user"."public_id",
-                             "users_user"."address_filled_at",
-                             "users_user"."first_login",
-                             "users_user"."upcoming_deletion_notified_at",
-                             "users_user"."allow_next_sso_sub_update"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
         ''',
       }),
       dict({
@@ -4768,187 +4269,48 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_prescriber_organization_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
           'list_for_siae[www/apply/views/list_views.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_prescriber_organization_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             "prescribers_prescriberorganization"."id",
-                             "prescribers_prescriberorganization"."address_line_1",
-                             "prescribers_prescriberorganization"."address_line_2",
-                             "prescribers_prescriberorganization"."post_code",
-                             "prescribers_prescriberorganization"."city",
-                             "prescribers_prescriberorganization"."department",
-                             "prescribers_prescriberorganization"."coords",
-                             "prescribers_prescriberorganization"."geocoding_score",
-                             "prescribers_prescriberorganization"."geocoding_updated_at",
-                             "prescribers_prescriberorganization"."ban_api_resolved_address",
-                             "prescribers_prescriberorganization"."insee_city_id",
-                             "prescribers_prescriberorganization"."name",
-                             "prescribers_prescriberorganization"."created_at",
-                             "prescribers_prescriberorganization"."updated_at",
-                             "prescribers_prescriberorganization"."uid",
-                             "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                             "prescribers_prescriberorganization"."automatic_geocoding_update",
-                             "prescribers_prescriberorganization"."siret",
-                             "prescribers_prescriberorganization"."kind",
-                             "prescribers_prescriberorganization"."is_brsa",
-                             "prescribers_prescriberorganization"."phone",
-                             "prescribers_prescriberorganization"."email",
-                             "prescribers_prescriberorganization"."website",
-                             "prescribers_prescriberorganization"."description",
-                             "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                             "prescribers_prescriberorganization"."created_by_id",
-                             "prescribers_prescriberorganization"."authorization_status",
-                             "prescribers_prescriberorganization"."authorization_updated_at",
-                             "prescribers_prescriberorganization"."authorization_updated_by_id",
-                             "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_prescriber_organization_id" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
-          'CompanyFilterJobApplicationsForm.get_sender_companies_choices[www/apply/forms.py]',
-          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
-          'list_for_siae[www/apply/views/list_views.py]',
-        ]),
-        'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_company_id") "job_applications_jobapplication"."id",
-                             "job_applications_jobapplication"."job_seeker_id",
-                             "job_applications_jobapplication"."eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                             "job_applications_jobapplication"."create_employee_record",
-                             "job_applications_jobapplication"."resume_id",
-                             "job_applications_jobapplication"."sender_id",
-                             "job_applications_jobapplication"."sender_kind",
-                             "job_applications_jobapplication"."sender_company_id",
-                             "job_applications_jobapplication"."sender_prescriber_organization_id",
-                             "job_applications_jobapplication"."to_company_id",
-                             "job_applications_jobapplication"."state",
-                             "job_applications_jobapplication"."archived_at",
-                             "job_applications_jobapplication"."archived_by_id",
-                             "job_applications_jobapplication"."hired_job_id",
-                             "job_applications_jobapplication"."message",
-                             "job_applications_jobapplication"."answer",
-                             "job_applications_jobapplication"."answer_to_prescriber",
-                             "job_applications_jobapplication"."refusal_reason",
-                             "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                             "job_applications_jobapplication"."hiring_start_at",
-                             "job_applications_jobapplication"."hiring_end_at",
-                             "job_applications_jobapplication"."origin",
-                             "job_applications_jobapplication"."approval_id",
-                             "job_applications_jobapplication"."approval_delivery_mode",
-                             "job_applications_jobapplication"."approval_number_sent_by_email",
-                             "job_applications_jobapplication"."approval_number_sent_at",
-                             "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_by_id",
-                             "job_applications_jobapplication"."approval_manually_refused_at",
-                             "job_applications_jobapplication"."transferred_at",
-                             "job_applications_jobapplication"."transferred_by_id",
-                             "job_applications_jobapplication"."transferred_from_id",
-                             "job_applications_jobapplication"."created_at",
-                             "job_applications_jobapplication"."updated_at",
-                             "job_applications_jobapplication"."processed_at",
-                             "job_applications_jobapplication"."prehiring_guidance_days",
-                             "job_applications_jobapplication"."contract_type",
-                             "job_applications_jobapplication"."nb_hours_per_week",
-                             "job_applications_jobapplication"."contract_type_details",
-                             "job_applications_jobapplication"."qualification_type",
-                             "job_applications_jobapplication"."qualification_level",
-                             "job_applications_jobapplication"."planned_training_hours",
-                             "job_applications_jobapplication"."inverted_vae_contract",
-                             "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                             T3."id",
-                             T3."address_line_1",
-                             T3."address_line_2",
-                             T3."post_code",
-                             T3."city",
-                             T3."department",
-                             T3."coords",
-                             T3."geocoding_score",
-                             T3."geocoding_updated_at",
-                             T3."ban_api_resolved_address",
-                             T3."insee_city_id",
-                             T3."name",
-                             T3."created_at",
-                             T3."updated_at",
-                             T3."uid",
-                             T3."active_members_email_reminder_last_sent_at",
-                             T3."automatic_geocoding_update",
-                             T3."siret",
-                             T3."naf",
-                             T3."kind",
-                             T3."brand",
-                             T3."phone",
-                             T3."email",
-                             T3."auth_email",
-                             T3."website",
-                             T3."description",
-                             T3."provided_support",
-                             T3."source",
-                             T3."created_by_id",
-                             T3."block_job_applications",
-                             T3."job_applications_blocked_at",
-                             T3."spontaneous_applications_open_since",
-                             T3."convention_id",
-                             T3."job_app_score",
-                             T3."is_searchable",
-                             T3."rdv_solidarites_id",
-                             T3."fields_history"
-          FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."sender_company_id" = T3."id")
-          WHERE "job_applications_jobapplication"."to_company_id" = %s
-          ORDER BY "job_applications_jobapplication"."sender_company_id" ASC
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" = %s)
+          LIMIT 21
         ''',
       }),
       dict({
@@ -5517,6 +4879,56 @@
       }),
       dict({
         'origin': list([
+          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
+          'SimpleNode[apply/list_for_siae.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_for_siae.html]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."id" IN (%s))
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Approval.is_suspended[approvals/models.py]',
           'Approval.state[approvals/models.py]',
           'approval_state_badge[utils/templatetags/badges.py]',
@@ -5824,6 +5236,350 @@
           <hr/>
           <fieldset>
               <legend>
+                  <button aria-controls="collapseDepartments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDepartments" data-bs-toggle="collapse" type="button">
+                      Départements
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDepartments">
+                  <div class="form-group">
+                      <label class="form-label" for="id_departments">
+                          Départements
+                      </label>
+                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+                          <option value="01">
+                              01 - Ain
+                          </option>
+                          <option value="02">
+                              02 - Aisne
+                          </option>
+                          <option value="03">
+                              03 - Allier
+                          </option>
+                          <option value="04">
+                              04 - Alpes-de-Haute-Provence
+                          </option>
+                          <option value="05">
+                              05 - Hautes-Alpes
+                          </option>
+                          <option value="06">
+                              06 - Alpes-Maritimes
+                          </option>
+                          <option value="07">
+                              07 - Ardèche
+                          </option>
+                          <option value="08">
+                              08 - Ardennes
+                          </option>
+                          <option value="09">
+                              09 - Ariège
+                          </option>
+                          <option value="10">
+                              10 - Aube
+                          </option>
+                          <option value="11">
+                              11 - Aude
+                          </option>
+                          <option value="12">
+                              12 - Aveyron
+                          </option>
+                          <option value="13">
+                              13 - Bouches-du-Rhône
+                          </option>
+                          <option value="14">
+                              14 - Calvados
+                          </option>
+                          <option value="15">
+                              15 - Cantal
+                          </option>
+                          <option value="16">
+                              16 - Charente
+                          </option>
+                          <option value="17">
+                              17 - Charente-Maritime
+                          </option>
+                          <option value="18">
+                              18 - Cher
+                          </option>
+                          <option value="19">
+                              19 - Corrèze
+                          </option>
+                          <option value="2A">
+                              2A - Corse-du-Sud
+                          </option>
+                          <option value="2B">
+                              2B - Haute-Corse
+                          </option>
+                          <option value="21">
+                              21 - Côte-d'Or
+                          </option>
+                          <option value="22">
+                              22 - Côtes-d'Armor
+                          </option>
+                          <option value="23">
+                              23 - Creuse
+                          </option>
+                          <option value="24">
+                              24 - Dordogne
+                          </option>
+                          <option value="25">
+                              25 - Doubs
+                          </option>
+                          <option value="26">
+                              26 - Drôme
+                          </option>
+                          <option value="27">
+                              27 - Eure
+                          </option>
+                          <option value="28">
+                              28 - Eure-et-Loir
+                          </option>
+                          <option value="29">
+                              29 - Finistère
+                          </option>
+                          <option value="30">
+                              30 - Gard
+                          </option>
+                          <option value="31">
+                              31 - Haute-Garonne
+                          </option>
+                          <option value="32">
+                              32 - Gers
+                          </option>
+                          <option value="33">
+                              33 - Gironde
+                          </option>
+                          <option value="34">
+                              34 - Hérault
+                          </option>
+                          <option value="35">
+                              35 - Ille-et-Vilaine
+                          </option>
+                          <option value="36">
+                              36 - Indre
+                          </option>
+                          <option value="37">
+                              37 - Indre-et-Loire
+                          </option>
+                          <option value="38">
+                              38 - Isère
+                          </option>
+                          <option value="39">
+                              39 - Jura
+                          </option>
+                          <option value="40">
+                              40 - Landes
+                          </option>
+                          <option value="41">
+                              41 - Loir-et-Cher
+                          </option>
+                          <option value="42">
+                              42 - Loire
+                          </option>
+                          <option value="43">
+                              43 - Haute-Loire
+                          </option>
+                          <option value="44">
+                              44 - Loire-Atlantique
+                          </option>
+                          <option value="45">
+                              45 - Loiret
+                          </option>
+                          <option value="46">
+                              46 - Lot
+                          </option>
+                          <option value="47">
+                              47 - Lot-et-Garonne
+                          </option>
+                          <option value="48">
+                              48 - Lozère
+                          </option>
+                          <option value="49">
+                              49 - Maine-et-Loire
+                          </option>
+                          <option value="50">
+                              50 - Manche
+                          </option>
+                          <option value="51">
+                              51 - Marne
+                          </option>
+                          <option value="52">
+                              52 - Haute-Marne
+                          </option>
+                          <option value="53">
+                              53 - Mayenne
+                          </option>
+                          <option value="54">
+                              54 - Meurthe-et-Moselle
+                          </option>
+                          <option value="55">
+                              55 - Meuse
+                          </option>
+                          <option value="56">
+                              56 - Morbihan
+                          </option>
+                          <option value="57">
+                              57 - Moselle
+                          </option>
+                          <option value="58">
+                              58 - Nièvre
+                          </option>
+                          <option value="59">
+                              59 - Nord
+                          </option>
+                          <option value="60">
+                              60 - Oise
+                          </option>
+                          <option value="61">
+                              61 - Orne
+                          </option>
+                          <option value="62">
+                              62 - Pas-de-Calais
+                          </option>
+                          <option value="63">
+                              63 - Puy-de-Dôme
+                          </option>
+                          <option value="64">
+                              64 - Pyrénées-Atlantiques
+                          </option>
+                          <option value="65">
+                              65 - Hautes-Pyrénées
+                          </option>
+                          <option value="66">
+                              66 - Pyrénées-Orientales
+                          </option>
+                          <option value="67">
+                              67 - Bas-Rhin
+                          </option>
+                          <option value="68">
+                              68 - Haut-Rhin
+                          </option>
+                          <option value="69">
+                              69 - Rhône
+                          </option>
+                          <option value="70">
+                              70 - Haute-Saône
+                          </option>
+                          <option value="71">
+                              71 - Saône-et-Loire
+                          </option>
+                          <option value="72">
+                              72 - Sarthe
+                          </option>
+                          <option value="73">
+                              73 - Savoie
+                          </option>
+                          <option value="74">
+                              74 - Haute-Savoie
+                          </option>
+                          <option value="75">
+                              75 - Paris
+                          </option>
+                          <option value="76">
+                              76 - Seine-Maritime
+                          </option>
+                          <option value="77">
+                              77 - Seine-et-Marne
+                          </option>
+                          <option value="78">
+                              78 - Yvelines
+                          </option>
+                          <option value="79">
+                              79 - Deux-Sèvres
+                          </option>
+                          <option value="80">
+                              80 - Somme
+                          </option>
+                          <option value="81">
+                              81 - Tarn
+                          </option>
+                          <option value="82">
+                              82 - Tarn-et-Garonne
+                          </option>
+                          <option value="83">
+                              83 - Var
+                          </option>
+                          <option value="84">
+                              84 - Vaucluse
+                          </option>
+                          <option value="85">
+                              85 - Vendée
+                          </option>
+                          <option value="86">
+                              86 - Vienne
+                          </option>
+                          <option value="87">
+                              87 - Haute-Vienne
+                          </option>
+                          <option value="88">
+                              88 - Vosges
+                          </option>
+                          <option value="89">
+                              89 - Yonne
+                          </option>
+                          <option value="90">
+                              90 - Territoire de Belfort
+                          </option>
+                          <option value="91">
+                              91 - Essonne
+                          </option>
+                          <option value="92">
+                              92 - Hauts-de-Seine
+                          </option>
+                          <option value="93">
+                              93 - Seine-Saint-Denis
+                          </option>
+                          <option value="94">
+                              94 - Val-de-Marne
+                          </option>
+                          <option value="95">
+                              95 - Val-d'Oise
+                          </option>
+                          <option value="971">
+                              971 - Guadeloupe
+                          </option>
+                          <option value="972">
+                              972 - Martinique
+                          </option>
+                          <option value="973">
+                              973 - Guyane
+                          </option>
+                          <option value="974">
+                              974 - La Réunion
+                          </option>
+                          <option value="975">
+                              975 - Saint-Pierre-et-Miquelon
+                          </option>
+                          <option value="976">
+                              976 - Mayotte
+                          </option>
+                          <option value="977">
+                              977 - Saint-Barthélémy
+                          </option>
+                          <option value="978">
+                              978 - Saint-Martin
+                          </option>
+                          <option value="984">
+                              984 - Terres australes et antarctiques françaises
+                          </option>
+                          <option value="986">
+                              986 - Wallis-et-Futuna
+                          </option>
+                          <option value="987">
+                              987 - Polynésie française
+                          </option>
+                          <option value="988">
+                              988 - Nouvelle-Calédonie
+                          </option>
+                          <option value="989">
+                              989 - Île Clipperton
+                          </option>
+                      </select>
+                  </div>
+              </div>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
                   <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                       Émetteur
                   </button>
@@ -5833,21 +5589,21 @@
                       <label class="form-label" for="id_senders">
                           Nom de la personne
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_prescriber_organizations">
                           Nom de l'organisme prescripteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_prescriber_organization" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_companies">
                           Nom de l’employeur orienteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_company" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
                       </select>
                   </div>
               </div>
@@ -6013,6 +5769,350 @@
           <hr/>
           <fieldset>
               <legend>
+                  <button aria-controls="collapseDepartments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDepartments" data-bs-toggle="collapse" type="button">
+                      Départements
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDepartments">
+                  <div class="form-group">
+                      <label class="form-label" for="id_departments">
+                          Départements
+                      </label>
+                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+                          <option value="01">
+                              01 - Ain
+                          </option>
+                          <option value="02">
+                              02 - Aisne
+                          </option>
+                          <option value="03">
+                              03 - Allier
+                          </option>
+                          <option value="04">
+                              04 - Alpes-de-Haute-Provence
+                          </option>
+                          <option value="05">
+                              05 - Hautes-Alpes
+                          </option>
+                          <option value="06">
+                              06 - Alpes-Maritimes
+                          </option>
+                          <option value="07">
+                              07 - Ardèche
+                          </option>
+                          <option value="08">
+                              08 - Ardennes
+                          </option>
+                          <option value="09">
+                              09 - Ariège
+                          </option>
+                          <option value="10">
+                              10 - Aube
+                          </option>
+                          <option value="11">
+                              11 - Aude
+                          </option>
+                          <option value="12">
+                              12 - Aveyron
+                          </option>
+                          <option value="13">
+                              13 - Bouches-du-Rhône
+                          </option>
+                          <option value="14">
+                              14 - Calvados
+                          </option>
+                          <option value="15">
+                              15 - Cantal
+                          </option>
+                          <option value="16">
+                              16 - Charente
+                          </option>
+                          <option value="17">
+                              17 - Charente-Maritime
+                          </option>
+                          <option value="18">
+                              18 - Cher
+                          </option>
+                          <option value="19">
+                              19 - Corrèze
+                          </option>
+                          <option value="2A">
+                              2A - Corse-du-Sud
+                          </option>
+                          <option value="2B">
+                              2B - Haute-Corse
+                          </option>
+                          <option value="21">
+                              21 - Côte-d'Or
+                          </option>
+                          <option value="22">
+                              22 - Côtes-d'Armor
+                          </option>
+                          <option value="23">
+                              23 - Creuse
+                          </option>
+                          <option value="24">
+                              24 - Dordogne
+                          </option>
+                          <option value="25">
+                              25 - Doubs
+                          </option>
+                          <option value="26">
+                              26 - Drôme
+                          </option>
+                          <option value="27">
+                              27 - Eure
+                          </option>
+                          <option value="28">
+                              28 - Eure-et-Loir
+                          </option>
+                          <option value="29">
+                              29 - Finistère
+                          </option>
+                          <option value="30">
+                              30 - Gard
+                          </option>
+                          <option value="31">
+                              31 - Haute-Garonne
+                          </option>
+                          <option value="32">
+                              32 - Gers
+                          </option>
+                          <option value="33">
+                              33 - Gironde
+                          </option>
+                          <option value="34">
+                              34 - Hérault
+                          </option>
+                          <option value="35">
+                              35 - Ille-et-Vilaine
+                          </option>
+                          <option value="36">
+                              36 - Indre
+                          </option>
+                          <option value="37">
+                              37 - Indre-et-Loire
+                          </option>
+                          <option value="38">
+                              38 - Isère
+                          </option>
+                          <option value="39">
+                              39 - Jura
+                          </option>
+                          <option value="40">
+                              40 - Landes
+                          </option>
+                          <option value="41">
+                              41 - Loir-et-Cher
+                          </option>
+                          <option value="42">
+                              42 - Loire
+                          </option>
+                          <option value="43">
+                              43 - Haute-Loire
+                          </option>
+                          <option value="44">
+                              44 - Loire-Atlantique
+                          </option>
+                          <option value="45">
+                              45 - Loiret
+                          </option>
+                          <option value="46">
+                              46 - Lot
+                          </option>
+                          <option value="47">
+                              47 - Lot-et-Garonne
+                          </option>
+                          <option value="48">
+                              48 - Lozère
+                          </option>
+                          <option value="49">
+                              49 - Maine-et-Loire
+                          </option>
+                          <option value="50">
+                              50 - Manche
+                          </option>
+                          <option value="51">
+                              51 - Marne
+                          </option>
+                          <option value="52">
+                              52 - Haute-Marne
+                          </option>
+                          <option value="53">
+                              53 - Mayenne
+                          </option>
+                          <option value="54">
+                              54 - Meurthe-et-Moselle
+                          </option>
+                          <option value="55">
+                              55 - Meuse
+                          </option>
+                          <option value="56">
+                              56 - Morbihan
+                          </option>
+                          <option value="57">
+                              57 - Moselle
+                          </option>
+                          <option value="58">
+                              58 - Nièvre
+                          </option>
+                          <option value="59">
+                              59 - Nord
+                          </option>
+                          <option value="60">
+                              60 - Oise
+                          </option>
+                          <option value="61">
+                              61 - Orne
+                          </option>
+                          <option value="62">
+                              62 - Pas-de-Calais
+                          </option>
+                          <option value="63">
+                              63 - Puy-de-Dôme
+                          </option>
+                          <option value="64">
+                              64 - Pyrénées-Atlantiques
+                          </option>
+                          <option value="65">
+                              65 - Hautes-Pyrénées
+                          </option>
+                          <option value="66">
+                              66 - Pyrénées-Orientales
+                          </option>
+                          <option value="67">
+                              67 - Bas-Rhin
+                          </option>
+                          <option value="68">
+                              68 - Haut-Rhin
+                          </option>
+                          <option value="69">
+                              69 - Rhône
+                          </option>
+                          <option value="70">
+                              70 - Haute-Saône
+                          </option>
+                          <option value="71">
+                              71 - Saône-et-Loire
+                          </option>
+                          <option value="72">
+                              72 - Sarthe
+                          </option>
+                          <option value="73">
+                              73 - Savoie
+                          </option>
+                          <option value="74">
+                              74 - Haute-Savoie
+                          </option>
+                          <option value="75">
+                              75 - Paris
+                          </option>
+                          <option value="76">
+                              76 - Seine-Maritime
+                          </option>
+                          <option value="77">
+                              77 - Seine-et-Marne
+                          </option>
+                          <option value="78">
+                              78 - Yvelines
+                          </option>
+                          <option value="79">
+                              79 - Deux-Sèvres
+                          </option>
+                          <option value="80">
+                              80 - Somme
+                          </option>
+                          <option value="81">
+                              81 - Tarn
+                          </option>
+                          <option value="82">
+                              82 - Tarn-et-Garonne
+                          </option>
+                          <option value="83">
+                              83 - Var
+                          </option>
+                          <option value="84">
+                              84 - Vaucluse
+                          </option>
+                          <option value="85">
+                              85 - Vendée
+                          </option>
+                          <option value="86">
+                              86 - Vienne
+                          </option>
+                          <option value="87">
+                              87 - Haute-Vienne
+                          </option>
+                          <option value="88">
+                              88 - Vosges
+                          </option>
+                          <option value="89">
+                              89 - Yonne
+                          </option>
+                          <option value="90">
+                              90 - Territoire de Belfort
+                          </option>
+                          <option value="91">
+                              91 - Essonne
+                          </option>
+                          <option value="92">
+                              92 - Hauts-de-Seine
+                          </option>
+                          <option value="93">
+                              93 - Seine-Saint-Denis
+                          </option>
+                          <option value="94">
+                              94 - Val-de-Marne
+                          </option>
+                          <option value="95">
+                              95 - Val-d'Oise
+                          </option>
+                          <option value="971">
+                              971 - Guadeloupe
+                          </option>
+                          <option value="972">
+                              972 - Martinique
+                          </option>
+                          <option value="973">
+                              973 - Guyane
+                          </option>
+                          <option value="974">
+                              974 - La Réunion
+                          </option>
+                          <option value="975">
+                              975 - Saint-Pierre-et-Miquelon
+                          </option>
+                          <option value="976">
+                              976 - Mayotte
+                          </option>
+                          <option value="977">
+                              977 - Saint-Barthélémy
+                          </option>
+                          <option value="978">
+                              978 - Saint-Martin
+                          </option>
+                          <option value="984">
+                              984 - Terres australes et antarctiques françaises
+                          </option>
+                          <option value="986">
+                              986 - Wallis-et-Futuna
+                          </option>
+                          <option value="987">
+                              987 - Polynésie française
+                          </option>
+                          <option value="988">
+                              988 - Nouvelle-Calédonie
+                          </option>
+                          <option value="989">
+                              989 - Île Clipperton
+                          </option>
+                      </select>
+                  </div>
+              </div>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
                   <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                       Émetteur
                   </button>
@@ -6022,21 +6122,21 @@
                       <label class="form-label" for="id_senders">
                           Nom de la personne
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_prescriber_organizations">
                           Nom de l'organisme prescripteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_prescriber_organization" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_companies">
                           Nom de l’employeur orienteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_company" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
                       </select>
                   </div>
               </div>
@@ -6344,6 +6444,350 @@
           <hr/>
           <fieldset>
               <legend>
+                  <button aria-controls="collapseDepartments" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseDepartments" data-bs-toggle="collapse" type="button">
+                      Départements
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapseDepartments">
+                  <div class="form-group">
+                      <label class="form-label" for="id_departments">
+                          Départements
+                      </label>
+                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+                          <option value="01">
+                              01 - Ain
+                          </option>
+                          <option value="02">
+                              02 - Aisne
+                          </option>
+                          <option value="03">
+                              03 - Allier
+                          </option>
+                          <option value="04">
+                              04 - Alpes-de-Haute-Provence
+                          </option>
+                          <option value="05">
+                              05 - Hautes-Alpes
+                          </option>
+                          <option value="06">
+                              06 - Alpes-Maritimes
+                          </option>
+                          <option value="07">
+                              07 - Ardèche
+                          </option>
+                          <option value="08">
+                              08 - Ardennes
+                          </option>
+                          <option value="09">
+                              09 - Ariège
+                          </option>
+                          <option value="10">
+                              10 - Aube
+                          </option>
+                          <option value="11">
+                              11 - Aude
+                          </option>
+                          <option value="12">
+                              12 - Aveyron
+                          </option>
+                          <option value="13">
+                              13 - Bouches-du-Rhône
+                          </option>
+                          <option value="14">
+                              14 - Calvados
+                          </option>
+                          <option value="15">
+                              15 - Cantal
+                          </option>
+                          <option value="16">
+                              16 - Charente
+                          </option>
+                          <option value="17">
+                              17 - Charente-Maritime
+                          </option>
+                          <option value="18">
+                              18 - Cher
+                          </option>
+                          <option value="19">
+                              19 - Corrèze
+                          </option>
+                          <option value="2A">
+                              2A - Corse-du-Sud
+                          </option>
+                          <option value="2B">
+                              2B - Haute-Corse
+                          </option>
+                          <option value="21">
+                              21 - Côte-d'Or
+                          </option>
+                          <option value="22">
+                              22 - Côtes-d'Armor
+                          </option>
+                          <option value="23">
+                              23 - Creuse
+                          </option>
+                          <option value="24">
+                              24 - Dordogne
+                          </option>
+                          <option value="25">
+                              25 - Doubs
+                          </option>
+                          <option value="26">
+                              26 - Drôme
+                          </option>
+                          <option value="27">
+                              27 - Eure
+                          </option>
+                          <option value="28">
+                              28 - Eure-et-Loir
+                          </option>
+                          <option value="29">
+                              29 - Finistère
+                          </option>
+                          <option value="30">
+                              30 - Gard
+                          </option>
+                          <option value="31">
+                              31 - Haute-Garonne
+                          </option>
+                          <option value="32">
+                              32 - Gers
+                          </option>
+                          <option value="33">
+                              33 - Gironde
+                          </option>
+                          <option value="34">
+                              34 - Hérault
+                          </option>
+                          <option value="35">
+                              35 - Ille-et-Vilaine
+                          </option>
+                          <option value="36">
+                              36 - Indre
+                          </option>
+                          <option value="37">
+                              37 - Indre-et-Loire
+                          </option>
+                          <option value="38">
+                              38 - Isère
+                          </option>
+                          <option value="39">
+                              39 - Jura
+                          </option>
+                          <option value="40">
+                              40 - Landes
+                          </option>
+                          <option value="41">
+                              41 - Loir-et-Cher
+                          </option>
+                          <option value="42">
+                              42 - Loire
+                          </option>
+                          <option value="43">
+                              43 - Haute-Loire
+                          </option>
+                          <option value="44">
+                              44 - Loire-Atlantique
+                          </option>
+                          <option value="45">
+                              45 - Loiret
+                          </option>
+                          <option value="46">
+                              46 - Lot
+                          </option>
+                          <option value="47">
+                              47 - Lot-et-Garonne
+                          </option>
+                          <option value="48">
+                              48 - Lozère
+                          </option>
+                          <option value="49">
+                              49 - Maine-et-Loire
+                          </option>
+                          <option value="50">
+                              50 - Manche
+                          </option>
+                          <option value="51">
+                              51 - Marne
+                          </option>
+                          <option value="52">
+                              52 - Haute-Marne
+                          </option>
+                          <option value="53">
+                              53 - Mayenne
+                          </option>
+                          <option value="54">
+                              54 - Meurthe-et-Moselle
+                          </option>
+                          <option value="55">
+                              55 - Meuse
+                          </option>
+                          <option value="56">
+                              56 - Morbihan
+                          </option>
+                          <option value="57">
+                              57 - Moselle
+                          </option>
+                          <option value="58">
+                              58 - Nièvre
+                          </option>
+                          <option value="59">
+                              59 - Nord
+                          </option>
+                          <option value="60">
+                              60 - Oise
+                          </option>
+                          <option value="61">
+                              61 - Orne
+                          </option>
+                          <option value="62">
+                              62 - Pas-de-Calais
+                          </option>
+                          <option value="63">
+                              63 - Puy-de-Dôme
+                          </option>
+                          <option value="64">
+                              64 - Pyrénées-Atlantiques
+                          </option>
+                          <option value="65">
+                              65 - Hautes-Pyrénées
+                          </option>
+                          <option value="66">
+                              66 - Pyrénées-Orientales
+                          </option>
+                          <option value="67">
+                              67 - Bas-Rhin
+                          </option>
+                          <option value="68">
+                              68 - Haut-Rhin
+                          </option>
+                          <option value="69">
+                              69 - Rhône
+                          </option>
+                          <option value="70">
+                              70 - Haute-Saône
+                          </option>
+                          <option value="71">
+                              71 - Saône-et-Loire
+                          </option>
+                          <option value="72">
+                              72 - Sarthe
+                          </option>
+                          <option value="73">
+                              73 - Savoie
+                          </option>
+                          <option value="74">
+                              74 - Haute-Savoie
+                          </option>
+                          <option value="75">
+                              75 - Paris
+                          </option>
+                          <option value="76">
+                              76 - Seine-Maritime
+                          </option>
+                          <option value="77">
+                              77 - Seine-et-Marne
+                          </option>
+                          <option value="78">
+                              78 - Yvelines
+                          </option>
+                          <option value="79">
+                              79 - Deux-Sèvres
+                          </option>
+                          <option value="80">
+                              80 - Somme
+                          </option>
+                          <option value="81">
+                              81 - Tarn
+                          </option>
+                          <option value="82">
+                              82 - Tarn-et-Garonne
+                          </option>
+                          <option value="83">
+                              83 - Var
+                          </option>
+                          <option value="84">
+                              84 - Vaucluse
+                          </option>
+                          <option value="85">
+                              85 - Vendée
+                          </option>
+                          <option value="86">
+                              86 - Vienne
+                          </option>
+                          <option value="87">
+                              87 - Haute-Vienne
+                          </option>
+                          <option value="88">
+                              88 - Vosges
+                          </option>
+                          <option value="89">
+                              89 - Yonne
+                          </option>
+                          <option value="90">
+                              90 - Territoire de Belfort
+                          </option>
+                          <option value="91">
+                              91 - Essonne
+                          </option>
+                          <option value="92">
+                              92 - Hauts-de-Seine
+                          </option>
+                          <option value="93">
+                              93 - Seine-Saint-Denis
+                          </option>
+                          <option value="94">
+                              94 - Val-de-Marne
+                          </option>
+                          <option value="95">
+                              95 - Val-d'Oise
+                          </option>
+                          <option value="971">
+                              971 - Guadeloupe
+                          </option>
+                          <option value="972">
+                              972 - Martinique
+                          </option>
+                          <option value="973">
+                              973 - Guyane
+                          </option>
+                          <option value="974">
+                              974 - La Réunion
+                          </option>
+                          <option value="975">
+                              975 - Saint-Pierre-et-Miquelon
+                          </option>
+                          <option value="976">
+                              976 - Mayotte
+                          </option>
+                          <option value="977">
+                              977 - Saint-Barthélémy
+                          </option>
+                          <option value="978">
+                              978 - Saint-Martin
+                          </option>
+                          <option value="984">
+                              984 - Terres australes et antarctiques françaises
+                          </option>
+                          <option value="986">
+                              986 - Wallis-et-Futuna
+                          </option>
+                          <option value="987">
+                              987 - Polynésie française
+                          </option>
+                          <option value="988">
+                              988 - Nouvelle-Calédonie
+                          </option>
+                          <option value="989">
+                              989 - Île Clipperton
+                          </option>
+                      </select>
+                  </div>
+              </div>
+          </fieldset>
+          <hr/>
+          <fieldset>
+              <legend>
                   <button aria-controls="collapseSenders" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseSenders" data-bs-toggle="collapse" type="button">
                       Émetteur
                   </button>
@@ -6353,21 +6797,21 @@
                       <label class="form-label" for="id_senders">
                           Nom de la personne
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_prescriber_organizations">
                           Nom de l'organisme prescripteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_prescriber_organization" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_prescriber_organizations" lang="fr" multiple="" name="sender_prescriber_organizations">
                       </select>
                   </div>
                   <div class="form-group">
                       <label class="form-label" for="id_sender_companies">
                           Nom de l’employeur orienteur
                       </label>
-                      <select class="form-select is-valid django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
+                      <select class="form-select is-valid django-select2" data-ajax--cache="true" data-ajax--delay="250" data-ajax--type="GET" data-ajax--url="/apply/siae/list/filters/sender_company" data-allow-clear="true" data-dropdown-parent="#offcanvasApplyFilters" data-minimum-input-length="1" data-placeholder="" data-theme="bootstrap-5" id="id_sender_companies" lang="fr" multiple="" name="sender_companies">
                       </select>
                   </div>
               </div>
