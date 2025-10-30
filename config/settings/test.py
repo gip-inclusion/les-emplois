@@ -75,3 +75,11 @@ FORCE_PROCONNECT_LOGIN = True  # default behaviour in tests
 REQUIRE_OTP_FOR_STAFF = False
 
 BREVO_API_URL = "https://mailer.test.com"
+
+# Nexus metabase db
+# ---------------------------------------
+NEXUS_METABASE_DB_HOST = DATABASES["default"]["HOST"]  # noqa: F405
+NEXUS_METABASE_DB_PORT = DATABASES["default"]["PORT"]  # noqa: F405
+NEXUS_METABASE_DB_DATABASE = DATABASES["default"]["NAME"]  # noqa: F405
+NEXUS_METABASE_DB_USER = DATABASES["default"]["USER"]  # noqa: F405
+NEXUS_METABASE_DB_PASSWORD = DATABASES["default"]["PASSWORD"]  # noqa: F405
