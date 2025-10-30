@@ -57,6 +57,18 @@ METABASE_DASHBOARDS = {
         "tally_popup_form_id": "meG0ae",
         "tally_embed_form_id": "wdo89o",
     },
+    "stats_siae_raw": {
+        "dashboard_id": 643,
+    },
+    "stats_siae_raw_hiring": {
+        "dashboard_id": 646,
+    },
+    "stats_siae_raw_auto_prescription": {
+        "dashboard_id": 647,
+    },
+    "stats_siae_raw_beneficiaires": {
+        "dashboard_id": 648,
+    },
     #
     # Prescriber stats - CD.
     #

@@ -130,6 +130,16 @@ def render_stats(
     base_context.update(context)
     if request.user.is_authenticated and request.user.is_employer:
         base_context.setdefault("pilotage_webinar_banners", [])
+        base_context["pilotage_webinar_banners"].append(
+            {
+                "title": "Nouveauté",
+                "description": "Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié. "
+                "En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité",  # noqa: E501
+                "call_to_action": "Partagez votre avis",
+                "url": "https://etudes.inclusion.gouv.fr/siae-2025",
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2025, 7, 18),
+            }
+        )
 
     if "pilotage_webinar_banners" not in base_context:
         base_context["pilotage_webinar_banners"] = [
@@ -216,7 +226,7 @@ def stats_siae_etp(request):
     )
 
 
-def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY):
+def render_stats_siae(request, page_title, *, filters_param=[mb.C1_SIAE_FILTER_KEY]):
     """
     SIAE stats shown only to their own members.
     Employers can see stats for all their SIAEs at once, not just the one currently being worked on.
@@ -226,21 +236,15 @@ def render_stats_siae(request, page_title, *, filter_param=mb.C1_SIAE_FILTER_KEY
         "page_title": page_title,
         "department": request.current_organization.department,
     }
-    match filter_param:
-        case mb.C1_SIAE_FILTER_KEY:
-            params = {
-                mb.C1_SIAE_FILTER_KEY: [
-                    str(membership.company_id)
-                    for membership in request.user.active_or_in_grace_period_company_memberships()
-                ]
-            }
-        case mb.ASP_SIAE_FILTER_KEY_FLAVOR3:
-            params = {
-                mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
-                    org.convention.asp_id for org in request.organizations if org.convention is not None
-                ],
-            }
-
+    params = {}
+    if mb.C1_SIAE_FILTER_KEY in filters_param:
+        params[mb.C1_SIAE_FILTER_KEY] = [
+            str(membership.company_id) for membership in request.user.active_or_in_grace_period_company_memberships()
+        ]
+    if mb.ASP_SIAE_FILTER_KEY_FLAVOR3 in filters_param:
+        params[mb.ASP_SIAE_FILTER_KEY_FLAVOR3] = [
+            org.convention.asp_id for org in request.organizations if org.convention is not None
+        ]
     return render_stats(
         request=request,
         context=context,
@@ -270,7 +274,7 @@ def stats_siae_orga_etp(request):
     return render_stats_siae(
         request=request,
         page_title="Suivi des effectifs annuels et mensuels (ETP)",
-        filter_param=mb.ASP_SIAE_FILTER_KEY_FLAVOR3,
+        filters_param=[mb.ASP_SIAE_FILTER_KEY_FLAVOR3],
     )
 
 
@@ -279,7 +283,35 @@ def stats_siae_beneficiaries(request):
     return render_stats_siae(
         request=request,
         page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
-        filter_param=mb.ASP_SIAE_FILTER_KEY_FLAVOR3,
+        filters_param=[mb.ASP_SIAE_FILTER_KEY_FLAVOR3],
+    )
+
+
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw(request):
+    return render_stats_siae(
+        request=request,
+        page_title="Export complet de vos données",
+        filters_param=[mb.ASP_SIAE_FILTER_KEY_FLAVOR3, mb.C1_SIAE_FILTER_KEY],
+    )
+
+
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw_hiring(request):
+    return render_stats_siae(request=request, page_title="Données brutes des candidatures")
+
+
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw_auto_prescription(request):
+    return render_stats_siae(request=request, page_title="Données brutes de l'auto-prescription")
+
+
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw_beneficiaires(request):
+    return render_stats_siae(
+        request=request,
+        page_title="Données brutes du suivi des bénéficiaires, taux d’encadrement et présence en emploi",
+        filters_param=[mb.ASP_SIAE_FILTER_KEY_FLAVOR3],
     )
 
 
