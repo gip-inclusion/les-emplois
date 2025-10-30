@@ -308,6 +308,20 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def with_jobseeker_valid_geiq_eligibility_diagnosis(self):
         """
+        Gives the last valid GEIQ eligibility diagnosis *with or without allowance* for this job seeker and this GEIQ.
+        It is used to display criteria in list_for_siae.
+        """
+        subquery = Subquery(
+            GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                job_seeker=OuterRef("job_seeker"),
+                for_geiq=OuterRef("to_company"),
+            ).values("id")[:1],
+            output_field=models.IntegerField(),
+        )
+        return self.annotate(jobseeker_valid_geiq_eligibility_diagnosis=subquery)
+
+    def with_jobseeker_valid_geiq_eligibility_diagnosis_with_allowance(self):
+        """
         Gives the last valid GEIQ eligibility diagnosis *with allowance* for this job seeker and this GEIQ.
         Valid and with allowance because the eligibility badges depend on these two factors.
         """
@@ -351,17 +365,17 @@ class JobApplicationQuerySet(models.QuerySet):
             .values("id")[:1],
             output_field=models.IntegerField(),
         )
-        return self.annotate(jobseeker_valid_geiq_eligibility_diagnosis=subquery)
+        return self.annotate(jobseeker_valid_geiq_eligibility_diagnosis_with_allowance=subquery)
 
     def with_jobseeker_geiq_eligibility_diagnosis(self):
         """
         Gives the "geiq_eligibility_diagnosis" linked to the job application or if none is found,
-        the last valid GEIQ eligibility diagnosis for this job seeker and this GEIQ.
+        the last valid GEIQ eligibility diagnosis with allowance for this job seeker and this GEIQ.
         """
 
-        return self.with_jobseeker_valid_geiq_eligibility_diagnosis().annotate(
+        return self.with_jobseeker_valid_geiq_eligibility_diagnosis_with_allowance().annotate(
             jobseeker_geiq_eligibility_diagnosis=Coalesce(
-                F("geiq_eligibility_diagnosis"), F("jobseeker_valid_geiq_eligibility_diagnosis")
+                F("geiq_eligibility_diagnosis"), F("jobseeker_valid_geiq_eligibility_diagnosis_with_allowance")
             )
         )
 

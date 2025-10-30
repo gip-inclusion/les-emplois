@@ -728,6 +728,25 @@ class TestJobApplicationQuerySet:
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_geiq_eligibility_diagnosis == eligibility_diagnosis.pk
 
+    def test_with_jobseeker_valid_geiq_eligibility_diagnosis_with_a_denormalized_diagnosis_from_current_employer(self):
+        job_application = JobApplicationFactory(
+            sent_by_company=True, to_company__kind=CompanyKind.GEIQ, geiq_eligibility_diagnosis=None
+        )
+        eligibility_diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            author_geiq=job_application.sender_company,
+            job_seeker=job_application.job_seeker,
+        )  # not granting the allowance
+
+        qs = (
+            JobApplication.objects.all()
+            .with_jobseeker_geiq_eligibility_diagnosis()
+            .with_jobseeker_valid_geiq_eligibility_diagnosis()
+        )
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_geiq_eligibility_diagnosis is None  # because no allowance is granted
+        assert qs.first().jobseeker_valid_geiq_eligibility_diagnosis == eligibility_diagnosis.pk
+
     def test_with_jobseeker_geiq_eligibility_diagnosis_with_a_denormalized_diagnosis_from_another_employer(self):
         job_application = JobApplicationFactory(
             sent_by_company=True, to_company__kind=CompanyKind.GEIQ, geiq_eligibility_diagnosis=None
@@ -845,7 +864,7 @@ class TestJobApplicationQuerySet:
         with assertNumQueries(0):
             assert hasattr(obj, "jobseeker_geiq_eligibility_diagnosis_author_kind")
             assert hasattr(obj, "jobseeker_geiq_eligibility_diagnosis")
-            assert hasattr(obj, "jobseeker_valid_geiq_eligibility_diagnosis")
+            assert hasattr(obj, "jobseeker_valid_geiq_eligibility_diagnosis_with_allowance")
 
     def test_eligible_as_employee_record(self):
         # A valid job application:
