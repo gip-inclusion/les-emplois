@@ -20,7 +20,7 @@ from itou.utils.urls import add_url_params
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -611,6 +611,7 @@ def test_table_and_list_snapshot(client, snapshot):
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
+    geiq = CompanyFactory(with_membership=True, name="Tartempion", kind=CompanyKind.GEIQ)
     common_kwargs = {
         "sender_kind": SenderKind.PRESCRIBER,
         "sender": prescriber,
@@ -634,6 +635,37 @@ def test_table_and_list_snapshot(client, snapshot):
         author_prescriber_organization=prescriber_org,
         author=prescriber,
         criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.QPV],
+    )
+
+    geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq diag geiq",
+        author_kind=AuthorKind.GEIQ,
+        author_geiq=geiq,
+        author=geiq.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.RSA, AdministrativeCriteriaKind.PM],
+    )
+    geiq_diag_without_allowance = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq sans aide",
+        author_kind=AuthorKind.GEIQ,
+        author_geiq=geiq,
+        author=geiq.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASE],  # not enough to get the allowance
+    )
+    no_criteria_prescriber_geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+    )
+    prescriber_geiq_diag = GEIQEligibilityDiagnosisFactory(
+        job_seeker__first_name="Jean",
+        job_seeker__last_name="Geiq diag prescripteur",
+        author_kind=AuthorKind.PRESCRIBER,  # the allowance is granted as it comes from a prescriber
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+        criteria_kinds=[AdministrativeCriteriaKind.ASE],
     )
 
     prescriber_approval = ApprovalFactory(
@@ -696,6 +728,38 @@ def test_table_and_list_snapshot(client, snapshot):
             job_seeker=prescriber_approval.user,
             to_company__name="Tartempion",
             to_company__kind=CompanyKind.GEIQ,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.PROCESSING,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=geiq_diag,
+            job_seeker=geiq_diag.job_seeker,
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.REFUSED,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=no_criteria_prescriber_geiq_diag,
+            job_seeker=job_seeker,  # job_seeker has IAE and GEIQ diags, we should show the corresponding criteria
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.POSTPONED,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=prescriber_geiq_diag,
+            job_seeker=prescriber_geiq_diag.job_seeker,
+            to_company=geiq,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            eligibility_diagnosis=None,
+            geiq_eligibility_diagnosis=geiq_diag_without_allowance,
+            job_seeker=geiq_diag_without_allowance.job_seeker,
+            to_company=geiq,
             **common_kwargs,
         ),
     ]

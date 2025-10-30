@@ -19,8 +19,8 @@
             <th scope="col">Émetteur</th>
             {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED and request.current_organization.is_subject_to_iae_rules %}
                 {# prescription or received by IAE employer #}
-                <th scope="col" class="text-nowrap">Critères administratifs IAE</th>
-                <th scope="col">Statut IAE</th>
+                <th scope="col" class="text-nowrap">Critères administratifs</th>
+                <th scope="col">Statut éligibilité</th>
             {% endif %}
             <th scope="col" class="text-end w-50px"></th>
         </tr>
