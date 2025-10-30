@@ -126,6 +126,7 @@ INSTALLED_APPS = [
     "itou.gps",
     "itou.rdv_insertion",
     "itou.archive",
+    "itou.nexus",
 ]
 
 # TODO: Remove with Django 6.0
@@ -885,3 +886,11 @@ MAINTENANCE_DESCRIPTION = os.getenv("MAINTENANCE_DESCRIPTION", None)
 PAGE_SIZE_DEFAULT = 20
 PAGE_SIZE_SMALL = 10
 PAGE_SIZE_LARGE = 50
+
+# Nexus metabase db
+# ------------------------------------------------------------------------------
+NEXUS_METABASE_DB_HOST = os.getenv("NEXUS_METABASE_DB_HOST")
+NEXUS_METABASE_DB_PORT = os.getenv("NEXUS_METABASE_DB_PORT")
+NEXUS_METABASE_DB_DATABASE = os.getenv("NEXUS_METABASE_DB_DATABASE")
+NEXUS_METABASE_DB_USER = os.getenv("NEXUS_METABASE_DB_USER")
+NEXUS_METABASE_DB_PASSWORD = os.getenv("NEXUS_METABASE_DB_PASSWORD")
