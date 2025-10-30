@@ -21,6 +21,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
+from itou.jobs.models import Appellation
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -841,11 +842,12 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         return sorted(departments, key=lambda dpts: dpts[1])
 
     def _get_choices_for_jobs(self):
-        jobs = set()
-        for job_application in self.job_applications_qs.prefetch_related("selected_jobs__appellation"):
-            for job in job_application.selected_jobs.all():
-                jobs.add((job.appellation.code, job.appellation.name))
-        return sorted(jobs, key=lambda job: job[1])
+        return (
+            Appellation.objects.filter(jobdescription__jobapplication__in=self.job_applications_qs.all())
+            .distinct()
+            .order_by("name", "code")
+            .values_list("code", "name")
+        )
 
     def filter(self, queryset):
         queryset = super().filter(queryset)
