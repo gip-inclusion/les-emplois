@@ -1885,7 +1885,7 @@
 # ---
 # name: TestFillJobSeekerInfosForHire.test_as_company[view queries]
   dict({
-    'num_queries': 25,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -2614,30 +2614,6 @@
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.get_context_data[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.get_context_data[www/apply/views/submit_views.py]',
           'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
           'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
