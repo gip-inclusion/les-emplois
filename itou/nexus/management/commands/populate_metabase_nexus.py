@@ -51,17 +51,17 @@ def create_table(reset=False):
             cursor.execute(f"DROP TABLE IF EXISTS {STRUCTURES_TABLE}")
         cursor.execute(f"""
             CREATE TABLE {USER_TABLE} (
-                source      text NOT NULL,
-                id_source   text NOT NULL,
-                id_unique   text NOT NULL,
-                nom         text NOT NULL,
-                prénom      text NOT NULL,
-                email       text NOT NULL,
-                téléphone   text NOT NULL,
-                last_login  timestamp with time zone,
-                auth        text NOT NULL,
-                type        text NOT NULL,
-                updated_at  timestamp with time zone
+                source              text NOT NULL,
+                id_source           text NOT NULL,
+                id_unique           text NOT NULL,
+                nom                 text NOT NULL,
+                prénom              text NOT NULL,
+                email               text NOT NULL,
+                téléphone           text NOT NULL,
+                dernière_connexion  timestamp with time zone,
+                auth                text NOT NULL,
+                type                text NOT NULL,
+                mise_à_jour         timestamp with time zone
             )
             """)
         cursor.execute(f"""
@@ -70,7 +70,7 @@ def create_table(reset=False):
                 user_id_unique          text NOT NULL,
                 structure_id_unique     text NOT NULL,
                 role                    text NOT NULL,
-                updated_at  timestamp with time zone
+                mise_à_jour             timestamp with time zone
             )
             """)
         cursor.execute(f"""
@@ -88,7 +88,7 @@ def create_table(reset=False):
                 longitude   double precision,
                 email       text NOT NULL,
                 téléphone   text NOT NULL,
-                updated_at  timestamp with time zone
+                mise_à_jour timestamp with time zone
             )
             """)
 
@@ -147,22 +147,18 @@ class Command(BaseCommand):
             "prénom": "text",
             "email": "text",
             "téléphone": "text",
-            "last_login": "timestamp with time zone",
+            "dernière_connexion": "timestamp with time zone",
             "auth": "text",
             "type": "text",
-            "updated_at": "timestamp with time zone",
+            "mise_à_jour": "timestamp with time zone",
         }
 
         populate_table(USER_TABLE, columns, serializer, [queryset])
 
     def populate_memberships(self):
-        employers_qs = (
-            CompanyMembership.objects.active().select_related("company").only("company__uid", "user_id", "is_admin")
-        )
-        prescribers_qs = (
-            PrescriberMembership.objects.active()
-            .select_related("organization")
-            .only("organization__uid", "user_id", "is_admin")
+        employers_qs = CompanyMembership.objects.select_related("company").only("company__uid", "user_id", "is_admin")
+        prescribers_qs = PrescriberMembership.objects.select_related("organization").only(
+            "organization__uid", "user_id", "is_admin"
         )
 
         def serializer(membership):
@@ -184,7 +180,7 @@ class Command(BaseCommand):
             "user_id_unique": "text",
             "structure_id_unique": "text",
             "role": "text",
-            "updated_at": "timestamp with time zone",
+            "mise_à_jour": "timestamp with time zone",
         }
 
         populate_table(MEMBERSHIPS_TABLE, columns, serializer, [employers_qs, prescribers_qs])
@@ -232,7 +228,7 @@ class Command(BaseCommand):
             "longitude": "double precision",
             "email": "text",
             "téléphone": "text",
-            "updated_at": "timestamp with time zone",
+            "mise_à_jour": "timestamp with time zone",
         }
 
         populate_table(STRUCTURES_TABLE, columns, serializer, querysets=[prescribers_qs, company_qs])
