@@ -16,6 +16,7 @@ from itou.eligibility.enums import (
     AuthorKind,
 )
 from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.jobs.models import Appellation
@@ -24,7 +25,7 @@ from itou.www.apply.views.list_views import JobApplicationOrder, JobApplications
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -181,29 +182,16 @@ class TestProcessListSiae:
         # No selected jobs, the filter should not appear.
         assertNotContains(response, self.SELECTED_JOBS)
 
-    def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self, client, subtests):
+    def test_list_for_siae_hide_criteria_for_non_iae_or_geiq_employers(self, client, subtests):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
-
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
-        # Level 1 criteria
-        diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
-        JobApplicationFactory(
-            job_seeker=diagnosis.job_seeker,
-            to_company=company,
-            eligibility_diagnosis=None,  # fallback on the jobseeker's
-        )
-
-        TITLE = '<p class="h5">Critères administratifs IAE</p>'
-        CRITERION = "<li>Allocataire AAH</li>"
-
         client.force_login(employer)
 
         expect_to_see_criteria = {
             CompanyKind.EA: False,
             CompanyKind.EATT: False,
             CompanyKind.EI: True,
-            CompanyKind.GEIQ: False,
+            CompanyKind.GEIQ: True,
             CompanyKind.OPCS: False,
             CompanyKind.ACI: True,
             CompanyKind.AI: True,
@@ -211,18 +199,41 @@ class TestProcessListSiae:
             CompanyKind.ETTI: True,
         }
         for kind in CompanyKind:
+            if kind == CompanyKind.GEIQ:
+                diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+                # Level 1 criteria
+                diagnosis.administrative_criteria.add(
+                    GEIQAdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH)
+                )
+                title = '<p class="h5">Critères administratifs GEIQ</p>'
+                criterion = "<li>Allocataire de l'Allocation aux Adultes Handicapés (AAH)</li>"
+            else:
+                diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+                # Level 1 criteria
+                diagnosis.administrative_criteria.add(
+                    AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH)
+                )
+                title = '<p class="h5">Critères administratifs IAE</p>'
+                criterion = "<li>Allocataire AAH</li>"
+
+            JobApplicationFactory(
+                job_seeker=diagnosis.job_seeker,
+                to_company=company,
+                eligibility_diagnosis=None,  # fallback on the jobseeker's
+            )
             with subtests.test(kind=kind.label):
                 company.kind = kind
                 company.save(update_fields=("kind", "updated_at"))
                 response = client.get(
                     reverse("apply:list_for_siae"), data={"display": JobApplicationsDisplayKind.LIST}
                 )
+
                 if expect_to_see_criteria[kind]:
-                    assertContains(response, TITLE, html=True)
-                    assertContains(response, CRITERION, html=True)
+                    assertContains(response, title, html=True)
+                    assertContains(response, criterion, html=True)
                 else:
-                    assertNotContains(response, TITLE, html=True)
-                    assertNotContains(response, CRITERION, html=True)
+                    assertNotContains(response, title, html=True)
+                    assertNotContains(response, criterion, html=True)
 
     def test_list_for_siae_filtered_by_one_state(self, client):
         company = CompanyFactory(with_membership=True)
@@ -814,29 +825,18 @@ def test_list_for_siae_htmx_filters(client):
     assertSoupEqual(page, fresh_page)
 
 
-def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
+def test_table_for_siae_hide_criteria_for_non_iae_or_geiq_employers(client, subtests):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
-
-    diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
-    # Level 1 criteria
-    diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH))
-    JobApplicationFactory(
-        job_seeker=diagnosis.job_seeker,
-        to_company=company,
-        eligibility_diagnosis=None,  # fallback on the jobseeker's
-    )
-
-    TITLE = '<th scope="col" class="text-nowrap">Critères administratifs IAE</th>'
-    CRITERION = "<li>Allocataire AAH</li>"
-
     client.force_login(employer)
+
+    TITLE = '<th scope="col" class="text-nowrap">Critères administratifs</th>'
 
     expect_to_see_criteria = {
         CompanyKind.EA: False,
         CompanyKind.EATT: False,
         CompanyKind.EI: True,
-        CompanyKind.GEIQ: False,
+        CompanyKind.GEIQ: True,
         CompanyKind.OPCS: False,
         CompanyKind.ACI: True,
         CompanyKind.AI: True,
@@ -844,20 +844,40 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
         CompanyKind.ETTI: True,
     }
     for kind in CompanyKind:
+        if kind == CompanyKind.GEIQ:
+            diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
+            # Level 1 criteria
+            diagnosis.administrative_criteria.add(
+                GEIQAdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH)
+            )
+            criterion = "<li>Allocataire de l'Allocation aux Adultes Handicapés (AAH)</li>"
+        else:
+            diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+            # Level 1 criteria
+            diagnosis.administrative_criteria.add(
+                AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.AAH)
+            )
+            criterion = "<li>Allocataire AAH</li>"
+        JobApplicationFactory(
+            job_seeker=diagnosis.job_seeker,
+            to_company=company,
+            eligibility_diagnosis=None,  # fallback on the jobseeker's
+        )
+
         with subtests.test(kind=kind.label):
             company.kind = kind
             company.save(update_fields=("kind", "updated_at"))
             response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.TABLE})
             if expect_to_see_criteria[kind]:
                 assertContains(response, TITLE, html=True)
-                assertContains(response, CRITERION, html=True)
+                assertContains(response, criterion, html=True)
             else:
                 assertNotContains(response, TITLE, html=True)
-                assertNotContains(response, CRITERION, html=True)
+                assertNotContains(response, criterion, html=True)
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_list_snapshot(client, snapshot):
+def test_list_and_table_empty_snapshot(client, snapshot):
     company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
@@ -870,95 +890,6 @@ def test_list_snapshot(client, snapshot):
         response = client.get(url, display_param)
         page = parse_response_to_soup(response, selector="#job-applications-section")
         assert pretty_indented(page) == snapshot(name="empty")
-
-    job_seeker = JobSeekerFactory(for_snapshot=True)
-    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
-    prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
-
-    job_applications = [
-        JobApplicationFactory(
-            sender_kind=SenderKind.JOB_SEEKER, state=JobApplicationState.ACCEPTED, sender=job_seeker, **common_kwargs
-        ),
-        JobApplicationFactory(
-            sender_kind=SenderKind.EMPLOYER,
-            sender=company.members.first(),
-            sender_company=company,
-            state=JobApplicationState.NEW,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            sender_kind=SenderKind.PRESCRIBER,
-            sender=prescriber_org.members.first(),
-            sender_prescriber_organization=prescriber_org,
-            state=JobApplicationState.REFUSED,
-            **common_kwargs,
-        ),
-    ]
-
-    # List display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/siae/details",
-                        "/apply/[PK of JobApplication]/siae/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications list")
-
-    # Table display
-    response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
-    page = parse_response_to_soup(
-        response,
-        selector="#job-applications-section",
-        replace_in_attr=itertools.chain(
-            *(
-                [
-                    (
-                        "href",
-                        f"/apply/{job_application.pk}/siae/details",
-                        "/apply/[PK of JobApplication]/siae/details",
-                    ),
-                    (
-                        "id",
-                        f"state_{job_application.pk}",
-                        "state_[PK of JobApplication]",
-                    ),
-                    (
-                        "value",
-                        str(job_application.pk),
-                        "[PK of JobApplication]",
-                    ),
-                    (
-                        "id",
-                        f"select-{job_application.pk}",
-                        "select-[PK of JobApplication]",
-                    ),
-                    (
-                        "for",
-                        f"select-{job_application.pk}",
-                        "select-[PK of JobApplication]",
-                    ),
-                ]
-                for job_application in job_applications
-            )
-        ),
-    )
-    assert pretty_indented(page) == snapshot(name="applications table")
 
 
 def test_list_for_siae_exports(client, snapshot):
@@ -2060,110 +1991,190 @@ def test_htmx_order(client):
 
 
 @freeze_time("2024-11-27", tick=True)
-def test_table_iae_state_and_criteria(client, snapshot):
-    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
+@pytest.mark.parametrize("geiq", [True, False])
+def test_table_and_list_snapshot(client, snapshot, geiq):
+    if geiq:
+        kind = CompanyKind.GEIQ
+
+        def CustomEligibilityDiagnosisFactory(**kwargs):
+            kwargs["author_geiq"] = kwargs.pop("author_company", None)
+            if kwargs.get("author_kind", None) == AuthorKind.EMPLOYER:
+                kwargs["author_kind"] = AuthorKind.GEIQ
+            return GEIQEligibilityDiagnosisFactory(**kwargs)
+
+        def CustomJobApplicationFactory(**kwargs):
+            kwargs["geiq_eligibility_diagnosis"] = kwargs.pop("diagnosis", None)
+            kwargs["eligibility_diagnosis"] = None
+            return JobApplicationFactory(**kwargs)
+
+    else:
+        kind = CompanyKind.EI
+
+        def CustomEligibilityDiagnosisFactory(**kwargs):
+            kwargs["author_siae"] = kwargs.pop("author_company", None)
+            return IAEEligibilityDiagnosisFactory(**kwargs)
+
+        def CustomJobApplicationFactory(**kwargs):
+            kwargs["eligibility_diagnosis"] = kwargs.pop("diagnosis", None)
+            kwargs["geiq_eligibility_diagnosis"] = None
+            return JobApplicationFactory(**kwargs)
+
+    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True, kind=kind)
     employer = company.members.first()
+    other_company = CompanyFactory(name="L'autre, Inc.", with_membership=True)
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
-    prescriber_org = PrescriberOrganizationFactory(authorized=True, for_snapshot=True, with_membership=True)
+    prescriber_org = PrescriberOrganizationFactory(
+        authorized=True,
+        for_snapshot=True,
+        with_membership=True,
+        membership__user__first_name="Yvon",
+        membership__user__last_name="Iva",
+    )
     prescriber = prescriber_org.members.get()
     job_seeker = JobSeekerFactory(for_snapshot=True)
     common_kwargs = {
         "to_company": company,
-        "sender_kind": SenderKind.EMPLOYER,
-        "sender": employer,
-        "sender_company": company,
     }
-    company_diag = IAEEligibilityDiagnosisFactory(
+    company_diag = CustomEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.EMPLOYER,
-        author_siae=company,
+        author_company=company,
         author=company.members.first(),
-        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+        criteria_kinds=[AdministrativeCriteriaKind.ASE],  # for GEIQ, not enough to get the allowance
     )
-    no_criteria_prescriber_diag = IAEEligibilityDiagnosisFactory(
+    no_criteria_prescriber_diag = CustomEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.PRESCRIBER,
         author_prescriber_organization=prescriber_org,
         author=prescriber,
     )
-    prescriber_diag = IAEEligibilityDiagnosisFactory(
-        job_seeker=job_seeker,
+    prescriber_diag = CustomEligibilityDiagnosisFactory(
+        job_seeker__first_name="Olivia",
+        job_seeker__last_name="Dufruit",
         author_kind=AuthorKind.PRESCRIBER,
         author_prescriber_organization=prescriber_org,
         author=prescriber,
         criteria_kinds=[AdministrativeCriteriaKind.AAH, AdministrativeCriteriaKind.QPV],
     )
 
-    prescriber_approval = ApprovalFactory(
-        user__first_name="Martine",
-        user__last_name="Martin",
-    )
-    employer_approval = ApprovalFactory(
-        user__first_name="Aline",
-        user__last_name="Bato",
-        with_diagnosis_from_employer=True,
-    )
-    company_approval_diag = IAEEligibilityDiagnosisFactory(
-        job_seeker__first_name="Béatrice",
-        job_seeker__last_name="Voiture",
-        author_kind=AuthorKind.EMPLOYER,
-        author_siae=company,
-        author=company.members.first(),
-        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
-    )
-    ApprovalFactory(
-        user=company_approval_diag.job_seeker,
-        eligibility_diagnosis=company_approval_diag,
-    )
-
     job_applications = [
-        JobApplicationFactory(
+        CustomJobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
+            diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
             **common_kwargs,
         ),
-        JobApplicationFactory(
+        CustomJobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=company_diag,
+            diagnosis=company_diag,
             job_seeker=job_seeker,
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
             **common_kwargs,
         ),
-        JobApplicationFactory(
+        CustomJobApplicationFactory(
             state=JobApplicationState.REFUSED,
-            eligibility_diagnosis=no_criteria_prescriber_diag,
+            diagnosis=no_criteria_prescriber_diag,
             job_seeker=job_seeker,
+            sender_kind=SenderKind.PRESCRIBER,
+            sender=prescriber,
+            sender_prescriber_organization=prescriber_org,
             **common_kwargs,
         ),
-        JobApplicationFactory(
+        CustomJobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=prescriber_diag,
+            diagnosis=prescriber_diag,
             job_seeker=job_seeker,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            eligibility_diagnosis=employer_approval.eligibility_diagnosis,
-            job_seeker=employer_approval.user,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
-            job_seeker=prescriber_approval.user,
-            **common_kwargs,
-        ),
-        JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            eligibility_diagnosis=company_approval_diag,
-            job_seeker=company_approval_diag.job_seeker,
+            sender_kind=SenderKind.PRESCRIBER,
+            sender=prescriber,
+            sender_prescriber_organization=None,
             **common_kwargs,
         ),
     ]
+    if not geiq:
+        prescriber_approval = ApprovalFactory(
+            user__first_name="Martine",
+            user__last_name="Martin",
+        )
+        employer_approval = ApprovalFactory(
+            user__first_name="Aline",
+            user__last_name="Bato",
+            with_diagnosis_from_employer=True,
+        )
+        company_approval_diag = IAEEligibilityDiagnosisFactory(
+            job_seeker__first_name="Béatrice",
+            job_seeker__last_name="Voiture",
+            author_kind=AuthorKind.EMPLOYER,
+            author_siae=company,
+            author=company.members.first(),
+            criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+        )
+        ApprovalFactory(
+            user=company_approval_diag.job_seeker,
+            eligibility_diagnosis=company_approval_diag,
+        )
+        job_applications += [
+            JobApplicationFactory(
+                state=JobApplicationState.ACCEPTED,
+                eligibility_diagnosis=employer_approval.eligibility_diagnosis,
+                job_seeker=employer_approval.user,
+                sender_kind=SenderKind.EMPLOYER,
+                sender=other_company.members.last(),
+                sender_company=other_company,
+                **common_kwargs,
+            ),
+            JobApplicationFactory(
+                state=JobApplicationState.ACCEPTED,
+                eligibility_diagnosis=prescriber_approval.eligibility_diagnosis,
+                job_seeker=prescriber_approval.user,
+                sender_kind=SenderKind.JOB_SEEKER,
+                sender=prescriber_approval.user,
+                **common_kwargs,
+            ),
+            JobApplicationFactory(
+                state=JobApplicationState.POOL,
+                eligibility_diagnosis=company_approval_diag,
+                job_seeker=company_approval_diag.job_seeker,
+                sender_kind=SenderKind.EMPLOYER,
+                sender=employer,
+                sender_company=company,
+                **common_kwargs,
+            ),
+        ]
 
+    # List display
+    response = client.get(url, {"display": JobApplicationsDisplayKind.LIST})
+    page = parse_response_to_soup(
+        response,
+        selector="#job-applications-section",
+        replace_in_attr=itertools.chain(
+            *(
+                [
+                    (
+                        "href",
+                        f"/apply/{job_application.pk}/siae/details",
+                        "/apply/[PK of JobApplication]/siae/details",
+                    ),
+                    (
+                        "id",
+                        f"state_{job_application.pk}",
+                        "state_[PK of JobApplication]",
+                    ),
+                ]
+                for job_application in job_applications
+            )
+        ),
+    )
+    assert pretty_indented(page) == snapshot(name="applications list" + (" for geiq" if geiq else ""))
+
+    # Table display
     response = client.get(url, {"display": JobApplicationsDisplayKind.TABLE})
     page = parse_response_to_soup(
         response,
@@ -2201,4 +2212,4 @@ def test_table_iae_state_and_criteria(client, snapshot):
             )
         ),
     )
-    assert pretty_indented(page) == snapshot(name="applications table")
+    assert pretty_indented(page) == snapshot(name="applications table" + (" for geiq" if geiq else ""))

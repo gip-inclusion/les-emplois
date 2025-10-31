@@ -71,20 +71,6 @@ def check_waiting_period(job_application):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
-def _get_geiq_eligibility_diagnosis(job_application, only_prescriber):
-    # Return the job_application diagnosis if it's accepted
-    if job_application.state.is_accepted:
-        # or None if the viewer is a prescriber and the diangosis was made by the company
-        # NB. the job application may not have a geiq diagnosis
-        if only_prescriber and getattr(job_application.geiq_eligibility_diagnosis, "author_geiq", None):
-            return None
-        return job_application.geiq_eligibility_diagnosis
-    return GEIQEligibilityDiagnosis.objects.diagnoses_for(
-        job_application.job_seeker,
-        job_application.to_company if not only_prescriber else None,
-    ).first()
-
-
 def job_application_sender_left_org(job_app):
     if org_id := job_app.sender_prescriber_organization_id:
         return not job_app.sender.prescribermembership_set.filter(organization_id=org_id).exists()
@@ -132,8 +118,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_job_seeker"))
 
     geiq_eligibility_diagnosis = (
-        job_application.to_company.kind == CompanyKind.GEIQ
-        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+        job_application.to_company.kind == CompanyKind.GEIQ and job_application.get_geiq_eligibility_diagnosis()
     )
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
 
@@ -248,8 +233,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     request.session[session_key] = back_url
 
     geiq_eligibility_diagnosis = (
-        job_application.to_company.kind == CompanyKind.GEIQ
-        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+        job_application.to_company.kind == CompanyKind.GEIQ and job_application.get_geiq_eligibility_diagnosis()
     )
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
 
@@ -399,7 +383,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
     geiq_eligibility_diagnosis = (
         job_application.to_company.kind == CompanyKind.GEIQ
-        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=True)
+        and job_application.get_geiq_eligibility_diagnosis(for_prescriber=True)
     )
 
     eligibility_diagnosis = job_application.get_eligibility_diagnosis()
@@ -779,7 +763,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all(),
                 "geiq_eligibility_diagnosis": (
-                    _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+                    job_application.get_geiq_eligibility_diagnosis()
                     if job_application.to_company.kind == CompanyKind.GEIQ
                     else None
                 ),
@@ -849,7 +833,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             form.save()
             geiq_eligibility_diagnosis = None
             if state_update and job_application.to_company.kind == CompanyKind.GEIQ:
-                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+                geiq_eligibility_diagnosis = job_application.get_geiq_eligibility_diagnosis()
             return render(
                 request,
                 "apply/includes/job_application_prior_action.html",

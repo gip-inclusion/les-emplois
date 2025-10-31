@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import SelectedAdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
@@ -31,7 +32,7 @@ from itou.www.apply.forms import (
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
 )
-from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER, _get_geiq_eligibility_diagnosis
+from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER
 from itou.www.stats.utils import can_view_stats_ft
 
 
@@ -99,16 +100,23 @@ def _add_pending_for_weeks(job_applications):
         job_app.pending_for_weeks = pending_for_weeks
 
 
-def _add_administrative_criteria(job_applications):
+def _add_administrative_criteria(job_applications, for_geiq=False):
+    SelectedAdministrativeCriteriaClass = (
+        GEIQSelectedAdministrativeCriteria if for_geiq else SelectedAdministrativeCriteria
+    )
+    jobseeker_eligibility_diagnosis_attr = (
+        "jobseeker_valid_geiq_eligibility_diagnosis" if for_geiq else "jobseeker_eligibility_diagnosis"
+    )
+
     diagnoses_ids = tuple(
-        job_application.jobseeker_eligibility_diagnosis
+        getattr(job_application, jobseeker_eligibility_diagnosis_attr)
         for job_application in job_applications
-        if job_application.jobseeker_eligibility_diagnosis is not None
+        if getattr(job_application, jobseeker_eligibility_diagnosis_attr, None) is not None
     )
 
     diagnosis_criteria = defaultdict(list)
     for selected_criteria in (
-        SelectedAdministrativeCriteria.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
+        SelectedAdministrativeCriteriaClass.objects.filter(eligibility_diagnosis__in=diagnoses_ids)
         .select_related("administrative_criteria")
         .order_by("administrative_criteria__level", "administrative_criteria__name")
     ):
@@ -117,15 +125,18 @@ def _add_administrative_criteria(job_applications):
         )
 
     for job_application in job_applications:
-        ja_criteria = diagnosis_criteria[job_application.jobseeker_eligibility_diagnosis]
-        if len(ja_criteria) > 4:
-            # Only show the 3 first
-            extra_nb = len(ja_criteria) - 3
-            ja_criteria = ja_criteria[:3]
-        else:
-            extra_nb = 0
-        job_application.preloaded_administrative_criteria = ja_criteria
-        job_application.preloaded_administrative_criteria_extra_nb = extra_nb
+        if for_geiq and job_application.to_company.kind == CompanyKind.GEIQ or not for_geiq:
+            ja_criteria = []
+            if job_application.to_company.is_subject_to_eligibility_rules:
+                ja_criteria = diagnosis_criteria[getattr(job_application, jobseeker_eligibility_diagnosis_attr)]
+            if len(ja_criteria) > 4:
+                # Only show the 3 first
+                extra_nb = len(ja_criteria) - 3
+                ja_criteria = ja_criteria[:3]
+            else:
+                extra_nb = 0
+            job_application.preloaded_administrative_criteria = ja_criteria
+            job_application.preloaded_administrative_criteria_extra_nb = extra_nb
 
 
 @check_user(lambda u: u.is_job_seeker)
@@ -212,7 +223,11 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET, request=request)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
+    job_applications = (
+        job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
+        .with_jobseeker_geiq_eligibility_diagnosis_author_kind()
+        .with_jobseeker_valid_geiq_eligibility_diagnosis()
+    )
 
     title = "Candidatures envoyées"
     filters_counter = 0
@@ -250,6 +265,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         job_applications_page, functools.partial(can_view_personal_information, request)
     )
     _add_administrative_criteria(job_applications_page)
+    _add_administrative_criteria(job_applications_page, for_geiq=True)
 
     context = {
         "title": title,
@@ -323,7 +339,11 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
+    job_applications = (
+        job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
+        .with_jobseeker_geiq_eligibility_diagnosis_author_kind()
+        .with_jobseeker_valid_geiq_eligibility_diagnosis()
+    )
 
     title = "Candidatures reçues"
     filters_counter = 0
@@ -368,9 +388,10 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
-    iae_company = company.kind in CompanyKind.siae_kinds()
-    if iae_company:
+    if company.is_subject_to_iae_rules:
         _add_administrative_criteria(job_applications_page)
+    elif company.kind == CompanyKind.GEIQ:
+        _add_administrative_criteria(job_applications_page, for_geiq=True)
 
     context = {
         "title": title,
@@ -462,9 +483,9 @@ def list_for_siae_actions(request):
         cannot_accept_reason = "Cette candidature est déjà acceptée."
     can_accept = cannot_accept_reason is None
     if can_accept and company.kind == CompanyKind.GEIQ:
-        selected_job_applications[0].geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(
-            selected_job_applications[0], only_prescriber=False
-        )
+        selected_job_applications[0].geiq_eligibility_diagnosis = selected_job_applications[
+            0
+        ].get_geiq_eligibility_diagnosis()
     job_seeker_nb = len(set(job_application.job_seeker_id for job_application in selected_job_applications))
     prescriber_nb = len(
         set(

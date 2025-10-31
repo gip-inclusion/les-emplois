@@ -4,7 +4,6 @@ from pytest_django.asserts import assertContains, assertNotContains, assertTempl
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
-from itou.www.apply.views.process_views import _get_geiq_eligibility_diagnosis
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -237,84 +236,6 @@ class TestJobApplicationGEIQEligibilityDetails:
 
         response = self.get_response(client, job_application, job_application.sender)
         assert response.status_code == 200
-
-
-def test_get_geiq_eligibility_diagnosis(subtests):
-    expired_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        expired=True,
-    )
-    job_seeker = expired_prescriber_diagnosis.job_seeker
-    expired_company_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_employer=True,
-        expired=True,
-        job_seeker=job_seeker,
-    )
-    geiq = expired_company_diagnosis.author_geiq
-    newer_company_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_employer=True,
-        job_seeker=job_seeker,
-        author_geiq=geiq,
-    )
-    valid_prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
-        from_prescriber=True,
-        job_seeker=job_seeker,
-    )
-
-    # The new prescriber diagnosis changed the valid_company_diagnosis expiry date : it's now expired
-    newer_company_diagnosis.refresh_from_db()
-    assert not newer_company_diagnosis.is_valid
-
-    new_job_application = JobApplicationFactory(
-        to_company=geiq,
-        job_seeker=job_seeker,
-        eligibility_diagnosis=None,
-    )
-    accepted_job_application_with_company_diagnosis = JobApplicationFactory(
-        to_company=geiq,
-        job_seeker=job_seeker,
-        geiq_eligibility_diagnosis=expired_company_diagnosis,
-        eligibility_diagnosis=None,
-        state=JobApplicationState.ACCEPTED,
-    )
-    accepted_job_application_with_prescriber_diagnosis = JobApplicationFactory(
-        to_company=geiq,
-        job_seeker=job_seeker,
-        geiq_eligibility_diagnosis=expired_prescriber_diagnosis,
-        eligibility_diagnosis=None,
-        state=JobApplicationState.ACCEPTED,
-    )
-
-    # on accepted job application:
-    # the hiring company and jobseeker get the linked diagnosis
-    # a prescriber only sees the diagnosis if it was created by a prescriber
-    assert (
-        _get_geiq_eligibility_diagnosis(accepted_job_application_with_company_diagnosis, only_prescriber=False)
-        == expired_company_diagnosis
-    )
-    assert (
-        _get_geiq_eligibility_diagnosis(accepted_job_application_with_company_diagnosis, only_prescriber=True) is None
-    )
-    assert (
-        _get_geiq_eligibility_diagnosis(accepted_job_application_with_prescriber_diagnosis, only_prescriber=False)
-        == expired_prescriber_diagnosis
-    )
-    assert (
-        _get_geiq_eligibility_diagnosis(accepted_job_application_with_prescriber_diagnosis, only_prescriber=True)
-        == expired_prescriber_diagnosis
-    )
-
-    # On not accepted job application: if there's a valid prescriber diagnosis, return it
-    assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=False) == valid_prescriber_diagnosis
-    assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=True) == valid_prescriber_diagnosis
-
-    # If there's no prescriber valid diagnosis :
-    # the hiring company and jobseeker get the most recent diagnosis
-    # a prescriber get the most revent among prescriber diangoses
-    valid_prescriber_diagnosis.delete()
-    _valid_diagnois_from_other_company = GEIQEligibilityDiagnosisFactory(from_employer=True, job_seeker=job_seeker)
-    assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=False) == newer_company_diagnosis
-    assert _get_geiq_eligibility_diagnosis(new_job_application, only_prescriber=True) == expired_prescriber_diagnosis
 
 
 class TestJobSeekerGeoDetailsForGEIQDiagnosis:

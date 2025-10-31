@@ -4,7 +4,7 @@
 {% block progress_title %}{{ block.super }} - Éligibilité GEIQ{% endblock %}
 
 {% block pre_step_title %}
-    {% if is_subject_to_geiq_eligibility_rules and geiq_eligibility_diagnosis %}
+    {% if is_subject_to_geiq_rules and geiq_eligibility_diagnosis %}
         {% if eligibility_diagnosis.author_organization %}
             <div class="mb-5">
                 <p>L’éligibilité GEIQ du candidat a été validée par :</p>
