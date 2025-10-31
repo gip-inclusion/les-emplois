@@ -23,7 +23,7 @@
                role="tab"
                aria-controls="statistiques"
                aria-selected="true"
-               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
+               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Pilotage</a>
         </li>
         {% if user.is_employer or user.is_prescriber %}
             <li class="nav-item">
@@ -40,43 +40,65 @@
                 <div class="col-12">
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
-                            <h2>Statistiques</h2>
-                            <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
-                            </div>
-                            {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
-                                <section class="s-section mb-3 mb-md-5">
-                                    <div class="s-section__container">
-                                        {% if stats_kpi %}
-                                            {% include "dashboard/includes/stats/_institution_kpi.html" %}
-                                        {% endif %}
-                                        <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
-                                    </div>
-                                </section>
-                            {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
-                                {% include "dashboard/includes/stats/employer.html" %}
-                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
-                                {% include "dashboard/includes/stats/prescriber.html" %}
-                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_FT %}
-                                {% include "dashboard/includes/stats/prescriber_ft.html" %}
-                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
-                                {% include "dashboard/includes/stats/prescriber_dept.html" %}
-                            {% elif layout_kind is DashboardStatsLayoutKind.SD_IAE %}
-                                {% include "dashboard/includes/stats/sd_iae.html" %}
-                            {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
-                                {% include "dashboard/includes/stats/dgefp.html" %}
+                            <h2>Pilotage de mon activité</h2>
+                            {% if not request.user.is_employer %}
+                                <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
+                                    <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
+                                </div>
                             {% endif %}
-                        </div>
-                        {% if user.is_employer or user.is_prescriber %}
-                            <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
-                                <h2>Événements à venir</h2>
-                                <div class="mt-3 mt-md-4">
-                                    <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=10" title="Événements des emplois de l'inclusion | Livestorm">
+                            {% if request.user.is_employer %}
+                                <div class="alert alert-info alert-dismissible fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                                    <div class="row">
+                                        <div class="col-auto pe-0">
+                                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-2">
+                                                <strong>Nouveauté</strong>
+                                            </p>
+                                            <p class="mb-0">
+                                                Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
+                                                <br>
+                                                En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         {% endif %}
+                        {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
+                            <section class="s-section mb-3 mb-md-5">
+                                <div class="s-section__container">
+                                    {% if stats_kpi %}
+                                        {% include "dashboard/includes/stats/_institution_kpi.html" %}
+                                    {% endif %}
+                                    <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                                </div>
+                            </section>
+                        {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
+                            {% include "dashboard/includes/stats/employer.html" %}
+                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
+                            {% include "dashboard/includes/stats/prescriber.html" %}
+                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_FT %}
+                            {% include "dashboard/includes/stats/prescriber_ft.html" %}
+                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
+                            {% include "dashboard/includes/stats/prescriber_dept.html" %}
+                        {% elif layout_kind is DashboardStatsLayoutKind.SD_IAE %}
+                            {% include "dashboard/includes/stats/sd_iae.html" %}
+                        {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
+                            {% include "dashboard/includes/stats/dgefp.html" %}
+                        {% endif %}
                     </div>
+                    {% if user.is_employer or user.is_prescriber %}
+                        <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
+                            <h2>Événements à venir</h2>
+                            <div class="mt-3 mt-md-4">
+                                <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=10" title="Événements des emplois de l'inclusion | Livestorm">
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

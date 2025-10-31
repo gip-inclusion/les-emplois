@@ -154,7 +154,7 @@
         </li>
         {% if can_view_stats_dashboard_widget %}
             <li class="nav-item">
-                <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
+                <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Pilotage</a>
             </li>
         {% endif %}
         {% if user.is_employer or user.is_prescriber %}
