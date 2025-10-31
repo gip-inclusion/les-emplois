@@ -1,9 +1,6 @@
 {% load badges %}
-<li>
-    <div class="d-flex align-items-center">
-        <span>{{ criterion.administrative_criteria.name }}</span>
-        {% if request.user.is_employer or request.from_authorized_prescriber %}
-            {% criterion_certification_badge criterion %}
-        {% endif %}
-    </div>
-</li>
+
+{{ criterion.administrative_criteria.name }}
+{% if request.user.is_employer or request.from_authorized_prescriber %}
+    {% criterion_certification_badge criterion %}
+{% endif %}
