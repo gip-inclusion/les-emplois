@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2025-11-03
+
+### Ajouté
+
+- [Nexus: Ajout d'une synchronisation de données pour les analyses des utilisateurs Nexus](https://github.com/gip-inclusion/les-emplois/pull/7058)
+
+### Modifié
+
+- [Candidature : Masquer la liste des commentaires dans la barre latérale s'il n'y a aucun commentaire](https://github.com/gip-inclusion/les-emplois/pull/7061)
+- [Candidature : Ne pas afficher le filtre sur les critères administratifs pour les employeurs non IAE](https://github.com/gip-inclusion/les-emplois/pull/7063)
+- [Parcours d'embauche: ajout d'une étape dédiée aux données du candidat](https://github.com/gip-inclusion/les-emplois/pull/7036)
+
+### Tech
+
+- [Performance: amélioration du calcul du filtre "Fiches de poste" sur les listes de candidature](https://github.com/gip-inclusion/les-emplois/pull/7070)
+
 ## 2025-10-27
 
 ### Ajouté
