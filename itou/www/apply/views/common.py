@@ -47,11 +47,12 @@ class CommonUserInfoFormsMixin:
                 data=self.request.POST or None,
                 back_url=self.request.get_full_path(),
             )
-            forms["user_address"] = JobSeekerAddressForm(
-                instance=self.job_seeker,
-                initial=session_forms_data.get("user_address", {}),
-                data=self.request.POST or None,
-            )
+            if not self.job_seeker.address_on_one_line:
+                forms["user_address"] = JobSeekerAddressForm(
+                    instance=self.job_seeker,
+                    initial=session_forms_data.get("user_address", {}),
+                    data=self.request.POST or None,
+                )
         elif self.company.kind == CompanyKind.GEIQ:
             forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
                 instance=self.job_seeker.jobseeker_profile,

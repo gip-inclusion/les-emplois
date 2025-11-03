@@ -1,5 +1,6 @@
 import datetime
 import io
+import random
 import uuid
 from unittest import mock
 
@@ -3029,14 +3030,6 @@ class TestDirectHireFullProcess:
         post_data = {
             "pole_emploi_id": new_job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": new_job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
-            "ban_api_resolved_address": new_job_seeker.geocoding_address,
-            "address_line_1": new_job_seeker.address_line_1,
-            "post_code": geispolsheim.post_codes[0],
-            "insee_code": geispolsheim.code_insee,
-            "city": geispolsheim.name,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
             # BRSA criterion certification.
             "birthdate": birthdate,
             "birth_place": "",
@@ -3056,17 +3049,6 @@ class TestDirectHireFullProcess:
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
                 "nir": new_job_seeker.jobseeker_profile.nir,
-            },
-            "user_address": {
-                "ban_api_resolved_address": new_job_seeker.geocoding_address,
-                "address_line_1": new_job_seeker.address_line_1,
-                "address_line_2": "",
-                "post_code": geispolsheim.post_codes[0],
-                "insee_code": geispolsheim.code_insee,
-                "city": geispolsheim.name,
-                "fill_mode": "ban_api",
-                # Select the first and only one option
-                "address_for_autocomplete": "0",
             },
         }
 
@@ -5554,13 +5536,6 @@ class TestFillJobSeekerInfosForHire:
             "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
             "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
         }
         # Test with invalid data
         response = client.post(
@@ -5591,21 +5566,110 @@ class TestFillJobSeekerInfosForHire:
                 "lack_of_nir_reason": "",
                 "nir": self.job_seeker.jobseeker_profile.nir,
             },
-            "user_address": {
-                "ban_api_resolved_address": self.job_seeker.geocoding_address,
-                "address_line_1": self.job_seeker.address_line_1,
-                "address_line_2": "",
-                "post_code": self.city.post_codes[0],
-                "insee_code": self.city.code_insee,
-                "city": self.city.name,
-                "fill_mode": "ban_api",
-                # Select the first and only one option
-                "address_for_autocomplete": "0",
-            },
         }
         # If you come back to the view, it is pre-filled with session data
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
         assertContains(response, NEW_POLE_EMPLOI_ID)
+
+    @pytest.mark.parametrize("address", ["empty", "incomplete"])
+    def test_as_company_no_address(self, client, address):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        address_kwargs = {
+            "address_line_1": "",
+            "city": "",
+            "post_code": "",
+        }
+        if address == "incomplete":
+            address_kwargs.pop(random.choice(list(address_kwargs.keys())))
+
+        # Remove job seeker address
+        for key, value in address_kwargs.items():
+            setattr(self.job_seeker, key, value)
+        self.job_seeker.save(update_fields=address_kwargs.keys())
+
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+
+        response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, "Éligible à l’IAE")
+
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "address_line_1": "128 Rue de Grenelle",
+            "address_line_2": "",
+            "post_code": "67118",
+            "city": "Geispolsheim",
+            "fill_mode": "ban_api",
+            "insee_code": "67152",
+            "ban_api_resolved_address": "128 Rue de Grenelle 67118 Geispolsheim",
+            "address_for_autocomplete": "67152_1234_00128",
+        }
+        # Test with invalid data
+        response = client.post(
+            reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}),
+            data=post_data | {"address_line_1": "", "address_for_autocomplete": ""},
+        )
+        assert response.status_code == 200
+        assertFormError(response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire.")
+        # Then with valid data
+        response = client.post(
+            reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}), data=post_data
+        )
+        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
+        assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+                "lack_of_pole_emploi_id_reason": "",
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+                "nir": self.job_seeker.jobseeker_profile.nir,
+            },
+            "user_address": {
+                "address_line_1": "128 Rue de Grenelle",
+                "address_line_2": "",
+                "post_code": "67118",
+                "city": "Geispolsheim",
+                "fill_mode": "ban_api",
+                "insee_code": "67152",
+                "ban_api_resolved_address": "128 Rue de Grenelle 67118 Geispolsheim",
+                "address_for_autocomplete": "67152_1234_00128",
+            },
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
+        assertContains(response, "128 Rue de Grenelle")
+
+        # Check that address is saved on job seeker after contract signature
+        post_data = {
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "answer": "",
+            "confirmed": True,
+        }
+        response = client.post(
+            reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}),
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        job_application = JobApplication.objects.select_related("job_seeker").get(
+            sender=company.members.first(), to_company=company
+        )
+        assertRedirects(
+            response,
+            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        assert job_application.job_seeker.address_line_1 == "128 Rue de Grenelle"
 
     def test_as_company_eligibility_diagnosis_from_another_company(self, client):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
@@ -5624,13 +5688,6 @@ class TestFillJobSeekerInfosForHire:
             "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
             "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
         }
         response = client.post(
             reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}),
@@ -5648,17 +5705,6 @@ class TestFillJobSeekerInfosForHire:
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
                 "nir": self.job_seeker.jobseeker_profile.nir,
-            },
-            "user_address": {
-                "ban_api_resolved_address": self.job_seeker.geocoding_address,
-                "address_line_1": self.job_seeker.address_line_1,
-                "address_line_2": "",
-                "post_code": self.city.post_codes[0],
-                "insee_code": self.city.code_insee,
-                "city": self.city.name,
-                "fill_mode": "ban_api",
-                # Select the first and only one option
-                "address_for_autocomplete": "0",
             },
         }
 

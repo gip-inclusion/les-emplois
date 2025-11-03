@@ -2227,18 +2227,6 @@ class TestProcessAcceptViewsInWizard:
     def _accept_jobseeker_post_data(self, job_application, post_data=None):
         extra_post_data = post_data or {}
         job_seeker = job_application.job_seeker
-        # JobSeekerAddressForm
-        address_default_fields = {
-            "ban_api_resolved_address": job_seeker.geocoding_address,
-            "address_line_1": job_seeker.address_line_1,
-            "post_code": job_seeker.insee_city.post_codes[0],
-            "insee_code": job_seeker.insee_city.code_insee,
-            "city": job_seeker.insee_city.name,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-            "geocoding_score": 0.9714,
-        }
         # JobSeekerPersonalDataForm
         birth_place = (
             Commune.objects.filter(
@@ -2256,7 +2244,6 @@ class TestProcessAcceptViewsInWizard:
         }
         return {
             **personal_data_default_fields,
-            **address_default_fields,
         } | extra_post_data
 
     def _accept_contract_post_data(self, job_application, post_data=None):
@@ -2653,6 +2640,18 @@ class TestProcessAcceptViewsInWizard:
         employer = self.company.members.first()
         client.force_login(employer)
 
+        # Remove job seeker address to force address form presence
+        self.job_seeker.address_line_1 = ""
+        self.job_seeker.city = ""
+        self.job_seeker.post_code = ""
+        self.job_seeker.save(update_fields=["address_line_1", "city", "post_code"])
+        # And add birth info since it is not the purpose of this test
+        self.job_seeker.jobseeker_profile.birth_country = (
+            Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
+        )
+        self.job_seeker.jobseeker_profile.birthdate = datetime.date(1990, 1, 1)
+        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birthdate"])
+
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, "Valider les informations")
@@ -2677,6 +2676,27 @@ class TestProcessAcceptViewsInWizard:
             response,
             [messages.Message(messages.ERROR, "Certaines informations sont manquantes ou invalides")],
         )
+
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": "",
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "address_line_1": "37 B Rue du Général De Gaulle",
+            "address_line_2": "",
+            "post_code": "67118",
+            "city": "Geispolsheim",
+            "fill_mode": "ban_api",
+            "insee_code": "67152",
+            "ban_api_resolved_address": "37 B Rue du Général De Gaulle, 67118 Geispolsheim",
+            "address_for_autocomplete": "67152_1234_00037",
+        }
+        response = client.post(self.get_job_seeker_info_step_url(session_uuid), data=post_data)
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
+        self.fill_contract_info_step(client, job_application, session_uuid)
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.address_line_1 == "37 B Rue du Général De Gaulle"
 
     def test_no_diagnosis_on_job_application(self, client):
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -3720,13 +3740,6 @@ class TestFillJobSeekerInfosForAccept:
             "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
             "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-            "ban_api_resolved_address": self.job_seeker.geocoding_address,
-            "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
-            "fill_mode": "ban_api",
-            "address_for_autocomplete": "0",
         }
         # Test with invalid data
         response = client.post(
@@ -3757,21 +3770,104 @@ class TestFillJobSeekerInfosForAccept:
                 "lack_of_nir_reason": "",
                 "nir": self.job_seeker.jobseeker_profile.nir,
             },
-            "user_address": {
-                "ban_api_resolved_address": self.job_seeker.geocoding_address,
-                "address_line_1": self.job_seeker.address_line_1,
-                "address_line_2": "",
-                "post_code": self.city.post_codes[0],
-                "insee_code": self.city.code_insee,
-                "city": self.city.name,
-                "fill_mode": "ban_api",
-                # Select the first and only one option
-                "address_for_autocomplete": "0",
-            },
         }
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, NEW_POLE_EMPLOI_ID)
+
+    @pytest.mark.parametrize("address", ["empty", "incomplete"])
+    def test_as_iae_company_no_address(self, client, address):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        address_kwargs = {
+            "address_line_1": "",
+            "city": "",
+            "post_code": "",
+        }
+        if address == "incomplete":
+            address_kwargs.pop(random.choice(list(address_kwargs.keys())))
+
+        # Remove job seeker address
+        for key, value in address_kwargs.items():
+            setattr(self.job_seeker, key, value)
+        self.job_seeker.save(update_fields=address_kwargs.keys())
+
+        client.force_login(company.members.first())
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "address_line_1": "128 Rue de Grenelle",
+            "address_line_2": "",
+            "post_code": "67118",
+            "city": "Geispolsheim",
+            "fill_mode": "ban_api",
+            "insee_code": "67152",
+            "ban_api_resolved_address": "128 Rue de Grenelle 67118 Geispolsheim",
+            "address_for_autocomplete": "67152_1234_00128",
+        }
+        # Test with invalid data
+        response = client.post(
+            fill_job_seeker_infos_url,
+            data=post_data | {"address_line_1": "", "address_for_autocomplete": ""},
+        )
+        assert response.status_code == 200
+        assertFormError(response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire.")
+        response = client.post(fill_job_seeker_infos_url, data=post_data)
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+                "lack_of_pole_emploi_id_reason": "",
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+                "nir": self.job_seeker.jobseeker_profile.nir,
+            },
+            "user_address": {
+                "address_line_1": "128 Rue de Grenelle",
+                "address_line_2": "",
+                "post_code": "67118",
+                "city": "Geispolsheim",
+                "fill_mode": "ban_api",
+                "insee_code": "67152",
+                "ban_api_resolved_address": "128 Rue de Grenelle 67118 Geispolsheim",
+                "address_for_autocomplete": "67152_1234_00128",
+            },
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "128 Rue de Grenelle")
 
     def test_as_geiq_company(self, client):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
