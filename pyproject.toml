@@ -41,6 +41,8 @@ python_files = ["tests*.py", "test_*.py"]
 filterwarnings = [
     "error",
     "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
+    # https://codeberg.org/allauth/django-allauth/pulls/4596
+    "ignore:allauth.headless.tokens.base.AbstractTokenStrategy is deprecated, use allauth.headless.tokens.strategies.base.AbstractTokenStrategy:UserWarning:allauth.headless.tokens.base",
 ]
 addopts = [
     "--reuse-db",
