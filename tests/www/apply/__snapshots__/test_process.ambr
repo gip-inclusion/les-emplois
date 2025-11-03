@@ -854,7 +854,7 @@
 # ---
 # name: TestProcessAcceptViewsInWizard.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 29,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -1780,28 +1780,6 @@
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerAddressForm.clean_insee_code[common_apps/address/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."normalized_name",
-                 "cities_city"."slug",
-                 "cities_city"."department",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee",
-                 "cities_city"."coords",
-                 "cities_city"."edition_mode",
-                 "cities_city"."last_synced_at"
-          FROM "cities_city"
-          WHERE "cities_city"."code_insee" = %s
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
