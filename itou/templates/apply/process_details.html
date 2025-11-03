@@ -102,7 +102,18 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-3">
-                            {% block sidebar %}{{ block.super }}{% endblock %}
+                            {% block sidebar %}
+                                {% if request.user.is_prescriber %}
+                                    <div class="c-box mb-4">
+                                        <h3>Suivi du candidat</h3>
+                                        <p>Retrouvez l’ensemble de ses candidatures en un seul endroit.</p>
+                                        <a href="{% url "job_seekers_views:job_applications" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-primary btn-block"
+                                           {% matomo_event "candidature" "clic-box-sidebar" "historique" %}>Suivre toutes ses candidatures</a>
+                                    </div>
+                                {% endif %}
+                                {{ block.super }}
+                            {% endblock %}
                         </div>
                     </div>
                 </div>
