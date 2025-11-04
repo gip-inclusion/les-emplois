@@ -155,21 +155,8 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
     def clean_session(self):
         pass
 
-    def get_context_data(
-        self,
-        form_accept=None,
-        form_user_address=None,
-        form_birth_place=None,
-        form_personal_data=None,
-        **kwargs,
-    ):
-        if all(f is None for f in [form_accept, form_user_address, form_birth_place, form_personal_data]):
-            forms = self.get_forms()
-            form_accept = forms["accept"]
-            form_user_address = forms.get("user_address")
-            form_personal_data = forms.get("personal_data")
-            form_birth_place = forms.get("birth_place")
-
+    def get_context_data(self, *, forms, **kwargs):
+        form_accept = forms["accept"]
         # Hide the other forms in the HTML
         form_user_address = None
         form_personal_data = None
@@ -208,7 +195,7 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
         if self.missing_or_invalid_job_seeker_infos(forms):
             messages.error(request, "Certaines informations sont manquantes ou invalides")
             return HttpResponseRedirect(self.get_back_url())
-        return super().get(request, *args, **kwargs)
+        return super().get(request, *args, forms=forms, **kwargs)
 
     def post(self, request, *args, **kwargs):
         forms = self.get_forms()
@@ -217,7 +204,7 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
             return HttpResponseRedirect(self.get_back_url())
 
         if not all([form.is_valid() for form in forms.values()]):
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(forms=forms, **kwargs)
             return self.render_to_response(context)
 
         if request.htmx and not request.POST.get("confirmed"):
@@ -225,10 +212,7 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
                 request=request,
                 template="apply/includes/job_application_accept_form.html",
                 context=self.get_context_data(
-                    form_accept=forms["accept"],
-                    form_user_address=forms.get("user_address"),
-                    form_birth_place=forms.get("birth_place"),
-                    form_personal_data=forms.get("personal_data"),
+                    forms=forms,
                 ),
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )

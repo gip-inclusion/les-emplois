@@ -2756,7 +2756,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 39,
+    'num_queries': 37,
     'queries': list([
       dict({
         'origin': list([
@@ -3760,92 +3760,6 @@
           'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_context_data[www/apply/views/common.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'AcceptForm.__init__[www/apply/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_context_data[www/apply/views/common.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get_context_data[www/apply/views/submit_views.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_jobdescription"."id",
-                 "companies_jobdescription"."appellation_id",
-                 "companies_jobdescription"."company_id",
-                 "companies_jobdescription"."created_at",
-                 "companies_jobdescription"."updated_at",
-                 "companies_jobdescription"."is_active",
-                 "companies_jobdescription"."last_employer_update_at",
-                 "companies_jobdescription"."custom_name",
-                 "companies_jobdescription"."description",
-                 "companies_jobdescription"."ui_rank",
-                 "companies_jobdescription"."contract_type",
-                 "companies_jobdescription"."other_contract_type",
-                 "companies_jobdescription"."location_id",
-                 "companies_jobdescription"."hours_per_week",
-                 "companies_jobdescription"."open_positions",
-                 "companies_jobdescription"."profile_description",
-                 "companies_jobdescription"."is_resume_mandatory",
-                 "companies_jobdescription"."is_qpv_mandatory",
-                 "companies_jobdescription"."market_context_description",
-                 "companies_jobdescription"."source_id",
-                 "companies_jobdescription"."source_kind",
-                 "companies_jobdescription"."source_url",
-                 "companies_jobdescription"."source_tags",
-                 "companies_jobdescription"."field_history",
-                 "companies_jobdescription"."creation_source",
-                 "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text",
-                 "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."normalized_name",
-                 "cities_city"."slug",
-                 "cities_city"."department",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee",
-                 "cities_city"."coords",
-                 "cities_city"."edition_mode",
-                 "cities_city"."last_synced_at"
-          FROM "companies_jobdescription"
-          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
-          WHERE "companies_jobdescription"."company_id" = %s
-          ORDER BY "companies_jobdescription"."custom_name" ASC,
-                   "companies_jobdescription"."is_active" ASC
-        ''',
       }),
       dict({
         'origin': list([
