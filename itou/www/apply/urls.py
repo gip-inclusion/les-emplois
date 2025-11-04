@@ -169,7 +169,6 @@ urlpatterns = [
         name="refuse",
     ),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
-    path("<uuid:job_application_id>/siae/accept", process_views.AcceptView.as_view(), name="accept"),
     path("<uuid:job_application_id>/siae/start-accept", process_views.start_accept_wizard, name="start-accept"),
     path(
         "<uuid:session_uuid>/accept/job-seeker-infos",
