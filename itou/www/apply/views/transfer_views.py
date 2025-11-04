@@ -96,7 +96,7 @@ class JobApplicationExternalTransferStep1View(LoginRequiredMixin, EmployerSearch
         return [
             "search/includes/siaes_search_results.html"
             if self.request.htmx
-            else "apply/process_external_transfer_siaes_search_results.html"
+            else "apply/transfer/external_transfer_siaes_search_results.html"
         ]
 
 
@@ -212,7 +212,7 @@ class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, Applicat
 
 class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, ApplicationResumeView):
     additionnal_related_models = ["sender", "sender_company", "sender_prescriber_organization"]
-    template_name = "apply/process_external_transfer_resume.html"
+    template_name = "apply/transfer/external_transfer_resume.html"
     form_class = TransferJobApplicationForm
 
     def get_initial(self):
@@ -281,7 +281,7 @@ class JobApplicationExternalTransferStepEndView(ApplicationEndView):
 
 
 class JobApplicationInternalTransferView(TemplateView):
-    template_name = "apply/process_internal_transfer.html"
+    template_name = "apply/transfer/internal_transfer.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
