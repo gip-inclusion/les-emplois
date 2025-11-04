@@ -601,7 +601,7 @@ class TestJobApplicationQuerySet:
         qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
         assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
 
-    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_prescriber(self):
+    def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_prescriber_on_jobseeker(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company__subject_to_iae_rules=True,
@@ -616,7 +616,7 @@ class TestJobApplicationQuerySet:
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
-    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_current_employer(self):
+    def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_current_employer_on_jobseeker(self):
         job_application = JobApplicationSentByCompanyFactory(
             to_company__subject_to_iae_rules=True,
             eligibility_diagnosis=None,
@@ -631,7 +631,7 @@ class TestJobApplicationQuerySet:
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
-    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_another_employer(self):
+    def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_another_employer_on_jobseeker(self):
         job_application = JobApplicationSentByCompanyFactory(
             to_company__subject_to_iae_rules=True,
             eligibility_diagnosis=None,
