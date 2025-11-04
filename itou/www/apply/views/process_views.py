@@ -637,7 +637,6 @@ class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJo
 
 class ContractForAcceptView(AcceptWizardMixin, common_views.BaseAcceptView):
     template_name = "apply/process_accept_contract_step.html"
-    only_accept_form = True
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
