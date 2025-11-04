@@ -119,7 +119,6 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
 
 class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
     template_name = None
-    only_accept_form = False
 
     def test_func(self):
         return self.request.user.is_employer
@@ -133,11 +132,10 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
     def get_forms(self):
         forms = super().get_forms()
 
-        if self.only_accept_form:
-            # Make the other forms appear as bound with initial data to trigger validation
-            for form in forms.values():
-                form.is_bound = True
-                form.data = form.initial
+        # Make the other forms appear as bound with initial data to trigger validation
+        for form in forms.values():
+            form.is_bound = True
+            form.data = form.initial
 
         forms["accept"] = AcceptForm(
             instance=self.job_application,
@@ -172,11 +170,10 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
             form_personal_data = forms.get("personal_data")
             form_birth_place = forms.get("birth_place")
 
-        if self.only_accept_form:
-            # Hide the other forms in the HTML
-            form_user_address = None
-            form_personal_data = None
-            form_birth_place = None
+        # Hide the other forms in the HTML
+        form_user_address = None
+        form_personal_data = None
+        form_birth_place = None
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
         context["form_user_address"] = form_user_address
@@ -207,16 +204,15 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
         return bool(other_forms and not all([form.is_valid() for form in other_forms.values()]))
 
     def get(self, request, *args, **kwargs):
-        if self.only_accept_form:
-            forms = self.get_forms()
-            if self.missing_or_invalid_job_seeker_infos(forms):
-                messages.error(request, "Certaines informations sont manquantes ou invalides")
-                return HttpResponseRedirect(self.get_back_url())
+        forms = self.get_forms()
+        if self.missing_or_invalid_job_seeker_infos(forms):
+            messages.error(request, "Certaines informations sont manquantes ou invalides")
+            return HttpResponseRedirect(self.get_back_url())
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         forms = self.get_forms()
-        if self.only_accept_form and self.missing_or_invalid_job_seeker_infos(forms):
+        if self.missing_or_invalid_job_seeker_infos(forms):
             messages.error(request, "Certaines informations sont manquantes ou invalides")
             return HttpResponseRedirect(self.get_back_url())
 

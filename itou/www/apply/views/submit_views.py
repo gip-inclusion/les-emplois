@@ -846,7 +846,6 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
 
 class ContractForHireView(ApplicationBaseView, common_views.BaseAcceptView):
     template_name = "apply/submit/hire_confirmation.html"
-    only_accept_form = True
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
