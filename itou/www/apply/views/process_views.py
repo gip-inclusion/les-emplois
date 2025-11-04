@@ -537,59 +537,6 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
     return render(request, template_name, context)
 
 
-class AcceptView(common_views.BaseAcceptView):
-    template_name = "apply/process_accept.html"
-
-    def setup(self, request, job_application_id, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
-            "job_seeker", "job_seeker__jobseeker_profile", "to_company"
-        )
-        self.job_application = get_object_or_404(queryset, id=job_application_id)
-        check_waiting_period(self.job_application)
-
-        self.company = self.job_application.to_company
-        self.job_seeker = self.job_application.job_seeker
-
-        self.next_url = get_safe_url(
-            request,
-            "next_url",
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
-        )
-
-        if self.company.is_subject_to_iae_rules:
-            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                job_seeker=self.job_seeker, for_siae=self.company
-            )
-        elif self.company.kind == CompanyKind.GEIQ:
-            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                job_seeker=self.job_seeker, for_geiq=self.company
-            ).first()
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.job_application.eligibility_diagnosis_by_siae_required():
-            messages.error(
-                request,
-                "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.",
-                extra_tags="toast",
-            )
-            return HttpResponseRedirect(self.next_url)
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_session(self):
-        return None
-
-    def get_back_url(self):
-        return self.next_url
-
-    def get_error_url(self):
-        return self.next_url
-
-    def get_success_url(self):
-        return self.next_url
-
-
 def initialize_accept_session(request, data):
     return SessionNamespace.create(request.session, ACCEPT_SESSION_KIND, data)
 
