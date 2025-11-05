@@ -1885,7 +1885,7 @@
 # ---
 # name: TestFillJobSeekerInfosForHire.test_as_company[view queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -2684,53 +2684,6 @@
       }),
       dict({
         'origin': list([
-          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
-          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IncludeNode[apply/submit/fill_job_seeker_infos.html]',
-          'BlockNode[apply/submit_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/fill_job_seeker_infos.html]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE (NOT ("asp_commune"."ignore")
-                 AND "asp_commune"."id" IN (%s))
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IncludeNode[apply/submit/fill_job_seeker_infos.html]',
-          'BlockNode[apply/submit_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/fill_job_seeker_infos.html]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          ORDER BY "asp_country"."name" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
@@ -2760,7 +2713,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 37,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -3564,74 +3517,6 @@
           WHERE "companies_jobdescription"."company_id" = %s
           ORDER BY "companies_jobdescription"."custom_name" ASC,
                    "companies_jobdescription"."is_active" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ContractForHireView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          WHERE "asp_country"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ContractForHireView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE (NOT ("asp_commune"."ignore")
-                 AND "asp_commune"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommuneQuerySet.by_insee_code_and_period[asp/models.py]',
-          'JobSeekerPersonalDataForm.clean[asp/forms.py]',
-          'JobSeekerPersonalDataForm.clean[users/forms.py]',
-          'JobSeekerPersonalDataForm.clean[common_apps/nir/forms.py]',
-          'ContractForHireView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE (NOT ("asp_commune"."ignore")
-                 AND "asp_commune"."code" = %s
-                 AND "asp_commune"."start_date" <= %s
-                 AND ("asp_commune"."end_date" IS NULL
-                      OR "asp_commune"."end_date" >= %s))
-          LIMIT 21
         ''',
       }),
       dict({

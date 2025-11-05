@@ -13,6 +13,7 @@ from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
+from itou.asp.models import Country
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
@@ -678,6 +679,20 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
         ):
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
+
+        if self.instance.jobseeker_profile.birthdate:
+            del self.fields["birthdate"]
+            if self.instance.jobseeker_profile.birth_country:
+                del self.fields["birth_country"]
+                del self.fields["birth_place"]
+        # If the birthdate is missing and the country is France, the birthdate
+        # can influence the birth_place: allow to modify both and keep the fields
+        elif (
+            self.instance.jobseeker_profile.birth_country_id
+            and self.instance.jobseeker_profile.birth_country_id != Country.FRANCE_ID
+        ):
+            del self.fields["birth_country"]
+            del self.fields["birth_place"]
 
 
 class FilterJobApplicationsForm(forms.Form):
