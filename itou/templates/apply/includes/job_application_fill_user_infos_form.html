@@ -9,11 +9,13 @@
 
     {% include "includes/job_seekers/readonly_form.html" with form=form_personal_data request=request only %}
     {% bootstrap_form_errors form_personal_data type='non_fields' %}
-    {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
-    {% collapse_field form_personal_data.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
-    <div id="collapse_lack_of_nir_reason" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form_personal_data.lack_of_nir.value %} show{% endif %}">
-        {% bootstrap_field form_personal_data.lack_of_nir_reason %}
-    </div>
+    {% if form_personal_data.nir %}
+        {% bootstrap_field form_personal_data.nir wrapper_class="form-group form-group-input-w-lg-66" %}
+        {% collapse_field form_personal_data.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
+        <div id="collapse_lack_of_nir_reason" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form_personal_data.lack_of_nir.value %} show{% endif %}">
+            {% bootstrap_field form_personal_data.lack_of_nir_reason %}
+        </div>
+    {% endif %}
     {% bootstrap_field form_personal_data.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
     {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
     {% bootstrap_field form_personal_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}

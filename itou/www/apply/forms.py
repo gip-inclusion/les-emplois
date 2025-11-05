@@ -665,6 +665,13 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
     class Meta(JobSeekerProfileModelForm.Meta):
         fields = []
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.jobseeker_profile.nir:
+            del self.fields["nir"]
+            del self.fields["lack_of_nir"]
+            del self.fields["lack_of_nir_reason"]
+
 
 class FilterJobApplicationsForm(forms.Form):
     """
