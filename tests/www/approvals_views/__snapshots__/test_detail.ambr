@@ -2234,7 +2234,7 @@
   '''
   <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-          <h2>
+          <h2 class="h3">
               Prolongations
           </h2>
           <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
@@ -2277,7 +2277,7 @@
               <tbody>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">
+                          <span class="badge badge-sm rounded-pill bg-accent-03-lighter text-primary">
                               En attente
                           </span>
                       </td>
@@ -2299,7 +2299,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">
+                          <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                               Refusée
                           </span>
                       </td>
@@ -2323,7 +2323,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                               Acceptée
                           </span>
                       </td>
@@ -2345,7 +2345,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                               Acceptée
                           </span>
                       </td>
@@ -2392,7 +2392,7 @@
   '''
   <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-          <h2>
+          <h2 class="h3">
               Prolongations
           </h2>
       </div>
@@ -2426,7 +2426,7 @@
               <tbody>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">
+                          <span class="badge badge-sm rounded-pill bg-accent-03-lighter text-primary">
                               En attente
                           </span>
                       </td>
@@ -2448,7 +2448,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">
+                          <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">
                               Refusée
                           </span>
                       </td>
@@ -2472,7 +2472,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                               Acceptée
                           </span>
                       </td>
@@ -2494,7 +2494,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                          <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                               Acceptée
                           </span>
                       </td>
@@ -4515,7 +4515,7 @@
   '''
   <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-          <h2>
+          <h2 class="h3">
               Suspensions
           </h2>
           <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
@@ -4550,14 +4550,14 @@
                       <th scope="col">
                           Émetteur
                       </th>
-                      <th scope="col">
+                      <th class="text-end w-100px" scope="col">
                       </th>
                   </tr>
               </thead>
               <tbody>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-info">
+                          <span class="badge badge-sm rounded-pill bg-info">
                               En cours
                           </span>
                       </td>
@@ -4574,27 +4574,22 @@
                           Une siae
                       </td>
                       <td>
-                          <a class="btn btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
                               <i aria-hidden="true" class="ri-pencil-line fw-medium">
                               </i>
                               <span class="visually-hidden">
                                   Modifier la suspension
                               </span>
                           </a>
-                          <button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'actions" class="btn btn-link btn-ico-only btn-sm" data-bs-toggle="dropdown" id="dropdown_1_action_menu" type="button">
-                              <i aria-hidden="true" class="ri-more-2-fill">
+                          <a class="btn btn-sm btn-link btn-ico-only" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">
+                              <i aria-label="Supprimer la suspension" class="ri-delete-bin-line" data-bs-title="Supprimer la suspension" data-bs-toggle="tooltip">
                               </i>
-                          </button>
-                          <div aria-labelledby="dropdown_1_action_menu" class="dropdown-menu">
-                              <a class="dropdown-item" href="/approvals/suspension/1/action/?back_url=/approvals/details/[Public ID of Approval]">
-                                  Supprimer la suspension
-                              </a>
-                          </div>
+                          </a>
                       </td>
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                          <span class="badge badge-sm rounded-pill bg-light text-primary">
                               Passée
                           </span>
                       </td>
@@ -4640,7 +4635,7 @@
   '''
   <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-          <h2>
+          <h2 class="h3">
               Suspensions
           </h2>
           <div aria-label="Actions sur le PASS IAE" class="d-flex flex-column flex-md-row gap-3" role="group">
@@ -4675,14 +4670,14 @@
                       <th scope="col">
                           Émetteur
                       </th>
-                      <th scope="col">
+                      <th class="text-end w-100px" scope="col">
                       </th>
                   </tr>
               </thead>
               <tbody>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-info">
+                          <span class="badge badge-sm rounded-pill bg-info">
                               En cours
                           </span>
                       </td>
@@ -4703,7 +4698,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                          <span class="badge badge-sm rounded-pill bg-light text-primary">
                               Passée
                           </span>
                       </td>
@@ -4749,7 +4744,7 @@
   '''
   <div class="c-box mb-3 mb-md-4">
       <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-          <h2>
+          <h2 class="h3">
               Suspensions
           </h2>
       </div>
@@ -4775,14 +4770,14 @@
                       <th scope="col">
                           Émetteur
                       </th>
-                      <th scope="col">
+                      <th class="text-end w-100px" scope="col">
                       </th>
                   </tr>
               </thead>
               <tbody>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-info">
+                          <span class="badge badge-sm rounded-pill bg-info">
                               En cours
                           </span>
                       </td>
@@ -4803,7 +4798,7 @@
                   </tr>
                   <tr>
                       <td>
-                          <span class="badge badge-base rounded-pill bg-light text-primary">
+                          <span class="badge badge-sm rounded-pill bg-light text-primary">
                               Passée
                           </span>
                       </td>
@@ -4952,7 +4947,7 @@
 # ---
 # name: test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-outline-warning btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=Aci+de+la+rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=Aci+de+la+rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
       <i aria-hidden="true" class="ri-pass-expired-line fw-medium">
       </i>
       <span>
