@@ -23,7 +23,7 @@
             {% if approval_deletion_form_url %}
                 <a href="{{ approval_deletion_form_url }}"
                    id="approval-deletion-link"
-                   class="btn btn-lg btn-outline-warning btn-ico"
+                   class="btn btn-lg btn-danger btn-ico"
                    target="_blank"
                    rel="noopener"
                    aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
