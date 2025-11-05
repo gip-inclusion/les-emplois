@@ -5,16 +5,22 @@ from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState
-from itou.www.approvals_views.views import ApprovalListView
+from itou.www.approvals_views.views import ApprovalDisplayKind, ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import (
+    PAGINATION_PAGE_ONE_MARKUP,
+    assertSnapshotQueries,
+    parse_response_to_soup,
+    pretty_indented,
+)
 
 
 class TestApprovalsListView:
@@ -35,6 +41,8 @@ class TestApprovalsListView:
         client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
+
+        assert response.context["display_kind"] == ApprovalDisplayKind.TABLE  # Check default display kind
 
         assertContains(response, "1 résultat")
         assertContains(response, approval.user.get_full_name())
@@ -59,7 +67,7 @@ class TestApprovalsListView:
         response = client.get(url)
 
         assertContains(response, "2 résultats")
-        assertContains(response, f"<h3>{approval.user.get_full_name()}</h3>", html=True, count=1)
+        assertContains(response, f'aria-label="Voir les informations de {approval.user.get_full_name()}"', count=1)
         assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
         assertContains(response, reverse("employees:detail", kwargs={"public_id": another_approval.user.public_id}))
 
@@ -360,6 +368,42 @@ class TestApprovalsListView:
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
+    def test_update_display_kind_with_htmx(self, client):
+        company = CompanyFactory(with_membership=True)
+
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+        )
+        employer = company.members.first()
+        client.force_login(employer)
+
+        url = reverse("approvals:list")
+        response = client.get(url, {"display": ApprovalDisplayKind.TABLE})
+        assertContains(response, "1 résultat")
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}), count=2)
+        simulated_page = parse_response_to_soup(response)
+
+        # Switch from table to list
+        [display_input] = simulated_page.find_all(id="display-kind")
+        display_input["value"] = ApprovalDisplayKind.LIST.value
+        response = client.get(url, {"display": ApprovalDisplayKind.LIST}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+        response = client.get(url, {"display": ApprovalDisplayKind.LIST})
+        assertContains(response, "1 résultat")
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}), count=1)
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
+        # Switch from list to table
+        [display_input] = simulated_page.find_all(id="display-kind")
+        display_input["value"] = ApprovalDisplayKind.TABLE.value
+        response = client.get(url, {"display": ApprovalDisplayKind.TABLE}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+        response = client.get(url, {"display": ApprovalDisplayKind.TABLE})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
     def test_no_tabs_when_siae_does_not_have_access_to_employee_records(self, client):
         company = CompanyFactory(
             convention=None,
@@ -379,3 +423,54 @@ class TestApprovalsListView:
         response = client.get(reverse("approvals:list"))
         assertContains(response, "1 résultat")
         assertNotContains(response, self.TABS_CLASS)
+
+
+def test_list_and_table_empty_snapshot(client, snapshot):
+    company = CompanyFactory(with_membership=True)
+    client.force_login(company.members.get())
+    url = reverse("approvals:list")
+
+    for display_param in [
+        {},
+        {"display": ApprovalDisplayKind.LIST},
+        {"display": ApprovalDisplayKind.TABLE},
+    ]:
+        response = client.get(url, display_param)
+        page = parse_response_to_soup(response, selector="#approvals-list")
+        assert pretty_indented(page) == snapshot(name="empty")
+
+
+@freeze_time("2025-01-01")
+def test_table_and_list_snapshot(client, snapshot):
+    approval = ApprovalFactory(with_jobapplication=True, for_snapshot=True)
+    job_application = approval.jobapplication_set.get()
+    client.force_login(job_application.to_company.members.first())
+    url = reverse("approvals:list")
+
+    response = client.get(url, {"display": ApprovalDisplayKind.TABLE})
+    page = parse_response_to_soup(
+        response,
+        selector="#approvals-list",
+        replace_in_attr=[
+            (
+                "href",
+                f"approval={approval.pk}",
+                "approval=[PK of Approval]",
+            ),
+        ],
+    )
+    assert pretty_indented(page) == snapshot(name="table")
+
+    response = client.get(url, {"display": ApprovalDisplayKind.LIST})
+    page = parse_response_to_soup(
+        response,
+        selector="#approvals-list",
+        replace_in_attr=[
+            (
+                "href",
+                f"approval={approval.pk}",
+                "approval=[PK of Approval]",
+            ),
+        ],
+    )
+    assert pretty_indented(page) == snapshot(name="list")

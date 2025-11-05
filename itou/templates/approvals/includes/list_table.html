@@ -1,0 +1,51 @@
+{% load badges %}
+{% load format_filters %}
+{% load matomo %}
+
+<table class="table table-hover table-sortable">
+    <caption class="visually-hidden">Liste des salariés et PASS IAE</caption>
+    <thead>
+        <tr>
+            <th scope="col" class="text-nowrap">Prénom NOM</th>
+            <th scope="col">Statut du PASS IAE</th>
+            <th scope="col">Numéro de PASS IAE</th>
+            <th scope="col">
+                Durée de validité
+                <i class="ri-information-line text-info"
+                   aria-label="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."
+                   data-bs-toggle="tooltip"
+                   data-bs-title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."
+                   role="button"
+                   tabindex="0">
+                </i>
+            </th>
+            <th scope="col" class="text-end w-50px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for approval in approval_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'employees:detail' public_id=approval.user.public_id %}?approval={{ approval.pk }}&back_url={{ request.get_full_path|urlencode }}"
+                       class="btn-link"
+                       {% matomo_event "salaries" "clic" "details-salarie-tableau" %}>{{ approval.user.get_full_name }}</a>
+                </td>
+                <td>{% approval_state_badge approval span_extra_classes="badge-sm text-wrap" icon_extra_classes="ri-xl" %}</td>
+                <td>
+                    {{ approval|format_approval_number }}
+                    {% include 'includes/copy_to_clipboard.html' with content=approval.number css_classes="btn-link btn-sm" only_icon=True %}
+                </td>
+                <td>{{ approval.get_remainder_display }}</td>
+                <td class="text-end w-50px align-middle">
+                    <a class="btn btn-sm btn-link btn-ico-only"
+                       href="{% url 'employees:detail' public_id=approval.user.public_id %}?approval={{ approval.pk }}&back_url={{ request.get_full_path|urlencode }}"
+                       {% matomo_event "salaries" "clic" "details-salarie-tableau" %}
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Voir les informations de {{ approval.user.get_full_name }}">
+                        <i class="ri-arrow-drop-right-line fs-lg" aria-label="Voir les informations de {{ approval.user.get_full_name }}"></i>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
