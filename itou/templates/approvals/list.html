@@ -50,15 +50,22 @@
                               hx-swap="outerHTML"
                               hx-push-url="true"
                               hx-include="#id_job_seeker">
+                            <input id="display-kind" type="hidden" name="display" value="{{ display_kind }}">
                             <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                                 {% include "approvals/includes/approvals_filters/status.html" %}
                                 {% include "includes/btn_dropdown_filter/radio.html" with field=filters_form.expiry only %}
                                 {% include "approvals/includes/list_reset_filters.html" %}
                             </div>
                         </form>
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                            {% include "approvals/includes/list_counter.html" %}
-                            <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.job_seeker layout="inline" %}</div>
+
+                        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                            <div class="flex-md-grow-1">{% include "approvals/includes/list_counter.html" %}</div>
+                            <div class="flex-column flex-md-row mt-3 mt-md-0">
+                                {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
+                            </div>
+                            <div class="d-flex gap-2 mt-3 mt-md-0 ms-0 ms-md-2" role="group" aria-label="Changement du mode d'affichage des salariés et PASS IAE">
+                                {% include "common/list_view_switcher.html" with display_kind=display_kind request=request only %}
+                            </div>
                         </div>
                         {% include "approvals/includes/list_results.html" %}
                     </div>

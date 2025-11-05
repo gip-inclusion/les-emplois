@@ -459,3 +459,166 @@
     ]),
   })
 # ---
+# name: test_list_and_table_empty_snapshot[empty]
+  '''
+  <div id="approvals-list">
+      <div class="c-box c-box--results my-3 my-md-4">
+          <div class="c-box--results__body">
+              <p class="mb-0">
+                  Aucun salarié pour le moment.
+              </p>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_table_and_list_snapshot[list]
+  '''
+  <div id="approvals-list">
+      <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+          <div class="c-box--results__header">
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-user-line">
+                  </i>
+                  <div>
+                      <h3>
+                          Jane DOE
+                      </h3>
+                      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                          <span class="badge badge-sm text-wrap rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-pass-valid-line ri-xl">
+                              </i>
+                              PASS IAE valide
+                          </span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <ul class="list-data">
+                  <li>
+                      <small>
+                          Numéro de PASS IAE
+                      </small>
+                      <strong>
+                          <span>
+                              99999
+                          </span>
+                          <span class="ms-1">
+                              99
+                          </span>
+                          <span class="ms-1">
+                              99999
+                          </span>
+                      </strong>
+                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="999999999999" type="button">
+                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                          </i>
+                          <span class="visually-hidden">
+                              Copier
+                          </span>
+                      </button>
+                  </li>
+                  <li>
+                      <small>
+                          Durée de validité
+                          <i aria-label="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line text-info" data-bs-title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </small>
+                      <strong class="text-success">
+                          356112 jours (Environ 975 ans)
+                      </strong>
+                  </li>
+              </ul>
+          </div>
+          <div class="c-box--results__footer">
+              <div class="d-flex justify-content-md-end">
+                  <a aria-label="Voir les informations de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dlist">
+                      Voir les informations
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: test_table_and_list_snapshot[table]
+  '''
+  <div id="approvals-list">
+      <div class="table-responsive mt-3 mt-md-4">
+          <table class="table table-hover table-sortable">
+              <caption class="visually-hidden">
+                  Liste des salariés et PASS IAE
+              </caption>
+              <thead>
+                  <tr>
+                      <th class="text-nowrap" scope="col">
+                          Prénom NOM
+                      </th>
+                      <th scope="col">
+                          Statut du PASS IAE
+                      </th>
+                      <th scope="col">
+                          Numéro de PASS IAE
+                      </th>
+                      <th scope="col">
+                          Durée de validité
+                          <i aria-label="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line text-info" data-bs-title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                          </i>
+                      </th>
+                      <th class="text-end w-50px" scope="col">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <a class="btn-link" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dtable">
+                              Jane DOE
+                          </a>
+                      </td>
+                      <td>
+                          <span class="badge badge-sm text-wrap rounded-pill bg-success-lighter text-success">
+                              <i aria-hidden="true" class="ri-pass-valid-line ri-xl">
+                              </i>
+                              PASS IAE valide
+                          </span>
+                      </td>
+                      <td>
+                          <span>
+                              99999
+                          </span>
+                          <span class="ms-1">
+                              99
+                          </span>
+                          <span class="ms-1">
+                              99999
+                          </span>
+                          <button class="btn-link btn-sm" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="999999999999" type="button">
+                              <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                              </i>
+                              <span class="visually-hidden">
+                                  Copier
+                              </span>
+                          </button>
+                      </td>
+                      <td>
+                          356112 jours (Environ 975 ans)
+                      </td>
+                      <td class="text-end w-50px align-middle">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir les informations de Jane DOE" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dtable">
+                              <i aria-label="Voir les informations de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                              </i>
+                          </a>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+  </div>
+  
+  '''
+# ---
