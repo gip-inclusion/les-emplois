@@ -41,12 +41,14 @@ class CommonUserInfoFormsMixin:
 
         if self.company.is_subject_to_iae_rules:
             # Info that will be used to search for an existing Pôle emploi approval.
-            forms["personal_data"] = JobSeekerPersonalDataForm(
+            personal_data_form = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
                 initial=session_forms_data.get("personal_data", {}),
                 data=self.request.POST if self.request.method == "POST" else None,
                 back_url=self.request.get_full_path(),
             )
+            if personal_data_form.fields:
+                forms["personal_data"] = personal_data_form
             if not self.job_seeker.address_on_one_line:
                 forms["user_address"] = JobSeekerAddressForm(
                     instance=self.job_seeker,
