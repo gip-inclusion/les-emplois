@@ -3012,25 +3012,20 @@ class TestDirectHireFullProcess:
         )
 
         next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, next_url)
+        assertRedirects(response, next_url, fetch_redirect_response=False)
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
 
         # Fill job seeker infos
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Valider les informations")
+        # No missing data to fill - skip to contract
+        next_url = reverse("apply:hire_contract", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, next_url)
+
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
-        assertContains(response, check_infos_url)  # Back button URL
-        response = client.post(next_url, data={})
-
-        next_url = reverse("apply:hire_contract", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, next_url)
-        assert client.session[apply_session_name]["job_seeker_info_forms_data"] == {"personal_data": {}}
 
         # Hire confirmation
         # ----------------------------------------------------------------------
@@ -3038,9 +3033,7 @@ class TestDirectHireFullProcess:
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, ACCEPT_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
-        assertContains(
-            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
-        )  # Back button URL
+        assertContains(response, check_infos_url)  # Back button URL
 
         hiring_start_at = timezone.localdate()
         post_data = {
@@ -5512,14 +5505,7 @@ class TestFillJobSeekerInfosForHire:
             response = client.get(
                 reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
             )
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
-
-        response = client.post(
-            reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}), data={}
-        )
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
-        assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {"personal_data": {}}
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_as_company_no_birthdate(self, client, birth_country):
@@ -5795,7 +5781,6 @@ class TestFillJobSeekerInfosForHire:
         )
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
         assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {
-            "personal_data": {},
             "user_address": {
                 "address_line_1": "128 Rue de Grenelle",
                 "address_line_2": "",
@@ -5922,24 +5907,15 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Valider les informations")
 
         NEW_POLE_EMPLOI_ID = "1234567A"
+        PERSONAL_DATA_SESSION_KEY = "job_seeker_info_forms_data"
         if with_lack_of_pole_emploi_id_reason:
-            # If a reason is already present, the pole_emploi_id field is not shown
-            assertNotContains(response, POLE_EMPLOI_FIELD_MARKER)
-            # Try to skip to contract step
-            response = client.get(accept_contract_infos_url)
-            # With a reason, it's OK since the form is valid
-            assert response.status_code == 200
-            # Go to next step
-            response = client.post(fill_job_seeker_infos_url, data={})
             assertRedirects(response, accept_contract_infos_url)
-            assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-                "personal_data": {},
-            }
+            assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
+            assertContains(response, "Déclarer l’embauche de Clara SION")
+            assertContains(response, "Valider les informations")
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
             # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
@@ -5964,7 +5940,7 @@ class TestFillJobSeekerInfosForHire:
                 data={"pole_emploi_id": NEW_POLE_EMPLOI_ID, "lack_of_pole_emploi_id_reason": ""},
             )
             assertRedirects(response, accept_contract_infos_url)
-            assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            assert client.session[session_uuid][PERSONAL_DATA_SESSION_KEY] == {
                 "personal_data": {
                     "pole_emploi_id": NEW_POLE_EMPLOI_ID,
                     "lack_of_pole_emploi_id_reason": "",
@@ -6010,16 +5986,7 @@ class TestFillJobSeekerInfosForHire:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "PASS IAE valide")
-
-        response = client.post(
-            reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}),
-            data={},
-        )
-
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
-        assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {"personal_data": {}}
 
     def test_as_geiq(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)

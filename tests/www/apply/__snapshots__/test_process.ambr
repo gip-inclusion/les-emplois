@@ -174,8 +174,7 @@
       }),
       dict({
         'origin': list([
-          'start_accept_wizard[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -361,8 +360,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'start_accept_wizard[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -397,8 +395,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'start_accept_wizard[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -532,12 +529,8 @@
       dict({
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'RelatedManager.last_considered_valid[eligibility/models/iae.py]',
-          'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
-          'User.has_valid_diagnosis[users/models.py]',
-          'JobApplication.eligibility_diagnosis_by_siae_required[job_applications/models.py]',
-          'start_accept_wizard[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -659,9 +652,8 @@
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
-                 AND ("eligibility_eligibilitydiagnosis"."author_kind" = %s
-                      OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
+          WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                  OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
                  AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
@@ -671,33 +663,70 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
+          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
+          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
-          UPDATE "django_session"
-          SET "session_data" = %s,
-              "expire_date" = %s
-          WHERE "django_session"."session_key" = %s
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE "asp_commune"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
+          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
+          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
+          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
+          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
+          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
+          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
+        ]),
+        'sql': '''
+          SELECT "users_identitycertification"."id",
+                 "users_identitycertification"."jobseeker_profile_id",
+                 "users_identitycertification"."certifier",
+                 "users_identitycertification"."certified_at"
+          FROM "users_identitycertification"
+          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
