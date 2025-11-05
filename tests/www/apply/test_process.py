@@ -98,7 +98,7 @@ from tests.www.eligibility_views.utils import (
 
 logger = logging.getLogger(__name__)
 
-DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
+NIR_FIELD_ID = 'id="id_nir"'
 PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE = "L’employeur a refusé la candidature avec le motif “Autre”."
 REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
@@ -2962,35 +2962,16 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
         assertContains(response, "Valider les informations")
-        # Check that the NIR field is disabled
-        assertContains(response, DISABLED_NIR)
-        assertContains(
-            response,
-            "Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.",
-            html=True,
-        )
+        # Check that the NIR field has been removed
+        assertNotContains(response, NIR_FIELD_ID)
 
         job_application.job_seeker.last_login = None
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()
         response = client.get(jobseeker_info_url)
         assertContains(response, "Valider les informations")
-        # Check that the NIR field is disabled
-        assertContains(response, DISABLED_NIR)
-        assertContains(
-            response,
-            (
-                '<a href="'
-                f'{
-                    reverse(
-                        "job_seekers_views:nir_modification_request",
-                        kwargs={"public_id": job_application.job_seeker.public_id},
-                        query={"back_url": jobseeker_info_url},
-                    )
-                }">Demander la correction du numéro de sécurité sociale</a>'
-            ),
-            html=True,
-        )
+        # Check that the NIR field has been removed
+        assertNotContains(response, NIR_FIELD_ID)
 
     def test_no_nir_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
@@ -3004,8 +2985,8 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
         assertContains(response, "Valider les informations")
-        # Check that the NIR field is not disabled
-        assertNotContains(response, DISABLED_NIR)
+        # Check that the NIR field is present
+        assertContains(response, NIR_FIELD_ID)
 
         post_data = self._accept_jobseeker_post_data(job_application)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
@@ -3795,9 +3776,6 @@ class TestFillJobSeekerInfosForAccept:
                 "lack_of_pole_emploi_id_reason": "",
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": self.job_seeker.jobseeker_profile.nir,
             },
         }
         # If you come back to the view, it is pre-filled with session data
@@ -3879,9 +3857,6 @@ class TestFillJobSeekerInfosForAccept:
                 "lack_of_pole_emploi_id_reason": "",
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": self.job_seeker.jobseeker_profile.nir,
             },
             "user_address": {
                 "address_line_1": "128 Rue de Grenelle",
@@ -3897,6 +3872,117 @@ class TestFillJobSeekerInfosForAccept:
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "128 Rue de Grenelle")
+
+    @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
+    def test_as_iae_company_no_nir(self, client, with_lack_of_nir_reason):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        # Remove job seeker nir, with or without a reason
+        self.job_seeker.jobseeker_profile.nir = ""
+        if with_lack_of_nir_reason:
+            self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
+                [LackOfNIRReason.TEMPORARY_NUMBER, LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER]
+            )
+        else:
+            self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        accept_contract_infos_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid})
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Valider les informations")
+
+        # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
+        response = client.get(accept_contract_infos_url)
+        if with_lack_of_nir_reason:
+            # With a reason, it's OK since the form is valid
+            assert response.status_code == 200
+        else:
+            assertRedirects(response, fill_job_seeker_infos_url, fetch_redirect_response=False)
+            assertMessages(
+                response,
+                [messages.Message(messages.ERROR, "Certaines informations sont manquantes ou invalides")],
+            )
+
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+        }
+        # Test with invalid data
+        response = client.post(fill_job_seeker_infos_url, data=post_data | {"nir": ""})
+        assert response.status_code == 200
+        assertFormError(
+            response.context["form_personal_data"], "nir", "Le numéro de sécurité sociale n'est pas valide"
+        )
+
+        # Fill new nir
+        NEW_NIR = "197013625838386"
+        response = client.post(
+            fill_job_seeker_infos_url,
+            data=post_data | {"nir": NEW_NIR, "lack_of_nir": False, "lack_of_nir_reason": ""},
+        )
+        assertRedirects(response, accept_contract_infos_url)
+
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+                "lack_of_pole_emploi_id_reason": "",
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+                "nir": NEW_NIR,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+            },
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, NEW_NIR)
+
+        # Check that nir is saved after filling contract info step
+        response = client.post(
+            accept_contract_infos_url,
+            data={
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+                "confirmed": True,
+            },
+            headers={"hx-request": "true"},
+        )
+        assertRedirects(
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        self.job_seeker.jobseeker_profile.refresh_from_db()
+        assert self.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     def test_as_geiq_company(self, client):
         company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)

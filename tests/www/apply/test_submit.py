@@ -3049,9 +3049,6 @@ class TestDirectHireFullProcess:
                 "lack_of_pole_emploi_id_reason": new_job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
                 "birth_place": None,
                 "birth_country": other_country.pk,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": new_job_seeker.jobseeker_profile.nir,
             },
         }
 
@@ -5572,9 +5569,6 @@ class TestFillJobSeekerInfosForHire:
                 "lack_of_pole_emploi_id_reason": "",
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": self.job_seeker.jobseeker_profile.nir,
             },
         }
         # If you come back to the view, it is pre-filled with session data
@@ -5639,9 +5633,6 @@ class TestFillJobSeekerInfosForHire:
                 "lack_of_pole_emploi_id_reason": "",
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": self.job_seeker.jobseeker_profile.nir,
             },
             "user_address": {
                 "address_line_1": "128 Rue de Grenelle",
@@ -5681,6 +5672,80 @@ class TestFillJobSeekerInfosForHire:
         )
         assert job_application.job_seeker.address_line_1 == "128 Rue de Grenelle"
 
+    def test_as_company_no_nir(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        # Remove job seeker nir, with or without a reason
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
+            [LackOfNIRReason.TEMPORARY_NUMBER, LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER, ""]
+        )
+        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+
+        client.force_login(company.members.first())
+        session_uuid = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []}).name
+        fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
+        accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, "Éligible à l’IAE")
+
+        NEW_NIR = "197013625838386"
+        post_data = {
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
+            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+            "nir": NEW_NIR,
+        }
+        # Test with invalid data
+        response = client.post(fill_job_seeker_infos_url, data=post_data | {"nir": ""})
+        assert response.status_code == 200
+        assertFormError(
+            response.context["form_personal_data"], "nir", "Le numéro de sécurité sociale n'est pas valide"
+        )
+        # Then with valid data
+        response = client.post(fill_job_seeker_infos_url, data=post_data)
+        assertRedirects(response, accept_contract_infos_url)
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+                "lack_of_pole_emploi_id_reason": "",
+                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
+                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+                "nir": NEW_NIR,
+            },
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, NEW_NIR)
+
+        # Check that the NIR is saved on job seeker after contract signature
+        post_data = {
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "answer": "",
+            "confirmed": True,
+        }
+        response = client.post(accept_contract_infos_url, data=post_data, headers={"hx-request": "true"})
+        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
+            sender=company.members.first(), to_company=company
+        )
+        assertRedirects(
+            response,
+            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
+
     def test_as_company_eligibility_diagnosis_from_another_company(self, client):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
         ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
@@ -5712,9 +5777,6 @@ class TestFillJobSeekerInfosForHire:
                 "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                "lack_of_nir": False,
-                "lack_of_nir_reason": "",
-                "nir": self.job_seeker.jobseeker_profile.nir,
             },
         }
 
