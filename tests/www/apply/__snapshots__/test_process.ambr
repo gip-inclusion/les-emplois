@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestFillJobSeekerInfosForAccept.test_as_iae_company[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -174,7 +174,8 @@
       }),
       dict({
         'origin': list([
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'start_accept_wizard[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -360,7 +361,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'start_accept_wizard[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -395,7 +397,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'start_accept_wizard[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -529,8 +532,12 @@
       dict({
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'RelatedManager.last_considered_valid[eligibility/models/iae.py]',
+          'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
+          'User.has_valid_diagnosis[users/models.py]',
+          'JobApplication.eligibility_diagnosis_by_siae_required[job_applications/models.py]',
+          'start_accept_wizard[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -652,8 +659,9 @@
           LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
           INNER JOIN "users_user" T4 ON ("eligibility_eligibilitydiagnosis"."author_id" = T4."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE (("eligibility_eligibilitydiagnosis"."author_kind" = %s
-                  OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
+          WHERE ("eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
+                 AND ("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                      OR "eligibility_eligibilitydiagnosis"."author_siae_id" = %s)
                  AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s
                  AND "eligibility_eligibilitydiagnosis"."expires_at" > %s)
           ORDER BY 10 DESC,
@@ -663,168 +671,9 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE "asp_commune"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          WHERE "asp_country"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
-          'IfNode[layout/base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept_base.html]',
-          'ExtendsNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "companies_jobdescription"
-          WHERE ("companies_jobdescription"."company_id" = %s
-                 AND "companies_jobdescription"."is_active"
-                 AND "companies_jobdescription"."last_employer_update_at" < %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
-          'Company.convention_can_be_accessed_by[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept_base.html]',
-          'ExtendsNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE ("companies_companymembership"."id" IN
-                   (SELECT U0."id"
-                    FROM "companies_companymembership" U0
-                    INNER JOIN "users_user" U1 ON (U0."user_id" = U1."id")
-                    WHERE (U1."is_active"
-                           AND U0."is_active"
-                           AND U0."company_id" = %s
-                           AND U0."is_admin"
-                           AND U1."is_active"))
-                 AND "users_user"."id" = %s)
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'RemoteAutocompleteSelect2Widget.optgroups[utils/widgets.py]',
-          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IncludeNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-          'BlockNode[apply/process_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept_base.html]',
-          'ExtendsNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE (NOT ("asp_commune"."ignore")
-                 AND "asp_commune"."id" IN (%s))
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'SimpleNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IfNode[apply/includes/job_application_fill_user_infos_form.html]',
-          'IncludeNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-          'BlockNode[apply/process_base.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept_base.html]',
-          'ExtendsNode[apply/process_accept_fill_job_seeker_infos_step.html]',
-        ]),
-        'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          ORDER BY "asp_country"."name" ASC
-        ''',
       }),
       dict({
         'origin': list([
@@ -857,7 +706,7 @@
 # ---
 # name: TestProcessAcceptViewsInWizard.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 28,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -1630,34 +1479,6 @@
           FROM "asp_commune"
           WHERE (NOT ("asp_commune"."ignore")
                  AND "asp_commune"."id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'CommuneQuerySet.by_insee_code_and_period[asp/models.py]',
-          'JobSeekerPersonalDataForm.clean[asp/forms.py]',
-          'JobSeekerPersonalDataForm.clean[users/forms.py]',
-          'JobSeekerPersonalDataForm.clean[common_apps/nir/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE (NOT ("asp_commune"."ignore")
-                 AND "asp_commune"."code" = %s
-                 AND "asp_commune"."start_date" <= %s
-                 AND ("asp_commune"."end_date" IS NULL
-                      OR "asp_commune"."end_date" >= %s))
           LIMIT 21
         ''',
       }),

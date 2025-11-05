@@ -2232,7 +2232,8 @@ class TestProcessAcceptViewsInWizard:
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
     def _accept_jobseeker_post_data(self, job_application, post_data=None):
-        extra_post_data = post_data or {}
+        if post_data is not None:
+            return post_data
         job_seeker = job_application.job_seeker
         # JobSeekerPersonalDataForm
         birth_place = (
@@ -2243,14 +2244,11 @@ class TestProcessAcceptViewsInWizard:
             .first()
             .pk
         )
-        personal_data_default_fields = {
-            "birthdate": job_seeker.jobseeker_profile.birthdate,
-            "birth_country": extra_post_data.setdefault("birth_country", Country.FRANCE_ID),
-            "birth_place": extra_post_data.setdefault("birth_place", birth_place),
-        }
         return {
-            **personal_data_default_fields,
-        } | extra_post_data
+            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birth_country": Country.FRANCE_ID,
+            "birth_place": birth_place,
+        }
 
     def _accept_contract_post_data(self, job_application, post_data=None):
         extra_post_data = post_data or {}
@@ -2822,6 +2820,7 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile.nir = ""
         jobseeker_profile.pole_emploi_id = ""
         jobseeker_profile.lack_of_pole_emploi_id_reason = LackOfPoleEmploiId.REASON_FORGOTTEN
+        jobseeker_profile.birth_country = Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
         jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
@@ -3098,6 +3097,7 @@ class TestProcessAcceptViewsInWizard:
         post_data = {
             "nir": NEW_NIR,
             "lack_of_nir_reason": jobseeker_profile.lack_of_nir_reason,
+            "birth_country": Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first().pk,
         }
         post_data = self._accept_jobseeker_post_data(job_application=job_application, post_data=post_data)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
@@ -3397,6 +3397,9 @@ class TestProcessAcceptViewsInWizard:
             job_seeker__jobseeker_profile__birthdate=datetime.date(1995, 12, 27),
         )
         job_seeker = job_application.job_seeker
+        # Remove birthdate to have the form available
+        job_seeker.jobseeker_profile.birthdate = None
+        job_seeker.jobseeker_profile.save(update_fields=["birthdate"])
         IdentityCertification.objects.create(
             jobseeker_profile=job_seeker.jobseeker_profile,
             certifier=IdentityCertificationAuthorities.API_PARTICULIER,
@@ -3420,7 +3423,7 @@ class TestProcessAcceptViewsInWizard:
             # Select the first and only one option
             "address_for_autocomplete": "0",
             "geocoding_score": 0.9714,
-            "birthdate": job_seeker.jobseeker_profile.birthdate,
+            "birthdate": "",
             "birth_country": birth_country.pk,
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
         }
@@ -3445,6 +3448,12 @@ class TestProcessAcceptViewsInWizard:
         )
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
         job_application = self.create_job_application(eligibility_diagnosis=diagnosis)
+        # Remove birth related infos to have the forms available
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+        self.job_seeker.jobseeker_profile.birthdate = None
+        self.job_seeker.jobseeker_profile.birth_place = None
+        self.job_seeker.jobseeker_profile.birth_country = None
+        self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_place", "birth_country"])
 
         # required assumptions for the test case
         assert self.company.is_subject_to_iae_rules
@@ -3458,7 +3467,6 @@ class TestProcessAcceptViewsInWizard:
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, "Valider les informations")
 
-        birthdate = self.job_seeker.jobseeker_profile.birthdate
         birth_place = (
             Commune.objects.filter(
                 # The birthdate must be >= 1900-01-01, and we’re removing 1 day from start_date.
@@ -3723,7 +3731,8 @@ class TestFillJobSeekerInfosForAccept:
             "apply:start-accept",
             kwargs={"job_application_id": job_application.pk},
         )
-        response = client.get(url_accept)
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(url_accept)
         session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
         assert session_uuid is not None
         fill_job_seeker_infos_url = reverse(
@@ -3735,39 +3744,12 @@ class TestFillJobSeekerInfosForAccept:
             fetch_redirect_response=False,
         )
 
-        with assertSnapshotQueries(snapshot(name="view queries")):
-            response = client.get(fill_job_seeker_infos_url)
+        response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Accepter la candidature de Clara SION")
 
-        post_data = {
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-        }
-        # Test with invalid data
-        response = client.post(
-            fill_job_seeker_infos_url,
-            data=post_data | {"birthdate": ""},
-        )
-        assert response.status_code == 200
-        assertFormError(response.context["form_personal_data"], "birthdate", "Ce champ est obligatoire.")
-        # Then with valid data
-        NEW_BIRTHDATE = datetime.date(1990, 5, 15)
-        response = client.post(
-            fill_job_seeker_infos_url,
-            data=post_data | {"birthdate": NEW_BIRTHDATE.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)},
-        )
+        response = client.post(fill_job_seeker_infos_url, data={})
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
-        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": {
-                "birthdate": NEW_BIRTHDATE,
-                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            },
-        }
-        # If you come back to the view, it is pre-filled with session data
-        response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, NEW_BIRTHDATE)
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {"personal_data": {}}
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_as_iae_company_no_address(self, client, address):
@@ -3814,9 +3796,6 @@ class TestFillJobSeekerInfosForAccept:
         assertContains(response, "Accepter la candidature de Clara SION")
 
         post_data = {
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
             "address_line_1": "128 Rue de Grenelle",
             "address_line_2": "",
             "post_code": "67118",
@@ -3836,11 +3815,7 @@ class TestFillJobSeekerInfosForAccept:
         response = client.post(fill_job_seeker_infos_url, data=post_data)
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": {
-                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
-                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            },
+            "personal_data": {},
             "user_address": {
                 "address_line_1": "128 Rue de Grenelle",
                 "address_line_2": "",
@@ -3855,6 +3830,260 @@ class TestFillJobSeekerInfosForAccept:
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "128 Rue de Grenelle")
+
+    @pytest.mark.parametrize("birth_country", [None, "france", "other"])
+    def test_as_iae_company_no_birthdate(self, client, birth_country):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        self.job_seeker.jobseeker_profile.birthdate = None
+        if birth_country == "france":
+            self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
+            self.job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
+                "59183", datetime.date(1990, 1, 1)
+            )
+        elif birth_country == "other":
+            self.job_seeker.jobseeker_profile.birth_country = (
+                Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
+            )
+            self.job_seeker.jobseeker_profile.birth_place = None
+        else:
+            self.job_seeker.jobseeker_profile.birth_country = None
+            self.job_seeker.jobseeker_profile.birth_place = None
+        self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        accept_contract_infos_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid})
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Valider les informations")
+
+        COUNTRY_FIELD_ID = 'id="id_birth_country"'
+        PLACE_FIELD_ID = 'id="id_birth_place"'
+        NEW_BIRTHDATE = datetime.date(1990, 1, 1)
+        if birth_country == "other":
+            assertNotContains(response, COUNTRY_FIELD_ID)
+            assertNotContains(response, PLACE_FIELD_ID)
+            invalid_post_data = {"birthdate": ""}
+
+            def assertForm(form):
+                assertFormError(form, "birthdate", "Ce champ est obligatoire.")
+
+            valid_post_data = {"birthdate": NEW_BIRTHDATE}
+            birth_place = None
+        else:
+            assertContains(response, COUNTRY_FIELD_ID)
+            assertContains(response, PLACE_FIELD_ID)
+            birth_place = (
+                Commune.objects.filter(
+                    # The birthdate must be >= 1900-01-01, and we’re removing 1 day from start_date.
+                    Q(start_date__gt=datetime.date(1900, 1, 1)),
+                    # Must be a valid choice for the user current birthdate.
+                    Q(start_date__lte=NEW_BIRTHDATE),
+                    Q(end_date__gte=NEW_BIRTHDATE) | Q(end_date=None),
+                )
+                .order_by("?")
+                .first()
+            )
+
+            bad_birthdate = birth_place.start_date - datetime.timedelta(days=1)
+            invalid_post_data = {
+                "birthdate": bad_birthdate,
+                "birth_place": birth_place.pk,
+                "birth_country": Country.FRANCE_ID,
+            }
+
+            def assertForm(form):
+                assertFormError(
+                    form,
+                    "birth_place",
+                    (
+                        f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date "
+                        f"du {bad_birthdate:%d/%m/%Y}"
+                    ),
+                )
+
+            valid_post_data = {
+                "birthdate": NEW_BIRTHDATE,
+                "birth_place": birth_place.pk,
+                "birth_country": Country.FRANCE_ID,
+            }
+
+        # Test with invalid data
+        response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
+        assert response.status_code == 200
+        assertForm(response.context["form_personal_data"])
+        # Then with valid data
+        response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
+        assertRedirects(response, accept_contract_infos_url)
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": valid_post_data,
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, NEW_BIRTHDATE)
+
+        # Check that birth infos are saved (if modified) after filling contract info step
+        response = client.post(
+            accept_contract_infos_url,
+            data={
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+                "confirmed": True,
+            },
+            headers={"hx-request": "true"},
+        )
+        assertRedirects(
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        self.job_seeker.jobseeker_profile.refresh_from_db()
+        assert self.job_seeker.jobseeker_profile.birthdate == NEW_BIRTHDATE
+        assert self.job_seeker.jobseeker_profile.birth_place == birth_place
+        if birth_country != "other":
+            assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
+
+    @pytest.mark.parametrize("in_france", [True, False])
+    def test_as_iae_company_no_birth_country(self, client, in_france):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+
+        assert self.job_seeker.jobseeker_profile.birthdate
+        self.job_seeker.jobseeker_profile.birth_country = None
+        self.job_seeker.jobseeker_profile.birth_place = None
+        self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
+
+        client.force_login(company.members.first())
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        assert session_uuid is not None
+        fill_job_seeker_infos_url = reverse(
+            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
+        )
+        accept_contract_infos_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid})
+        assertRedirects(
+            response,
+            fill_job_seeker_infos_url,
+            fetch_redirect_response=False,
+        )
+
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Valider les informations")
+
+        if in_france:
+            new_country = Country.objects.get(pk=Country.FRANCE_ID)
+            new_place = (
+                Commune.objects.filter(
+                    # The birthdate must be >= 1900-01-01, and we’re removing 1 day from start_date.
+                    Q(start_date__gt=datetime.date(1900, 1, 1)),
+                    # Must be a valid choice for the user current birthdate.
+                    Q(start_date__lte=self.job_seeker.jobseeker_profile.birthdate),
+                    Q(end_date__gte=self.job_seeker.jobseeker_profile.birthdate) | Q(end_date=None),
+                )
+                .order_by("?")
+                .first()
+            )
+
+            invalid_post_data = {
+                "birth_place": "",
+                "birth_country": Country.FRANCE_ID,
+            }
+
+            def assertForm(form):
+                assertFormError(
+                    form,
+                    None,
+                    (
+                        "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est "
+                        "la France."
+                    ),
+                )
+
+            valid_post_data = {
+                "birth_place": new_place.pk,
+            }
+        else:
+            new_country = Country.objects.exclude(pk=Country.FRANCE_ID).order_by("?").first()
+            new_place = None
+
+            invalid_post_data = {"birth_country": ""}
+
+            def assertForm(form):
+                assertFormError(form, "birth_country", "Le pays de naissance est obligatoire.")
+
+            valid_post_data = {"birth_country": new_country.pk}
+
+        # Test with invalid data
+        response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
+        assert response.status_code == 200
+        assertForm(response.context["form_personal_data"])
+        # Then with valid data
+        response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
+        assertRedirects(response, accept_contract_infos_url)
+        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
+            "personal_data": {
+                "birth_place": new_place and new_place.pk,
+                "birth_country": new_country.pk,
+            }
+        }
+        # If you come back to the view, it is pre-filled with session data
+        response = client.get(fill_job_seeker_infos_url)
+        assertContains(response, f'<option value="{new_country.pk}" selected>')
+
+        # Check that birth infos are saved (if modified) after filling contract info step
+        response = client.post(
+            accept_contract_infos_url,
+            data={
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+                "confirmed": True,
+            },
+            headers={"hx-request": "true"},
+        )
+        assertRedirects(
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        self.job_seeker.jobseeker_profile.refresh_from_db()
+        assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
+        assert self.job_seeker.jobseeker_profile.birth_place == new_place
 
     @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
     def test_as_iae_company_no_nir(self, client, with_lack_of_nir_reason):
@@ -3909,13 +4138,8 @@ class TestFillJobSeekerInfosForAccept:
                 [messages.Message(messages.ERROR, "Certaines informations sont manquantes ou invalides")],
             )
 
-        post_data = {
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-        }
         # Test with invalid data
-        response = client.post(fill_job_seeker_infos_url, data=post_data | {"nir": ""})
+        response = client.post(fill_job_seeker_infos_url, data={"nir": ""})
         assert response.status_code == 200
         assertFormError(
             response.context["form_personal_data"], "nir", "Le numéro de sécurité sociale n'est pas valide"
@@ -3925,15 +4149,12 @@ class TestFillJobSeekerInfosForAccept:
         NEW_NIR = "197013625838386"
         response = client.post(
             fill_job_seeker_infos_url,
-            data=post_data | {"nir": NEW_NIR, "lack_of_nir": False, "lack_of_nir_reason": ""},
+            data={"nir": NEW_NIR, "lack_of_nir": False, "lack_of_nir_reason": ""},
         )
         assertRedirects(response, accept_contract_infos_url)
 
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
             "personal_data": {
-                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
-                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
                 "nir": NEW_NIR,
                 "lack_of_nir": False,
                 "lack_of_nir_reason": "",
@@ -4005,11 +4226,6 @@ class TestFillJobSeekerInfosForAccept:
         assertContains(response, "Accepter la candidature de Clara SION")
         assertContains(response, "Valider les informations")
 
-        post_data = {
-            "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place.pk,
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country.pk,
-        }
         NEW_POLE_EMPLOI_ID = "1234567A"
         if with_lack_of_pole_emploi_id_reason:
             # If a reason is already present, the pole_emploi_id field is not shown
@@ -4019,14 +4235,10 @@ class TestFillJobSeekerInfosForAccept:
             # With a reason, it's OK since the form is valid
             assert response.status_code == 200
             # Go to next step
-            response = client.post(fill_job_seeker_infos_url, data=post_data)
+            response = client.post(fill_job_seeker_infos_url, data={})
             assertRedirects(response, accept_contract_infos_url)
             assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-                "personal_data": {
-                    "birthdate": self.job_seeker.jobseeker_profile.birthdate,
-                    "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                    "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-                },
+                "personal_data": {},
             }
         else:
             # If no reason is present, the pole_emploi_id field is shown
@@ -4040,7 +4252,7 @@ class TestFillJobSeekerInfosForAccept:
             )
             # Test with invalid data
             response = client.post(
-                fill_job_seeker_infos_url, data=post_data | {"pole_emploi_id": "", "lack_of_pole_emploi_id_reason": ""}
+                fill_job_seeker_infos_url, data={"pole_emploi_id": "", "lack_of_pole_emploi_id_reason": ""}
             )
             assert response.status_code == 200
             assertFormError(
@@ -4050,16 +4262,13 @@ class TestFillJobSeekerInfosForAccept:
             )
             response = client.post(
                 fill_job_seeker_infos_url,
-                data=post_data | {"pole_emploi_id": NEW_POLE_EMPLOI_ID, "lack_of_pole_emploi_id_reason": ""},
+                data={"pole_emploi_id": NEW_POLE_EMPLOI_ID, "lack_of_pole_emploi_id_reason": ""},
             )
             assertRedirects(response, accept_contract_infos_url)
             assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
                 "personal_data": {
-                    "birthdate": self.job_seeker.jobseeker_profile.birthdate,
                     "pole_emploi_id": NEW_POLE_EMPLOI_ID,
                     "lack_of_pole_emploi_id_reason": "",
-                    "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                    "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
                 },
             }
             # If you come back to the view, it is pre-filled with session data
