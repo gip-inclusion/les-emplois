@@ -16,9 +16,6 @@
 
         {% csrf_token %}
 
-        {% include "apply/includes/job_application_fill_user_infos_form.html" with form_personal_data=form_personal_data form_user_address=form_user_address form_birth_place=form_birth_place request=request only %}
-
-        {% if form_user_address or form_personal_data or form_birth_place %}<hr>{% endif %}
         <h2>Contrat</h2>
         {% bootstrap_form_errors form_accept type="non_fields" %}
 
