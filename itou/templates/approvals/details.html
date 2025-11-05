@@ -18,7 +18,7 @@
                 <div class="col-12">
                     <div class="c-box mb-3 mb-md-4">
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                            <h2>Suspensions</h2>
+                            <h2 class="h3">Suspensions</h2>
                             {% if is_employer_with_accepted_application %}
                                 <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
                                     {% if can_be_suspended_by_current_user %}
@@ -53,7 +53,7 @@
                                             <th scope="col">Jusqu’au</th>
                                             <th scope="col">Motif</th>
                                             <th scope="col">Émetteur</th>
-                                            <th scope="col" />
+                                            <th scope="col" class="text-end w-100px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -61,9 +61,9 @@
                                             <tr>
                                                 <td>
                                                     {% if suspension.is_in_progress %}
-                                                        <span class="badge badge-base rounded-pill bg-info">En cours</span>
+                                                        <span class="badge badge-sm rounded-pill bg-info">En cours</span>
                                                     {% else %}
-                                                        <span class="badge badge-base rounded-pill bg-light text-primary">Passée</span>
+                                                        <span class="badge badge-sm rounded-pill bg-light text-primary">Passée</span>
                                                     {% endif %}
                                                 </td>
                                                 <td {% if suspension.is_in_progress %}class="text-info fw-bold"{% endif %}>{{ suspension.start_at|date:"d/m/Y" }}</td>
@@ -79,18 +79,15 @@
                                                 <td>
                                                     {% if suspension.can_be_handled_by_current_user %}
                                                         <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                                                           class="btn btn-ico-only"
+                                                           class="btn btn-sm btn-link btn-ico-only"
                                                            data-bs-toggle="tooltip"
                                                            data-bs-title="Modifier la suspension">
                                                             <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                                                             <span class="visually-hidden">Modifier la suspension</span>
                                                         </a>
-                                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
-                                                            <i class="ri-more-2-fill" aria-hidden="true"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                                            <a class="dropdown-item" href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
-                                                        </div>
+                                                        <a class="btn btn-sm btn-link btn-ico-only" href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                                            <i class="ri-delete-bin-line" data-bs-toggle="tooltip" data-bs-title="Supprimer la suspension" aria-label="Supprimer la suspension"></i>
+                                                        </a>
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -126,7 +123,7 @@
                 <div class="col-12">
                     <div class="c-box mb-3 mb-md-4">
                         <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-                            <h2>Prolongations</h2>
+                            <h2 class="h3">Prolongations</h2>
                             {% if is_employer_with_accepted_application %}
                                 <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
                                     {% if can_be_prolonged_by_current_user %}
@@ -171,12 +168,12 @@
                                                     {% if prolongation.status %}
                                                         {# Prolongation request #}
                                                         {% if prolongation.status == "DENIED" %}
-                                                            <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">Refusée</span>
+                                                            <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">Refusée</span>
                                                         {% elif prolongation.status == "PENDING" %}
-                                                            <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">En attente</span>
+                                                            <span class="badge badge-sm rounded-pill bg-accent-03-lighter text-primary">En attente</span>
                                                         {% endif %}
                                                     {% else %}
-                                                        <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
+                                                        <span class="badge badge-sm rounded-pill bg-success-lighter text-success">Acceptée</span>
                                                     {% endif %}
                                                 </td>
                                                 <td>{{ prolongation.start_at|date:"d/m/Y" }}</td>
