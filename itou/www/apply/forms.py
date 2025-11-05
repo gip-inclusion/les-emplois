@@ -672,6 +672,13 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
             del self.fields["lack_of_nir"]
             del self.fields["lack_of_nir_reason"]
 
+        if (
+            self.instance.jobseeker_profile.pole_emploi_id
+            or self.instance.jobseeker_profile.lack_of_pole_emploi_id_reason
+        ):
+            del self.fields["pole_emploi_id"]
+            del self.fields["lack_of_pole_emploi_id_reason"]
+
 
 class FilterJobApplicationsForm(forms.Form):
     """
