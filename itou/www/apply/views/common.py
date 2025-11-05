@@ -157,20 +157,9 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
 
     def get_context_data(self, *, forms, **kwargs):
         form_accept = forms["accept"]
-        # Hide the other forms in the HTML
-        form_user_address = None
-        form_personal_data = None
-        form_birth_place = None
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
-        context["form_user_address"] = form_user_address
-        context["form_personal_data"] = form_personal_data
-        context["form_birth_place"] = form_birth_place
-        context["has_form_error"] = any(
-            form.errors
-            for form in [form_accept, form_user_address, form_birth_place, form_personal_data]
-            if form is not None
-        )
+        context["has_form_error"] = bool(form_accept.errors)
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["hide_value"] = ContractType.OTHER.value
         context["matomo_custom_title"] = "Candidature acceptée"
