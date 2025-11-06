@@ -4441,6 +4441,8 @@ def test_detect_existing_job_seeker(client):
 class TestApplicationGEIQEligibilityView:
     DIAG_VALIDITY_TXT = "Date de fin de validité du diagnostic"
     UPDATE_ELIGIBILITY = "Mettre à jour l’éligibilité"
+    CONFIRMED_ELIGIBILITY = "Éligibilité GEIQ confirmée"
+    UNCONFIRMED_ELIGIBILITY = "Éligibilité GEIQ non confirmée"
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
@@ -4556,7 +4558,7 @@ class TestApplicationGEIQEligibilityView:
         response = client.get(
             reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         )
-        assertContains(response, "Éligibilité GEIQ confirmée")
+        assertContains(response, self.CONFIRMED_ELIGIBILITY)
         assertContains(response, self.DIAG_VALIDITY_TXT)
         assertContains(response, self.UPDATE_ELIGIBILITY)
 
@@ -4571,7 +4573,7 @@ class TestApplicationGEIQEligibilityView:
         )
         url = reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
-        assertContains(response, "Éligibilité GEIQ non confirmée")
+        assertContains(response, self.UNCONFIRMED_ELIGIBILITY)
         assertNotContains(response, self.DIAG_VALIDITY_TXT)
         assertNotContains(response, self.UPDATE_ELIGIBILITY)
 
@@ -4611,7 +4613,7 @@ class TestApplicationGEIQEligibilityView:
             follow=True,
         )
 
-        assertContains(response, "Éligibilité GEIQ confirmée")
+        assertContains(response, self.CONFIRMED_ELIGIBILITY)
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
         assertContains(response, self.DIAG_VALIDITY_TXT)
 
@@ -4625,7 +4627,7 @@ class TestApplicationGEIQEligibilityView:
             follow=True,
         )
 
-        assertContains(response, "Éligibilité GEIQ non confirmée")
+        assertContains(response, self.UNCONFIRMED_ELIGIBILITY)
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
         # Badge is KO if job seeker has a valid diagnosis without allowance
