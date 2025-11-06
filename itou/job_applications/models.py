@@ -111,6 +111,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     ]
     CAN_ADD_PRIOR_ACTION_STATES = [
         JobApplicationState.NEW,
+        JobApplicationState.POOL,
         JobApplicationState.PROCESSING,
         JobApplicationState.POSTPONED,
         JobApplicationState.OBSOLETE,
@@ -916,7 +917,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_change_prior_actions(self):
-        return self.can_have_prior_action and not self.state.is_accepted
+        return self.can_have_prior_action and (
+            self.state == JobApplicationState.PRIOR_TO_HIRE
+            or self.state in JobApplicationWorkflow.CAN_ADD_PRIOR_ACTION_STATES
+        )
 
     @property
     def is_refused_due_to_deactivation(self):
