@@ -4626,7 +4626,25 @@ class TestApplicationGEIQEligibilityView:
             reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name}),
             follow=True,
         )
+        assertContains(response, self.UNCONFIRMED_ELIGIBILITY)
+        assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
+        # Badge KO if job seeker has an expired diagnosis
+        job_seeker_with_expired_diagnosis = JobSeekerFactory()
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            from_prescriber=True, expired=True, job_seeker=job_seeker_with_expired_diagnosis
+        )
+        assert not diagnosis.is_valid
+        apply_session = fake_session_initialization(
+            client,
+            self.geiq,
+            job_seeker_with_expired_diagnosis,
+            {"selected_jobs": self.geiq.job_description_through.all()},
+        )
+        response = client.get(
+            reverse("apply:application_geiq_eligibility", kwargs={"session_uuid": apply_session.name}),
+            follow=True,
+        )
         assertContains(response, self.UNCONFIRMED_ELIGIBILITY)
         assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
