@@ -402,22 +402,48 @@ def test_list_snapshot(client, snapshot):
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
     company = CompanyFactory(for_snapshot=True, with_membership=True)
+    geiq_company = CompanyFactory(for_snapshot=True, kind=CompanyKind.GEIQ)
     common_kwargs = {
         "job_seeker": job_seeker,
-        "eligibility_diagnosis": None,
         "to_company": company,
         "sender_kind": SenderKind.PRESCRIBER,
         "sender": prescriber,
     }
 
+    company_diagnosis = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=company,
+        author=company.members.first(),
+        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+    )
+    prescriber_diagnosis = IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.PRESCRIBER,
+        author_prescriber_organization=prescriber_org,
+        author=prescriber,
+        criteria_kinds=[AdministrativeCriteriaKind.ASS, AdministrativeCriteriaKind.RSA],
+    )
+
     job_applications = [
-        JobApplicationFactory(state=JobApplicationState.ACCEPTED, **common_kwargs),
         JobApplicationFactory(
-            state=JobApplicationState.NEW,
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=company_diagnosis,
             **common_kwargs,
         ),
         JobApplicationFactory(
+            state=JobApplicationState.NEW,
+            eligibility_diagnosis=None,
+            **common_kwargs,
+        ),
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            eligibility_diagnosis=prescriber_diagnosis,
+            **{**common_kwargs, "to_company": geiq_company},
+        ),  # This one should not have the IAE criteria section displayed
+        JobApplicationFactory(
             state=JobApplicationState.REFUSED,
+            eligibility_diagnosis=None,
             **common_kwargs,
         ),
     ]
@@ -429,6 +455,7 @@ def test_list_snapshot(client, snapshot):
         selector="#job-applications-section",
         replace_in_attr=itertools.chain(
             [("href", f"/company/{company.pk}/card", "/company/[PK of Company]/card")],
+            [("href", f"/company/{geiq_company.pk}/card", "/company/[PK of Company]/card")],
             *(
                 [
                     (
