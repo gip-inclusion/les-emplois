@@ -68,6 +68,9 @@ class TestCertifyCriteriaApiParticulier:
             [IdentityCertificationAuthorities.API_PARTICULIER],
             transform=lambda certification: certification.certifier,
         )
+        criterion.refresh_from_db()
+        # Was committed to the database.
+        assert criterion.last_certification_attempt_at is not None
 
     # The API returns the same error messages for each endpoint called by us.
     # It would be useless to test them all.
@@ -91,6 +94,9 @@ class TestCertifyCriteriaApiParticulier:
             assert criterion.certification_period is None
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(jobseeker_profile.identity_certifications.all(), [])
+        criterion.refresh_from_db()
+        # Was committed to the database.
+        assert criterion.last_certification_attempt_at is not None
 
     @pytest.mark.parametrize(
         "status_code,json_data,headers,retry_task_exception",
