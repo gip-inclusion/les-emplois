@@ -429,6 +429,9 @@ def test_can_change_prior_actions():
         is True
     )
     assert (
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POOL).can_change_prior_actions is True
+    )
+    assert (
         JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.ACCEPTED).can_change_prior_actions
         is False
     )
