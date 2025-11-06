@@ -987,14 +987,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def get_geiq_eligibility_diagnosis(self, for_prescriber=False):
         """
-        Returns the GEIQ eligibility diagnosis linked to this job application if it is accepted,
-        or None if the viewer is a prescriber and the diagnosis was made by the company.
+        Returns the GEIQ eligibility diagnosis linked to this job application if any,
+        otherwise retrieve the diagnosis associated to the job seeker. If the viewer is
+        a prescriber and the diagnosis was made by the company, returns None.
         """
         if not self.to_company.kind == CompanyKind.GEIQ:
             return None
 
-        if self.state.is_accepted:
-            if for_prescriber and getattr(self.geiq_eligibility_diagnosis, "author_geiq", None):
+        if self.geiq_eligibility_diagnosis:
+            if for_prescriber and self.geiq_eligibility_diagnosis.author_geiq:
                 return None
             return self.geiq_eligibility_diagnosis
         return GEIQEligibilityDiagnosis.objects.diagnoses_for(
