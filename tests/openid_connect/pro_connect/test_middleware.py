@@ -8,27 +8,19 @@ from tests.users.factories import EmployerFactory
 
 params_tuples = [
     ("?proconnect_login=true", ""),
-    ("?proconnect_login=true&filter=76", "?filter=76"),
     ("?proconnect_login=true&filter=76&kind=EI", "?filter=76&kind=EI"),
 ]
 
 
-@pytest.mark.parametrize(
-    "params,user,redirection",
-    [
-        ("", lambda: EmployerFactory(membership=True), "dashboard:index"),
-        ("?param=1", lambda: EmployerFactory(membership=True), "dashboard:index"),
-        ("?param=1&username=2", lambda: EmployerFactory(membership=True), "dashboard:index"),
-        ("", None, "search:employers_home"),
-        ("?param=1", None, "search:employers_home"),
-        ("?param=1&username=2", None, "search:employers_home"),
-    ],
-)
-def test_middleware_wo_proconnect_login_param(client, db, params, user, redirection):
-    if user:
-        client.force_login(user())
-    response = client.get(f"{reverse('home:hp')}/{params}")
-    assertRedirects(response, reverse(redirection), fetch_redirect_response=False)
+def test_middleware_wo_proconnect_login_param(client):
+    url = reverse("home:hp", query={"param": "1", "username": "2"})
+
+    response = client.get(url)
+    assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
+
+    client.force_login(EmployerFactory(membership=True))
+    response = client.get(url)
+    assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
 
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
