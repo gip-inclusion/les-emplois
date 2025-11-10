@@ -429,9 +429,9 @@ django-anymail==13.1 \
     --hash=sha256:63e48402ec8258f17640eb73c8c64141f16d2f8ae7d448d0fb1c66e82b7cbcf6 \
     --hash=sha256:b51783176f8a8382e958808151551558e4a46d1375fbc343742d1ebd06ce8e9e
     # via -r requirements/base.txt
-django-appconf==1.1.0 \
-    --hash=sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f \
-    --hash=sha256:9fcead372f82a0f21ee189434e7ae9c007cbb29af1118c18251720f3d06243e4
+django-appconf==1.2.0 \
+    --hash=sha256:15a88d60dd942d6059f467412fe4581db632ef03018a3c183fb415d6fc9e5cec \
+    --hash=sha256:b81bce5ef0ceb9d84df48dfb623a32235d941c78cc5e45dbb6947f154ea277f4
     # via
     #   -r requirements/base.txt
     #   django-select2
