@@ -35,7 +35,8 @@ extend_exclude = "itou/templates/utils/widgets/duet_date_picker_widget.html"
 format_css = true
 format_js = true
 
-[tool.pytest.ini_options]
+[tool.pytest]
+minversion = "9.0"
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["tests*.py", "test_*.py"]
 filterwarnings = [
