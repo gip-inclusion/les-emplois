@@ -626,7 +626,10 @@ class ContractForAcceptView(AcceptWizardMixin, common_views.BaseAcceptView):
         self.accept_session.delete()
 
     def get_back_url(self):
-        return reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": self.accept_session.name})
+        other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
+        if other_forms:
+            return reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": self.accept_session.name})
+        return None
 
     def get_error_url(self):
         return self.request.get_full_path()

@@ -858,7 +858,12 @@ class ContractForHireView(ApplicationBaseView, common_views.BaseAcceptView):
         self.apply_session.delete()
 
     def get_back_url(self):
-        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
+        if other_forms:
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        return self.get_eligibility_for_hire_step_url() or reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+        )
 
     def get_error_url(self):
         return self.request.get_full_path()
