@@ -1229,8 +1229,8 @@ class JobSeekerProfile(models.Model):
         """
         if cleaned_nir := cleaned_data.get("nir"):
             if cleaned_title := cleaned_data.get("title"):
-                if (cleaned_nir[0] == "1" and cleaned_title != Title.M) or (
-                    cleaned_nir[0] == "2" and cleaned_title != Title.MME
+                if (cleaned_nir[0] in "137" and cleaned_title != Title.M) or (
+                    cleaned_nir[0] in "248" and cleaned_title != Title.MME
                 ):
                     raise ValidationError(
                         JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE
