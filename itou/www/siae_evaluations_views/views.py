@@ -290,6 +290,15 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
     form_class = InstitutionEvaluatedSiaeNotifyStep3Form
     template_name = "siae_evaluations/institution_evaluated_siae_notify_step3.html"
 
+    def _build_notification_email(self, evaluated_siae, sanctions):
+        if sanctions.no_sanction_reason:
+            return SIAEEmailFactory(evaluated_siae).not_sanctioned()
+        if sanctions.training_session and not sanctions.has_significant_sanction:
+            return SIAEEmailFactory(evaluated_siae).sanctioned_with_training_session()
+
+        # No email is sent for the other sanctions: SIAEs are informed by postal mail
+        return None
+
     def get(self, request, *args, **kwargs):
         if self.sessionkey not in request.session:
             return HttpResponseRedirect(
@@ -332,12 +341,9 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         sanctions.save()
         evaluated_siae.save(update_fields=["notified_at"])
         del self.request.session[self.sessionkey]
-        messages.success(self.request, f"{evaluated_siae} a bien été notifiée de la sanction.")
-        if sanctions.no_sanction_reason:
-            email = SIAEEmailFactory(evaluated_siae).not_sanctioned()
-        else:
-            email = SIAEEmailFactory(evaluated_siae).sanctioned()
-        send_email_messages([email])
+        if email := self._build_notification_email(evaluated_siae, sanctions):
+            send_email_messages([email])
+            messages.success(self.request, f"{evaluated_siae} a bien été notifiée de la décision.")
         return super().form_valid(form)
 
     def get_success_url(self):
