@@ -615,13 +615,15 @@ class TestUtilsValidators:
         validate_nir("141062B78200582")
         # Valid number with fictitious month
         validate_nir("141208078200587")
+        # Valid number starting with 3
+        validate_nir("341068078200554")
         with pytest.raises(ValidationError):
             validate_nir("123456789")
         with pytest.raises(ValidationError):
             validate_nir("141068078200557123")
-        # Should start with 1 or 2.
+        # Should start with 1, 2, 3, 4, 7, 8.
         with pytest.raises(ValidationError):
-            validate_nir("341208078200557")
+            validate_nir("941208078200575")
         # Third group should be between 0 and 12.
         with pytest.raises(ValidationError):
             validate_nir("141208078200557")
@@ -874,6 +876,18 @@ class TestUtilsTemplateFilters:
             ),
             ("", ""),
             ("12345678910", "12345678910"),
+            (
+                " 4 41 06 80 782 005 04",
+                '<span>4</span><span class="ms-1">41</span><span class="ms-1">06</span>'
+                '<span class="ms-1">80</span><span class="ms-1">782</span><span class="ms-1">005</span>'
+                '<span class="ms-1">04</span>',
+            ),
+            (
+                "741068078200548",
+                '<span>7</span><span class="ms-1">41</span><span class="ms-1">06</span>'
+                '<span class="ms-1">80</span><span class="ms-1">782</span><span class="ms-1">005</span>'
+                '<span class="ms-1">48</span>',
+            ),
         ]
         for nir, expected in test_cases:
             with subtests.test(nir):
