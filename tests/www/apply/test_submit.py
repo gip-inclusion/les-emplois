@@ -3023,7 +3023,8 @@ class TestDirectHireFullProcess:
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        assertContains(response, check_infos_url)  # Back button URL
         other_country = Country.objects.exclude(
             pk__in=(Country.FRANCE_ID, new_job_seeker.jobseeker_profile.birth_country_id)
         ).first()
@@ -3204,7 +3205,8 @@ class TestDirectHireFullProcess:
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
-        assertContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        assertContains(response, check_infos_url)  # Back button URL
         other_country = Country.objects.exclude(
             pk__in=(Country.FRANCE_ID, job_seeker.jobseeker_profile.birth_country_id)
         ).first()
