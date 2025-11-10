@@ -123,6 +123,7 @@ LINK_RESET_MARKUP = (
     '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
+CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
 
 
 class TestProcessViews:
@@ -2303,7 +2304,14 @@ class TestProcessAcceptViewsInWizard:
         return client.post(url_job_seeker_info, data=post_data)
 
     def fill_contract_info_step(
-        self, client, job_application, session_uuid, post_data=None, assert_successful=True, next_url=None
+        self,
+        client,
+        job_application,
+        session_uuid,
+        post_data=None,
+        assert_successful=True,
+        next_url=None,
+        with_previous_step=True,
     ):
         """
         This is not a test. It's a shortcut to process "apply:start-accept" wizard steps:
@@ -2313,9 +2321,16 @@ class TestProcessAcceptViewsInWizard:
         - POST: hide the modal and redirect to the next url.
 
         """
+        next_url = next_url or reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         contract_info_url = self.get_contract_info_step_url(session_uuid)
         response = client.get(contract_info_url)
         assertContains(response, "Confirmation de l’embauche")
+        if with_previous_step:
+            assertContains(response, CONFIRM_RESET_MARKUP % next_url)
+            assertContains(response, BACK_BUTTON_ARIA_LABEL)
+        else:
+            assertContains(response, LINK_RESET_MARKUP % next_url)
+            assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
 
@@ -2343,7 +2358,6 @@ class TestProcessAcceptViewsInWizard:
 
         post_data = post_data | {"confirmed": "True"}
         response = client.post(contract_info_url, headers={"hx-request": "true"}, data=post_data)
-        next_url = next_url or reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
         # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
         # I guess it's normal as it's an AJAX response.
@@ -3387,7 +3401,12 @@ class TestProcessAcceptViewsInWizard:
 
         post_data = self._accept_contract_post_data(job_application=job_application)
         self.fill_contract_info_step(
-            client, job_application, session_uuid, post_data=post_data, assert_successful=True
+            client,
+            job_application,
+            session_uuid,
+            post_data=post_data,
+            assert_successful=True,
+            with_previous_step=False,
         )
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile

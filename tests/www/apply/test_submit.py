@@ -3058,7 +3058,10 @@ class TestDirectHireFullProcess:
         response = client.get(next_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, ACCEPT_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
-        assertNotContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        assertContains(
+            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
+        )  # Back button URL
 
         hiring_start_at = timezone.localdate()
         post_data = {
@@ -3227,7 +3230,10 @@ class TestDirectHireFullProcess:
         response = client.get(contract_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, ACCEPT_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
-        assertNotContains(response, LINK_RESET_MARKUP % check_infos_url)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        assertContains(
+            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
+        )  # Back button URL
 
         hiring_start_at = timezone.localdate()
         post_data = {

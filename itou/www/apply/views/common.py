@@ -155,6 +155,9 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
     def get_back_url(self):
         raise NotImplementedError
 
+    def get_reset_url(self):
+        raise NotImplementedError
+
     def get_error_url(self):
         raise NotImplementedError
 
@@ -173,6 +176,7 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
         context["job_seeker"] = self.job_seeker
         context["company"] = self.company
         context["back_url"] = self.get_back_url()
+        context["reset_url"] = self.get_reset_url()
         context["hire_process"] = self.job_application is None
         return context
 
