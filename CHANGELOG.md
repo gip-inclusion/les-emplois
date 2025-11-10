@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2025-11-10
+
+### Ajouté
+
+- [Candidature: Ajout lien d'accès direct au profil candidat depuis le détail d’une candidature](https://github.com/gip-inclusion/les-emplois/pull/7081)
+
+### Modifié
+
+- [Candidature/GEIQ: autoriser l'ajout d'actions préalables aux candidatures dans le vivier](https://github.com/gip-inclusion/les-emplois/pull/7088)
+- [Candidature: ajout d'une étape dédiée aux données du candidat dans l'acceptation d'une candidature](https://github.com/gip-inclusion/les-emplois/pull/7067)
+- [Candidature: ne demander l'adresse du candidat que si elle est absente](https://github.com/gip-inclusion/les-emplois/pull/7089)
+- [Désactiver les crons pour les API France Travail](https://github.com/gip-inclusion/les-emplois/pull/7094)
+- [Interface: Correction des tables "suspensions" et "prolongations"](https://github.com/gip-inclusion/les-emplois/pull/7085)
+- [Éligibilité : Fiabilisation de la certification des critères de l’API particulier](https://github.com/gip-inclusion/les-emplois/pull/7043)
+
 ## 2025-11-03
 
 ### Ajouté
