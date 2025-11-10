@@ -91,16 +91,21 @@ def test_pagination(client):
 
 def test_queries(client, snapshot):
     prescriber = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True).sender
-    JobApplicationFactory(sender=prescriber)
+    JobApplicationFactory(sender=prescriber, with_approval=True)
+    JobApplicationFactory(
+        sender=prescriber,
+        sender_prescriber_organization=prescriber.prescriberorganization_set.first(),
+        with_geiq_eligibility_diagnosis_from_prescriber=True,
+    )
     client.force_login(prescriber)
 
     with assertSnapshotQueries(snapshot(name="SQL queries in list mode")):
         response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.LIST})
-    assert len(response.context["job_applications_page"].object_list) == 2
+    assert len(response.context["job_applications_page"].object_list) == 3
 
     with assertSnapshotQueries(snapshot(name="SQL queries in table mode")):
         response = client.get(reverse("apply:list_prescriptions"), {"display": JobApplicationsDisplayKind.TABLE})
-    assert len(response.context["job_applications_page"].object_list) == 2
+    assert len(response.context["job_applications_page"].object_list) == 3
 
 
 def test_as_unauthorized_prescriber(client, snapshot):
