@@ -11,6 +11,7 @@ from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
@@ -2458,7 +2459,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
     @freeze_time("2022-10-24 11:11:00")
     def test_post_training(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
-            company__name="Les petits jardins", user__email="siae@mailinator.com"
+            company__name="Les petits jardins", company__kind=CompanyKind.EI, user__email="siae@mailinator.com"
         )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="Campagne 2022",
@@ -2481,6 +2482,11 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la décision.")],
+        )
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
@@ -2491,9 +2497,12 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Participation à une session de présentation de l’auto-prescription\n\n"
-            "    RDV le lundi 8 à 15h à la DDETS\n\n"
+            "au sein de votre SIAE, la DDETS a décidé que les personnes en charge du recrutement dans "
+            "votre structure, EI Les petits jardins, devront participer à une session de présentation des règles "
+            "relatives à l’auto-prescription.\n\n"
+            "Une convocation vous sera adressée ultérieurement par courrier électronique.\n\n"
+            "Vous trouverez ci-dessous, les précisions apportées par votre DDETS :\n"
+            "RDV le lundi 8 à 15h à la DDETS\n\n"
             "Cordialement,\n\n"
             "---\n"
             "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
@@ -2537,29 +2546,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Retrait temporaire de la capacité d’auto-prescription\n\n"
-            "    La capacité d’auto-prescrire un parcours d’insertion par l’activité économique est suspendue pour "
-            "une durée déterminée par l’autorité administrative.\n\n"
-            "    Dans votre cas, le retrait temporaire de la capacité d’auto-prescription sera effectif à partir du "
-            "1 janvier 2023 et jusqu’au 1 février 2023.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(
             datetime.date(2023, 1, 1), datetime.date(2023, 2, 1)
@@ -2892,30 +2885,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Retrait définitif de la capacité d’auto-prescription\n\n"
-            "    La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande "
-            "de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de "
-            "formation définies par l’autorité administrative.\n\n"
-            "    Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du "
-            "1 janvier 2023.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
@@ -3006,32 +2982,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Suppression d’une partie de l’aide au poste\n\n"
-            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
-            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
-            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
-            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
-            "la récupération, le cas échéant, des montants correspondants.\n\n"
-            "    Dans votre cas, la suppression de 20 % de l’aide au poste sera effective à partir du 1 janvier 2023 "
-            "et jusqu’au 1 juin 2023.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
         assert evaluated_siae.sanctions.subsidy_cut_percent == 20
@@ -3162,32 +3119,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Suppression de l’aide au poste\n\n"
-            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
-            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
-            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
-            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
-            "la récupération, le cas échéant, des montants correspondants.\n\n"
-            "    Dans votre cas, la suppression de l’aide au poste sera effective à partir du 1 janvier 2023 "
-            "et jusqu’au 1 juin 2023.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
         assert evaluated_siae.sanctions.subsidy_cut_percent == 100
@@ -3223,30 +3161,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous la mesure prise :\n\n"
-            "- Déconventionnement de la structure\n\n"
-            "    La suppression du conventionnement s’apprécie par l’autorité administrative. Cette notification "
-            "s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a "
-            "participé aux aides financières concernées en application de l’article L. 5132-2, le préfet informe le "
-            "président du conseil départemental de sa décision.\n\n"
-            "    Chat trop vorace.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
@@ -3280,6 +3201,11 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la décision.")],
+        )
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
@@ -3339,44 +3265,13 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
             ),
         )
+        assertMessages(response, [])
+
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.notified_at == timezone.now()
         assert evaluated_siae.notification_reason == "INVALID_PROOF"
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        [email] = mailoutbox
-        assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanctions"
-        assert email.body == (
-            "Bonjour,\n\n"
-            "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
-            "dans votre SIAE, vous trouverez ci-dessous les mesures prises :\n\n"
-            "- Retrait définitif de la capacité d’auto-prescription\n\n"
-            "    La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande "
-            "de la structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de "
-            "formation définies par l’autorité administrative.\n\n"
-            "    Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du "
-            "1 janvier 2023.\n\n"
-            "- Suppression d’une partie de l’aide au poste\n\n"
-            "    La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par "
-            "imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la "
-            "part du préfet. Lorsque le département a participé aux aides financières concernées en application de "
-            "l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de "
-            "la récupération, le cas échéant, des montants correspondants.\n\n"
-            "    Dans votre cas, la suppression de 20 % de l’aide au poste sera effective à partir du 1 janvier 2023 "
-            "et jusqu’au 1 juin 2023.\n\n"
-            "- Déconventionnement de la structure\n\n"
-            "    La suppression du conventionnement s’apprécie par l’autorité administrative. Cette notification "
-            "s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a "
-            "participé aux aides financières concernées en application de l’article L. 5132-2, le préfet informe le "
-            "président du conseil départemental de sa décision.\n\n"
-            "    Chat trop vorace.\n\n"
-            "Cordialement,\n\n"
-            "---\n"
-            "[TEST] Cet email est envoyé depuis un environnement de démonstration, "
-            "merci de ne pas en tenir compte [TEST]\n"
-            "Les emplois de l'inclusion\n"
-            "http://localhost:8000/"
-        )
+        assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
         assert evaluated_siae.sanctions.subsidy_cut_percent == 20
