@@ -118,6 +118,12 @@ NON_IAE_CANCELLATION_CONFIRMATION = (
 
 EMPLOYER_PRIVATE_COMMENT_MARKUP = "<small>Commentaire privé de l'employeur</small>"
 
+BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
+LINK_RESET_MARKUP = (
+    '<a href="%s" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"'
+    ' aria-label="Annuler la saisie de ce formulaire">'
+)
+
 
 class TestProcessViews:
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
@@ -2374,6 +2380,8 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, "Valider les informations")
+        assertContains(response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]))
+        assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
@@ -2423,6 +2431,8 @@ class TestProcessAcceptViewsInWizard:
         }
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, "Valider les informations")
+        assertContains(response, LINK_RESET_MARKUP % next_url)
+        assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 

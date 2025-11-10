@@ -73,6 +73,9 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
     def get_back_url(self):
         raise NotImplementedError
 
+    def get_reset_url(self):
+        raise NotImplementedError
+
     def get_success_url(self):
         raise NotImplementedError
 
@@ -96,6 +99,7 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
         context["job_seeker"] = self.job_seeker
         context["company"] = self.company
         context["back_url"] = self.get_back_url()
+        context["reset_url"] = self.get_reset_url()
         context["hire_process"] = self.job_application is None
         return context
 

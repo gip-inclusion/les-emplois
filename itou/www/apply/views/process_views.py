@@ -596,7 +596,7 @@ class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJo
         return self.accept_session
 
     def get_back_url(self):
-        return self.get_reset_url()
+        return None  # First step of the wizard: no back url
 
     def get_success_url(self):
         return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
