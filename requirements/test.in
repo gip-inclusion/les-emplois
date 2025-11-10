@@ -16,7 +16,6 @@ pytest  # https://github.com/pytest-dev/pytest
 pytest-django # https://github.com/pytest-dev/pytest-django/
 pytest-mock  # https://github.com/pytest-dev/pytest-mock/
 pytest-randomly  # https://github.com/pytest-dev/pytest-randomly
-pytest-subtests  # https://github.com/pytest-dev/pytest-subtests
 pytest-xdist  # https://pypi.org/project/pytest-xdist/
 python-crontab  # https://gitlab.com/doctormo/python-crontab/
 # Mock Anymail requests.
