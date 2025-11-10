@@ -2397,7 +2397,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -3324,7 +3324,7 @@
                    "approvals_approval"."id"
           ORDER BY "job_applications_jobapplication"."created_at" DESC,
                    "job_applications_jobapplication"."id" DESC
-          LIMIT 2
+          LIMIT 3
         ''',
       }),
       dict({
@@ -3364,6 +3364,7 @@
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s,
                                                                                         %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
@@ -3407,6 +3408,7 @@
           FROM "approvals_approval"
           LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -3446,6 +3448,37 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IfNode[apply/includes/list_card_body.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'ForNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_prescriptions.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -3481,7 +3514,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -4350,7 +4383,7 @@
                    "approvals_approval"."id"
           ORDER BY "job_applications_jobapplication"."created_at" DESC,
                    "job_applications_jobapplication"."id" DESC
-          LIMIT 2
+          LIMIT 3
         ''',
       }),
       dict({
@@ -4390,6 +4423,7 @@
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
           WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s,
                                                                                         %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
@@ -4433,6 +4467,7 @@
           FROM "approvals_approval"
           LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("approvals_approval"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
           WHERE "approvals_approval"."user_id" IN (%s,
+                                                   %s,
                                                    %s)
           ORDER BY "approvals_approval"."start_at" DESC
         ''',
@@ -4468,6 +4503,39 @@
                                                                                             %s)
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."name" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IfNode[apply/includes/list_tr.html]',
+          'IncludeNode[apply/includes/list_table.html]',
+          'ForNode[apply/includes/list_table.html]',
+          'IncludeNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IfNode[apply/includes/list_job_applications.html]',
+          'IncludeNode[apply/list_prescriptions.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/list_prescriptions.html]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
         ''',
       }),
       dict({
