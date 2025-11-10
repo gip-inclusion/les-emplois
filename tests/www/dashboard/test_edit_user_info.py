@@ -153,10 +153,10 @@ class TestEditUserInfoView:
     def test_inconsistent_nir_title_birthdate(self, client):
         birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
-            jobseeker_profile__nir="178122978200508",
             title="M",
             jobseeker_profile__birthdate=birthdate,
         )
+        assert user.jobseeker_profile.nir.startswith(tuple("137"))
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
