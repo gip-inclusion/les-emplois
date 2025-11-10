@@ -133,6 +133,7 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
 
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
+        self.forms = None
 
     def get_forms(self):
         forms = super().get_forms()
@@ -160,8 +161,8 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
     def clean_session(self):
         pass
 
-    def get_context_data(self, *, forms, **kwargs):
-        form_accept = forms["accept"]
+    def get_context_data(self, **kwargs):
+        form_accept = self.forms["accept"]
         context = super().get_context_data(**kwargs)
         context["form_accept"] = form_accept
         context["has_form_error"] = bool(form_accept.errors)
@@ -180,34 +181,32 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
             return "apply/includes/job_application_accept_form.html"
         return super().get_template_names()
 
-    def missing_or_invalid_job_seeker_infos(self, forms):
-        other_forms = {k: v for k, v in forms.items() if k != "accept"}
+    def missing_or_invalid_job_seeker_infos(self):
+        other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
         return bool(other_forms and not all([form.is_valid() for form in other_forms.values()]))
 
     def get(self, request, *args, **kwargs):
-        forms = self.get_forms()
-        if self.missing_or_invalid_job_seeker_infos(forms):
+        self.forms = self.get_forms()
+        if self.missing_or_invalid_job_seeker_infos():
             messages.error(request, "Certaines informations sont manquantes ou invalides")
             return HttpResponseRedirect(self.get_back_url())
-        return super().get(request, *args, forms=forms, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        forms = self.get_forms()
-        if self.missing_or_invalid_job_seeker_infos(forms):
+        self.forms = self.get_forms()
+        if self.missing_or_invalid_job_seeker_infos():
             messages.error(request, "Certaines informations sont manquantes ou invalides")
             return HttpResponseRedirect(self.get_back_url())
 
-        if not all([form.is_valid() for form in forms.values()]):
-            context = self.get_context_data(forms=forms, **kwargs)
+        if not all([form.is_valid() for form in self.forms.values()]):
+            context = self.get_context_data(**kwargs)
             return self.render_to_response(context)
 
         if request.htmx and not request.POST.get("confirmed"):
             return TemplateResponse(
                 request=request,
                 template="apply/includes/job_application_accept_form.html",
-                context=self.get_context_data(
-                    forms=forms,
-                ),
+                context=self.get_context_data(),
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
 
@@ -215,18 +214,18 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
 
         try:
             with transaction.atomic():
-                if form_personal_data := forms.get("personal_data"):
+                if form_personal_data := self.forms.get("personal_data"):
                     form_personal_data.save()
                     if self.eligibility_diagnosis:
                         self.eligibility_diagnosis.schedule_certification()
-                if form_user_address := forms.get("user_address"):
+                if form_user_address := self.forms.get("user_address"):
                     form_user_address.save()
-                if form_birth_place := forms.get("birth_place"):
+                if form_birth_place := self.forms.get("birth_place"):
                     form_birth_place.save()
                     if self.geiq_eligibility_diagnosis:
                         self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
-                job_application = forms["accept"].save(commit=False)
+                job_application = self.forms["accept"].save(commit=False)
                 if creating:
                     job_application.job_seeker = self.job_seeker
                     job_application.to_company = self.company
