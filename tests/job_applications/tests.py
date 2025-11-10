@@ -580,26 +580,26 @@ class TestJobApplicationQuerySet:
 
     def test_with_has_suspended_approval(self):
         job_app = JobApplicationSentByJobSeekerFactory()
-        qs = JobApplication.objects.with_has_suspended_approval().get(pk=job_app.pk)
-        assert hasattr(qs, "has_suspended_approval")
-        assert not qs.has_suspended_approval
+        obj = JobApplication.objects.with_has_suspended_approval().get(pk=job_app.pk)
+        assert hasattr(obj, "has_suspended_approval")
+        assert not obj.has_suspended_approval
 
     def test_with_last_change(self):
         job_app = JobApplicationSentByJobSeekerFactory()
-        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
-        assert hasattr(qs, "last_change")
-        assert qs.last_change == job_app.created_at
+        obj = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        assert hasattr(obj, "last_change")
+        assert obj.last_change == job_app.created_at
 
         job_app.process()
-        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        obj = JobApplication.objects.with_last_change().get(pk=job_app.pk)
         last_change = job_app.logs.order_by("-timestamp").first()
-        assert qs.last_change == last_change.timestamp
+        assert obj.last_change == last_change.timestamp
 
     def test_with_jobseeker_eligibility_diagnosis(self):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
-        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
-        assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
+        obj = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
+        assert obj.jobseeker_eligibility_diagnosis == diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_prescriber_on_jobseeker(self):
         job_application = JobApplicationFactory(
@@ -665,7 +665,7 @@ class TestJobApplicationQuerySet:
         )
         older_diagnosis.administrative_criteria.add(level1_other_criterion)
 
-        qs = (
+        obj = (
             JobApplication.objects.with_jobseeker_eligibility_diagnosis()
             .with_eligibility_diagnosis_criterion(level1_criterion.pk)
             .with_eligibility_diagnosis_criterion(level2_criterion.pk)
@@ -673,14 +673,14 @@ class TestJobApplicationQuerySet:
             .get(pk=job_app.pk)
         )
         # Check that with_jobseeker_eligibility_diagnosis works and retrieves the most recent diagnosis
-        assert getattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
-        assert getattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
-        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+        assert getattr(obj, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+        assert getattr(obj, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+        assert not getattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
         job_app.eligibility_diagnosis = older_diagnosis
         job_app.save()
 
-        qs = (
+        obj = (
             JobApplication.objects.with_jobseeker_eligibility_diagnosis()
             .with_eligibility_diagnosis_criterion(level1_criterion.pk)
             .with_eligibility_diagnosis_criterion(level2_criterion.pk)
@@ -688,39 +688,39 @@ class TestJobApplicationQuerySet:
             .get(pk=job_app.pk)
         )
         # Check that with_jobseeker_eligibility_diagnosis uses job_app.eligibility_diagnosis in priority
-        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
-        assert not getattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
-        assert getattr(qs, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
+        assert not getattr(obj, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
+        assert not getattr(obj, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
+        assert getattr(obj, f"eligibility_diagnosis_criterion_{level1_other_criterion.pk}")
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id(self):
         job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
         diagnosis = job_app.geiq_eligibility_diagnosis
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
             pk=job_app.pk
         )
         # Always return the diagnosis associated to the application
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == diagnosis.pk
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_expired(self):
         # If a diagnosis is associated with a job application, return it whatever its validity
         job_app = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, geiq_eligibility_diagnosis__expired=True)
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
             pk=job_app.pk
         )
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
 
         # Create a valid diagnosis on the job seeker
         GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
-        qs = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id().get(pk=job_app.pk)
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
+        obj = JobApplication.objects.with_jobseeker_geiq_eligibility_diagnosis_id(for_prescriber=True).get(
             pk=job_app.pk
         )
-        assert qs.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
+        assert obj.jobseeker_geiq_eligibility_diagnosis_id == job_app.geiq_eligibility_diagnosis.pk
 
     def test_with_jobseeker_geiq_eligibility_diagnosis_id_with_a_diagnosis_from_the_prescriber_on_jobseeker(self):
         job_application = JobApplicationFactory(
