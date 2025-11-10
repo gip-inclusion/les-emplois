@@ -44,7 +44,7 @@ class CommonUserInfoFormsMixin:
             personal_data_form = JobSeekerPersonalDataForm(
                 instance=self.job_seeker,
                 initial=session_forms_data.get("personal_data", {}),
-                data=self.request.POST if self.request.method == "POST" else None,
+                data=self.request.POST or None,
                 back_url=self.request.get_full_path(),
             )
             if personal_data_form.fields:
