@@ -1,9 +1,12 @@
 [
   "*/5 * * * * $ROOT/clevercloud/run_management_command.sh scan_s3_files",
+  "*/5 0-21 * * * $ROOT/clevercloud/send_approvals_to_pe.sh",
   "*/5 7-20 * * MON-FRI $ROOT/clevercloud/run_management_command.sh reject_job_applications_after_delay",
   "*/20 7-18 * * MON-FRI $ROOT/clevercloud/run_management_command.sh anonymize_jobseekers --wet-run",
 
+  "5 * * * * $ROOT/clevercloud/run_management_command.sh sync_ft_offers --wet-run",
   "5 * * * * $ROOT/clevercloud/run_management_command.sh update_companies_job_app_score",
+  "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",
   "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
   "30 * * * * $ROOT/clevercloud/run_management_command.sh upload_data_to_pilotage asp_riae_shared_bucket/ --wet-run",
   "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=companies",
