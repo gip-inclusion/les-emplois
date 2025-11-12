@@ -29,7 +29,7 @@ class ProConnectLoginMiddleware(MiddlewareMixin):
             return HttpResponseRedirect(
                 reverse(
                     "pro_connect:authorize",
-                    query={"user_kind": user.kind, "next_url": new_url},
+                    query={"user_kind": user.kind, "next_url": new_url, "user_email": user.email},
                 )
             )
         except User.DoesNotExist:

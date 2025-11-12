@@ -53,7 +53,7 @@ def test_middleware_for_unlogged_proconnect_user(client, db, params, expected_pa
         response,
         reverse(
             "pro_connect:authorize",
-            query={"user_kind": "employer", "next_url": f"/{expected_params}"},
+            query={"user_kind": "employer", "next_url": f"/{expected_params}", "user_email": user.email},
         ),
         fetch_redirect_response=False,
     )
