@@ -8,4 +8,7 @@ Candidature transférée
 de la structure {{ origin_company.display_name }}
 vers la structure {{ target_company.display_name }}.
 
+-----
+
+Suivez toutes les candidatures de {{ job_application.job_seeker.first_name|title|mask_unless:can_view_personal_information }} {% if job_application.job_seeker.email and can_view_personal_information %} {{ job_application.job_seeker.last_name|upper|mask_unless:can_view_personal_information }} {% endif %}en un seul endroit : {{ job_seekers_job_applications_link }}
 {% endblock body %}

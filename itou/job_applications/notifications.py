@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
@@ -8,6 +10,7 @@ from itou.communications.dispatch import (
 from itou.job_applications.enums import RefusalReason
 from itou.job_applications.utils import show_afpa_ad
 from itou.utils.perms.utils import _can_view_personal_information
+from itou.utils.urls import get_absolute_url
 
 
 class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
@@ -42,6 +45,16 @@ class JobApplicationNewForProxyNotification(ProxyNotification):
     subject_template = "apply/email/new_for_prescriber_subject.txt"
     body_template = "apply/email/new_for_prescriber_body.txt"
 
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
+
 
 @notifications_registry.register
 class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
@@ -72,6 +85,16 @@ class JobApplicationAddedToPoolForProxyNotification(ProxyNotification):
     subject_template = "apply/email/add_to_pool_for_proxy_subject.txt"
     body_template = "apply/email/add_to_pool_for_proxy_body.txt"
 
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
+
 
 @notifications_registry.register
 class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
@@ -91,6 +114,16 @@ class JobApplicationPostponedForProxyNotification(ProxyNotification):
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/postpone_for_proxy_subject.txt"
     body_template = "apply/email/postpone_for_proxy_body.txt"
+
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
 
 
 @notifications_registry.register
@@ -152,6 +185,16 @@ class JobApplicationRefusedForProxyNotification(ProxyNotification):
             return super().is_applicable() and job_application.refusal_reason != RefusalReason.AUTO
         return super().is_applicable()
 
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
+
 
 @notifications_registry.register
 class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, EmailNotification):
@@ -171,6 +214,16 @@ class JobApplicationTransferredForProxyNotification(ProxyNotification):
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_prescriber_subject.txt"
     body_template = "apply/email/transfer_prescriber_body.txt"
+
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
 
 
 @notifications_registry.register
