@@ -9,11 +9,9 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.models import Company
-from itou.job_applications.enums import JobApplicationState
 from itou.www.approvals_views.views import ApprovalDisplayKind, ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
-from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
@@ -32,7 +30,7 @@ class TestApprovalsListView:
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_list_view(self, client):
-        approval = ApprovalFactory(with_jobapplication=True)
+        approval = ApprovalFactory(with_jobapplication=True, with_ongoing_contract=True)
         job_application = approval.jobapplication_set.get()
 
         approval_for_other_company = ApprovalFactory(with_jobapplication=True)
@@ -53,12 +51,14 @@ class TestApprovalsListView:
         assertContains(response, self.TABS_CLASS)
 
     def test_multiple_approvals_for_the_same_user(self, client):
-        approval = ApprovalFactory(with_jobapplication=True)
+        approval = ApprovalFactory(with_jobapplication=True, with_ongoing_contract=True)
         job_application = approval.jobapplication_set.get()
 
         another_approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company=job_application.to_company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=job_application.to_company,
         )
 
         employer = job_application.to_company.members.first()
@@ -72,7 +72,7 @@ class TestApprovalsListView:
         assertContains(response, reverse("employees:detail", kwargs={"public_id": another_approval.user.public_id}))
 
     def test_multiple_job_application(self, client):
-        approval = ApprovalFactory(with_jobapplication=True)
+        approval = ApprovalFactory(with_jobapplication=True, with_ongoing_contract=True)
 
         # Create another job_application on the same approval / siae
         job_application = approval.jobapplication_set.get()
@@ -90,6 +90,7 @@ class TestApprovalsListView:
     def test_job_seeker_filters(self, client, snapshot):
         approval = ApprovalFactory(
             with_jobapplication=True,
+            with_ongoing_contract=True,
             user__first_name="Jean",
             user__last_name="Vier",
         )
@@ -97,10 +98,12 @@ class TestApprovalsListView:
         approval_same_company = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__to_company=job_application.to_company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=job_application.to_company,
             user__first_name="Seb",
             user__last_name="Tambre",
         )
-        approval_other_company = ApprovalFactory(with_jobapplication=True)
+        approval_other_company = ApprovalFactory(with_jobapplication=True, with_ongoing_contract=True)
 
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -143,21 +146,29 @@ class TestApprovalsListView:
             end_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         future_approval = ApprovalFactory(
             start_at=now + datetime.timedelta(days=1),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         valid_approval = ApprovalFactory(
             start_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         suspended_approval = ApprovalFactory(
             start_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         SuspensionFactory(
             approval=suspended_approval,
@@ -260,6 +271,8 @@ class TestApprovalsListView:
             end_at=in_less_than_1_month,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         in_less_than_3_months = now + relativedelta(days=80)
         approval_3 = ApprovalFactory(
@@ -267,6 +280,8 @@ class TestApprovalsListView:
             end_at=in_less_than_3_months,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         in_less_than_7_mmonths = now + relativedelta(days=200)
         approval_7 = ApprovalFactory(
@@ -274,11 +289,15 @@ class TestApprovalsListView:
             end_at=in_less_than_7_mmonths,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
 
         employer = company.members.first()
@@ -314,6 +333,8 @@ class TestApprovalsListView:
             ApprovalListView.paginate_by + 1,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         employer = company.members.first()
         client.force_login(employer)
@@ -339,6 +360,8 @@ class TestApprovalsListView:
             end_at=in_less_than_1_month,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         in_less_than_3_months = now + relativedelta(days=80)
         approval_3 = ApprovalFactory(
@@ -346,6 +369,8 @@ class TestApprovalsListView:
             end_at=in_less_than_3_months,
             with_jobapplication=True,
             with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         employer = company.members.first()
         client.force_login(employer)
@@ -411,13 +436,11 @@ class TestApprovalsListView:
             with_membership=True,
             source=Company.SOURCE_STAFF_CREATED,
         )
-        approval = ApprovalFactory()
-        JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            to_company=company,
-            approval=approval,
-            job_seeker=approval.user,
-            eligibility_diagnosis=approval.eligibility_diagnosis,
+        ApprovalFactory(
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+            with_ongoing_contract=True,
+            with_ongoing_contract__company=company,
         )
         client.force_login(company.members.get())
         response = client.get(reverse("approvals:list"))
