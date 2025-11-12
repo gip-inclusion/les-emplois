@@ -84,5 +84,5 @@
     {% include "apply/includes/list_counter.html" with job_applications_page=job_applications_page request=request only %}
     {% include "apply/includes/job_applications_export_button.html" with list_exports_url=list_exports_url request=request only %}
     {% include "apply/includes/job_applications_filters/offcanvas_footer.html" with display_kind=display_kind filters_counter=filters_counter job_applications_list_kind=job_applications_list_kind order=order request=request JobApplicationsListKind=JobApplicationsListKind only %}
-    {% include "apply/includes/list_view_switcher.html" with display_kind=display_kind job_applications_list_kind=job_applications_list_kind request=request JobApplicationsListKind=JobApplicationsListKind only %}
+    {% include "common/list_view_switcher.html" with display_kind=display_kind job_applications_list_kind=job_applications_list_kind request=request JobApplicationsListKind=JobApplicationsListKind only %}
 {% endif %}
