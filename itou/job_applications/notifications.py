@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
@@ -8,6 +10,19 @@ from itou.communications.dispatch import (
 from itou.job_applications.enums import RefusalReason
 from itou.job_applications.utils import show_afpa_ad
 from itou.utils.perms.utils import _can_view_personal_information
+from itou.utils.urls import get_absolute_url
+
+
+class WithJobSeekersApplicationsLink:
+    def get_context(self):
+        context = super().get_context()
+        job_application = context["job_application"]
+        path = reverse(
+            "job_seekers_views:job_applications",
+            kwargs={"public_id": job_application.job_seeker.public_id},
+        )
+        context["job_seekers_job_applications_link"] = get_absolute_url(path)
+        return context
 
 
 class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
@@ -34,7 +49,7 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
 
 
 @notifications_registry.register
-class JobApplicationNewForProxyNotification(ProxyNotification):
+class JobApplicationNewForProxyNotification(WithJobSeekersApplicationsLink, ProxyNotification):
     """Notification sent to proxy (prescriber or employer/orienter) when created"""
 
     name = "Confirmation d’envoi de candidature"
@@ -64,7 +79,7 @@ class JobApplicationAddedToPoolForJobSeekerNotification(JobSeekerNotification, E
 
 
 @notifications_registry.register
-class JobApplicationAddedToPoolForProxyNotification(ProxyNotification):
+class JobApplicationAddedToPoolForProxyNotification(WithJobSeekersApplicationsLink, ProxyNotification):
     """Notification sent to proxy (prescriber or employer/orienter) when added to pool"""
 
     name = "Ajout au vivier d’une candidature envoyée"
@@ -84,7 +99,7 @@ class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, Ema
 
 
 @notifications_registry.register
-class JobApplicationPostponedForProxyNotification(ProxyNotification):
+class JobApplicationPostponedForProxyNotification(WithJobSeekersApplicationsLink, ProxyNotification):
     """Notification sent to proxy (prescriber or employer/orienter) when postponed"""
 
     name = "Mise en attente d’une candidature envoyée"
@@ -139,7 +154,7 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
 
 
 @notifications_registry.register
-class JobApplicationRefusedForProxyNotification(ProxyNotification):
+class JobApplicationRefusedForProxyNotification(WithJobSeekersApplicationsLink, ProxyNotification):
     """Notification sent to proxy (prescriber or employer/orienter) when refused"""
 
     name = "Refus de candidature"
@@ -164,7 +179,7 @@ class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, E
 
 
 @notifications_registry.register
-class JobApplicationTransferredForProxyNotification(ProxyNotification):
+class JobApplicationTransferredForProxyNotification(WithJobSeekersApplicationsLink, ProxyNotification):
     """Notification sent to proxy (prescriber or employer/orienter) when transferred"""
 
     name = "Transfert d'une candidature envoyée"
