@@ -4,39 +4,25 @@
 {% load str_filters %}
 
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-
     <div class="c-box--results__header">
-
         <div class="c-box--results__summary">
             <i class="ri-user-line" aria-hidden="true"></i>
-
             <div>
-
                 <h3>{{ approval.user.get_full_name }}</h3>
-
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                     {% approval_state_badge approval span_extra_classes="badge-sm text-wrap" icon_extra_classes="ri-xl" %}
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
     <hr class="m-0">
-
     <div class="c-box--results__body">
-
         <ul class="list-data">
-
             <li>
                 <small>Numéro de PASS IAE</small>
                 <strong>{{ approval|format_approval_number }}</strong>
                 {% include 'includes/copy_to_clipboard.html' with content=approval.number css_classes="btn-link" only_icon=True %}
-
             </li>
-
             <li>
                 <small>
                     Durée de validité
@@ -49,22 +35,15 @@
                     </i>
                 </small>
                 <strong class="text-success">{{ approval.get_remainder_display }}</strong>
-
             </li>
-
         </ul>
-
     </div>
-
     <div class="c-box--results__footer">
-
         <div class="d-flex justify-content-md-end">
             <a href="{% url 'employees:detail' public_id=approval.user.public_id %}?approval={{ approval.pk }}&back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary btn-block w-100 w-md-auto"
                {% matomo_event "salaries" "clic" "details-salarie" %}
                aria-label="Voir les informations de {{ approval.user.get_full_name }}">Voir les informations</a>
-
         </div>
-
     </div>
 </div>
