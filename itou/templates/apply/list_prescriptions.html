@@ -39,7 +39,7 @@
                             {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                         <div class="d-flex gap-2 mt-3 mt-md-0 ms-0 ms-md-2" role="group" aria-label="Changement du mode d'affichage des candidatures">
-                            {% include "apply/includes/list_view_switcher.html" %}
+                            {% include "common/list_view_switcher.html" %}
                         </div>
                     </div>
                     {% include "apply/includes/list_job_applications.html" with csrf_token=csrf_token job_applications_page=job_applications_page filters_counter=filters_counter request=request list_exports_url=list_exports_url job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind display_kind=display_kind order=order only %}
