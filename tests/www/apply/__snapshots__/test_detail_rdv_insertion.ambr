@@ -2466,6 +2466,16 @@
   
   '''
 # ---
+# name: TestRdvInsertionInvitationRequestsList.test_invite_fails_for_invalid_job_application
+  '''
+  <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
+      <i aria-hidden="true" class="ri-alert-line fw-medium">
+      </i>
+      Une erreur s’est produite, l’envoi n’a pas abouti
+  </span>
+  
+  '''
+# ---
 # name: TestRdvInsertionInvitationRequestsList.test_invite_response_includes_updated_invitation_requests_listing_for_employer[existing_invitation_requests]
   '''
   <div class="mb-6" id="rdvi-invitation-requests">
