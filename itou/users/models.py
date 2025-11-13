@@ -533,6 +533,20 @@ class User(AbstractUser, AddressMixin):
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
+    def can_be_reactivated(self):
+        if self.is_active:  # Already active
+            return False
+
+        if self.kind not in UserKind.professionals():  # Limit to professionals
+            return False
+        if self.username and self.has_sso_provider:  # Login will be possible after reactivation
+            # Target the users deactivated by the anonymization process as we can
+            # easily "revert" the changes, and the account can be self-recovered.
+            if self.upcoming_deletion_notified_at and not self.email:
+                return True
+
+        return False
+
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
 

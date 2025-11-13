@@ -22,6 +22,14 @@
             </form>
         </li>
     {% endif %}
+    {% if has_change_permission and original.can_be_reactivated %}
+        <li>
+            <form method="post" action="{% url 'admin:reactivate_user' user_pk=original.pk %}">
+                {% csrf_token %}
+                <button class="button with-confirm">Réactiver</button>
+            </form>
+        </li>
+    {% endif %}
 
     {{ block.super }}
 {% endblock %}
