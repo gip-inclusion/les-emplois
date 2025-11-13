@@ -1,3 +1,5 @@
+import datetime
+
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
@@ -41,7 +43,15 @@ class ApprovalExpiry(TextChoices):
     ALL = "", "Tous"
 
 
+class ContractStatus(TextChoices):
+    ONGOING = "ongoing", "Contrats en cours ou terminés il y a moins de 3 mois"
+    ENDED = "ended", "Contrats terminés il y a plus de 3 mois"
+    ALL = "", "Tous"
+
+
 class ApprovalForm(forms.Form):
+    END_OF_CONTRACT_DAYS_OF_GRACE = 90
+
     job_seeker = forms.ChoiceField(
         required=False,
         label="Nom",
@@ -61,6 +71,13 @@ class ApprovalForm(forms.Form):
         choices=ApprovalExpiry.choices,
         widget=forms.RadioSelect,
         initial=ApprovalExpiry.ALL,
+        required=False,
+    )
+    contract_status = forms.ChoiceField(
+        label="Statut du contrat",
+        choices=ContractStatus.choices,
+        widget=forms.RadioSelect,
+        initial=ContractStatus.ALL,
         required=False,
     )
 
@@ -112,6 +129,21 @@ class ApprovalForm(forms.Form):
 
         if expiry := data.get("expiry", ApprovalExpiry.ALL):
             qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=int(expiry)), end_at__gte=now))
+        if (contract_status := data.get("contract_status")) and contract_status != ContractStatus.ALL:
+            if contract_status == ContractStatus.ONGOING:
+                qs_filters_list.append(
+                    Q(
+                        contract_end_at__gte=timezone.localdate()
+                        - datetime.timedelta(days=self.END_OF_CONTRACT_DAYS_OF_GRACE)
+                    )
+                )
+            else:
+                qs_filters_list.append(
+                    Q(
+                        contract_end_at__lt=timezone.localdate()
+                        - datetime.timedelta(days=self.END_OF_CONTRACT_DAYS_OF_GRACE)
+                    )
+                )
 
         return qs_filters_list
 

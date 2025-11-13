@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import Max, Prefetch
+from django.db.models import F, Max, OuterRef, Prefetch, Subquery
+from django.db.models.base import Coalesce
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -33,6 +34,8 @@ from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import save_file
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
 from itou.utils.db import (
@@ -49,6 +52,7 @@ from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
 from itou.www.approvals_views.forms import (
     ApprovalForm,
+    ContractStatus,
     ProlongationRequestDenyInformationProposedActionsForm,
     ProlongationRequestDenyInformationReasonExplanationForm,
     ProlongationRequestDenyInformationReasonForm,
@@ -60,6 +64,35 @@ from itou.www.approvals_views.forms import (
 
 
 logger = logging.getLogger(__name__)
+
+
+def _add_contract_data(queryset, siae):
+    """
+    The contract data (their end dates) is used to filter out job seekers that have not been assisted by a company
+    for a while.
+    We don't have a clear link between the approval and a contract, so we consider the contracts that overlap with
+    the approval dates (ie. exclude contracts that started and ended before the approval start date, or that started
+    and ended after the approval end date)
+    If no contract is found (eg. when a company just hired a job seeker, the contract is not immediately available)
+    use the accepted job application's `hiring_end_at`. If it has been left unfilled, use the approval's end date.
+    """
+    contracts_qs = (
+        Contract.objects.filter(job_seeker=OuterRef("user"), company=siae)
+        .annotate(end_date_or_today=Coalesce("end_date", timezone.localdate()))
+        .exclude(end_date_or_today__lt=OuterRef("start_at"))
+        .exclude(start_date__gt=OuterRef("end_at"))
+    )
+    job_applications_qs = JobApplication.objects.filter(
+        state=JobApplicationState.ACCEPTED, to_company=siae, approval=OuterRef("pk")
+    )
+
+    return queryset.annotate(
+        contract_end_at=Coalesce(
+            Subquery(contracts_qs.order_by("-end_date_or_today").values("end_date_or_today")[:1]),
+            Subquery(job_applications_qs.order_by("-hiring_end_at").values("hiring_end_at")[:1]),
+            F("end_at"),
+        )
+    )
 
 
 class ApprovalDisplayKind(enum.StrEnum):
@@ -125,10 +158,12 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         form_filters = [self.form.get_approvals_qs_filter()]
         if self.form.is_valid():
             form_filters += self.form.get_qs_filters()
+
+        queryset = super().get_queryset()
+        if self.form.cleaned_data.get("contract_status", ContractStatus.ALL) != ContractStatus.ALL:
+            queryset = _add_contract_data(queryset, self.siae)
         return (
-            super()
-            .get_queryset()
-            .filter(*form_filters)
+            queryset.filter(*form_filters)
             .distinct()  # Because of the suspended_qs_filter that looks into suspensions
             .select_related("user")
             .prefetch_related("suspension_set")
