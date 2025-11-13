@@ -23,7 +23,14 @@
                role="tab"
                aria-controls="statistiques"
                aria-selected="true"
-               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Pilotage</a>
+               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
+                {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules %}
+                    <span>Pilotage</span>
+                    <span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>
+                {% else %}
+                    Pilotage
+                {% endif %}
+            </a>
         </li>
         {% if user.is_employer or user.is_prescriber %}
             <li class="nav-item">
