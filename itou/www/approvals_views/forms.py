@@ -41,6 +41,12 @@ class ApprovalExpiry(TextChoices):
     ALL = "", "Tous"
 
 
+class ContractStatus(TextChoices):
+    ONGOING = "", "Contrats en cours ou terminés il y a moins de 3 mois"
+    ENDED = "ended", "Contrats terminés il y a plus de 3 mois"
+    ALL = "all", "Tous"
+
+
 class ApprovalForm(forms.Form):
     job_seeker = forms.ChoiceField(
         required=False,
@@ -61,6 +67,13 @@ class ApprovalForm(forms.Form):
         choices=ApprovalExpiry.choices,
         widget=forms.RadioSelect,
         initial=ApprovalExpiry.ALL,
+        required=False,
+    )
+    contract_status = forms.ChoiceField(
+        label="Statut du contrat",
+        choices=ContractStatus.choices,
+        widget=forms.RadioSelect,
+        initial=ContractStatus.ONGOING,
         required=False,
     )
 
@@ -112,6 +125,10 @@ class ApprovalForm(forms.Form):
 
         if expiry := data.get("expiry", ApprovalExpiry.ALL):
             qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=int(expiry)), end_at__gte=now))
+        if not data.get("contract_status") or data.get("contract_status") != ContractStatus.ALL:
+            # Defaults to list of approvals associated with ongoing contracts
+            status = data.get("contract_status") != "ended"
+            qs_filters_list.append(Q(has_ongoing_contract=status))
 
         return qs_filters_list
 
