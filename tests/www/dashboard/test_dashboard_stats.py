@@ -16,7 +16,7 @@ def test_index_stats_for_employer(snapshot, client):
     client.force_login(
         EmployerFactory(
             membership=True,
-            membership__company__kind=random.choice(list(CompanyKind)),
+            membership__company__kind=random.choice(CompanyKind.siae_kinds()),
         )
     )
 

@@ -46,12 +46,12 @@
                                     <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
                                 </div>
                             {% endif %}
-                            {% if request.user.is_employer %}
-                                <div class="alert alert-info alert-dismissible fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status">
+                            {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules %}
+                                <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status" id="alert-stats-siae-2025-11">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                                     <div class="row">
                                         <div class="col-auto pe-0">
-                                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                                            <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
                                         </div>
                                         <div class="col">
                                             <p class="mb-2">
