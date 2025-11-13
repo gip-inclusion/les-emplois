@@ -11,7 +11,7 @@ from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -617,6 +617,11 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 name="deactivate_user",
             ),
             path(
+                "reactivate/<int:user_pk>",
+                self.admin_site.admin_view(self.reactivate_view),
+                name="reactivate_user",
+            ),
+            path(
                 "transfer/<int:from_user_pk>",
                 self.admin_site.admin_view(self.transfer_view),
                 name="transfer_user_data",
@@ -661,6 +666,33 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         add_support_remark_to_obj(
             user,
             f"{now:%Y-%m-%d} ({request.user.get_full_name()}): Désactivation de l’utilisateur",
+        )
+        return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+
+    def reactivate_view(self, request, user_pk):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        user = get_object_or_404(models.User, pk=user_pk)
+
+        if not user.can_be_reactivated():
+            return HttpResponseNotFound()
+
+        user.is_active = True
+        user.upcoming_deletion_notified_at = None
+        changed_fields = [
+            "is_active",
+            "upcoming_deletion_notified_at",
+        ]  # As a list to mimic Django change_message format
+        user.save(update_fields=changed_fields)
+        self.log_change(request, user, [{"changed": {"fields": changed_fields}}])
+
+        logger.info("user=%d reactivated", user.pk)
+        messages.success(request, format_html("Réactivation de l'utilisateur {user} effectuée.", user=user))
+        add_support_remark_to_obj(
+            user,
+            f"{timezone.now():%Y-%m-%d} ({request.user.get_full_name()}): Réactivation de l’utilisateur",
         )
         return redirect(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
 

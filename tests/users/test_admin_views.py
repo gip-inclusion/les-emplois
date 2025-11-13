@@ -563,3 +563,78 @@ class TestDeactivateView:
         user_content_type = ContentType.objects.get_for_model(User)
         user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).first()
         assert f"2023-08-31 ({admin_user.get_full_name()}): Désactivation de l’utilisateur" in user_remark.remark
+
+
+class TestReactivateView:
+    def test_reactivate_button(self, client):
+        user = random.choice([EmployerFactory, PrescriberFactory])(
+            is_active=False,
+            notified_days_ago=40,
+            email=None,
+        )
+        reactivate_url = reverse("admin:reactivate_user", kwargs={"user_pk": user.pk})
+
+        admin_user = ItouStaffFactory()
+        admin_user.user_permissions.add(*Permission.objects.filter(codename="view_user"))
+        client.force_login(admin_user)
+
+        assert user.can_be_reactivated() is True
+        # Basic staff users without write access don't see the button
+        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+        assertNotContains(response, reactivate_url)
+
+        # With the change permission, the button appears
+        admin_user.user_permissions.add(*Permission.objects.filter(codename="change_user"))
+        response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+        assertContains(response, reactivate_url)
+
+    def test_reactivate_without_change_permission(self, client):
+        user = random.choice([EmployerFactory, PrescriberFactory])(
+            is_active=False,
+            notified_days_ago=40,
+            email=None,
+        )
+        admin_user = ItouStaffFactory()
+        admin_user.user_permissions.add(*Permission.objects.filter(codename="view_user"))
+        client.force_login(admin_user)
+
+        assert user.can_be_reactivated() is True
+        response = client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
+        assert response.status_code == 403
+
+    def test_reactivate_non_reactivable_user(self, admin_client):
+        user = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory, JobSeekerFactory])()
+
+        assert user.can_be_reactivated() is False
+        response = admin_client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
+        assert response.status_code == 404
+
+    def test_reactivate_user(self, admin_client, caplog):
+        user = random.choice([EmployerFactory, PrescriberFactory])(
+            username="0e8bee68-6c4b-48bb-850c-0dea09915d94",
+            is_active=False,
+            notified_days_ago=40,
+            email=None,
+        )
+
+        response = admin_client.post(reverse("admin:reactivate_user", kwargs={"user_pk": user.pk}))
+        assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
+
+        user.refresh_from_db()
+        assert user.is_active is True
+        assert user.upcoming_deletion_notified_at is None
+
+        assert f"user={user.pk} reactivated" in caplog.text
+        assertMessages(
+            response,
+            [
+                messages.Message(messages.SUCCESS, f"Réactivation de l'utilisateur {user} effectuée."),
+            ],
+        )
+        user_content_type = ContentType.objects.get_for_model(User)
+        user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).first()
+        expected = (
+            f"{timezone.localdate():%Y-%m-%d} ({get_user(admin_client).get_full_name()}):"
+            " Réactivation de l’utilisateur"
+        )
+        assert expected in user_remark.remark
