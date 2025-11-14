@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 86,
+    'num_queries': 88,
     'queries': list([
       dict({
         'origin': list([
@@ -1109,23 +1109,24 @@
           LEFT OUTER JOIN "job_applications_jobapplication" T18 ON ("users_user"."id" = T18."transferred_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationcomment" ON ("users_user"."id" = "job_applications_jobapplicationcomment"."created_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("users_user"."id" = "job_applications_jobapplicationtransitionlog"."user_id")
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."prescriber_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" ON ("users_user"."id" = "approvals_prolongationrequest"."processed_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T22 ON ("users_user"."id" = T22."assigned_to_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."created_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."declared_by_id")
-          LEFT OUTER JOIN "approvals_prolongationrequest" T25 ON ("users_user"."id" = T25."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."assigned_to_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."created_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T25 ON ("users_user"."id" = T25."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongationrequest" T26 ON ("users_user"."id" = T26."updated_by_id")
           LEFT OUTER JOIN "approvals_prolongation" ON ("users_user"."id" = "approvals_prolongation"."created_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T27 ON ("users_user"."id" = T27."declared_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T28 ON ("users_user"."id" = T28."updated_by_id")
-          LEFT OUTER JOIN "approvals_prolongation" T29 ON ("users_user"."id" = T29."validated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T28 ON ("users_user"."id" = T28."declared_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T29 ON ("users_user"."id" = T29."updated_by_id")
+          LEFT OUTER JOIN "approvals_prolongation" T30 ON ("users_user"."id" = T30."validated_by_id")
           LEFT OUTER JOIN "companies_siaeconvention" ON ("users_user"."id" = "companies_siaeconvention"."reactivated_by_id")
-          LEFT OUTER JOIN "geiq_assessments_assessment" T31 ON ("users_user"."id" = T31."reviewed_by_id")
-          LEFT OUTER JOIN "geiq_assessments_assessment" T32 ON ("users_user"."id" = T32."submitted_by_id")
-          LEFT OUTER JOIN "approvals_suspension" T33 ON ("users_user"."id" = T33."updated_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T32 ON ("users_user"."id" = T32."reviewed_by_id")
+          LEFT OUTER JOIN "geiq_assessments_assessment" T33 ON ("users_user"."id" = T33."submitted_by_id")
+          LEFT OUTER JOIN "approvals_suspension" T34 ON ("users_user"."id" = T34."updated_by_id")
           LEFT OUTER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."updated_by_id")
           LEFT OUTER JOIN "institutions_institutionmembership" ON ("users_user"."id" = "institutions_institutionmembership"."updated_by_id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."updated_by_id")
-          LEFT OUTER JOIN "users_user" T37 ON ("users_user"."id" = T37."created_by_id")
+          LEFT OUTER JOIN "users_user" T38 ON ("users_user"."id" = T38."created_by_id")
           WHERE ("users_user"."id" IN (%s,
                                        %s,
                                        %s,
@@ -1154,23 +1155,24 @@
                  AND T18."id" IS NULL
                  AND "job_applications_jobapplicationcomment"."id" IS NULL
                  AND "job_applications_jobapplicationtransitionlog"."id" IS NULL
+                 AND "users_jobseekerassignment"."id" IS NULL
                  AND "approvals_prolongationrequest"."id" IS NULL
-                 AND T22."id" IS NULL
                  AND T23."id" IS NULL
                  AND T24."id" IS NULL
                  AND T25."id" IS NULL
+                 AND T26."id" IS NULL
                  AND "approvals_prolongation"."id" IS NULL
-                 AND T27."id" IS NULL
                  AND T28."id" IS NULL
                  AND T29."id" IS NULL
+                 AND T30."id" IS NULL
                  AND "companies_siaeconvention"."id" IS NULL
-                 AND T31."id" IS NULL
                  AND T32."id" IS NULL
                  AND T33."id" IS NULL
+                 AND T34."id" IS NULL
                  AND "companies_companymembership"."id" IS NULL
                  AND "institutions_institutionmembership"."id" IS NULL
                  AND "prescribers_prescribermembership"."id" IS NULL
-                 AND T37."id" IS NULL)
+                 AND T38."id" IS NULL)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -1707,6 +1709,34 @@
                                                                      %s,
                                                                      %s)
           ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "users_jobseekerassignment"."id",
+                 "users_jobseekerassignment"."created_at",
+                 "users_jobseekerassignment"."updated_at",
+                 "users_jobseekerassignment"."job_seeker_id",
+                 "users_jobseekerassignment"."prescriber_id",
+                 "users_jobseekerassignment"."prescriber_organization_id",
+                 "users_jobseekerassignment"."last_action_kind"
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."prescriber_id" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+          ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
       dict({
@@ -2837,6 +2867,27 @@
                                                             %s,
                                                             %s,
                                                             %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_jobseekerassignment"
+          WHERE "users_jobseekerassignment"."job_seeker_id" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
         ''',
       }),
       dict({
