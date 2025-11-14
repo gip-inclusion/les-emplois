@@ -44,7 +44,7 @@ class BirthPlaceModelForm(forms.ModelForm):
         birth_country = self.cleaned_data.get("birth_country")
         birth_date = self.get_birth_date()
 
-        if not birth_country:
+        if not birth_country and "birth_country" in self.fields:
             # Selecting a birth place sets the birth country field to France and disables it.
             # However, disabled fields are ignored by Django.
             # That's also why we can't make it mandatory.

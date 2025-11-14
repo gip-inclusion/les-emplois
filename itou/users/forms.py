@@ -36,10 +36,14 @@ class JobSeekerProfileFieldsMixin:
 
     def save(self, commit=True):
         user = super().save(commit=commit)
+        update_fields = []
         for field in self.PROFILE_FIELDS:
-            setattr(user.jobseeker_profile, field, self.cleaned_data[field])
-        if commit:
-            user.jobseeker_profile.save(update_fields=self.PROFILE_FIELDS)
+            if field in self.fields:
+                setattr(user.jobseeker_profile, field, self.cleaned_data[field])
+                update_fields.append(field)
+
+        if commit and update_fields:
+            user.jobseeker_profile.save(update_fields=update_fields)
 
     @property
     def cleaned_data_from_profile_fields(self):

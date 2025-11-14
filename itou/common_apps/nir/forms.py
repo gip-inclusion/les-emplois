@@ -86,7 +86,7 @@ class JobSeekerNIRUpdateMixin:
 
     def clean(self):
         super().clean()
-        if self.cleaned_data["lack_of_nir"]:
+        if self.cleaned_data.get("lack_of_nir"):
             if self.cleaned_data.get("lack_of_nir_reason"):
                 self.cleaned_data["nir"] = ""
             else:
@@ -96,23 +96,23 @@ class JobSeekerNIRUpdateMixin:
         else:
             if self.cleaned_data.get("nir"):
                 self.cleaned_data["lack_of_nir_reason"] = ""
-            elif not self.has_error("nir"):
+            elif not self.has_error("nir") and "nir" in self.fields:
                 self.add_error(
                     "nir",
                     forms.ValidationError("Le numéro de sécurité sociale n'est pas valide"),
                 )
 
     def nir_error(self):
-        details = (
-            "Pour continuer, veuillez entrer un numéro de sécurité sociale valide ou cocher la "
-            f'mention "{self.fields["lack_of_nir"].label}" et sélectionner un motif.'
-        )
         if self.has_error(NON_FIELD_ERRORS, code="unique_nir_if_not_empty"):
             title = "Le numéro de sécurité sociale est déjà associé à un autre utilisateur"
         elif self.has_error("nir") or self.has_error("lack_of_nir_reason"):
             title = "Le numéro de sécurité sociale n'est pas valide"
         else:
             return None
+        details = (
+            "Pour continuer, veuillez entrer un numéro de sécurité sociale valide ou cocher la "
+            f'mention "{self.fields["lack_of_nir"].label}" et sélectionner un motif.'
+        )
         return f"""
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
                 <p>
