@@ -22,6 +22,7 @@ from itou.utils.mocks.address_format import (
 from itou.utils.validators import validate_nir
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
 from tests.geo.factories import QPVFactory, ZRRFactory
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 DEFAULT_PASSWORD = "P4ssw0rd!*****"
@@ -403,3 +404,22 @@ def random_user_kind_factory(**kwargs):
             functools.partial(LaborInspectorFactory, membership=True),
         ]
     )(**kwargs)
+
+
+class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobSeekerAssignment
+        skip_postgeneration_save = True
+
+    class Params:
+        for_snapshot = factory.Trait(
+            job_seeker__for_snapshot=True,
+            created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
+        )
+
+    job_seeker = factory.SubFactory(JobSeekerFactory)
+    prescriber_organization = factory.SubFactory("tests.prescribers.factories.PrescriberOrganizationFactory")
+    prescriber = factory.SubFactory(
+        PrescriberFactory, membership__organization=factory.SelfAttribute("..prescriber_organization")
+    )
+    created_at = factory.LazyFunction(timezone.now)
