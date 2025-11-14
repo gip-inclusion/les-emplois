@@ -23,10 +23,6 @@ class JobSeekerNIRUpdateMixin:
             label="Impossible de renseigner le numéro de sécurité sociale",
             widget=widgets.CheckboxInput(
                 attrs={
-                    "aria-expanded": "false",
-                    "aria-controls": "id_lack_of_nir_reason",
-                    "data-bs-target": ".lack_of_nir_reason_group",
-                    "data-bs-toggle": "collapse",
                     "data-disable-target": "#id_nir",
                 }
             ),
@@ -42,8 +38,6 @@ class JobSeekerNIRUpdateMixin:
         )
 
         self.fields["lack_of_nir_reason"].label = "Sélectionner un motif"
-        # This is a hack to easily tweak this field bootstrap form_group_class
-        self.fields["lack_of_nir_reason"].form_group_class = "form-group ms-4 collapse lack_of_nir_reason_group"
 
         query = {"back_url": back_url} if back_url else {}
         nir_modification_request_link = format_html(
@@ -86,9 +80,6 @@ class JobSeekerNIRUpdateMixin:
 
         if self["lack_of_nir"].value():
             self.fields["nir"].disabled = True
-            # Make sure the collapse state is consistent
-            self.fields["lack_of_nir"].widget.attrs["aria-expanded"] = "true"
-            self.fields["lack_of_nir_reason"].form_group_class += " show"
 
     def clean_nir(self):
         return self.cleaned_data["nir"].upper().replace(" ", "")
