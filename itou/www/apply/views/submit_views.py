@@ -610,6 +610,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
             else:
                 # Check if update is really needed: may change diagnosis expiration date
                 if self.form.has_changed():
+                    todo: add organization here too
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
                         self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
                     )

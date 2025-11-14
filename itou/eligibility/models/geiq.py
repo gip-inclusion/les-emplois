@@ -241,6 +241,10 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         diagnosis.administrative_criteria.set(administrative_criteria)
         diagnosis.schedule_certification()
 
+        if author.is_prescriber:
+            # Sync job seeker assignment to a prescriber
+            JobSeekerAssignment.objects.assign_job_seeker(diagnosis.job_seeker, author, author_org)
+
         return diagnosis
 
 
