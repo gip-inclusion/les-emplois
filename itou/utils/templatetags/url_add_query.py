@@ -4,7 +4,9 @@ https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 
 from urllib.parse import urlsplit, urlunsplit
 
+import jwt
 from django import template
+from django.conf import settings
 from django.http import QueryDict
 
 from itou.users.enums import IdentityProvider
@@ -35,8 +37,13 @@ def url_add_query(url, **kwargs):
     return urlunsplit(parsed._replace(query=querystring.urlencode("/")))
 
 
+def generate_proconnect_login_jwt(user):
+    return jwt.encode(payload={"email": user.email}, key=settings.PRO_CONNECT_AUTO_LOGIN_KEY, algorithm="HS256")
+
+
 @register.simple_tag
 def autologin_proconnect(url, user):
     if user.is_authenticated and user.identity_provider == IdentityProvider.PRO_CONNECT:
-        return url_add_query(url, proconnect_login="true")
+        token = generate_proconnect_login_jwt(user)
+        return url_add_query(url, proconnect_login=token)
     return url

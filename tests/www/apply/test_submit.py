@@ -41,6 +41,7 @@ from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.templatetags.url_add_query import generate_proconnect_login_jwt
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views import constants as apply_view_constants
@@ -1507,6 +1508,7 @@ class TestApplyAsAuthorizedPrescriber:
                     ("href", apply_session_name, "[SessionUUID]"),
                     ("href", str(new_job_seeker.public_id), "[Public ID of JobSeeker]"),
                     ("href", f"/company/{company.pk}", "company/[PK of Company]"),
+                    ("href", generate_proconnect_login_jwt(user), "[JWT]"),
                 ],
             )
         )
