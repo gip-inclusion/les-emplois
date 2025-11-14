@@ -1142,12 +1142,12 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-info alert-dismissible fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status">
+      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
           <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
           </button>
           <div class="row">
               <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
                   </i>
               </div>
               <div class="col">
