@@ -47,9 +47,11 @@ from itou.users.enums import (
     UserKind,
 )
 from itou.users.notifications import JobSeekerCreatedByProxyNotification, JobSeekerCreatedByProxyNotificationForGPS
+from itou.utils import iso_standards
 from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.emails import get_email_message
+from itou.utils.france_standards import NIR
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -1227,17 +1229,17 @@ class JobSeekerProfile(models.Model):
         """
         Validate consistency between NIR, title and birthdate
         """
-        if cleaned_nir := cleaned_data.get("nir"):
+        if cleaned_nir := NIR(cleaned_data.get("nir")):
             if cleaned_title := cleaned_data.get("title"):
-                if (cleaned_nir[0] in "137" and cleaned_title != Title.M) or (
-                    cleaned_nir[0] in "248" and cleaned_title != Title.MME
+                if (cleaned_nir.sex is iso_standards.Sex.MALE and cleaned_title != Title.M) or (
+                    cleaned_nir.sex is iso_standards.Sex.FEMALE and cleaned_title != Title.MME
                 ):
                     raise ValidationError(
                         JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE
                         % (f" {cleaned_nir}" if remind_nir_in_error else "")
                     )
             if cleaned_birthdate := cleaned_data.get("birthdate"):
-                nir_year_month = cleaned_nir[1:5]
+                nir_year_month = f"{cleaned_nir.birth_year:02d}{cleaned_nir.birth_month:02d}"
                 birthdate_year_month = cleaned_birthdate.strftime("%y%m")
                 birthdate_inconsistency = False
                 if 1 <= int(nir_year_month[2:4]) <= 12:
