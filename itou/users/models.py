@@ -1497,3 +1497,59 @@ class IdentityCertification(models.Model):
         constraints = [
             models.UniqueConstraint("jobseeker_profile", "certifier", name="uniq_jobseeker_profile_certifier"),
         ]
+
+
+class JobSeekerAssignment(models.Model):
+    """
+    An assignment of a job seeker to a prescriber, with or without organization.
+    """
+
+    created_at = models.DateTimeField(verbose_name="date de création", auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name="date de la dernière action", auto_now=True)
+    job_seeker = models.ForeignKey(
+        User,
+        verbose_name="candidat",
+        on_delete=models.CASCADE,
+        related_name="job_seeker_assignments",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    prescriber = models.ForeignKey(
+        User,
+        verbose_name="prescripteur",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="prescriber_assignments",
+        limit_choices_to={"kind": UserKind.PRESCRIBER},
+    )
+    prescriber_organization = models.ForeignKey(
+        PrescriberOrganization,
+        verbose_name="organisation prescriptrice",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="organization_assignments",
+    )
+
+    class Meta:
+        verbose_name = "affectation candidat"
+        verbose_name_plural = "affectations candidats"
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_%(class)s_assignment_per_jobseeker",
+                fields=["job_seeker", "prescriber", "prescriber_organization"],
+                nulls_distinct=False,
+                violation_error_message=(
+                    "Une affectation existe déjà entre le candidat et le prescripteur et/ou l'organisation "
+                    "prescriptrice."
+                ),
+            ),
+            models.CheckConstraint(
+                name="prescriber_and_or_organization_%(class)s",
+                condition=(Q(prescriber__isnull=False) | Q(prescriber_organization__isnull=False)),
+                violation_error_message=(
+                    "Un candidat doit être associé à un prescripteur et/ou à une organisation prescriptrice."
+                ),
+            ),
+        ]
+
+    def __str__(self):
+        return f"Affectation de JobSeeker pk={self.job_seeker.pk}"
