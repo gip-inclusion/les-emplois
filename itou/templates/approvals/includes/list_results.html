@@ -9,9 +9,13 @@
             </div>
         </div>
     {% else %}
-        {% for approval in approval_list %}
-            {% include "approvals/includes/list_card.html" with approval=approval %}
-        {% endfor %}
+        {% if display_kind.is_table %}
+            <div class="table-responsive mt-3 mt-md-4">{% include "approvals/includes/list_table.html" %}</div>
+        {% elif display_kind.is_list %}
+            {% for approval in approval_list %}
+                {% include "approvals/includes/list_card.html" with approval=approval %}
+            {% endfor %}
+        {% endif %}
         {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#approvals-list" boost_indicator="#approvals-list" request=request only %}
     {% endif %}
 </div>
@@ -19,4 +23,5 @@
 {% if request.htmx %}
     {% include "approvals/includes/list_counter.html" %}
     {% include "approvals/includes/list_reset_filters.html" %}
+    {% include "common/list_view_switcher.html" with display_kind=display_kind request=request only %}
 {% endif %}
