@@ -48,7 +48,7 @@ from itou.job_applications.models import JobApplication, JobApplicationTransitio
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import Title, UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerAssignment, User
 from itou.utils.brevo import MalformedResponseException
 from itou.utils.models import PkSupportRemark
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
@@ -66,11 +66,12 @@ from tests.files.factories import FileFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedJobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -1148,6 +1149,16 @@ class TestAnonymizeJobseekersManagementCommand:
             name="anonymized_geiq_eligibility_diagnoses"
         )
 
+    def test_archive_jobseeker_with_assignments(self):
+        jobseeker = JobSeekerFactory(
+            date_joined=timezone.make_aware(datetime.datetime(2022, 11, 11)), notified_days_ago=30
+        )
+        JobSeekerAssignmentFactory(job_seeker=jobseeker)
+
+        call_command("anonymize_jobseekers", wet_run=True)
+
+        assert not JobSeekerAssignment.objects.exists()
+
     def test_anonymized_at_is_the_first_day_of_the_month(self):
         job_application = JobApplicationFactory(
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
@@ -1528,6 +1539,36 @@ class TestAnonymizeProfessionalManagementCommand:
         # for when deleting the user account.
         anonymized_prescriber = AnonymizedProfessional.objects.get()
         assert anonymized_prescriber.had_memberships_in_authorized_organization is True
+
+    @pytest.mark.parametrize("with_organization", [True, False])
+    def test_anonymize_professional_with_job_seeker_assignment(
+        self, with_organization, django_capture_on_commit_callbacks, caplog, respx_mock
+    ):
+        organization = PrescriberOrganizationFactory() if with_organization else None
+        JobSeekerAssignmentFactory(
+            prescriber__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+            prescriber__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+            prescriber_organization=organization,
+        )
+
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+
+        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
+
+        # If the assignment beared an organization, nothing was really deleted in order to keep somewhere the link
+        # between the job seeker and the organization
+        assert JobSeekerAssignment.objects.exists() is with_organization
+
+        # The previous assignment blocked the actual deletion, even if there was no organization…
+        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists()
+
+        # …but running again the command deletes it for real, if there was no organization.
+        with django_capture_on_commit_callbacks(execute=True):
+            call_command("anonymize_professionals", wet_run=True)
+
+        assert caplog.messages.count("Anonymized professionals after grace period, count: 1") == 2
+        assert User.objects.filter(kind=UserKind.PRESCRIBER).exists() is with_organization
 
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(

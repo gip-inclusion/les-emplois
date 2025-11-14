@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 from collections import Counter
@@ -39,6 +40,7 @@ from itou.common_apps.address.models import AddressMixin
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
+    ActionKind,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -57,6 +59,8 @@ from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
+
+logger = logging.getLogger(__name__)
 
 ERROR_UNIQUE_NIR_CODE = "unique_nir_if_not_empty"
 
@@ -1574,3 +1578,85 @@ class IdentityCertification(models.Model):
         constraints = [
             models.UniqueConstraint("jobseeker_profile", "certifier", name="uniq_jobseeker_profile_certifier"),
         ]
+
+
+class JobSeekerAssignmentManager(models.Manager):
+    def upsert_assignment(self, job_seeker, prescriber, prescriber_organization, last_action_kind):
+        assert job_seeker.is_job_seeker
+        if prescriber.kind != UserKind.PRESCRIBER:
+            # This should not happen but we don't want to block everything
+            logger.error("We should not try to add a JobSeekerAssignment on user=%s", prescriber)
+            return
+
+        assignment = JobSeekerAssignment(
+            job_seeker=job_seeker,
+            prescriber=prescriber,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=last_action_kind,
+        )
+        JobSeekerAssignment.objects.bulk_create(
+            [assignment],
+            update_conflicts=True,
+            update_fields=["updated_at", "last_action_kind"],
+            unique_fields=["job_seeker", "prescriber", "prescriber_organization"],
+        )
+
+
+class JobSeekerAssignment(models.Model):
+    """
+    An assignment of a job seeker to a prescriber, with or without organization.
+    """
+
+    # TODO(ewen): set to auto_now_add=True when the objects are created from existing contacts
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    # TODO(ewen): set to auto_now=True when the objects are created from existing contacts
+    updated_at = models.DateTimeField(verbose_name="date de la dernière action", default=timezone.now)
+    job_seeker = models.ForeignKey(
+        User,
+        verbose_name="candidat",
+        on_delete=models.CASCADE,
+        related_name="job_seeker_assignments",
+        limit_choices_to={"kind": UserKind.JOB_SEEKER},
+    )
+    prescriber = models.ForeignKey(
+        User,
+        verbose_name="prescripteur",
+        on_delete=models.RESTRICT,
+        related_name="prescriber_assignments",
+        limit_choices_to={"kind": UserKind.PRESCRIBER},
+    )
+    prescriber_organization = models.ForeignKey(
+        PrescriberOrganization,
+        verbose_name="organisation prescriptrice",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="organization_assignments",
+    )
+    last_action_kind = models.CharField(
+        verbose_name="dernière action effectuée",
+        choices=ActionKind.choices,
+        default=ActionKind.CREATE,
+    )
+
+    objects = JobSeekerAssignmentManager()
+
+    class Meta:
+        verbose_name = "affectation candidat"
+        verbose_name_plural = "affectations candidats"
+        ordering = ["-updated_at"]
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_%(class)s_assignment_per_jobseeker",
+                fields=["job_seeker", "prescriber", "prescriber_organization"],
+                nulls_distinct=False,
+                violation_error_message=(
+                    "Une affectation existe déjà entre le candidat, le prescripteur et l'organisation prescriptrice."
+                ),
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"Affectation de JobSeeker pk={self.job_seeker.pk} à "
+            f"prescriber={self.prescriber.pk}, organization={self.prescriber_organization.pk}"
+        )
