@@ -847,7 +847,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
         self.fields["job_seeker"].choices = self._get_choices_for_job_seeker(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
-        self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
+        self.fields["departments"].choices = self._get_choices_for_departments()
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
 
     def _get_choices_for_sender(self, users):
@@ -857,12 +857,15 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def _get_choices_for_administrativecriteria(self):
         return [(c.pk, c.name) for c in AdministrativeCriteria.objects.all()]
 
-    def _get_choices_for_departments(self, job_seekers):
-        departments = {
-            (user.department, DEPARTMENTS.get(user.department))
-            for user in job_seekers
-            if user.department in DEPARTMENTS
-        }
+    def _get_choices_for_departments(self):
+        departments = (
+            self.job_applications_qs.order_by("job_seeker__department")
+            .distinct("job_seeker__department")
+            .values_list("job_seeker__department", flat=True)
+        )
+        departments = [
+            (department, DEPARTMENTS[department]) for department in departments if department in DEPARTMENTS
+        ]
         return sorted(departments, key=lambda dpts: dpts[1])
 
     def _get_choices_for_jobs(self):
