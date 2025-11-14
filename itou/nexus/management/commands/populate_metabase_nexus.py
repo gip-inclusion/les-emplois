@@ -10,10 +10,12 @@ import logging
 import psycopg
 import tenacity
 from django.conf import settings
+from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from psycopg import sql
 
 from itou.companies.models import Company, CompanyMembership
+from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -122,7 +124,20 @@ class Command(BaseCommand):
             is_active=True,
             kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER],
             email__isnull=False,
+        ).annotate(
+            has_authorized_prescriber_orgnization_membership=Exists(
+                PrescriberMembership.objects.filter(
+                    user=OuterRef("pk"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
+                )
+            )
         )
+
+        def get_user_kind(user):
+            if user.kind == UserKind.PRESCRIBER:
+                if user.has_authorized_prescriber_orgnization_membership:
+                    return "prescripteur habilité"
+                return "orienteur"
+            return user.get_kind_display()
 
         def serializer(user):
             return [
@@ -135,7 +150,7 @@ class Command(BaseCommand):
                 user.phone,
                 user.last_login,
                 user.get_identity_provider_display(),
-                user.get_kind_display(),
+                get_user_kind(user),
                 self.run_at,
             ]
 
