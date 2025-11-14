@@ -112,6 +112,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
         "jobseekerexternaldata",  # JobSeekerExternalData.user: this seems largely unused
         "logentry",  # django.contrib.admin.models.LogEntry.user
+        "prescriber_assignments",  # JobSeekerAssignment.prescriber
         "prescriber_org_invitations",  # PrescriberWithOrgInvitation.sender
         "prescribermembership",  # PrescriberMembership.user
         "prescriberorganization",  # PrescriberOrganization.members

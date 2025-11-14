@@ -15,7 +15,7 @@ from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
-from itou.users.models import User, UserKind
+from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand
@@ -143,6 +143,7 @@ class Command(BaseCommand):
 
     def anonymize_and_delete_professionals(self, users):
         AnonymizedProfessional.objects.bulk_create([self.make_anonymized_professional(user) for user in users])
+        # TODO(ewen): delete prescriber here too?
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
     def anonymize_professionals_without_deletion(self, users):
@@ -151,6 +152,10 @@ class Command(BaseCommand):
             model.objects.filter(user_id__in=user_ids).update(is_active=False)
 
         EmailAddress.objects.filter(user_id__in=user_ids).delete()
+
+        JobSeekerAssignment.objects.filter(
+            prescriber_id__in=[user.id for user in users], prescriber_organization_id__isnull=True
+        ).delete()
 
         User.objects.filter(id__in=user_ids).update(
             is_active=False,
