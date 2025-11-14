@@ -7,6 +7,7 @@
 
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load theme_inclusion %}
 
 <form method="post" class="js-prevent-multiple-submit js-format-nir" data-matomo-name="dashboard-edit-job-seeker-identity">
     {% csrf_token %}
@@ -21,8 +22,8 @@
     {% bootstrap_field form.first_name %}
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
-    {% bootstrap_field form.lack_of_nir %}
-    <div class="ps-3 pb-1 mb-3 border-start border-primary collapse lack_of_nir_reason_group">
+    {% collapse_field form.lack_of_nir target_id="collapse_lack_of_nir_reason" %}
+    <div id="collapse_lack_of_nir_reason" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
         {% bootstrap_field form.lack_of_nir_reason %}
     </div>
     {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
