@@ -31,7 +31,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
@@ -47,6 +47,7 @@ from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     LaborInspectorFactory,
@@ -1319,3 +1320,81 @@ def test_user_first_login(client):
     user.refresh_from_db()
     assert user.last_login != initial_first_login
     assert user.first_login == initial_first_login
+
+
+class TestJobSeekerAssignment:
+    @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_job_seeker(self, factory):
+        not_a_job_seeker = factory()
+        prescriber = PrescriberFactory()
+
+        with pytest.raises(AssertionError):
+            JobSeekerAssignment.objects.assign_job_seeker(not_a_job_seeker, prescriber, None)
+
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_prescriber(self, factory, caplog):
+        not_a_prescriber = factory()
+        job_seeker = JobSeekerFactory()
+
+        JobSeekerAssignment.objects.assign_job_seeker(job_seeker, not_a_prescriber, None)
+        assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
+
+    def test_prescriber_and_or_organization(self):
+        job_seeker = JobSeekerFactory()
+
+        with pytest.raises(IntegrityError):
+            JobSeekerAssignment.objects.assign_job_seeker(job_seeker, None, None)
+
+    @pytest.mark.parametrize(
+        "with_prescriber,with_organization",
+        [
+            (True, True),
+            (True, False),
+            (False, True),
+        ],
+    )
+    def test_unique_constraint(self, with_prescriber, with_organization):
+        prescriber = PrescriberFactory() if with_prescriber else None
+        organization = PrescriberOrganizationFactory() if with_organization else None
+        assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
+
+        # assign_job_seeker updates the existing assignment
+        JobSeekerAssignment.objects.assign_job_seeker(assignment.job_seeker, prescriber, organization)
+
+        with pytest.raises(IntegrityError):
+            JobSeekerAssignmentFactory(
+                job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=organization
+            )
+
+    @pytest.mark.parametrize(
+        "with_prescriber,with_organization",
+        [
+            (True, True),
+            (True, False),
+            (False, True),
+        ],
+    )
+    def test_assign_job_seeker(self, with_prescriber, with_organization):
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory() if with_prescriber else None
+        organization = PrescriberOrganizationFactory() if with_organization else None
+
+        # Creation
+        with freezegun.freeze_time("2025-11-14 12:00:01"):
+            assignment, created = JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+        assert created is True
+        assert assignment.job_seeker == job_seeker
+        assert assignment.prescriber == prescriber
+        assert assignment.prescriber_organization == organization
+        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+
+        # Update
+        with freezegun.freeze_time("2025-11-15 18:00:01"):
+            assignment, created = JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+        assert created is False
+        assert assignment.job_seeker == job_seeker
+        assert assignment.prescriber == prescriber
+        assert assignment.prescriber_organization == organization
+        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)
