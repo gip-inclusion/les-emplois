@@ -20,6 +20,8 @@ from itou.metabase.tables.utils import (
 )
 from itou.users.enums import IdentityProvider
 from itou.users.models import User
+from itou.utils import iso_standards
+from itou.utils.france_standards import NIR
 
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
@@ -133,13 +135,13 @@ def format_criteria_name_as_column_name(criteria):
 
 def get_gender_from_nir(job_seeker):
     if job_seeker.jobseeker_profile.nir:
-        match job_seeker.jobseeker_profile.nir[0]:
-            case "1":
+        match NIR(job_seeker.jobseeker_profile.nir).sex:
+            case iso_standards.Sex.MALE:
                 return "Homme"
-            case "2":
+            case iso_standards.Sex.FEMALE:
                 return "Femme"
             case _:
-                raise ValueError("Unexpected NIR first digit")
+                raise ValueError("Unexpected sex value")
     return None
 
 
