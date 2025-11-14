@@ -87,3 +87,10 @@ class LackOfNIRReason(models.TextChoices):
 class LackOfPoleEmploiId(models.TextChoices):
     REASON_FORGOTTEN = "FORGOTTEN", "Identifiant France Travail oublié"
     REASON_NOT_REGISTERED = "NOT_REGISTERED", "Non inscrit auprès de France Travail"
+
+
+class ActionKind(models.TextChoices):
+    CREATE = "CREATE", "création du compte candidat"
+    APPLY = "APPLY", "envoi de candidature"
+    IAE_ELIGIBILITY = "IAE_ELIGIBILITY", "validation de l'éligibilité IAE"
+    GEIQ_ELIGIBILITY = "GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"
