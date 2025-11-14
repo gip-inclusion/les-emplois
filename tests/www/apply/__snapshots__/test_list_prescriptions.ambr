@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_as_unauthorized_prescriber[SQL queries for prescriptions list]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -331,6 +331,22 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'PrescriberFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON (T3."department") T3."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" T3 ON ("job_applications_jobapplication"."job_seeker_id" = T3."id")
+          WHERE "job_applications_jobapplication"."sender_id" = %s
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
@@ -2449,7 +2465,7 @@
 # ---
 # name: test_queries[SQL queries in list mode]
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -2783,6 +2799,24 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'PrescriberFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON (T4."department") T4."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
+          WHERE (("job_applications_jobapplication"."sender_id" = %s
+                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                 OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
@@ -3703,7 +3737,7 @@
 # ---
 # name: test_queries[SQL queries in table mode]
   dict({
-    'num_queries': 18,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -4037,6 +4071,24 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'PrescriberFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'PrescriberFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_prescriptions[www/apply/views/list_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON (T4."department") T4."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
+          WHERE (("job_applications_jobapplication"."sender_id" = %s
+                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                 OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
