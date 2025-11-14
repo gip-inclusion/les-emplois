@@ -116,11 +116,13 @@ class TestNav:
 class TestThemeInclusion:
     def test_collapse_field(self, snapshot):
         class NIRForm(forms.Form):
-            no_nir = forms.BooleanField()
+            no_nir = forms.BooleanField(required=False)  # Prevent error when unchecked
             nir = forms.CharField()
 
         template = Template('{% load theme_inclusion %}{% collapse_field form.no_nir target_id="nir" %}')
-        assert template.render(Context({"form": NIRForm()})) == snapshot()
+        assert template.render(Context({"form": NIRForm()})) == snapshot(name="unchecked")
+        assert template.render(Context({"form": NIRForm(data={"no_nir": False})})) == snapshot(name="bound unchecked")
+        assert template.render(Context({"form": NIRForm(data={"no_nir": True})})) == snapshot(name="bound checked")
 
     def test_collapse_field_multiple_controls(self):
         class NIRForm(forms.Form):
