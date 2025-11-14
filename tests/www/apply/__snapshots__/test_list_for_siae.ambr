@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in list mode]
   dict({
-    'num_queries': 26,
+    'num_queries': 27,
     'queries': list([
       dict({
         'origin': list([
@@ -395,6 +395,21 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          WHERE "job_applications_jobapplication"."to_company_id" = %s
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
@@ -1369,7 +1384,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae[SQL queries in table mode]
   dict({
-    'num_queries': 23,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -1763,6 +1778,21 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          WHERE "job_applications_jobapplication"."to_company_id" = %s
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
@@ -2639,7 +2669,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with all filters but job_seeker]
   dict({
-    'num_queries': 24,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -3033,6 +3063,21 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          WHERE "job_applications_jobapplication"."to_company_id" = %s
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
@@ -4018,7 +4063,7 @@
 # ---
 # name: TestProcessListSiae.test_list_for_siae_filters_query[SQL queries with only job_seeker filter]
   dict({
-    'num_queries': 21,
+    'num_queries': 22,
     'queries': list([
       dict({
         'origin': list([
@@ -4412,6 +4457,21 @@
           FROM "eligibility_administrativecriteria"
           ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyFilterJobApplicationsForm._get_choices_for_departments[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'CompanyFilterJobApplicationsForm.__init__[www/apply/forms.py]',
+          'list_for_siae[www/apply/views/list_views.py]',
+        ]),
+        'sql': '''
+          SELECT DISTINCT ON ("users_user"."department") "users_user"."department" AS "job_seeker__department"
+          FROM "job_applications_jobapplication"
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          WHERE "job_applications_jobapplication"."to_company_id" = %s
+          ORDER BY 1 ASC
         ''',
       }),
       dict({
