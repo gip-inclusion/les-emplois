@@ -84,6 +84,7 @@ def collapse_field(bound_field, *, target_id, **kwargs):
         "data-bs-toggle": "collapse",
         "data-bs-target": f"#{target_id}",
         "aria-controls": target_id,
+        "aria-expanded": str(bool(bound_field.value())).lower(),
     }
     for attr, value in collapse_attrs.items():
         if attr in field_spec.widget.attrs:
