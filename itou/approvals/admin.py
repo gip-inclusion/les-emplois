@@ -20,7 +20,6 @@ from itou.employee_record import enums as employee_record_enums
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.users.utils import NIR_RE
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
     InconsistencyCheckMixin,
@@ -32,6 +31,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_structure_view_link,
 )
+from itou.utils.france_standards import NIR
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -307,7 +307,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelA
                 # Handle partial numbers not starting with the prefix (migrated PEApproval)
                 search_fields.append("number__contains")
 
-        if NIR_RE.match(search_term):
+        if NIR(search_term).has_valid_format():
             search_fields.append("user__jobseeker_profile__nir__exact")
 
         if not search_fields:

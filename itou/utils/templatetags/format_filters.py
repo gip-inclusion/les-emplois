@@ -3,13 +3,14 @@ https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
 
 import io
-import re
 from textwrap import wrap
 
 from django import template
 from django.template.defaultfilters import floatformat, stringfilter
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+
+from itou.utils.france_standards import NIR
 
 
 register = template.Library()
@@ -49,19 +50,17 @@ def format_siret(siret):
 @register.filter
 @stringfilter
 def format_nir(nir):
-    nir_without_spaces = nir.replace(" ", "")
-    nir_regex = r"^([123478])([0-9]{2})([0-9]{2})(2[AB]|[0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})$"
-    match = re.match(nir_regex, nir_without_spaces)
-    if match is not None:
-        groups = match.groups()
+    nir_obj = NIR(nir)
+    if nir_obj.has_valid_format():
+        nir_parts = nir_obj.parts
         with io.StringIO() as formatted:
-            formatted.write(f"<span>{groups[0]}</span>")
-            for group in groups[1:]:
+            formatted.write(f"<span>{nir_parts[0]}</span>")
+            for group in nir_parts[1:]:
                 formatted.write(f'<span class="ms-1">{group}</span>')
             return mark_safe(formatted.getvalue())
     else:
-        # Some NIRs do not match the pattern (they can be NTT/NIA) so we can’t format them
-        # When this happen, we should not crash but return the initial value
+        # Some NIRs do not match the pattern (they can be NTT) so we can’t format them
+        # When this happens, we should not crash but return the initial value
         return nir
 
 

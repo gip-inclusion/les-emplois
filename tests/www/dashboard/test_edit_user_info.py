@@ -206,7 +206,7 @@ class TestEditUserInfoView:
     def test_validate_nir_unknown_birth_month(self, client):
         birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
-            jobseeker_profile__nir="178332978200553",
+            jobseeker_profile__nir="178202978200539",
             title="M",
             jobseeker_profile__birthdate=birthdate,
         )

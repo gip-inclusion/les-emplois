@@ -37,7 +37,6 @@ from itou.users.admin_forms import (
     UserAdminForm,
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
-from itou.users.utils import NIR_RE
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -51,6 +50,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_structure_view_link,
 )
+from itou.utils.france_standards import NIR
 
 
 logger = logging.getLogger(__name__)
@@ -543,7 +543,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             search_fields.append("public_id__exact")
         except ValueError:
             pass
-        if NIR_RE.match(search_term):
+        if NIR(search_term).has_valid_format():
             search_fields.append("jobseeker_profile__nir__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
@@ -996,7 +996,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                 pass
             else:
                 search_fields.append("asp_uid__exact")
-        if NIR_RE.match(search_term):
+        if NIR(search_term).has_valid_format():
             search_fields.append("nir__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
@@ -1024,7 +1024,7 @@ class NirModificationRequestAdmin(ItouModelAdmin):
     def get_search_fields(self, request):
         search_fields = []
         search_term = request.GET.get("q", "").strip()
-        if NIR_RE.match(search_term):
+        if NIR(search_term).has_valid_format():
             search_fields.append("nir__exact")
             search_fields.append("jobseeker_profile__nir__exact")
         if search_term.isdecimal():

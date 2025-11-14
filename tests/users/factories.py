@@ -11,6 +11,7 @@ from django.utils.text import slugify
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, EITIContributions, LaneType
 from itou.cities.models import City
+from itou.common_apps.address import departments
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
@@ -376,19 +377,17 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     @factory.lazy_attribute
     def nir(self):
         gender = random.choice("137") if self.user.title == Title.M else random.choice("248")
-        if self.birthdate:
-            year = self.birthdate.strftime("%y")
-            month = self.birthdate.strftime("%m")
-        else:
-            year = "87"
-            month = "06"
-        department = str(random.randint(1, 99)).zfill(2)
-        random_1 = str(random.randint(0, 399)).zfill(3)
-        random_2 = str(random.randint(0, 399)).zfill(3)
-        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
+        year_and_month = self.birthdate.strftime("%y%m") if self.birthdate else "8706"
+        department_or_foreign_country = random.choice(list(departments.DEPARTMENTS) + ["99"])
+        digits_left_for_city_or_country = 5 - len(department_or_foreign_country)
+        city_or_country = str(random.randint(1, int("9" * digits_left_for_city_or_country))).zfill(
+            digits_left_for_city_or_country
+        )
+        birth_order = random.randint(1, 999)
+        incomplete_nir = f"{gender}{year_and_month}{department_or_foreign_country}{city_or_country}{birth_order:03d}"
         assert len(incomplete_nir) == 13
-        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
-        nir = f"{incomplete_nir}{control_key}"
+        control_key = 97 - int(incomplete_nir.replace("2A", "19").replace("2B", "18")) % 97
+        nir = f"{incomplete_nir}{control_key:02d}"
         validate_nir(nir)
         return nir
 
