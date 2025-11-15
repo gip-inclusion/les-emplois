@@ -22,7 +22,7 @@ from itou.approvals.models import (
 )
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, ContractFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -89,6 +89,22 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
                     eligibility_diagnosis=eligibility_diagnosis,
                     **kwargs,
                 )
+            )
+
+    @factory.post_generation
+    def with_ongoing_contract(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            company = kwargs.pop("company", self.jobapplication_set.first().to_company)
+            start_date = kwargs.pop("start_date", timezone.localdate())
+            end_date = kwargs.pop("end_date", None)
+            ContractFactory(
+                job_seeker=self.user,
+                company=company,
+                start_date=start_date,
+                end_date=end_date,
+                **kwargs,
             )
 
 

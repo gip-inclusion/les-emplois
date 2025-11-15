@@ -25,7 +25,7 @@
     "fields": {
       "company": 3850,
       "details": "[]",
-      "end_date": null,
+      "end_date": "2025-01-01",
       "job_seeker": 17,
       "start_date": "2024-08-23"
     },
@@ -36,7 +36,7 @@
     "fields": {
       "company": 3850,
       "details": "[]",
-      "end_date": null,
+      "end_date": "2025-01-01",
       "job_seeker": 19,
       "start_date": "2024-08-23"
     },
@@ -47,7 +47,7 @@
     "fields": {
       "company": 3850,
       "details": "[]",
-      "end_date": null,
+      "end_date": "2025-01-01",
       "job_seeker": 20,
       "start_date": "2024-08-23"
     },
@@ -64,5 +64,16 @@
     },
     "model": "companies.contract",
     "pk": 8
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "details": "[]",
+      "end_date": "2025-10-10",
+      "job_seeker": 123,
+      "start_date": "2024-10-10"
+    },
+    "model": "companies.contract",
+    "pk": 9
   }
 ]

@@ -2,12 +2,14 @@ import logging
 import urllib.parse
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import Max, Prefetch
+from django.db.models import Exists, Max, OuterRef, Prefetch, Q
+from django.db.models.base import Coalesce
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -32,6 +34,8 @@ from itou.companies.models import Contract
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import save_file
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
 from itou.utils.auth import check_user
 from itou.utils.db import (
@@ -59,6 +63,36 @@ from itou.www.approvals_views.forms import (
 
 
 logger = logging.getLogger(__name__)
+
+
+def _add_contract_data(queryset, siae):
+    """
+    The contract data (their end dates) is used to filter out job seekers that have not been assisted by a company
+    for a while.
+    We don't have a clear link between the approval and a contract, so we consider the contracts that overlap with
+    the approval dates (ie. exclude contracts that started and ended before the approval start date, or that started
+    and ended after the approval end date)
+    When a company just hired a job seeker, the contract is not yet available for a few days. While waiting it is
+    fetched by `fetch_riae_contracts`, we fallback on the hiring_start_at found in the accepted job application (and
+    not hiring_end_at, as it is often null). This leaves ~3 months for the contract to be fetched from the ASP.
+    """
+    END_OF_CONTRACT_DAYS_OF_GRACE = 90
+    contracts_qs = (
+        Contract.objects.filter(job_seeker=OuterRef("user"), company=siae)
+        .annotate(end_date_or_today=Coalesce("end_date", timezone.localdate()))
+        .exclude(Q(start_date__lt=OuterRef("start_at"), end_date_or_today__lt=OuterRef("start_at")))
+        .exclude(Q(start_date__gt=OuterRef("end_at"), end_date_or_today__gt=OuterRef("end_at")))
+    )
+    job_applications_qs = JobApplication.objects.filter(state=JobApplicationState.ACCEPTED, approval=OuterRef("pk"))
+
+    has_ongoing_contract = Exists(
+        contracts_qs.exclude(end_date__lt=timezone.localdate() - relativedelta(days=END_OF_CONTRACT_DAYS_OF_GRACE))
+    ) | Exists(
+        job_applications_qs.exclude(hiring_start_at__isnull=True).exclude(
+            hiring_start_at__lt=timezone.localdate() - relativedelta(days=END_OF_CONTRACT_DAYS_OF_GRACE)
+        )
+    )
+    return queryset.annotate(has_ongoing_contract=has_ongoing_contract)
 
 
 class ApprovalBaseViewMixin:
@@ -101,10 +135,10 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         form_filters = [self.form.get_approvals_qs_filter()]
         if self.form.is_valid():
             form_filters += self.form.get_qs_filters()
+
+        queryset = _add_contract_data(super().get_queryset(), self.siae)
         return (
-            super()
-            .get_queryset()
-            .filter(*form_filters)
+            queryset.filter(*form_filters)
             .distinct()  # Because of the suspended_qs_filter that looks into suspensions
             .select_related("user")
             .prefetch_related("suspension_set")
