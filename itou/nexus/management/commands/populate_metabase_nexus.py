@@ -112,10 +112,6 @@ def populate_table(table_name, table_columns, serializer, querysets):
                     copy.write_row(serializer(row))
 
 
-def log_retry_attempt(retry_state):
-    logger.info("Attempt failed with outcome=%s", retry_state.outcome)
-
-
 class Command(BaseCommand):
     help = "Populate nexus metabase database."
 
@@ -255,7 +251,7 @@ class Command(BaseCommand):
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
         wait=tenacity.wait_fixed(5),
-        after=log_retry_attempt,
+        after=tenacity.after_log(logger, logging.INFO),
         reraise=True,
     )
     def handle(self, *args, reset_tables=False, **kwargs):

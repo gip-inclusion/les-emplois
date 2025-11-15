@@ -23,14 +23,6 @@ from itou.utils.slack import send_slack_message
 logger = logging.getLogger(__name__)
 
 
-def log_retry_attempt(retry_state):
-    try:
-        outcome = retry_state.outcome.result()
-    except Exception as e:
-        outcome = str(e)
-    logger.info("attempt=%s failed with outcome=%s", retry_state.attempt_number, outcome)
-
-
 # Matomo might be a little tingly sometimes, let's give it retries.
 httpx_transport = httpx.HTTPTransport(retries=3)
 client = httpx.Client(transport=httpx_transport)
@@ -89,7 +81,7 @@ def matomo_api_call(options):
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(3),
         wait=tenacity.wait_fixed(30),
-        after=log_retry_attempt,
+        after=tenacity.after_log(logger, logging.INFO),
         reraise=True,
     )
     def get_csv_raw_data():
