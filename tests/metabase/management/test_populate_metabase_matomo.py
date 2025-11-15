@@ -1,5 +1,5 @@
+import httpx
 import pytest
-import tenacity
 from django.core import management
 from django.db import connection
 from django.test import override_settings
@@ -54,7 +54,7 @@ def test_matomo_retry(monkeypatch, respx_mock, caplog, snapshot):
         500,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
-    with pytest.raises(tenacity.RetryError):
+    with pytest.raises(httpx.HTTPStatusError, match="500 Internal Server Error"):
         # Use pool_size=1 for stable output
         management.call_command("populate_metabase_matomo", wet_run=True, pool_size=1)
 
