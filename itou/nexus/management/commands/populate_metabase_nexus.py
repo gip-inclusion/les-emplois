@@ -256,6 +256,7 @@ class Command(BaseCommand):
         stop=tenacity.stop_after_attempt(3),
         wait=tenacity.wait_fixed(5),
         after=log_retry_attempt,
+        reraise=True,
     )
     def handle(self, *args, reset_tables=False, **kwargs):
         if reset_tables:

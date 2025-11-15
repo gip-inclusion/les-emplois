@@ -86,7 +86,12 @@ METABASE_PUBLIC_DASHBOARDS_TABLE_NAME = "suivi_visiteurs_tb_publics_v1"
 
 
 def matomo_api_call(options):
-    @tenacity.retry(stop=tenacity.stop_after_attempt(3), wait=tenacity.wait_fixed(30), after=log_retry_attempt)
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(3),
+        wait=tenacity.wait_fixed(30),
+        after=log_retry_attempt,
+        reraise=True,
+    )
     def get_csv_raw_data():
         url = urllib.parse.urljoin(settings.MATOMO_BASE_URL, "index.php")
         return (
