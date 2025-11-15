@@ -84,10 +84,6 @@ from itou.utils.slack import send_slack_message
 logger = logging.getLogger(__name__)
 
 
-def log_retry_attempt(retry_state):
-    logging.info("Attempt failed with outcome=%s", retry_state.outcome)
-
-
 class Command(BaseCommand):
     help = "Populate metabase database."
 
@@ -675,8 +671,8 @@ class Command(BaseCommand):
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
-        wait=tenacity.wait_fixed(5),
-        after=log_retry_attempt,
+        wait=tenacity.wait_fixed(0),
+        after=tenacity.after_log(logger, logging.INFO),
         reraise=True,
     )
     def handle(self, *, mode, **options):
