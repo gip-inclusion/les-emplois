@@ -51,6 +51,7 @@ from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.templatetags import badges, dict_filters, format_filters, job_seekers
 from itou.utils.templatetags.datetime_filters import duration, naturaldate
+from itou.utils.templatetags.url_add_query import generate_proconnect_login_jwt
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
@@ -706,18 +707,23 @@ class TestUtilsTemplateTags:
         assert out_none == expected
 
     @pytest.mark.parametrize(
-        "user,expected_query_params",
+        "user_factory,is_param_expected",
         [
-            (lambda: JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT), ""),
+            (functools.partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
             (
-                lambda: PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT),
-                "?proconnect_login=true",
+                functools.partial(PrescriberFactory, identity_provider=IdentityProvider.PRO_CONNECT),
+                True,
             ),
         ],
     )
-    def test_autologin_proconnect(self, db, user, expected_query_params):
+    def test_autologin_proconnect(self, user_factory, is_param_expected):
+        user = user_factory()
         template = Template("{% load url_add_query %}{% autologin_proconnect url user %}")
-        out = template.render(Context({"url": "/test/", "user": user()}))
+        out = template.render(Context({"url": "/test/", "user": user}))
+        expected_query_params = ""
+        if is_param_expected:
+            expected_query_params = "?proconnect_login=" + generate_proconnect_login_jwt(user)
+
         assert out == f"/test/{expected_query_params}"
 
     def test_redirection_url(self):

@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertRedirects
 
 from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.utils.templatetags.url_add_query import generate_proconnect_login_jwt
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
@@ -59,12 +60,20 @@ class TestUpdateEligibilityView:
             query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="0")
+        assert pretty_indented(
+            parse_response_to_soup(
+                response, "#main", replace_in_attr=[("href", generate_proconnect_login_jwt(prescriber), "[JWT]")]
+            )
+        ) == snapshot(name="0")
 
         # With an expired eligibility diagnosis
         IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, expired=True)
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="0")
+        assert pretty_indented(
+            parse_response_to_soup(
+                response, "#main", replace_in_attr=[("href", generate_proconnect_login_jwt(prescriber), "[JWT]")]
+            )
+        ) == snapshot(name="0")
 
         response = client.post(url, {"level_1_1": True})
         assertRedirects(response, reverse("job_seekers_views:list"))
@@ -88,7 +97,14 @@ class TestUpdateEligibilityView:
             query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response, "#main", replace_in_attr=[("href", generate_proconnect_login_jwt(prescriber), "[JWT]")]
+                )
+            )
+            == snapshot
+        )
 
         # if "shrouded" is present then we don't update the eligibility diagnosis
         response = client.post(url, {"level_1_1": True, "shrouded": "whatever"})

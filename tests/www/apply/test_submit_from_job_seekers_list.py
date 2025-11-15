@@ -8,6 +8,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationState
+from itou.utils.templatetags.url_add_query import generate_proconnect_login_jwt
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande
@@ -151,6 +152,7 @@ class TestApplyAsPrescriber:
                 replace_in_attr=[
                     ("href", apply_session_name, "[Session UUID]"),
                     ("href", f"/company/{guerande_company.pk}", "company/[PK of Company]"),
+                    ("href", generate_proconnect_login_jwt(prescriber), "[JWT]"),
                 ],
             )
         ) == snapshot(name="eligibility_step")
