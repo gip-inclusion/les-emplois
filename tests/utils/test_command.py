@@ -1,8 +1,8 @@
 import pytest
 from django.db import IntegrityError
+from itoutils.django.commands import dry_runnable
 
 from itou.users.models import User
-from itou.utils.command import dry_runnable
 from tests.users.factories import (
     JobSeekerFactory,
 )
