@@ -37,6 +37,7 @@ class Command(BaseCommand):
             stop=tenacity.stop_after_attempt(10),
             wait=tenacity.wait_fixed(1),
             retry=tenacity.retry_if_exception_type(PoleEmploiRateLimitException),
+            reraise=True,
         )
         def pe_check_user_details(user, client, *, swap=False):
             return client.recherche_individu_certifie(
