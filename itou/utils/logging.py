@@ -3,8 +3,7 @@ import logging
 import httpx
 from django.conf import settings
 from django_datadog_logger.formatters import datadog
-
-from itou.utils.command import get_current_command_info
+from itoutils.django.commands import get_current_command_info
 
 
 logger = logging.getLogger(__name__)
