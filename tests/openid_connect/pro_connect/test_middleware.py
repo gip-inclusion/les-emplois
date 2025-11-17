@@ -40,7 +40,7 @@ def test_middlware_for_non_proconnect_user(client, db, params, expected_params):
         response = client.get(f"/{params}{username_param}")
         assertRedirects(
             response,
-            f"{reverse('signup:choose_user_kind')}?next_url=/{expected_params}",
+            reverse("signup:choose_user_kind", query={"next_url": f"/{expected_params}"}),
             fetch_redirect_response=False,
         )
 
@@ -51,6 +51,9 @@ def test_middleware_for_unlogged_proconnect_user(client, db, params, expected_pa
     response = client.get(f"/{params}&username={user.username}")
     assertRedirects(
         response,
-        f"{reverse('pro_connect:authorize')}?user_kind={user.kind}&next_url=/{expected_params}",
+        reverse(
+            "pro_connect:authorize",
+            query={"user_kind": "employer", "next_url": f"/{expected_params}"},
+        ),
         fetch_redirect_response=False,
     )
