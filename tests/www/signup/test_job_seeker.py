@@ -158,13 +158,11 @@ class TestJobSeekerSignup:
             count=1,
         )
 
-    def test_job_seeker_signup_temporary_nir(self, client):
+    def test_job_seeker_signup_invalid_nir(self, client):
         """
-        For the moment, we don't handle temporary social numbers.
-        Skipping NIR verification is allowed if a temporary one should be used instead.
+        Skipping NIR verification is allowed if we provide an invalid one.
         """
 
-        # Temporary numbers don't have a consistent format.
         nir = "1234567895GHTUI"
 
         job_seeker_data = JobSeekerFactory.build()
@@ -177,7 +175,7 @@ class TestJobSeekerSignup:
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
         }
 
-        # Temporary NIR not considered valid.
+        # NIR not considered valid.
         url = reverse("signup:job_seeker")
         response = client.post(url, post_data)
         assert response.status_code == 200
@@ -186,11 +184,10 @@ class TestJobSeekerSignup:
         # Possible to submit the form without the NIR.
         user = self._test_job_seeker_signup_forms(client, nir, skip=1)
 
-        # Temporary NIR is not stored with user information.
+        # NIR is not stored with user information.
         assert user.jobseeker_profile.nir == ""
 
-    def test_job_seeker_signup_temporary_nir_resubmission(self, client):
-        # Temporary numbers don't have a consistent format.
+    def test_job_seeker_signup_invalid_nir_resubmission(self, client):
         nir = "1234567895GHTUI"
 
         job_seeker_data = JobSeekerFactory.build()
@@ -203,7 +200,7 @@ class TestJobSeekerSignup:
             "birthdate": job_seeker_data.jobseeker_profile.birthdate,
         }
 
-        # Temporary NIR not considered valid.
+        # NIR not considered valid.
         url = reverse("signup:job_seeker")
         response = client.post(url, post_data)
         assert response.status_code == 200
@@ -214,7 +211,7 @@ class TestJobSeekerSignup:
         user = self._test_job_seeker_signup_forms(client, valid_nir)
         assert user.jobseeker_profile.nir == valid_nir
 
-    def test_job_seeker_signup_temporary_nir_invalid_birthdate(self, client):
+    def test_job_seeker_signup_invalid_nir_invalid_birthdate(self, client):
         nir = "1234567895GHTUI"
 
         job_seeker_data = JobSeekerFactory.build(born_in_france=True)
@@ -521,9 +518,9 @@ class TestJobSeekerSignup:
         FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
     )
     @reload_module(fc_constants)
-    def test_job_seeker_temporary_nir_with_france_connect(self, client):
-        # temporary NIR is discarded on a previous step and tested separately.
-        # See self.test_job_seeker_temporary_nir
+    def test_job_seeker_invalid_nir_with_france_connect(self, client):
+        # invalid NIR is discarded on a previous step and tested separately.
+        # See self.test_job_seeker_invalid_nir
 
         nir = ""
         job_seeker_data = JobSeekerFactory.build(born_in_france=True)
@@ -637,7 +634,7 @@ class TestJobSeekerSignup:
         assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
-    def test_job_seeker_signup_with_conflicting_email_temporary_nir(self, client, snapshot):
+    def test_job_seeker_signup_with_conflicting_email_invalid_nir(self, client, snapshot):
         existing_user = JobSeekerFactory(for_snapshot=True)
 
         post_data = {
@@ -657,7 +654,7 @@ class TestJobSeekerSignup:
         assert response.context["form"].errors["email"] == ["Un autre utilisateur utilise déjà cette adresse e-mail."]
         assertContains(response, reverse("login:existing_user", kwargs={"user_public_id": existing_user.public_id}))
 
-    def test_job_seeker_signup_birth_fields_conflict_temporary_nir(self, client, snapshot):
+    def test_job_seeker_signup_birth_fields_conflict_invalid_nir(self, client, snapshot):
         existing_user = JobSeekerFactory(for_snapshot=True, jobseeker_profile__nir="", born_in_france=True)
 
         post_data = {
@@ -735,7 +732,7 @@ class TestJobSeekerSignup:
     def test_job_seeker_signup_email_and_nir_priorities(self, client):
         """
         The NIR is normally a more reliable source of unicity than email
-        When the NIR is undefined (e.g. temporary), then a matching email is more important
+        When the NIR is undefined (e.g. invalid), then a matching email is more important
         """
         existing_user = JobSeekerFactory(jobseeker_profile__nir="")
 
@@ -752,7 +749,7 @@ class TestJobSeekerSignup:
         response = client.post(reverse("signup:job_seeker"), post_data)
         assert response.status_code == 200
 
-        # Matching all information except the (temporary) NIR
+        # Matching all information except the (invalid) NIR
         assert "Vous possédez déjà un compte" in str(
             parse_response_to_soup(response, selector="#message-modal-1-label")
         )
