@@ -3,9 +3,9 @@
     <div class="row mb-3">
         <div class="col-12 col-sm">
             {% if kind == "IAE" %}
-                <h3 class="mb-0">Diagnostic IAE</h3>
+                <h3 class="mb-0">Éligibilité à l'IAE</h3>
             {% elif kind == "GEIQ" %}
-                <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+                <h3 class="mb-0">Éligibilité public prioritaire GEIQ</h3>
             {% endif %}
             <span class="text-success fs-sm">Valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</span>
         </div>
