@@ -1,6 +1,7 @@
 import datetime
 import functools
 import itertools
+from contextlib import nullcontext
 from datetime import timedelta
 from unittest import mock
 
@@ -9,6 +10,7 @@ import pytest
 import xworkflows
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
 
 from itou.approvals.models import Approval
@@ -815,3 +817,22 @@ def test_transition_log(faker):
         tested_transitions |= set(specs.keys())
 
     assert tested_transitions == {t.name for t in EmployeeRecordWorkflow.transitions}
+
+
+def test_employee_record_ntt_constraint(subtests):
+    employee_record = EmployeeRecordFactory()
+    for exception, ntt in [
+        (IntegrityError, ""),
+        (IntegrityError, "1234"),  # Too short
+        (DataError, "1" * 50),  # Too long
+        (IntegrityError, "91234567890"),  # Invalid first digit
+        (IntegrityError, "11234567aB01"),  # Non digit character in SIREN part
+        (None, "11234567890"),  # Valid
+        (None, "1123456789JackSparrow"),  # Valid
+    ]:
+        with subtests.test(ntt=ntt):
+            with transaction.atomic():
+                context = nullcontext() if exception is None else pytest.raises(exception)
+                with context:
+                    employee_record.ntt = ntt
+                    employee_record.save()
