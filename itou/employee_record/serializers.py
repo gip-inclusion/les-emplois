@@ -6,6 +6,7 @@ from unidecode import unidecode
 from itou.asp.models import AllocationDuration, EducationLevel, EITIContributions, LaneExtension, LaneType, SiaeMeasure
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.typing import CodeComInsee
+from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
 from itou.utils.serializers import DefaultIfEmptyChoiceField, NullField, NullIfEmptyCharField, NullIfEmptyChoiceField
@@ -33,6 +34,7 @@ class _PersonSerializer(serializers.Serializer):
 
     passDateDeb = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.start_at")  # Required
     passDateFin = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.end_at")  # Required
+    salarieNIR = serializers.SerializerMethodField()  # Required
 
     # TODO: Remove to fields after confirmation as they are not mentioned in CC V1.05, § 2.4.1
     sufPassIae = NullField()
@@ -70,6 +72,12 @@ class _PersonSerializer(serializers.Serializer):
             "codeComInsee": None,
             "codeDpt": "099",
         }
+
+    def get_salarieNIR(self, obj: EmployeeRecord) -> str:
+        nir = obj.job_application.job_seeker.jobseeker_profile.nir
+        if is_ntt_required(nir):
+            return obj.ntt or ""
+        return nir
 
 
 class _StaticPersonSerializer(_PersonSerializer):
@@ -215,6 +223,14 @@ class _SituationSerializer(serializers.Serializer):
     nomActeurCreationEntr = NullField()  # Required for EITI, "null" for others
     revenuMensuelMoyenTI = NullField()  # Required for EITI, "null" for others
     cotisationsTI = NullField()  # Required for EITI, "null" for others
+
+    salarieSortantASE = serializers.ReadOnlyField(default=False)  # Required
+    salarieParentIsole = serializers.ReadOnlyField(default=False)  # Required
+    salarieHebergement = serializers.ReadOnlyField(default=False)  # Required
+    salarieRefugie = serializers.ReadOnlyField(default=False)  # Required
+    salarieSortantDetention = serializers.ReadOnlyField(default=False)  # Required
+    salarieLangueFrancaise = serializers.ReadOnlyField(default=False)  # Required
+    salarieMobilite = serializers.ReadOnlyField(default=False)  # Required
 
 
 class _SituationForEITISerializer(_SituationSerializer):
