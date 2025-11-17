@@ -147,7 +147,7 @@ class TestApprovalProlongation:
         )
         assertContains(
             response,
-            '<div class="invalid-feedback">Sélectionnez un choix valide. invalid n’en fait pas partie.</div>',
+            '<div class="invalid-feedback d-block">Sélectionnez un choix valide. invalid n’en fait pas partie.</div>',
             count=1,
         )
 
@@ -373,7 +373,7 @@ class TestApprovalProlongation:
             assertContains(
                 response,
                 f"""
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                     Assurez-vous que cette valeur est inférieure ou égale à {max_end_at:%d/%m/%Y}.
                 </div>
                 """,

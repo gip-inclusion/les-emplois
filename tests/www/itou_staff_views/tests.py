@@ -158,7 +158,8 @@ class TestExportJobApplications:
             )
         assertContains(
             response,
-            '<div class="invalid-feedback">Assurez-vous que cette valeur est inférieure ou égale à 2024-05-21.</div>',
+            '<div class="invalid-feedback d-block">'
+            "Assurez-vous que cette valeur est inférieure ou égale à 2024-05-21.</div>",
         )
 
 
