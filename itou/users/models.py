@@ -1252,7 +1252,7 @@ class JobSeekerProfile(models.Model):
                         JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE
                         % (f" {cleaned_nir}" if remind_nir_in_error else "")
                     )
-            if cleaned_birthdate := cleaned_data.get("birthdate"):
+            if (cleaned_birthdate := cleaned_data.get("birthdate")) and cleaned_nir.value[0] in "12":
                 nir_year_month = f"{cleaned_nir.birth_year:02d}{cleaned_nir.birth_month:02d}"
                 birthdate_year_month = cleaned_birthdate.strftime("%y%m")
                 birthdate_inconsistency = False
