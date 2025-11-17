@@ -19,7 +19,7 @@ from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordTransition
 from itou.job_applications.models import JobApplication
-from itou.users.enums import UserKind
+from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils.auth import check_user
@@ -120,10 +120,16 @@ class AddView(UserPassesTestMixin, WizardView):
 
     def done(self, *args, **kwargs):
         session_data = self.wizard_session.as_dict()
-        approval = Approval.objects.get(
+        approval = Approval.objects.select_related("user__jobseeker_profile").get(
             pk=session_data[AddViewStep.CHOOSE_APPROVAL]["approval"],
             user=session_data[AddViewStep.CHOOSE_EMPLOYEE]["employee"],
         )
+        if approval.user.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
+            return reverse(
+                "employee_record_views:nir_already_used",
+                kwargs={"job_seeker_public_id": approval.user.public_id},
+                query={"back_url": self.reset_url} if self.reset_url else None,
+            )
         job_application = (
             JobApplication.objects.filter(to_company=self.company, approval=approval)
             .accepted()
@@ -623,4 +629,39 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
         "employee_record": employee_record,
         "matomo_custom_title": "Réactiver la fiche salarié ASP",
     }
+    return render(request, template_name, context)
+
+
+def nir_already_used(request, job_seeker_public_id, template_name="employee_record/nir_already_used.html"):
+    siae = get_current_company_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    job_seeker = get_object_or_404(
+        User.objects.select_related("jobseeker_profile").filter(
+            kind=UserKind.JOB_SEEKER, public_id=job_seeker_public_id
+        )
+    )
+    if job_seeker.jobseeker_profile.lack_of_nir_reason != LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
+        return HttpResponseRedirect(reverse("employee_record_views:missing_employee"))
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse("employee_record_views:list"))
+
+    query = {"back_url": back_url}
+    fix_nir_url = reverse(
+        "job_seekers_views:nir_modification_request",
+        kwargs={"public_id": job_seeker.public_id},
+        query=query,
+    )
+
+    context = {
+        "fix_nir_url": fix_nir_url,
+        "matomo_custom_title": "NIR déjà utilisé - Fiches salarié ASP",
+        "back_url": reverse(
+            "employee_record_views:add",
+            query={"reset_url": back_url},
+        ),
+    }
+
     return render(request, template_name, context)

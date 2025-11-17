@@ -3,11 +3,13 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
+from itou.users.enums import LackOfNIRReason
 from itou.www.employee_record_views.views import AddView
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
 
 
@@ -176,3 +178,59 @@ def test_choose_employee_step_with_a_bad_choice(client):
     assert response.context["form"].errors == {
         "employee": [f"Sélectionnez un choix valide. {job_application.job_seeker.pk} n’en fait pas partie."]
     }
+
+
+def test_employee_with_nir_already_used(client, snapshot):
+    company = CompanyFactory(use_employee_record=True, with_membership=True)
+    job_application = JobApplicationFactory(
+        to_company=company,
+        to_company__use_employee_record=True,
+        with_approval=True,
+        job_seeker__public_id="00000000-0000-0000-0000-000000000001",
+        job_seeker__jobseeker_profile__nir="",
+        job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
+    )
+    client.force_login(company.members.first())
+
+    # Go through the wizard
+    reset_url = reverse("employee_record_views:list")
+    response = client.get(reverse("employee_record_views:add", query={"reset_url": reset_url}))
+
+    wizard_session_name = get_session_name(client.session, AddView.expected_session_kind)
+    choose_employee_url = reverse(
+        "employee_record_views:add", kwargs={"session_uuid": wizard_session_name, "step": "choose-employee"}
+    )
+    assertRedirects(response, choose_employee_url)
+    response = client.post(choose_employee_url, {"employee": job_application.job_seeker.pk})
+    choose_approval_url = reverse(
+        "employee_record_views:add", kwargs={"session_uuid": wizard_session_name, "step": "choose-approval"}
+    )
+    assertRedirects(response, choose_approval_url)
+    post_data = {
+        "approval": job_application.approval.pk,
+    }
+    response = client.post(choose_approval_url, post_data)
+
+    # Wizard ends up on NIR already used page
+    already_used_url = reverse(
+        "employee_record_views:nir_already_used",
+        kwargs={"job_seeker_public_id": job_application.job_seeker.public_id},
+        query={"back_url": reset_url},
+    )
+    assertRedirects(response, already_used_url, fetch_redirect_response=False)
+    response = client.get(already_used_url)
+    assert pretty_indented(parse_response_to_soup(response, selector="#main .s-section")) == snapshot(
+        name="nir-already-used"
+    )
+
+
+def test_nir_already_used_fixed(client):
+    company = CompanyFactory(use_employee_record=True, with_membership=True)
+    job_seeker = JobSeekerFactory()
+    client.force_login(company.members.first())
+    already_used_url = reverse(
+        "employee_record_views:nir_already_used",
+        kwargs={"job_seeker_public_id": job_seeker.public_id},
+    )
+    response = client.get(already_used_url)
+    assertRedirects(response, reverse("employee_record_views:missing_employee"))
