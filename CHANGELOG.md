@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2025-11-17
+
+### Ajouté
+
+- [Admin : Ajout d'un bouton pour réactiver un utilisateur dans le cas simple](https://github.com/gip-inclusion/les-emplois/pull/7117)
+
+### Modifié
+
+- [Autoriser les NIR commençant par 3/4/7/8](https://github.com/gip-inclusion/les-emplois/pull/7109)
+- [Candidature: correction des boutons Annuler / Retour sur le parcours d'acceptation et d'embauche](https://github.com/gip-inclusion/les-emplois/pull/7107)
+- [Candidature : Affichage des critères d’éligibilité IAE et GEIQ dans les vues “liste” et “tableau” de la page de suivi de candidature des prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/7032)
+- [Inscription/candidature: modification des textes faisant référence au NIR provisoire](https://github.com/gip-inclusion/les-emplois/pull/7115)
+- [Interface: correction du formulaire de renseignement du NIR](https://github.com/gip-inclusion/les-emplois/pull/7119)
+- [Réactiver les crons pour les API France Travail](https://github.com/gip-inclusion/les-emplois/pull/7113)
+- [Vie privée : Mise à jour de la politique de confidentialité](https://github.com/gip-inclusion/les-emplois/pull/7093)
+
 ## 2025-11-10
 
 ### Ajouté
