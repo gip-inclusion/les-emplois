@@ -19,7 +19,7 @@ from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.job_applications.enums import SenderKind
-from itou.utils.validators import validate_siret
+from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
 
 
 logger = logging.getLogger(__name__)
@@ -242,6 +242,11 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         related_name="employee_record",
     )
 
+    # Needed when the job seeker has no NIR or NIA
+    ntt = models.CharField(
+        max_length=40, verbose_name="numéro technique temporaire", validators=[validate_ntt], null=True, blank=True
+    )
+
     # Employee records may be linked to a valid financial annex
     # This field can't be automatically filled, the user will be asked
     # to select a valid one manually
@@ -282,6 +287,10 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
             models.UniqueConstraint(
                 fields=["asp_measure", "siret", "approval_number"],
                 name="unique_asp_measure_siret_approval_number",
+            ),
+            models.CheckConstraint(
+                condition=Q(ntt__isnull=True) | Q(ntt__regex=rf"\A{NTT_REGEX}\Z"),
+                name="employee_record_ntt_regex",
             ),
         ]
 

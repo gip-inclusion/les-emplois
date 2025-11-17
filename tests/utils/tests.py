@@ -3,6 +3,7 @@ import decimal
 import functools
 import importlib
 import json
+import random
 import uuid
 from datetime import date
 from unittest import mock
@@ -67,6 +68,7 @@ from itou.utils.validators import (
     validate_html,
     validate_naf,
     validate_nir,
+    validate_ntt,
     validate_pole_emploi_id,
     validate_post_code,
     validate_siren,
@@ -629,6 +631,19 @@ class TestUtilsValidators:
         # Last group should validate the first 13 characters.
         with pytest.raises(ValidationError):
             validate_nir("141068078200520")
+
+    def test_validate_ntt(self):
+        # Valid number
+        validate_ntt("112345678901")
+        validate_ntt("1123456789JohnDoe")
+        with pytest.raises(ValidationError):
+            validate_ntt("1" * 10)  # Too short
+        with pytest.raises(ValidationError):
+            validate_ntt("1" * 41)  # Too long
+        with pytest.raises(ValidationError):
+            validate_ntt(f"{random.randint(3, 9)}12345678901")  # Should start with 1 or 2
+        with pytest.raises(ValidationError):
+            validate_ntt("123456aBc01")  # Letters in SIREN part
 
     def test_validate_af_number(self):
         # Dubious values.

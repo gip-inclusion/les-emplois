@@ -13,6 +13,10 @@ alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanum
 validate_code_safir = RegexValidator(r"^[0-9]{5}$", "Le code SAFIR doit être composé de 5 chiffres.")
 
 
+# Regex shared between validate_ntt and EmployeeRecord model constraint
+NTT_REGEX = r"[12][0-9]{9}[0-9a-zA-Z]{1,30}"
+
+
 def validate_post_code(post_code):
     if not post_code.isdigit() or len(post_code) != 5:
         raise ValidationError("Le code postal doit être composé de 5 chiffres.")
@@ -72,6 +76,19 @@ def validate_nir(nir):
 
     if nir == "269054958815780":
         raise ValidationError("Ce numéro est fictif et indiqué à titre illustratif. Veuillez indiquer un numéro réel.")
+
+
+def validate_ntt(ntt):
+    ntt = str(ntt).replace(" ", "")
+    if len(ntt) > 40:
+        raise ValidationError("Le numéro technique temporaire est trop long (maximum 40 caractères autorisés).")
+    if len(ntt) < 11:
+        raise ValidationError("Le numéro technique temporaire est trop court (minimum 11 caractères autorisés).")
+    ntt_regex = f"^{NTT_REGEX}$"
+
+    match = re.match(ntt_regex, ntt)
+    if not match:
+        raise ValidationError("Ce numéro n’est pas valide.")
 
 
 def get_min_birthdate():
