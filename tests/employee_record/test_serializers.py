@@ -1,3 +1,4 @@
+import random
 from datetime import timedelta
 
 import pytest
@@ -39,6 +40,33 @@ class TestEmployeeRecordPersonSerializer:
 
         job_seeker.first_name = "Jean-Philippe René Hippolyte Gilbert Dufaël"
         assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE RENE HIPPOLYTE"
+
+    def test_get_salarieNIR(self):
+        employee_record = EmployeeRecordWithProfileFactory(job_application__job_seeker__jobseeker_profile__nir="")
+        profile = employee_record.job_application.job_seeker.jobseeker_profile
+        serializer = _PersonSerializer(employee_record)
+        # No NIR and no NTT
+        assert serializer.get_salarieNIR(employee_record) == ""
+
+        # No NIR but NTT
+        employee_record.ntt = "11234567890001"
+        assert serializer.get_salarieNIR(employee_record) == "11234567890001"
+
+        # NIR and NTT
+        profile.nir = "22345678901234"
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
+        # NIR and no NTT
+        employee_record.ntt = ""
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
+        # NIR starting with 7 or 8 and no NTT
+        profile.nir = random.choice(["700123456789036", "800123456789083"])
+        assert serializer.get_salarieNIR(employee_record) == ""
+
+        # NIR starting with 7 or 8 and NTT
+        employee_record.ntt = "11234567890001"
+        assert serializer.get_salarieNIR(employee_record) == "11234567890001"
 
 
 class TestEmployeeRecordAddressSerializer:
@@ -268,6 +296,34 @@ def test_situation_salarie_serializer_with_eiti_fields_filled(snapshot, kind):
         job_application__job_seeker__jobseeker_profile__eiti_contributions=EITIContributions.OTHER_SERVICES,
         # Force some fields for snapshots
         job_application__job_seeker__jobseeker_profile__education_level=EducationLevel.NO_SCHOOLING,
+    )
+    notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
+
+    data = EmployeeRecordSerializer(employee_record).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record")
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+    assert data["situationSalarie"] == snapshot(name="employee record update notification")
+
+
+@pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
+def test_situation_salarie_serializer_with_most_fields_filled(snapshot, kind):
+    employee_record = EmployeeRecordWithProfileFactory(
+        status=Status.PROCESSED,
+        job_application__to_company__kind=kind,
+        job_application__job_seeker__jobseeker_profile__education_level=EducationLevel.BEP_OR_CAP_DIPLOMA,
+        job_application__job_seeker__jobseeker_profile__resourceless=True,
+        job_application__job_seeker__jobseeker_profile__oeth_employee=True,
+        job_application__job_seeker__jobseeker_profile__rqth_employee=True,
+        job_application__job_seeker__jobseeker_profile__ase_exit=True,
+        job_application__job_seeker__jobseeker_profile__isolated_parent=True,
+        job_application__job_seeker__jobseeker_profile__housing_issue=True,
+        job_application__job_seeker__jobseeker_profile__refugee=True,
+        job_application__job_seeker__jobseeker_profile__detention_exit_or_ppsmj=True,
+        job_application__job_seeker__jobseeker_profile__low_level_in_french=True,
+        job_application__job_seeker__jobseeker_profile__mobility_issue=True,
     )
     notification = EmployeeRecordUpdateNotification(employee_record=employee_record)
 
