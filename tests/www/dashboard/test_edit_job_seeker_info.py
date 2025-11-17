@@ -373,8 +373,8 @@ class TestEditJobSeekerInfo:
             <input type="text" name="first_name" maxlength="150" class="form-control is-invalid"
                    aria-describedby="id_first_name_error"
                    required aria-invalid="true" id="id_first_name">
-            <div id="id_first_name_error">
-             <div class="invalid-feedback">Ce champ est obligatoire.</div>
+            <div id="id_first_name_error" class="w-100">
+             <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
             </div>
             </div>
             """,
@@ -389,8 +389,8 @@ class TestEditJobSeekerInfo:
             <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
                    aria-describedby="id_last_name_error"
                     required aria-invalid="true" id="id_last_name">
-            <div id="id_last_name_error">
-             <div class="invalid-feedback">Ce champ est obligatoire.</div>
+            <div id="id_last_name_error" class="w-100">
+             <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
             </div>
             </div>
             """,

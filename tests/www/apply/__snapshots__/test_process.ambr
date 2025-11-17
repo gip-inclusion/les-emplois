@@ -6762,9 +6762,9 @@
   
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error">
+      <div id="id_prehiring_guidance_days_error" class="w-100">
           
-              <div class="invalid-feedback">Ce champ est obligatoire.</div>
+              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
           
       </div>
   
@@ -6792,9 +6792,9 @@
   
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error">
+      <div id="id_prehiring_guidance_days_error" class="w-100">
           
-              <div class="invalid-feedback">Ce champ est obligatoire.</div>
+              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
           
       </div>
   
@@ -6826,9 +6826,9 @@
   
   <div id="geiq_contract_type_and_options_block">
       <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_prehiring_guidance_days">Nombre de jours d’accompagnement avant contrat</label><input type="number" name="prehiring_guidance_days" min="0" class="form-control is-invalid" required aria-invalid="true" aria-describedby="id_prehiring_guidance_days_helptext id_prehiring_guidance_days_error" id="id_prehiring_guidance_days">
-      <div id="id_prehiring_guidance_days_error">
+      <div id="id_prehiring_guidance_days_error" class="w-100">
           
-              <div class="invalid-feedback">Ce champ est obligatoire.</div>
+              <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
           
       </div>
   

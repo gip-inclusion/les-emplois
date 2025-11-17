@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalProlongation.test_check_invalid_prescriber[unknown authorized prescriber]
   '''
-  <div class="invalid-feedback">
+  <div class="invalid-feedback d-block">
       Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur les emplois de l’inclusion, vous pouvez
       <a aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)" href="/search/prescribers" rel="noopener" target="_blank">
           retrouver ici
@@ -13,7 +13,7 @@
 # ---
 # name: TestApprovalProlongation.test_check_multiple_prescriber_organization[prescriber is member of many organizations]
   '''
-  <div class="invalid-feedback">
+  <div class="invalid-feedback d-block">
       Ce champ est obligatoire.
   </div>
   
@@ -144,8 +144,8 @@
       </label>
       <duet-date-picker aria-describedby="id_end_at_helptext id_end_at_error" aria-invalid="true" class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" required="">
       </duet-date-picker>
-      <div id="id_end_at_error">
-          <div class="invalid-feedback">
+      <div class="w-100" id="id_end_at_error">
+          <div class="invalid-feedback d-block">
               Ce champ est obligatoire.
           </div>
       </div>

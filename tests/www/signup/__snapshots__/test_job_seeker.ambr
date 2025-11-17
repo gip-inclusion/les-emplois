@@ -354,11 +354,11 @@
                   </button>
               </div>
           </div>
-          <div id="id_password1_error">
-              <div class="invalid-feedback">
+          <div class="w-100" id="id_password1_error">
+              <div class="invalid-feedback d-block">
                   Ce mot de passe est trop court. Il doit contenir au minimum 14 caractères.
               </div>
-              <div class="invalid-feedback">
+              <div class="invalid-feedback d-block">
                   Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.
               </div>
           </div>
