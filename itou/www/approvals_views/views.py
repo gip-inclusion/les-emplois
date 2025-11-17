@@ -101,7 +101,7 @@ class ApprovalBaseViewMixin:
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
-    paginate_by = settings.PAGE_SIZE_SMALL
+    paginate_by = settings.PAGE_SIZE_DEFAULT
     paginator_class = ItouPaginator
 
     def __init__(self):
