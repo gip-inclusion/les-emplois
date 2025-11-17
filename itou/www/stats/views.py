@@ -476,12 +476,19 @@ def stats_ft_hiring(request):
 
 
 def render_stats_ph(
-    request, page_title, *, extra_params=None, extra_context=None, with_region_param=False, with_department_name=True
+    request,
+    page_title,
+    *,
+    extra_params=None,
+    extra_context=None,
+    with_department_param=True,
+    with_region_param=False,
+    with_department_name=True,
 ):
     department = request.current_organization.department
-    params = {
-        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[department] if with_department_name else department],
-    }
+    params = {}
+    if with_department_param:
+        params[mb.DEPARTMENT_FILTER_KEY] = [DEPARTMENTS[department] if with_department_name else department]
     if with_region_param:
         params[mb.REGION_FILTER_KEY] = [DEPARTMENT_TO_REGION[department]]
     if extra_params:
@@ -534,6 +541,30 @@ def stats_ph_beneficiaries(request):
         page_title="Suivi des bénéficiaires, taux d’encadrement et présence en emploi",
         with_department_name=False,
         extra_context={"tally_hidden_fields": {"type_prescripteur": request.current_organization.kind}},
+    )
+
+
+@check_request(utils.can_view_stats_ph)
+def stats_ph_raw(request):
+    return render_stats_ph(
+        request=request,
+        page_title="Export complet de vos données",
+        with_department_param=False,
+        extra_params={
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: request.current_organization.pk,
+        },
+    )
+
+
+@check_request(utils.can_view_stats_ph)
+def stats_ph_raw_hiring(request):
+    return render_stats_ph(
+        request=request,
+        page_title="Données brutes des candidatures",
+        with_department_param=False,
+        extra_params={
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: request.current_organization.pk,
+        },
     )
 
 

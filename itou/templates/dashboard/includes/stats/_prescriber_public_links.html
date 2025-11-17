@@ -1,9 +1,29 @@
 {% load pilotage %}
 
 <div class="col mb-3 mb-lg-5 d-flex flex-column">
-    <h3>Données nationales publiques</h3>
+    <h3>Données brutes</h3>
     <div class="c-box p-0 flex-grow-1">
-        <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+        <div class="p-3 p-lg-4">
+            <h4 class="mb-0">Export de vos données</h4>
+        </div>
+        <div class="px-3 px-lg-4">
+            <ul class="list-unstyled mb-lg-5">
+                <li class="d-flex align-items-center mb-3">
+                    <a href="{% url "stats:stats_ph_raw" %}" class="btn-link btn-ico">
+                        <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
+                        <span>Découvrir mes jeux de données</span>
+                    </a>
+                    <span class="badge rounded-pill badge-xs bg-important text-white ms-2">Nouveau</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+        <div class="p-3 p-lg-4">
+            <h4 class="mb-0">Données nationales publiques</h4>
+        </div>
+        <div class="px-3 px-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% pilotage_public_dashboard "zoom-employeurs" %}" class="btn-link btn-ico">
