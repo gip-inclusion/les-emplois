@@ -151,23 +151,23 @@ class TestEditUserInfoView:
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
     def test_inconsistent_nir_title_birthdate(self, client):
-        birthdate = date(1978, 12, 20)
+        original_birthdate = date(1978, 12, 20)
         user = JobSeekerFactory(
             title="M",
-            jobseeker_profile__birthdate=birthdate,
+            jobseeker_profile__birthdate=original_birthdate,
         )
         assert user.jobseeker_profile.nir.startswith(tuple("137"))
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 
-        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, original_birthdate)
         # Inconsistent title
         post_data = {
             "email": "bob@saintclar.net",
             "title": "MME",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": birthdate.isoformat(),
+            "birthdate": original_birthdate.isoformat(),
             "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -183,25 +183,29 @@ class TestEditUserInfoView:
         assert user.title == "M"
 
         # Inconsistent birthdate
+        new_birthdate = date(1978, 11, 20)
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
-            "birthdate": date(1978, 11, 20).isoformat(),
+            "birthdate": new_birthdate.isoformat(),
             "birth_place": birth_place.pk,
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "lack_of_nir": False,
         } | self.address_form_fields()
         response = client.post(url, data=post_data)
-
-        assert response.status_code == 200
-        assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
         user = User.objects.get(id=user.id)
-
-        # Ensure that the job seeker did not change the birthdate.
-        assert user.jobseeker_profile.birthdate == birthdate
+        if user.jobseeker_profile.nir[0] == "1":
+            # Permanent NIR: perform the birthdate verification
+            assert response.status_code == 200
+            assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+            assert user.jobseeker_profile.birthdate == original_birthdate
+        else:
+            # Temporary NIR: no birthdate verification
+            assert response.status_code == 302
+            assert user.jobseeker_profile.birthdate == new_birthdate
 
     def test_validate_nir_unknown_birth_month(self, client):
         birthdate = date(1978, 12, 20)
@@ -261,6 +265,40 @@ class TestEditUserInfoView:
 
         # Ensure that the job seeker did not change the birthdate.
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+
+    @pytest.mark.parametrize(
+        "temporary_nir",
+        ["315945785544152", "401221234567803", "714612105555578", "888595834567534"],
+    )
+    def test_validate_temporary_nir_birthdate(self, client, temporary_nir):
+        birthdate = date(1978, 12, 20)
+        title = Title.M if temporary_nir[0] in "37" else Title.MME
+        user = JobSeekerFactory(
+            jobseeker_profile__nir=temporary_nir,
+            title=title,
+            jobseeker_profile__birthdate=birthdate,
+        )
+        client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
+        # the NIR is temporary (starting with 3, 4, 7 or 8) -> do not check the birthdate
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": title,
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": birthdate.isoformat(),
+            "birth_place": birth_place.pk,
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_nir": False,
+        } | self.address_form_fields()
+        response = client.post(url, data=post_data)
+        assertRedirects(response, reverse("dashboard:index"))
+        user = User.objects.get(id=user.id)
+        # The birthdate was updated
+        assert user.jobseeker_profile.birthdate == birthdate
 
     def test_required_address_fields_are_present(self, client):
         user = JobSeekerFactory(with_address=True)
