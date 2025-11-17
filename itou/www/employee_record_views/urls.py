@@ -13,6 +13,7 @@ urlpatterns = [
         name="add",
     ),
     path("missing", views.missing_employee, name="missing_employee"),
+    path("nir-already-used/<uuid:job_seeker_public_id>", views.nir_already_used, name="nir_already_used"),
     path("list", views.list_employee_records, name="list"),
     path("create/<uuid:job_application_id>", views.create, name="create"),
     path("create_step_2/<uuid:job_application_id>", views.create_step_2, name="create_step_2"),
