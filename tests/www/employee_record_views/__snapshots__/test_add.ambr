@@ -1,4 +1,29 @@
 # serializer version: 1
+# name: test_employee_with_nir_already_used[nir-already-used]
+  '''
+  <section class="s-section">
+      <div class="s-section__container container">
+          <div class="s-section__row row">
+              <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                  <h2>
+                      Vous ne pouvez pas continuer
+                  </h2>
+                  <div class="alert alert-warning">
+                      <p>
+                          Cette fiche salarié ne peut pas être créé ou modifiée.
+                              Veuillez d’abord régulariser le numéro de sécurité sociale.
+                      </p>
+                      <a class="btn btn-primary" href="/job-seekers/nir-modification/00000000-0000-0000-0000-000000000001?back_url=%2Femployee_record%2Flist">
+                          Régulariser le n⁰ de sécurité sociale
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+  '''
+# ---
 # name: test_wizard[choose-approval-queries]
   dict({
     'num_queries': 12,
