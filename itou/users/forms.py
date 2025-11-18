@@ -75,7 +75,29 @@ class JobSeekerProfileFieldsMixin:
             self._update_errors(e)
 
 
-class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
+class PoleEmploiFieldsMixin:
+    def clean(self):
+        super().clean()
+        if "pole_emploi_id" in self.fields and "lack_of_pole_emploi_id_reason" in self.fields:
+            JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+
+    def pole_emploi_id_error(self):
+        if self.has_error("pole_emploi_id"):
+            return mark_safe("""
+                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                    <p>
+                        <strong>L’identifiant France Travail n’est pas valide</strong>
+                    </p>
+                    <p class="mb-0">
+                        Pour continuer, veuillez renseigner un identifiant qui respecte l’un des deux formats
+                        autorisés : 8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.
+                    </p>
+                </div>
+            """)
+        return None
+
+
+class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, BirthPlaceWithBirthdateModelForm):
     PROFILE_FIELDS = ["birthdate", "birth_place", "birth_country"]
     REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate"]
 
@@ -111,23 +133,3 @@ class JobSeekerProfileModelForm(JobSeekerProfileFieldsMixin, BirthPlaceWithBirth
                     accessor = modelfield.attname
                     value = getattr(self.instance.jobseeker_profile, accessor)
                     field.queryset = field.queryset.filter(pk=value)
-
-    def clean(self):
-        super().clean()
-        if "pole_emploi_id" in self.fields and "lack_of_pole_emploi_id_reason" in self.fields:
-            JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
-
-    def pole_emploi_id_error(self):
-        if self.has_error("pole_emploi_id"):
-            return mark_safe("""
-                <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
-                    <p>
-                        <strong>L’identifiant France Travail n’est pas valide</strong>
-                    </p>
-                    <p class="mb-0">
-                        Pour continuer, veuillez renseigner un identifiant qui respecte l’un des deux formats
-                        autorisés : 8 caractères (7 chiffres suivis d'une lettre ou d'un chiffre) ou 11 chiffres.
-                    </p>
-                </div>
-            """)
-        return None
