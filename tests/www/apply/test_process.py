@@ -3271,6 +3271,115 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.usefixtures("api_particulier_settings")
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
+    def test_accept_iae_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        mocked_request = mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
+        )
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_siae=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
+            criteria_kinds=[criteria_kind, AdministrativeCriteriaKind.CAP_BEP],
+        )
+        job_application = self.create_job_application(
+            eligibility_diagnosis=diagnosis,
+        )
+        birthdate = datetime.date(1995, 12, 27)
+        job_application.job_seeker.jobseeker_profile.birthdate = birthdate
+        job_application.job_seeker.jobseeker_profile.birth_country = Country.objects.get(pk=Country.FRANCE_ID)
+        job_application.job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
+            "07141", job_application.job_seeker.jobseeker_profile.birthdate
+        )
+        job_application.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        to_be_certified_criteria = diagnosis.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=criteria_kind
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
+        self.fill_contract_info_step(
+            client, job_application, session_uuid, assert_successful=True, with_previous_step=False
+        )
+        mocked_request.assert_called_once()
+
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
+            )
+            assert criterion.certified_at
+
+    @pytest.mark.usefixtures("api_particulier_settings")
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @freeze_time("2024-09-11")
+    def test_accept_geiq_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
+        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        mocked_request = mocker.patch(
+            "itou.utils.apis.api_particulier._request",
+            return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
+        )
+        self.company.kind = CompanyKind.GEIQ
+        self.company.save()
+        diagnosis = GEIQEligibilityDiagnosisFactory(
+            job_seeker=self.job_seeker,
+            author_geiq=self.company if from_kind is UserKind.EMPLOYER else None,
+            certifiable=True,
+            **{f"from_{from_kind}": True},
+            criteria_kinds=[criteria_kind],
+        )
+        job_application = self.create_job_application(
+            geiq_eligibility_diagnosis=diagnosis,
+        )
+        birthdate = datetime.date(1995, 12, 27)
+        job_application.job_seeker.jobseeker_profile.birthdate = birthdate
+        job_application.job_seeker.jobseeker_profile.birth_country = Country.objects.get(pk=Country.FRANCE_ID)
+        job_application.job_seeker.jobseeker_profile.birth_place = Commune.objects.by_insee_code_and_period(
+            "07141", job_application.job_seeker.jobseeker_profile.birthdate
+        )
+        job_application.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
+        to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
+            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
+        ).all()
+
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertContains(response, "Valider les informations")
+        assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertContains(response, self.BIRTH_PLACE_LABEL)
+
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
+        assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
+        self.fill_contract_info_step(
+            client, job_application, session_uuid, assert_successful=True, with_previous_step=True
+        )
+        mocked_request.assert_called_once()
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
+            )
+            assert criterion.certified_at
+
+    @pytest.mark.usefixtures("api_particulier_settings")
+    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         mocked_request = mocker.patch(
