@@ -5593,12 +5593,12 @@ class TestFillJobSeekerInfosForHire:
         # Test with invalid data
         response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
         assert response.status_code == 200
-        assertForm(response.context["form_personal_data"])
+        assertForm(response.context["form_birth_data"])
         # Then with valid data
         response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
         assertRedirects(response, accept_contract_infos_url)
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": valid_post_data,
+            "birth_data": valid_post_data,
         }
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
@@ -5695,12 +5695,12 @@ class TestFillJobSeekerInfosForHire:
         # Test with invalid data
         response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
         assert response.status_code == 200
-        assertForm(response.context["form_personal_data"])
+        assertForm(response.context["form_birth_data"])
         # Then with valid data
         response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
         assertRedirects(response, accept_contract_infos_url)
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": {
+            "birth_data": {
                 "birth_place": new_place and new_place.pk,
                 "birth_country": new_country.pk,
             }

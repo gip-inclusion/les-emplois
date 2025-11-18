@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.db.models import Exists, OuterRef, Q
-from django.forms.models import ALL_FIELDS
 from django.template.defaultfilters import urlencode as urlencode_filter
 from django.urls import reverse
 from django.utils import timezone
@@ -3214,15 +3213,13 @@ class TestProcessAcceptViewsInWizard:
             "birth_place": "",
         }
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
-        assertFormError(
-            response.context["form_personal_data"], "birth_country", "Le pays de naissance est obligatoire."
-        )
+        assertFormError(response.context["form_birth_data"], "birth_country", "Le pays de naissance est obligatoire.")
 
         # Wrong birth country and birth place.
         post_data["birth_country"] = "0012345"
         post_data["birth_place"] = "008765"
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
-        assert response.context["form_personal_data"].errors == {
+        assert response.context["form_birth_data"].errors == {
             "birth_place": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
             "birth_country": [
                 "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
@@ -3608,17 +3605,14 @@ class TestProcessAcceptViewsInWizard:
             f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
         )
 
-        assert response.context["form_personal_data"].errors == {
+        assert response.context["form_birth_data"].errors == {
             "birth_place": [expected_msg],
-            ALL_FIELDS: [
-                "La commune de naissance doit être spécifiée si et seulement si le pays de naissance est la France."
-            ],
         }
 
         # assert malformed birthdate does not crash view
         post_data["birthdate"] = "20240-001-001"
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
-        assert response.context["form_personal_data"].errors == {"birthdate": ["Saisissez une date valide."]}
+        assert response.context["form_birth_data"].errors == {"birthdate": ["Saisissez une date valide."]}
 
         # test that fixing the birthdate fixes the form submission
         post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
@@ -3732,13 +3726,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
         assertContains(response, "Valider les informations")
-        assertContains(
-            response,
-            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
-            html=True,
-            count=1,
-        )
-        form = response.context["form"]
+        form = response.context["form_birth_data"]
         assert form.fields["birth_place"].disabled is False
         assert form.fields["birth_country"].disabled is False
         post_data = {
@@ -3992,12 +3980,12 @@ class TestFillJobSeekerInfosForAccept:
         # Test with invalid data
         response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
         assert response.status_code == 200
-        assertForm(response.context["form_personal_data"])
+        assertForm(response.context["form_birth_data"])
         # Then with valid data
         response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
         assertRedirects(response, accept_contract_infos_url)
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": valid_post_data,
+            "birth_data": valid_post_data,
         }
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
@@ -4110,12 +4098,12 @@ class TestFillJobSeekerInfosForAccept:
         # Test with invalid data
         response = client.post(fill_job_seeker_infos_url, data=invalid_post_data)
         assert response.status_code == 200
-        assertForm(response.context["form_personal_data"])
+        assertForm(response.context["form_birth_data"])
         # Then with valid data
         response = client.post(fill_job_seeker_infos_url, data=valid_post_data)
         assertRedirects(response, accept_contract_infos_url)
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "personal_data": {
+            "birth_data": {
                 "birth_place": new_place and new_place.pk,
                 "birth_country": new_country.pk,
             }

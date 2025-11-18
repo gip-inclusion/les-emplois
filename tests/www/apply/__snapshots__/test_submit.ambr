@@ -1885,7 +1885,7 @@
 # ---
 # name: TestFillJobSeekerInfosForHire.test_as_company[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -2511,7 +2511,6 @@
       dict({
         'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
@@ -2567,35 +2566,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE "asp_commune"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
           'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
           'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
@@ -2609,26 +2579,6 @@
           FROM "asp_country"
           WHERE "asp_country"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -2668,7 +2618,7 @@
 # ---
 # name: TestHireContract.test_as_company[view queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -3294,7 +3244,6 @@
       dict({
         'origin': list([
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ContractForHireView.get_forms[www/apply/views/common.py]',
@@ -3351,36 +3300,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE "asp_commune"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'ContractForHireView.get_forms[www/apply/views/common.py]',
           'ContractForHireView.get_forms[www/apply/views/common.py]',
           'ContractForHireView.get[www/apply/views/common.py]',
@@ -3395,27 +3314,6 @@
           FROM "asp_country"
           WHERE "asp_country"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
