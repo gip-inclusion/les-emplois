@@ -674,13 +674,13 @@ class TestModel:
         no_nir_profile = JobSeekerProfileFactory(nir="")
         # This works
         assert no_nir_profile.nir == ""
-        no_nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        no_nir_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         no_nir_profile.save()
 
         nir_profile = JobSeekerProfileFactory()
         # This doesn't
         assert nir_profile.nir
-        nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        nir_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         with pytest.raises(
             ValidationError,
             match="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR.",

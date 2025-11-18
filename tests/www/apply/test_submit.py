@@ -508,7 +508,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     user = JobSeekerFactory(
         jobseeker_profile__birthdate=None,
         jobseeker_profile__nir="",
-        jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+        jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
     )
     client.force_login(user)
 
@@ -2182,7 +2182,7 @@ class TestApplyAsPrescriberNirExceptions:
     def test_one_account_lack_of_nir_reason(self, client):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
             with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
@@ -4062,13 +4062,13 @@ class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
             extra_post_data_1={
                 "nir": "",
                 "lack_of_nir": True,
-                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+                "lack_of_nir_reason": LackOfNIRReason.NO_NIR.value,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
             },
         )
         # Check that we could update its NIR infos
-        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self, client):
         # Make sure the job seeker does not manage its own account
@@ -4200,13 +4200,13 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
             extra_post_data_1={
                 "nir": "",
                 "lack_of_nir": True,
-                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+                "lack_of_nir_reason": LackOfNIRReason.NO_NIR.value,
                 "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
                 "birth_country": Country.FRANCE_ID,
             },
         )
         # Check that we could update its NIR infos
-        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self, client):
         # Make sure the job seeker does not manage its own account
@@ -5144,7 +5144,7 @@ class TestCheckJobSeekerInformationsForHire:
                     "phone": "",
                     "jobseeker_profile__birthdate": None,
                     "jobseeker_profile__nir": "",
-                    "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+                    "jobseeker_profile__lack_of_nir_reason": LackOfNIRReason.NO_NIR,
                     "jobseeker_profile__lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
                     "jobseeker_profile__education_level": "",
                 },
@@ -5230,7 +5230,7 @@ class TestCheckJobSeekerInformationsForHire:
         job_seeker = JobSeekerFactory(
             for_snapshot=True,
             jobseeker_profile__nir="",
-            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
             last_checked_at=timezone.make_aware(datetime.datetime(2023, 10, 1, 12, 0, 0)),
         )
         client.force_login(company.members.first())
@@ -5827,7 +5827,7 @@ class TestFillJobSeekerInfosForHire:
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
-            [LackOfNIRReason.TEMPORARY_NUMBER, LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER, ""]
+            [LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER, ""]
         )
         self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
