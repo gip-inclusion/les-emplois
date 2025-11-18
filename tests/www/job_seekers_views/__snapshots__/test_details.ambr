@@ -3648,7 +3648,7 @@
                                               <li>
                                                   <small>
                                                       Durée de validité
-                                                      <i aria-label="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      <i aria-label="La durée de validité est calculée sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, elle décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="La durée de validité est calculée sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, elle décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
                                                       </i>
                                                   </small>
                                                   <strong class="text-success">
