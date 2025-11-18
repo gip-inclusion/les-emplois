@@ -66,7 +66,9 @@ class JobSeekerNIRUpdateMixin:
                     nir_help_text = nir_modification_request_link
                 self.fields["nir"].help_text = nir_help_text
         else:
-            self.fields["nir"].help_text = "Numéro à 15 chiffres."
+            self.fields[
+                "nir"
+            ].help_text = "Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés."
 
         if self.initial.get("lack_of_nir_reason") == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
             self.fields["lack_of_nir_reason"].help_text = nir_modification_request_link
