@@ -3,7 +3,8 @@ from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, Country
 from itou.users.models import JobSeekerProfile
-from itou.utils.widgets import RemoteAutocompleteSelect2Widget
+from itou.utils.validators import validate_birthdate
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 
 
 class BirthPlaceModelForm(forms.ModelForm):
@@ -72,6 +73,22 @@ class BirthPlaceModelForm(forms.ModelForm):
 
 
 class BirthPlaceWithBirthdateModelForm(BirthPlaceModelForm):
+    birthdate = forms.DateField(
+        label="Date de naissance",
+        required=True,
+        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
+        validators=[validate_birthdate],
+        widget=DuetDatePickerWidget(
+            {
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        ),
+    )
+
+    class Meta(BirthPlaceModelForm.Meta):
+        fields = BirthPlaceModelForm.Meta.fields + ["birthdate"]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birth_place"].widget.attrs["data-select2-link-with-birthdate"] = "id_birthdate"
@@ -82,8 +99,8 @@ class BirthPlaceWithBirthdateModelForm(BirthPlaceModelForm):
 
 class BirthPlaceWithoutBirthdateModelForm(BirthPlaceModelForm):
     def __init__(self, birthdate, *args, **kwargs):
-        self.birthdate = birthdate
+        self._birthdate = birthdate
         super().__init__(*args, **kwargs)
 
     def get_birth_date(self):
-        return self.birthdate
+        return self._birthdate

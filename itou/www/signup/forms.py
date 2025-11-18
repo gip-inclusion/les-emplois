@@ -17,8 +17,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.validators import validate_birthdate, validate_code_safir, validate_nir, validate_siren, validate_siret
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.validators import validate_code_safir, validate_nir, validate_siren, validate_siret
 
 
 def _get_organization_data_from_api(siret):
@@ -78,18 +77,6 @@ class ChooseUserKindSignupForm(forms.Form):
 
 
 class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, BaseSignupForm):
-    birthdate = forms.DateField(
-        label="Date de naissance",
-        required=True,
-        help_text="Au format JJ/MM/AAAA, par exemple 20/12/1978",
-        validators=[validate_birthdate],
-        widget=DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        ),
-    )
     nir = forms.CharField(
         label="Numéro de sécurité sociale",
         required=True,
