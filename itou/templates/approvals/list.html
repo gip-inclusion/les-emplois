@@ -83,4 +83,36 @@
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <!-- Needed to use the Select2MultipleWidget JS widget. -->
     {{ filters_form.media.js }}
+    {# djlint:off #}
+    <script nonce="{{ CSP_NONCE }}">
+        document.addEventListener("htmx:load", () => {
+            const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
+            const filterDropdown = document.getElementById('intro-js-contract-status-filter');
+
+            if (filterDropdown && window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
+                setTimeout(function() {
+                    introJs.tour().setOptions({
+                            disableInteraction: true,
+                            dontShowAgain: true,
+                            dontShowAgainCookie: "introjsContractStatusFilterDontShowAgain",
+                            dontShowAgainCookieDays: 90,
+                            dontShowAgainLabel: "Ne plus afficher",
+                            showProgress: false,
+                            showBullets: false,
+                            skipLabel: '',
+                            nextLabel: 'Suivant',
+                            prevLabel: 'Précédent',
+                            doneLabel: 'Fin',
+                            steps: [{
+                                element: document.querySelector('#intro-js-contract-status-filter'),
+                                title: 'Découvrez le filtre par statut du contrat',
+                                intro: 'Vous pouvez maintenant filtrer les PASS IAE par contrats en cours ou terminés depuis moins de 3 mois.'
+                            }]
+                        })
+                        .start();
+                }, 300)
+            }
+        });
+</script>
+    {# djlint:on #}
 {% endblock %}
