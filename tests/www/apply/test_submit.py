@@ -696,7 +696,7 @@ class TestApplyAsJobSeeker:
         # GPS : a job seeker must not follow himself
         assert not FollowUpGroup.objects.exists()
 
-    def test_apply_as_job_seeker_temporary_nir(self, client):
+    def test_apply_as_job_seeker_invalid_nir(self, client):
         """
         Full path is tested above. See test_apply_as_job_seeker.
         """
@@ -1616,7 +1616,7 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
         assert response.context["eligibility_diagnosis"] is None
 
-    def test_apply_with_temporary_nir(self, client):
+    def test_apply_with_invalid_nir(self, client):
         company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.get()

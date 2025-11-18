@@ -453,7 +453,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
             self.job_seeker_session.delete()
             return HttpResponseRedirect(next_url)
         else:
-            kwargs["temporary_nir_url"] = next_url
+            kwargs["invalid_nir_url"] = next_url
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
@@ -509,7 +509,7 @@ class CheckNIRForSenderView(JobSeekerForSenderBaseView):
         else:
             # Require at least one attempt with an invalid NIR to access the search by email feature.
             # The goal is to prevent users from skipping the search by NIR and creating duplicates.
-            context["temporary_nir_url"] = self.search_by_email_url(self.job_seeker_session.name)
+            context["invalid_nir_url"] = self.search_by_email_url(self.job_seeker_session.name)
 
         return self.render_to_response(self.get_context_data(**kwargs) | context)
 
