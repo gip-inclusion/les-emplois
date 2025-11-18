@@ -222,14 +222,14 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
             with transaction.atomic():
                 if form_personal_data := self.forms.get("personal_data"):
                     form_personal_data.save()
-                    if self.eligibility_diagnosis:
-                        self.eligibility_diagnosis.schedule_certification()
                 if form_user_address := self.forms.get("user_address"):
                     form_user_address.save()
                 if form_birth_place := self.forms.get("birth_place"):
                     form_birth_place.save()
-                    if self.geiq_eligibility_diagnosis:
-                        self.geiq_eligibility_diagnosis.schedule_certification()
+                if self.eligibility_diagnosis:
+                    self.eligibility_diagnosis.schedule_certification()
+                if self.geiq_eligibility_diagnosis:
+                    self.geiq_eligibility_diagnosis.schedule_certification()
                 # Instance will be committed by the transition, performed by django-xworkflows.
                 job_application = self.forms["accept"].save(commit=False)
                 if creating:
