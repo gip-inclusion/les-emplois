@@ -56,9 +56,10 @@ class CommonUserInfoFormsMixin:
                     data=self.request.POST or None,
                 )
         elif self.company.kind == CompanyKind.GEIQ:
-            forms["birth_place"] = BirthPlaceWithoutBirthdateModelForm(
+            forms["birth_data"] = BirthPlaceWithoutBirthdateModelForm(
                 instance=self.job_seeker.jobseeker_profile,
-                initial=session_forms_data.get("birth_place", {}),
+                # TODO(xfernandez): remove birth_place fallback in a week
+                initial=session_forms_data.get("birth_data", session_forms_data.get("birth_place", {})),
                 birthdate=self.job_seeker.jobseeker_profile.birthdate,
                 data=self.request.POST or None,
             )
@@ -86,13 +87,13 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
 
         form_user_address = forms.get("user_address")
         form_personal_data = forms.get("personal_data")
-        form_birth_place = forms.get("birth_place")
+        form_birth_data = forms.get("birth_data")
 
         context["form_user_address"] = form_user_address
         context["form_personal_data"] = form_personal_data
-        context["form_birth_place"] = form_birth_place
+        context["form_birth_data"] = form_birth_data
         context["has_form_error"] = any(
-            form.errors for form in [form_user_address, form_birth_place, form_personal_data] if form is not None
+            form.errors for form in [form_user_address, form_birth_data, form_personal_data] if form is not None
         )
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
@@ -224,8 +225,8 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
                     form_personal_data.save()
                 if form_user_address := self.forms.get("user_address"):
                     form_user_address.save()
-                if form_birth_place := self.forms.get("birth_place"):
-                    form_birth_place.save()
+                if form_birth_data := self.forms.get("birth_data"):
+                    form_birth_data.save()
                 if self.eligibility_diagnosis:
                     self.eligibility_diagnosis.schedule_certification()
                 if self.geiq_eligibility_diagnosis:

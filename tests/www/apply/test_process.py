@@ -3421,7 +3421,7 @@ class TestProcessAcceptViewsInWizard:
             "birth_place": "",
         }
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
-        assertFormError(response.context["form_birth_place"], "birth_country", "Le pays de naissance est obligatoire.")
+        assertFormError(response.context["form_birth_data"], "birth_country", "Le pays de naissance est obligatoire.")
 
         # Then set it.
         birth_country = Country.objects.get(pk=Country.FRANCE_ID)
@@ -4388,7 +4388,7 @@ class TestFillJobSeekerInfosForAccept:
         response = client.post(fill_job_seeker_infos_url, data=post_data)
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
         assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "birth_place": {
+            "birth_data": {
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
             },
