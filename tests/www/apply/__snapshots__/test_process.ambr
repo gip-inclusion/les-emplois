@@ -735,7 +735,7 @@
 # ---
 # name: TestProcessAcceptViewsInWizard.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 27,
+    'num_queries': 28,
     'queries': list([
       dict({
         'origin': list([
@@ -1508,6 +1508,34 @@
           FROM "asp_commune"
           WHERE (NOT ("asp_commune"."ignore")
                  AND "asp_commune"."id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CommuneQuerySet.by_insee_code_and_period[asp/models.py]',
+          'JobSeekerPersonalDataForm.clean[asp/forms.py]',
+          'JobSeekerPersonalDataForm.clean[users/forms.py]',
+          'JobSeekerPersonalDataForm.clean[common_apps/nir/forms.py]',
+          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
+          'ContractForAcceptView.get[www/apply/views/common.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."code" = %s
+                 AND "asp_commune"."start_date" <= %s
+                 AND ("asp_commune"."end_date" IS NULL
+                      OR "asp_commune"."end_date" >= %s))
           LIMIT 21
         ''',
       }),
