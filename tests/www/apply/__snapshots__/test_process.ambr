@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestFillJobSeekerInfosForAccept.test_as_iae_company[view queries]
   dict({
-    'num_queries': 13,
+    'num_queries': 11,
     'queries': list([
       dict({
         'origin': list([
@@ -663,34 +663,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "asp_commune"."id",
-                 "asp_commune"."start_date",
-                 "asp_commune"."end_date",
-                 "asp_commune"."code",
-                 "asp_commune"."name",
-                 "asp_commune"."normalized_name",
-                 "asp_commune"."created_at",
-                 "asp_commune"."city_id",
-                 "asp_commune"."ignore"
-          FROM "asp_commune"
-          WHERE "asp_commune"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
           'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -707,25 +679,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'FillJobSeekerInfosForAcceptView.get_forms[www/apply/views/common.py]',
-          'FillJobSeekerInfosForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -735,7 +688,7 @@
 # ---
 # name: TestProcessAcceptViewsInWizard.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 28,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -1397,26 +1350,6 @@
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerProfile.readonly_pii_fields[users/models.py]',
-          'JobSeekerPersonalDataForm.__init__[users/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
-          'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'ContractForAcceptView.get_forms[www/apply/views/common.py]',
-          'ContractForAcceptView.get_forms[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT "users_identitycertification"."id",
-                 "users_identitycertification"."jobseeker_profile_id",
-                 "users_identitycertification"."certifier",
-                 "users_identitycertification"."certified_at"
-          FROM "users_identitycertification"
-          WHERE "users_identitycertification"."jobseeker_profile_id" = %s
-          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1480,22 +1413,6 @@
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
-          SELECT "asp_country"."id",
-                 "asp_country"."code",
-                 "asp_country"."name",
-                 "asp_country"."group",
-                 "asp_country"."department"
-          FROM "asp_country"
-          WHERE "asp_country"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
           SELECT "asp_commune"."id",
                  "asp_commune"."start_date",
                  "asp_commune"."end_date",
@@ -1513,10 +1430,24 @@
       }),
       dict({
         'origin': list([
+          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
+          'ContractForAcceptView.get[www/apply/views/common.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          WHERE "asp_country"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'CommuneQuerySet.by_insee_code_and_period[asp/models.py]',
-          'JobSeekerPersonalDataForm.clean[asp/forms.py]',
-          'JobSeekerPersonalDataForm.clean[users/forms.py]',
-          'JobSeekerPersonalDataForm.clean[common_apps/nir/forms.py]',
+          'BirthPlaceWithoutBirthdateModelForm.clean[asp/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -1541,7 +1472,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -1554,7 +1484,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -1568,7 +1497,6 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -1576,38 +1504,6 @@
       }),
       dict({
         'origin': list([
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "_check"
-          WHERE COALESCE(((%s = %s
-                           OR %s = %s)), %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),
@@ -1620,44 +1516,6 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
-          'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
-          'ContractForAcceptView.get[www/apply/views/common.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "_check"
-          WHERE COALESCE((NOT (%s = %s)
-                          AND EXISTS
-                            (SELECT %s AS "a"
-                             FROM "users_jobseekerprofile" U0
-                             WHERE (U0."nir" = %s
-                                    AND NOT (U0."user_id" = %s)
-                                    AND NOT (U0."nir" = %s))
-                             LIMIT 1)), %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'JobSeekerPersonalDataForm._post_clean[users/forms.py]',
           'ContractForAcceptView.missing_or_invalid_job_seeker_infos[www/apply/views/common.py]',
           'ContractForAcceptView.get[www/apply/views/common.py]',
         ]),

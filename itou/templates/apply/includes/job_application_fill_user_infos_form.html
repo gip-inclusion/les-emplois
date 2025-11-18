@@ -20,17 +20,17 @@
         {% bootstrap_field form_personal_data.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
         {% bootstrap_field form_personal_data.lack_of_pole_emploi_id_reason %}
     {% endif %}
-    {% if form_personal_data.birthdate %}
-        {% bootstrap_field form_personal_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
-    {% endif %}
-    {% if form_personal_data.birth_country %}
-        {% bootstrap_field form_personal_data.birth_place %}
-        {% bootstrap_field form_personal_data.birth_country %}
-    {% endif %}
 {% endif %}
 
 {% if form_birth_data %}
-    {% bootstrap_form form_birth_data %}
+    {% bootstrap_form_errors form_birth_data type='non_fields' %}
+    {% if form_birth_data.birthdate %}
+        {% bootstrap_field form_birth_data.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
+    {% endif %}
+    {% if form_birth_data.birth_country %}
+        {% bootstrap_field form_birth_data.birth_place %}
+        {% bootstrap_field form_birth_data.birth_country %}
+    {% endif %}
 {% endif %}
 
 {% if form_user_address %}

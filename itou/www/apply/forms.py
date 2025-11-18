@@ -13,7 +13,6 @@ from django.utils import timezone
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
-from itou.asp.models import Country
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
@@ -23,8 +22,8 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationComment, PriorAction
 from itou.jobs.models import Appellation
-from itou.users.forms import JobSeekerProfileModelForm
-from itou.users.models import User
+from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
@@ -651,19 +650,18 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelForm):
-    """
-    Info that will be used to search for an existing Pôle emploi approval.
-    """
-
-    PROFILE_FIELDS = JobSeekerProfileModelForm.PROFILE_FIELDS + [
+class JobSeekerPersonalDataForm(
+    JobSeekerNIRUpdateMixin, PoleEmploiFieldsMixin, JobSeekerProfileFieldsMixin, forms.ModelForm
+):
+    PROFILE_FIELDS = [
         "pole_emploi_id",
         "lack_of_pole_emploi_id_reason",
         "nir",
         "lack_of_nir_reason",
     ]
 
-    class Meta(JobSeekerProfileModelForm.Meta):
+    class Meta:
+        model = User
         fields = []
 
     def __init__(self, *args, **kwargs):
@@ -680,26 +678,23 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
 
-        if self.instance.jobseeker_profile.birthdate:
-            del self.fields["birthdate"]
 
-            def get_birth_date():
-                return self.instance.jobseeker_profile.birthdate
+class BirthDateForm(forms.ModelForm):
+    class Meta:
+        model = JobSeekerProfile
+        fields = ["birthdate"]
 
-            if self.fields["birth_place"].widget.attrs.get("data-select2-link-with-birthdate"):
-                del self.fields["birth_place"].widget.attrs["data-select2-link-with-birthdate"]
-            self.get_birth_date = get_birth_date  # Needed for BirthPlaceModelForm
-            if self.instance.jobseeker_profile.birth_country:
-                del self.fields["birth_country"]
-                del self.fields["birth_place"]
-        # If the birthdate is missing and the country is France, the birthdate
-        # can influence the birth_place: allow to modify both and keep the fields
-        elif (
-            self.instance.jobseeker_profile.birth_country_id
-            and self.instance.jobseeker_profile.birth_country_id != Country.FRANCE_ID
-        ):
-            del self.fields["birth_country"]
-            del self.fields["birth_place"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        birthdate = self.fields["birthdate"]
+        birthdate.required = True
+        birthdate.widget = DuetDatePickerWidget(
+            attrs={
+                "min": DuetDatePickerWidget.min_birthdate(),
+                "max": DuetDatePickerWidget.max_birthdate(),
+            }
+        )
+        birthdate.help_text = "Au format JJ/MM/AAAA, par exemple 20/12/1978."
 
 
 class FilterJobApplicationsForm(forms.Form):

@@ -10,7 +10,8 @@ from django.views.generic import FormView, TemplateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
-from itou.asp.forms import BirthPlaceWithoutBirthdateModelForm
+from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
+from itou.asp.models import Country
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -21,6 +22,7 @@ from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
+    BirthDateForm,
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
 )
@@ -49,6 +51,31 @@ class CommonUserInfoFormsMixin:
             )
             if personal_data_form.fields:
                 forms["personal_data"] = personal_data_form
+            birth_data_form_class = None
+            birth_data_form_kwargs = {
+                "instance": self.job_seeker.jobseeker_profile,
+                # TODO(xfernandez): remove personal_data fallback in a week
+                "initial": session_forms_data.get("birth_data", session_forms_data.get("personal_data", {})),
+                "data": self.request.POST or None,
+            }
+            if self.job_seeker.jobseeker_profile.birthdate:
+                if not self.job_seeker.jobseeker_profile.birth_country:
+                    birth_data_form_class = BirthPlaceWithoutBirthdateModelForm
+                    birth_data_form_kwargs["birthdate"] = self.job_seeker.jobseeker_profile.birthdate
+            else:
+                # If birth country is not France, the birthdate won't impact the birth place selection
+                # Otherwise, if the birthdate is missing and the country is France, the birthdate
+                # can influence the birth_place: allow to modify both and keep the fields
+                if (
+                    self.job_seeker.jobseeker_profile.birth_country_id
+                    and self.job_seeker.jobseeker_profile.birth_country_id != Country.FRANCE_ID
+                ):
+                    birth_data_form_class = BirthDateForm
+                else:
+                    birth_data_form_class = BirthPlaceWithBirthdateModelForm
+            if birth_data_form_class:
+                forms["birth_data"] = birth_data_form_class(**birth_data_form_kwargs)
+
             if not self.job_seeker.address_on_one_line:
                 forms["user_address"] = JobSeekerAddressForm(
                     instance=self.job_seeker,
