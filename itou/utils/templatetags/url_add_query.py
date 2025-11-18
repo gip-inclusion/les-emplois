@@ -6,6 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django import template
 from django.http import QueryDict
+from django.urls import reverse
 
 from itou.users.enums import IdentityProvider
 
@@ -38,5 +39,5 @@ def url_add_query(url, **kwargs):
 @register.simple_tag
 def autologin_proconnect(url, user):
     if user.is_authenticated and user.identity_provider == IdentityProvider.PRO_CONNECT:
-        return url_add_query(url, proconnect_login="true")
+        return reverse("nexus:auto_login", query={"next_url": url})
     return url
