@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
-from itou.utils.widgets import DuetDatePickerWidget
 
 
 def validate_francetravail_email(email):
@@ -108,14 +107,6 @@ class JobSeekerProfileModelForm(PoleEmploiFieldsMixin, JobSeekerProfileFieldsMix
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.readonly_pii_fields = self.instance.jobseeker_profile.readonly_pii_fields() if self.instance.pk else []
-        birthdate = self.fields["birthdate"]
-        birthdate.widget = DuetDatePickerWidget(
-            attrs={
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
-        birthdate.help_text = "Au format JJ/MM/AAAA, par exemple 20/12/1978."
         for fieldname in self.REQUIRED_FIELDS:
             try:
                 self.fields[fieldname].required = True
