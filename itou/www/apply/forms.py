@@ -686,7 +686,8 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileModelFo
             def get_birth_date():
                 return self.instance.jobseeker_profile.birthdate
 
-            del self.fields["birth_place"].widget.attrs["data-select2-link-with-birthdate"]
+            if self.fields["birth_place"].widget.attrs.get("data-select2-link-with-birthdate"):
+                del self.fields["birth_place"].widget.attrs["data-select2-link-with-birthdate"]
             self.get_birth_date = get_birth_date  # Needed for BirthPlaceModelForm
             if self.instance.jobseeker_profile.birth_country:
                 del self.fields["birth_country"]
