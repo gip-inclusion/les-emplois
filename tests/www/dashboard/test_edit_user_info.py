@@ -408,14 +408,14 @@ class TestEditUserInfoView:
     @freeze_time("2023-03-10")
     def test_edit_with_lack_of_nir_reason(self, client):
         user = JobSeekerFactory(
-            jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+            jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR
         )
         client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)
         # Check that the NIR field is disabled (it can be reenabled via lack_of_nir check box)
         assertContains(response, DISABLED_NIR)
-        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        assertContains(response, LackOfNIRReason.NO_NIR.label, html=True)
         assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 

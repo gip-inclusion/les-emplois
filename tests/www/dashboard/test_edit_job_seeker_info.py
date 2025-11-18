@@ -140,7 +140,7 @@ class TestEditJobSeekerInfo:
         )
         job_application = JobApplicationSentByPrescriberFactory(
             job_seeker__jobseeker_profile__nir="",
-            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
         )
         user = job_application.to_company.members.first()
 
@@ -158,7 +158,7 @@ class TestEditJobSeekerInfo:
         url = f"{url}?back_url={back_url}"
 
         response = client.get(url)
-        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
+        assertContains(response, LackOfNIRReason.NO_NIR.label, html=True)
         assertContains(response, DISABLED_NIR)
         assertNotContains(response, self.NIR_UPDATE_LINK_LABEL, html=True)
         assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
@@ -243,13 +243,13 @@ class TestEditJobSeekerInfo:
         post_data.update(
             {
                 "lack_of_nir": True,
-                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+                "lack_of_nir_reason": LackOfNIRReason.NO_NIR.value,
             }
         )
         response = client.post(url, data=post_data)
         assertRedirects(response, expected_url=back_url)
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
         assert job_seeker.jobseeker_profile.nir == ""
 
         response = client.get(url)

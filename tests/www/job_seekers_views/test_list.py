@@ -424,7 +424,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
             "birth_country": 91,
             "birth_place": Commune.objects.by_insee_code_and_period("64483", datetime.date(2000, 1, 1)).pk,
             "birthdate": datetime.date(2000, 1, 1),
-            "lack_of_nir_reason": "TEMPORARY_NUMBER",
+            "lack_of_nir_reason": "NO_NIR",
             "education_level": "00",
             "resourceless": True,
             "pole_emploi_id": "",

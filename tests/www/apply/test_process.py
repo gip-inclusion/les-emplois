@@ -226,12 +226,12 @@ class TestProcessViews:
         assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
-        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
-        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
+        assertContains(response, LackOfNIRReason.NO_NIR.label)
 
         # Test resume presence:
         job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
@@ -309,12 +309,12 @@ class TestProcessViews:
         assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
-        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
-        assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
+        assertContains(response, LackOfNIRReason.NO_NIR.label)
 
         # Test resume presence:
         job_application = JobApplicationSentByJobSeekerFactory(to_company=company)
@@ -2836,7 +2836,7 @@ class TestProcessAcceptViewsInWizard:
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": jobseeker_profile.lack_of_pole_emploi_id_reason,
             "lack_of_nir": True,
-            "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+            "lack_of_nir_reason": LackOfNIRReason.NO_NIR,
         }
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
@@ -3079,7 +3079,7 @@ class TestProcessAcceptViewsInWizard:
     def test_lack_of_nir_reason_update(self, client):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
-        jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
 
@@ -4050,7 +4050,7 @@ class TestFillJobSeekerInfosForAccept:
         self.job_seeker.jobseeker_profile.nir = ""
         if with_lack_of_nir_reason:
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
-                [LackOfNIRReason.TEMPORARY_NUMBER, LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER]
+                [LackOfNIRReason.NO_NIR, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER]
             )
         else:
             self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""

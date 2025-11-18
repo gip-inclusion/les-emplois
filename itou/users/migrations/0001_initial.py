@@ -784,7 +784,6 @@ class Migration(migrations.Migration):
                     models.CharField(
                         blank=True,
                         choices=[
-                            ("TEMPORARY_NUMBER", "Numéro temporaire (NIA/NTT)"),
                             ("NO_NIR", "Pas de numéro de sécurité sociale"),
                             (
                                 "NIR_ASSOCIATED_TO_OTHER",

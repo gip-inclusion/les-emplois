@@ -77,7 +77,6 @@ class IdentityCertificationAuthorities(models.TextChoices):
 
 
 class LackOfNIRReason(models.TextChoices):
-    TEMPORARY_NUMBER = "TEMPORARY_NUMBER", "Numéro temporaire (NIA/NTT)"
     NO_NIR = "NO_NIR", "Pas de numéro de sécurité sociale"
     NIR_ASSOCIATED_TO_OTHER = (
         "NIR_ASSOCIATED_TO_OTHER",
