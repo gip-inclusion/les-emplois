@@ -3191,7 +3191,7 @@ class TestDirectHireFullProcess:
         response = client.post(fill_job_seeker_infos_url, data=post_data)
         assertRedirects(response, contract_url)
         assert client.session[apply_session_name]["job_seeker_info_forms_data"] == {
-            "birth_place": {
+            "birth_data": {
                 "birth_country": other_country.pk,
                 "birth_place": None,
             }
@@ -6011,7 +6011,7 @@ class TestFillJobSeekerInfosForHire:
         )
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
         assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {
-            "birth_place": {
+            "birth_data": {
                 "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
                 "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
             },
