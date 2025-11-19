@@ -454,6 +454,7 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
+          'ExtendsNode[employee_record/base_add.html]',
           'ExtendsNode[employee_record/add.html]',
         ]),
         'sql': '''
@@ -473,6 +474,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[employee_record/base_add.html]',
           'ExtendsNode[employee_record/add.html]',
         ]),
         'sql': '''
@@ -912,6 +914,7 @@
           'Company.has_job_descriptions_not_updated_recently[companies/models.py]',
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
+          'ExtendsNode[employee_record/base_add.html]',
           'ExtendsNode[employee_record/add.html]',
         ]),
         'sql': '''
@@ -931,6 +934,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
+          'ExtendsNode[employee_record/base_add.html]',
           'ExtendsNode[employee_record/add.html]',
         ]),
         'sql': '''
