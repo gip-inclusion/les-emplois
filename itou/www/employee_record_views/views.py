@@ -20,7 +20,6 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordTransition
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason, UserKind
-from itou.users.forms import JobSeekerProfileModelForm
 from itou.users.models import User
 from itou.utils.auth import check_user
 from itou.utils.pagination import pager
@@ -33,6 +32,7 @@ from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseEmployeeForm,
     EmployeeRecordFilterForm,
     FindEmployeeOrJobSeekerForm,
+    NewEmployeeRecordJobSeekerForm,
     NewEmployeeRecordStep2Form,
     NewEmployeeRecordStep3ForEITIForm,
     NewEmployeeRecordStep3Form,
@@ -303,6 +303,20 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)
 
 
+def get_session_ntt_key(job_application):
+    return f"NTT_{job_application.to_company_id}_{job_application.job_seeker_id}"
+
+
+def get_session_ntt(request, job_application):
+    key = get_session_ntt_key(job_application)
+    return request.session.get(key)
+
+
+def set_session_ntt(request, job_application, ntt_value):
+    key = get_session_ntt_key(job_application)
+    request.session[key] = ntt_value
+
+
 def create(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
@@ -310,11 +324,30 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     Step 1: Name and birth date / place / country of the jobseeker
     """
     job_application = can_create_employee_record(request, job_application_id)
-    form = JobSeekerProfileModelForm(data=request.POST or None, instance=job_application.job_seeker)
+
+    existing_ntt = None
+    if not job_application.job_seeker.jobseeker_profile.nir:
+        # A NTT might be needed: try to find one on a possibly existing employee record
+        employee_record = job_application.employee_record.order_by("-created_at").first()
+        if employee_record and employee_record.ntt:
+            existing_ntt = employee_record.ntt
+        else:
+            existing_ntt = get_session_ntt(request, job_application)
+
+    form = NewEmployeeRecordJobSeekerForm(
+        data=request.POST or None,
+        instance=job_application.job_seeker,
+        back_url=get_safe_url(request, "back_url", fallback_url=reverse("employee_record_views:list")),
+        siren=job_application.to_company.siren,
+        initial={"ntt": existing_ntt} if existing_ntt else {},
+    )
     query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     if request.method == "POST" and form.is_valid():
         form.save()
+        if not form.cleaned_data.get("nir"):
+            # Store NTT for step 3
+            set_session_ntt(request, job_application, form.cleaned_data.get("ntt"))
         return HttpResponseRedirect(
             reverse("employee_record_views:create_step_2", args=(job_application.pk,), query=query)
         )
@@ -412,8 +445,8 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         form.save()
         job_application.refresh_from_db()
 
-        employee_record_exists = job_application.employee_record.exists()
-        if not employee_record_exists:
+        employee_record = job_application.employee_record.order_by("created_at").last()
+        if not employee_record:
             # The EmployeeRecord() object doesn't exist, so we create one from the job application
             try:
                 employee_record = EmployeeRecord.from_job_application(job_application)
@@ -424,10 +457,15 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
                     request,
                     f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
                 )
-            else:
-                employee_record_exists = True
+                employee_record = None
 
-        if employee_record_exists:
+        if employee_record:
+            if not job_application.job_seeker.jobseeker_profile.nir and (
+                ntt := get_session_ntt(request, job_application)
+            ):
+                # Retrieve NTT from step 1 if needed
+                employee_record.ntt = ntt
+                employee_record.save(update_fields=("ntt", "updated_at"))
             return HttpResponseRedirect(
                 reverse("employee_record_views:create_step_4", args=(job_application.id,), query=query)
             )
