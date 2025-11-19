@@ -1,21 +1,10 @@
-{% extends "layout/base.html" %}
+{% extends "employee_record/base_add.html" %}
 {% load buttons_form %}
-{% load components %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load matomo %}
 {% load str_filters %}
 {% load theme_inclusion %}
-
-{% block title %}Créer une fiche salarié {{ block.super }}{% endblock %}
-
-{% block title_content %}
-    {% component_title c_title__main=c_title__main %}
-        {% fragment as c_title__main %}
-            <h1>Créer une fiche salarié - {{ request.current_organization.display_name }}</h1>
-        {% endfragment %}
-    {% endcomponent_title %}
-{% endblock %}
 
 {% block content %}
     <section class="s-section">
