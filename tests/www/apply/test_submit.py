@@ -1701,7 +1701,7 @@ class TestApplyAsPrescriber:
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
-        with_temporary_nir = random.choice([True, False])
+        with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
         user = PrescriberFactory()
         client.force_login(user)
@@ -1710,7 +1710,7 @@ class TestApplyAsPrescriber:
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="714612105555578" if with_temporary_nir else "178122978200508",
+            jobseeker_profile__nir="714612105555578" if with_nia else "178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
@@ -1843,7 +1843,7 @@ class TestApplyAsPrescriber:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assertion = assertNotContains if with_temporary_nir else assertContains
+        assertion = assertNotContains if with_nia else assertContains
         assertion(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.

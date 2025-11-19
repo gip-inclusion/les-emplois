@@ -267,14 +267,14 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
 
     @pytest.mark.parametrize(
-        "temporary_nir",
+        "nia",
         ["315945785544152", "401221234567803", "714612105555578", "888595834567534"],
     )
-    def test_validate_temporary_nir_birthdate(self, client, temporary_nir):
+    def test_validate_nia_birthdate(self, client, nia):
         birthdate = date(1978, 12, 20)
-        title = Title.M if temporary_nir[0] in "37" else Title.MME
+        title = Title.M if nia[0] in "37" else Title.MME
         user = JobSeekerFactory(
-            jobseeker_profile__nir=temporary_nir,
+            jobseeker_profile__nir=nia,
             title=title,
             jobseeker_profile__birthdate=birthdate,
         )
@@ -282,7 +282,7 @@ class TestEditUserInfoView:
         url = reverse("dashboard:edit_user_info")
 
         birth_place = Commune.objects.by_insee_code_and_period(self.city.code_insee, birthdate)
-        # the NIR is temporary (starting with 3, 4, 7 or 8) -> do not check the birthdate
+        # the NIR is an NIA (starting with 3, 4, 7 or 8) -> do not check the birthdate
         post_data = {
             "email": "bob@saintclar.net",
             "title": title,
