@@ -1,12 +1,19 @@
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.validators import RegexValidator
-from django.urls import reverse_lazy
+from django.forms import widgets
+from django.urls import reverse, reverse_lazy
+from django.utils.html import format_html
 from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, RSAAllocation
 from itou.cities.models import City
 from itou.employee_record.enums import Status
-from itou.users.models import JobSeekerProfile
+from itou.employee_record.models import EmployeeRecord
+from itou.users.enums import Title
+from itou.users.forms import JobSeekerProfileModelForm
+from itou.users.models import ERROR_UNIQUE_NIR_CODE, JobSeekerProfile
+from itou.utils.validators import validate_nir, validate_ntt
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
 
@@ -86,6 +93,171 @@ class EmployeeRecordFilterForm(forms.Form):
             [(user.id, user.get_full_name().title()) for user in job_seekers if user.get_full_name()],
             key=lambda u: u[1],
         )
+
+
+class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
+    PROFILE_FIELDS = JobSeekerProfileModelForm.PROFILE_FIELDS + [
+        "nir",
+        "lack_of_nir_reason",  # Only here to allow its modification in save()
+    ]
+
+    nir = forms.CharField(
+        label="Numéro de sécurité sociale",
+        required=False,
+        max_length=21,  # 15 + 6 white spaces
+        strip=True,
+        validators=[validate_nir],
+        widget=forms.TextInput(),
+        help_text="Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés.",
+    )
+
+    # A transient checkbox used to collapse optional block
+    lack_of_nir = forms.BooleanField(
+        required=False,
+        label=(
+            "Impossible de renseigner le numéro de sécurité sociale (NIR) "
+            "ou le numéro d’immatriculation d’attente (NIA)"
+        ),
+        widget=widgets.CheckboxInput(
+            attrs={
+                "data-disable-target": "#id_nir",
+            }
+        ),
+    )
+
+    ntt = forms.CharField(
+        label="Numéro technique temporaire",
+        required=False,
+        max_length=40,
+        strip=True,
+        validators=[validate_ntt],
+        widget=forms.TextInput(),
+        help_text="Ce numéro doit comporter entre 11 et 40 caractères",
+    )
+
+    def __init__(self, *args, siren, mandatory_ntt, back_url=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._back_url = back_url
+        self._siren = siren  # Used to validate NTT
+        self._mandatory_ntt = mandatory_ntt
+
+        # Not displayed, but still in PROFILE_FIELDS for save()
+        self.fields["lack_of_nir_reason"].disabled = True
+        self.fields["lack_of_nir_reason"].widget = forms.HiddenInput()
+
+        if self.initial.get("nir"):
+            # Disable NIR editing altogether if the job seeker already has one
+            self.fields["nir"].disabled = True
+            self.fields["nir"].help_text = format_html(
+                '<a href="{}">Demander la correction du numéro de sécurité sociale</a>',
+                reverse(
+                    "job_seekers_views:nir_modification_request",
+                    kwargs={"public_id": self.instance.public_id},
+                    query={"back_url": back_url} if back_url else None,
+                ),
+            )
+
+            if mandatory_ntt:
+                # Here a NIR is present but a NTT is still mandatory (NIA starts with 7 or 8):
+                # force lack_of_nir to be checked to show the NTT field
+                self.fields["lack_of_nir"].disabled = True
+                self.initial["lack_of_nir"] = True
+            else:
+                # Here a NIR is present and no NTT is needed: hide lack_of_nir and NTT fields
+                self.fields["lack_of_nir"].widget = forms.HiddenInput()
+                self.fields["ntt"].disabled = True
+
+        if self["lack_of_nir"].value():
+            self.fields["nir"].disabled = True
+
+    def clean(self):
+        super().clean()
+
+        if self.cleaned_data.get("lack_of_nir"):
+            if ntt := self.cleaned_data.get("ntt"):
+                if title := self.cleaned_data.get("title"):
+                    expected_prefix = "1" if title == Title.M else "2"
+                    if not ntt.startswith(expected_prefix):
+                        self.add_error(
+                            "ntt",
+                            forms.ValidationError(
+                                f"Le numéro technique temporaire doit commencer par '{expected_prefix}' pour être "
+                                "cohérent avec la civilité."
+                            ),
+                        )
+                if ntt[1:10] != self._siren:
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError(
+                            "Le numéro technique temporaire doit contenir le SIREN de l'entreprise "
+                            "d'accueil aux positions 2 à 10."
+                        ),
+                    )
+                if (
+                    EmployeeRecord.objects.filter(ntt=ntt)
+                    .exclude(job_application__job_seeker=self.instance.pk)
+                    .exists()
+                ):
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError("Ce numéro technique temporaire est déjà associé à un autre salarié."),
+                    )
+
+            elif not self.has_error("ntt"):  # Avoid double error message
+                if self._mandatory_ntt:
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError(
+                            "Le numéro technique temporaire est obligatoire si votre NIA commence par les numéros "
+                            "7 ou 8."
+                        ),
+                    )
+                else:
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError(
+                            "Le numéro technique temporaire est obligatoire si vous ne disposez pas du NIR ou du NIA."
+                        ),
+                    )
+        else:
+            if not self.cleaned_data.get("nir"):
+                self.add_error(
+                    "nir",
+                    forms.ValidationError(
+                        "Pour continuer, veuillez entrer un numéro de sécurité sociale valide ou cocher la mention "
+                        '"Impossible de renseigner le numéro de sécurité sociale (NIR) ou le numéro '
+                        'd’identification d’attente (NIA)" et renseigner un numéro technique temporaire.'
+                    ),
+                )
+        JobSeekerProfile.clean_nir_title_birthdate_fields(self.cleaned_data)
+
+    def _post_clean(self):
+        if self.cleaned_data.get("nir"):
+            # If NIR is provided, reset lack_of_nir_reason to avoid constraint validation error
+            self.cleaned_data["lack_of_nir_reason"] = ""
+        super()._post_clean()
+        if self.has_error(NON_FIELD_ERRORS, code=ERROR_UNIQUE_NIR_CODE):
+            # Remove the unique nir error message to provide our ownn
+            [unique_nir_error] = [
+                error for error in self.errors[NON_FIELD_ERRORS].data if error.code == ERROR_UNIQUE_NIR_CODE
+            ]
+            self.errors[NON_FIELD_ERRORS].remove(unique_nir_error)
+            self.add_error(
+                None,
+                forms.ValidationError(
+                    format_html(
+                        '<p class="mb-2">'
+                        "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur. Veuillez "
+                        "vérifier votre saisie ou demander la régularisation à notre équipe technique.</p>"
+                        '<a href="{}" class="btn btn-primary">Régulariser le n⁰ de sécurité sociale</a>',
+                        reverse(
+                            "job_seekers_views:nir_modification_request",
+                            kwargs={"public_id": self.instance.public_id},
+                            query={"back_url": self._back_url} if self._back_url else None,
+                        ),
+                    )
+                ),
+            )
 
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
