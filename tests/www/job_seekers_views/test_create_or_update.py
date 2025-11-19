@@ -629,13 +629,13 @@ class TestStandaloneCreateAsPrescriber:
         from_url = reverse("job_seekers_views:list")
         user = PrescriberOrganizationFactory(with_membership=True).members.first()
         client.force_login(user)
-        with_temporary_nir = random.choice([True, False])
+        with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
-            jobseeker_profile__nir="714612105555578" if with_temporary_nir else "178122978200508",
+            jobseeker_profile__nir="714612105555578" if with_nia else "178122978200508",
             jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
             title="M",
         )
@@ -736,7 +736,7 @@ class TestStandaloneCreateAsPrescriber:
             "lack_of_nir_reason": "",
         }
         response = client.post(next_url, data=post_data)
-        assertion = assertNotContains if with_temporary_nir else assertContains
+        assertion = assertNotContains if with_nia else assertContains
         assertion(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
 
         # Resume to valid data and proceed with "normal" flow.
