@@ -555,15 +555,23 @@ class TestContractView:
         company = job_application.to_company
 
         # Not displayed contracts
-        ContractFactory()  # Contract on another job seeker
-        ContractFactory(job_seeker=approval.user, start_date="2024-12-31")  # Too old contract
-        ContractFactory(job_seeker=approval.user, start_date="2025-06-01")  # Too recent contract
+        ContractFactory(start_date="2025-01-02")  # Contract on another job seeker
+        ContractFactory(job_seeker=approval.user, start_date="2024-12-01", end_date="2024-12-31")  # Before approval
+        ContractFactory(job_seeker=approval.user, start_date="2025-06-01", end_date="2025-06-30")  # After approval
 
         # Displayed contracts
         ContractFactory(
             company__name="Tif'any", job_seeker=approval.user, start_date="2025-01-01", end_date="2025-08-07"
-        )
-        ContractFactory(company__name="Tralal’Hair", job_seeker=approval.user, start_date="2025-02-01", end_date=None)
+        )  # Fully inside approval validity
+        ContractFactory(
+            company__name="Tralal’Hair", job_seeker=approval.user, start_date="2025-02-01", end_date=None
+        )  # start date inside approval validity
+        ContractFactory(
+            company__name="Faudra Tif Hair", job_seeker=approval.user, start_date="2024-10-01", end_date="2025-01-10"
+        )  # end date inside approval validity
+        ContractFactory(
+            company__name="Inter Planet Hair", job_seeker=approval.user, start_date="2024-10-01", end_date="2025-06-30"
+        )  # approval inside contract dates
 
         client.force_login(company.members.first())
         response = client.get(reverse("approvals:contracts", kwargs={"public_id": approval.public_id}))

@@ -340,10 +340,9 @@ class ContractsView(BaseApprovalDetailView):
         context = super().get_context_data(**kwargs)
         context["contracts"] = (
             Contract.objects.filter(job_seeker=self.object.user)
-            .filter(
-                start_date__gte=self.object.start_at,
-                start_date__lte=self.object.end_at,
-            )
+            # Filter out contracts that do not overlap the approval
+            .exclude(end_date__lt=self.object.start_at)
+            .exclude(start_date__gt=self.object.end_at)
             .select_related("company")
             .order_by("-start_date")
         )

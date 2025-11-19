@@ -4939,6 +4939,56 @@
                       </div>
                   </div>
               </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-home-smile-2-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Faudra Tif Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/10/2024 au 10/01/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="c-box c-box--results mb-3 mb-md-4">
+                  <div class="c-box--results__header">
+                      <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <div class="c-box--results__summary flex-grow-1">
+                              <i aria-hidden="true" class="ri-home-smile-2-line">
+                              </i>
+                              <div>
+                                  <span>
+                                      EI
+                                  </span>
+                                  <h3>
+                                      Inter Planet Hair
+                                  </h3>
+                              </div>
+                          </div>
+                          <div class="align-self-center">
+                              <span>
+                                  <i aria-hidden="true" class="ri-calendar-line ri-lg fw-normal">
+                                  </i>
+                                  Du 01/10/2024 au 30/06/2025
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
       </section>
   </main>
