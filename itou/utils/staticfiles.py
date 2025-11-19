@@ -152,8 +152,8 @@ ASSET_INFOS = {
     },
     "intro.js": {
         "download": {
-            "url": "https://registry.npmjs.org/intro.js/-/intro.js-7.2.0.tgz",
-            "sha256": "4578c4cde6d9800cf210ca4bc7d3f5a3a6afd8f545a5acc9ed4a9e03b65c87df",
+            "url": "https://registry.npmjs.org/intro.js/-/intro.js-8.3.2.tgz",
+            "sha256": "1ca4b824d0f9335cb30e5ecb7290edccd164c392f65b447210d306e8a9513330",
         },
         "extract": {
             "origin": "package/minified",
