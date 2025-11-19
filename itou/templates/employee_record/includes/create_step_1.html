@@ -1,5 +1,6 @@
 {% load buttons_form %}
 {% load django_bootstrap5 %}
+{% load theme_inclusion %}
 {% load url_add_query %}
 
 <div class="s-section__row row">
@@ -18,6 +19,43 @@
                     {% bootstrap_field form.birthdate wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.birth_country %}
                     {% bootstrap_field form.birth_place %}
+                    {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
+                    {% collapse_field form.lack_of_nir target_id="collapse_ntt" %}
+                    <div id="collapse_ntt" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.lack_of_nir.value %} show{% endif %}">
+                        {% bootstrap_field form.ntt %}
+                    </div>
+                    {% if not job_application.job_seeker.jobseeker_profile.nir %}
+                        <div class="c-info">
+                            <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoNoNir" aria-expanded="true" aria-controls="collapseInfoNoNir">
+                                <span>Le candidat n’a pas de numéro de sécurité sociale (NIR) ?</span>
+                            </button>
+                            <div class="c-info__detail collapse show" id="collapseInfoNoNir">
+                                <p>Vous pouvez quand même continuer en renseignant :</p>
+                                <ul class="mt-0">
+                                    <li>un numéro d’immatriculation d’attente (NIA);</li>
+                                    <li>
+                                        ou un numéro technique temporaire (NTT) en cochant la case ci-dessus.
+                                        Celui-ci peut être généré par votre logiciel de paie ou créé manuellement.
+                                        <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% elif mandatory_ntt %}
+                        <div class="c-info">
+                            <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoNir78" aria-expanded="true" aria-controls="collapseInfoNir78">
+                                <span>Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?</span>
+                            </button>
+                            <div class="c-info__detail collapse show" id="collapseInfoNir78">
+                                <p>Vous pouvez poursuivre la démarche en renseignant un numéro technique temporaire (NTT).</p>
+                                <p class="mt-0">
+                                    Ce numéro peut être généré par votre logiciel de paie ou créé manuellement.
+                                    <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
+                                </p>
+                            </div>
+                        </div>
+
+                    {% endif %}
                 </fieldset>
                 {% url "employee_record_views:list" as secondary_url %}
                 {% if request.GET.status %}

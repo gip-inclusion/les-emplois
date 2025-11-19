@@ -18,6 +18,7 @@ from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
+from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.enums import SenderKind
 from itou.utils.validators import NTT_REGEX, validate_ntt, validate_siret
 
@@ -523,6 +524,8 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
         try:
             self.clean()
         except Exception:
+            return False
+        if is_ntt_required(self.job_application.job_seeker.jobseeker_profile.nir) and not self.ntt:
             return False
         return True
 

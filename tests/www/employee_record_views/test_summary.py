@@ -37,7 +37,17 @@ class TestSummaryEmployeeRecords:
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
             to_company=self.company, job_seeker__first_name="Lauren", job_seeker__last_name="Mata"
         )
-        self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
+        if self.job_application.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
+            ntt = "".join(
+                [
+                    "1" if self.job_application.job_seeker.title == Title.M else "2",
+                    self.company.siren,
+                    "leMatriculeDuS414r13",
+                ]
+            )
+        else:
+            ntt = None
+        self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application, ntt=ntt)
         self.url = reverse("employee_record_views:summary", args=(self.employee_record.id,))
 
     def test_access_granted(self, client):

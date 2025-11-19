@@ -1,4 +1,58 @@
 # serializer version: 1
+# name: TestCreateEmployeeRecordStep1.test_nir_starting_with_7_or_8[info_box_nir_starting_with_7_or_8]
+  '''
+  <div class="c-info">
+      <button aria-controls="collapseInfoNir78" aria-expanded="true" class="c-info__summary" data-bs-target="#collapseInfoNir78" data-bs-toggle="collapse" type="button">
+          <span>
+              Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?
+          </span>
+      </button>
+      <div class="c-info__detail collapse show" id="collapseInfoNir78">
+          <p>
+              Vous pouvez poursuivre la démarche en renseignant un numéro technique temporaire (NTT).
+          </p>
+          <p class="mt-0">
+              Ce numéro peut être généré par votre logiciel de paie ou créé manuellement.
+              <a class="has-external-link" href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" rel="noopener" target="_blank">
+                  En savoir plus
+              </a>
+              .
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestCreateEmployeeRecordStep1.test_no_nir_with_lack_of_nir_reason[info_box_no_nir]
+  '''
+  <div class="c-info">
+      <button aria-controls="collapseInfoNoNir" aria-expanded="true" class="c-info__summary" data-bs-target="#collapseInfoNoNir" data-bs-toggle="collapse" type="button">
+          <span>
+              Le candidat n’a pas de numéro de sécurité sociale (NIR) ?
+          </span>
+      </button>
+      <div class="c-info__detail collapse show" id="collapseInfoNoNir">
+          <p>
+              Vous pouvez quand même continuer en renseignant :
+          </p>
+          <ul class="mt-0">
+              <li>
+                  un numéro d’immatriculation d’attente (NIA);
+              </li>
+              <li>
+                  ou un numéro technique temporaire (NTT) en cochant la case ci-dessus.
+                                          Celui-ci peut être généré par votre logiciel de paie ou créé manuellement.
+                  <a class="has-external-link" href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" rel="noopener" target="_blank">
+                      En savoir plus
+                  </a>
+                  .
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestCreateEmployeeRecordStep2.test_job_seeker_address_geolocated
   '''
   <form action="/employee_record/create_step_2/[PK of JobApplication]" method="post">

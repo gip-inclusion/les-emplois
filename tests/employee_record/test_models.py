@@ -27,6 +27,7 @@ from itou.employee_record.models import (
 )
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.users.enums import Title
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -837,3 +838,43 @@ def test_employee_record_ntt_constraint(subtests):
                 with context:
                     employee_record.ntt = ntt
                     employee_record.save()
+
+
+def test_has_valid_data_filled():
+    employee_record = EmployeeRecordFactory.build(
+        job_application__job_seeker__jobseeker_profile__with_hexa_address=True,
+        job_application__job_seeker__jobseeker_profile__with_education_level=True,
+        job_application__job_seeker__jobseeker_profile__with_classic_nir=True,
+        job_application__job_seeker__born_in_france=True,
+    )
+    assert employee_record.has_valid_data_filled() is True
+
+    profile = employee_record.job_application.job_seeker.jobseeker_profile
+
+    # Empty hexa address
+    old_hexa_commune = profile.hexa_commune
+    profile.hexa_commune = None
+    assert employee_record.has_valid_data_filled() is False
+    profile.hexa_commune = old_hexa_commune
+
+    # Empty education level
+    old_education_level = profile.education_level
+    profile.education_level = None
+    assert employee_record.has_valid_data_filled() is False
+    profile.education_level = old_education_level
+
+    # Empty NIR
+    old_nir = profile.nir
+    profile.nir = None
+    assert employee_record.has_valid_data_filled() is False
+    profile.nir = old_nir
+
+    # NIR starting with 7 or 8
+    gender = "7" if employee_record.job_application.job_seeker.title == Title.M else "8"
+    new_nir = gender + old_nir[1:-2]
+    profile.nir = f"{new_nir}{str(97 - int(new_nir) % 97).zfill(2)}"
+    assert employee_record.has_valid_data_filled() is False
+
+    # OK with a NTT
+    employee_record.ntt = "11234567890"
+    assert employee_record.has_valid_data_filled() is True
