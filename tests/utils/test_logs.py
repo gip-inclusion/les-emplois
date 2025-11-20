@@ -31,26 +31,6 @@ def test_log_current_organization(client):
     assert f'"usr.organization_id": {membership.company_id}' in captured.getvalue()
 
 
-def test_log_current_command(client):
-    root_logger = logging.getLogger()
-    stream_handler = root_logger.handlers[0]
-    captured = io.StringIO()
-    assert isinstance(stream_handler, logging.StreamHandler)
-    # caplog cannot be used since the command infos are written by the log formatter
-    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
-    with patch.object(stream_handler, "stream", captured):
-        management.call_command(
-            # This could have been any other command inheriting from LoggedCommandMixin
-            "delete_old_emails"
-        )
-    # Check that the organization_id is properly logged to stdout
-    lines = captured.getvalue().splitlines()
-    log = json.loads(lines[0])
-    assert log["command.name"] == "itou.emails.management.commands.delete_old_emails"
-    assert "command.run_uid" in log
-    assert uuid.UUID(log["command.run_uid"])
-
-
 def test_log_hijack_infos(client):
     LOG_KEY = "usr.hijack_history"
     dashboard_url = reverse("dashboard:index")

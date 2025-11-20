@@ -445,6 +445,7 @@ django==5.2.9 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
+    #   itoutils
     #   slippers
 django-allauth==65.13.1 \
     --hash=sha256:2887294beedfd108b4b52ebd182e0ed373deaeb927fc5a22f77bbde3174704a6 \
@@ -475,7 +476,9 @@ django-csp==4.0 \
 django-datadog-logger==0.7.3 \
     --hash=sha256:4361bb068a4b188fa14135398f9b747728464a291757e6adf8c95c9215dcd602 \
     --hash=sha256:87838cd868f407e050831c536413de6b2ece31433b28c952c0fd90be1d66486a
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   itoutils
 django-debug-toolbar==6.1.0 \
     --hash=sha256:e214dea4494087e7cebdcea84223819c5eb97f9de3110a3665ad673f0ba98413 \
     --hash=sha256:e962ec350c9be8bdba918138e975a9cdb193f60ec396af2bb71b769e8e165519
@@ -775,6 +778,10 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
+itoutils[django]==25.12.4.0 \
+    --hash=sha256:30ed33741d0f33255a7c30ec5a2f4973580b41067ac0dda89fd17969b446d20f \
+    --hash=sha256:a69aa3158e752ad12e3ea7df8f600eb69167145739bf2f923659fb789c5103b3
+    # via -r requirements/test.txt
 jedi==0.19.2 \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
     --hash=sha256:a8ef22bde8490f57fe5c7681a3c83cb58874daf72b4784de3cce5b6ef6edb5b9
@@ -1261,6 +1268,7 @@ psycopg[binary]==3.2.12 \
     # via
     #   -r requirements/test.txt
     #   django-citext
+    #   itoutils
 psycopg-binary==3.2.12 \
     --hash=sha256:095ccda59042a1239ac2fefe693a336cb5cecf8944a8d9e98b07f07e94e2b78d \
     --hash=sha256:0afb71a99871a41dd677d207c6a988d978edde5d6a018bafaed4f9da45357055 \
