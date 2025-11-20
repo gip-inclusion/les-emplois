@@ -2,9 +2,10 @@ from datetime import timedelta
 
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.users.models import NirModificationRequest
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

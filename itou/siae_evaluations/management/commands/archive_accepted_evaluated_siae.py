@@ -2,11 +2,12 @@ from datetime import timedelta
 
 from django.db.models import Count
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
 from itou.siae_evaluations.enums import EvaluatedSiaeFinalState
 from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 DELAY = timedelta(days=60)

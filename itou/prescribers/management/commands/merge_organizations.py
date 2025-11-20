@@ -1,13 +1,15 @@
 import argparse
 import logging
 
+from itoutils.django.commands import dry_runnable
+
 from itou.approvals import models as approvals_models
 from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.prescribers import models as prescribers_models
 from itou.users import models as users_models
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,10 @@
 import argparse
 
 from django.db import transaction
+from itoutils.django.commands import dry_runnable
 
 from itou.companies import models as companies_models, transfer
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 HELP_TEXT = """

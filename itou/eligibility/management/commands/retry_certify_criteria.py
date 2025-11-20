@@ -1,5 +1,6 @@
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import GEIQSelectedAdministrativeCriteria, SelectedAdministrativeCriteria
@@ -7,7 +8,7 @@ from itou.eligibility.tasks import API_PARTICULIER_RETRY_DURATION, async_certify
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.apis import api_particulier
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 from itou.utils.db import or_queries
 
 
