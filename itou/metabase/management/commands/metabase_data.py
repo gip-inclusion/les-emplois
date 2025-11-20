@@ -7,11 +7,12 @@ from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from itoutils.django.commands import dry_runnable
 
 from itou.metabase.models import DatumKey
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis.metabase import DEPARTMENT_FILTER_KEY, REGION_FILTER_KEY, Client
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):

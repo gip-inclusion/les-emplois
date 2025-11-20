@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
 from itou.archive.constants import GRACE_PERIOD
@@ -17,7 +18,7 @@ from itou.prescribers.models import PrescriberMembership
 from itou.users.models import User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.admin import add_support_remark_to_obj
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 BATCH_SIZE = 200

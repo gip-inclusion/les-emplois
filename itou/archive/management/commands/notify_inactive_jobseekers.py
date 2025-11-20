@@ -1,11 +1,12 @@
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
 from itou.archive.constants import GRACE_PERIOD, INACTIVITY_PERIOD
 from itou.archive.utils import inactive_jobseekers_without_recent_related_objects
 from itou.users.models import User
 from itou.users.notifications import InactiveUser
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 BATCH_SIZE = 200

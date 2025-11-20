@@ -1,12 +1,13 @@
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import CancelledApproval
 from itou.archive.constants import EXPIRATION_PERIOD
 from itou.archive.models import AnonymizedCancelledApproval
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 def anonymized_cancelled_approval(obj):

@@ -2,12 +2,13 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 from sentry_sdk.crons import monitor
 
 from itou.archive.tasks import async_delete_contact
 from itou.users.models import User
 from itou.utils.brevo import BrevoClient
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 def modified_before(contact, cutoff_date):

@@ -10,6 +10,7 @@ import tenacity
 from django.db.models import F, Q
 from django.utils import timezone
 from httpx import RequestError
+from itoutils.django.commands import dry_runnable
 
 from itou.users.enums import IdentityCertificationAuthorities, UserKind
 from itou.users.models import IdentityCertification, JobSeekerProfile, User
@@ -19,7 +20,7 @@ from itou.utils.apis.pole_emploi import (
     PoleEmploiRateLimitException,
     pole_emploi_partenaire_api_client,
 )
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 RETRY_DELAY = datetime.timedelta(days=7)
