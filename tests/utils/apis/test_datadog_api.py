@@ -1,5 +1,5 @@
+import httpx
 import pytest
-import tenacity
 from freezegun import freeze_time
 
 from itou.utils.apis.datadog import DatadogApiClient, DatadogBadResponseException
@@ -114,5 +114,5 @@ def test_datadog_exceptions(settings, respx_mock, mocker, caplog):
         },
     )
     client = DatadogApiClient()
-    with pytest.raises(tenacity.RetryError):
+    with pytest.raises(httpx.HTTPStatusError, match="429 Too Many Requests"):
         client.count_daily_unique_users()
