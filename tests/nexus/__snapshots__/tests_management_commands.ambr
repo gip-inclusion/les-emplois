@@ -10,8 +10,6 @@
           'Command.populate_users[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -20,8 +18,6 @@
           'populate_table[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.populate_users[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -84,8 +80,6 @@
           'Command.populate_memberships[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -108,8 +102,6 @@
           'Command.populate_memberships[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -131,8 +123,6 @@
           'populate_table[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.populate_structures[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -186,8 +176,6 @@
           'populate_table[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.populate_structures[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
