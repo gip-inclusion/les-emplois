@@ -1,6 +1,4 @@
-import io
 import logging
-from unittest.mock import patch
 
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
@@ -11,34 +9,22 @@ from tests.users.factories import (
 )
 
 
-def test_log_current_organization(client):
+def test_log_current_organization(capture_stream_handler_log, client):
     membership = CompanyMembershipFactory()
     client.force_login(membership.user)
-    root_logger = logging.getLogger()
-    stream_handler = root_logger.handlers[0]
-    captured = io.StringIO()
-    assert isinstance(stream_handler, logging.StreamHandler)
-    # caplog cannot be used since the organization_id is written by the log formatter
-    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
-    with patch.object(stream_handler, "stream", captured):
+    with capture_stream_handler_log(logging.getLogger()) as captured:
         response = client.get(reverse("dashboard:index"))
     assert response.status_code == 200
     # Check that the organization_id is properly logged to stdout
     assert f'"usr.organization_id": {membership.company_id}' in captured.getvalue()
 
 
-def test_log_hijack_infos(client):
+def test_log_hijack_infos(capture_stream_handler_log, client):
     LOG_KEY = "usr.hijack_history"
     dashboard_url = reverse("dashboard:index")
     membership = CompanyMembershipFactory()
     client.force_login(membership.user)
-    root_logger = logging.getLogger()
-    stream_handler = root_logger.handlers[0]
-    captured = io.StringIO()
-    assert isinstance(stream_handler, logging.StreamHandler)
-    # caplog cannot be used since the organization_id is written by the log formatter
-    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
-    with patch.object(stream_handler, "stream", captured):
+    with capture_stream_handler_log(logging.getLogger()) as captured:
         response = client.get(dashboard_url)
     assert response.status_code == 200
     # Check that the hijack info is not there
@@ -49,10 +35,7 @@ def test_log_hijack_infos(client):
     client.force_login(hijacker)
     response = client.post(reverse("hijack:acquire"), {"user_pk": membership.user.pk, "next": dashboard_url})
     assertRedirects(response, dashboard_url, fetch_redirect_response=False)
-    captured = io.StringIO()
-    # caplog cannot be used since the organization_id is written by the log formatter
-    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
-    with patch.object(stream_handler, "stream", captured):
+    with capture_stream_handler_log(logging.getLogger()) as captured:
         response = client.get(dashboard_url)
     assert response.status_code == 200
     # Check that the hijack info is there
