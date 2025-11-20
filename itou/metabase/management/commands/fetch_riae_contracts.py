@@ -123,6 +123,10 @@ class Command(BaseCommand):
                     # We don't need these contracts since we don't have the corresponding company
                     continue
 
+                if end_date and start_date > end_date:
+                    # There are a few contrats that end before they start: drop them
+                    continue
+
                 if contract := contracts.get(contract_id):
                     contract.start_date = min(start_date, contract.start_date)
                     if end_date and contract.end_date:

@@ -71,6 +71,17 @@ def test_fetch_riae_contracts(mocker, settings):
             "Emplois Candidat ID": 0,
             "Type Contrat": "initial",
         },  # unknown job seeker -> set job_seeker=None
+        {
+            "Contrat Date Embauche": "2023-01-17",
+            "Contrat Date Fin Contrat": None,
+            "Contrat Date Sortie Definitive": "2023-01-01",
+            "Contrat ID Ctr": 5,
+            "Contrat ID Structure": convention.asp_id,
+            "Contrat Mesure Disp Code": "ACI_DC",
+            "Contrat Parent ID": 5,
+            "Emplois Candidat ID": job_seeker.pk,
+            "Type Contrat": "initial",
+        },  # inconsistent dates
     ]
 
     mocker.patch(
