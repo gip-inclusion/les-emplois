@@ -39,13 +39,24 @@ def test_fetch_riae_contracts(mocker, settings):
             "Type Contrat": "initial",
         },  # OK
         {
+            "Contrat Date Embauche": "2023-05-01",
+            "Contrat Date Fin Contrat": "2023-07-31",
+            "Contrat Date Sortie Definitive": "2023-08-30",  # prefer this date when available
+            "Contrat ID Ctr": 2,
+            "Contrat ID Structure": convention.asp_id,
+            "Contrat Mesure Disp Code": "ACI_DC",
+            "Contrat Parent ID": 2,
+            "Emplois Candidat ID": job_seeker.pk,
+            "Type Contrat": "initial",
+        },  # OK
+        {
             "Contrat Date Embauche": "2023-01-01",
             "Contrat Date Fin Contrat": None,
             "Contrat Date Sortie Definitive": "2023-04-30",
-            "Contrat ID Ctr": 2,
+            "Contrat ID Ctr": 3,
             "Contrat ID Structure": convention.asp_id,
             "Contrat Mesure Disp Code": "EI_DC",
-            "Contrat Parent ID": 2,
+            "Contrat Parent ID": 3,
             "Emplois Candidat ID": job_seeker.pk,
             "Type Contrat": "initial",
         },  # not match for convention.asp_id + EI kind -> set company=None
@@ -53,10 +64,10 @@ def test_fetch_riae_contracts(mocker, settings):
             "Contrat Date Embauche": "2023-01-01",
             "Contrat Date Fin Contrat": None,
             "Contrat Date Sortie Definitive": None,
-            "Contrat ID Ctr": 3,
+            "Contrat ID Ctr": 4,
             "Contrat ID Structure": convention.asp_id,
             "Contrat Mesure Disp Code": "ACI_DC",
-            "Contrat Parent ID": 3,
+            "Contrat Parent ID": 4,
             "Emplois Candidat ID": 0,
             "Type Contrat": "initial",
         },  # unknown job seeker -> set job_seeker=None
@@ -80,17 +91,24 @@ def test_fetch_riae_contracts(mocker, settings):
 
     contract_2 = Contract.objects.get(pk=2)
     assert contract_2.job_seeker_id == job_seeker.pk
-    assert contract_2.company_id is None
-    assert contract_2.start_date == datetime.date(2023, 1, 1)
-    assert contract_2.end_date == datetime.date(2023, 4, 30)
+    assert contract_2.company_id == company.pk
+    assert contract_2.start_date == datetime.date(2023, 5, 1)
+    assert contract_2.end_date == datetime.date(2023, 8, 30)
     assert contract_2.details == [mocked_data[2]]
 
     contract_3 = Contract.objects.get(pk=3)
-    assert contract_3.job_seeker_id is None
-    assert contract_3.company_id == company.pk
+    assert contract_3.job_seeker_id == job_seeker.pk
+    assert contract_3.company_id is None
     assert contract_3.start_date == datetime.date(2023, 1, 1)
-    assert contract_3.end_date is None
+    assert contract_3.end_date == datetime.date(2023, 4, 30)
     assert contract_3.details == [mocked_data[3]]
+
+    contract_4 = Contract.objects.get(pk=4)
+    assert contract_4.job_seeker_id is None
+    assert contract_4.company_id == company.pk
+    assert contract_4.start_date == datetime.date(2023, 1, 1)
+    assert contract_4.end_date is None
+    assert contract_4.details == [mocked_data[4]]
 
     # Clean old contracts that were removed from metabase
     mocker.patch(

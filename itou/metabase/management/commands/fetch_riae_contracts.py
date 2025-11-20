@@ -110,9 +110,11 @@ class Command(BaseCommand):
             try:
                 contract_id = contract_data["Contrat Parent ID"]
                 start_date = contract_data["Contrat Date Embauche"]
-                if contract_end := contract_data["Contrat Date Fin Contrat"]:
+                if contract_end := contract_data["Contrat Date Sortie Definitive"]:
+                    # this date is the actual end of the contract, prefer it when available
                     end_date = contract_end
-                elif contract_end := contract_data["Contrat Date Sortie Definitive"]:
+                elif contract_end := contract_data["Contrat Date Fin Contrat"]:
+                    # this date is theoretical
                     end_date = contract_end
                 else:
                     end_date = None
