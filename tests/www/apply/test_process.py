@@ -31,10 +31,7 @@ from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
-from itou.eligibility.models import (
-    AdministrativeCriteria,
-    EligibilityDiagnosis,
-)
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
@@ -153,11 +150,8 @@ class TestProcessViews:
     REFUSAL_REASON_NOT_SHARED_MENTION = (
         "<small>Motif de refus non partagé avec le candidat</small><strong>Autre</strong>"
     )
-    IAE_ELIGIBILITY_NO_CRITERIA_MENTION = "Le prescripteur habilité n’a pas renseigné de critères."
-    IAE_ELIGIBILITY_WITH_CRITERIA_MENTION = (
-        "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic "
-        "ayant permis la délivrance d’un PASS IAE"
-    )
+    IAE_ELIGIBILITY_NO_CRITERIA_MENTION = '<i class="text-disabled">Non renseigné</i>'
+    IAE_ELIGIBILITY_WITH_CRITERIA_MENTION = "<ul><li>"
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
@@ -223,8 +217,8 @@ class TestProcessViews:
         )
         assert_previous_step(response, back_url)  # Back_url is restored from session
 
-        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         job_application.job_seeker.jobseeker_profile.save()
@@ -306,8 +300,8 @@ class TestProcessViews:
         )
         assert_previous_step(response, back_url, back_to_list=True)  # Back_url is restored from session
 
-        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-        assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+        assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
         job_application.job_seeker.jobseeker_profile.save()
@@ -352,8 +346,8 @@ class TestProcessViews:
                 response = client.get(url)
                 # Check if approval is displayed
                 assertion(response, "Numéro de PASS IAE")
-                assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-                assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+                assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+                assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
 
     def test_details_for_company_certified_criteria_after_expiration(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -530,8 +524,8 @@ class TestProcessViews:
         assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
         assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
 
         # Has link to job description with back_url set
@@ -582,8 +576,8 @@ class TestProcessViews:
             )
         )
         assertContains(response, CERTIFIED_BADGE_HTML, html=True, count=1)
-        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-        assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+        assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
 
     def test_details_for_prescriber_certifiable_criteria(self, client):
         certifiable_crit = IAESelectedAdministrativeCriteriaFactory(
@@ -720,8 +714,8 @@ class TestProcessViews:
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
 
-        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
+        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION, html=True)
+        assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION, html=True)
 
     def test_details_for_job_seeker_when_sender_left_org(self, client):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
