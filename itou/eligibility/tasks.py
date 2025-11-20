@@ -1,3 +1,4 @@
+import datetime
 import logging
 from json import JSONDecodeError
 
@@ -96,8 +97,14 @@ def certify_criterion_with_api_particulier(criterion):
             )
 
 
-# Retry every 10 minutes for 24h.
-@on_commit_task(retries=24 * 6, retry_delay=10 * 60)
+# Retry for a long time, since the API particulier can only tell whether a job
+# seeker benefits from a subsidy **on the day we call it**.
+API_PARTICULIER_RETRY_DURATION = datetime.timedelta(days=1)
+API_PARTICULIER_RETRY_DELAY = datetime.timedelta(minutes=10)
+API_PARTICULIER_RETRY_COUNT = API_PARTICULIER_RETRY_DURATION / API_PARTICULIER_RETRY_DURATION
+
+
+@on_commit_task(retries=API_PARTICULIER_RETRY_COUNT, retry_delay=API_PARTICULIER_RETRY_DURATION.total_seconds)
 def async_certify_criterion_with_api_particulier(model_name, selected_administrative_criteria_id):
     model = apps.get_model("eligibility", model_name)
     with transaction.atomic():
