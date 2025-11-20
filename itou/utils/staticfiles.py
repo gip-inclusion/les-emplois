@@ -64,11 +64,11 @@ ASSET_INFOS = {
     },
     "bootstrap": {
         "download": {
-            "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.3.zip",
-            "sha256": "55d7f1ce795040afb8311df09d29d0d34648400c1eaabb2d0a2ed2216b3db05d",
+            "url": "https://github.com/twbs/bootstrap/archive/refs/tags/v5.3.8.zip",
+            "sha256": "4f36c463a1079debab6b5e43e09e14253d3aa896939967b3e9f9098edc39e448",
         },
         "extract": {
-            "origin": "bootstrap-5.3.3/dist/js",
+            "origin": "bootstrap-5.3.8/dist/js",
             "destination": "vendor/bootstrap",
             "files": [
                 "bootstrap.min.js",
