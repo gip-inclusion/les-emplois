@@ -1,7 +1,8 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Exists, OuterRef
+from itoutils.django.commands import dry_runnable
 
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
 
 
