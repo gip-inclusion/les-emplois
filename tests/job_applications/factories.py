@@ -42,8 +42,19 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         skip_postgeneration_save = True
 
     class Params:
+        # IAE
+        with_iae_eligibility_diagnosis = factory.Trait(
+            eligibility_diagnosis=factory.SubFactory(
+                IAEEligibilityDiagnosisFactory,
+                from_prescriber=True,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+                author=factory.SelfAttribute("..sender"),
+            ),
+            to_company__subject_to_iae_rules=True,
+        )
         with_approval = factory.Trait(
             state=JobApplicationState.ACCEPTED,
+            with_iae_eligibility_diagnosis=True,
             approval=factory.SubFactory(
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
@@ -54,7 +65,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
         # GEIQ diagnosis created by a GEIQ
         with_geiq_eligibility_diagnosis = factory.Trait(
-            to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            to_company__kind=CompanyKind.GEIQ,
             sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
@@ -63,11 +74,10 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 author_kind=AuthorKind.GEIQ,
                 author_geiq=factory.SelfAttribute("..to_company"),
             ),
-            eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
             sent_by_authorized_prescriber_organisation=True,
-            to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            to_company__kind=CompanyKind.GEIQ,
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
@@ -77,7 +87,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                     PrescriberOrganizationFactory, authorized=True, with_membership=True
                 ),
             ),
-            eligibility_diagnosis=None,
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(
@@ -115,7 +124,12 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    to_company = factory.SubFactory(CompanyFactory, with_membership=True)
+    to_company = factory.SubFactory(
+        CompanyFactory,
+        with_membership=True,
+        not_subject_to_iae_rules=True,
+        # A siae job app requires an diagnosis to be accepted, let us use a Trait when necessary
+    )
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
@@ -123,12 +137,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     resume = factory.SubFactory(FileFactory)
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
-    eligibility_diagnosis = factory.SubFactory(
-        IAEEligibilityDiagnosisFactory,
-        from_prescriber=True,
-        job_seeker=factory.SelfAttribute("..job_seeker"),
-        author=factory.SelfAttribute("..sender"),
-    )
     processed_at = factory.LazyAttribute(
         lambda o: datetime.now(UTC)
         if str(o.state) in models.JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES

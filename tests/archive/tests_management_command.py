@@ -1157,6 +1157,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
             created_at=timezone.now() - INACTIVITY_PERIOD,
+            with_iae_eligibility_diagnosis=True,
             eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
         )
         ApprovalFactory(
@@ -1509,7 +1510,10 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         prescriber = membership.user
         # The related object prevents deletion.
-        job_application = JobApplicationFactory(sender=prescriber)
+        job_application = JobApplicationFactory(
+            sender=prescriber,
+            with_iae_eligibility_diagnosis=True,
+        )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages
