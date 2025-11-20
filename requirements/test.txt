@@ -420,6 +420,7 @@ django==5.2.9 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
+    #   itoutils
     #   slippers
 django-allauth==65.13.1 \
     --hash=sha256:2887294beedfd108b4b52ebd182e0ed373deaeb927fc5a22f77bbde3174704a6 \
@@ -450,7 +451,9 @@ django-csp==4.0 \
 django-datadog-logger==0.7.3 \
     --hash=sha256:4361bb068a4b188fa14135398f9b747728464a291757e6adf8c95c9215dcd602 \
     --hash=sha256:87838cd868f407e050831c536413de6b2ece31433b28c952c0fd90be1d66486a
-    # via -r requirements/base.txt
+    # via
+    #   -r requirements/base.txt
+    #   itoutils
 django-filter==25.2 \
     --hash=sha256:760e984a931f4468d096f5541787efb8998c61217b73006163bf2f9523fe8f23 \
     --hash=sha256:9c0f8609057309bba611062fe1b720b4a873652541192d232dd28970383633e3
@@ -715,6 +718,10 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
+itoutils[django]==25.12.4.0 \
+    --hash=sha256:30ed33741d0f33255a7c30ec5a2f4973580b41067ac0dda89fd17969b446d20f \
+    --hash=sha256:a69aa3158e752ad12e3ea7df8f600eb69167145739bf2f923659fb789c5103b3
+    # via -r requirements/base.txt
 jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
     --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
@@ -1162,6 +1169,7 @@ psycopg[binary]==3.2.12 \
     # via
     #   -r requirements/base.txt
     #   django-citext
+    #   itoutils
 psycopg-binary==3.2.12 \
     --hash=sha256:095ccda59042a1239ac2fefe693a336cb5cecf8944a8d9e98b07f07e94e2b78d \
     --hash=sha256:0afb71a99871a41dd677d207c6a988d978edde5d6a018bafaed4f9da45357055 \

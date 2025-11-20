@@ -2,9 +2,7 @@ import logging
 
 import httpx
 from django.conf import settings
-from django_datadog_logger.formatters import datadog
-
-from itou.utils.command import get_current_command_info
+from itoutils.django.logging import DataDogJSONFormatter
 
 
 logger = logging.getLogger(__name__)
@@ -13,15 +11,9 @@ logger = logging.getLogger(__name__)
 NO_RECURSIVE_LOG_FLAG = "_no_recursive_log_flag"
 
 
-class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
-    # We don't want those information in our logs
-    LOG_KEYS_TO_REMOVE = ["usr.name", "usr.email", "usr.session_key"]
-
+class ItouDataDogJSONFormatter(DataDogJSONFormatter):
     def json_record(self, message, extra, record):
         log_entry_dict = super().json_record(message, extra, record)
-        for log_key in self.LOG_KEYS_TO_REMOVE:
-            if log_key in log_entry_dict:
-                del log_entry_dict[log_key]
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
             if current_org := getattr(wsgi_request, "current_organization", None):
@@ -43,10 +35,6 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
             if session := getattr(wsgi_request, "session", None):
                 if hijack_history := session.get("hijack_history", []):
                     log_entry_dict["usr.hijack_history"] = hijack_history
-        if (command_info := get_current_command_info()) is not None:
-            log_entry_dict["command.run_uid"] = command_info.run_uid
-            log_entry_dict["command.name"] = command_info.name
-            log_entry_dict["command.wet_run"] = command_info.wet_run
         return log_entry_dict
 
 
