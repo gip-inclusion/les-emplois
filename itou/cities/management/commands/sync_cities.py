@@ -6,11 +6,12 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.cities.models import City, EditionModeChoices
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.models import JobDescription
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 from itou.utils.sync import DiffItemKind, yield_sync_diff
 
 

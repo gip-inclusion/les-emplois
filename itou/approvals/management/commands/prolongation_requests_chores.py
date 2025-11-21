@@ -3,12 +3,13 @@ from django.core.management.base import CommandError
 from django.db.models import F, Q
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
+from itoutils.django.commands import dry_runnable
 
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
 from itou.approvals.notifications import ProlongationRequestCreatedReminderForPrescriberNotification
 from itou.prescribers.models import PrescriberMembership
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
