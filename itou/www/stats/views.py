@@ -315,6 +315,22 @@ def stats_siae_raw_beneficiaires(request):
     )
 
 
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw_accompagnement(request):
+    return render_stats_siae(
+        request=request,
+        page_title="Données brutes du type d’accompagnement proposé et des freins à lever",
+        filters_param=[mb.ASP_SIAE_FILTER_KEY_FLAVOR3],
+    )
+
+
+@check_request(utils.can_view_stats_siae)
+def stats_siae_raw_orienteur(request):
+    return render_stats_siae(
+        request=request, page_title="Données brutes des candidatures émises/transférées à un autre employeur"
+    )
+
+
 def render_stats_cd(request, page_title, *, extra_context=None, with_department_name=True):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
