@@ -161,7 +161,7 @@ MIDDLEWARE = [
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     "itou.www.middleware.RateLimitMiddleware",
-    "itou.openid_connect.pro_connect.middleware.ProConnectLoginMiddleware",
+    "itou.nexus.middleware.AutoLoginMiddleware",
     "itou.utils.triggers.middleware.fields_history",
     # Final logger
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
