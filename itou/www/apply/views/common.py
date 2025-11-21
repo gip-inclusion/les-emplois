@@ -54,8 +54,7 @@ class CommonUserInfoFormsMixin:
             birth_data_form_class = None
             birth_data_form_kwargs = {
                 "instance": self.job_seeker.jobseeker_profile,
-                # TODO(xfernandez): remove personal_data fallback in a week
-                "initial": session_forms_data.get("birth_data", session_forms_data.get("personal_data", {})),
+                "initial": session_forms_data.get("birth_data", {}),
                 "data": self.request.POST or None,
             }
             if self.job_seeker.jobseeker_profile.birthdate:
@@ -85,8 +84,7 @@ class CommonUserInfoFormsMixin:
         elif self.company.kind == CompanyKind.GEIQ:
             forms["birth_data"] = BirthPlaceWithoutBirthdateModelForm(
                 instance=self.job_seeker.jobseeker_profile,
-                # TODO(xfernandez): remove birth_place fallback in a week
-                initial=session_forms_data.get("birth_data", session_forms_data.get("birth_place", {})),
+                initial=session_forms_data.get("birth_data", {}),
                 birthdate=self.job_seeker.jobseeker_profile.birthdate,
                 data=self.request.POST or None,
             )

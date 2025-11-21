@@ -6310,7 +6310,7 @@ class TestHireContract:
             {
                 "selected_jobs": [],
                 "job_seeker_info_forms_data": {
-                    "personal_data": {
+                    "birth_data": {
                         "birth_place": None,
                         "birth_country": other_country.pk,
                     },
