@@ -5501,6 +5501,29 @@ class TestFillJobSeekerInfosForHire:
             side_effect=mock_get_first_geocoding_data,
         )
 
+    def accept_contract(self, client, company, session_uuid):
+        accept_contract_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
+        response = client.post(
+            accept_contract_url,
+            data={
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+                "confirmed": True,
+            },
+            headers={"hx-request": "true"},
+        )
+        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
+            sender=company.members.first(), to_company=company
+        )
+        assertRedirects(
+            response,
+            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        return job_application
+
     def test_as_company(self, client, snapshot):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
@@ -5609,25 +5632,7 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, NEW_BIRTHDATE)
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
-            sender=company.members.first(), to_company=company
-        )
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, company, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birthdate == NEW_BIRTHDATE
         assert self.job_seeker.jobseeker_profile.birth_place == birth_place
@@ -5714,25 +5719,7 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, f'<option value="{new_country.pk}" selected>')
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile__birth_place").get(
-            sender=company.members.first(), to_company=company
-        )
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, company, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
@@ -5803,26 +5790,7 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, "128 Rue de Grenelle")
 
         # Check that address is saved on job seeker after contract signature
-        post_data = {
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "answer": "",
-            "confirmed": True,
-        }
-        response = client.post(
-            reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        job_application = JobApplication.objects.select_related("job_seeker").get(
-            sender=company.members.first(), to_company=company
-        )
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        job_application = self.accept_contract(client, company, apply_session.name)
         assert job_application.job_seeker.address_line_1 == "128 Rue de Grenelle"
 
     def test_as_company_no_nir(self, client):
@@ -5874,22 +5842,7 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, NEW_NIR)
 
         # Check that the NIR is saved on job seeker after contract signature
-        post_data = {
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "answer": "",
-            "confirmed": True,
-        }
-        response = client.post(accept_contract_infos_url, data=post_data, headers={"hx-request": "true"})
-        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
-            sender=company.members.first(), to_company=company
-        )
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        job_application = self.accept_contract(client, company, session_uuid)
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
@@ -5957,25 +5910,7 @@ class TestFillJobSeekerInfosForHire:
             assertContains(response, NEW_POLE_EMPLOI_ID)
 
         # Check that pole_emploi_id is saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
-            sender=company.members.first(), to_company=company
-        )
-        assertRedirects(
-            response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, company, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         if not with_lack_of_pole_emploi_id_reason:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == NEW_POLE_EMPLOI_ID

@@ -3766,6 +3766,24 @@ class TestFillJobSeekerInfosForAccept:
             side_effect=mock_get_first_geocoding_data,
         )
 
+    def accept_contract(self, client, job_application, session_uuid):
+        response = client.post(
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+            data={
+                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                "hiring_end_at": "",
+                "answer": "",
+                "confirmed": True,
+            },
+            headers={"hx-request": "true"},
+        )
+        assertRedirects(
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+
     def test_as_iae_company(self, client, snapshot):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
@@ -3875,6 +3893,13 @@ class TestFillJobSeekerInfosForAccept:
         # If you come back to the view, it is pre-filled with session data
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "128 Rue de Grenelle")
+
+        # Check that address infos are saved (if modified) after filling contract info step
+        self.accept_contract(client, job_application, session_uuid)
+        self.job_seeker.refresh_from_db()
+        assert self.job_seeker.address_line_1 == "128 Rue de Grenelle"
+        assert self.job_seeker.post_code == "67118"
+        assert self.job_seeker.city == "Geispolsheim"
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_as_iae_company_no_birthdate(self, client, birth_country):
@@ -3989,22 +4014,7 @@ class TestFillJobSeekerInfosForAccept:
         assertContains(response, NEW_BIRTHDATE)
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, job_application, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birthdate == NEW_BIRTHDATE
         assert self.job_seeker.jobseeker_profile.birth_place == birth_place
@@ -4110,22 +4120,7 @@ class TestFillJobSeekerInfosForAccept:
         assertContains(response, f'<option value="{new_country.pk}" selected>')
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, job_application, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
@@ -4210,22 +4205,7 @@ class TestFillJobSeekerInfosForAccept:
         assertContains(response, NEW_NIR)
 
         # Check that nir is saved after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, job_application, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.nir == NEW_NIR
 
@@ -4312,22 +4292,7 @@ class TestFillJobSeekerInfosForAccept:
             assertContains(response, NEW_POLE_EMPLOI_ID)
 
         # Check that pole_emploi_id is saved (if modified) after filling contract info step
-        response = client.post(
-            accept_contract_infos_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        self.accept_contract(client, job_application, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         if not with_lack_of_pole_emploi_id_reason:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == NEW_POLE_EMPLOI_ID
