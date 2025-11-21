@@ -459,9 +459,9 @@ django-appconf==1.2.0 \
     # via
     #   -r requirements/test.txt
     #   django-select2
-django-bootstrap5==25.2 \
-    --hash=sha256:9418969fa5932729dc1addb1b70f13c9312a522b15033219ac3cbc5728eb8937 \
-    --hash=sha256:abcfcd543efc19aaab4456a12b566507f684cfda98effc5dd3ad5167ba05c7b3
+django-bootstrap5==25.3 \
+    --hash=sha256:3d381a5329a1439ac3237456c28cc8170c62b4c56ad3564d57876ffc3d4c5e78 \
+    --hash=sha256:cc36f1a19d3200c0f5628c703320edb5c4e39e19bf17607fadf58ddb11828912
     # via -r requirements/test.txt
 django-citext==1.0.2 \
     --hash=sha256:375a2d6a06133ad9e375f0db62d4d606fa43428de14751d03856b9c702c0000f \
