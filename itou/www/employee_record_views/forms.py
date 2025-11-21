@@ -249,6 +249,8 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
         super()._post_clean()
         if self.instance.jobseeker_profile.nir and self.instance.jobseeker_profile.lack_of_nir_reason:
             self.instance.jobseeker_profile.lack_of_nir_reason = ""
+        # TODO: vérifier les erreurs présentes pour __all__ et si "Ce numéro de sécurité sociale est déjà associé
+        # à un autre utilisateur." (utiliser le message de la contrainte) -> rajouter le HTML
 
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
