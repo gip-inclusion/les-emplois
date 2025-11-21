@@ -17,11 +17,14 @@ urlpatterns = [
     path("siae/auto_prescription", views.stats_siae_auto_prescription, name="stats_siae_auto_prescription"),
     path("siae/beneficiaries", views.stats_siae_beneficiaries, name="stats_siae_beneficiaries"),
     path("siae/raw", views.stats_siae_raw, name="stats_siae_raw"),
+    # The 'siae/raw' URLs below are not published on the website but are directly linked in a metabase dashboard
     path("siae/raw_hiring", views.stats_siae_raw_hiring, name="stats_siae_raw_hiring"),
     path(
         "siae/raw_auto_prescription", views.stats_siae_raw_auto_prescription, name="stats_siae_raw_auto_prescription"
     ),
     path("siae/raw_beneficiaires", views.stats_siae_raw_beneficiaires, name="stats_siae_raw_beneficiaires"),
+    path("siae/raw_accompagnement", views.stats_siae_raw_accompagnement, name="stats_siae_raw_accompagnements"),
+    path("siae/raw_orienteur", views.stats_siae_raw_orienteur, name="stats_siae_raw_orienteur"),
     # Prescriber stats - CD.
     path("cd/iae", views.stats_cd_iae, name="stats_cd_iae"),
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),

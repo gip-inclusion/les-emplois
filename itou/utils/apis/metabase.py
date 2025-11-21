@@ -69,6 +69,12 @@ METABASE_DASHBOARDS = {
     "stats_siae_raw_beneficiaires": {
         "dashboard_id": 648,
     },
+    "stats_siae_raw_accompagnements": {
+        "dashboard_id": 663,
+    },
+    "stats_siae_raw_orienteur": {
+        "dashboard_id": 664,
+    },
     #
     # Prescriber stats - CD.
     #
