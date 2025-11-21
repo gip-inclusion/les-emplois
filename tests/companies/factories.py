@@ -125,6 +125,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             )
         )
         for_snapshot = factory.Trait(
+            kind=CompanyKind.EI,
             name="ACME Inc.",
             address_line_1="112 rue de la Croix-Nivert",
             post_code="75015",
@@ -155,8 +156,17 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     post_code = factory.LazyFunction(create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
     source = models.Company.SOURCE_ASP
-    convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
+
+    @factory.post_generation
+    def with_convention(self, create, extracted, **kwargs):
+        if create is False or extracted is False:
+            return
+
+        if self.is_subject_to_iae_rules:
+            kwargs.setdefault("kind", self.kind)
+            self.convention = extracted or SiaeConventionFactory(**kwargs)
+            self.save(update_fields=["convention", "updated_at"])
 
 
 class CompanyMembershipFactory(factory.django.DjangoModelFactory):

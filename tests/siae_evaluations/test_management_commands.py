@@ -6,6 +6,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.companies.enums import CompanyKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.management.commands.archive_accepted_evaluated_siae import DELAY
 from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedSiae
@@ -63,7 +64,8 @@ class TestManagementCommand:
         evaluated_company_1 = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign1,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="00000000000032",
         )
         campaign2 = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(days=30),
@@ -76,10 +78,14 @@ class TestManagementCommand:
         evaluated_company_2 = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign2,
             siae__name="Bazar antique",
-            siae__convention__siret_signature="12345678900012",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="12345678900012",
         )
         evaluated_siae3 = EvaluatedSiaeFactory.create(
-            evaluation_campaign=campaign2, siae__name="Trucs muche", siae__convention__siret_signature="12345678900024"
+            evaluation_campaign=campaign2,
+            siae__name="Trucs muche",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="12345678900024",
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
@@ -152,7 +158,8 @@ class TestManagementCommand:
         evaluated_siae = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="00000000000032",
         )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
@@ -190,7 +197,8 @@ class TestManagementCommand:
         EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="00000000000032",
             reminder_sent_at=timezone.now() - relativedelta(days=1),
         )
         with django_capture_on_commit_callbacks(execute=True):
@@ -273,14 +281,16 @@ class TestManagementCommand:
         evaluated_siae_no_proof = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="00000000000032",
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_proof)
 
         evaluated_siae_not_submitted = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="trier pour la planète",
-            siae__convention__siret_signature="12345678900012",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="12345678900012",
         )
         evaluated_job_app_not_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_not_submitted)
         EvaluatedAdministrativeCriteriaFactory(
@@ -353,7 +363,8 @@ class TestManagementCommand:
         evaluated_siae_no_answer = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="00000000000032",
             reviewed_at=adversarial_phase_start,
             # Reminder before adversarial phase.
             reminder_sent_at=adversarial_phase_start - relativedelta(days=30),
@@ -363,7 +374,8 @@ class TestManagementCommand:
         evaluated_siae_reviewed_quickly = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="trier pour la planète",
-            siae__convention__siret_signature="12345678900012",
+            siae__kind=CompanyKind.EI,
+            siae__with_convention__siret_signature="12345678900012",
             reviewed_at=timezone.now() - relativedelta(weeks=9),
         )
         job_app_reviewed_quickly = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_reviewed_quickly)
@@ -378,7 +390,7 @@ class TestManagementCommand:
         evaluated_siae_resubmitted = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="ultim’emploi",
-            siae__convention__siret_signature="11111111100011",
+            siae__with_convention__siret_signature="11111111100011",
             reviewed_at=timezone.now() - relativedelta(weeks=9),
         )
         job_app_resubmitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_resubmitted)
@@ -450,7 +462,7 @@ class TestManagementCommand:
         evaluated_siae_no_answer = EvaluatedSiaeFactory.create(
             evaluation_campaign=campaign,
             siae__name="les petits jardins",
-            siae__convention__siret_signature="00000000000032",
+            siae__with_convention__siret_signature="00000000000032",
             reviewed_at=adversarial_phase_start,
             reminder_sent_at=adversarial_phase_start + relativedelta(days=30),
         )

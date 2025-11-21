@@ -474,7 +474,7 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
     antenna = CompanyFactory(
         kind=CompanyKind.ACI,
         department=factory.fuzzy.FuzzyChoice([31, 84]),
-        convention=company.convention,
+        with_convention=company.convention,
         source=Company.SOURCE_USER_CREATED,
     )
     assert get_params_aci_asp_ids_for_department(antenna.department) == {"id_asp_de_la_siae": []}

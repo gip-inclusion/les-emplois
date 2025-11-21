@@ -26,7 +26,7 @@ class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
         sender=None,
         eligibility_diagnosis=None,
         to_company__with_membership=False,
-        to_company__convention=None,
+        to_company__with_convention=False,
     )
     asp_id = factory.Faker("pyint")
     approval_number = factory.Faker("pystr_format", string_format="#" * 12)

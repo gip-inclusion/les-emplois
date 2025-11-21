@@ -26,7 +26,12 @@ class TestCanCreateSiaeAntenna:
         assert can_create_antenna(request) is admin
 
     def test_siae_admin_without_convention_cannot_create_antenna(self):
-        company = CompanyFactory(with_membership=True, membership__is_admin=True, convention=None)
+        company = CompanyFactory(
+            with_membership=True,
+            membership__is_admin=True,
+            subject_to_iae_rules=True,
+            with_convention=False,
+        )
         user = company.members.get()
         request = run_perms_middleware(user)
         assert can_create_antenna(request) is False

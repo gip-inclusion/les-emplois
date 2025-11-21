@@ -211,21 +211,23 @@ class TestCompanyModel:
         assert reverse("signup:company_select") in email.body
 
     def test_deactivation_queryset_methods(self):
-        company = CompanyFactory()
+        company = CompanyFactory(
+            subject_to_iae_rules=True,
+        )
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 1
         assert Company.objects.active_or_in_grace_period().count() == 1
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyFactory(convention__pending_grace_period=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_convention__pending_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 1
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyFactory(convention__after_grace_period=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_convention__after_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 0
@@ -333,7 +335,10 @@ class TestCompanyModel:
     def test_siret_from_asp_source(self):
         company = CompanyFactory(with_membership=True, source=Company.SOURCE_ASP)
         antenna = CompanyFactory(
-            with_membership=True, convention=company.convention, source=Company.SOURCE_USER_CREATED
+            with_membership=True,
+            subject_to_iae_rules=True,
+            with_convention=company.convention,
+            source=Company.SOURCE_USER_CREATED,
         )
 
         assert company.siret != antenna.siret
@@ -506,7 +511,7 @@ class TestJobDescriptionQuerySet:
 
     def test_is_active(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        company = CompanyFactory(kind=CompanyKind.EI, convention=None)
+        company = CompanyFactory(kind=CompanyKind.EI, with_convention=False)
         job = JobDescriptionFactory(company=company, is_active=False)
         assert JobDescription.objects.active().count() == 0
         job.is_active = True

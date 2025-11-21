@@ -689,7 +689,9 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
-        user = CompanyMembershipFactory(company__convention__is_active=False).user
+        user = CompanyMembershipFactory(
+            company__subject_to_iae_rules=True, company__with_convention__is_active=False
+        ).user
         invitation = EmployerInvitationFactory(email=user.email)
         client.force_login(user)
         response = client.get(invitation.acceptance_link, follow=True)
@@ -698,7 +700,7 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         assert user.company_set.count() == 2
 
     def test_inactive_siae(self, client):
-        company = CompanyFactory(convention__is_active=False, with_membership=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_convention__is_active=False, with_membership=True)
         invitation = EmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         client.force_login(user)
