@@ -910,6 +910,58 @@ class EvaluatedAdministrativeCriteria(models.Model):
         return self.review_state
 
 
+class EvaluatedJobApplicationSanction(models.Model):
+    evaluated_siae = models.ForeignKey(
+        EvaluatedSiae,
+        on_delete=models.CASCADE,
+        verbose_name="SIAE évaluée",
+        related_name="job_application_sanctions",
+    )
+    evaluated_job_application = models.ForeignKey(
+        EvaluatedJobApplication,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="candidature évaluée",
+        related_name="+",
+    )
+    subsidy_cut_percent = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        verbose_name="pourcentage de retrait de l’aide au poste",
+    )
+    subsidy_cut_dates = InclusiveDateRangeField(
+        blank=True,
+        null=True,
+        verbose_name="dates de retrait de l’aide au poste",
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="subsidy_cut_consistency",
+                violation_error_message=(
+                    "Le pourcentage et la date de début de retrait de l’aide au poste doivent être renseignés."
+                ),
+                condition=models.Q(
+                    evaluated_job_application__isnull=True,
+                    subsidy_cut_percent__isnull=True,
+                    subsidy_cut_dates__isnull=True,
+                )
+                | models.Q(
+                    evaluated_job_application__isnull=False,
+                    subsidy_cut_percent__isnull=False,
+                    subsidy_cut_dates__isnull=False,
+                ),
+            ),
+        ]
+        verbose_name = "Sanction par auto-prescription"
+        verbose_name_plural = "Sanctions par auto-prescription"
+
+    def __str__(self):
+        return f"{self.__class__.__name__} pour {self.evaluated_siae}"
+
+
 class Sanctions(models.Model):
     evaluated_siae = models.OneToOneField(
         EvaluatedSiae,
@@ -925,17 +977,6 @@ class Sanctions(models.Model):
         null=True,
         verbose_name="retrait de la capacité d’auto-prescription",
     )
-    subsidy_cut_percent = models.PositiveSmallIntegerField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(1), MaxValueValidator(100)],
-        verbose_name="pourcentage de retrait de l’aide au poste",
-    )
-    subsidy_cut_dates = InclusiveDateRangeField(
-        blank=True,
-        null=True,
-        verbose_name="dates de retrait de l’aide au poste",
-    )
     deactivation_reason = models.TextField(
         blank=True,
         verbose_name="explication du déconventionnement de la structure",
@@ -943,25 +984,10 @@ class Sanctions(models.Model):
     no_sanction_reason = models.TextField(blank=True, verbose_name="explication de l’absence de sanction")
 
     class Meta:
-        constraints = [
-            models.CheckConstraint(
-                name="subsidy_cut_consistency",
-                violation_error_message=(
-                    "Le pourcentage et la date de début de retrait de l’aide au poste doivent être renseignés."
-                ),
-                condition=models.Q(subsidy_cut_percent__isnull=True, subsidy_cut_dates__isnull=True)
-                | models.Q(subsidy_cut_percent__isnull=False, subsidy_cut_dates__isnull=False),
-            ),
-        ]
         verbose_name_plural = "sanctions"
 
     def __str__(self):
         return f"{self.__class__.__name__} pour {self.evaluated_siae}"
 
     def count_active(self):
-        return (
-            bool(self.training_session)
-            + bool(self.suspension_dates)
-            + bool(self.subsidy_cut_dates)
-            + bool(self.deactivation_reason)
-        )
+        return bool(self.training_session) + bool(self.suspension_dates) + bool(self.deactivation_reason)

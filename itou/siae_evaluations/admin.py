@@ -338,10 +338,39 @@ class SanctionsAdmin(ItouModelAdmin):
         "evaluated_siae",
         "training_session",
         "suspension_dates",
-        "subsidy_cut_percent",
-        "subsidy_cut_dates",
         "deactivation_reason",
         "no_sanction_reason",
+    ]
+    list_filter = ("evaluated_siae__evaluation_campaign__name",)
+
+    @admin.display(description="campagne", ordering="evaluated_siae__evaluation_campaign")
+    def evaluation_campaign(self, obj):
+        return obj.evaluated_siae.evaluation_campaign.name
+
+    @admin.display(description="institution", ordering="evaluated_siae__evaluation_campaign__institution")
+    def institution(self, obj):
+        return obj.evaluated_siae.evaluation_campaign.institution
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(models.EvaluatedJobApplicationSanction)
+class EvaluatedJobApplicationSanctionAdmin(ItouModelAdmin):
+    list_display = [
+        "evaluated_siae",
+        "evaluated_job_application",
+        "evaluation_campaign",
+        "institution",
+    ]
+    # fixme: to improve
+    list_select_related = ["evaluated_siae__evaluation_campaign__institution", "evaluated_siae__siae"]
+    search_fields = ["evaluated_siae__siae__name"]
+    readonly_fields = [
+        "evaluated_siae",
+        "evaluated_job_application",
+        "subsidy_cut_percent",
+        "subsidy_cut_dates",
     ]
     list_filter = ("evaluated_siae__evaluation_campaign__name",)
 

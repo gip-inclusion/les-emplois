@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Q
+from django.forms import formset_factory
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
@@ -29,6 +30,8 @@ from itou.www.siae_evaluations_views.forms import (
     AdministrativeCriteriaEvaluationForm,
     InstitutionEvaluatedSiaeNotifyStep1Form,
     InstitutionEvaluatedSiaeNotifyStep2Form,
+    InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm,
+    InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet,
     InstitutionEvaluatedSiaeNotifyStep3Form,
     LaborExplanationForm,
     SetChosenPercentForm,
@@ -197,8 +200,8 @@ def evaluation_campaign_data_context(evaluated_siae):
         .filter(siae=evaluated_siae.siae_id)
         .exclude(pk=evaluated_siae.pk)
         .order_by("-evaluation_campaign__evaluated_period_start_at")
-        .select_related("evaluation_campaign", "sanctions")
-        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+        .select_related("evaluation_campaign")
+        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria", "sanctions")
     )
     return context
 
@@ -286,9 +289,45 @@ class InstitutionEvaluatedSiaeNotifyStep2View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
-class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixin, generic.FormView):
-    form_class = InstitutionEvaluatedSiaeNotifyStep3Form
+class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixin, generic.TemplateView):
     template_name = "siae_evaluations/institution_evaluated_siae_notify_step3.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object = self.get_object()
+
+        sanctions = self.request.session[self.sessionkey]["sanctions"]
+        self.evaluated_job_applications_to_sanction = [
+            job_app
+            for job_app in EvaluatedJobApplication.objects.viewable().filter(evaluated_siae=self.object)
+            if job_app.compute_state()
+            in [
+                evaluation_enums.EvaluatedJobApplicationsState.REFUSED,
+                evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            ]
+        ]
+
+        self.forms = {}
+        self.forms["siae_sanctions_form"] = InstitutionEvaluatedSiaeNotifyStep3Form(
+            data=self.request.POST or None, sanctions=sanctions
+        )
+        job_application_sanction_formset = formset_factory(
+            form=InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm,
+            formset=InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet,
+            extra=0,
+        )
+        self.forms["job_application_sanction_formset"] = job_application_sanction_formset(
+            data=self.request.POST or None,
+            sanctions=sanctions,
+            evaluated_job_applications_to_sanction=self.evaluated_job_applications_to_sanction,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["siae_sanctions_form"] = self.forms["siae_sanctions_form"]
+        context["job_application_sanction_formset"] = self.forms["job_application_sanction_formset"]
+        context["evaluated_job_applications_to_sanction"] = self.evaluated_job_applications_to_sanction
+        return context
 
     def get(self, request, *args, **kwargs):
         if self.sessionkey not in request.session:
@@ -298,7 +337,6 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
                     kwargs={"evaluated_siae_pk": self.kwargs["evaluated_siae_pk"]},
                 )
             )
-        self.object = self.get_object()
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -309,13 +347,10 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
                     kwargs={"evaluated_siae_pk": self.kwargs["evaluated_siae_pk"]},
                 )
             )
-        self.object = self.get_object()
-        return super().post(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["sanctions"] = self.request.session[self.sessionkey]["sanctions"]
-        return kwargs
+        if not all([form.is_valid() for form in self.forms.values()]):
+            context = self.get_context_data(**kwargs)
+            return self.render_to_response(context)
+        return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, form):
         evaluated_siae = self.object
