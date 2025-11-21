@@ -1883,7 +1883,7 @@
   
   '''
 # ---
-# name: TestFillJobSeekerInfosForHire.test_as_company[view queries]
+# name: TestFillJobSeekerInfosForHire.test_no_missing_data_iae[view queries]
   dict({
     'num_queries': 18,
     'queries': list([

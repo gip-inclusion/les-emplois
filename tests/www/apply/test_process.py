@@ -62,7 +62,7 @@ from itou.www.apply.views.process_views import (
 )
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory, SiaeConventionFactory
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
@@ -3354,15 +3354,9 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
-        assertContains(response, self.BIRTH_COUNTRY_LABEL)
-        assertContains(response, self.BIRTH_PLACE_LABEL)
-
-        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         self.fill_contract_info_step(
-            client, job_application, session_uuid, assert_successful=True, with_previous_step=True
+            client, job_application, session_uuid, assert_successful=True, with_previous_step=False
         )
         mocked_request.assert_called_once()
         # certification
@@ -3478,6 +3472,18 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertContains(response, "Valider les informations")
+        assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        assertContains(response, self.BIRTH_PLACE_LABEL)
+
+        birth_place = Commune.objects.by_insee_code_and_period(
+            "07141", job_application.job_seeker.jobseeker_profile.birthdate
+        )
+        post_data = {
+            "birth_country": "",
+            "birth_place": birth_place.pk,
+        }
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
         post_data = self._accept_contract_post_data(job_application=job_application)
@@ -3487,13 +3493,13 @@ class TestProcessAcceptViewsInWizard:
             session_uuid,
             post_data=post_data,
             assert_successful=True,
-            with_previous_step=False,
+            with_previous_step=True,
         )
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
-        assert not jobseeker_profile.birth_country
-        assert not jobseeker_profile.birth_place
+        assert jobseeker_profile.birth_country_id == Country.FRANCE_ID
+        assert jobseeker_profile.birth_place_id == birth_place.id
 
     def test_accept_with_job_seeker_update(self, client):
         diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
@@ -3757,6 +3763,11 @@ class TestFillJobSeekerInfosForAccept:
             with_ban_geoloc_address=True,
             born_in_france=True,
         )
+        self.company = CompanyFactory(with_membership=True, kind=random.choice(list(CompanyKind)))
+        if self.company.is_subject_to_iae_rules:
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        elif self.company.kind == CompanyKind.GEIQ:
+            GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
 
@@ -3767,14 +3778,28 @@ class TestFillJobSeekerInfosForAccept:
         )
 
     def accept_contract(self, client, job_application, session_uuid):
+        post_data = {
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "answer": "",
+            "confirmed": True,
+        }
+        if job_application.to_company.kind == CompanyKind.GEIQ:
+            create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)  # For hired_job field
+            post_data.update(
+                {
+                    "prehiring_guidance_days": 10,
+                    "contract_type": ContractType.APPRENTICESHIP,
+                    "nb_hours_per_week": 10,
+                    "qualification_type": QualificationType.CQP,
+                    "qualification_level": QualificationLevel.LEVEL_4,
+                    "planned_training_hours": 20,
+                    "hired_job": JobDescriptionFactory(company=self.company).pk,
+                }
+            )
         response = client.post(
             reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
+            data=post_data,
             headers={"hx-request": "true"},
         )
         assertRedirects(
@@ -3784,16 +3809,20 @@ class TestFillJobSeekerInfosForAccept:
             fetch_redirect_response=False,
         )
 
-    def test_as_iae_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+    def test_no_missing_data_iae(self, client, snapshot):
+        # Ensure company is SIAE kind since it will trigger an extra query for eligibility diagnosis
+        # changing the SQL queries snapshot
+        if not self.company.is_subject_to_iae_rules:
+            self.company.kind = random.choice(list(CompanyKind.siae_kinds()))
+            self.company.convention = SiaeConventionFactory(kind=self.company.kind)
+            self.company.save(update_fields=["convention", "kind", "updated_at"])
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
-        client.force_login(company.members.first())
+        client.force_login(self.company.members.first())
 
         url_accept = reverse(
             "apply:start-accept",
@@ -3816,14 +3845,11 @@ class TestFillJobSeekerInfosForAccept:
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
-    def test_as_iae_company_no_address(self, client, address):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+    def test_no_address(self, client, address):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
         address_kwargs = {
             "address_line_1": "",
@@ -3838,7 +3864,7 @@ class TestFillJobSeekerInfosForAccept:
             setattr(self.job_seeker, key, value)
         self.job_seeker.save(update_fields=address_kwargs.keys())
 
-        client.force_login(company.members.first())
+        client.force_login(self.company.members.first())
 
         url_accept = reverse(
             "apply:start-accept",
@@ -3902,14 +3928,12 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.city == "Geispolsheim"
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
-    def test_as_iae_company_no_birthdate(self, client, birth_country):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+    def test_no_birthdate(self, client, birth_country):
+        client.force_login(self.company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
         self.job_seeker.jobseeker_profile.birthdate = None
         if birth_country == "france":
@@ -4022,14 +4046,11 @@ class TestFillJobSeekerInfosForAccept:
             assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
     @pytest.mark.parametrize("in_france", [True, False])
-    def test_as_iae_company_no_birth_country(self, client, in_france):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+    def test_company_no_birth_country(self, client, in_france):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
 
         assert self.job_seeker.jobseeker_profile.birthdate
@@ -4037,7 +4058,7 @@ class TestFillJobSeekerInfosForAccept:
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
 
-        client.force_login(company.members.first())
+        client.force_login(self.company.members.first())
         url_accept = reverse(
             "apply:start-accept",
             kwargs={"job_application_id": job_application.pk},
@@ -4126,14 +4147,12 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
 
     @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
-    def test_as_iae_company_no_nir(self, client, with_lack_of_nir_reason):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+    def test_company_no_nir(self, client, with_lack_of_nir_reason):
+        client.force_login(self.company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.nir = ""
@@ -4210,15 +4229,13 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
-    def test_as_iae_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
+    def test_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+        client.force_login(self.company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationState.PROCESSING,
             job_seeker=self.job_seeker,
-            to_company=company,
+            to_company=self.company,
         )
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.pole_emploi_id = ""
@@ -4300,75 +4317,6 @@ class TestFillJobSeekerInfosForAccept:
         else:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == ""
             assert self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason != ""
-
-    def test_as_geiq_company(self, client):
-        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationState.PROCESSING,
-            job_seeker=self.job_seeker,
-            to_company=company,
-        )
-        client.force_login(company.members.first())
-
-        url_accept = reverse(
-            "apply:start-accept",
-            kwargs={"job_application_id": job_application.pk},
-        )
-        response = client.get(url_accept)
-        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
-        assert session_uuid is not None
-        fill_job_seeker_infos_url = reverse(
-            "apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}
-        )
-        assertRedirects(
-            response,
-            fill_job_seeker_infos_url,
-            fetch_redirect_response=False,
-        )
-
-        response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Accepter la candidature de Clara SION")
-
-        post_data = {
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-        }
-        response = client.post(fill_job_seeker_infos_url, data=post_data)
-        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
-        assert client.session[session_uuid]["job_seeker_info_forms_data"] == {
-            "birth_data": {
-                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            },
-        }
-
-    def test_as_non_iae_geiq_company(self, client):
-        company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationState.PROCESSING,
-            job_seeker=self.job_seeker,
-            to_company=company,
-        )
-        client.force_login(company.members.first())
-
-        url_accept = reverse(
-            "apply:start-accept",
-            kwargs={"job_application_id": job_application.pk},
-        )
-        response = client.get(url_accept)
-        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
-        assert session_uuid is not None
-        assertRedirects(
-            response,
-            reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}),
-            fetch_redirect_response=False,
-        )
-
-        response = client.get(reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid}))
-        # No form to fill, so redirect to apply:accept_contract_infos
-        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
 
 
 class TestProcessTemplates:
@@ -5192,6 +5140,8 @@ def test_htmx_reload_contract_type_and_options_in_wizard(client):
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
         job_seeker__for_snapshot=True,
+        job_seeker__with_address=True,
+        job_seeker__with_pole_emploi_id=True,
         job_seeker__born_in_france=True,  # To avoid job seeker infos step
     )
     employer = job_application.to_company.members.first()

@@ -217,6 +217,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         job_application = JobApplicationFactory(
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
+            job_seeker__with_address=True,
+            job_seeker__with_pole_emploi_id=True,
             job_seeker__born_outside_france=True,
         )
         job_description = JobDescriptionFactory(company=job_application.to_company)
@@ -266,6 +268,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         job_application = JobApplicationFactory(
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
+            job_seeker__with_address=True,
+            job_seeker__with_pole_emploi_id=True,
             job_seeker__born_outside_france=True,
         )
         job_description = JobDescriptionFactory(company=job_application.to_company)
