@@ -53,11 +53,13 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
     JobDescriptionFactory,
+    SiaeConventionFactory,
 )
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
@@ -3077,11 +3079,17 @@ class TestDirectHireFullProcess:
         assert response.status_code == 200
 
     @freeze_time()
-    def test_hire_as_geiq(self, client):
+    def test_hire_as_geiq(self, client, mocker, settings):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
         reset_url_dashboard = reverse("dashboard:index")
         job_seeker = JobSeekerFactory(born_outside_france=True)
+        geispolsheim = create_city_geispolsheim()
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_first_geocoding_data,
+        )
 
         user = company.members.first()
         client.force_login(user)
@@ -3182,19 +3190,34 @@ class TestDirectHireFullProcess:
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
         assertContains(response, check_infos_url)  # Back button URL
-        other_country = Country.objects.exclude(
-            pk__in=(Country.FRANCE_ID, job_seeker.jobseeker_profile.birth_country_id)
-        ).first()
+
+        NEW_POLE_EMPLOI_ID = "1234567A"
         post_data = {
-            "birth_country": other_country.pk,
+            "pole_emploi_id": NEW_POLE_EMPLOI_ID,
+            "ban_api_resolved_address": "10 rue des jardins 67118 Geispolsheim",
+            "address_line_1": "10 rue des jardins",
+            "post_code": geispolsheim.post_codes[0],
+            "insee_code": geispolsheim.code_insee,
+            "city": geispolsheim.name,
+            "fill_mode": "ban_api",
         }
         response = client.post(fill_job_seeker_infos_url, data=post_data)
         assertRedirects(response, contract_url)
         assert client.session[apply_session_name]["job_seeker_info_forms_data"] == {
-            "birth_data": {
-                "birth_country": other_country.pk,
-                "birth_place": None,
-            }
+            "personal_data": {
+                "pole_emploi_id": NEW_POLE_EMPLOI_ID,
+                "lack_of_pole_emploi_id_reason": "",
+            },
+            "user_address": {
+                "ban_api_resolved_address": "10 rue des jardins 67118 Geispolsheim",
+                "address_line_1": "10 rue des jardins",
+                "address_line_2": "",
+                "post_code": geispolsheim.post_codes[0],
+                "insee_code": geispolsheim.code_insee,
+                "city": geispolsheim.name,
+                "fill_mode": "ban_api",
+                "address_for_autocomplete": None,
+            },
         }
 
         # Hire confirmation
@@ -3249,7 +3272,8 @@ class TestDirectHireFullProcess:
         assert job_application.qualification_type == QualificationType.STATE_DIPLOMA
         assert job_application.qualification_level == QualificationLevel.LEVEL_4
 
-        assert job_application.job_seeker.jobseeker_profile.birth_country_id == other_country.pk
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id == NEW_POLE_EMPLOI_ID
+        assert job_application.job_seeker.address_line_1 == "10 rue des jardins"
 
         # Get application detail
         # ----------------------------------------------------------------------
@@ -5328,11 +5352,7 @@ class TestCheckPreviousApplicationsForHireView:
         url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
         next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
-        assertRedirects(
-            response, next_url, target_status_code=302
-        )  # No form to fill, so redirect to apply:hire_contract
-        response = client.get(next_url)
-        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, next_url)
 
         # with previous job application
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
@@ -5343,11 +5363,7 @@ class TestCheckPreviousApplicationsForHireView:
             reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name}),
             data={"force_new_application": "force"},
         )
-        assertRedirects(
-            response, next_url, target_status_code=302
-        )  # No form to fill, so redirect to apply:hire_contract
-        response = client.get(next_url)
-        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, next_url)
 
 
 class TestEligibilityForHire:
@@ -5360,12 +5376,9 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         assertRedirects(
-            response, next_url, target_status_code=302
-        )  # No form to fill, so redirect to apply:hire_contract
-        response = client.get(next_url)
-        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
+            response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
+        )
 
     def test_job_seeker_with_valid_diagnosis(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -5494,6 +5507,11 @@ class TestFillJobSeekerInfosForHire:
         )
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
+        self.company = CompanyFactory(with_membership=True, kind=random.choice(list(CompanyKind)))
+        if self.company.is_subject_to_iae_rules:
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        elif self.company.kind == CompanyKind.GEIQ:
+            GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
 
         settings.API_BAN_BASE_URL = "http://ban-api"
         mocker.patch(
@@ -5501,34 +5519,57 @@ class TestFillJobSeekerInfosForHire:
             side_effect=mock_get_first_geocoding_data,
         )
 
-    def accept_contract(self, client, company, session_uuid):
+    def accept_contract(self, client, session_uuid):
         accept_contract_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
+        post_data = {
+            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "answer": "",
+            "confirmed": True,
+        }
+        if self.company.kind == CompanyKind.GEIQ:
+            create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)  # For hired_job field
+            post_data.update(
+                {
+                    "prehiring_guidance_days": 10,
+                    "contract_type": ContractType.APPRENTICESHIP,
+                    "nb_hours_per_week": 10,
+                    "qualification_type": QualificationType.CQP,
+                    "qualification_level": QualificationLevel.LEVEL_4,
+                    "planned_training_hours": 20,
+                    "hired_job": JobDescriptionFactory(company=self.company).pk,
+                }
+            )
         response = client.post(
             accept_contract_url,
-            data={
-                "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": "",
-                "answer": "",
-                "confirmed": True,
-            },
+            data=post_data,
             headers={"hx-request": "true"},
         )
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
-            sender=company.members.first(), to_company=company
+            sender=self.company.members.first(), to_company=self.company
         )
+        if self.company.is_subject_to_iae_rules:
+            expected_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        else:
+            expected_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(
             response,
-            reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}),
+            expected_url,
             status_code=200,
             fetch_redirect_response=False,
         )
         return job_application
 
-    def test_as_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+    def test_no_missing_data_iae(self, client, snapshot):
+        # Ensure company is SIAE kind since it will trigger an extra query for eligibility diagnosis
+        # changing the SQL queries snapshot
+        if not self.company.is_subject_to_iae_rules:
+            self.company.kind = random.choice(list(CompanyKind.siae_kinds()))
+            self.company.convention = SiaeConventionFactory(kind=self.company.kind)
+            self.company.save(update_fields=["convention", "kind", "updated_at"])
+            IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(
@@ -5537,10 +5578,7 @@ class TestFillJobSeekerInfosForHire:
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
-    def test_as_company_no_birthdate(self, client, birth_country):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-
+    def test_no_birthdate(self, client, birth_country):
         self.job_seeker.jobseeker_profile.birthdate = None
         if birth_country == "france":
             self.job_seeker.jobseeker_profile.birth_country_id = Country.FRANCE_ID
@@ -5557,14 +5595,15 @@ class TestFillJobSeekerInfosForHire:
             self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.save(update_fields=["birthdate", "birth_country", "birth_place"])
 
-        client.force_login(company.members.first())
-        session_uuid = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []}).name
+        client.force_login(self.company.members.first())
+        session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
         fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
         accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
+        if self.company.is_subject_to_iae_rules:
+            assertContains(response, "Éligible à l’IAE")
 
         COUNTRY_FIELD_ID = 'id="id_birth_country"'
         PLACE_FIELD_ID = 'id="id_birth_place"'
@@ -5632,7 +5671,7 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, NEW_BIRTHDATE)
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        self.accept_contract(client, company, session_uuid)
+        self.accept_contract(client, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birthdate == NEW_BIRTHDATE
         assert self.job_seeker.jobseeker_profile.birth_place == birth_place
@@ -5640,23 +5679,21 @@ class TestFillJobSeekerInfosForHire:
             assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
     @pytest.mark.parametrize("in_france", [True, False])
-    def test_as_company_no_birth_country(self, client, in_france):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-
+    def test_no_birth_country(self, client, in_france):
         assert self.job_seeker.jobseeker_profile.birthdate
         self.job_seeker.jobseeker_profile.birth_country = None
         self.job_seeker.jobseeker_profile.birth_place = None
         self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place"])
 
-        client.force_login(company.members.first())
-        session_uuid = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []}).name
+        client.force_login(self.company.members.first())
+        session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
         fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
         accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
+        if self.company.is_subject_to_iae_rules:
+            assertContains(response, "Éligible à l’IAE")
 
         if in_france:
             new_country = Country.objects.get(pk=Country.FRANCE_ID)
@@ -5719,15 +5756,13 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, f'<option value="{new_country.pk}" selected>')
 
         # Check that birth infos are saved (if modified) after filling contract info step
-        self.accept_contract(client, company, session_uuid)
+        self.accept_contract(client, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
-    def test_as_company_no_address(self, client, address):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+    def test_no_address(self, client, address):
         address_kwargs = {
             "address_line_1": "",
             "city": "",
@@ -5741,12 +5776,13 @@ class TestFillJobSeekerInfosForHire:
             setattr(self.job_seeker, key, value)
         self.job_seeker.save(update_fields=address_kwargs.keys())
 
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
         assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
+        if self.company.is_subject_to_iae_rules:
+            assertContains(response, "Éligible à l’IAE")
 
         post_data = {
             "birthdate": self.job_seeker.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -5790,12 +5826,10 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, "128 Rue de Grenelle")
 
         # Check that address is saved on job seeker after contract signature
-        job_application = self.accept_contract(client, company, apply_session.name)
+        job_application = self.accept_contract(client, apply_session.name)
         assert job_application.job_seeker.address_line_1 == "128 Rue de Grenelle"
 
-    def test_as_company_no_nir(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+    def test_no_nir(self, client):
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = random.choice(
@@ -5803,14 +5837,15 @@ class TestFillJobSeekerInfosForHire:
         )
         self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
-        client.force_login(company.members.first())
-        session_uuid = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []}).name
+        client.force_login(self.company.members.first())
+        session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
         fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
         accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
+        if self.company.is_subject_to_iae_rules:
+            assertContains(response, "Éligible à l’IAE")
 
         NEW_NIR = "197013625838386"
         post_data = {
@@ -5842,15 +5877,13 @@ class TestFillJobSeekerInfosForHire:
         assertContains(response, NEW_NIR)
 
         # Check that the NIR is saved on job seeker after contract signature
-        job_application = self.accept_contract(client, company, session_uuid)
+        job_application = self.accept_contract(client, session_uuid)
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
-    def test_as_iae_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
+    def test_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
-        client.force_login(company.members.first())
+        client.force_login(self.company.members.first())
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.pole_emploi_id = ""
         if with_lack_of_pole_emploi_id_reason:
@@ -5861,7 +5894,7 @@ class TestFillJobSeekerInfosForHire:
             self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason = ""
         self.job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id", "lack_of_pole_emploi_id_reason"])
 
-        session_uuid = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []}).name
+        session_uuid = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []}).name
         fill_job_seeker_infos_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": session_uuid})
         accept_contract_infos_url = reverse("apply:hire_contract", kwargs={"session_uuid": session_uuid})
 
@@ -5910,7 +5943,7 @@ class TestFillJobSeekerInfosForHire:
             assertContains(response, NEW_POLE_EMPLOI_ID)
 
         # Check that pole_emploi_id is saved (if modified) after filling contract info step
-        self.accept_contract(client, company, session_uuid)
+        self.accept_contract(client, session_uuid)
         self.job_seeker.jobseeker_profile.refresh_from_db()
         if not with_lack_of_pole_emploi_id_reason:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == NEW_POLE_EMPLOI_ID
@@ -5919,55 +5952,24 @@ class TestFillJobSeekerInfosForHire:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == ""
             assert self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason != ""
 
-    def test_as_company_eligibility_diagnosis_from_another_company(self, client):
+    def test_as_iae_company_eligibility_diagnosis_from_another_company(self, client):
+        if self.company.is_subject_to_iae_rules:
+            # Delete existing prescriber diagnosis
+            self.job_seeker.eligibility_diagnoses.all().delete()
+        else:
+            # Ensure company is SIAE kind
+            self.company.kind = random.choice(list(CompanyKind.siae_kinds()))
+            self.company.convention = SiaeConventionFactory(kind=self.company.kind)
+            self.company.save(update_fields=["convention", "kind", "updated_at"])
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
         ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        client.force_login(company.members.get())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        client.force_login(self.company.members.get())
+        apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
-
-    def test_as_geiq(self, client):
-        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)
-        diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
-        company = diagnosis.author_geiq
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligibilité GEIQ confirmée")
-
-        post_data = {
-            "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-        }
-        response = client.post(
-            reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-        )
-        assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
-        assert client.session[apply_session.name]["job_seeker_info_forms_data"] == {
-            "birth_data": {
-                "birth_place": self.job_seeker.jobseeker_profile.birth_place_id,
-                "birth_country": self.job_seeker.jobseeker_profile.birth_country_id,
-            },
-        }
-
-    def test_as_other_company(self, client):
-        company = CompanyFactory(kind=CompanyKind.EA, with_membership=True)
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
-
-        response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        # No form to fill, so redirect to apply:hire_contract
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
 
     def test_no_country_disable_with_certification(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
-        IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         IdentityCertification.objects.create(
             jobseeker_profile=self.job_seeker.jobseeker_profile,
             certifier=IdentityCertificationAuthorities.API_PARTICULIER,
@@ -5977,8 +5979,8 @@ class TestFillJobSeekerInfosForHire:
         self.job_seeker.jobseeker_profile.pole_emploi_id = ""
         self.job_seeker.jobseeker_profile.save(update_fields=["birth_country", "birth_place", "pole_emploi_id"])
 
-        client.force_login(company.members.first())
-        apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
+        client.force_login(self.company.members.first())
+        apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         birth_country = Country.objects.get(name="BORA-BORA")
 
@@ -5987,7 +5989,8 @@ class TestFillJobSeekerInfosForHire:
         )
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Déclarer l’embauche de Clara SION")
-        assertContains(response, "Éligible à l’IAE")
+        if self.company.is_subject_to_iae_rules:
+            assertContains(response, "Éligible à l’IAE")
 
         post_data = {
             "ban_api_resolved_address": self.job_seeker.geocoding_address,
