@@ -703,7 +703,8 @@ def test_an_active_siae_without_convention_can_not_access_the_view(client):
     siae = CompanyFactory(
         use_employee_record=True,
         source=Company.SOURCE_STAFF_CREATED,
-        convention=None,
+        subject_to_iae_rules=True,
+        with_convention=False,
         with_membership=True,
     )
     client.force_login(siae.members.first())

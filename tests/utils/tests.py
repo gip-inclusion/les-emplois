@@ -216,7 +216,9 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        request.user = CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user
+        request.user = CompanyMembershipFactory(
+            company__subject_to_iae_rules=True, company__with_convention=False
+        ).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -238,7 +240,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_siae_in_grace_period(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        company = CompanyFactory(convention__pending_grace_period=True)
+        company = CompanyFactory(subject_to_iae_rules=True, with_convention__pending_grace_period=True)
         request.user = CompanyMembershipFactory(company=company).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
@@ -261,7 +263,11 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_siae_in_grace_period_and_active_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        company = CompanyFactory(name="1", convention__pending_grace_period=True)
+        company = CompanyFactory(
+            name="1",
+            subject_to_iae_rules=True,
+            with_convention__pending_grace_period=True,
+        )
         request.user = CompanyMembershipFactory(company=company).user
         # OPCS ensures that the siae is active (since it is not subject to eligibility) and also that
         # the ordering based on kind will put it in second position for request.organizations

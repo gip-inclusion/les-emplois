@@ -101,7 +101,7 @@ def test_missing_employee(client, snapshot):
         approval=approval,
         hiring_start_at=datetime.date(2025, 2, 14),
     )
-    other_siae = CompanyFactory(convention=siae.convention, for_snapshot=True)
+    other_siae = CompanyFactory(subject_to_iae_rules=True, with_convention=siae.convention, for_snapshot=True)
     job_application = JobApplicationFactory(
         to_company=other_siae,
         job_seeker=job_seeker,

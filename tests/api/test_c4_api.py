@@ -73,10 +73,20 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_companies_antenne_with_user_created_with_proper_siret(self, api_client, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
+        company_1 = CompanyFactory(
+            siret="10000000000001",
+            subject_to_iae_rules=True,
+        )
+        company_2 = CompanyFactory(
+            siret="10000000000002",
+            subject_to_iae_rules=True,
+            with_convention=company_1.convention,
+        )
         company_3 = CompanyFactory(
-            siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000000003",
+            source=Company.SOURCE_USER_CREATED,
+            subject_to_iae_rules=True,
+            with_convention=company_1.convention,
         )
 
         with assertNumQueries(NUM_QUERIES):
@@ -99,10 +109,21 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_companies_antenne_with_user_created_and_999(self, api_client, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
+        company_1 = CompanyFactory(
+            siret="10000000000001",
+            subject_to_iae_rules=True,
+        )
+        company_2 = CompanyFactory(
+            siret="10000000000002",
+            source=Company.SOURCE_ASP,
+            subject_to_iae_rules=True,
+            with_convention=company_1.convention,
+        )
         company_3 = CompanyFactory(
-            siret="10000000099991", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000099991",
+            source=Company.SOURCE_USER_CREATED,
+            subject_to_iae_rules=True,
+            with_convention=company_1.convention,
         )
 
         num_queries = NUM_QUERIES
@@ -143,7 +164,7 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_companies_without_convention(self, api_client):
-        CompanyFactory(convention=None)
+        CompanyFactory(subject_to_iae_rules=True, with_convention=False)
 
         num_queries = NUM_QUERIES
         with assertNumQueries(num_queries):
@@ -158,7 +179,7 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_companies_without_admins(self, api_client):
-        company = CompanyFactory(convention=None)
+        company = CompanyFactory()
         # An active admin membership on a disabled user
         CompanyMembershipFactory(company=company, user__is_active=False, is_active=True, is_admin=True)
         # An inactive admin membership
@@ -179,7 +200,7 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_companies_with_multiple_admins(self, api_client):
-        company = CompanyFactory(convention=None)
+        company = CompanyFactory()
         CompanyMembershipFactory(company=company, joined_at=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC))
         latest_admin = CompanyMembershipFactory(
             company=company, joined_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC)
@@ -198,7 +219,7 @@ class TestC4CompanyAPI:
 
     @override_settings(C4_TOKEN="C4SecretToken")
     def test_list_no_reserved_companies(self, api_client):
-        CompanyFactory(kind=COMPANY_KIND_RESERVED, convention=None)
+        CompanyFactory(kind=COMPANY_KIND_RESERVED)
 
         num_queries = NUM_QUERIES
         num_queries -= 2  # no company and no prefetch memberships

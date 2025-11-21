@@ -953,7 +953,8 @@ class TestJobApplicationQuerySet:
         # There's already an employee record for a SIAE of the same convention and the same approval
         job_app_on_same_convention = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
-            to_company__convention=job_app_with_employee_record.to_company.convention,
+            to_company__subject_to_iae_rules=True,
+            to_company__with_convention=job_app_with_employee_record.to_company.convention,
             to_company__source=Company.SOURCE_USER_CREATED,
             approval=job_app_with_employee_record.approval,
         )

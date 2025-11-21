@@ -565,11 +565,19 @@ class TestEvaluationCampaignManager:
         campaign = EvaluationCampaignFactory(institution=institution)
         # Did not select eligibility criteria to justify.
         evaluated_siae_no_response = EvaluatedSiaeFactory(
-            pk=1001, evaluation_campaign=campaign, siae__name="Les grands jardins", siae__pk=2001
+            pk=1001,
+            evaluation_campaign=campaign,
+            siae__name="Les grands jardins",
+            siae__kind=CompanyKind.EI,
+            siae__pk=2001,
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
         evaluated_siae_no_docs = EvaluatedSiaeFactory(
-            pk=1002, evaluation_campaign=campaign, siae__name="Les petits jardins", siae__pk=2002
+            pk=1002,
+            evaluation_campaign=campaign,
+            siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
+            siae__pk=2002,
         )
         evaluated_jobapp_no_docs = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_docs)
         EvaluatedAdministrativeCriteriaFactory(
@@ -578,7 +586,7 @@ class TestEvaluationCampaignManager:
             # default review_state is PENDING
         )
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            pk=1003, evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=2003
+            pk=1003, evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=2003
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
         EvaluatedAdministrativeCriteriaFactory(
@@ -591,6 +599,7 @@ class TestEvaluationCampaignManager:
             pk=1004,
             evaluation_campaign=campaign,
             siae__name="Geo accepted",
+            siae__kind=CompanyKind.EI,
             siae__pk=2004,
             reviewed_at=accepted_ts,
             final_reviewed_at=accepted_ts,
@@ -606,6 +615,7 @@ class TestEvaluationCampaignManager:
             pk=1005,
             evaluation_campaign=campaign,
             siae__name="Geo refused",
+            siae__kind=CompanyKind.EI,
             siae__pk=2005,
             reviewed_at=refused_ts,
         )
@@ -691,6 +701,7 @@ class TestEvaluationCampaignManager:
             pk=1000,
             evaluation_campaign=campaign,
             siae__name="Les grands jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
@@ -719,7 +730,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            pk=1000, evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=2000
+            pk=1000, evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=2000
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
         EvaluatedAdministrativeCriteriaFactory(
@@ -756,7 +767,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
@@ -793,7 +804,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
@@ -830,6 +841,7 @@ class TestEvaluationCampaignManager:
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
         )
@@ -895,6 +907,7 @@ class TestEvaluationCampaignManager:
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
             reviewed_at=timezone.now() - datetime.timedelta(days=2),
@@ -941,6 +954,7 @@ class TestEvaluationCampaignManager:
             evaluated_period_end_at=datetime.date(2022, 9, 30),
         )
         evaluated_siae = EvaluatedSiaeFactory(
+            siae__kind=CompanyKind.EI,
             siae__name="Les petits jardins",
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,

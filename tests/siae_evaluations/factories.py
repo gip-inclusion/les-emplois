@@ -65,7 +65,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
         )
 
     evaluation_campaign = factory.SubFactory(EvaluationCampaignFactory)
-    siae = factory.SubFactory(CompanyFactory, department="14")
+    siae = factory.SubFactory(CompanyFactory, department="14", subject_to_iae_rules=True)
 
 
 class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
