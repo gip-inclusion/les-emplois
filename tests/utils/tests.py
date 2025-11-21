@@ -68,6 +68,7 @@ from itou.utils.validators import (
     validate_html,
     validate_naf,
     validate_nir,
+    validate_ntt,
     validate_pole_emploi_id,
     validate_post_code,
     validate_siren,
@@ -630,6 +631,18 @@ class TestUtilsValidators:
         # Last group should validate the first 13 characters.
         with pytest.raises(ValidationError):
             validate_nir("141068078200520")
+
+    def test_validate_ntt(self):
+        # Valid number
+        validate_ntt("112345678901")
+        validate_ntt("1123456789JohnDoe")
+        with pytest.raises(ValidationError):
+            validate_ntt("123456789")  # Too short
+        with pytest.raises(ValidationError):
+            validate_ntt("11234567890123456789012345678901234567890")  # Too long
+        # Should start with 1 or 2
+        with pytest.raises(ValidationError):
+            validate_ntt("912345678901")
 
     def test_validate_af_number(self):
         # Dubious values.

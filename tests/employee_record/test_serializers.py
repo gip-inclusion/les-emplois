@@ -40,6 +40,21 @@ class TestEmployeeRecordPersonSerializer:
         job_seeker.first_name = "Jean-Philippe René Hippolyte Gilbert Dufaël"
         assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE RENE HIPPOLYTE"
 
+    def test_get_salarieNIR(self):
+        employee_record = EmployeeRecordWithProfileFactory(job_application__job_seeker__jobseeker_profile__nir="")
+        profile = employee_record.job_application.job_seeker.jobseeker_profile
+        serializer = _PersonSerializer(employee_record)
+        assert serializer.get_salarieNIR(employee_record) == ""
+
+        employee_record.ntt = "11234567890001"
+        assert serializer.get_salarieNIR(employee_record) == "11234567890001"
+
+        profile.nir = "22345678901234"
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
+        employee_record.ntt = ""
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
 
 class TestEmployeeRecordAddressSerializer:
     def test_hexa_additional_address(self):
