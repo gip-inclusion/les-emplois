@@ -41,51 +41,43 @@ class CommonUserInfoFormsMixin:
         else:
             session_forms_data = session.get("job_seeker_info_forms_data", {})
 
-        if self.company.is_subject_to_iae_rules:
-            # Info that will be used to search for an existing Pôle emploi approval.
-            personal_data_form = JobSeekerPersonalDataForm(
-                instance=self.job_seeker,
-                initial=session_forms_data.get("personal_data", {}),
-                data=self.request.POST or None,
-                back_url=self.request.get_full_path(),
-            )
-            if personal_data_form.fields:
-                forms["personal_data"] = personal_data_form
-            birth_data_form_class = None
-            birth_data_form_kwargs = {
-                "instance": self.job_seeker.jobseeker_profile,
-                "initial": session_forms_data.get("birth_data", {}),
-                "data": self.request.POST or None,
-            }
-            if self.job_seeker.jobseeker_profile.birthdate:
-                if not self.job_seeker.jobseeker_profile.birth_country:
-                    birth_data_form_class = BirthPlaceWithoutBirthdateModelForm
-                    birth_data_form_kwargs["birthdate"] = self.job_seeker.jobseeker_profile.birthdate
+        # Info that will be used to search for an existing Pôle emploi approval.
+        personal_data_form = JobSeekerPersonalDataForm(
+            instance=self.job_seeker,
+            initial=session_forms_data.get("personal_data", {}),
+            data=self.request.POST or None,
+            back_url=self.request.get_full_path(),
+        )
+        if personal_data_form.fields:
+            forms["personal_data"] = personal_data_form
+        birth_data_form_class = None
+        birth_data_form_kwargs = {
+            "instance": self.job_seeker.jobseeker_profile,
+            "initial": session_forms_data.get("birth_data", {}),
+            "data": self.request.POST or None,
+        }
+        if self.job_seeker.jobseeker_profile.birthdate:
+            if not self.job_seeker.jobseeker_profile.birth_country:
+                birth_data_form_class = BirthPlaceWithoutBirthdateModelForm
+                birth_data_form_kwargs["birthdate"] = self.job_seeker.jobseeker_profile.birthdate
+        else:
+            # If birth country is not France, the birthdate won't impact the birth place selection
+            # Otherwise, if the birthdate is missing and the country is France, the birthdate
+            # can influence the birth_place: allow to modify both and keep the fields
+            if (
+                self.job_seeker.jobseeker_profile.birth_country_id
+                and self.job_seeker.jobseeker_profile.birth_country_id != Country.FRANCE_ID
+            ):
+                birth_data_form_class = BirthDateForm
             else:
-                # If birth country is not France, the birthdate won't impact the birth place selection
-                # Otherwise, if the birthdate is missing and the country is France, the birthdate
-                # can influence the birth_place: allow to modify both and keep the fields
-                if (
-                    self.job_seeker.jobseeker_profile.birth_country_id
-                    and self.job_seeker.jobseeker_profile.birth_country_id != Country.FRANCE_ID
-                ):
-                    birth_data_form_class = BirthDateForm
-                else:
-                    birth_data_form_class = BirthPlaceWithBirthdateModelForm
-            if birth_data_form_class:
-                forms["birth_data"] = birth_data_form_class(**birth_data_form_kwargs)
+                birth_data_form_class = BirthPlaceWithBirthdateModelForm
+        if birth_data_form_class:
+            forms["birth_data"] = birth_data_form_class(**birth_data_form_kwargs)
 
-            if not self.job_seeker.address_on_one_line:
-                forms["user_address"] = JobSeekerAddressForm(
-                    instance=self.job_seeker,
-                    initial=session_forms_data.get("user_address", {}),
-                    data=self.request.POST or None,
-                )
-        elif self.company.kind == CompanyKind.GEIQ:
-            forms["birth_data"] = BirthPlaceWithoutBirthdateModelForm(
-                instance=self.job_seeker.jobseeker_profile,
-                initial=session_forms_data.get("birth_data", {}),
-                birthdate=self.job_seeker.jobseeker_profile.birthdate,
+        if not self.job_seeker.address_on_one_line:
+            forms["user_address"] = JobSeekerAddressForm(
+                instance=self.job_seeker,
+                initial=session_forms_data.get("user_address", {}),
                 data=self.request.POST or None,
             )
 

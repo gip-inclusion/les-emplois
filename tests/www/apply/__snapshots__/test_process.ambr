@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestFillJobSeekerInfosForAccept.test_as_iae_company[view queries]
+# name: TestFillJobSeekerInfosForAccept.test_no_missing_data_iae[view queries]
   dict({
     'num_queries': 11,
     'queries': list([
