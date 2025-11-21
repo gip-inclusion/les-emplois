@@ -616,6 +616,7 @@ class TestApprovalModel:
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
+            with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
 
@@ -626,6 +627,7 @@ class TestApprovalModel:
         other_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.ETTI,
+            with_iae_eligibility_diagnosis=True,
             job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
         )
         other_application.accept(user=other_application.to_company.members.first())
@@ -645,6 +647,7 @@ class TestApprovalModel:
     def test_deleting_an_approval_without_application_linked(self):
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
+            with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
 
