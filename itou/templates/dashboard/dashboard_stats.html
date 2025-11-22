@@ -24,7 +24,7 @@
                aria-controls="statistiques"
                aria-selected="true"
                {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
-                {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules %}
+                {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
                     <span>Pilotage</span>
                     <span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>
                 {% else %}
@@ -48,12 +48,7 @@
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
                             <h2>Pilotage de mon activité</h2>
-                            {% if not request.user.is_employer %}
-                                <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                    <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
-                                </div>
-                            {% endif %}
-                            {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules %}
+                            {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
                                 <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status" id="alert-stats-siae-2025-11">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                                     <div class="row">
