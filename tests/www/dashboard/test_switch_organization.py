@@ -61,7 +61,11 @@ class TestSwitchCompany:
         user = company.members.first()
         client.force_login(user)
 
-        related_company = CompanyFactory(with_membership=True, convention__pending_grace_period=True)
+        related_company = CompanyFactory(
+            with_membership=True,
+            subject_to_iae_rules=True,
+            with_convention__pending_grace_period=True,
+        )
         related_company.members.add(user)
 
         url = reverse("dashboard:index")
@@ -84,7 +88,7 @@ class TestSwitchCompany:
         user = company.members.first()
         client.force_login(user)
 
-        related_company = CompanyFactory(convention__after_grace_period=True)
+        related_company = CompanyFactory(subject_to_iae_rules=True, with_convention__after_grace_period=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")

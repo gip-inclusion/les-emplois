@@ -86,7 +86,7 @@ class TestImportSiaeManagementCommands:
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
-        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
+        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.EI, with_convention=False)
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
@@ -95,7 +95,7 @@ class TestImportSiaeManagementCommands:
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, with_convention=False)
 
         with freeze_time("2022-10-10"):
             results = get_creatable_conventions(
@@ -118,7 +118,7 @@ class TestImportSiaeManagementCommands:
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, with_convention=False)
 
         with freeze_time("2022-10-10"):
             results = get_creatable_conventions(
@@ -140,7 +140,7 @@ class TestImportSiaeManagementCommands:
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, with_convention=False)
 
         conventions = get_creatable_conventions(
             get_siret_to_siae_row(get_vue_structure_df()),
@@ -267,7 +267,7 @@ class TestImportSiaeManagementCommands:
             source=Company.SOURCE_ASP,
             siret="21540323900000",
             kind=CompanyKind.ACI,
-            convention=SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=112, siret_signature="21540323900000"),
+            with_convention=SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=112, siret_signature="21540323900000"),
         )
 
         monkeypatch.setenv("CC_USER_ID", clever_user_id)
@@ -334,12 +334,12 @@ def test_cleanup_siaes_after_grace_period(capsys):
 
     company_with_active_convention = CompanyFactory(subject_to_iae_rules=True)
     CompanyFactory(
-        subject_to_iae_rules=True, convention__is_active=False, convention__deactivated_at=old_enough
+        subject_to_iae_rules=True, with_convention__is_active=False, with_convention__deactivated_at=old_enough
     )  # Deletable company
     undeletable_company = JobApplicationFactory(
         to_company__kind=CompanyKind.EI,
-        to_company__convention__is_active=False,
-        to_company__convention__deactivated_at=old_enough,
+        to_company__with_convention__is_active=False,
+        to_company__with_convention__deactivated_at=old_enough,
         to_company__is_searchable=True,
     ).to_company
 

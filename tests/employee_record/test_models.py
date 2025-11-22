@@ -305,7 +305,8 @@ class TestEmployeeRecordModel:
         employee_record = EmployeeRecordFactory(
             job_application__to_company__siret="10000000000002",
             job_application__to_company__source=Company.SOURCE_USER_CREATED,
-            job_application__to_company__convention=main_company.convention,
+            job_application__to_company__subject_to_iae_rules=True,
+            job_application__to_company__with_convention=main_company.convention,
         )
         employee_record._fill_denormalized_fields()  # to run siret_from_asp_source(main_company)
 
@@ -685,7 +686,8 @@ class TestEmployeeRecordQueryset:
     def test_for_asp_company(self):
         employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
         employee_record_in_antenna = EmployeeRecordFactory(
-            job_application__to_company__convention=employee_record_1.job_application.to_company.convention,
+            job_application__to_company__subject_to_iae_rules=True,
+            job_application__to_company__with_convention=employee_record_1.job_application.to_company.convention,
             job_application__to_company__source=Company.SOURCE_USER_CREATED,
             job_application__approval=employee_record_1.job_application.approval,
         )
@@ -703,7 +705,8 @@ class TestEmployeeRecordQueryset:
         employee_record = EmployeeRecordFactory()
         company = employee_record.job_application.to_company
         EmployeeRecordFactory(
-            job_application__to_company__convention=company.convention,
+            job_application__to_company__subject_to_iae_rules=True,
+            job_application__to_company__with_convention=company.convention,
             job_application__to_company__source=Company.SOURCE_USER_CREATED,
         )
 

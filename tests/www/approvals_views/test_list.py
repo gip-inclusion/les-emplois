@@ -671,7 +671,8 @@ class TestApprovalsListView:
 
     def test_no_tabs_when_siae_does_not_have_access_to_employee_records(self, client):
         company = CompanyFactory(
-            convention=None,
+            subject_to_iae_rules=True,
+            with_convention=False,
             use_employee_record=True,
             with_membership=True,
             source=Company.SOURCE_STAFF_CREATED,
