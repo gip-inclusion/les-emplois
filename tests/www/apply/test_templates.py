@@ -19,10 +19,7 @@ from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
-from tests.eligibility.factories import (
-    GEIQEligibilityDiagnosisFactory,
-    IAEEligibilityDiagnosisFactory,
-)
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -187,8 +184,7 @@ def test_known_criteria_template_with_partial_zrr_criterion():
 
 
 class TestIAEEligibilityDetail:
-    ELIGIBILITY_TITLE_FROM_PRESCRIBER = "Situation administrative du candidat"
-    ELIGIBILITY_TITLE_FROM_EMPLOYER = "Critères administratifs"
+    ELIGIBILITY_TITLE = "Critères administratifs"
 
     @property
     def template(self):
@@ -230,7 +226,7 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
-        assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         assert AdministrativeCriteriaLevel(criteria.level).label in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
@@ -238,7 +234,7 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
         )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
@@ -254,7 +250,7 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
         )
-        assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert AdministrativeCriteriaLevel(criteria.level).label in rendered
 
@@ -262,7 +258,7 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(
             Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
         )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
         assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
 
@@ -277,7 +273,7 @@ class TestIAEEligibilityDetail:
                 }
             )
         )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER not in rendered
+        assert self.ELIGIBILITY_TITLE not in rendered
         assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
         assert "Le diagnostic d'éligibilité IAE de ce candidat a expiré" in rendered
 
@@ -311,7 +307,7 @@ class TestIAEEligibilityDetail:
 
 
 class TestGEIQEligibilityDetail:
-    ELIGIBILITY_TITLE = "Situation administrative du candidat"
+    ELIGIBILITY_TITLE = "Critères administratifs"
 
     @property
     def template(self):
