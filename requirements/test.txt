@@ -389,6 +389,7 @@ cryptography==46.0.3 \
     --hash=sha256:f260d0d41e9b4da1ed1e0f1ce571f97fe370b152ab18778e9e8f67d6af432018
     # via
     #   -r requirements/base.txt
+    #   jwcrypto
     #   paramiko
 cssbeautifier==1.15.4 \
     --hash=sha256:78c84d5e5378df7d08622bbd0477a1abdbd209680e95480bf22f12d5701efc98 \
@@ -748,6 +749,10 @@ jsonschema-specifications==2025.9.1 \
     # via
     #   -r requirements/base.txt
     #   jsonschema
+jwcrypto==1.5.6 \
+    --hash=sha256:150d2b0ebbdb8f40b77f543fb44ffd2baeff48788be71f67f03566692fd55789 \
+    --hash=sha256:771a87762a0c081ae6166958a954f80848820b2ab066937dc8b8379d65b1b039
+    # via -r requirements/base.txt
 lxml==6.0.2 \
     --hash=sha256:058027e261afed589eddcfe530fcc6f3402d7fd7e89bfd0532df82ebc1563dba \
     --hash=sha256:063eccf89df5b24e361b123e257e437f9e9878f425ee9aae3144c77faf6da6d8 \
@@ -1817,6 +1822,7 @@ typing-extensions==4.15.0 \
     # via
     #   -r requirements/base.txt
     #   beautifulsoup4
+    #   jwcrypto
     #   slippers
 tzdata==2025.2 \
     --hash=sha256:1a403fada01ff9221ca8044d701868fa132215d84beb92242d9acd2147f667a8 \

@@ -706,19 +706,24 @@ class TestUtilsTemplateTags:
         assert out_none == expected
 
     @pytest.mark.parametrize(
-        "user,expected_query_params",
+        "user_factory,is_param_expected",
         [
-            (lambda: JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT), ""),
+            (functools.partial(JobSeekerFactory, identity_provider=IdentityProvider.FRANCE_CONNECT), False),
             (
-                lambda: PrescriberFactory(identity_provider=IdentityProvider.PRO_CONNECT),
-                "?proconnect_login=true",
+                functools.partial(PrescriberFactory, identity_provider=IdentityProvider.PRO_CONNECT),
+                True,
             ),
         ],
     )
-    def test_autologin_proconnect(self, db, user, expected_query_params):
+    def test_autologin_proconnect(self, user_factory, is_param_expected):
+        user = user_factory()
         template = Template("{% load url_add_query %}{% autologin_proconnect url user %}")
-        out = template.render(Context({"url": "/test/", "user": user()}))
-        assert out == f"/test/{expected_query_params}"
+        url = "/test/"
+        out = template.render(Context({"url": url, "user": user}))
+        if is_param_expected:
+            assert out == reverse("nexus:auto_login", query={"next_url": url})
+        else:
+            assert out == url
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")

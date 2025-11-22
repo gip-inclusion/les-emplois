@@ -161,7 +161,7 @@ MIDDLEWARE = [
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     "itou.www.middleware.RateLimitMiddleware",
-    "itou.openid_connect.pro_connect.middleware.ProConnectLoginMiddleware",
+    "itou.nexus.middleware.AutoLoginMiddleware",
     "itou.utils.triggers.middleware.fields_history",
     # Final logger
     "django_datadog_logger.middleware.request_log.RequestLoggingMiddleware",
@@ -894,3 +894,9 @@ NEXUS_METABASE_DB_PORT = os.getenv("NEXUS_METABASE_DB_PORT")
 NEXUS_METABASE_DB_DATABASE = os.getenv("NEXUS_METABASE_DB_DATABASE")
 NEXUS_METABASE_DB_USER = os.getenv("NEXUS_METABASE_DB_USER")
 NEXUS_METABASE_DB_PASSWORD = os.getenv("NEXUS_METABASE_DB_PASSWORD")
+NEXUS_ALLOWED_REDIRECT_HOSTS = os.getenv(
+    "NEXUS_ALLOWED_REDIRECT_HOSTS", "dora.inclusion.gouv.fr,communaute.inclusion.beta.gouv.fr"
+).split(",")
+
+nexus_key = os.getenv("NEXUS_AUTO_LOGIN_KEY")
+NEXUS_AUTO_LOGIN_KEY = json.loads(nexus_key) if nexus_key else None
