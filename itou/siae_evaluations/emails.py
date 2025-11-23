@@ -205,8 +205,11 @@ class SIAEEmailFactory:
         body = "siae_evaluations/email/to_siae_not_sanctioned_body.txt"
         return get_email_message(self.recipients, context, subject, body)
 
-    def sanctioned(self):
-        context = {"sanctions": self.evaluated_siae.sanctions}
-        subject = "siae_evaluations/email/to_siae_sanctioned_subject.txt"
-        body = "siae_evaluations/email/to_siae_sanctioned_body.txt"
+    def sanctioned_with_training_session(self):
+        context = {
+            "sanctions": self.evaluated_siae.sanctions,
+            "siae": self.evaluated_siae.siae,
+        }
+        subject = "siae_evaluations/email/to_siae_sanctioned_with_training_session_subject.txt"
+        body = "siae_evaluations/email/to_siae_sanctioned_with_training_session_body.txt"
         return get_email_message(self.recipients, context, subject, body)
