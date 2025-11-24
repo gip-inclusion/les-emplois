@@ -32,7 +32,11 @@ class EvaluationCampaignFactory(factory.django.DjangoModelFactory):
         model = models.EvaluationCampaign
 
     name = factory.fuzzy.FuzzyText(length=10)
-    institution = factory.SubFactory(InstitutionFactory, department="14")
+    institution = factory.SubFactory(
+        InstitutionFactory,
+        department="14",
+        with_membership=True,
+    )
     evaluated_period_start_at = factory.LazyAttribute(before_ended_at(months=3))
     evaluated_period_end_at = factory.LazyAttribute(before_ended_at(months=1))
     calendar = factory.SubFactory(CalendarFactory)
@@ -65,7 +69,11 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
         )
 
     evaluation_campaign = factory.SubFactory(EvaluationCampaignFactory)
-    siae = factory.SubFactory(CompanyFactory, department="14")
+    siae = factory.SubFactory(
+        CompanyFactory,
+        department="14",
+        with_membership=True,
+    )
 
 
 class EvaluatedJobApplicationFactory(factory.django.DjangoModelFactory):
