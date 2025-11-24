@@ -58,6 +58,9 @@ from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 
+ERROR_UNIQUE_NIR_CODE = "unique_nir_if_not_empty"
+
+
 class UserQuerySet(models.QuerySet):
     def get_eligibility_validated_lookup(self, siae=None):
         from itou.approvals.models import Approval
@@ -1209,7 +1212,7 @@ class JobSeekerProfile(models.Model):
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",
                 condition=~Q(nir=""),
-                violation_error_code="unique_nir_if_not_empty",
+                violation_error_code=ERROR_UNIQUE_NIR_CODE,
                 violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
         ]
