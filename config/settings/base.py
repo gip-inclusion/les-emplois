@@ -770,7 +770,6 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 # ------------------------------------------------------------------------------
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
 GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
-GPS_NAV_ENTRY_DEPARTMENTS = ["30"]
 GPS_SLACK_WEBHOOK_URL = os.getenv("GPS_SLACK_WEBHOOK_URL")
 GPS_CONTACT_EMAIL = "contact.gps@inclusion.gouv.fr"
 
