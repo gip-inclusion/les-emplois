@@ -147,10 +147,13 @@ class AsyncEmailBackend(BaseEmailBackend):
         emails_count = 0
         for message in email_messages:
             for mjemail in sanitize_mailjet_recipients(message):
-                emails_count += 1
                 # Send each email in a separate task, so that Huey retry mecanism only
                 # retries the failed email.
                 email = Email.from_email_message(mjemail)
                 email.save()
+                if not [*mjemail.to, *mjemail.cc, *mjemail.bcc]:
+                    logger.error(f"Email {email.pk} has no recipients, ignoring.", stack_info=True)
+                    continue
+                emails_count += 1
                 _async_send_message(email.pk)
         return emails_count
