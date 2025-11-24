@@ -47,13 +47,9 @@ urlpatterns = [
         ItouSpectacularRedocView.as_view(url_name="v1:openapi_schema"),
         name="redoc",
     ),
-]
-
-urlpatterns += router.urls
-
-urlpatterns += [
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
     path("candidatures/recherche/", JobApplicationSearchView.as_view(), name="job-applications-search"),
     path("data-inclusion/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("marche/", C4CompanyView.as_view(), name="marche-company-list"),
+    *router.urls,
 ]
