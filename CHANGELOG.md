@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2025-11-24
+
+### Ajouté
+
+- [Employeur : Distinguer les salariés avec un contrat en cours et ceux qui ont un contrat terminé](https://github.com/gip-inclusion/les-emplois/pull/7118)
+- [Interface : Ajout d'une vue tableau sur la liste des salariés et PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/7086)
+
+### Modifié
+
+- [Candidature/Déclaration d'embauche : correction du formulaire de choix de lieu de naissance pour les candidats ayant une date de naissance](https://github.com/gip-inclusion/les-emplois/pull/7145)
+- [Candidature : correction du déclenchement de la certification même si aucunes données candidat n'ont pas été demandées](https://github.com/gip-inclusion/les-emplois/pull/7149)
+- [Candidature : ne plus demander les infos déjà disponibles pour les entreprises en IAE](https://github.com/gip-inclusion/les-emplois/pull/7096)
+- [Demandeur d’emploi : lever la contrainte de vérification de la cohérence NIR/date de naissance pour les numéros commençant par 3, 4, 7, 8](https://github.com/gip-inclusion/les-emplois/pull/7143)
+- [Informations candidat : suppression du motif `Numéro temporaire (NIA/NTT)`](https://github.com/gip-inclusion/les-emplois/pull/7144)
+- [Interface : Harmonisation du titre des blocs "Éligibilité à l’IAE"](https://github.com/gip-inclusion/les-emplois/pull/7141)
+- [PASS IAE : afficher les contrats qui chevauchent les PASS](https://github.com/gip-inclusion/les-emplois/pull/7150)
+- [PASS IAE : petites améliorations dans le script d'import des contrats ASP](https://github.com/gip-inclusion/les-emplois/pull/7151)
+
 ## 2025-11-17
 
 ### Ajouté
