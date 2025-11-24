@@ -44,10 +44,6 @@ def is_allowed_to_use_gps_advanced_features(request):
     return request.user.is_employer or request.from_authorized_prescriber or is_gps_authorized(request)
 
 
-def show_gps_as_a_nav_entry(request):
-    return getattr(request.current_organization, "department", None) in settings.GPS_NAV_ENTRY_DEPARTMENTS
-
-
 @check_request(is_allowed_to_use_gps)
 def group_list(request, current, template_name="gps/group_list.html"):
     logger.info(f"GPS visit_list_groups{'_old' if current is False else ''}")
