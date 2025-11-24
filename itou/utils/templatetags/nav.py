@@ -5,7 +5,6 @@ from django.utils.text import slugify
 from itou.institutions.enums import InstitutionKind
 from itou.utils.errors import silently_report_exception
 from itou.www.geiq_assessments_views.views import company_has_access_to_assessments
-from itou.www.gps.views import is_allowed_to_use_gps, show_gps_as_a_nav_entry
 
 
 register = template.Library()
@@ -267,8 +266,8 @@ NAV_ENTRIES = {
     ),
     # GPS (for employers and prescribers with an org in department nb 30)
     "gps": NavItem(
-        label="GPS",
-        icon="ri-compass-line",
+        label="Réseau d'intervenants",
+        icon="ri-pin-distance-line",
         target=reverse("gps:group_list"),
         active_view_names=[
             "gps:group_list",
@@ -309,6 +308,7 @@ def nav(request):
                 if request.from_authorized_prescriber:
                     jobseekers_items.append(NAV_ENTRIES["prescriber-approval-prolongations"])
             menu_items.append(NavGroup(label="Candidats", icon="ri-user-line", items=jobseekers_items))
+            menu_items.append(NAV_ENTRIES["gps"])
             if request.current_organization:
                 organization_items = [
                     (
@@ -340,6 +340,7 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-members"])
             if request.current_organization.convention_can_be_accessed_by(request.user):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
+            menu_items.append(NAV_ENTRIES["gps"])
             menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.user.is_labor_inspector:
             menu_items.append(
@@ -354,8 +355,6 @@ def nav(request):
                 InstitutionKind.DREETS_GEIQ,
             ):
                 menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
-        if is_allowed_to_use_gps(request) and show_gps_as_a_nav_entry(request):
-            menu_items.append(NAV_ENTRIES["gps"])
         menu_items.append(
             NavGroup(
                 label="Rechercher",
