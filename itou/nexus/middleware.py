@@ -13,7 +13,7 @@ from itou.users.models import User
 logger = logging.getLogger(__name__)
 
 
-class ProConnectLoginMiddleware(MiddlewareMixin):
+class AutoLoginMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if "auto_login" not in request.GET:
             return
@@ -37,22 +37,22 @@ class ProConnectLoginMiddleware(MiddlewareMixin):
             logger.info("Invalid auto login token")
 
         if email is None:
-            logger.info("ProConnect auto login: Missing email in token -> ignored")
+            logger.info("Nexus auto login: Missing email in token -> ignored")
             return HttpResponseRedirect(new_url)
 
         if request.user.is_authenticated:
             if request.user.email == email:
-                logger.info("ProConnect auto login: user is already logged in")
+                logger.info("Nexus auto login: user is already logged in")
                 return HttpResponseRedirect(new_url)
             else:
-                logger.info("ProConnect auto login: wrong user is logged in -> logging them out")
+                logger.info("Nexus auto login: wrong user is logged in -> logging them out")
                 # We should probably also logout the user from ProConnect but it requires to redirect to ProConnect
                 # and the flow becomes a lotmore complicated
                 logout(request)
 
         try:
             user = User.objects.get(email=email, kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
-            logger.info("ProConnect auto login: %s was found and forwarded to ProConnect", user)
+            logger.info("Nexus auto login: %s was found and forwarded to ProConnect", user)
             return HttpResponseRedirect(
                 reverse(
                     "pro_connect:authorize",
@@ -62,5 +62,5 @@ class ProConnectLoginMiddleware(MiddlewareMixin):
         except User.DoesNotExist:
             # There's no user with this email, we have to create them an account but we need to know
             # if they are a prescriber or an employer.
-            logger.info("ProConnect auto login: no user found for jwt=%s", token)
+            logger.info("Nexus auto login: no user found for jwt=%s", token)
             return HttpResponseRedirect(reverse("signup:choose_user_kind", query={"next_url": new_url}))
