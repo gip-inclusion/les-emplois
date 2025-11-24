@@ -21,7 +21,7 @@ def test_middleware_for_authenticated_user(client, params, expected_params, capl
 
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(response, f"/{expected_params}", fetch_redirect_response=False)
-    assert caplog.messages == ["ProConnect auto login: user is already logged in"]
+    assert caplog.messages == ["Nexus auto login: user is already logged in"]
 
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
@@ -41,8 +41,8 @@ def test_middleware_for_wrong_authenticated_user(client, params, expected_params
         fetch_redirect_response=False,
     )
     assert caplog.messages == [
-        "ProConnect auto login: wrong user is logged in -> logging them out",
-        f"ProConnect auto login: {user} was found and forwarded to ProConnect",
+        "Nexus auto login: wrong user is logged in -> logging them out",
+        f"Nexus auto login: {user} was found and forwarded to ProConnect",
     ]
 
 
@@ -52,7 +52,7 @@ def test_middleware_multiple_tokens(client, caplog):
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(response, reverse("home:hp"), fetch_redirect_response=False)
     assert caplog.messages == [
-        "ProConnect auto login: Multiple tokens found -> ignored",
+        "Nexus auto login: Multiple tokens found -> ignored",
     ]
 
 
@@ -63,7 +63,7 @@ def test_middleware_invalid_token(client, caplog):
     assert caplog.messages == [
         "Could not decrypt jwt",
         "Invalid auto login token",
-        "ProConnect auto login: Missing email in token -> ignored",
+        "Nexus auto login: Missing email in token -> ignored",
     ]
 
 
@@ -77,7 +77,7 @@ def test_middleware_with_no_existing_user(client, params, expected_params, caplo
         reverse("signup:choose_user_kind", query={"next_url": f"/{expected_params}"}),
         fetch_redirect_response=False,
     )
-    assert caplog.messages == [f"ProConnect auto login: no user found for jwt={jwt}"]
+    assert caplog.messages == [f"Nexus auto login: no user found for jwt={jwt}"]
 
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
@@ -94,7 +94,7 @@ def test_middleware_for_unlogged_user(client, params, expected_params, caplog):
         ),
         fetch_redirect_response=False,
     )
-    assert caplog.messages == [f"ProConnect auto login: {user} was found and forwarded to ProConnect"]
+    assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
 
     # It also works if it's not a ProConnect user
     user.identity_provider = IdentityProvider.INCLUSION_CONNECT
@@ -110,4 +110,4 @@ def test_middleware_for_unlogged_user(client, params, expected_params, caplog):
         ),
         fetch_redirect_response=False,
     )
-    assert caplog.messages == [f"ProConnect auto login: {user} was found and forwarded to ProConnect"]
+    assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
