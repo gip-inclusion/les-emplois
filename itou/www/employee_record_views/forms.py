@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.validators import RegexValidator
 from django.forms import widgets
 from django.urls import reverse, reverse_lazy
@@ -11,7 +12,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import Title
 from itou.users.forms import JobSeekerProfileModelForm
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import ERROR_UNIQUE_NIR_CODE, JobSeekerProfile
 from itou.utils.validators import validate_nir, validate_ntt
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 from itou.www.employee_record_views.enums import EmployeeRecordOrder
@@ -212,29 +213,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
                     ),
                 )
         else:
-            if nir := self.cleaned_data.get("nir"):
-                if (
-                    existing_user := User.objects.filter(jobseeker_profile__nir=nir)
-                    .exclude(pk=self.instance.pk)
-                    .first()
-                ):
-                    self.add_error(
-                        None,
-                        forms.ValidationError(
-                            format_html(
-                                '<p class="mb-2">'
-                                "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.Veuillez "
-                                "vérifier votre saisie ou demander la régularisation à notre équipe technique.</p>"
-                                '<a href="{}" class="btn btn-primary">Régulariser le n⁰ de sécurité sociale</a>',
-                                reverse(
-                                    "job_seekers_views:nir_modification_request",
-                                    kwargs={"public_id": existing_user.public_id},
-                                    query={"back_url": self._back_url} if self._back_url else None,
-                                ),
-                            )
-                        ),
-                    )
-            else:
+            if not self.cleaned_data.get("nir"):
                 self.add_error(
                     "nir",
                     forms.ValidationError(
@@ -250,8 +229,28 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
             # If NIR is provided, reset lack_of_nir_reason to avoid constraint validation error
             self.cleaned_data["lack_of_nir_reason"] = ""
         super()._post_clean()
-        # TODO: vérifier les erreurs présentes pour __all__ et si "Ce numéro de sécurité sociale est déjà associé
-        # à un autre utilisateur." (utiliser le message de la contrainte) -> rajouter le HTML
+        if self.has_error(NON_FIELD_ERRORS, code=ERROR_UNIQUE_NIR_CODE):
+            # Remove the unique nir error message to provide our ownn
+            [unique_nir_error] = [
+                error for error in self.errors[NON_FIELD_ERRORS].data if error.code == ERROR_UNIQUE_NIR_CODE
+            ]
+            self.errors[NON_FIELD_ERRORS].remove(unique_nir_error)
+            self.add_error(
+                None,
+                forms.ValidationError(
+                    format_html(
+                        '<p class="mb-2">'
+                        "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur. Veuillez "
+                        "vérifier votre saisie ou demander la régularisation à notre équipe technique.</p>"
+                        '<a href="{}" class="btn btn-primary">Régulariser le n⁰ de sécurité sociale</a>',
+                        reverse(
+                            "job_seekers_views:nir_modification_request",
+                            kwargs={"public_id": self.instance.public_id},
+                            query={"back_url": self._back_url} if self._back_url else None,
+                        ),
+                    )
+                ),
+            )
 
 
 class NewEmployeeRecordStep2Form(forms.ModelForm):
