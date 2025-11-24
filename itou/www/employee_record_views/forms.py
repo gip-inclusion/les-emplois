@@ -205,7 +205,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
                         forms.ValidationError("Ce numéro technique temporaire est déjà associé à un autre salarié."),
                     )
 
-            else:
+            elif not self.has_error("ntt"):  # Avoid double error message
                 self.add_error(
                     "ntt",
                     forms.ValidationError(
