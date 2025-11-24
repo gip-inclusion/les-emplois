@@ -14,7 +14,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from rest_framework.authtoken.models import Token
 
 from itou.antivirus.models import Scan
-from itou.api.models import CompanyToken, DepartmentToken
+from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
 from itou.asp.models import Department
 from itou.emails.models import Email
 from itou.external_data.models import ExternalDataImport
@@ -75,6 +75,7 @@ def test_all_admin(admin_client, mocker, subtests):
     create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
     auth_models.Group.objects.create(name="Groupe de test")
     CompanyToken.objects.create(label="Test")
+    ServiceToken.objects.create(service="dora")
     DepartmentToken.objects.create(department="01", label="Token tests département 01")
     Scan.objects.create(file=FileFactory(), clamav_signature="toto")
     Department.objects.create(code="33", name="Gironde", start_date=timezone.localdate())

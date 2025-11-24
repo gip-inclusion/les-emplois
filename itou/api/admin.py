@@ -1,7 +1,7 @@
 from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
-from itou.api.models import CompanyToken, DepartmentToken
+from itou.api.models import CompanyToken, DepartmentToken, ServiceToken
 from itou.utils.admin import ItouModelAdmin
 
 
@@ -30,3 +30,10 @@ class DepartmentTokenAdmin(ItouModelAdmin):
         if obj:
             return ["department"] + self.readonly_fields
         return self.readonly_fields
+
+
+@admin.register(ServiceToken)
+class ServiceTokenAdmin(ItouModelAdmin):
+    list_display = ["service", "created_at"]
+    ordering = ["-created_at"]
+    readonly_fields = ["key", "created_at"]
