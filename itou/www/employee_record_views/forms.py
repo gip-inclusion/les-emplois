@@ -246,9 +246,10 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
         JobSeekerProfile.clean_nir_title_birthdate_fields(self.cleaned_data)
 
     def _post_clean(self):
+        if self.cleaned_data.get("nir"):
+            # If NIR is provided, reset lack_of_nir_reason to avoid constraint validation error
+            self.cleaned_data["lack_of_nir_reason"] = ""
         super()._post_clean()
-        if self.instance.jobseeker_profile.nir and self.instance.jobseeker_profile.lack_of_nir_reason:
-            self.instance.jobseeker_profile.lack_of_nir_reason = ""
         # TODO: vérifier les erreurs présentes pour __all__ et si "Ce numéro de sécurité sociale est déjà associé
         # à un autre utilisateur." (utiliser le message de la contrainte) -> rajouter le HTML
 
