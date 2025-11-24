@@ -105,6 +105,15 @@
                       </div>
                   </li>
                   <li class="nav-item">
+                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
+                          <i aria-hidden="true" class="ri-pin-distance-line fw-medium">
+                          </i>
+                          <span>
+                              Réseau d'intervenants
+                          </span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
                       <button aria-controls="collapse-nav-structure" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-structure" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-community-line fw-medium">
                           </i>
@@ -1032,6 +1041,15 @@
                       </div>
                   </li>
                   <li class="nav-item">
+                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
+                          <i aria-hidden="true" class="ri-pin-distance-line fw-medium">
+                          </i>
+                          <span>
+                              Réseau d'intervenants
+                          </span>
+                      </a>
+                  </li>
+                  <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
                           <i aria-hidden="true" class="ri-team-line fw-medium">
                           </i>
@@ -1339,6 +1357,15 @@
                               </li>
                           </ul>
                       </div>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups/list">
+                          <i aria-hidden="true" class="ri-pin-distance-line fw-medium">
+                          </i>
+                          <span>
+                              Réseau d'intervenants
+                          </span>
+                      </a>
                   </li>
                   <li class="nav-item">
                       <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
