@@ -1173,9 +1173,9 @@ pynacl==1.6.1 \
     --hash=sha256:e735c3a1bdfde3834503baf1a6d74d4a143920281cb724ba29fb84c9f49b9c48 \
     --hash=sha256:fc734c1696ffd49b40f7c1779c89ba908157c57345cf626be2e0719488a076d3
     # via paramiko
-pypdf==6.3.0 \
-    --hash=sha256:2d5f9741e851e378908692d571374b3cbd94582fdd1c740fcf7c029ec35ac0e6 \
-    --hash=sha256:d066a2fdf8195e1811ae5a9d5a2f97f5bed0e1e7954297295eadee6357e76c5d
+pypdf==6.4.0 \
+    --hash=sha256:4769d471f8ddc3341193ecc5d6560fa44cf8cd0abfabf21af4e195cc0c224072 \
+    --hash=sha256:55ab9837ed97fd7fcc5c131d52fcc2223bc5c6b8a1488bbf7c0e27f1f0023a79
     # via -r requirements/base.in
 python-dateutil==2.9.0.post0 \
     --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
