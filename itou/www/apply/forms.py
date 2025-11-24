@@ -944,7 +944,8 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         for form_field_name, job_application_field_name in self.get_autocomplete_fields_to_clean().items():
             # Prevent user enumeration by checking that selected values are valid
             if instances := self.cleaned_data.get(form_field_name):
-                if not isinstance(instances, list):
+                if form_field_name == "job_seeker":
+                    # job_seeker is a single selection field
                     instances = [instances]
                 valid_values = self.job_applications_qs.filter(
                     **{f"{job_application_field_name}__in": instances}
