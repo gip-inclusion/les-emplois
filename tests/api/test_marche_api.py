@@ -9,7 +9,6 @@ from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company
 from itou.nexus.enums import Service
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.users.factories import EmployerFactory
 from tests.utils.testing import BASE_NUM_QUERIES
 
 
@@ -22,9 +21,6 @@ NUM_QUERIES += 1  # Prefetch members
 
 class TestMarcheCompanyAPI:
     url = reverse("v1:marche-company-list")
-
-    def setup_method(self):
-        self.user = EmployerFactory()
 
     def api_client(self, service=Service.MARCHE):
         headers = {}
