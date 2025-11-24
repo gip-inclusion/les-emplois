@@ -913,6 +913,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             autocomplete_view_name, kwargs={"field_name": "job_seeker"}
         )
         self.fields["job_seeker"].widget.label_from_instance = get_field_label_from_instance("job_seeker", request)
+        self.fields["job_seeker"].queryset = self.fields["job_seeker"].queryset.filter(
+            pk__in=self.job_applications_qs.get_unique_fk_qs("job_seeker").values_list("job_seeker_id", flat=True)
+        )
 
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
         self.fields["departments"].choices = self._get_choices_for_departments()
