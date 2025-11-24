@@ -1116,15 +1116,17 @@ class TestListPrescriptionsSenders:
     def test_as_prescriber(self, client, snapshot):
         job_application = JobApplicationFactory()
         client.force_login(job_application.sender)
+        senders_autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
 
         # A term is needed to search
-        response = client.get(reverse("apply:list_prescriptions_senders"))
+        response = client.get(senders_autocomplete_url)
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
             response = client.get(
-                reverse("apply:list_prescriptions_senders"), {"term": job_application.sender.get_full_name()}
+                senders_autocomplete_url,
+                {"term": job_application.sender.get_full_name()},
             )
         assert response.status_code == 200
         assert response.json() == {
@@ -1135,7 +1137,7 @@ class TestListPrescriptionsSenders:
                 },
             ]
         }
-        response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "Nom sans aucun rapport"})
+        response = client.get(senders_autocomplete_url, {"term": "Nom sans aucun rapport"})
         assert response.json() == {"results": []}
 
     def test_as_employer(self, client, snapshot):
@@ -1163,14 +1165,15 @@ class TestListPrescriptionsSenders:
             sender_kind=SenderKind.EMPLOYER,
         )
         client.force_login(employer)
+        senders_autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
 
         # A term is needed to search
-        response = client.get(reverse("apply:list_prescriptions_senders"))
+        response = client.get(senders_autocomplete_url)
         assert response.status_code == 200
         assert response.json() == {"results": []}
 
         with assertSnapshotQueries(snapshot(name="SQL queries")):
-            response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "alice"})
+            response = client.get(senders_autocomplete_url, {"term": "alice"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -1181,5 +1184,5 @@ class TestListPrescriptionsSenders:
             ]
         }
 
-        response = client.get(reverse("apply:list_prescriptions_senders"), {"term": "Nom sans aucun rapport"})
+        response = client.get(senders_autocomplete_url, {"term": "Nom sans aucun rapport"})
         assert response.json() == {"results": []}
