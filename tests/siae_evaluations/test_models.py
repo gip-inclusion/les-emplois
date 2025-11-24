@@ -560,7 +560,7 @@ class TestEvaluationCampaignManager:
 
     @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
-        institution = InstitutionFactory(name="DDETS 1", department="01")
+        institution = InstitutionFactory(name="DDETS 1", department="01", with_membership=True)
         ignored_siae = EvaluatedSiaeFactory(pk=1000, siae__pk=2000, evaluation_campaign__institution=institution)
         campaign = EvaluationCampaignFactory(institution=institution)
         # Did not select eligibility criteria to justify.

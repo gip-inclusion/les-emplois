@@ -27,6 +27,7 @@ class TestEvaluationCampaignAdmin:
         campaign1 = EvaluationCampaignFactory(name="Contrôle 01/01/2022", institution=institution)
         campaign1_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign1,
+            siae__with_membership=False,  # Created manually.
             siae__name="les jardins",
             siae__siret="00000000000040",
             siae__convention__siret_signature="00000000000032",
@@ -37,6 +38,7 @@ class TestEvaluationCampaignAdmin:
         campaign2 = EvaluationCampaignFactory(name="Contrôle 01/01/2021", institution=institution)
         campaign2_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign2,
+            siae__with_membership=False,  # Created manually.
             siae__name="les trucs du bazar",
             siae__siret="12345678900040",
             siae__convention__siret_signature="12345678900032",
@@ -49,6 +51,7 @@ class TestEvaluationCampaignAdmin:
         )
         campaign3_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign3,
+            siae__with_membership=False,  # Created manually.
             siae__name="les bidules",
             siae__siret="11111111100040",
             siae__convention__siret_signature="11111111100032",
@@ -61,6 +64,7 @@ class TestEvaluationCampaignAdmin:
         campaign4 = EvaluationCampaignFactory(name="Contrôle 01/01/2018", institution=institution)
         campaign4_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign4,
+            siae__with_membership=False,  # Created manually.
             siae__name="les machins",
             siae__convention__siret_signature="22222222200032",
             siae__phone="0622222222",
@@ -69,6 +73,7 @@ class TestEvaluationCampaignAdmin:
         )
         EvaluatedSiaeFactory(
             evaluation_campaign=campaign4,
+            siae__with_membership=False,  # Created manually.
             siae__name="les machins le retour",
             siae__convention__siret_signature="22222222200033",
             siae__phone="0633333333",
@@ -83,7 +88,9 @@ class TestEvaluationCampaignAdmin:
         CompanyMembershipFactory(company=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         # Not selected.
         EvaluatedSiaeFactory(
-            evaluation_campaign__name="Contrôle 02/02/2020", evaluation_campaign__institution__department="02"
+            evaluation_campaign__name="Contrôle 02/02/2020",
+            evaluation_campaign__institution__department="02",
+            siae__with_membership=False,  # Created manually.
         )
         admin_user = ItouStaffFactory(is_superuser=True)
         client.force_login(admin_user)
