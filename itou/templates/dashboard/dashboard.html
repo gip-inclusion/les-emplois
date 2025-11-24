@@ -243,9 +243,6 @@
                             {% if user.is_employer or user.is_prescriber %}
                                 <h2>Services partenaires</h2>
                                 <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                                    {% if can_view_gps_card %}
-                                        {% include "dashboard/includes/gps_card.html" %}
-                                    {% endif %}
                                     {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                                 </div>
                             {% endif %}
