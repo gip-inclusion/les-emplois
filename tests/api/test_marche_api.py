@@ -165,7 +165,7 @@ class TestMarcheCompanyAPI:
 
     def test_list_companies_without_admins(self):
         api_client = self.api_client()
-        company = CompanyFactory(convention=None)
+        company = CompanyFactory()
         # An active admin membership on a disabled user
         CompanyMembershipFactory(company=company, user__is_active=False, is_active=True, is_admin=True)
         # An inactive admin membership
@@ -186,7 +186,7 @@ class TestMarcheCompanyAPI:
 
     def test_list_companies_with_multiple_admins(self):
         api_client = self.api_client()
-        company = CompanyFactory(convention=None)
+        company = CompanyFactory()
         CompanyMembershipFactory(company=company, joined_at=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC))
         latest_admin = CompanyMembershipFactory(
             company=company, joined_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC)
