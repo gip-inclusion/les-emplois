@@ -1,0 +1,64 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load str_filters %}
+
+{% block title %}Import du fichier ACI Convergence / PHC {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Import du fichier ACI Convergence / PHC</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    {% if request.method == "POST" %}
+                        <div class="c-box mb-5">
+                            <h2>Résultats de l’import</h2>
+                            <p>{{ sirets_in_file }} SIRET dans le document.</p>
+
+                            <h3>Ajouté{{ to_add|length|pluralizefr }}</h3>
+                            {% if not to_add %}
+                                <p>Aucun</p>
+                            {% else %}
+                                <ul>
+                                    {% for item in to_add %}<li>{{ item|format_siret }}</li>{% endfor %}
+                                </ul>
+                            {% endif %}
+
+                            <h3>Retiré{{ to_delete|length|pluralizefr }}</h3>
+                            {% if not to_delete %}
+                                <p>Aucun</p>
+                            {% else %}
+                                <ul>
+                                    {% for item in to_delete %}<li>{{ item|format_siret }}</li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <div class="c-form">
+                        <h2>Fichier à importer</h2>
+                        <p>
+                            Le fichier peut contenir plusieurs feuilles. Dans chaque feuille, une colonne intitulée « SIRET » doit contenir le SIRET d’une ACI Convergence ou PHC. Les espaces et caractères spéciaux sont ignorés.
+                        </p>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {% itou_buttons_form primary_label="Importer" %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

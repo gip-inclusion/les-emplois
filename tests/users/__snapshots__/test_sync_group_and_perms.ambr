@@ -137,6 +137,7 @@
     'add_company',
     'change_company',
     'delete_company',
+    'import_aci_convergence_phc',
     'view_company',
     'add_companymembership',
     'change_companymembership',

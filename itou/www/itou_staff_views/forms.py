@@ -1,12 +1,17 @@
 import datetime
+import re
 
+import pandas
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.files.forms import ItouFileField
 from itou.users.models import User
+from itou.utils.constants import MB
+from itou.utils.validators import validate_siret
 from itou.utils.widgets import DuetDatePickerWidget
 
 
@@ -45,6 +50,42 @@ class ItouStaffExportJobApplicationForm(forms.Form):
                     "L’intervalle de date de création de compte est invalide, la fin est avant le début."
                 )
         return cleaned_data
+
+
+class ImportACIConvergencePHCForm(forms.Form):
+    file = ItouFileField(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        max_upload_size=1 * MB,
+        label="Fichier ACI Convergence PHC",
+    )
+
+    def clean(self):
+        if not self.errors:
+            file = self.cleaned_data["file"]
+            siret_column = "SIRET"
+            siret_replace_re = re.compile(r"[^0-9]*")
+            df = pandas.read_excel(
+                file,
+                converters={siret_column: lambda siret: siret_replace_re.sub("", siret)},
+                sheet_name=None,
+                usecols=[siret_column],
+            )
+            document_sirets = set()
+            for sheet_name, columns in df.items():
+                try:
+                    sirets = columns["SIRET"]
+                except KeyError:
+                    self.add_error("__all__", f"La feuille de calcul « {sheet_name} » n’a pas de colonne SIRET.")
+                    continue
+                for row_index, siret in enumerate(sirets, 2):
+                    try:
+                        validate_siret(siret)
+                    except ValidationError as e:
+                        self.add_error("__all__", f"Feuille « {sheet_name} », ligne {row_index} : {e.message}")
+                    else:
+                        document_sirets.add(siret)
+            return {"document_sirets": document_sirets}
+        return self.cleaned_data
 
 
 class MergeUserForm(forms.Form):

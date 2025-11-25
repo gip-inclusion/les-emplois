@@ -2581,6 +2581,35 @@
     ),
   ])
 # ---
+# name: TestImportAciConvergencePHC.test_import_file_summary
+  '''
+  <div class="c-box mb-5">
+      <h2>
+          Résultats de l’import
+      </h2>
+      <p>
+          2 SIRET dans le document.
+      </p>
+      <h3>
+          Ajouté
+      </h3>
+      <ul>
+          <li>
+              999 999 999 00016
+          </li>
+      </ul>
+      <h3>
+          Retiré
+      </h3>
+      <ul>
+          <li>
+              000 000 000 00000
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
 # name: TestMergeUsers.test_merge_order[same_order]
   '''
   <div class="row mb-5" id="users_info">

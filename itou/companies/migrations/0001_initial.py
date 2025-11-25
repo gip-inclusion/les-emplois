@@ -425,6 +425,9 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "entreprise",
                 "unique_together": {("siret", "kind")},
+                "permissions": [
+                    ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
+                ],
             },
             managers=[
                 ("objects", itou.companies.models.CompanyManager()),

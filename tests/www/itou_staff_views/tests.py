@@ -21,7 +21,7 @@ from pytest_django.asserts import (
 )
 from rest_framework.authtoken.models import Token
 
-from itou.companies.models import CompanyMembership
+from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
 from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
@@ -271,6 +271,92 @@ class TestExportCTA:
             assert response.status_code == 200
             assert response["Content-Disposition"] == ('attachment; filename="export_cta_2024-05-17_11-11-11.csv"')
             assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")
+
+
+class TestImportAciConvergencePHC:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            (JobSeekerFactory, {}, 403),
+            (EmployerFactory, {"membership": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 302),
+            (ItouStaffFactory, {"is_superuser": True}, 200),
+        ],
+    )
+    def test_requires_staff(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:import_aci_convergence_phc"))
+        assert response.status_code == expected_status
+
+    def test_permission(self, client, settings):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("itou_staff_views:import_aci_convergence_phc")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="import_aci_convergence_phc"))
+        response = client.get(url)
+        assert response.status_code == 200
+
+    def test_import_file_summary(self, admin_client, snapshot):
+        remaining_siret = "12345678900012"
+        SiaeACIConvergencePHC.objects.create(siret=remaining_siret)
+        new_siret = "99999999900016"
+        SiaeACIConvergencePHC.objects.create(siret="00000000000000")
+        with io.BytesIO() as xlsxfile:
+            workbook = openpyxl.Workbook()
+            convergence_sheet = workbook.active
+            phc_sheet = workbook.create_sheet("PHC")
+            convergence_sheet.append(["SIRET"])
+            convergence_sheet.append([remaining_siret])
+            phc_sheet.append(["SIRET"])
+            phc_sheet.append([new_siret])
+            workbook.save(xlsxfile)
+            xlsxfile.seek(0)
+            xlsxfile.name = "aci_phc_convergence.xlsx"
+            response = admin_client.post(reverse("itou_staff_views:import_aci_convergence_phc"), {"file": xlsxfile})
+        assert response.status_code == 200
+        assert response.context["form"].errors == {}
+        soup = parse_response_to_soup(response, selector=".c-box")
+        assert pretty_indented(soup) == snapshot()
+        assertQuerySetEqual(
+            SiaeACIConvergencePHC.objects.values_list("siret", flat=True),
+            [remaining_siret, new_siret],
+            ordered=False,
+        )
+
+    def test_import_file_invalid_siret(self, admin_client):
+        siren = "123456789"
+        with io.BytesIO() as xlsxfile:
+            workbook = openpyxl.Workbook()
+            workbook.remove(workbook.active)
+            convergence_sheet = workbook.create_sheet("Convergence")
+            convergence_sheet.append(["SIRET"])
+            convergence_sheet.append([siren])
+            workbook.save(xlsxfile)
+            xlsxfile.seek(0)
+            xlsxfile.name = "aci_phc_convergence.xlsx"
+            response = admin_client.post(reverse("itou_staff_views:import_aci_convergence_phc"), {"file": xlsxfile})
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+                <p>
+                    <strong>Votre formulaire contient une erreur</strong>
+                </p>
+                <ul class="mb-0">
+                    <li>Feuille « Convergence », ligne 2 : Le numéro SIRET doit être composé de 14 chiffres.</li>
+                </ul>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        assert SiaeACIConvergencePHC.objects.exists() is False
 
 
 class TestMergeUsers:
