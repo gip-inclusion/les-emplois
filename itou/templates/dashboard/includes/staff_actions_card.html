@@ -1,16 +1,26 @@
-{% if perms.users.merge_users %}
+{% if perms.companies.import_aci_convergence_phc or perms.users.merge_users %}
     <div class="col mb-3 mb-md-4">
         <div class="c-box p-0 h-100">
             <div class="p-3 p-lg-4">
                 <span class="h4 m-0">Actions</span>
             </div>
             <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                <p class="mb-3 mb-lg-5">
-                    <a href="{% url 'itou_staff_views:merge_users' %}" class="btn-link btn-ico">
-                        <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
-                        <span>Fusion de comptes</span>
-                    </a>
-                </p>
+                {% if perms.users.merge_users %}
+                    <p class="mb-3 mb-lg-5">
+                        <a href="{% url 'itou_staff_views:merge_users' %}" class="btn-link btn-ico">
+                            <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Fusion de comptes</span>
+                        </a>
+                    </p>
+                {% endif %}
+                {% if perms.companies.import_aci_convergence_phc %}
+                    <p class="mb-3 mb-lg-5">
+                        <a href="{% url 'itou_staff_views:import_aci_convergence_phc' %}" class="btn-link btn-ico">
+                            <i class="ri-upload-line ri-lg fw-normal" aria-hidden="true"></i>
+                            <span>Import ACI Convergence / PHC</span>
+                        </a>
+                    </p>
+                {% endif %}
             </div>
         </div>
     </div>
