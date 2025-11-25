@@ -83,7 +83,7 @@ class TestDataInclusionSiaeStructure:
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
-        company_2 = CompanyFactory(
+        company_3 = CompanyFactory(
             siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
         )
 
@@ -102,7 +102,7 @@ class TestDataInclusionSiaeStructure:
             (company_2, company_2.siret, False),
             # siae is user created, but it has its own siret
             # so it is not an antenne according to data.inclusion
-            (company_2, company_2.siret, False),
+            (company_3, company_3.siret, False),
         ]:
             structure_data = next(
                 (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
