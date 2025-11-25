@@ -128,6 +128,7 @@ def test_check_verbose_name_lower():
     def bad_name(name):
         first_word, *rest = name.split()
         return first_word[0].isupper() and first_word not in {
+            "ACI",
             "CV",
             "DDETS",
             "GEIQ",
@@ -138,6 +139,7 @@ def test_check_verbose_name_lower():
             "QPV",
             "ROME",
             "SIAE",
+            "SIRET",
             "URL",
             "ZRR",
         }
