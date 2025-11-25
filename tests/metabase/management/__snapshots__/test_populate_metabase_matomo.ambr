@@ -84,8 +84,6 @@
           'update_table_at_date[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.handle[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -95,8 +93,6 @@
           'update_table_at_date[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.handle[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
         ]),
         'sql': 'CREATE TABLE IF NOT EXISTS "suivi_visiteurs_tb_publics_v1" ("Unique visitors" varchar,"Visits" varchar,"Users" varchar,"Actions" varchar,"Maximum actions in one visit" varchar,"Bounces" varchar,"Total time spent by visitors (in seconds)" varchar,"New Visits" varchar,"Actions by New Visits" varchar,"Unique new visitors" varchar,"New Users" varchar,"max_actions_new" varchar,"Bounce Rate for New Visits" varchar,"Avg. Actions per New Visit" varchar,"Avg. Duration of a New Visit (in sec)" varchar,"Returning Visits" varchar,"Actions by Returning Visits" varchar,"Unique returning visitors" varchar,"Returning Users" varchar,"Maximum actions in one returning visit" varchar,"Bounce Rate for Returning Visits" varchar,"Avg. Actions per Returning Visit" varchar,"Avg. Duration of a Returning Visit (in sec)" varchar,"Visitors from Search Engines" varchar,"Visitors from Social Networks" varchar,"Visitors from Direct Entry" varchar,"Visitors from Websites" varchar,"Visitors from Campaigns" varchar,"Distinct search engines" varchar,"Distinct social networks" varchar,"Distinct keywords" varchar,"Distinct websites" varchar,"Referrers_distinctWebsitesUrls" varchar,"Distinct campaigns" varchar,"Percent of Visitors from Direct Entry" varchar,"Percent of Visitors from Search Engines" varchar,"Percent of Visitors from Campaigns" varchar,"Percent of Visitors from Social Networks" varchar,"Percent of Visitors from Websites" varchar,"PagePerformance_network_time" varchar,"PagePerformance_network_hits" varchar,"PagePerformance_servery_time" varchar,"PagePerformance_server_hits" varchar,"PagePerformance_transfer_time" varchar,"PagePerformance_transfer_hits" varchar,"PagePerformance_domprocessing_time" varchar,"PagePerformance_domprocessing_hits" varchar,"PagePerformance_domcompletion_time" varchar,"PagePerformance_domcompletion_hits" varchar,"PagePerformance_onload_time" varchar,"PagePerformance_onload_hits" varchar,"PagePerformance_pageload_time" varchar,"PagePerformance_pageload_hits" varchar,"Avg. network time" varchar,"Avg. server time" varchar,"Avg. transfer time" varchar,"Avg. DOM processing time" varchar,"Avg. DOM completion time" varchar,"Avg. on load time" varchar,"Avg. page load time" varchar,"Conversions" varchar,"Visits with Conversions" varchar,"Revenue" varchar,"Conversion Rate" varchar,"nb_conversions_new_visit" varchar,"nb_visits_converted_new_visit" varchar,"revenue_new_visit" varchar,"conversion_rate_new_visit" varchar,"nb_conversions_returning_visit" varchar,"nb_visits_converted_returning_visit" varchar,"revenue_returning_visit" varchar,"conversion_rate_returning_visit" varchar,"Pageviews" varchar,"Unique Pageviews" varchar,"Downloads" varchar,"Unique Downloads" varchar,"Outlinks" varchar,"Unique Outlinks" varchar,"Searches" varchar,"Unique Keywords" varchar,"Bounce Rate" varchar,"Actions per Visit" varchar,"Avg. Visit Duration (in seconds)" varchar,"Date" varchar,"Tableau de bord" varchar)',
       }),
@@ -104,8 +100,6 @@
         'origin': list([
           'update_table_at_date[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.handle[metabase/management/commands/populate_metabase_matomo.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
@@ -118,8 +112,6 @@
         'origin': list([
           'update_table_at_date[metabase/management/commands/populate_metabase_matomo.py]',
           'Command.handle[metabase/management/commands/populate_metabase_matomo.py]',
-          'Command.execute[utils/command.py]',
-          'Command.execute[utils/command.py]',
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''

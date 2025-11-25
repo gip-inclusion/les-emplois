@@ -1,9 +1,11 @@
 import argparse
 import uuid
 
+from itoutils.django.commands import dry_runnable
+
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.utils.command import BaseCommand, dry_runnable
+from itou.utils.command import BaseCommand
 
 
 class Command(BaseCommand):
