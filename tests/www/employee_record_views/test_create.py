@@ -359,6 +359,43 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         assertRedirects(response, target_url)
 
+    def test_no_nir(self, client):
+        valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+
+        client.force_login(self.user)
+        client.get(self.url)
+
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data["nir"] = valid_nir_for_birthdate
+        response = client.post(self.url, data=data)
+
+        # Redirects must go to step 2
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+
+        assertRedirects(response, target_url)
+
+    def test_no_nir_other_user(self, client):
+        valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        JobSeekerFactory(jobseeker_profile__nir=valid_nir_for_birthdate)
+
+        client.force_login(self.user)
+        client.get(self.url)
+
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data["nir"] = valid_nir_for_birthdate
+        response = client.post(self.url, data=data)
+
+        # Redirects must go to step 2
+        target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
+
+        assertRedirects(response, target_url)
+
 
 class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
     NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
