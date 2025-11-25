@@ -276,7 +276,7 @@
     dict({
       'applied_at': datetime.date(2022, 3, 1),
       'company_department': '72',
-      'company_has_convention': False,
+      'company_has_convention': True,
       'company_kind': 'EI',
       'company_naf': '4572A',
       'had_approval': False,
