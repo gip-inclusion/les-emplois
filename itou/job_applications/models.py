@@ -884,6 +884,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         permissions = [
             ("export_job_applications_unknown_to_ft", "Can export job applications of job seekers unknown to FT")
         ]
+        indexes = [models.Index(fields=["to_company_id", "hiring_start_at"])]
 
     def __str__(self):
         return str(self.id)
