@@ -13,6 +13,7 @@ urlpatterns = [
     ),
     path("export-ft-api-rejections", views.export_ft_api_rejections, name="export_ft_api_rejections"),
     path("export-cta", views.export_cta, name="export_cta"),
+    path("import-aci-convergence-phc", views.import_aci_convergence_phc, name="import_aci_convergence_phc"),
     path("merge-users", views.merge_users, name="merge_users"),
     path(
         "merge-users/<uuid:user_1_public_id>/<uuid:user_2_public_id>",

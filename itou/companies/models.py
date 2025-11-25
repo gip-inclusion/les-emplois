@@ -361,6 +361,9 @@ class Company(AddressMixin, OrganizationAbstract):
         verbose_name = "entreprise"
         unique_together = ("siret", "kind")
         triggers = [FieldsHistory(name="company_fields_history", fields=["siret"])]
+        permissions = [
+            ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
+        ]
 
     @property
     def accept_survey_url(self):

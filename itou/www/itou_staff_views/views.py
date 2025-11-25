@@ -18,7 +18,7 @@ from django_otp import devices_for_user, login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.approvals.models import Approval
-from itou.companies.models import CompanyMembership
+from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
@@ -35,6 +35,7 @@ from itou.www.itou_staff_views.export_utils import (
 )
 from itou.www.itou_staff_views.forms import (
     ConfirmTOTPDeviceForm,
+    ImportACIConvergencePHCForm,
     ItouStaffExportJobApplicationForm,
     MergeUserConfirmForm,
     MergeUserForm,
@@ -206,6 +207,36 @@ def export_cta(request):
             ),
         },
         streaming_content=(writer.writerow(row) for row in content()),
+    )
+
+
+@check_user(lambda user: user.is_staff)
+@permission_required("companies.import_aci_convergence_phc")
+def import_aci_convergence_phc(request, template_name="itou_staff_views/import_aci_convergence_phc.html"):
+    form = (
+        ImportACIConvergencePHCForm(data=request.POST, files=request.FILES)
+        if request.method == "POST"
+        else ImportACIConvergencePHCForm()
+    )
+    to_add = []
+    to_delete = []
+    document_sirets = []
+    if request.method == "POST" and form.is_valid():
+        document_sirets = form.cleaned_data["document_sirets"]
+        database_sirets = set(SiaeACIConvergencePHC.objects.values_list("siret", flat=True))
+        to_delete = database_sirets - document_sirets
+        to_add = document_sirets - database_sirets
+        SiaeACIConvergencePHC.objects.bulk_create([SiaeACIConvergencePHC(siret=siret) for siret in to_add])
+        SiaeACIConvergencePHC.objects.filter(siret__in=to_delete).delete()
+    return render(
+        request,
+        template_name,
+        {
+            "form": form,
+            "sirets_in_file": len(document_sirets),
+            "to_add": to_add,
+            "to_delete": to_delete,
+        },
     )
 
 
