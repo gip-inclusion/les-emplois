@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models import BooleanField, Case, Count, Exists, F, OuterRef, Q, Subquery, Value, When
+from django.db.models import BooleanField, Case, CheckConstraint, Count, Exists, F, OuterRef, Q, Subquery, Value, When
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.functions import Cast, Coalesce, Greatest
 from django.urls import reverse
@@ -539,7 +539,8 @@ class Company(AddressMixin, OrganizationAbstract):
     @property
     def is_aci_convergence(self):
         return (
-            self.kind == CompanyKind.ACI and self.canonical_company.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST
+            self.kind == CompanyKind.ACI
+            and SiaeACIConvergencePHC.objects.filter(siret=self.canonical_company.siret).exists()
         )
 
     def convention_can_be_accessed_by(self, user):
@@ -1138,3 +1139,24 @@ class Contract(models.Model):
         default=list,
     )
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+
+class SiaeACIConvergencePHC(models.Model):
+    siret = models.CharField(
+        editable=False,
+        max_length=14,
+        unique=True,
+        validators=[validate_siret],
+        verbose_name="SIRET",
+    )
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+
+    class Meta:
+        verbose_name = "ACI Convergence / PHC"
+        verbose_name_plural = "ACI Convergence / PHC"
+        constraints = [
+            CheckConstraint(name="aci_cvg_phc_siret", condition=Q(siret__regex=r"\A[0-9]{14}\Z")),
+        ]
+
+    def __str__(self):
+        return self.siret

@@ -101,7 +101,7 @@ class ContractType(models.TextChoices):
                 choices = [cls.FIXED_TERM_I, cls.FIXED_TERM_USAGE, cls.TEMPORARY, cls.PROFESSIONAL_TRAINING, cls.OTHER]
             case _:
                 choices = list(cls)
-                # These are only for ACI from ACI_CONVERGENCE_SIRET_WHITELIST
+                # These are only for ACI from SiaeACIConvergencePHC
                 choices.remove(cls.FIXED_TERM_I_PHC)
                 choices.remove(cls.FIXED_TERM_I_CVG)
 
