@@ -5,14 +5,14 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company, JobDescription
+from itou.companies.models import Company, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
 from itou.utils import triggers
@@ -550,8 +550,8 @@ class TestCompanyContractType:
             ("OTHER", "Autre type de contrat"),
         ]
         company = CompanyFactory(kind=CompanyKind.ACI)
-        with override_settings(ACI_CONVERGENCE_SIRET_WHITELIST=[company.siret]):
-            result = ContractType.choices_for_company(company=company)
+        SiaeACIConvergencePHC.objects.create(siret=company.siret)
+        result = ContractType.choices_for_company(company=company)
         assert result == expected
 
     def test_choices_for_siae_new_siae_kind(self):
