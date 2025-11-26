@@ -152,7 +152,15 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+          SELECT "companies_companymembership"."id",
+                 "companies_companymembership"."user_id",
+                 "companies_companymembership"."joined_at",
+                 "companies_companymembership"."is_admin",
+                 "companies_companymembership"."is_active",
+                 "companies_companymembership"."created_at",
+                 "companies_companymembership"."updated_at",
+                 "companies_companymembership"."company_id",
+                 "companies_companymembership"."updated_by_id",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
@@ -188,10 +196,12 @@
                  "users_user"."first_login",
                  "users_user"."upcoming_deletion_notified_at",
                  "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          INNER JOIN "companies_companymembership" ON ("users_user"."id" = "companies_companymembership"."user_id")
-          WHERE "companies_companymembership"."company_id" IN (%s,
-                                                               %s)
+          FROM "companies_companymembership"
+          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "companies_companymembership"."is_active"
+                 AND "companies_companymembership"."company_id" IN (%s,
+                                                                    %s))
           ORDER BY RANDOM() ASC
         ''',
       }),
