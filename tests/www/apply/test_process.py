@@ -690,7 +690,7 @@ class TestProcessViews:
         """As a job seeker, I can access the job_applications details for job seekers."""
         job_seeker = JobSeekerFactory()
 
-        job_application = JobApplicationFactory(job_seeker=job_seeker)
+        job_application = JobApplicationFactory(job_seeker=job_seeker, with_iae_eligibility_diagnosis=True)
         job_application.process()
 
         client.force_login(job_seeker)
@@ -756,6 +756,7 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber_organisation=True,
+                with_iae_eligibility_diagnosis=True,
             )
 
         user = job_application.to_company.members.first()
@@ -779,6 +780,7 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber_organisation=True,
+                with_iae_eligibility_diagnosis=True,
             )
 
         user = job_application.to_company.active_members.first()
@@ -801,6 +803,7 @@ class TestProcessViews:
             job_application = JobApplicationFactory(
                 for_snapshot=True,
                 sent_by_authorized_prescriber_organisation=True,
+                with_iae_eligibility_diagnosis=True,
             )
 
         user = job_application.to_company.active_members.first()
@@ -851,10 +854,12 @@ class TestProcessViews:
                 for_snapshot=True,
                 job_seeker=job_seeker,
                 sent_by_authorized_prescriber_organisation=True,
+                with_iae_eligibility_diagnosis=True,
             )
             job_app2 = JobApplicationFactory(
                 job_seeker=job_seeker,
                 sent_by_authorized_prescriber_organisation=True,
+                with_iae_eligibility_diagnosis=True,
             )
 
         user1 = job_app1.to_company.active_members.first()
@@ -1646,7 +1651,6 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(with_address_in_qpv=True),
-            eligibility_diagnosis=None,
         )
 
         assert job_application.state.is_processing
@@ -1708,7 +1712,6 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(with_address_in_qpv=True),
-            eligibility_diagnosis=None,
         )
 
         assert job_application.state.is_processing
@@ -2849,7 +2852,9 @@ class TestProcessAcceptViewsInWizard:
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
         # Send 3 job applications to 3 different structures
-        job_application = self.create_job_application(hiring_start_at=hiring_start_at, hiring_end_at=hiring_end_at)
+        job_application = self.create_job_application(
+            hiring_start_at=hiring_start_at, hiring_end_at=hiring_end_at, with_iae_eligibility_diagnosis=True
+        )
         job_seeker = job_application.job_seeker
 
         wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E")
@@ -4417,7 +4422,7 @@ class TestProcessTemplates:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_application = JobApplicationFactory(eligibility_diagnosis=None)
+        self.job_application = JobApplicationFactory()
         self.employer = self.job_application.to_company.members.first()
         self.url_details = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
@@ -4700,8 +4705,11 @@ def test_accept_button(client):
     assertNotContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
     job_application.to_company = CompanyFactory(kind=CompanyKind.AI, with_membership=True)
-    job_application.save()
     client.force_login(job_application.to_company.members.first())
+    job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+        from_prescriber=True, job_seeker=job_application.job_seeker
+    )
+    job_application.save()
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 

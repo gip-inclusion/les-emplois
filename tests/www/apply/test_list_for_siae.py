@@ -53,9 +53,11 @@ class TestProcessListSiae:
         job2 = JobDescriptionFactory(company=company, appellation=appellations[1], location=city)
 
         # A job application without eligibility diagnosis
-        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2], eligibility_diagnosis=None)
+        job_app = JobApplicationFactory(to_company=company, selected_jobs=[job1, job2])
         # Two with it (ensure there are no 1+N queries)
-        JobApplicationFactory.create_batch(2, to_company=company, selected_jobs=[job1, job2])
+        JobApplicationFactory.create_batch(
+            2, to_company=company, selected_jobs=[job1, job2], with_iae_eligibility_diagnosis=True
+        )
         # A job application for another company
         JobApplicationFactory()
 
@@ -150,7 +152,7 @@ class TestProcessListSiae:
         JobApplicationFactory(
             job_seeker=diagnosis.job_seeker,
             to_company=company,
-            eligibility_diagnosis=None,  # fallback on the jobseeker's
+            # fallback on the jobseeker's iae eligibility diagnosis
         )
 
         client.force_login(employer)
@@ -191,7 +193,7 @@ class TestProcessListSiae:
         JobApplicationFactory(
             job_seeker=diagnosis.job_seeker,
             to_company=company,
-            eligibility_diagnosis=None,  # fallback on the jobseeker's
+            # fallback on the jobseeker's iae eligibility diagnosis
         )
 
         TITLE = '<p class="h5">Critères administratifs IAE</p>'
@@ -442,8 +444,8 @@ class TestProcessListSiae:
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
-        job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
-        _another_job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+        job_app = JobApplicationFactory(to_company=company)
+        _another_job_app = JobApplicationFactory(to_company=company)
 
         client.force_login(employer)
         response = client.get(reverse("apply:list_for_siae"), {"eligibility_validated": True})
@@ -518,7 +520,7 @@ class TestProcessListSiae:
         employer = company.members.first()
         client.force_login(employer)
 
-        job_app = JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+        job_app = JobApplicationFactory(to_company=company)
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
@@ -637,7 +639,7 @@ class TestProcessListSiae:
 def test_list_display_kind(client):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
-    JobApplicationFactory(to_company=company, eligibility_diagnosis=None)
+    JobApplicationFactory(to_company=company)
     client.force_login(employer)
     url = reverse("apply:list_for_siae")
 
@@ -824,7 +826,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
     JobApplicationFactory(
         job_seeker=diagnosis.job_seeker,
         to_company=company,
-        eligibility_diagnosis=None,  # fallback on the jobseeker's
+        # fallback on the jobseeker's iae eligibility diagnosis
     )
 
     TITLE = '<th scope="col" class="text-nowrap">Critères administratifs</th>'
@@ -872,7 +874,7 @@ def test_list_snapshot(client, snapshot):
         assert pretty_indented(page) == snapshot(name="empty")
 
     job_seeker = JobSeekerFactory(for_snapshot=True)
-    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
+    common_kwargs = {"job_seeker": job_seeker, "with_iae_eligibility_diagnosis": True, "to_company": company}
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
 
     job_applications = [
@@ -990,8 +992,8 @@ def test_list_for_siae_exports_back_to_list(client):
 @pytest.mark.parametrize(
     "job_app_kwargs",
     [
-        pytest.param({"for_snapshot": True}, id="for_snapshot"),
-        pytest.param({"for_snapshot": True, "eligibility_diagnosis": None}, id="no_eligibility_diag"),
+        pytest.param({"for_snapshot": True, "with_iae_eligibility_diagnosis": True}, id="for_snapshot"),
+        pytest.param({"for_snapshot": True}, id="no_eligibility_diag"),
     ],
 )
 @freeze_time("2024-08-18")
@@ -1049,8 +1051,8 @@ def test_list_for_siae_exports_download_by_month(client):
     "job_app_kwargs",
     [
         pytest.param({"with_approval": True}, id="with_approval"),
-        pytest.param({}, id="with_eligibility_diag"),
-        pytest.param({"eligibility_diagnosis": None}, id="no_eligibility_diag"),
+        pytest.param({"with_iae_eligibility_diagnosis": True}, id="with_eligibility_diag"),
+        pytest.param({}, id="no_eligibility_diag"),
     ],
 )
 def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
@@ -1898,19 +1900,24 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     employer = company.members.first()
 
     acceptable_app_1 = JobApplicationFactory(
-        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"), to_company=company, state=JobApplicationState.PROCESSING
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+        with_iae_eligibility_diagnosis=True,
     )
     assert acceptable_app_1.accept.is_available()
     acceptable_app_2 = JobApplicationFactory(
         pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=company,
         state=JobApplicationState.PRIOR_TO_HIRE,
+        with_iae_eligibility_diagnosis=True,
     )
     assert acceptable_app_2.accept.is_available()
     acceptable_app_3 = JobApplicationFactory(
         pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=company,
         state=JobApplicationState.NEW,
+        with_iae_eligibility_diagnosis=True,
     )
     assert acceptable_app_3.accept.is_available()
 
@@ -2121,7 +2128,6 @@ def test_table_iae_state_and_criteria(client, snapshot):
     job_applications = [
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
             **common_kwargs,

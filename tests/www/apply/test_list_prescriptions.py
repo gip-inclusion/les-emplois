@@ -248,10 +248,8 @@ def test_filtered_by_company(client):
 
 
 def test_filtered_by_eligibility_state_prescriber(client):
-    eligibility_validated_jobapp = JobApplicationFactory()
-    eligibility_pending_jobapp = JobApplicationFactory(
-        sender=eligibility_validated_jobapp.sender, eligibility_diagnosis=None
-    )
+    eligibility_validated_jobapp = JobApplicationFactory(with_iae_eligibility_diagnosis=True)
+    eligibility_pending_jobapp = JobApplicationFactory(sender=eligibility_validated_jobapp.sender)
     client.force_login(eligibility_validated_jobapp.sender)
     response = client.get(reverse("apply:list_prescriptions"), {"eligibility_validated": "on"})
     applications = response.context["job_applications_page"].object_list
@@ -456,7 +454,10 @@ def test_exports_back_to_list(client):
 
 @freeze_time("2024-08-18")
 def test_exports_download(client, snapshot):
-    job_application = JobApplicationFactory(for_snapshot=True)
+    job_application = JobApplicationFactory(
+        for_snapshot=True,
+        with_iae_eligibility_diagnosis=True,
+    )
     JobApplicationFactory(
         created_at=timezone.now() - datetime.timedelta(days=1),  # Force application order
         job_seeker__title=Title.M,
@@ -712,7 +713,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
     job_applications = [
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
             to_company=company,
@@ -763,7 +763,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         # GEIQ
         JobApplicationFactory(
             state=JobApplicationState.REFUSED,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=no_criteria_prescriber_geiq_diag,
             job_seeker=job_seeker,  # job_seeker has IAE and GEIQ diags, we should show the corresponding criteria
             to_company=geiq,
@@ -771,7 +770,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=prescriber_geiq_diag,
             job_seeker=prescriber_geiq_diag.job_seeker,
             to_company=geiq,
@@ -779,8 +777,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.POOL,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=prescriber_geiq_diag.job_seeker,  # Second application by a prescriber, use existing diag
             to_company__kind=CompanyKind.GEIQ,
             to_company__name="L'autre GEIQ",
@@ -788,8 +784,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Sans diag Geiq",
             to_company=geiq,
@@ -798,8 +792,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         # Expired diagnosis on the job seeker, no other diagnosis
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=prescriber_expired_geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,
@@ -808,7 +800,6 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         # we currently display the old diagnosis and criteria
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=prescriber_expired_geiq_diag_on_jobapp,
             job_seeker=prescriber_expired_geiq_diag_on_jobapp.job_seeker,
             to_company=geiq,
@@ -818,16 +809,12 @@ def test_table_and_list_snapshot_as_prescriber(client, snapshot):
         # applications must come with a diagnosis. Testing the cases where the diagnoses were deleted by hand.
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,
         ),
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=geiq_diag_without_allowance.job_seeker,
             to_company=geiq,
             **common_kwargs,
@@ -966,7 +953,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
     job_applications = [
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
             job_seeker__first_name="Pas de",
             job_seeker__last_name="Diagnostique",
             to_company=company,
@@ -1017,7 +1003,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         # GEIQ
         JobApplicationFactory(
             state=JobApplicationState.POSTPONED,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=prescriber_geiq_diag,
             job_seeker=prescriber_geiq_diag.job_seeker,
             to_company=geiq,
@@ -1025,8 +1010,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker__first_name="Jean",
             job_seeker__last_name="Sans diag Geiq",
             to_company=geiq,
@@ -1034,8 +1017,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         ),
         JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,
@@ -1043,7 +1024,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         # Expired diagnosis on the job application
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=expired_geiq_diag,
             job_seeker=expired_geiq_diag.job_seeker,
             to_company=geiq,
@@ -1052,8 +1032,6 @@ def test_table_and_list_snapshot_as_employer(client, snapshot):
         # Expired diagnosis on the job seeker
         JobApplicationFactory(
             state=JobApplicationState.NEW,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             job_seeker=expired_geiq_diag.job_seeker,
             to_company=geiq,
             **common_kwargs,

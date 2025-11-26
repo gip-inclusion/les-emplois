@@ -4819,7 +4819,11 @@ class TestCheckPreviousApplicationsView:
         self._login_and_setup_session(client, authorized_prescriber)
 
         # Create a very recent application
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
+        job_application = JobApplicationFactory(
+            job_seeker=self.job_seeker,
+            to_company=self.company,
+            with_iae_eligibility_diagnosis=True,
+        )
         response = client.get(self.check_prev_applications_url)
         assert pretty_indented(
             parse_response_to_soup(
@@ -5284,7 +5288,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
@@ -5305,7 +5309,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, next_url)
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
@@ -5331,7 +5335,7 @@ class TestCheckPreviousApplicationsForHireView:
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
 
         # with previous job application
-        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company, eligibility_diagnosis=None)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=company)
         response = client.get(url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
         assertContains(response, "Ce candidat a déjà postulé pour cette entreprise")
