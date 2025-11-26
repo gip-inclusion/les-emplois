@@ -222,7 +222,7 @@ class TestProcessViews:
         )
         assert_previous_step(response, back_url)  # Back_url is restored from session
 
-        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
+        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
@@ -351,7 +351,7 @@ class TestProcessViews:
                 response = client.get(url)
                 # Check if approval is displayed
                 assertion(response, "Numéro de PASS IAE")
-                assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
+                assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
                 assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
     def test_details_for_company_certified_criteria_after_expiration(self, client):
@@ -529,7 +529,7 @@ class TestProcessViews:
         assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
+        assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
         assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
 
