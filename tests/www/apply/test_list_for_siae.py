@@ -2202,3 +2202,53 @@ def test_table_iae_state_and_criteria(client, snapshot):
         ),
     )
     assert pretty_indented(page) == snapshot(name="applications table")
+
+
+class TestListForSiaeSenders:
+    def test_as_prescriber(self, client):
+        job_application = JobApplicationFactory()
+        client.force_login(job_application.sender)
+
+        senders_autocomplete_url = reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"})
+
+        response = client.get(senders_autocomplete_url)
+        assert response.status_code == 404
+
+    def test_as_employer(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        job_application = JobApplicationFactory(
+            to_company=company, sender__first_name="Alice", sender__last_name="Lewis"
+        )
+        other_job_application = JobApplicationFactory(
+            to_company=company, sender__first_name="Bob", sender__last_name="Alice"
+        )
+        JobApplicationFactory(to_company=company, sender__first_name="John", sender__last_name="Smith")
+        client.force_login(employer)
+        senders_autocomplete_url = reverse("apply:list_for_siae_autocomplete", kwargs={"field_name": "sender"})
+
+        # A term is needed to search
+        response = client.get(senders_autocomplete_url)
+        assert response.status_code == 200
+        assert response.json() == {"results": []}
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = client.get(senders_autocomplete_url, {"term": "lewis"})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {
+                    "id": job_application.sender.pk,
+                    "text": "Alice LEWIS",
+                },
+            ]
+        }
+
+        response = client.get(senders_autocomplete_url, {"term": "Nom sans aucun rapport"})
+        assert response.json() == {"results": []}
+
+        response = client.get(senders_autocomplete_url, {"term": "alice"})
+        assert response.status_code == 200
+        assert len(response.json()["results"]) == 2
+        assert {"id": job_application.sender.pk, "text": "Alice LEWIS"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "Bob ALICE"} in response.json()["results"]
