@@ -17,14 +17,32 @@
         </p>
     {% endif %}
 
-    {% if diagnosis.selected_administrative_criteria_for_display %}
-        <h4>Situation administrative du candidat</h4>
-        <ul>
-            {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
-                {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <ul class="list-data mb-3">
+        <li>
+            <small>
+                Critères administratifs
+                {% if request.user.is_employer or request.user.is_prescriber %}
+                    <i class="ri-information-line text-info"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
+                       aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
+                       role="button"
+                       tabindex="0"></i>
+                {% endif %}
+            </small>
+            {% if not diagnosis.selected_administrative_criteria_for_display %}
+                <i class="text-disabled">Le prescripteur habilité n’a pas renseigné de critères.</i>
+            {% else %}
+                <ul>
+                    {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
+                        <li>
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    </ul>
 
     {% include "apply/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
@@ -66,9 +84,7 @@
         {% if request.user.is_employer %}
             <div class="col-12 col-md-auto">
                 {% with back_and_next_url=request.get_full_path|urlencode %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">
-                        Vérifier
-                    </a>
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">Vérifier</a>
                 {% endwith %}
             </div>
             {# GEIQ eligibility diagnosis expired #}
