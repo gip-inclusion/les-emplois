@@ -21,6 +21,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestEvaluatedSiaeSanctionView:
@@ -166,7 +167,7 @@ class TestEvaluatedSiaeSanctionView:
         )
         assert response.status_code == 404
 
-    def test_training_session(self, client):
+    def test_training_session(self, client, snapshot):
         client.force_login(self.institution_user)
         response = client.get(
             reverse(
@@ -175,28 +176,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Participation à une session de présentation de l’auto-prescription
-             </h3>
-             <div class="card">
-              <div class="card-body">
-               <p>RDV le 18 avril à 14h dans les locaux de Pôle Emploi.</p>
-              </div>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_temporary_suspension(self, client):
+    def test_temporary_suspension(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.suspension_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.save()
@@ -208,31 +190,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Retrait temporaire de la capacité d’auto-prescription
-             </h3>
-             <p>
-              La capacité d’auto-prescrire un parcours d'insertion par l'activité économique est suspendue pour une
-              durée déterminée par l'autorité administrative.
-             </p>
-             <p>
-              Dans votre cas, le retrait temporaire de la capacité d’auto-prescription sera effectif à partir du
-              1 janvier 2023 et jusqu’au 1 juin 2023.
-             </p>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_permanent_suspension(self, client):
+    def test_permanent_suspension(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.suspension_dates = InclusiveDateRange(datetime.date(2023, 1, 1))
         self.sanctions.save()
@@ -244,32 +204,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Retrait définitif de la capacité d’auto-prescription
-             </h3>
-             <p>
-              La capacité à prescrire un parcours est rompue, elle peut être rétablie par le préfet, à la demande de la
-              structure, sous réserve de la participation de ses dirigeants ou salariés à des actions de formation
-              définies par l'autorité administrative.
-             </p>
-             <p>
-              Dans votre cas, le retrait définitif de la capacité d’auto-prescription sera effectif à partir du
-              1 janvier 2023.
-             </p>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_subsidy_cut_rate(self, client):
+    def test_subsidy_cut_rate(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.subsidy_cut_percent = 35
@@ -282,34 +219,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Suppression d’une partie de l’aide au poste
-             </h3>
-             <p>
-              La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation
-              de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du
-              préfet. Lorsque le département a participé aux aides financières concernées en application de l'article
-              L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la
-              récupération, le cas échéant, des montants correspondants.
-             </p>
-             <p>
-              Dans votre cas, la suppression de 35 % de l’aide au poste sera effective à partir du 1 janvier 2023 et
-              jusqu’au 1 juin 2023.
-             </p>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_subsidy_cut_full(self, client):
+    def test_subsidy_cut_full(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
         self.sanctions.subsidy_cut_percent = 100
@@ -322,34 +234,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Suppression de l’aide au poste
-             </h3>
-             <p>
-              La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation
-              de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du
-              préfet. Lorsque le département a participé aux aides financières concernées en application de l'article
-              L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la
-              récupération, le cas échéant, des montants correspondants.
-             </p>
-             <p>
-              Dans votre cas, la suppression de l’aide au poste sera effective à partir du 1 janvier 2023 et
-              jusqu’au 1 juin 2023.
-             </p>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_deactivation(self, client):
+    def test_deactivation(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.deactivation_reason = "Mauvais comportement, rien ne va. On arrête tout."
         self.sanctions.save()
@@ -361,34 +248,9 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Déconventionnement de la structure
-             </h3>
-             <p>
-              La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification
-              s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a
-              participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le
-              président du conseil départemental de sa décision.
-             </p>
-             <div class="card">
-              <div class="card-body">
-               Mauvais comportement, rien ne va. On arrête tout.
-              </div>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_no_sanction(self, client):
+    def test_no_sanction(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.no_sanction_reason = "Ça ira pour cette fois."
         self.sanctions.save()
@@ -400,26 +262,7 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assertContains(
-            response,
-            """
-            <div class="card-body">
-             <h2>
-              Sanction
-             </h2>
-             <h3 class="mt-5">
-              Ne pas sanctionner
-             </h3>
-             <div class="card">
-              <div class="card-body">
-              Ça ira pour cette fois.
-              </div>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
 
 def test_sanctions_helper_view(client):
