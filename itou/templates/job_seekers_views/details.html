@@ -66,7 +66,7 @@
                         <div class="tab-pane fade show active">
                             <div class="row">
                                 <div class="col-12 {% if approval %}col-xxl-8 col-xxxl-9 order-2 order-xxl-1{% endif %}">
-                                    <h2>Informations</h2>
+                                    <h2>Informations générales</h2>
                                     <div class="c-box mb-3 mb-md-4">
                                         {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token only %}
                                     </div>
