@@ -18,7 +18,11 @@ class UpdownApiClient:
             },
         )
 
-    @tenacity.retry(wait=tenacity.wait_fixed(2), stop=tenacity.stop_after_attempt(8))
+    @tenacity.retry(
+        wait=tenacity.wait_fixed(2),
+        stop=tenacity.stop_after_attempt(8),
+        reraise=True,
+    )
     def _request(self, endpoint, start, end):
         params = {
             "from": start.isoformat(),
