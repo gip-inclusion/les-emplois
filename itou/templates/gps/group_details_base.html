@@ -4,7 +4,7 @@
 {% load str_filters %}
 
 {% block title %}
-    GPS - Profil de {{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+    Réseau d'intervenants - Profil de {{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
 
 {% block title_navinfo %}

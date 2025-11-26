@@ -27,6 +27,17 @@
         <small>Type</small>
         <strong>{{ job_application.get_sender_kind_display }}</strong>
     </li>
+
+    {% if job_application.sender_prescriber_organization %}
+        <li>
+            <small>Organisation</small>
+            <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
+            {% if job_application.is_sent_by_authorized_prescriber %}
+                <span class="badge badge-xs rounded-pill bg-warning">Prescripteur habilité</span>
+            {% endif %}
+        </li>
+    {% endif %}
+
     <li>
         <small>Adresse e-mail</small>
         {% if request.user.is_job_seeker and job_application.sender_kind != SenderKind.JOB_SEEKER %}
@@ -39,16 +50,6 @@
             {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         {% endif %}
     </li>
-
-    {% if job_application.sender_prescriber_organization %}
-        <li>
-            <small>Organisation</small>
-            <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
-            {% if job_application.is_sent_by_authorized_prescriber %}
-                <span class="badge badge-xs rounded-pill bg-warning">Prescripteur habilité</span>
-            {% endif %}
-        </li>
-    {% endif %}
 
     {% if job_application.sender_company %}
         <li>
