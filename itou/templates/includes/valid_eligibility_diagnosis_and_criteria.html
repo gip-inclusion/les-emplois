@@ -1,47 +1,31 @@
 
 {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
-    <p class="fs-sm">
-        {% if selected_administrative_criteria %}
-            <i>Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.</i>
-        {% else %}
-            <i>Le prescripteur habilité n’a pas renseigné de critères.</i>
-        {% endif %}
-    </p>
-
-    {% if selected_administrative_criteria %}
-        <p class="mb-2">
-            <span class="badge badge-sm rounded-pill bg-secondary">
-                {% if is_sent_by_authorized_prescriber %}
-                    Situation administrative du candidat
-                {% else %}
-                    Critères administratifs
+    <ul class="list-data mb-3">
+        <li>
+            <small>
+                Critères administratifs
+                {% if request.user.is_employer or request.user.is_prescriber %}
+                    <i class="ri-information-line text-info"
+                       data-bs-toggle="tooltip"
+                       data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
+                       aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
+                       role="button"
+                       tabindex="0"></i>
                 {% endif %}
-            </span>
-        </p>
-        {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
-        {% regroup selected_administrative_criteria|dictsort:"administrative_criteria.level" by administrative_criteria.get_level_display as levels_list %}
-        <ul>
-            {% for level, criteria in levels_list %}
-                {% comment %}
-                Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière
-                hiérarchisée afin de ne pas induire les employeurs en erreur.
-                Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critères de niveau 2 par exemple.
-                {% endcomment %}
-                {% if not flat_criteria_list %}
-                    <li>
-                        <span class="fw-bold">{{ level }}</span>
-                        <ul>
-                        {% endif %}
-                        {% for criterion in criteria %}
+            </small>
+            {% if not selected_administrative_criteria %}
+                <i class="text-disabled">Le prescripteur habilité n’a pas renseigné de critères.</i>
+            {% else %}
+                <ul>
+                    {% for criterion in eligibility_diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
+                        <li>
                             {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
-                        {% endfor %}
-                        {% if not flat_criteria_list %}
-                        </ul>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    </ul>
 {% endwith %}
 
 {% include "apply/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis itou_help_center_url=itou_help_center_url request=request only %}

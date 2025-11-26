@@ -229,10 +229,10 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -535,10 +535,10 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -1069,10 +1069,10 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -1117,10 +1117,10 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -2678,14 +2678,16 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -2996,14 +2998,16 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -3519,14 +3523,16 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -3813,14 +3819,16 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
                                                   </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>

@@ -1179,32 +1179,22 @@
                       John DOE (Acme inc.)
                   </b>
               </p>
-              <p class="mb-2">
-                  <span class="badge badge-sm rounded-pill bg-secondary">
-                      Critères administratifs
-                  </span>
-              </p>
-              <ul>
+              <ul class="list-data mb-3">
                   <li>
-                      <div class="d-flex align-items-center">
-                          <span>
+                      <small>
+                          Critères administratifs
+                      </small>
+                      <ul>
+                          <li>
                               Bénéficiaire du Revenu de Solidarité Active (RSA)
-                          </span>
-                      </div>
-                  </li>
-                  <li>
-                      <div class="d-flex align-items-center">
-                          <span>
+                          </li>
+                          <li>
                               Résident en quartier prioritaire de la politique de la ville (QPV)
-                          </span>
-                      </div>
-                  </li>
-                  <li>
-                      <div class="d-flex align-items-center">
-                          <span>
+                          </li>
+                          <li>
                               Sortant de l'Aide Sociale à l'Enfance (ASE)
-                          </span>
-                      </div>
+                          </li>
+                      </ul>
                   </li>
               </ul>
               <p>
@@ -1248,37 +1238,22 @@
                       </strong>
                       (Pres. Org.).
                   </p>
-                  <p class="fs-sm">
-                      <i>
-                          Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
-                      </i>
-                  </p>
-                  <p class="mb-2">
-                      <span class="badge badge-sm rounded-pill bg-secondary">
-                          Critères administratifs
-                      </span>
-                  </p>
-                  <ul>
+                  <ul class="list-data mb-3">
                       <li>
-                          <div class="d-flex align-items-center">
-                              <span>
+                          <small>
+                              Critères administratifs
+                          </small>
+                          <ul>
+                              <li>
                                   Bénéficiaire du RSA
-                              </span>
-                          </div>
-                      </li>
-                      <li>
-                          <div class="d-flex align-items-center">
-                              <span>
+                              </li>
+                              <li>
                                   Allocataire AAH
-                              </span>
-                          </div>
-                      </li>
-                      <li>
-                          <div class="d-flex align-items-center">
-                              <span>
+                              </li>
+                              <li>
                                   Problème de mobilité
-                              </span>
-                          </div>
+                              </li>
+                          </ul>
                       </li>
                   </ul>
                   <p class="mb-0">
