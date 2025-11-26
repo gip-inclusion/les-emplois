@@ -32,18 +32,15 @@
             </strong>
         </li>
         <li>
-            <small>Critères administratifs sélectionnés</small>
+            <small>Critères administratifs</small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
                 {% if not criteria %}
-                    <i class="text-disabled">Non renseigné</i>
+                    <i class="text-disabled">Le prescripteur habilité n’a pas renseigné de critères.</i>
                 {% else %}
-                    <strong>
-                        {% for criterion in criteria %}
-                            {{ criterion.name }}
-                            {% if not forloop.last %};{% endif %}
-                        {% endfor %}
-                    </strong>
+                    <ul>
+                        {% for criterion in criteria %}<li>{{ criterion.name }}</li>{% endfor %}
+                    </ul>
                 {% endif %}
             {% endwith %}
         </li>
