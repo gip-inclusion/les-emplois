@@ -1,10 +1,33 @@
 from drf_spectacular.utils import PolymorphicProxySerializer, extend_schema
 from rest_framework import authentication, exceptions, generics
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 
+from itou.api.auth import ServiceAccount, ServiceTokenAuthentication
 from itou.api.data_inclusion_api import enums, serializers
+from itou.api.models import ServiceToken
 from itou.companies.models import Company
+from itou.nexus.enums import Service
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.auth import LoginNotRequiredMixin
+
+
+class DataInclusionPermission(IsAuthenticated):
+    def has_permission(self, request, view) -> bool:
+        if not super().has_permission(request, view):
+            return False
+
+        if request.auth is None:  # TODO remove SessionAuthentication compat
+            return True
+
+        if isinstance(request.auth, Token):  # TODO remove TokenAuthentication compat
+            return True
+
+        return (
+            isinstance(request.user, ServiceAccount)
+            and isinstance(request.auth, ServiceToken)
+            and request.auth.service == Service.DATA_INCLUSION
+        )
 
 
 @extend_schema(
@@ -33,9 +56,12 @@ class DataInclusionStructureView(LoginNotRequiredMixin, generics.ListAPIView):
     """
 
     authentication_classes = [
+        ServiceTokenAuthentication,
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
     ]
+
+    permission_classes = [DataInclusionPermission]
 
     def list(self, request, *args, **kwargs):
         unsafe_type_str = self.request.query_params.get("type")
