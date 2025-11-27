@@ -762,8 +762,6 @@ AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 
 FORCE_PROCONNECT_LOGIN = os.getenv("FORCE_PROCONNECT_LOGIN", "True") == "True"
 
-C4_TOKEN = os.getenv("C4_TOKEN", None)
-
 DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr")
 
 # GPS
