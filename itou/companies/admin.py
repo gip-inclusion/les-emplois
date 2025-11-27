@@ -425,6 +425,11 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
         )
 
 
+@admin.register(models.SiaeACIConvergencePHC)
+class SiaeACIConvergencePHCAdmin(ReadonlyMixin, ItouModelAdmin):
+    ordering = ["siret"]
+
+
 @admin.register(models.JobDescription)
 class JobDescriptionAdmin(ItouModelAdmin):
     list_display = (
