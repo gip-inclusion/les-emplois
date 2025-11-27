@@ -12,6 +12,11 @@ def forward(apps, schema_editor):
         ServiceToken.objects.create(service=Service.MARCHE, key=settings.C4_TOKEN)
 
 
+def reverse(apps, schema_editor):
+    ServiceToken = apps.get_model("api", "ServiceToken")
+    ServiceToken.objects.filter(service=Service.MARCHE, key=settings.C4_TOKEN).delete()
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("api", "0002_servicetoken"),
@@ -20,7 +25,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             forward,
-            reverse_code=migrations.RunPython.noop,
+            reverse_code=reverse,
             elidable=True,
         ),
     ]
