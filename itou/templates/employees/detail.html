@@ -46,6 +46,21 @@
                             {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
                         {% endfor %}
                     </div>
+
+                    {# Job seeker referent --------------------------------------------------------------------- #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2>Qui accompagne ce salarié ?</h2>
+                        <hr>
+                        {% include "gps/includes/membership.html" with membership=group.referent %}
+                        {% if user_in_group %}
+                            <div class="d-flex align-items-center c-info mb-3 mb-md-4">
+                                <span class="c-info__summary">Découvrez tous les intervenants qui ont accompagné {{ job_application.job_seeker.first_name|title }} {{ job_application.job_seeker.last_name|upper }}</span>
+                                <a href="{% url 'gps:group_memberships' group.pk %}" class="btn btn-sm btn-primary">
+                                    <span>Je découvre !</span>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}
