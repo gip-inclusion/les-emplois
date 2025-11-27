@@ -80,7 +80,7 @@
                     <div class="s-section__row row">
                         <div class="s-section__col col-12 col-xxl-12 order-2 order-xxl-1">
                             <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                                <h2 class="mb-0">Informations générales</h2>
+                                <h2 class="mb-0">Candidat</h2>
                                 <div class="d-flex flex-column flex-md-row gap-2" id="copy_public_id">
                                     {% include "includes/job_seekers/copy_public_id.html" with public_id=job_application.job_seeker.public_id only %}
                                 </div>
@@ -102,9 +102,18 @@
                             {# hiring details ------------------------------------------------------------------------ #}
                             {% include "apply/includes/siae_hiring_details.html" %}
 
-                            {# Job application info ------------------------------------------------------------------------- #}
+                        </div>
+                    </div>
+                    {# Job application info ------------------------------------------------------------------------- #}
+                    <div class="s-section__row row">
+                        <div class="s-section__col col-12 col-xxl-12 order-2 order-xxl-1">
+                            <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                                <h2 class="mb-0">Qui oriente ce candidat ?</h2>
+                            </div>
+                        </div>
+                        <div class="s-section__col col-12 col-xxl-8 col-xxxl-9 order-3 order-xxl-2">
                             <div class="c-box mb-3 mb-md-4">
-                                <h3>Candidature</h3>
+                                <h3>{{ job_application.sender.first_name|title }} {{ job_application.sender.last_name|upper }}</h3>
                                 {# Sender info ------------------------------------------------------------------------- #}
                                 {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 

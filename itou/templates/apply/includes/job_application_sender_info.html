@@ -20,10 +20,6 @@
 {% endif %}
 <ul class="list-data mb-3">
     <li>
-        <small>Émetteur</small>
-        <strong>{{ job_application.sender.first_name|title }} {{ job_application.sender.last_name|upper }}</strong>
-    </li>
-    <li>
         <small>Type</small>
         <strong>{{ job_application.get_sender_kind_display }}</strong>
     </li>
