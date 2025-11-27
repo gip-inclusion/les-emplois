@@ -177,6 +177,11 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
     data_returned_by_api = models.JSONField(
         blank=True, null=True, verbose_name="résultat renvoyé par l'API Particulier"
     )
+    certification_request_succeeded = models.BooleanField(
+        null=True,
+        editable=False,
+        verbose_name="appel à l’API de certification réussi",
+    )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     class Meta:
