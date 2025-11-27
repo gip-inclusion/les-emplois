@@ -958,6 +958,16 @@ class Sanctions(models.Model):
     def __str__(self):
         return f"{self.__class__.__name__} pour {self.evaluated_siae}"
 
+    @property
+    def has_significant_sanction(self):
+        return any(
+            [
+                self.suspension_dates,
+                self.subsidy_cut_dates,
+                self.deactivation_reason,
+            ]
+        )
+
     def count_active(self):
         return (
             bool(self.training_session)
