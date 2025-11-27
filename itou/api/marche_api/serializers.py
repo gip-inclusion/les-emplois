@@ -6,8 +6,8 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 
 
-class C4CompanySerializer(serializers.ModelSerializer):
-    """Serialize Company instance for the c4 project
+class MarcheCompanySerializer(serializers.ModelSerializer):
+    """Serialize Company instance for the le marché
 
     Fields are based on https://github.com/betagouv/itou-marche/blob/e3baa3486254ec54036f9de8f46ed6fcf267ca8f/lemarche/siaes/management/commands/sync_c1_c4.py
     """

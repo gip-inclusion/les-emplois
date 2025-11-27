@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from itou.api.auth import ServiceAccount, ServiceTokenAuthentication
-from itou.api.c4_api.serializers import C4CompanySerializer
+from itou.api.marche_api.serializers import MarcheCompanySerializer
 from itou.api.models import ServiceToken
 from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company, CompanyMembership
@@ -11,7 +11,7 @@ from itou.nexus.enums import Service
 from itou.utils.auth import LoginNotRequiredMixin
 
 
-class C4Permission(IsAuthenticated):
+class MarchePermission(IsAuthenticated):
     def has_permission(self, request, view) -> bool:
         if not super().has_permission(request, view):
             return False
@@ -23,13 +23,13 @@ class C4Permission(IsAuthenticated):
         )
 
 
-class C4CompanyView(LoginNotRequiredMixin, generics.ListAPIView):
+class MarcheCompanyView(LoginNotRequiredMixin, generics.ListAPIView):
     """API pour le Marché de l'inclusion"""
 
     authentication_classes = [ServiceTokenAuthentication]
-    permission_classes = [C4Permission]
+    permission_classes = [MarchePermission]
 
-    serializer_class = C4CompanySerializer
+    serializer_class = MarcheCompanySerializer
 
     def get_queryset(self):
         return (
