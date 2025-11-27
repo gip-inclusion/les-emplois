@@ -20,7 +20,7 @@ NUM_QUERIES += 1  # get siaes
 NUM_QUERIES += 1  # Prefetch members
 
 
-class TestC4CompanyAPI:
+class TestMarcheCompanyAPI:
     url = reverse("v1:marche-company-list")
 
     def setup_method(self):
@@ -43,7 +43,7 @@ class TestC4CompanyAPI:
         response = api_client.get(self.url, format="json", HTTP_AUTHORIZATION="Token bad_token")
         assert response.status_code == 401
 
-    def test_list_companies_bad_token(self):
+    def test_list_companies_token_from_other_service(self):
         api_client = self.api_client(service=Service.DATA_INCLUSION)
         response = api_client.get(self.url, format="json")
         assert response.status_code == 403
