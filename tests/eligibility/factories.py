@@ -117,14 +117,17 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
                     obj.eligibility_diagnosis.expires_at,
                 )
             ),
+            certification_request_succeeded=True,
         )
         criteria_not_certified = factory.Trait(
             certified=False,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+            certification_request_succeeded=True,
         )
         criteria_certification_error = factory.Trait(
             certified=None,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+            certification_request_succeeded=False,
         )
 
     eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
