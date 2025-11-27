@@ -1,37 +1,33 @@
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.db.models import Prefetch
-from rest_framework import authentication, exceptions, generics
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
+from itou.api.auth import ServiceAccount, ServiceTokenAuthentication
 from itou.api.c4_api.serializers import C4CompanySerializer
+from itou.api.models import ServiceToken
 from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company, CompanyMembership
+from itou.nexus.enums import Service
 from itou.utils.auth import LoginNotRequiredMixin
 
 
-class C4APIUser(AnonymousUser):
-    """
-    Extension of `AnonymousUser` class:
-    - Ensures that the `is_authenticated` property returns `True`.
-    """
+class C4Permission(IsAuthenticated):
+    def has_permission(self, request, view) -> bool:
+        if not super().has_permission(request, view):
+            return False
 
-    @property
-    def is_authenticated(self):
-        return True
-
-
-class C4Authentication(authentication.TokenAuthentication):
-    def authenticate_credentials(self, key):
-        if settings.C4_TOKEN is None or key != settings.C4_TOKEN:
-            raise exceptions.AuthenticationFailed("Invalid token.")
-
-        return C4APIUser(), None
+        return (
+            isinstance(request.user, ServiceAccount)
+            and isinstance(request.auth, ServiceToken)
+            and request.auth.service == Service.MARCHE
+        )
 
 
 class C4CompanyView(LoginNotRequiredMixin, generics.ListAPIView):
     """API pour le Marché de l'inclusion"""
 
-    authentication_classes = [C4Authentication]
+    authentication_classes = [ServiceTokenAuthentication]
+    permission_classes = [C4Permission]
 
     serializer_class = C4CompanySerializer
 
