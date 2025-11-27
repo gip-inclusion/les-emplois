@@ -57,8 +57,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     # factory.Sequence() start with 0 and an ASP ID should be greater than 0
     asp_id = factory.Sequence(lambda n: n + 1)
     is_active = True
