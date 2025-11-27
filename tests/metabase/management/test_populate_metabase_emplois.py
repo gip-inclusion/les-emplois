@@ -11,7 +11,7 @@ from psycopg.types.range import Range
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import JobDescription
+from itou.companies.models import JobDescription, SiaeACIConvergencePHC
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import AdministrativeCriteria, SelectedAdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
@@ -1046,7 +1046,7 @@ def test_populate_companies(snapshot):
 @pytest.mark.django_db(transaction=True)
 def test_populate_companies_convergence(settings):
     convergence_company = CompanyFactory(kind=CompanyKind.ACI)
-    settings.ACI_CONVERGENCE_SIRET_WHITELIST = [convergence_company.siret]
+    SiaeACIConvergencePHC.objects.create(siret=convergence_company.siret)
     aci_non_convergence_company = CompanyFactory(kind=CompanyKind.ACI)
     non_convergence_company = CompanyFactory()
 
