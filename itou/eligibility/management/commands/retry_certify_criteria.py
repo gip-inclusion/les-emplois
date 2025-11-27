@@ -1,11 +1,9 @@
-from datetime import timedelta
-
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import GEIQSelectedAdministrativeCriteria, SelectedAdministrativeCriteria
-from itou.eligibility.tasks import async_certify_criterion_with_api_particulier
+from itou.eligibility.tasks import API_PARTICULIER_RETRY_DURATION, async_certify_criterion_with_api_particulier
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.apis import api_particulier
@@ -36,7 +34,7 @@ class Command(BaseCommand):
                     administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
                     certified=None,
                     eligibility_diagnosis__expires_at__gte=today,
-                    created_at__lte=timezone.now() - timedelta(days=1),
+                    created_at__lte=timezone.now() - API_PARTICULIER_RETRY_DURATION,
                 )
                 .exclude(
                     or_queries(
