@@ -599,10 +599,7 @@ class TestJobApplicationQuerySet:
         assert obj.jobseeker_eligibility_diagnosis == diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_prescriber_on_jobseeker(self):
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            to_company__subject_to_iae_rules=True,
-        )
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             from_prescriber=True,
             job_seeker=job_application.job_seeker,
@@ -613,9 +610,7 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_current_employer_on_jobseeker(self):
-        job_application = JobApplicationSentByCompanyFactory(
-            to_company__subject_to_iae_rules=True,
-        )
+        job_application = JobApplicationSentByCompanyFactory()
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
             from_employer=True,
             author_siae=job_application.sender_company,
@@ -627,7 +622,7 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_diagnosis_from_another_employer_on_jobseeker(self):
-        job_application = JobApplicationSentByCompanyFactory(to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationSentByCompanyFactory()
         IAEEligibilityDiagnosisFactory(
             from_employer=True,
             job_seeker=job_application.job_seeker,
@@ -1399,7 +1394,7 @@ class TestJobApplicationNotifications:
         assert "Se terminant le : Non renseigné" in email.body
 
     def test_notifications_deliver_approval_when_subject_to_eligibility_rules(self):
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(with_approval=True)
 
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 

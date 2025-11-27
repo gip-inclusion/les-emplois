@@ -332,10 +332,8 @@ class TestCouldSiaeBeDeleted:
 def test_cleanup_siaes_after_grace_period(capsys):
     old_enough = timezone.now() - timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS + 1)
 
-    company_with_active_convention = CompanyFactory(subject_to_iae_rules=True)
-    CompanyFactory(
-        subject_to_iae_rules=True, convention__is_active=False, convention__deactivated_at=old_enough
-    )  # Deletable company
+    company_with_active_convention = CompanyFactory()
+    CompanyFactory(convention__is_active=False, convention__deactivated_at=old_enough)  # Deletable company
     undeletable_company = JobApplicationFactory(
         to_company__kind=CompanyKind.EI,
         to_company__convention__is_active=False,

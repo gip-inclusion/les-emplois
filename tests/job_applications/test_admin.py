@@ -174,7 +174,7 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
 
 def test_create_then_accept_job_application(admin_client):
     job_seeker = JobSeekerFactory()
-    company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+    company = CompanyFactory(with_membership=True)
     employer = company.members.first()
     post_data = {
         "job_seeker": job_seeker.pk,
@@ -430,7 +430,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
 
 def test_create_inconsistent_job_application(admin_client):
     job_seeker = JobSeekerFactory()
-    company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+    company = CompanyFactory(with_membership=True)
     employer = company.members.first()
     approval = ApprovalFactory()
     post_data = {

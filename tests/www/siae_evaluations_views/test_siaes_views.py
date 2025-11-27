@@ -10,6 +10,7 @@ from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
@@ -715,7 +716,7 @@ class TestSiaeJobApplicationListView:
 
 class TestSiaeSelectCriteriaView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.EI)
         self.user = membership.user
         self.siae = membership.company
 

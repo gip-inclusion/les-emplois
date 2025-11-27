@@ -50,7 +50,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 job_seeker=factory.SelfAttribute("..job_seeker"),
                 author=factory.SelfAttribute("..sender"),
             ),
-            to_company=factory.SubFactory(CompanyFactory, with_membership=True, subject_to_iae_rules=True),
         )
         with_approval = factory.Trait(
             state=JobApplicationState.ACCEPTED,

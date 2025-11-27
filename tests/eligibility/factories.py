@@ -91,7 +91,7 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     class Params:
         from_employer = factory.Trait(
             author_kind=AuthorKind.EMPLOYER,
-            author_siae=factory.SubFactory(CompanyFactory, subject_to_iae_rules=True, with_membership=True),
+            author_siae=factory.SubFactory(CompanyFactory, with_membership=True),
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
 

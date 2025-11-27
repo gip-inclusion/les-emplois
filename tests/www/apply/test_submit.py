@@ -1603,7 +1603,7 @@ class TestApplyAsAuthorizedPrescriber:
         assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
     def test_apply_step_eligibility_does_not_show_employer_diagnosis(self, client):
-        company = CompanyFactory(name="Les petits pains", with_membership=True, subject_to_iae_rules=True)
+        company = CompanyFactory(name="Les petits pains", with_membership=True)
         job_seeker = JobSeekerFactory()
         IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, job_seeker=job_seeker)
         prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
@@ -3297,7 +3297,7 @@ class TestApplicationView:
     spontaneous_application_label = "Candidature spontanée"
 
     def test_application_jobs_use_previously_selected_jobs(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, with_jobs=True)
+        company = CompanyFactory(with_membership=True, with_jobs=True)
 
         client.force_login(company.members.first())
         selected_job = company.job_description_through.first()
@@ -3340,7 +3340,7 @@ class TestApplicationView:
         )
 
     def test_application_start_with_invalid_job_description_id(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, with_jobs=True)
+        company = CompanyFactory(with_membership=True, with_jobs=True)
         client.force_login(company.members.get())
         response = client.get(
             reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_description_id": "invalid"}, follow=True
@@ -3461,7 +3461,7 @@ class TestApplicationView:
         )
 
     def test_application_eligibility_update_diagnosis_only_if_not_shrouded(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
@@ -3563,7 +3563,7 @@ class TestApplicationEndView:
 class TestLastCheckedAtView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        self.company = CompanyFactory(with_membership=True)
         self.job_seeker = JobSeekerFactory()
 
     def _check_last_checked_at(self, client, user, sees_warning, sees_verify_link):
@@ -3616,7 +3616,7 @@ class TestLastCheckedAtView:
 class UpdateJobSeekerTestMixin:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker, client):
-        self.company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        self.company = CompanyFactory(with_membership=True)
         self.job_seeker = JobSeekerFactory(
             with_ban_geoloc_address=True,
             jobseeker_profile__nir="178122978200508",
@@ -4218,7 +4218,7 @@ class TestUpdateJobSeekerForHire(UpdateJobSeekerTestMixin):
 
 class TestUpdateJobSeekerStep3View:
     def test_job_seeker_with_profile_has_check_boxes_ticked_in_step3(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerFactory(jobseeker_profile__ass_allocation_since=AllocationDuration.FROM_6_TO_11_MONTHS)
 
         client.force_login(company.members.first())
@@ -4672,7 +4672,7 @@ class TestApplicationGEIQEligibilityView:
 class TestCheckPreviousApplicationsView:
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, for_snapshot=True)
+        self.company = CompanyFactory(with_membership=True, for_snapshot=True)
         self.job_seeker = JobSeekerFactory()
 
     def _login_and_setup_session(self, client, user):
@@ -5178,7 +5178,7 @@ class TestCheckJobSeekerInformationsForHire:
         ],
     )
     def test_company(self, client, job_seeker_kwargs, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         job_seeker_kwargs["jobseeker_profile__birth_place"] = (
             Commune.objects.by_insee_code_and_period("59183", datetime.date(1990, 1, 1))
             if job_seeker_kwargs.get("born_in_france")
@@ -5278,7 +5278,7 @@ class TestCheckPreviousApplicationsForHireView:
         cls.job_seeker = JobSeekerFactory()
 
     def test_iae_employer(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {})
 
@@ -5368,7 +5368,7 @@ class TestEligibilityForHire:
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
 
     def test_job_seeker_with_valid_diagnosis(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
@@ -5378,7 +5378,7 @@ class TestEligibilityForHire:
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         assert not self.job_seeker.has_valid_diagnosis(for_siae=company)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
@@ -5415,7 +5415,7 @@ class TestGEIQEligibilityForHire:
         self.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
 
     def test_not_geiq(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
@@ -5502,7 +5502,7 @@ class TestFillJobSeekerInfosForHire:
         )
 
     def test_as_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
@@ -5515,7 +5515,7 @@ class TestFillJobSeekerInfosForHire:
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_as_company_no_birthdate(self, client, birth_country):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
 
         self.job_seeker.jobseeker_profile.birthdate = None
@@ -5636,7 +5636,7 @@ class TestFillJobSeekerInfosForHire:
 
     @pytest.mark.parametrize("in_france", [True, False])
     def test_as_company_no_birth_country(self, client, in_france):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
 
         assert self.job_seeker.jobseeker_profile.birthdate
@@ -5739,7 +5739,7 @@ class TestFillJobSeekerInfosForHire:
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_as_company_no_address(self, client, address):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         address_kwargs = {
             "address_line_1": "",
@@ -5826,7 +5826,7 @@ class TestFillJobSeekerInfosForHire:
         assert job_application.job_seeker.address_line_1 == "128 Rue de Grenelle"
 
     def test_as_company_no_nir(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # Remove job seeker nir, with or without a reason
         self.job_seeker.jobseeker_profile.nir = ""
@@ -5895,7 +5895,7 @@ class TestFillJobSeekerInfosForHire:
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
     def test_as_iae_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         # Remove job seeker nir, with or without a reason
@@ -5987,7 +5987,7 @@ class TestFillJobSeekerInfosForHire:
     def test_as_company_eligibility_diagnosis_from_another_company(self, client):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
         ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         client.force_login(company.members.get())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
@@ -6031,7 +6031,7 @@ class TestFillJobSeekerInfosForHire:
         assertRedirects(response, reverse("apply:hire_contract", kwargs={"session_uuid": apply_session.name}))
 
     def test_no_country_disable_with_certification(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
         IdentityCertification.objects.create(
             jobseeker_profile=self.job_seeker.jobseeker_profile,
@@ -6099,7 +6099,7 @@ class TestHireContract:
         )
 
     def test_as_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
@@ -6149,7 +6149,7 @@ class TestHireContract:
         assert apply_session.name not in client.session
 
     def test_cannot_hire_start_date_after_approval_expires(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
@@ -6177,7 +6177,7 @@ class TestHireContract:
     def test_as_company_eligibility_diagnosis_from_another_company(self, client):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
         ApprovalFactory(eligibility_diagnosis=eligibility_diagnosis, user=self.job_seeker)
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         client.force_login(company.members.get())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
@@ -6295,7 +6295,7 @@ class TestHireContract:
         )
 
     def test_retrieval_of_session_data(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         self.job_seeker.jobseeker_profile.birth_place = None
@@ -6365,7 +6365,7 @@ class TestNewHireProcessInfo:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        self.company = CompanyFactory(with_membership=True)
         self.geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         self.job_seeker = JobSeekerFactory(jobseeker_profile__nir="")
 

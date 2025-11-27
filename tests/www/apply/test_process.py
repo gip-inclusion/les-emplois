@@ -355,7 +355,7 @@ class TestProcessViews:
                 assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
     def test_details_for_company_certified_criteria_after_expiration(self, client):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         now = timezone.now()
         today = timezone.localdate(now)
         job_seeker = JobSeekerFactory()
@@ -1828,15 +1828,20 @@ class TestProcessViews:
         client.logout()
 
     @pytest.mark.parametrize(
-        "eligibility_trait,expected_msg",
+        "subject_to_iae_rules,expected_msg",
         [
-            ("subject_to_iae_rules", IAE_CANCELLATION_CONFIRMATION),
-            ("not_subject_to_iae_rules", NON_IAE_CANCELLATION_CONFIRMATION),
+            (True, IAE_CANCELLATION_CONFIRMATION),
+            (False, NON_IAE_CANCELLATION_CONFIRMATION),
         ],
     )
-    def test_cancel(self, client, eligibility_trait, expected_msg):
+    def test_cancel(self, client, subject_to_iae_rules, expected_msg):
         # Hiring date is today: cancellation should be possible.
-        job_application = JobApplicationFactory(with_approval=True, **{f"to_company__{eligibility_trait}": True})
+        if subject_to_iae_rules:
+            job_application = JobApplicationFactory(with_approval=True)
+        else:
+            job_application = JobApplicationFactory(
+                state=JobApplicationState.ACCEPTED, to_company__not_subject_to_iae_rules=True
+            )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
         detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -1858,7 +1863,7 @@ class TestProcessViews:
         assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
 
     def test_cancel_clean_back_url(self, client):
-        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_iae_rules=True)
+        job_application = JobApplicationFactory(with_approval=True)
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -3775,7 +3780,7 @@ class TestFillJobSeekerInfosForAccept:
         )
 
     def test_as_iae_company(self, client, snapshot):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -3807,7 +3812,7 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_as_iae_company_no_address(self, client, address):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -3886,7 +3891,7 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_as_iae_company_no_birthdate(self, client, birth_country):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -4021,7 +4026,7 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("in_france", [True, False])
     def test_as_iae_company_no_birth_country(self, client, in_france):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -4140,7 +4145,7 @@ class TestFillJobSeekerInfosForAccept:
 
     @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
     def test_as_iae_company_no_nir(self, client, with_lack_of_nir_reason):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -4240,7 +4245,7 @@ class TestFillJobSeekerInfosForAccept:
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
     def test_as_iae_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         client.force_login(company.members.first())
         job_application = JobApplicationSentByJobSeekerFactory(
