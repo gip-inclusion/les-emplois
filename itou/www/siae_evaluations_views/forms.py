@@ -207,7 +207,7 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
                 max_value=100,
                 widget=forms.NumberInput(
                     attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_PERCENT]} à partir du",
+                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_PERCENT]} en pourcent",
                         "placeholder": "Pourcentage d’aide retiré à la SIAE",
                         "step": "1",
                     },
