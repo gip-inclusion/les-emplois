@@ -3071,7 +3071,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
              <label class="form-label" for="id_subsidy_cut_percent">
               Pourcentage d’aide retiré à la SIAE
              </label>
-             <input aria-label="Suppression d’une partie de l’aide au poste à partir du"
+             <input aria-label="Suppression d’une partie de l’aide au poste en pourcent"
                     class="form-control is-invalid"
                     id="id_subsidy_cut_percent"
                     max="100"
