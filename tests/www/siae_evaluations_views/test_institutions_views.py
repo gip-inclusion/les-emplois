@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import html5lib
 import pytest
@@ -11,6 +12,7 @@ from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
+from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -20,6 +22,7 @@ from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
+    EvaluatedJobApplicationSanction,
     EvaluationCampaign,
     Sanctions,
 )
@@ -2041,10 +2044,15 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             evaluated_period_end_at=datetime.date(2022, 2, 28),
         )
         # This SIAE didn’t answer for that evaluation campaign.
+        evaluated_job_app_1 = EvaluatedJobApplicationFactory(
+            criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2
+        )
         previous_evaluated_siae_1 = EvaluatedSiaeFactory(
             evaluation_campaign=previous_campaign_1,
             siae=company,
             reviewed_at=timezone.make_aware(datetime.datetime(2022, 2, 24)),
+            complete=True,
+            job_app=evaluated_job_app_1,
         )
         EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_1)
         sanctions_1 = Sanctions.objects.create(
@@ -2081,20 +2089,21 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         NO_SANCTION = "<li>Ne pas sanctionner</li>"
         TEMP_SUSPENSION = "<li>Retrait temporaire de la capacité d’auto-prescription</li>"
         FINAL_SUSPENSION = "<li>Retrait définitif de la capacité d’auto-prescription</li>"
-        PARTIAL_CUT = "<li>Suppression d’une partie de l’aide au poste</li>"
-        TOTAL_CUT = "<li>Suppression de l’aide au poste</li>"
+        SUBSIDY_CUT = "<li>Suppression partielle ou totale de l’aide au poste</li>"
 
         assertContains(response, NO_SANCTION)
         assertNotContains(response, TEMP_SUSPENSION)
         assertNotContains(response, FINAL_SUSPENSION)
-        assertNotContains(response, PARTIAL_CUT, html=True)
-        assertNotContains(response, TOTAL_CUT, html=True)
+        assertNotContains(response, SUBSIDY_CUT, html=True)
 
         sanctions_1.no_sanction_reason = ""
         sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
-        sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
-        sanctions_1.subsidy_cut_percent = 50
         sanctions_1.save()
+        EvaluatedJobApplicationSanction.objects.create(
+            sanctions=sanctions_1,
+            evaluated_job_application=evaluated_job_app_1,
+            subsidy_cut_percent=random.choice([50, 100]),
+        )
 
         response = client.get(
             reverse(
@@ -2105,25 +2114,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertNotContains(response, NO_SANCTION)
         assertContains(response, TEMP_SUSPENSION)
         assertNotContains(response, FINAL_SUSPENSION)
-        assertContains(response, PARTIAL_CUT, html=True)
-        assertNotContains(response, TOTAL_CUT, html=True)
-
-        sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1))
-        sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
-        sanctions_1.subsidy_cut_percent = 100
-        sanctions_1.save()
-
-        response = client.get(
-            reverse(
-                self.urlname,
-                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
-            )
-        )
-        assertNotContains(response, NO_SANCTION)
-        assertNotContains(response, TEMP_SUSPENSION)
-        assertContains(response, FINAL_SUSPENSION)
-        assertNotContains(response, PARTIAL_CUT, html=True)
-        assertContains(response, TOTAL_CUT, html=True)
+        assertContains(response, SUBSIDY_CUT, html=True)
 
 
 class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
@@ -2293,7 +2284,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
         parser = html5lib.HTMLParser(namespaceHTMLElements=False)
         html = parser.parse(response.content)
         checkboxes = html.findall(".//input[@type='checkbox'][@name='sanctions']")
-        assert len(checkboxes) == 6
+        assert len(checkboxes) == 5
         assert sorted(c.get("value") for c in checkboxes if "checked" in c.attrib) == sorted(checked_values)
 
     def test_get_empty_session(self, client):
@@ -2323,7 +2314,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
         )
         client.force_login(self.user)
         key = f"siae_evaluations_views:institution_evaluated_siae_notify-{evaluated_siae.pk}"
-        checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
+        checked = ["SUBSIDY_CUT", "TRAINING"]
         session = client.session
         session[key] = {"sanctions": checked}
         session.save()
@@ -2344,7 +2335,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
             notification_text="A envoyé une photo de son chat.",
         )
         client.force_login(self.user)
-        checked = ["SUBSIDY_CUT_PERCENT", "TRAINING"]
+        checked = ["SUBSIDY_CUT", "TRAINING"]
         response = client.post(
             reverse(
                 self.urlname,
@@ -2397,12 +2388,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
                 "choisissez l’une ou l’autre de ces sanctions.",
             ),
             (
-                ["SUBSIDY_CUT_FULL", "SUBSIDY_CUT_PERCENT"],
-                "“Suppression d’une partie de l’aide au poste” est incompatible avec "
-                "“Suppression de toute l’aide au poste”, choisissez l’une ou l’autre de ces sanctions.",
-            ),
-            (
-                ["NO_SANCTIONS", "SUBSIDY_CUT_FULL"],
+                ["NO_SANCTIONS", "SUBSIDY_CUT"],
                 "“Ne pas sanctionner” est incompatible avec les autres sanctions.",
             ),
         ]
@@ -2510,8 +2496,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         )
         assert evaluated_siae.sanctions.training_session == "RDV le lundi 8 à 15h à la DDETS"
         assert evaluated_siae.sanctions.suspension_dates is None
-        assert evaluated_siae.sanctions.subsidy_cut_percent is None
-        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert EvaluatedJobApplicationSanction.objects.count() == 0
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2554,8 +2539,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(
             datetime.date(2023, 1, 1), datetime.date(2023, 2, 1)
         )
-        assert evaluated_siae.sanctions.subsidy_cut_percent is None
-        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert EvaluatedJobApplicationSanction.objects.count() == 0
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2890,8 +2874,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
-        assert evaluated_siae.sanctions.subsidy_cut_percent is None
-        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert EvaluatedJobApplicationSanction.objects.count() == 0
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2948,7 +2931,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_percent(self, client, mailoutbox):
+    @pytest.mark.parametrize("subsidy_cut_percent", [20, 100])
+    def test_post_subsidy_cut(self, client, mailoutbox, subsidy_cut_percent):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -2958,16 +2942,35 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             siae=company_membership.company,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            job_app__job_application__for_snapshot=True,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        evaluated_job_app_1 = EvaluatedJobApplication.objects.first()
+        evaluated_job_app_2 = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            complete=True,
+            criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            complete=True,
+            criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
         response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
-                "subsidy_cut_percent": 20,
-                "subsidy_cut_from": datetime.date(2023, 1, 1),
-                "subsidy_cut_to": datetime.date(2023, 6, 1),
+                "form-TOTAL_FORMS": "3",
+                "form-INITIAL_FORMS": "3",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app_1.pk,
+                "form-0-subsidy_cut_percent": subsidy_cut_percent,
+                "form-1-evaluated_job_application": evaluated_job_app_2.pk,
+                "form-1-subsidy_cut_percent": "0",  # will not be saved
+                "form-2-evaluated_job_application": evaluated_job_app_2.pk,
+                "form-2-subsidy_cut_percent": "",  # will not be saved
             },
         )
         assertRedirects(
@@ -2986,14 +2989,134 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
-        assert evaluated_siae.sanctions.subsidy_cut_percent == 20
-        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
-            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
+        assert (
+            evaluated_siae.sanctions.evaluated_job_applications_sanctions.first().subsidy_cut_percent
+            == subsidy_cut_percent
         )
+        assert EvaluatedJobApplicationSanction.objects.count() == 1
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_percent_invalid_date_and_percent(self, client, mailoutbox):
+    @pytest.mark.parametrize("accepted_state", [True, False])
+    def test_post_subsidy_cut_evaluated_job_application_state(self, client, accepted_state):
+        """
+        Test the evaluated job application display in the form.
+        Don't display accepted ones. Since the evaluated job app state is computed,
+        play with the evaluated adminitrative criteria state.
+        """
+        company_membership = CompanyMembershipFactory(
+            company__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=company_membership.company,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            job_app__job_application__for_snapshot=True,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        evaluated_job_app_1 = EvaluatedJobApplication.objects.first()
+        criterion_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+            if accepted_state
+            else random.choice(
+                list(
+                    set(evaluation_enums.EvaluatedAdministrativeCriteriaState.values)
+                    - {
+                        evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                        evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+                    }
+                )
+            )
+        )
+        evaluated_job_app_2 = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            complete=True,
+            criteria__review_state=criterion_state,
+            job_application__job_seeker__first_name="Vincent",
+            job_application__job_seeker__last_name="Xion",
+            job_application__with_approval=True,
+            job_application__approval__number="123459954321",
+            job_application__approval__start_at=datetime.date(2022, 1, 1),
+            job_application__approval__origin=Origin.PE_APPROVAL,
+            job_application__approval__eligibility_diagnosis=None,
+        )
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
+        response = client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        assertContains(
+            response,
+            """
+            <div class="c-box--results__summary flex-grow-1">
+             <i class="ri-pass-valid-line" aria-hidden="true"></i>
+             <div>
+              <h3>
+               PASS&nbsp;IAE <span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span>
+               délivré le 01 Janvier 2000
+              </h3>
+              <span>Jane DOE</span>
+             </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        if accepted_state:
+            assertion = assertNotContains
+        else:
+            assertion = assertContains
+        assertion(
+            response,
+            """
+            <div class="c-box--results__summary flex-grow-1">
+             <i class="ri-pass-valid-line" aria-hidden="true"></i>
+             <div>
+              <h3>
+               PASS&nbsp;IAE <span>12345</span><span class="ms-1">99</span><span class="ms-1">54321</span>
+               délivré le 01 Janvier 2022
+              </h3>
+              <span>Vincent XION</span>
+             </div>
+            </div>
+            """,
+            html=True,
+        )
+
+        response = client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "form-TOTAL_FORMS": "1" if accepted_state else "2",
+                "form-INITIAL_FORMS": "1" if accepted_state else "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app_1.pk,
+                "form-0-subsidy_cut_percent": "20",
+            }
+            | (
+                {}
+                if accepted_state
+                else {
+                    "form-1-evaluated_job_application": evaluated_job_app_2.pk,
+                    "form-1-subsidy_cut_percent": "20",
+                }
+            ),
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_list",
+                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+            ),
+        )
+        evaluated_siae.refresh_from_db()
+        assert evaluated_siae.notified_at == timezone.now()
+        assert evaluated_siae.notification_reason == "INVALID_PROOF"
+        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
+        assert EvaluatedJobApplicationSanction.objects.count() == 2 - accepted_state
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_subsidy_cut_invalid_data(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3006,85 +3129,102 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_PERCENT"])
+        evaluated_job_app = EvaluatedJobApplication.objects.first()
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
+
+        # Invalid percent
         response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
-                "subsidy_cut_percent": "110",
-                "subsidy_cut_from": "invalid",
-                "subsidy_cut_to": "invalid",
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app.pk,
+                "form-0-subsidy_cut_percent": "110",
             },
         )
         assertContains(
             response,
             """
-            <div class="form-group is-invalid form-group-required">
-             <label class="form-label" for="id_subsidy_cut_percent">
+            <div class="form-group is-invalid">
+             <label class="form-label" for="id_form-0-subsidy_cut_percent">
               Pourcentage d’aide retiré à la SIAE
              </label>
-             <input aria-label="Suppression d’une partie de l’aide au poste en pourcent"
+             <input aria-label="Suppression partielle ou totale de l’aide au poste en pourcent"
                     class="form-control is-invalid"
-                    id="id_subsidy_cut_percent"
+                    id="id_form-0-subsidy_cut_percent"
                     max="100"
-                    min="1"
-                    name="subsidy_cut_percent"
-                    placeholder="Pourcentage d’aide retiré à la SIAE"
-                    required aria-invalid="true"
+                    min="0"
+                    name="form-0-subsidy_cut_percent"
+                    placeholder="%"
+                    aria-invalid="true"
                     step="1"
                     type="number"
-                    aria-describedby="id_subsidy_cut_percent_error"
+                    aria-describedby="id_form-0-subsidy_cut_percent_error"
                     value="110" />
-             <div id="id_subsidy_cut_percent_error" class="w-100">
+             <div id="id_form-0-subsidy_cut_percent_error" class="w-100">
               <div class="invalid-feedback d-block">
                Assurez-vous que cette valeur est inférieure ou égale à 100.
               </div>
              </div>
             </div>
-            <div class="form-group is-invalid form-group-required">
-             <label class="form-label" for="id_subsidy_cut_from">
-              À partir du
-             </label>
-             <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste à partir du"
-                               class="is-invalid"
-                               identifier="id_subsidy_cut_from"
-                               name="subsidy_cut_from"
-                               required aria-invalid="true"
-                               aria-describedby="id_subsidy_cut_from_error"
-                               value="invalid"></duet-date-picker>
-              <div id="id_subsidy_cut_from_error" class="w-100">
-               <div class="invalid-feedback d-block">
-                Saisissez une date valide.
-               </div>
-              </div>
+            """,
+            html=True,
+            count=1,
+        )
+
+        # Invalid evaluated_job_application
+        response = client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": "0",
+                "form-0-subsidy_cut_percent": "100",
+            },
+        )
+        assertContains(
+            response,
+            """
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+             <p>
+              <strong>Votre formulaire contient une erreur</strong>
+             </p>
+             <ul class="mb-0">
+              <li>L’auto-prescription indiquée ne correspond pas à l’auto-prescription affichée.</li>
+             </ul>
             </div>
-            <div class="form-group is-invalid form-group-required">
-             <label class="form-label" for="id_subsidy_cut_to">
-              Jusqu’au
-             </label>
-             <duet-date-picker aria-label="Suppression d’une partie de l’aide au poste jusqu’au"
-                               class="is-invalid"
-                               identifier="id_subsidy_cut_to"
-                               name="subsidy_cut_to"
-                               required aria-invalid="true"
-                               aria-describedby="id_subsidy_cut_to_error"
-                               value="invalid"></duet-date-picker>
-              <div id="id_subsidy_cut_to_error" class="w-100">
-               <div class="invalid-feedback d-block">
-                Saisissez une date valide.
-               </div>
-              </div>
+            <input type="hidden" name="form-0-evaluated_job_application" value="0"
+               id="id_form-0-evaluated_job_application">
+            <div class="form-group">
+             <label class="form-label" for="id_form-0-subsidy_cut_percent">
+              Pourcentage d’aide retiré à la SIAE</label>
+             <input type="number"
+                    name="form-0-subsidy_cut_percent"
+                    aria-label="Suppression partielle ou totale de l’aide au poste en pourcent"
+                    placeholder="%"
+                    step="1"
+                    min="0"
+                    max="100"
+                    value="100"
+                    class="form-control is-valid"
+                    id="id_form-0-subsidy_cut_percent">
             </div>
             """,
             html=True,
             count=1,
         )
+
         evaluated_siae.refresh_from_db()
         assert [] == mailoutbox
         with pytest.raises(Sanctions.DoesNotExist):
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_full(self, client, mailoutbox):
+    def test_post_subsidy_cut_need_at_leat_one_form_filled(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3097,36 +3237,50 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT_FULL"])
+        evaluated_job_app_1 = EvaluatedJobApplication.objects.first()
+        evaluated_job_app_2 = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            complete=True,
+            criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
+
         response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
-                "subsidy_cut_percent": 20,  # Ignored.
-                "subsidy_cut_from": datetime.date(2023, 1, 1),
-                "subsidy_cut_to": datetime.date(2023, 6, 1),
+                "form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app_1.pk,
+                "form-0-subsidy_cut_percent": "",
+                "form-1-evaluated_job_application": evaluated_job_app_2.pk,
+                "form-1-subsidy_cut_percent": "0",
             },
         )
-        assertRedirects(
+        assertContains(
             response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            ),
+            """
+            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist="">
+             <p>
+              <strong>Votre formulaire contient une erreur</strong>
+             </p>
+             <ul class="mb-0">
+              <li>
+               Un pourcentage compris entre 0 et 100 doit être appliqué sur chacune des auto-prescriptions
+               listées ci-dessous.
+              </li>
+             </ul>
+            </div>
+            """,
+            html=True,
+            count=1,
         )
-        assertMessages(response, [])
 
         evaluated_siae.refresh_from_db()
-        assert evaluated_siae.notified_at == timezone.now()
-        assert evaluated_siae.notification_reason == "INVALID_PROOF"
-        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        assert mailoutbox == []
-        assert evaluated_siae.sanctions.training_session == ""
-        assert evaluated_siae.sanctions.suspension_dates is None
-        assert evaluated_siae.sanctions.subsidy_cut_percent == 100
-        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
-            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
-        )
-        assert evaluated_siae.sanctions.no_sanction_reason == ""
+        assert [] == mailoutbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_no_sanction(self, client, mailoutbox):
@@ -3185,8 +3339,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         )
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates is None
-        assert evaluated_siae.sanctions.subsidy_cut_percent is None
-        assert evaluated_siae.sanctions.subsidy_cut_dates is None
+        assert EvaluatedJobApplicationSanction.objects.count() == 0
         assert evaluated_siae.sanctions.no_sanction_reason == "Chat trop mignon."
 
     @freeze_time("2022-10-24 11:11:00")
@@ -3200,17 +3353,22 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             siae=company_membership.company,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            job_app__job_application__for_snapshot=True,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT"])
+        evaluated_job_app = EvaluatedJobApplication.objects.first()
+        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT"])
         response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
                 "permanent_suspension": datetime.date(2023, 1, 1),
-                "subsidy_cut_percent": 20,
-                "subsidy_cut_from": datetime.date(2023, 1, 1),
-                "subsidy_cut_to": datetime.date(2023, 6, 1),
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app.pk,
+                "form-0-subsidy_cut_percent": 20,
             },
         )
         assertRedirects(
@@ -3229,10 +3387,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert mailoutbox == []
         assert evaluated_siae.sanctions.training_session == ""
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
-        assert evaluated_siae.sanctions.subsidy_cut_percent == 20
-        assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
-            datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
-        )
+        assert EvaluatedJobApplicationSanction.objects.first().subsidy_cut_percent == 20
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
 
