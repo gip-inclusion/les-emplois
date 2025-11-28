@@ -25,11 +25,15 @@ Suite aux manquements constatés lors du dernier contrôle a posteriori des auto
 {% endif %}
 
 {% if sanctions.subsidy_cut_dates %}
-- Suppression {% if sanctions.subsidy_cut_percent < 100 %}d’une partie {% endif %}de l’aide au poste
+- Suppression partielle ou totale de l’aide au poste
 
     La suppression de l’aide attribuée aux salariés s’apprécie par l’autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l’article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
 
-    Dans votre cas, la suppression {% if sanctions.subsidy_cut_percent < 100 %}de {{ sanctions.subsidy_cut_percent }} % {% endif %}de l’aide au poste sera effective à partir du {{ sanctions.subsidy_cut_dates.lower|date }} et jusqu’au {{ sanctions.subsidy_cut_dates.upper|date }}.
+    Dans votre cas, la suppression partielle ou totale de l’aide au poste sera effective à partir du {{ sanctions.subsidy_cut_dates.lower|date }} et jusqu’au {{ sanctions.subsidy_cut_dates.upper|date }} sur les auto-prescriptions suivantes :
+{% for job_app_sanction in evaluated_job_applications_sanctions %}
+    - PASS IAE {{ job_app_sanction.evaluated_job_application.job_application.approval.number_with_spaces }} délivré le {{ job_app_sanction.evaluated_job_application.job_application.approval.start_at|date:"d E Y" }} ({{ job_app_sanction.evaluated_job_application.job_application.job_seeker.get_full_name }}) :
+      {% if job_app_sanction.subsidy_cut_percent == 100 %}totalité{% else %}{{ job_app_sanction.subsidy_cut_percent }} %{% endif %} de l’aide
+{% endfor%}
 {% endif %}
 
 {% if sanctions.deactivation_reason %}

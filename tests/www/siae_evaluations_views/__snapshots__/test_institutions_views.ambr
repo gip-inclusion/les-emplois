@@ -1894,7 +1894,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
@@ -2239,7 +2238,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
@@ -2333,7 +2331,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2444,7 +2442,7 @@
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
-          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.setup[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -2530,7 +2528,7 @@
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
-          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.setup[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -2539,6 +2537,27 @@
                  "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
           FROM "siae_evaluations_evaluatedjobapplication"
           WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'InstitutionEvaluatedSiaeNotifyStep3View.setup[www/siae_evaluations_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          INNER JOIN "siae_evaluations_evaluatedsiae" ON ("siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = "siae_evaluations_evaluatedsiae"."id")
+          WHERE ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" IN
+                   (SELECT U0."id"
+                    FROM "siae_evaluations_evaluationcampaign" U0
+                    WHERE ((U0."ended_at" IS NULL
+                            OR U0."ended_at" >= %s)
+                           AND NOT (U0."evaluated_period_end_at" < %s)))
+                 AND "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s)
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -2584,7 +2603,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
