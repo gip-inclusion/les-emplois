@@ -36,57 +36,9 @@
   
   '''
 # ---
-# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_full
-  '''
-  <div class="card-body">
-      <h2>
-          Sanction
-      </h2>
-      <h3 class="mt-5">
-          Suppression
-                                      
-                                      de l’aide au poste
-      </h3>
-      <p>
-          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-      </p>
-      <p>
-          Dans votre cas, la suppression
-                                      
-                                      de l’aide au poste sera effective à partir du 1 janvier 2023 et jusqu’au 1 juin 2023.
-      </p>
-  </div>
-  
-  '''
-# ---
-# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[card]
-  '''
-  <div class="card-body">
-      <h2>
-          Sanction
-      </h2>
-      <h3 class="mt-5">
-          Suppression
-                                      d’une partie
-                                      de l’aide au poste
-      </h3>
-      <p>
-          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-      </p>
-      <p>
-          Dans votre cas, la suppression
-                                      
-                                          de 35 %
-                                      
-                                      de l’aide au poste sera effective à partir du 1 janvier 2023 et jusqu’au 1 juin 2023.
-      </p>
-  </div>
-  
-  '''
-# ---
-# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[queries]
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_queries[queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -227,8 +179,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -241,7 +191,21 @@
       }),
       dict({
         'origin': list([
-          'evaluation_campaign_data_context[www/siae_evaluations_views/views.py]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -249,15 +213,131 @@
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
                  "siae_evaluations_evaluatedjobapplication"."job_application_id",
                  "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
-                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation",
+                 "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
           FROM "siae_evaluations_evaluatedjobapplication"
-          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          INNER JOIN "job_applications_jobapplication" ON ("siae_evaluations_evaluatedjobapplication"."job_application_id" = "job_applications_jobapplication"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          LEFT OUTER JOIN "siae_evaluations_evaluatedjobapplicationsanction" ON ("siae_evaluations_evaluatedjobapplication"."id" = "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id")
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'evaluation_campaign_data_context[www/siae_evaluations_views/views.py]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -272,9 +352,41 @@
                  "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
           FROM "siae_evaluations_evaluatedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
-          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s,
+                                                                                                      %s)
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
+                 "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s,
+                                                                                            %s,
+                                                                                            %s,
+                                                                                            %s,
+                                                                                            %s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
@@ -367,8 +479,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -435,6 +545,27 @@
       }),
       dict({
         'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/evaluated_siae_sanction.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s,
+                                                                                      %s,
+                                                                                      %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -467,6 +598,38 @@
       }),
     ]),
   })
+# ---
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[100][sanctions with subsidy_cut_percent=100]
+  '''
+  <div class="card-body">
+      <h2>
+          Sanction
+      </h2>
+      <h3 class="mt-5">
+          Suppression partielle ou totale de l’aide au poste
+      </h3>
+      <p>
+          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
+      </p>
+  </div>
+  
+  '''
+# ---
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[10][sanctions with subsidy_cut_percent=10]
+  '''
+  <div class="card-body">
+      <h2>
+          Sanction
+      </h2>
+      <h3 class="mt-5">
+          Suppression partielle ou totale de l’aide au poste
+      </h3>
+      <p>
+          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
+      </p>
+  </div>
+  
+  '''
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_temporary_suspension
   '''
@@ -509,7 +672,7 @@
 # ---
 # name: TestEvaluatedSiaeSanctionView.test_view_as_institution[queries]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -650,8 +813,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -664,7 +825,21 @@
       }),
       dict({
         'origin': list([
-          'evaluation_campaign_data_context[www/siae_evaluations_views/views.py]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -672,15 +847,131 @@
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
                  "siae_evaluations_evaluatedjobapplication"."job_application_id",
                  "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
-                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation",
+                 "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                 "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
           FROM "siae_evaluations_evaluatedjobapplication"
-          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          INNER JOIN "job_applications_jobapplication" ON ("siae_evaluations_evaluatedjobapplication"."job_application_id" = "job_applications_jobapplication"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
+          LEFT OUTER JOIN "eligibility_eligibilitydiagnosis" ON ("job_applications_jobapplication"."eligibility_diagnosis_id" = "eligibility_eligibilitydiagnosis"."id")
+          LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
+          LEFT OUTER JOIN "siae_evaluations_evaluatedjobapplicationsanction" ON ("siae_evaluations_evaluatedjobapplication"."id" = "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id")
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
           ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
         'origin': list([
-          'evaluation_campaign_data_context[www/siae_evaluations_views/views.py]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
@@ -695,9 +986,33 @@
                  "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
           FROM "siae_evaluations_evaluatedadministrativecriteria"
           INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
-          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" IN (%s)
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
+                 "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
         ''',
       }),
@@ -790,8 +1105,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -854,6 +1167,27 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/evaluated_siae_sanction.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
+          'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s,
+                                                                                      %s,
+                                                                                      %s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

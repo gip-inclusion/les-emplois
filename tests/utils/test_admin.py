@@ -40,6 +40,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
+    EvaluatedJobApplicationSanctionFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
     SanctionsFactory,
@@ -87,7 +88,7 @@ def test_all_admin(admin_client, mocker, subtests):
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     ExternalDataImport.objects.create(user=admin_user)
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
-    SanctionsFactory(evaluated_siae=evaluated_siae)
+    EvaluatedJobApplicationSanctionFactory(sanctions__evaluated_siae=evaluated_siae)
     InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LaborInspectorInvitationFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LabelInfos.objects.create(campaign=AssessmentCampaignFactory(), data=[])
@@ -115,6 +116,7 @@ def test_all_admin(admin_client, mocker, subtests):
             AssessmentCampaignFactory,  # Already used above
             EvaluatedAdministrativeCriteriaFactory,  # Already used above
             EvaluatedJobApplicationFactory,  # Called by EvaluatedAdministrativeCriteriaFactory
+            EvaluatedJobApplicationSanctionFactory,  # Already used above
             EvaluatedSiaeFactory,  # Called by EvaluatedAdministrativeCriteriaFactory
             EvaluationCampaignFactory,  # Called by EvaluatedAdministrativeCriteriaFactory
             FileFactory,  # Already used above
@@ -127,7 +129,7 @@ def test_all_admin(admin_client, mocker, subtests):
             JobSeekerFactory,  # Already used above
             LaborInspectorInvitationFactory,  # Already used above
             QPVFactory,  # Already used above
-            SanctionsFactory,  # Already used above
+            SanctionsFactory,  # Called by EvaluatedJobApplicationSanctionFactory
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
             UserFactory,  # A lot of subfactories, no need to use it
         ):

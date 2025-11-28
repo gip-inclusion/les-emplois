@@ -133,4 +133,14 @@ class SanctionsFactory(factory.django.DjangoModelFactory):
     )
     no_sanction_reason = ""
 
-    # TODO(ewen): We're omitting subsidy_cut_percent and subsidy_cut_dates here as they will soon be removed.
+
+class EvaluatedJobApplicationSanctionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.EvaluatedJobApplicationSanction
+        skip_postgeneration_save = True
+
+    sanctions = factory.SubFactory(SanctionsFactory)
+    evaluated_job_application = factory.SubFactory(
+        EvaluatedJobApplicationFactory, evaluated_siae=factory.SelfAttribute("..sanctions.evaluated_siae")
+    )
+    subsidy_cut_percent = factory.fuzzy.FuzzyInteger(1, 100)

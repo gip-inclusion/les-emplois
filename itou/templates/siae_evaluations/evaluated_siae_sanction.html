@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load components %}
+{% load format_filters %}
 {% load str_filters %}
 
 {% block title %}Décision de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
@@ -66,21 +67,10 @@
                                 </p>
                             {% endif %}
 
-                            {% if sanctions.subsidy_cut_dates %}
-                                <h3 class="mt-5">
-                                    Suppression
-                                    {% if sanctions.subsidy_cut_percent < 100 %}d’une partie{% endif %}
-                                    de l’aide au poste
-                                </h3>
+                            {% if sanctions.evaluated_job_applications_sanctions.count %}
+                                <h3 class="mt-5">Suppression partielle ou totale de l’aide au poste</h3>
                                 <p>
-                                    La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-                                </p>
-                                <p>
-                                    Dans votre cas, la suppression
-                                    {% if sanctions.subsidy_cut_percent < 100 %}
-                                        de {{ sanctions.subsidy_cut_percent }} %
-                                    {% endif %}
-                                    de l’aide au poste sera effective à partir du {{ sanctions.subsidy_cut_dates.lower|date }} et jusqu’au {{ sanctions.subsidy_cut_dates.upper|date }}.
+                                    La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
                                 </p>
                             {% endif %}
 

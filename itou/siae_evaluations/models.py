@@ -925,30 +925,9 @@ class Sanctions(models.Model):
         null=True,
         verbose_name="retrait de la capacité d’auto-prescription",
     )
-    subsidy_cut_percent = models.PositiveSmallIntegerField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(1), MaxValueValidator(100)],
-        verbose_name="pourcentage de retrait de l’aide au poste",
-    )
-    subsidy_cut_dates = InclusiveDateRangeField(
-        blank=True,
-        null=True,
-        verbose_name="dates de retrait de l’aide au poste",
-    )
     no_sanction_reason = models.TextField(blank=True, verbose_name="explication de l’absence de sanction")
 
     class Meta:
-        constraints = [
-            models.CheckConstraint(
-                name="subsidy_cut_consistency",
-                violation_error_message=(
-                    "Le pourcentage et la date de début de retrait de l’aide au poste doivent être renseignés."
-                ),
-                condition=models.Q(subsidy_cut_percent__isnull=True, subsidy_cut_dates__isnull=True)
-                | models.Q(subsidy_cut_percent__isnull=False, subsidy_cut_dates__isnull=False),
-            ),
-        ]
         verbose_name_plural = "sanctions"
 
     def __str__(self):
@@ -959,9 +938,39 @@ class Sanctions(models.Model):
         return any(
             [
                 self.suspension_dates,
-                self.subsidy_cut_dates,
+                self.evaluated_job_applications_sanctions.exists(),
             ]
         )
 
     def count_active(self):
-        return bool(self.training_session) + bool(self.suspension_dates) + bool(self.subsidy_cut_dates)
+        return (
+            bool(self.training_session)
+            + bool(self.suspension_dates)
+            + bool(self.evaluated_job_applications_sanctions.count())
+        )
+
+
+class EvaluatedJobApplicationSanction(models.Model):
+    sanctions = models.ForeignKey(
+        Sanctions,
+        on_delete=models.CASCADE,
+        verbose_name="sanctions",
+        related_name="evaluated_job_applications_sanctions",
+    )
+    evaluated_job_application = models.OneToOneField(
+        EvaluatedJobApplication,
+        on_delete=models.CASCADE,
+        verbose_name="candidature évaluée",
+        related_name="evaluated_job_application_sanction",
+    )
+    subsidy_cut_percent = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+        verbose_name="pourcentage de retrait de l’aide au poste",
+    )
+
+    class Meta:
+        verbose_name = "sanction par auto-prescription"
+        verbose_name_plural = "sanctions par auto-prescription"
+
+    def __str__(self):
+        return f"Sanction pour {self.evaluated_job_application}"
