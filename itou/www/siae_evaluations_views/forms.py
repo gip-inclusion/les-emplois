@@ -102,16 +102,14 @@ class InstitutionEvaluatedSiaeNotifyStep1Form(forms.ModelForm):
 TRAINING = "TRAINING"
 TEMPORARY_SUSPENSION = "TEMPORARY_SUSPENSION"
 PERMANENT_SUSPENSION = "PERMANENT_SUSPENSION"
-SUBSIDY_CUT_PERCENT = "SUBSIDY_CUT_PERCENT"
-SUBSIDY_CUT_FULL = "SUBSIDY_CUT_FULL"
+SUBSIDY_CUT = "SUBSIDY_CUT"
 DEACTIVATION = "DEACTIVATION"
 NO_SANCTIONS = "NO_SANCTIONS"
 SANCTION_CHOICES = {
     TRAINING: "Participation à une session de présentation de l’auto-prescription",
     TEMPORARY_SUSPENSION: "Retrait temporaire de la capacité d’auto-prescription",
     PERMANENT_SUSPENSION: "Retrait définitif de la capacité d’auto-prescription",
-    SUBSIDY_CUT_PERCENT: "Suppression d’une partie de l’aide au poste",
-    SUBSIDY_CUT_FULL: "Suppression de toute l’aide au poste",
+    SUBSIDY_CUT: "Suppression partielle ou totale de l’aide au poste",
     DEACTIVATION: "Déconventionnement de la structure",
     NO_SANCTIONS: "Ne pas sanctionner",
 }
@@ -138,8 +136,6 @@ class InstitutionEvaluatedSiaeNotifyStep2Form(forms.Form):
             errors = []
             if sanctions.issuperset({TEMPORARY_SUSPENSION, PERMANENT_SUSPENSION}):
                 errors.append(self.incompatible_error(TEMPORARY_SUSPENSION, PERMANENT_SUSPENSION))
-            if sanctions.issuperset({SUBSIDY_CUT_FULL, SUBSIDY_CUT_PERCENT}):
-                errors.append(self.incompatible_error(SUBSIDY_CUT_PERCENT, SUBSIDY_CUT_FULL))
             if len(sanctions) > 1 and NO_SANCTIONS in sanctions:
                 errors.append(
                     ValidationError(
@@ -200,24 +196,12 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
                     }
                 ),
             )
-        if SUBSIDY_CUT_PERCENT in sanctions:
-            self.fields["subsidy_cut_percent"] = forms.IntegerField(
-                label="Pourcentage d’aide retiré à la SIAE",
-                min_value=1,
-                max_value=100,
-                widget=forms.NumberInput(
-                    attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_PERCENT]} en pourcent",
-                        "placeholder": "Pourcentage d’aide retiré à la SIAE",
-                        "step": "1",
-                    },
-                ),
-            )
+        if SUBSIDY_CUT in sanctions:
             self.fields["subsidy_cut_from"] = forms.DateField(
                 label="À partir du",
                 widget=DuetDatePickerWidget(
                     attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_PERCENT]} à partir du",
+                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT]} à partir du",
                         "placeholder": False,
                     }
                 ),
@@ -226,26 +210,7 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
                 label="Jusqu’au",
                 widget=DuetDatePickerWidget(
                     attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_PERCENT]} jusqu’au",
-                        "placeholder": False,
-                    }
-                ),
-            )
-        if SUBSIDY_CUT_FULL in sanctions:
-            self.fields["subsidy_cut_from"] = forms.DateField(
-                label="À partir du",
-                widget=DuetDatePickerWidget(
-                    attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_FULL]} à partir du",
-                        "placeholder": False,
-                    }
-                ),
-            )
-            self.fields["subsidy_cut_to"] = forms.DateField(
-                label="Jusqu’au",
-                widget=DuetDatePickerWidget(
-                    attrs={
-                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_FULL]} jusqu’au",
+                        "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT]} jusqu’au",
                         "placeholder": False,
                     }
                 ),
@@ -280,8 +245,6 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         if not self.errors:
-            if cleaned_data.get("subsidy_cut_from") and "subsidy_cut_percent" not in cleaned_data:
-                cleaned_data["subsidy_cut_percent"] = 100
             if cleaned_data.get("subsidy_cut_from"):
                 datefrom = cleaned_data["subsidy_cut_from"]
                 dateto = cleaned_data["subsidy_cut_to"]
@@ -302,3 +265,66 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
             if cleaned_data.get("permanent_suspension"):
                 cleaned_data["suspension_dates"] = InclusiveDateRange(cleaned_data["permanent_suspension"])
         return cleaned_data
+
+
+class InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet(forms.BaseFormSet):
+    def __init__(self, sanctions, evaluated_job_applications_to_sanction, *args, **kwargs):
+        self.evaluated_job_applications_to_sanction = {
+            job_app.pk: job_app for job_app in evaluated_job_applications_to_sanction
+        }
+        initial = (
+            [
+                {
+                    "evaluated_job_application": job_app.pk,
+                    "subsidy_cut_percent": None,
+                }
+                for job_app in self.evaluated_job_applications_to_sanction.values()
+            ]
+            if SUBSIDY_CUT in sanctions
+            else []
+        )
+        super().__init__(*args, initial=initial, **kwargs)
+
+    def clean(self):
+        """Check that at least one evaluated job evaluation has a non zero percentage"""
+        if any(self.errors):
+            return
+
+        for form in self.forms:
+            if form.cleaned_data.get("subsidy_cut_percent"):
+                return
+        raise ValidationError("Un pourcentage doit être appliqué sur au moins une auto-prescription ci-dessous.")
+
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs["evaluated_job_application_to_display"] = self.evaluated_job_applications_to_sanction[
+            self.initial[index]["evaluated_job_application"]
+        ]
+        return kwargs
+
+
+class InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm(forms.Form):
+    evaluated_job_application = forms.IntegerField(widget=forms.HiddenInput())
+    subsidy_cut_percent = forms.IntegerField(
+        label="Pourcentage d’aide retiré à la SIAE",
+        required=False,
+        min_value=0,
+        max_value=100,
+        widget=forms.NumberInput(
+            attrs={
+                "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT]} en pourcent",
+                "placeholder": "Pourcentage d’aide retiré à la SIAE",
+                "step": "1",
+            },
+        ),
+    )
+
+    def __init__(self, *args, evaluated_job_application_to_display=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.evaluated_job_application_to_display = evaluated_job_application_to_display
+
+    def clean_evaluated_job_application(self):
+        evaluated_job_application_id = self.cleaned_data.get("evaluated_job_application")
+        if not EvaluatedJobApplication.objects.filter(pk=evaluated_job_application_id):
+            self.add_error(None, "L’auto-prescription n’a pas été trouvée.")
+        return evaluated_job_application_id

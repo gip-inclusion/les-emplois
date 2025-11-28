@@ -21,7 +21,7 @@ from itou.external_data.models import ExternalDataImport
 from itou.geiq_assessments.models import LabelInfos
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
-from itou.siae_evaluations.models import Sanctions
+from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedJobApplicationSanction, Sanctions
 from itou.users.models import NirModificationRequest
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import SiaeFinancialAnnexFactory
@@ -84,7 +84,12 @@ def test_all_admin(admin_client, mocker, subtests):
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     ExternalDataImport.objects.create(user=admin_user)
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
-    Sanctions.objects.create(evaluated_siae=evaluated_siae, training_session="RDV")
+    sanctions = Sanctions.objects.create(evaluated_siae=evaluated_siae, training_session="RDV")
+    EvaluatedJobApplicationSanction.objects.create(
+        sanctions=sanctions,
+        evaluated_job_application=EvaluatedJobApplication.objects.first(),
+        subsidy_cut_percent=20,
+    )
     InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LaborInspectorInvitationFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LabelInfos.objects.create(campaign=AssessmentCampaignFactory(), data=[])
