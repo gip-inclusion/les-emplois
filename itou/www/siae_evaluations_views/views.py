@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
-from django.db.models import Q
+from django.db.models import Prefetch, Q
+from django.forms import formset_factory
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.urls import reverse
@@ -16,6 +17,7 @@ from itou.siae_evaluations.emails import InstitutionEmailFactory, SIAEEmailFacto
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
     EvaluatedJobApplication,
+    EvaluatedJobApplicationSanction,
     EvaluatedSiae,
     EvaluationCampaign,
     Sanctions,
@@ -26,9 +28,12 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siae_evaluations_views.forms import (
+    SUBSIDY_CUT,
     AdministrativeCriteriaEvaluationForm,
     InstitutionEvaluatedSiaeNotifyStep1Form,
     InstitutionEvaluatedSiaeNotifyStep2Form,
+    InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm,
+    InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet,
     InstitutionEvaluatedSiaeNotifyStep3Form,
     LaborExplanationForm,
     SetChosenPercentForm,
@@ -198,7 +203,10 @@ def evaluation_campaign_data_context(evaluated_siae):
         .exclude(pk=evaluated_siae.pk)
         .order_by("-evaluation_campaign__evaluated_period_start_at")
         .select_related("evaluation_campaign", "sanctions")
-        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+        .prefetch_related(
+            "evaluated_job_applications__evaluated_administrative_criteria",
+            "sanctions__evaluated_job_applications_sanctions",
+        )
     )
     return context
 
@@ -225,6 +233,9 @@ class InstitutionEvaluatedSiaeNotifyMixin(SingleObjectMixin):
             )
             .select_related("evaluation_campaign", "siae")
             .prefetch_related(
+                Prefetch(
+                    "evaluated_job_applications", queryset=EvaluatedJobApplication.objects.order_by("pk")
+                ),  # Order the displayed evaluated_job_applications to sanction in step 3.
                 "evaluated_job_applications__evaluated_administrative_criteria",
                 "evaluated_job_applications__job_application__eligibility_diagnosis__administrative_criteria",
             )
@@ -286,8 +297,7 @@ class InstitutionEvaluatedSiaeNotifyStep2View(InstitutionEvaluatedSiaeNotifyMixi
         )
 
 
-class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixin, generic.FormView):
-    form_class = InstitutionEvaluatedSiaeNotifyStep3Form
+class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixin, generic.TemplateView):
     template_name = "siae_evaluations/institution_evaluated_siae_notify_step3.html"
 
     def _build_notification_email(self, evaluated_siae, sanctions):
@@ -299,7 +309,16 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         # No email is sent for the other sanctions: SIAEs are informed by postal mail
         return None
 
-    def get(self, request, *args, **kwargs):
+    def _get_evaluated_job_applications_to_sanction(self):
+        if SUBSIDY_CUT not in self.request.session[self.sessionkey]["sanctions"]:
+            return None
+        return [
+            job_app
+            for job_app in self.object.evaluated_job_applications.all()
+            if job_app.compute_state() in evaluation_enums.EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES
+        ]
+
+    def dispatch(self, request, *args, **kwargs):
         if self.sessionkey not in request.session:
             return HttpResponseRedirect(
                 reverse(
@@ -308,42 +327,71 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
                 )
             )
         self.object = self.get_object()
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if SUBSIDY_CUT in self.request.session[self.sessionkey]["sanctions"]:
+            qs = qs.prefetch_related(
+                "evaluated_job_applications__job_application__job_seeker",
+                "evaluated_job_applications__job_application__approval",
+            )
+        return qs
+
+    def get_forms(self):
+        forms = {}
+        sanctions = self.request.session[self.sessionkey]["sanctions"]
+
+        forms["siae_sanctions_form"] = InstitutionEvaluatedSiaeNotifyStep3Form(
+            data=self.request.POST or None, sanctions=sanctions
+        )
+        if SUBSIDY_CUT in sanctions:
+            evaluated_job_applications_to_sanction = self._get_evaluated_job_applications_to_sanction()
+            job_application_sanction_formset = formset_factory(
+                form=InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm,
+                formset=InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet,
+                extra=0,
+                max_num=len(evaluated_job_applications_to_sanction),
+                validate_max=True,
+            )
+            forms["job_application_sanction_formset"] = job_application_sanction_formset(
+                data=self.request.POST or None,
+                evaluated_job_applications_to_sanction=self._get_evaluated_job_applications_to_sanction(),
+            )
+        return forms
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["forms"] = self.get_forms()
+        return context
 
     def post(self, request, *args, **kwargs):
-        if self.sessionkey not in request.session:
-            return HttpResponseRedirect(
-                reverse(
-                    "siae_evaluations_views:institution_evaluated_siae_notify_step2",
-                    kwargs={"evaluated_siae_pk": self.kwargs["evaluated_siae_pk"]},
-                )
+        forms = self.get_forms()
+        if all([form.is_valid() for form in forms.values()]):
+            evaluated_siae = self.object
+            siae_sanctions_form = forms["siae_sanctions_form"]
+            sanctions = Sanctions.objects.create(
+                evaluated_siae=evaluated_siae,
+                training_session=siae_sanctions_form.cleaned_data.get("training_session", ""),
+                suspension_dates=siae_sanctions_form.cleaned_data.get("suspension_dates"),
+                no_sanction_reason=siae_sanctions_form.cleaned_data.get("no_sanction_reason", ""),
             )
-        self.object = self.get_object()
-        return super().post(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["sanctions"] = self.request.session[self.sessionkey]["sanctions"]
-        return kwargs
-
-    def form_valid(self, form):
-        evaluated_siae = self.object
-        sanctions = Sanctions(
-            evaluated_siae=evaluated_siae,
-            training_session=form.cleaned_data.get("training_session", ""),
-            suspension_dates=form.cleaned_data.get("suspension_dates"),
-            subsidy_cut_percent=form.cleaned_data.get("subsidy_cut_percent"),
-            subsidy_cut_dates=form.cleaned_data.get("subsidy_cut_dates"),
-            no_sanction_reason=form.cleaned_data.get("no_sanction_reason", ""),
-        )
-        evaluated_siae.notified_at = timezone.now()
-        sanctions.save()
-        evaluated_siae.save(update_fields=["notified_at"])
-        del self.request.session[self.sessionkey]
-        if email := self._build_notification_email(evaluated_siae, sanctions):
-            send_email_messages([email])
-            messages.success(self.request, f'L’entreprise "{evaluated_siae}" a bien été notifiée de la décision.')
-        return super().form_valid(form)
+            if formset := forms.get("job_application_sanction_formset"):
+                for form in formset:
+                    if subsidy_cut_percent := form.cleaned_data.get("subsidy_cut_percent"):
+                        EvaluatedJobApplicationSanction.objects.create(
+                            sanctions=sanctions,
+                            evaluated_job_application_id=form.cleaned_data.get("evaluated_job_application"),
+                            subsidy_cut_percent=subsidy_cut_percent,
+                        )
+            evaluated_siae.notified_at = timezone.now()
+            evaluated_siae.save(update_fields=["notified_at"])
+            del self.request.session[self.sessionkey]
+            if email := self._build_notification_email(evaluated_siae, sanctions):
+                send_email_messages([email])
+                messages.success(self.request, f'L’entreprise "{evaluated_siae}" a bien été notifiée de la décision.')
+            return HttpResponseRedirect(self.get_success_url())
+        return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse(
@@ -367,11 +415,32 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
         )
         .exclude(notified_at=None)
         .select_related("evaluation_campaign", "sanctions")
+        .prefetch_related(
+            "sanctions__evaluated_job_applications_sanctions",
+            Prefetch(
+                "evaluated_job_applications",
+                queryset=EvaluatedJobApplication.objects.select_related(
+                    "evaluated_job_application_sanction",
+                    "job_application__approval",
+                    "job_application__job_seeker",
+                    "job_application__eligibility_diagnosis",
+                ).prefetch_related(
+                    "evaluated_administrative_criteria",
+                    "job_application__eligibility_diagnosis__administrative_criteria",
+                ),
+            ),
+        )
     )
     context = evaluation_campaign_data_context(evaluated_siae)
     context["evaluated_siae"] = evaluated_siae
     context["is_siae"] = viewer_type == "siae"
     context["matomo_custom_title"] = "Décision de sanction"
+    context["evaluated_job_applications"] = [
+        evaluated_job_application
+        for evaluated_job_application in evaluated_siae.evaluated_job_applications.all()
+        if evaluated_job_application.compute_state()
+        in evaluation_enums.EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES
+    ]
     try:
         context["sanctions"] = evaluated_siae.sanctions
     except EvaluatedSiae.sanctions.RelatedObjectDoesNotExist:

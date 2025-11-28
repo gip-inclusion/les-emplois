@@ -37,6 +37,20 @@ class EvaluatedJobApplicationsState(models.TextChoices):
     REFUSED_2 = "REFUSED_2"
 
 
+EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES = [
+    # None of the criteria have been selected for justification
+    EvaluatedJobApplicationsState.PENDING,
+    # The criteria have been selected but no proof have been uploaded
+    EvaluatedJobApplicationsState.PROCESSING,
+    # The proofs have been uploaded for each selected criterion, but not submitted for validation
+    EvaluatedJobApplicationsState.UPLOADED,
+    # The justification has been refused the first time
+    EvaluatedJobApplicationsState.REFUSED,
+    # The justification has been refused a second time during the adversarial stage
+    EvaluatedJobApplicationsState.REFUSED_2,
+]
+
+
 class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
     PENDING = "PENDING"
     EDITABLE = "EDITABLE"
