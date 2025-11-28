@@ -17,6 +17,7 @@ from tests.institutions.factories import InstitutionFactory, InstitutionMembersh
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
+    EvaluatedJobApplicationSanctionFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
     SanctionsFactory,
@@ -35,6 +36,7 @@ class TestEvaluatedSiaeSanctionView:
         self.evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            job_app__job_application__for_snapshot=True,
             evaluation_campaign__institution=institution_membership.institution,
             evaluation_campaign__name="Contrôle 2022",
             siae=company_membership.company,
@@ -222,29 +224,11 @@ class TestEvaluatedSiaeSanctionView:
         self.assertSanctionContent(response)
         assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_subsidy_cut_rate(self, client, snapshot):
+    @pytest.mark.parametrize("subsidy_cut_percent", [10, 100])
+    def test_subsidy_cut_rate(self, client, subsidy_cut_percent, snapshot):
         self.sanctions.training_session = ""
-        self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
-        self.sanctions.subsidy_cut_percent = 35
         self.sanctions.save()
-        client.force_login(self.institution_user)
-        with assertSnapshotQueries(snapshot(name="queries")):
-            response = client.get(
-                reverse(
-                    "siae_evaluations_views:institution_evaluated_siae_sanction",
-                    kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
-                )
-            )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
-            name="card"
-        )
-
-    def test_subsidy_cut_full(self, client, snapshot):
-        self.sanctions.training_session = ""
-        self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
-        self.sanctions.subsidy_cut_percent = 100
-        self.sanctions.save()
+        EvaluatedJobApplicationSanctionFactory(sanctions=self.sanctions, subsidy_cut_percent=subsidy_cut_percent)
         client.force_login(self.institution_user)
         response = client.get(
             reverse(
@@ -253,7 +237,22 @@ class TestEvaluatedSiaeSanctionView:
             )
         )
         self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name=f"sanctions with subsidy_cut_percent={subsidy_cut_percent}"
+        )
+
+    def test_subsidy_cut_queries(self, client, snapshot):
+        self.sanctions.training_session = ""
+        self.sanctions.save()
+        EvaluatedJobApplicationSanctionFactory.create_batch(4, sanctions=self.sanctions)
+        client.force_login(self.institution_user)
+        with assertSnapshotQueries(snapshot(name="queries")):
+            client.get(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_sanction",
+                    kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+                )
+            )
 
     def test_no_sanction(self, client, snapshot):
         self.sanctions.training_session = ""

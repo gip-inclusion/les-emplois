@@ -1645,7 +1645,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep1.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1849,7 +1849,7 @@
                  "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
           FROM "siae_evaluations_evaluatedjobapplication"
           WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
-          ORDER BY RANDOM() ASC
+          ORDER BY "siae_evaluations_evaluatedjobapplication"."id" ASC
         ''',
       }),
       dict({
@@ -1894,8 +1894,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -1954,6 +1952,24 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step1.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s,
+                                                                                      %s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -1987,7 +2003,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep2.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2193,7 +2209,7 @@
                  "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
           FROM "siae_evaluations_evaluatedjobapplication"
           WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
-          ORDER BY RANDOM() ASC
+          ORDER BY "siae_evaluations_evaluatedjobapplication"."id" ASC
         ''',
       }),
       dict({
@@ -2238,8 +2254,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -2298,6 +2312,24 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step2.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s,
+                                                                                      %s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({
@@ -2331,7 +2363,7 @@
 # ---
 # name: TestInstitutionEvaluatedSiaeNotifyViewStep3.test_data_card_statistics_multiple_previous_campaigns_check_sanctions
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2442,7 +2474,7 @@
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
-          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.dispatch[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -2528,7 +2560,7 @@
         'origin': list([
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[<site-packages>/django/views/generic/detail.py]',
           'InstitutionEvaluatedSiaeNotifyStep3View.get_object[www/siae_evaluations_views/views.py]',
-          'InstitutionEvaluatedSiaeNotifyStep3View.get[www/siae_evaluations_views/views.py]',
+          'InstitutionEvaluatedSiaeNotifyStep3View.dispatch[www/siae_evaluations_views/views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -2537,7 +2569,7 @@
                  "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
           FROM "siae_evaluations_evaluatedjobapplication"
           WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" IN (%s)
-          ORDER BY RANDOM() ASC
+          ORDER BY "siae_evaluations_evaluatedjobapplication"."id" ASC
         ''',
       }),
       dict({
@@ -2582,8 +2614,6 @@
                  "siae_evaluations_sanctions"."evaluated_siae_id",
                  "siae_evaluations_sanctions"."training_session",
                  "siae_evaluations_sanctions"."suspension_dates",
-                 "siae_evaluations_sanctions"."subsidy_cut_percent",
-                 "siae_evaluations_sanctions"."subsidy_cut_dates",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -2642,6 +2672,24 @@
           ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
                    "eligibility_administrativecriteria"."level" ASC,
                    "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ForNode[siae_evaluations/includes/evaluation_data.html]',
+          'IncludeNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[siae_evaluations/institution_evaluated_siae_notify_step3.html]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedjobapplicationsanction"."subsidy_cut_percent"
+          FROM "siae_evaluations_evaluatedjobapplicationsanction"
+          WHERE "siae_evaluations_evaluatedjobapplicationsanction"."sanctions_id" IN (%s,
+                                                                                      %s)
+          ORDER BY RANDOM() ASC
         ''',
       }),
       dict({

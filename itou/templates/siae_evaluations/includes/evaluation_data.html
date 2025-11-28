@@ -42,12 +42,8 @@
                                     {% elif old_evaluated_siae.sanctions.suspension_dates %}
                                         <li>Retrait définitif de la capacité d’auto-prescription</li>
                                     {% endif %}
-                                    {% if old_evaluated_siae.sanctions.subsidy_cut_dates %}
-                                        <li>
-                                            Suppression
-                                            {% if old_evaluated_siae.sanctions.subsidy_cut_percent < 100 %}d’une partie{% endif %}
-                                            de l’aide au poste
-                                        </li>
+                                    {% if old_evaluated_siae.sanctions.evaluated_job_applications_sanctions.count %}
+                                        <li>Suppression partielle ou totale de l’aide au poste</li>
                                     {% endif %}
                                     {% if old_evaluated_siae.sanctions.no_sanction_reason %}<li>Ne pas sanctionner</li>{% endif %}
                                 </ul>
