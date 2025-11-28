@@ -168,7 +168,7 @@ def test_list_snapshot(client, snapshot):
         assert pretty_indented(page) == snapshot(name="empty")
 
     company = CompanyFactory(for_snapshot=True, with_membership=True)
-    common_kwargs = {"job_seeker": job_seeker, "eligibility_diagnosis": None, "to_company": company}
+    common_kwargs = {"job_seeker": job_seeker, "to_company": company}
     prescriber_org = PrescriberOrganizationFactory(for_snapshot=True, with_membership=True)
 
     job_applications = [

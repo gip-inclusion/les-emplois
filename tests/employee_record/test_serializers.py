@@ -285,6 +285,7 @@ def test_situation_salarie_serializer_pole_emploi_id(snapshot, pole_emploi_id):
     pole_emploi_since = AllocationDuration.FROM_6_TO_11_MONTHS if pole_emploi_id else ""
     employee_record = EmployeeRecordWithProfileFactory(
         status=Status.PROCESSED,
+        job_application__to_company__for_snapshot=True,
         job_application__job_seeker__for_snapshot=True,
         job_application__job_seeker__jobseeker_profile__pole_emploi_id=pole_emploi_id,
         job_application__job_seeker__jobseeker_profile__pole_emploi_since=pole_emploi_since,

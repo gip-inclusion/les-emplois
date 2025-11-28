@@ -13,6 +13,7 @@ from itou.approvals.enums import (
     ProlongationRequestStatus,
 )
 from itou.approvals.models import Approval
+from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
@@ -561,16 +562,32 @@ class TestContractView:
 
         # Displayed contracts
         ContractFactory(
-            company__name="Tif'any", job_seeker=approval.user, start_date="2025-01-01", end_date="2025-08-07"
+            company__name="Tif'any",
+            job_seeker=approval.user,
+            start_date="2025-01-01",
+            end_date="2025-08-07",
+            company__kind=CompanyKind.EI,
         )  # Fully inside approval validity
         ContractFactory(
-            company__name="Tralal’Hair", job_seeker=approval.user, start_date="2025-02-01", end_date=None
+            company__name="Tralal’Hair",
+            job_seeker=approval.user,
+            start_date="2025-02-01",
+            end_date=None,
+            company__kind=CompanyKind.EI,
         )  # start date inside approval validity
         ContractFactory(
-            company__name="Faudra Tif Hair", job_seeker=approval.user, start_date="2024-10-01", end_date="2025-01-10"
+            company__name="Faudra Tif Hair",
+            job_seeker=approval.user,
+            start_date="2024-10-01",
+            end_date="2025-01-10",
+            company__kind=CompanyKind.EI,
         )  # end date inside approval validity
         ContractFactory(
-            company__name="Inter Planet Hair", job_seeker=approval.user, start_date="2024-10-01", end_date="2025-06-30"
+            company__name="Inter Planet Hair",
+            job_seeker=approval.user,
+            start_date="2024-10-01",
+            end_date="2025-06-30",
+            company__kind=CompanyKind.EI,
         )  # approval inside contract dates
 
         client.force_login(company.members.first())

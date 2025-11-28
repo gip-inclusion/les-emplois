@@ -57,6 +57,7 @@ class TestDeduplicateJobSeekersManagementCommands:
         kwargs = {
             "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
             "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
+            "with_iae_eligibility_diagnosis": True,
         }
 
         # Create `user1`.

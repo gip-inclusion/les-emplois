@@ -7,6 +7,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries
 
+from itou.companies.enums import CompanyKind
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
@@ -29,6 +30,7 @@ class TestEvaluationCampaignAdmin:
             evaluation_campaign=campaign1,
             siae__with_membership=False,  # Created manually.
             siae__name="les jardins",
+            siae__kind=CompanyKind.EI,
             siae__siret="00000000000040",
             siae__convention__siret_signature="00000000000032",
             siae__phone="",
@@ -40,6 +42,7 @@ class TestEvaluationCampaignAdmin:
             evaluation_campaign=campaign2,
             siae__with_membership=False,  # Created manually.
             siae__name="les trucs du bazar",
+            siae__kind=CompanyKind.EI,
             siae__siret="12345678900040",
             siae__convention__siret_signature="12345678900032",
             siae__phone="0612345678",
@@ -53,6 +56,7 @@ class TestEvaluationCampaignAdmin:
             evaluation_campaign=campaign3,
             siae__with_membership=False,  # Created manually.
             siae__name="les bidules",
+            siae__kind=CompanyKind.EI,
             siae__siret="11111111100040",
             siae__convention__siret_signature="11111111100032",
             siae__phone="0611111111",
@@ -66,6 +70,7 @@ class TestEvaluationCampaignAdmin:
             evaluation_campaign=campaign4,
             siae__with_membership=False,  # Created manually.
             siae__name="les machins",
+            siae__kind=CompanyKind.EI,
             siae__convention__siret_signature="22222222200032",
             siae__phone="0622222222",
             reviewed_at=timezone.now() - relativedelta(days=2),
@@ -75,6 +80,7 @@ class TestEvaluationCampaignAdmin:
             evaluation_campaign=campaign4,
             siae__with_membership=False,  # Created manually.
             siae__name="les machins le retour",
+            siae__kind=CompanyKind.EI,
             siae__convention__siret_signature="22222222200033",
             siae__phone="0633333333",
         )

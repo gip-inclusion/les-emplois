@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from tests.api.utils import _str_with_tz
-from tests.companies.factories import CompanyFactory, SiaeConventionFactory
+from tests.companies.factories import CompanyFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import BASE_NUM_QUERIES
@@ -52,7 +52,7 @@ class TestDataInclusionSiaeStructure:
         assert response.json()["results"] == [
             {
                 "id": str(company.uid),
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "nom": company.display_name,
                 "siret": company.siret,
                 "description": "",
@@ -73,7 +73,7 @@ class TestDataInclusionSiaeStructure:
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
-        company_2 = CompanyFactory(
+        company_3 = CompanyFactory(
             siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
         )
 
@@ -92,7 +92,7 @@ class TestDataInclusionSiaeStructure:
             (company_2, company_2.siret, False),
             # siae is user created, but it has its own siret
             # so it is not an antenne according to data.inclusion
-            (company_2, company_2.siret, False),
+            (company_3, company_3.siret, False),
         ]:
             structure_data = next(
                 (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
@@ -183,8 +183,7 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_inactive_excluded(self):
-        convention = SiaeConventionFactory(is_active=False)
-        CompanyFactory(convention=convention)
+        CompanyFactory(convention__is_active=False)
 
         num_queries = NUM_QUERIES
         num_queries -= 1  # no siae to fetch

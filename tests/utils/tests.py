@@ -164,9 +164,9 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_multiple_memberships(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        company_1 = CompanyMembershipFactory(company__name="1").company
+        company_1 = CompanyMembershipFactory(company__name="1", company__kind=CompanyKind.EI).company
         request.user = company_1.members.first()
-        company_2 = CompanyFactory(name="2")
+        company_2 = CompanyFactory(name="2", kind=CompanyKind.EI)
         company_2.members.add(request.user)
 
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
@@ -189,9 +189,9 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        company_1 = CompanyMembershipFactory(company__name="1").company
+        company_1 = CompanyMembershipFactory(company__name="1", company__kind=CompanyKind.EI).company
         request.user = company_1.members.first()
-        company_2 = CompanyFactory(name="2")
+        company_2 = CompanyFactory(name="2", kind=CompanyKind.EI)
         company_2.members.add(request.user)
 
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
@@ -216,7 +216,7 @@ class TestItouCurrentOrganizationMiddleware:
     def test_employer_of_inactive_siae(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        request.user = CompanyMembershipFactory(company__subject_to_iae_rules=True, company__convention=None).user
+        request.user = CompanyMembershipFactory(company__convention=None).user
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
         with assertNumQueries(
@@ -1508,7 +1508,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     Also ensure the user ID is correctly set.
     """
     settings.MATOMO_BASE_URL = "https://fake.matomo.url"
-    company = CompanyFactory(with_membership=True, membership__user__pk=99999, department="59")
+    company = CompanyFactory(with_membership=True, membership__user__pk=99999, department="59", kind=CompanyKind.EI)
     user = company.members.first()
     client.force_login(user)
     matomo_script_id = "matomo-custom-init"

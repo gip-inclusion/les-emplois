@@ -36,7 +36,7 @@ class TestShowAndSelectFinancialAnnex:
         user = company.members.first()
         old_convention = company.convention
         # Only conventions of the same SIREN can be selected.
-        new_convention = SiaeConventionFactory(siret_signature=f"{company.siren}12345")
+        new_convention = SiaeConventionFactory(siret_signature=f"{company.siren}12345", kind=old_convention.kind)
 
         assert company.has_admin(user)
         assert company.should_have_convention

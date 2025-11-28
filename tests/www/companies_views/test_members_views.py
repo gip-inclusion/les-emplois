@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.common_apps.organizations.views import BaseMemberList
+from itou.companies.enums import CompanyKind
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.companies.factories import (
     CompanyFactory,
@@ -154,7 +155,9 @@ class TestUserMembershipDeactivation:
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        company = CompanyWith2MembershipsFactory(name="Les petits paniers", email="petitspaniers@mailinator.com")
+        company = CompanyWith2MembershipsFactory(
+            name="Les petits paniers", email="petitspaniers@mailinator.com", kind=CompanyKind.EI
+        )
         admin = company.members.filter(companymembership__is_admin=True).first()
         guest = company.members.filter(companymembership__is_admin=False).first()
 

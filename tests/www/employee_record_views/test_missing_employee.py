@@ -16,7 +16,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 @freeze_time("2025-02-14")
 def test_missing_employee(client, snapshot):
-    siae = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+    siae = CompanyFactory(with_membership=True)
     user = siae.members.get()
     client.force_login(user)
 

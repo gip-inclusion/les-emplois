@@ -1017,7 +1017,9 @@ class TestCustomApprovalAdminViews:
         # When employee records are allowed (or not) for the SIAE
         for kind in CompanyKind:
             with subtests.test("SIAE doesn't use employee records", kind=kind.name):
-                job_application = JobApplicationFactory(with_approval=True, to_company__kind=kind)
+                job_application = JobApplicationFactory(
+                    with_approval=kind in CompanyKind.siae_kinds(), to_company__kind=kind
+                )
                 msg = inline.employee_record_status(job_application)
                 if not job_application.to_company.can_use_employee_record:
                     assert msg == "La SIAE ne peut pas utiliser la gestion des fiches salarié"

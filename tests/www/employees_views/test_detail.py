@@ -37,6 +37,7 @@ class TestEmployeeDetailView:
             # Make job application.is_sent_by_authorized_prescriber to be true
             sender_kind=SenderKind.PRESCRIBER,
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+            with_iae_eligibility_diagnosis=True,
         )
         assert job_application.is_sent_by_authorized_prescriber
         IAEEligibilityDiagnosisFactory(
@@ -107,7 +108,7 @@ class TestEmployeeDetailView:
         assert response.status_code == 404
 
     def test_detail_view_no_approval(self, client):
-        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
+        company = CompanyFactory(with_membership=True)
         employer = company.members.first()
 
         job_seeker = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED).job_seeker

@@ -16,7 +16,7 @@ from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, p
 
 def test_display_in_sidebar_and_tab(client, snapshot):
     company = CompanyWith2MembershipsFactory()
-    job_app = JobApplicationFactory(to_company=company)
+    job_app = JobApplicationFactory(to_company=company, with_iae_eligibility_diagnosis=True)
     url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
     client.force_login(company.members.first())
 
@@ -79,9 +79,7 @@ def test_add_comment_htmx(client, snapshot, caplog):
     )
     user = company.members.last()
 
-    job_app = JobApplicationFactory(
-        for_snapshot=True, to_company=company, eligibility_diagnosis=None, resume=None, answer="👋"
-    )
+    job_app = JobApplicationFactory(for_snapshot=True, to_company=company, resume=None, answer="👋")
     # Create a bunch of comments to have different comments and last_comments counts.
     other_comments = JobApplicationCommentFactory.create_batch(
         LAST_COMMENTS_COUNT + 1,
@@ -223,9 +221,7 @@ def test_delete_comment_htmx(client, caplog):
     )
     user = company.members.last()
 
-    job_app = JobApplicationFactory(
-        for_snapshot=True, to_company=company, eligibility_diagnosis=None, resume=None, answer="👋"
-    )
+    job_app = JobApplicationFactory(for_snapshot=True, to_company=company, resume=None, answer="👋")
     # Create a bunch of comments to have different comments and last_comments counts.
     other_user_comments = JobApplicationCommentFactory.create_batch(
         LAST_COMMENTS_COUNT + 2, job_application=job_app, created_by=company.members.first()

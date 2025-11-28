@@ -62,6 +62,7 @@ class TestRdvInsertionDisplay:
             job_seeker__last_name="Henry",
             sent_by_authorized_prescriber_organisation=True,
             for_snapshot=True,
+            with_iae_eligibility_diagnosis=True,
         )
         self.participation = ParticipationFactory(
             job_seeker=self.job_application.job_seeker,

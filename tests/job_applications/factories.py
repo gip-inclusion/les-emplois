@@ -42,8 +42,18 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
         skip_postgeneration_save = True
 
     class Params:
+        # IAE
+        with_iae_eligibility_diagnosis = factory.Trait(
+            eligibility_diagnosis=factory.SubFactory(
+                IAEEligibilityDiagnosisFactory,
+                from_prescriber=True,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+                author=factory.SelfAttribute("..sender"),
+            ),
+        )
         with_approval = factory.Trait(
             state=JobApplicationState.ACCEPTED,
+            with_iae_eligibility_diagnosis=True,
             approval=factory.SubFactory(
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
@@ -63,7 +73,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                 author_kind=AuthorKind.GEIQ,
                 author_geiq=factory.SelfAttribute("..to_company"),
             ),
-            eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
             sent_by_authorized_prescriber_organisation=True,
@@ -77,7 +86,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
                     PrescriberOrganizationFactory, authorized=True, with_membership=True
                 ),
             ),
-            eligibility_diagnosis=None,
         )
         sent_by_authorized_prescriber_organisation = factory.Trait(
             sender_prescriber_organization=factory.SubFactory(
@@ -123,12 +131,6 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     resume = factory.SubFactory(FileFactory)
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
-    eligibility_diagnosis = factory.SubFactory(
-        IAEEligibilityDiagnosisFactory,
-        from_prescriber=True,
-        job_seeker=factory.SelfAttribute("..job_seeker"),
-        author=factory.SelfAttribute("..sender"),
-    )
     processed_at = factory.LazyAttribute(
         lambda o: datetime.now(UTC)
         if str(o.state) in models.JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES
@@ -185,7 +187,6 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
 
     sender = factory.SelfAttribute("job_seeker")
     sender_kind = SenderKind.JOB_SEEKER
-    eligibility_diagnosis = None
 
     class Params:
         with_iae_eligibility_diagnosis = factory.Trait(
@@ -228,6 +229,7 @@ class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescr
         PrescriberOrganizationFactory, france_travail=True, with_membership=True
     )
     sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
+    with_iae_eligibility_diagnosis = True
 
 
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):

@@ -197,10 +197,10 @@
                           J… H…
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>
@@ -255,10 +255,10 @@
                           J… H…
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>
@@ -318,10 +318,10 @@
                           J… H…
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>
@@ -383,10 +383,10 @@
                           Jacques HENRY
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>
@@ -436,10 +436,10 @@
                           Jacques HENRY
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>
@@ -494,10 +494,10 @@
                           Jacques HENRY
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
-                          <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                              <i aria-hidden="true" class="ri-check-line">
+                          <span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">
+                              <i aria-hidden="true" class="ri-error-warning-line">
                               </i>
-                              Éligible à l’IAE
+                              Éligibilité IAE à valider
                           </span>
                       </div>
                   </div>

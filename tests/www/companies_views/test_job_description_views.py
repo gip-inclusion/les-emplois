@@ -57,6 +57,7 @@ class JobDescriptionAbstract:
             coords=self.paris_city.coords,
             post_code="75001",
             with_membership=True,
+            kind=CompanyKind.EI,
         )
         user = company.members.first()
 

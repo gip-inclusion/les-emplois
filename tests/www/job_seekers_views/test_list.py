@@ -188,6 +188,7 @@ def test_multiple(client, snapshot):
         job_seeker__jobseeker_profile__is_stalled=True,
         sent_by_authorized_prescriber_organisation=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
+        with_iae_eligibility_diagnosis=True,
     )
     prescriber = job_app.sender
     # Other app for the same job seeker
@@ -205,7 +206,6 @@ def test_multiple(client, snapshot):
         job_seeker__post_code="29200",
         job_seeker__city="Brest",
         job_seeker__jobseeker_profile__is_stalled=True,
-        eligibility_diagnosis=None,
     )
     # Other app with approval
     job_app3 = JobApplicationFactory(
@@ -226,6 +226,7 @@ def test_multiple(client, snapshot):
         job_seeker__first_name="David",
         job_seeker__last_name="Waterford",
         job_seeker__public_id="44444444-4444-4444-4444-444444444444",
+        with_iae_eligibility_diagnosis=True,
     )
     # Other app for which the current user cannot see the personal information
     unauthorized_prescriber = PrescriberFactory(membership=False)
@@ -324,6 +325,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
         sender=prescriber,
         sent_by_authorized_prescriber_organisation=True,
         updated_at=timezone.now() - datetime.timedelta(days=1),
+        with_iae_eligibility_diagnosis=True,
     )
 
     # Job seeker created by the prescriber but for another organization; will not be shown
@@ -760,13 +762,11 @@ def test_filtered_by_is_stalled(client):
     client.force_login(prescriber)
     stalled = JobApplicationFactory(
         created_at=timezone.now() - datetime.timedelta(days=90),
-        eligibility_diagnosis=None,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
     )
     not_stalled_anymore = JobApplicationFactory(
         created_at=timezone.now() - datetime.timedelta(days=90),
-        eligibility_diagnosis=None,
         sender=prescriber,
         job_seeker__jobseeker_profile__is_stalled=True,
         job_seeker__jobseeker_profile__is_not_stalled_anymore=True,

@@ -39,7 +39,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company__kind=CompanyKind.GEIQ,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
         )
 
         # as employer, I see the prescriber diagnosis
@@ -70,7 +69,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company__kind=CompanyKind.GEIQ,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
         )
 
         # as employer, I see the prescriber diagnosis isn't valid anymore
@@ -121,7 +119,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company__kind=CompanyKind.GEIQ,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=diagnosis,
             was_hired=True,
         )
@@ -155,7 +152,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company__kind=CompanyKind.GEIQ,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
             geiq_eligibility_diagnosis=diagnosis,
             was_hired=True,
         )
@@ -185,7 +181,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company=diagnosis.author_geiq,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
         )
 
         # as employer, I see the prescriber diagnosis
@@ -208,7 +203,6 @@ class TestJobApplicationGEIQEligibilityDetails:
             to_company=diagnosis.author_geiq,
             job_seeker=diagnosis.job_seeker,
             sender=diagnosis.author,
-            eligibility_diagnosis=None,
         )
 
         # as employer, I see the prescriber diagnosis
@@ -231,7 +225,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         job_application = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             to_company__kind=CompanyKind.GEIQ,
-            eligibility_diagnosis=None,
         )
 
         response = self.get_response(client, job_application, job_application.sender)

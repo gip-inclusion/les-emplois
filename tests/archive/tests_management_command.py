@@ -187,7 +187,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: JobApplicationFactory(
-                    job_seeker=jobseeker, eligibility_diagnosis=None, created_at=timezone.now() - INACTIVITY_PERIOD
+                    job_seeker=jobseeker, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 id="jobseeker_with_job_application_without_recent_activity",
             ),
@@ -341,7 +341,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
         old_job_application_kwargs = {
             "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
             "created_at": timezone.now() - relativedelta(days=DAYS_OF_INACTIVITY),
-            "eligibility_diagnosis": None,
         }
         recent_job_application_kwargs = {
             **old_job_application_kwargs,
@@ -644,9 +643,6 @@ class TestAnonymizeJobseekersManagementCommand:
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
-            approval=None,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             created_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
@@ -673,9 +669,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 job_application = JobApplicationFactory(
                     **job_application_kwargs,
                     job_seeker=jobseeker,
-                    approval=None,
-                    eligibility_diagnosis=None,
-                    geiq_eligibility_diagnosis=None,
                 )
                 if transitions:
                     for from_state, to_state, months in transitions:
@@ -742,7 +735,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 "to_company__kind": CompanyKind.GEIQ,
                 "to_company__department": 70,
                 "to_company__naf": "4570A",
-                "to_company__convention__is_active": True,
                 "was_hired": True,
                 "hired_job__contract_type": "PERMANENT_I",
                 "to_company__romes": ["N1101"],
@@ -772,7 +764,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 "to_company__kind": CompanyKind.OPCS,
                 "to_company__department": 71,
                 "to_company__naf": "4571A",
-                "to_company__convention__is_active": False,
                 "to_company__romes": ["N1102"],
                 "state": JobApplicationState.REFUSED,
                 "refusal_reason": "reason",
@@ -796,10 +787,11 @@ class TestAnonymizeJobseekersManagementCommand:
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 3, 15)),
                 "sent_by_another_employer": True,
+                "sender_company__kind": CompanyKind.EI,
                 "to_company__kind": CompanyKind.EI,
                 "to_company__department": 72,
                 "to_company__naf": "4572A",
-                "to_company__convention": None,
+                "to_company__convention__is_active": False,
                 "state": JobApplicationState.PROCESSING,
                 "hiring_start_at": None,
                 "processed_at": None,
@@ -840,6 +832,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 5, 15)),
                 "sent_by_another_employer": True,
+                "sender_company__kind": CompanyKind.EI,
                 "to_company__kind": CompanyKind.EI,
                 "to_company__department": 74,
                 "to_company__naf": "4574A",
@@ -862,6 +855,7 @@ class TestAnonymizeJobseekersManagementCommand:
             },
             job_application_kwargs={
                 "created_at": timezone.make_aware(datetime.datetime(2022, 6, 15)),
+                "to_company__kind": CompanyKind.EI,
                 "to_company__department": 78,
                 "to_company__naf": "4578A",
                 "sent_by_job_seeker": True,
@@ -891,8 +885,6 @@ class TestAnonymizeJobseekersManagementCommand:
         job_application_kwargs = {
             "job_seeker": job_seeker,
             "approval": None,
-            "eligibility_diagnosis": None,
-            "geiq_eligibility_diagnosis": None,
             "sent_by_job_seeker": True,
             "created_at": timezone.make_aware(datetime.datetime(2022, 1, 15)),
         }
@@ -1012,6 +1004,7 @@ class TestAnonymizeJobseekersManagementCommand:
                 else None,
                 to_company__department=76,
                 to_company__naf="4567A",
+                to_company__kind=CompanyKind.EI,
                 state=state,
                 hiring_start_at=datetime.date(2023, 3, 2),
             )
@@ -1159,6 +1152,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
             created_at=timezone.now() - INACTIVITY_PERIOD,
+            with_iae_eligibility_diagnosis=True,
             eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
         )
         ApprovalFactory(
@@ -1511,7 +1505,10 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         prescriber = membership.user
         # The related object prevents deletion.
-        job_application = JobApplicationFactory(sender=prescriber)
+        job_application = JobApplicationFactory(
+            sender=prescriber,
+            with_iae_eligibility_diagnosis=True,
+        )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages

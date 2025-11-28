@@ -11,6 +11,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
 from itou.companies.enums import CompanyKind, ContractType
 from itou.jobs.models import Appellation
+from itou.siae_evaluations.enums import EvaluationSiaesKind
 from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
@@ -57,8 +58,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
 
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     # factory.Sequence() start with 0 and an ASP ID should be greater than 0
     asp_id = factory.Sequence(lambda n: n + 1)
     is_active = True
@@ -81,7 +81,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     """Generate a Company() object for unit tests.
 
     Usage:
-        CompanyFactory(subject_to_iae_rules=True, ...)
+        CompanyFactory(...)
         CompanyFactory(not_subject_to_iae_rules=True, ...)
         CompanyFactory(with_membership=True, ...)
         CompanyFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), ...)
@@ -92,12 +92,11 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True
 
     class Params:
-        subject_to_iae_rules = factory.Trait(
-            kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
-        )
+        with_convention = factory.LazyAttribute(lambda o: o.kind in CompanyKind.siae_kinds())
         not_subject_to_iae_rules = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in CompanyKind.siae_kinds()]),
         )
+        evaluable_kind = factory.Trait(kind=factory.fuzzy.FuzzyChoice(EvaluationSiaesKind.Evaluable))
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
             membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "company"),
@@ -124,6 +123,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             )
         )
         for_snapshot = factory.Trait(
+            kind=CompanyKind.EI,
             name="ACME Inc.",
             address_line_1="112 rue de la Croix-Nivert",
             post_code="75015",
@@ -144,8 +144,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
@@ -154,8 +153,12 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     post_code = factory.LazyFunction(create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
     source = models.Company.SOURCE_ASP
-    convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
+    convention = factory.Maybe(
+        "with_convention",
+        yes_declaration=factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind")),
+        no_declaration=None,
+    )
 
 
 class CompanyMembershipFactory(factory.django.DjangoModelFactory):
