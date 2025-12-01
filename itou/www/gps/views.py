@@ -64,7 +64,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
                 queryset=FollowUpGroupMembership.objects.filter(is_referent_certified=True).select_related("member")[
                     :1
                 ],
-                to_attr="referent",
+                to_attr="certified_referent",
             ),
         )
     )
