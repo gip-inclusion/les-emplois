@@ -10,7 +10,6 @@ from django.utils import timezone
 from huey.contrib.djhuey import on_commit_task
 from huey.exceptions import RetryTask
 
-from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
@@ -135,32 +134,3 @@ def async_certify_criterion_with_api_particulier(model_name, selected_administra
         if retry:
             raise captured_exc
         logger.exception(captured_exc)
-
-
-def _async_certify_eligibility_diagnosis_by_api_particulier(model_name, eligibility_diagnosis_pk):
-    model = apps.get_model("eligibility", model_name)
-    try:
-        eligibility_diagnosis = model.objects.get(pk=eligibility_diagnosis_pk)
-    except model.DoesNotExist:
-        logger.info(
-            "%s with pk %d does not exist, it cannot be certified.",
-            model_name,
-            eligibility_diagnosis_pk,
-        )
-        return
-    for criterion in eligibility_diagnosis.selected_administrative_criteria.filter(
-        administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
-    ):
-        async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
-
-
-# Deprecated, preserved for backward-compatibility. Drop 24h after the deploy.
-# Retry every 10 minutes for 24h.
-async_certify_eligibility_diagnosis_by_api_particulier = on_commit_task(retries=24 * 6, retry_delay=10 * 60)(
-    _async_certify_eligibility_diagnosis_by_api_particulier,
-)
-# TODO: Use the decorator and drop assignment of call_local if
-# https://github.com/coleifer/huey/pull/848 is integrated.
-async_certify_eligibility_diagnosis_by_api_particulier.call_local = (
-    _async_certify_eligibility_diagnosis_by_api_particulier
-)
