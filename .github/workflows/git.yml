@@ -9,5 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-    - name: Block Fixup Commit Merge
-      uses: 13rac1/block-fixup-merge-action@bd5504fb9ca0253e109d98eb86b7debc01970cdc # v2.0.0
+    - name: Detect fixup commits & complain if found
+      run: >
+        ! gh pr view ${{ github.event.pull_request.number }} --json commits  --jq ".commits[].messageHeadline"
+        | grep --regexp '^(amend|fixup|squash)!' --extended-regexp
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
