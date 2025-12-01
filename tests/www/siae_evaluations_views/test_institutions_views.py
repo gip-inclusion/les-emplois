@@ -2730,9 +2730,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 "temporary_suspension_to": "invalid",
             },
         )
-        from tests.utils.testing import pprint_html
-
-        pprint_html(response, name="form")
         assertContains(
             response,
             """
