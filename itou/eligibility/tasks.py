@@ -1,4 +1,3 @@
-import datetime
 import logging
 from json import JSONDecodeError
 
@@ -73,12 +72,16 @@ def certify_criterion_with_api_particulier(criterion):
             criterion.certified_at = timezone.now()
             criterion.data_returned_by_api = data["raw_response"]
             criterion.certification_period = None
-            if criterion.certified:
-                start_at = data["start_at"]
-                end_at = timezone.localdate(criterion.certified_at) + datetime.timedelta(
-                    days=criterion.CERTIFICATION_GRACE_PERIOD_DAYS
-                )
-                criterion.certification_period = InclusiveDateRange(start_at, end_at)
+            start_at = data["start_at"]
+            # The API can only tell whether the job seeker is beneficiary
+            # on the day of the request.
+            # Since we cannot tell when the certification expires, the
+            # upper bound is set to None, and we rely on the expiry of
+            # related objects (EligibilityDiagnosis) to actually expire a
+            # SelectedAdministrativeCriteria.
+            criterion.certification_period = (
+                InclusiveDateRange(start_at) if criterion.certified else InclusiveDateRange(empty=True)
+            )
     with transaction.atomic():
         criterion.save()
         if criterion.certified is not None:

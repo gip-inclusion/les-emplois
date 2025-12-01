@@ -3260,9 +3260,7 @@ class TestProcessAcceptViewsInWizard:
             criterion.refresh_from_db()
             assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
-            assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
-            )
+            assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
@@ -3310,9 +3308,7 @@ class TestProcessAcceptViewsInWizard:
             criterion.refresh_from_db()
             assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
-            assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
-            )
+            assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
@@ -3369,9 +3365,7 @@ class TestProcessAcceptViewsInWizard:
             criterion.refresh_from_db()
             assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
-            assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
-            )
+            assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
@@ -3448,9 +3442,7 @@ class TestProcessAcceptViewsInWizard:
             criterion.refresh_from_db()
             assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
-            assert criterion.certification_period == InclusiveDateRange(
-                datetime.date(2024, 8, 1), datetime.date(2024, 12, 12)
-            )
+            assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
