@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company
+from itou.nexus.enums import Service
 
 
 def _generate_key():
@@ -49,3 +50,21 @@ class DepartmentToken(models.Model):
     def datadog_info(self):
         """Method returning the token representation in our Datadog logs (no secret here!)"""
         return f"DepartmentToken-{self.pk}-for-{self.department}"
+
+
+class ServiceToken(models.Model):
+    key = models.CharField(default=_generate_key, unique=True)
+    service = models.CharField(verbose_name="service", choices=Service.choices)
+    purpose = models.TextField(verbose_name="utilisation du token")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "jeton d'API services PDI"
+        verbose_name_plural = "jetons d'API services PDI"
+
+    def __str__(self):
+        return f"{self.service}-{self.pk}"
+
+    def datadog_info(self):
+        """Method returning the token representation in our Datadog logs (no secret here!)"""
+        return f"ServiceToken-{self.pk}-for-{self.service}"
