@@ -476,7 +476,7 @@ def test_certify_criterion(mocker, EligibilityDiagnosisFactory, criteria_kind):
     assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
-    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13))
+    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
     certification = IdentityCertification.objects.get(jobseeker_profile=job_seeker.jobseeker_profile)
     assert certification.certifier == IdentityCertificationAuthorities.API_PARTICULIER
     with freeze_time("2025-10-15"):
@@ -524,7 +524,7 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
-                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
@@ -537,7 +537,7 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
-                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 12, 13)),
+                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
                 "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
@@ -550,7 +550,7 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
-                "certification_period": None,
+                "certification_period": InclusiveDateRange(empty=True),
                 "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
@@ -563,7 +563,7 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
-                "certification_period": None,
+                "certification_period": InclusiveDateRange(empty=True),
                 "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],

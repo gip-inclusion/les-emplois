@@ -59,9 +59,7 @@ class TestCertifyCriteriaApiParticulier:
         assert criterion.certified is True
         assert criterion.certified_at is not None
         assert criterion.data_returned_by_api == response["json"]
-        assert criterion.certification_period == InclusiveDateRange(
-            datetime.date(2024, 8, 1), datetime.date(2025, 4, 8)
-        )
+        assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
         jobseeker_profile = JobSeekerProfile.objects.get(pk=eligibility_diagnosis.job_seeker.jobseeker_profile)
         assertQuerySetEqual(
             jobseeker_profile.identity_certifications.all(),

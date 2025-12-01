@@ -70,7 +70,7 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     assert criterion.certified is False
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == response["json"]
-    assert criterion.certification_period is None
+    assert criterion.certification_period.isempty is True
     assert "https://fake-api-particulier.com/v3" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
 

@@ -6,7 +6,6 @@ from django.core import management
 from django.db import connection, transaction
 from django.utils import timezone
 from freezegun import freeze_time
-from psycopg.types.range import Range
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -205,10 +204,7 @@ def test_populate_job_seekers(snapshot):
     )
     user_3_selected_criteria.certified = True
     user_3_selected_criteria.certified_at = timezone.now()
-    user_3_selected_criteria.certification_period = InclusiveDateRange(
-        datetime.date(2025, 3, 13),
-        datetime.date(2025, 6, 13),
-    )
+    user_3_selected_criteria.certification_period = InclusiveDateRange(datetime.date(2025, 3, 13))
     user_3_selected_criteria.save()
     # Older accepted job_application with no eligibility diagnosis
     # Allow to check last_hiring_company_pk
@@ -396,9 +392,7 @@ def test_populate_job_seekers(snapshot):
             "critère_n1_bénéficiaire_du_rsa": 1,
             "critère_n1_bénéficiaire_du_rsa_certifié": 1,
             "critère_n1_bénéficiaire_du_rsa_date_certification": user_3_selected_criteria.certified_at,
-            "critère_n1_bénéficiaire_du_rsa_période_certification": Range(
-                datetime.date(2025, 3, 13), datetime.date(2025, 6, 14), "[)"
-            ),
+            "critère_n1_bénéficiaire_du_rsa_période_certification": InclusiveDateRange(datetime.date(2025, 3, 13)),
             "critère_n1_allocataire_ass": 0,
             "critère_n1_allocataire_aah": 0,
             "critère_n1_allocataire_aah_certifié": None,
