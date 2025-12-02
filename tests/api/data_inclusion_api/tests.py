@@ -7,7 +7,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.nexus.enums import Service
 from tests.api.utils import _str_with_tz
-from tests.companies.factories import CompanyFactory, SiaeConventionFactory
+from tests.companies.factories import CompanyFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import BASE_NUM_QUERIES
@@ -193,8 +193,7 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_inactive_excluded(self):
-        convention = SiaeConventionFactory(is_active=False)
-        CompanyFactory(convention=convention)
+        CompanyFactory(convention__is_active=False)
 
         num_queries = NUM_QUERIES
         num_queries -= 1  # no siae to fetch
@@ -436,8 +435,7 @@ class TestDataInclusionSiaeStructureOldAuth:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_inactive_excluded(self):
-        convention = SiaeConventionFactory(is_active=False)
-        CompanyFactory(convention=convention)
+        CompanyFactory(convention__is_active=False)
 
         num_queries = OLD_NUM_QUERIES
         num_queries -= 1  # no siae to fetch

@@ -4691,9 +4691,9 @@ def test_accept_button(client):
     # GEIQ without GEIQ diagnosis: we get the modals
     assertNotContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
-    job_application.to_company.kind = CompanyKind.AI
-    job_application.to_company.save(update_fields=("kind", "updated_at"))
-
+    job_application.to_company = CompanyFactory(kind=CompanyKind.AI, with_membership=True)
+    job_application.save()
+    client.force_login(job_application.to_company.members.first())
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
