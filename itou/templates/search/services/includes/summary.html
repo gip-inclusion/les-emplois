@@ -1,0 +1,4 @@
+{% load str_filters %}
+<p class="mb-3 mb-md-4" id="services-search-summary"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {{ results.paginator.count }} résultat{{ results.paginator.count|pluralizefr }}
+</p>

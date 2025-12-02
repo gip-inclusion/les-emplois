@@ -2,9 +2,11 @@ import logging
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
+from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
+from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -19,15 +21,18 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
+from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV1Client
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
+from itou.www.companies_views.views import DATA_INCLUSION_API_CACHE_PREFIX
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
     NewSavedSearchForm,
     PrescriberSearchForm,
+    ServiceSearchForm,
     SiaeSearchForm,
 )
 
@@ -352,6 +357,60 @@ def search_prescribers_results(request, template_name="search/prescribers_search
     return render(
         request,
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
+        context,
+    )
+
+
+@login_not_required
+def search_services_home(request, template_name="search/services/home.html"):
+    """
+    The search home page has a different design from the results page.
+    """
+    return render(request, template_name, {"form": ServiceSearchForm()})
+
+
+@login_not_required
+def search_services_results(request, template_name="search/services/results.html"):
+    form = ServiceSearchForm(data=request.GET or None)
+
+    results = []
+    if form.is_valid():
+        code_insee = form.cleaned_data["city"].code_insee
+        category = form.cleaned_data["category"]
+        thematics = form.cleaned_data["thematics"] or [
+            t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
+        ]
+        search_hash = hash(tuple(sorted(thematics)))
+        cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{search_hash}"
+
+        results = caches["failsafe"].get(cache_key)
+        if results is None:
+            client = DataInclusionApiV1Client(
+                settings.API_DATA_INCLUSION_BASE_URL,
+                settings.API_DATA_INCLUSION_TOKEN,
+            )
+            try:
+                results = client.search_services(
+                    code_commune=code_insee,
+                    thematiques=thematics,
+                )
+            except DataInclusionApiException:
+                raise
+            else:
+                # 6 hours is reasonable enough to get fresh results while still avoiding
+                # hitting the API too much. The API content is updated daily or hourly;
+                # we want changes to be propagated at a reasonable time.
+                caches["failsafe"].set(cache_key, results, 6 * 60 * 60)
+
+    context = {
+        "form": form,
+        "results": pager(results, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
+        "matomo_custom_title": "Recherche de services d'insertion",
+        "back_url": reverse("search:services_home"),
+    }
+    return render(
+        request,
+        "search/services/includes/results.html" if request.htmx else template_name,
         context,
     )
 
