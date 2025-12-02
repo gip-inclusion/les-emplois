@@ -11,6 +11,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
 from itou.companies.enums import CompanyKind, ContractType
 from itou.jobs.models import Appellation
+from itou.siae_evaluations.enums import EvaluationSiaesKind
 from tests.cities.factories import create_city_vannes
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
@@ -98,6 +99,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         not_subject_to_iae_rules = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind not in CompanyKind.siae_kinds()]),
         )
+        evaluable_kind = factory.Trait(kind=factory.fuzzy.FuzzyChoice(EvaluationSiaesKind.Evaluable))
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
             membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "company"),
@@ -145,8 +147,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    # FIXME(vperron): this should be made random
-    kind = CompanyKind.EI
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

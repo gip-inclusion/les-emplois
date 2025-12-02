@@ -205,7 +205,7 @@ class TestMarcheCompanyAPI:
 
     def test_list_no_reserved_companies(self):
         api_client = self.api_client()
-        CompanyFactory(kind=COMPANY_KIND_RESERVED, convention=None)
+        CompanyFactory(kind=COMPANY_KIND_RESERVED)
 
         num_queries = NUM_QUERIES
         num_queries -= 2  # no company and no prefetch memberships

@@ -73,6 +73,7 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
         CompanyFactory,
         department="14",
         with_membership=True,
+        evaluable_kind=True,
     )
 
 

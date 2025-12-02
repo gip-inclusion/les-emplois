@@ -162,7 +162,7 @@ class TestEvaluationCampaignQuerySet:
 
 @pytest.fixture
 def campaign_eligible_job_app_objects():
-    company = CompanyWith2MembershipsFactory(department="14")
+    company = CompanyWith2MembershipsFactory(department="14", evaluable_kind=True)
     job_seeker = JobSeekerFactory()
     start = timezone.localdate() - relativedelta(months=2)
     approval = ApprovalFactory(user=job_seeker, start_at=start)
@@ -354,11 +354,11 @@ class TestEvaluationCampaignManager:
         evaluation_campaign = EvaluationCampaignFactory()
 
         # company_1 got 1 job application
-        company_1 = CompanyFactory(department="14", with_membership=True)
+        company_1 = CompanyFactory(department="14", with_membership=True, evaluable_kind=True)
         create_batch_of_job_applications(company_1, size=1)
 
         # company_2 got 2 job applications
-        company_2 = CompanyFactory(department="14", with_membership=True)
+        company_2 = CompanyFactory(department="14", with_membership=True, evaluable_kind=True)
         create_batch_of_job_applications(company_2)
 
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
@@ -424,13 +424,21 @@ class TestEvaluationCampaignManager:
         assert 0 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            company = CompanyFactory(department="14", with_membership=True)
+            company = CompanyFactory(
+                department="14",
+                with_membership=True,
+                evaluable_kind=True,
+            )
             create_batch_of_job_applications(company)
 
         assert 1 == evaluation_campaign.number_of_siaes_to_select()
 
         for _ in range(3):
-            company = CompanyFactory(department="14", with_membership=True)
+            company = CompanyFactory(
+                department="14",
+                with_membership=True,
+                evaluable_kind=True,
+            )
             create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.number_of_siaes_to_select()
@@ -439,7 +447,7 @@ class TestEvaluationCampaignManager:
         evaluation_campaign = EvaluationCampaignFactory()
 
         for _ in range(6):
-            company = CompanyFactory(department="14", with_membership=True)
+            company = CompanyFactory(department="14", with_membership=True, evaluable_kind=True)
             create_batch_of_job_applications(company)
 
         assert 2 == evaluation_campaign.eligible_siaes_under_ratio().count()
@@ -447,7 +455,9 @@ class TestEvaluationCampaignManager:
     def test_populate(self, snapshot, subtests):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
-        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        company = CompanyFactory(
+            department=evaluation_campaign.institution.department, with_membership=True, evaluable_kind=True
+        )
         create_batch_of_job_applications(company)
         fake_now = timezone.now() - relativedelta(weeks=1)
 
@@ -474,7 +484,9 @@ class TestEvaluationCampaignManager:
 
     def test_populate_job_application_certified(self):
         evaluation_campaign = EvaluationCampaignFactory()
-        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        company = CompanyFactory(
+            department=evaluation_campaign.institution.department, with_membership=True, evaluable_kind=True
+        )
         create_batch_of_job_applications(company)
         certified_job_app = JobApplication.objects.first()
         rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
@@ -508,7 +520,11 @@ class TestEvaluationCampaignManager:
     def test_populate_all_job_applications_certified(self, django_capture_on_commit_callbacks, mailoutbox):
         institution_membership = InstitutionMembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution_membership.institution)
-        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        company = CompanyFactory(
+            department=evaluation_campaign.institution.department,
+            with_membership=True,
+            evaluable_kind=True,
+        )
         create_batch_of_job_applications(company)
         rsa = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.RSA)
         certified_job_apps = JobApplication.objects.all()
@@ -565,11 +581,19 @@ class TestEvaluationCampaignManager:
         campaign = EvaluationCampaignFactory(institution=institution)
         # Did not select eligibility criteria to justify.
         evaluated_siae_no_response = EvaluatedSiaeFactory(
-            pk=1001, evaluation_campaign=campaign, siae__name="Les grands jardins", siae__pk=2001
+            pk=1001,
+            evaluation_campaign=campaign,
+            siae__name="Les grands jardins",
+            siae__kind=CompanyKind.EI,
+            siae__pk=2001,
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
         evaluated_siae_no_docs = EvaluatedSiaeFactory(
-            pk=1002, evaluation_campaign=campaign, siae__name="Les petits jardins", siae__pk=2002
+            pk=1002,
+            evaluation_campaign=campaign,
+            siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
+            siae__pk=2002,
         )
         evaluated_jobapp_no_docs = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_docs)
         EvaluatedAdministrativeCriteriaFactory(
@@ -578,7 +602,7 @@ class TestEvaluationCampaignManager:
             # default review_state is PENDING
         )
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            pk=1003, evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=2003
+            pk=1003, evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=2003
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
         EvaluatedAdministrativeCriteriaFactory(
@@ -591,6 +615,7 @@ class TestEvaluationCampaignManager:
             pk=1004,
             evaluation_campaign=campaign,
             siae__name="Geo accepted",
+            siae__kind=CompanyKind.EI,
             siae__pk=2004,
             reviewed_at=accepted_ts,
             final_reviewed_at=accepted_ts,
@@ -606,6 +631,7 @@ class TestEvaluationCampaignManager:
             pk=1005,
             evaluation_campaign=campaign,
             siae__name="Geo refused",
+            siae__kind=CompanyKind.EI,
             siae__pk=2005,
             reviewed_at=refused_ts,
         )
@@ -691,6 +717,7 @@ class TestEvaluationCampaignManager:
             pk=1000,
             evaluation_campaign=campaign,
             siae__name="Les grands jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
@@ -719,7 +746,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            pk=1000, evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=2000
+            pk=1000, evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=2000
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
         EvaluatedAdministrativeCriteriaFactory(
@@ -756,7 +783,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
@@ -793,7 +820,7 @@ class TestEvaluationCampaignManager:
     ):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
-            evaluation_campaign=campaign, siae__name="Prim’vert", siae__pk=1234
+            evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
         )
         evaluated_jobapp_submitted = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_submitted)
 
@@ -830,6 +857,7 @@ class TestEvaluationCampaignManager:
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
         )
@@ -871,6 +899,7 @@ class TestEvaluationCampaignManager:
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
             siae__pk=2000,
+            siae__kind=CompanyKind.EI,
             evaluation_campaign=evaluation_campaign,
             notified_at=timezone.now() - datetime.timedelta(days=3),
         )
@@ -895,6 +924,7 @@ class TestEvaluationCampaignManager:
         )
         evaluated_siae = EvaluatedSiaeFactory(
             siae__name="Les petits jardins",
+            siae__kind=CompanyKind.EI,
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
             reviewed_at=timezone.now() - datetime.timedelta(days=2),
@@ -941,6 +971,7 @@ class TestEvaluationCampaignManager:
             evaluated_period_end_at=datetime.date(2022, 9, 30),
         )
         evaluated_siae = EvaluatedSiaeFactory(
+            siae__kind=CompanyKind.EI,
             siae__name="Les petits jardins",
             siae__pk=2000,
             evaluation_campaign=evaluation_campaign,
