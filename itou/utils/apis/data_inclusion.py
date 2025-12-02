@@ -21,10 +21,10 @@ class DataInclusionApiException(Exception):
     pass
 
 
-class DataInclusionApiClient:
+class DataInclusionApiV0Client:
     def __init__(self, base_url: str, token: str):
         self.client = httpx.Client(
-            base_url=base_url,
+            base_url=base_url.rstrip("/") + "/api/v0/",
             headers={"Authorization": f"Bearer {token}"},
             timeout=API_TIMEOUT_SECONDS,
         )

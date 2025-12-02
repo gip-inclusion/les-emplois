@@ -24,7 +24,7 @@ from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
+from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV0Client
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_request, check_user
 from itou.utils.pagination import pager
@@ -63,7 +63,7 @@ def get_data_inclusion_services(code_insee):
     cache = caches["failsafe"]
     results = cache.get(cache_key)
     if results is None:
-        client = DataInclusionApiClient(
+        client = DataInclusionApiV0Client(
             settings.API_DATA_INCLUSION_BASE_URL,
             settings.API_DATA_INCLUSION_TOKEN,
         )
@@ -787,7 +787,7 @@ def hx_dora_services(request, code_insee, template_name="companies/hx_dora_servi
 
 @login_not_required
 def dora_service_redirect(request, source: str, service_id: str) -> HttpResponseRedirect:
-    client = DataInclusionApiClient(
+    client = DataInclusionApiV0Client(
         settings.API_DATA_INCLUSION_BASE_URL,
         settings.API_DATA_INCLUSION_TOKEN,
     )

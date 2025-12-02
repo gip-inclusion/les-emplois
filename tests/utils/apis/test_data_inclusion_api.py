@@ -3,12 +3,12 @@ from urllib.parse import parse_qs
 import httpx
 import pytest
 
-from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
+from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV0Client
 
 
 def test_data_inclusion_client(settings, respx_mock):
-    client = DataInclusionApiClient("https://fake.api.gouv.fr/", "fake-token")
-    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    client = DataInclusionApiV0Client("https://fake.api.gouv.fr", "fake-token")
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/api/v0/search/services")
     api_mock.respond(
         200,
         json={
@@ -66,8 +66,8 @@ def test_data_inclusion_client(settings, respx_mock):
     ],
 )
 def test_data_inclusion_client_retrieve(respx_mock, response, expected):
-    client = DataInclusionApiClient("https://fake.api.gouv.fr/", "fake-token")
-    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").mock(return_value=response)
+    client = DataInclusionApiV0Client("https://fake.api.gouv.fr", "fake-token")
+    respx_mock.get("https://fake.api.gouv.fr/api/v0/services/dora/foo").mock(return_value=response)
 
     if expected == DataInclusionApiException:
         with pytest.raises(DataInclusionApiException):
