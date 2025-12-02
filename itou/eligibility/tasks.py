@@ -31,6 +31,7 @@ def certify_criterion_with_api_particulier(criterion):
         try:
             data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
         except httpx.HTTPStatusError as exc:
+            user_found = False
             criterion.data_returned_by_api = exc.response.json()
             match exc.response.status_code:
                 case (
@@ -68,10 +69,9 @@ def certify_criterion_with_api_particulier(criterion):
                 case _:
                     raise
         else:
-            criterion.certified = data["is_certified"]
+            user_found = True
             criterion.certified_at = timezone.now()
             criterion.data_returned_by_api = data["raw_response"]
-            criterion.certification_period = None
             start_at = data["start_at"]
             # The API can only tell whether the job seeker is beneficiary
             # on the day of the request.
@@ -80,11 +80,11 @@ def certify_criterion_with_api_particulier(criterion):
             # related objects (EligibilityDiagnosis) to actually expire a
             # SelectedAdministrativeCriteria.
             criterion.certification_period = (
-                InclusiveDateRange(start_at) if criterion.certified else InclusiveDateRange(empty=True)
+                InclusiveDateRange(start_at) if data["is_certified"] else InclusiveDateRange(empty=True)
             )
     with transaction.atomic():
         criterion.save()
-        if criterion.certified is not None:
+        if user_found:
             IdentityCertification.objects.upsert_certifications(
                 [
                     IdentityCertification(

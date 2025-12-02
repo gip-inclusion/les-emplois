@@ -11,7 +11,7 @@
                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
             {% endif %}
         </p>
-        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber request=request itou_help_center_url=itou_help_center_url only %}
+        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=is_sent_by_authorized_prescriber flat_criteria_list=is_sent_by_authorized_prescriber job_application=job_application request=request itou_help_center_url=itou_help_center_url only %}
     {% elif expired_eligibility_diagnosis %}
         <hr class="my-4">
         <h3>Éligibilité à l'IAE</h3>

@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.contrib.admin.templatetags import admin_list
 from django.forms import ValidationError
 from django.forms.models import BaseInlineFormSet
 from django.utils.html import format_html
@@ -7,7 +6,6 @@ from django.utils.html import format_html
 from itou.approvals import models as approvals_models
 from itou.eligibility import models
 from itou.eligibility.admin_form import GEIQEligibilityDiagnosisAdminForm, IAEEligibilityDiagnosisAdminForm
-from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.job_applications import models as job_applications_models
 from itou.utils.admin import (
     ItouModelAdmin,
@@ -22,8 +20,10 @@ class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         for line in self.cleaned_data:
-            if line.get("DELETE") and line["id"].certified:
-                raise ValidationError("Impossible de supprimer un critère certifié")
+            if line.get("DELETE"):
+                certification_period = line["id"].certification_period
+                if certification_period and not certification_period.isempty:
+                    raise ValidationError("Impossible de supprimer un critère certifié")
 
 
 class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
@@ -32,14 +32,12 @@ class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
     raw_id_fields = ("administrative_criteria",)
     fields = (
         "administrative_criteria",
-        "certified_display",
         "certified_at",
         "certification_period",
         "data_returned_by_api",
         "created_at",
     )
     readonly_fields = (
-        "certified_display",
         "certified_at",
         "certification_period",
         "last_certification_attempt_at",
@@ -49,12 +47,6 @@ class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
 
     def has_change_permission(self, request, obj=None):
         return False
-
-    @admin.display(description=AbstractSelectedAdministrativeCriteria._meta.get_field("certified").verbose_name)
-    def certified_display(self, obj):
-        if not obj.administrative_criteria.is_certifiable:
-            return "Non certifiable"
-        return admin_list._boolean_icon(obj.certified)
 
 
 class SelectedAdministrativeCriteriaInline(AbstractSelectedAdministrativeCriteriaInline):

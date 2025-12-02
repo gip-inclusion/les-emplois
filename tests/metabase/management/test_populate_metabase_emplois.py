@@ -205,7 +205,6 @@ def test_populate_job_seekers(snapshot):
     user_3_selected_criteria = SelectedAdministrativeCriteria.objects.get(
         eligibility_diagnosis=job_application_3.eligibility_diagnosis
     )
-    user_3_selected_criteria.certified = True
     user_3_selected_criteria.certified_at = timezone.now()
     user_3_selected_criteria.certification_period = InclusiveDateRange(datetime.date(2025, 3, 13))
     user_3_selected_criteria.save()
@@ -269,12 +268,10 @@ def test_populate_job_seekers(snapshot):
             "total_critères_niveau_1": None,
             "total_critères_niveau_2": None,
             "critère_n1_bénéficiaire_du_rsa": None,
-            "critère_n1_bénéficiaire_du_rsa_certifié": None,
             "critère_n1_bénéficiaire_du_rsa_date_certification": None,
             "critère_n1_bénéficiaire_du_rsa_période_certification": None,
             "critère_n1_allocataire_ass": None,
             "critère_n1_allocataire_aah": None,
-            "critère_n1_allocataire_aah_certifié": None,
             "critère_n1_allocataire_aah_date_certification": None,
             "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": None,
@@ -285,7 +282,6 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_deld_12_à_24_mois": None,
             "critère_n2_travailleur_handicapé": None,
             "critère_n2_parent_isolé": None,
-            "critère_n2_parent_isolé_certifié": None,
             "critère_n2_parent_isolé_date_certification": None,
             "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": None,
@@ -332,12 +328,10 @@ def test_populate_job_seekers(snapshot):
             "total_critères_niveau_1": 4,
             "total_critères_niveau_2": 14,
             "critère_n1_bénéficiaire_du_rsa": 1,
-            "critère_n1_bénéficiaire_du_rsa_certifié": None,
             "critère_n1_bénéficiaire_du_rsa_date_certification": None,
             "critère_n1_bénéficiaire_du_rsa_période_certification": None,
             "critère_n1_allocataire_ass": 1,
             "critère_n1_allocataire_aah": 1,
-            "critère_n1_allocataire_aah_certifié": None,
             "critère_n1_allocataire_aah_date_certification": None,
             "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": 1,
@@ -348,7 +342,6 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_deld_12_à_24_mois": 1,
             "critère_n2_travailleur_handicapé": 1,
             "critère_n2_parent_isolé": 1,
-            "critère_n2_parent_isolé_certifié": None,
             "critère_n2_parent_isolé_date_certification": None,
             "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": 1,
@@ -395,12 +388,10 @@ def test_populate_job_seekers(snapshot):
             "total_critères_niveau_1": 1,
             "total_critères_niveau_2": 0,
             "critère_n1_bénéficiaire_du_rsa": 1,
-            "critère_n1_bénéficiaire_du_rsa_certifié": 1,
             "critère_n1_bénéficiaire_du_rsa_date_certification": user_3_selected_criteria.certified_at,
             "critère_n1_bénéficiaire_du_rsa_période_certification": InclusiveDateRange(datetime.date(2025, 3, 13)),
             "critère_n1_allocataire_ass": 0,
             "critère_n1_allocataire_aah": 0,
-            "critère_n1_allocataire_aah_certifié": None,
             "critère_n1_allocataire_aah_date_certification": None,
             "critère_n1_allocataire_aah_période_certification": None,
             "critère_n1_detld_plus_de_24_mois": 0,
@@ -411,7 +402,6 @@ def test_populate_job_seekers(snapshot):
             "critère_n2_deld_12_à_24_mois": 0,
             "critère_n2_travailleur_handicapé": 0,
             "critère_n2_parent_isolé": 0,
-            "critère_n2_parent_isolé_certifié": None,
             "critère_n2_parent_isolé_date_certification": None,
             "critère_n2_parent_isolé_période_certification": None,
             "critère_n2_personne_sans_hébergement_ou_hébergée_ou_ayant_u": 0,

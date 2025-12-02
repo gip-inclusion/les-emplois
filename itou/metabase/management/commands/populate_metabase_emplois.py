@@ -387,7 +387,6 @@ class Command(BaseCommand):
                                 SelectedAdministrativeCriteria.objects.only(
                                     "administrative_criteria_id",
                                     "eligibility_diagnosis_id",
-                                    "certified",
                                     "certified_at",
                                     "certification_period",
                                 ),
