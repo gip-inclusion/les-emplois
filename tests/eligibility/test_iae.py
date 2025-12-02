@@ -477,7 +477,6 @@ def test_certify_criterion(mocker, EligibilityDiagnosisFactory, criteria_kind):
         administrative_criteria__kind=criteria_kind,
         eligibility_diagnosis=eligibility_diagnosis,
     )
-    assert criterion.certified is True
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
     assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
@@ -529,7 +528,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
-                "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
             },
@@ -542,7 +540,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
-                "certified": True,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
             },
@@ -555,7 +552,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(empty=True),
-                "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
             },
@@ -568,7 +564,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(empty=True),
-                "certified": False,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
             },
@@ -581,7 +576,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [],
             {
                 "certification_period": None,
-                "certified": None,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
             },
@@ -594,7 +588,6 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             [],
             {
                 "certification_period": None,
-                "certified": None,
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
             },
