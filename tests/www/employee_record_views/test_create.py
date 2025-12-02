@@ -9,7 +9,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
 from itou.cities.models import City
@@ -35,7 +35,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 # Helper functions
 def _get_user_form_data(user):
     form_data = {
-        "title": "M",
+        "title": user.title,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "birthdate": user.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -206,12 +206,13 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         )
 
         data = _get_user_form_data(self.job_seeker)
-        data.pop("title")
+        user_title = data.pop("title")
 
         response = client.post(self.url, data=data)
         assert 200 == response.status_code
+        assertFormError(response.context["form"], "title", "Ce champ est obligatoire.")
 
-        data["title"] = "MME"
+        data["title"] = user_title
         response = client.post(self.url, data=data)
 
         assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
