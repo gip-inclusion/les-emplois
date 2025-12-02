@@ -6118,6 +6118,42 @@
   
   '''
 # ---
+# name: test_list_for_siae_select_applications_batch_accept_geiq[active accept button]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-target="#confirm_no_allowance_modal" data-bs-toggle="modal">
+      <i aria-hidden="true" class="ri-check-line fw-medium">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_accept_geiq[inactive accept button already accepted]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Cette candidature est déjà acceptée." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </button>
+  
+  '''
+# ---
+# name: test_list_for_siae_select_applications_batch_accept_geiq[inactive accept button multiple job applications]
+  '''
+  <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-custom-class="c-box--action-tooltip" data-bs-placement="top" data-bs-title="Une seule candidature doit être séléctionnée pour être acceptée." data-bs-toggle="tooltip" disabled="" type="button">
+      <i aria-hidden="true" class="ri-close-line">
+      </i>
+      <span>
+          Accepter
+      </span>
+  </button>
+  
+  '''
+# ---
 # name: test_list_for_siae_select_applications_batch_add_to_pool[active add to pool button]
   '''
   <button class="btn justify-content-start dropdown-item" data-bs-target="#add_to_pool_confirmation_modal" data-bs-toggle="modal" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="batch-add-to-pool-applications-open-modal" type="button">
