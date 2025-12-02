@@ -67,7 +67,6 @@ def test_not_certified(criteria_kind, factory, respx_mock, caplog):
         administrative_criteria__kind=criteria_kind,
         eligibility_diagnosis=eligibility_diagnosis,
     )
-    assert criterion.certified is False
     assert criterion.certified_at == timezone.now()
     assert criterion.data_returned_by_api == response["json"]
     assert criterion.certification_period.isempty is True
@@ -90,7 +89,6 @@ def test_not_found(respx_mock, caplog):
     certify_criterion_with_api_particulier(criterion)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == response["json"]
-    assert crit.certified is None
     assert crit.certification_period is None
     assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text

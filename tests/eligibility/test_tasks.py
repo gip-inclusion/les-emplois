@@ -56,7 +56,6 @@ class TestCertifyCriteriaApiParticulier:
 
         criterion.refresh_from_db()
         assert len(respx_mock.calls) == 1
-        assert criterion.certified is True
         assert criterion.certified_at is not None
         assert criterion.data_returned_by_api == response["json"]
         assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
@@ -85,7 +84,6 @@ class TestCertifyCriteriaApiParticulier:
             criterion.refresh_from_db()
             assert exc_info.value.delay == 1
             assert len(respx_mock.calls) == 1
-            assert criterion.certified is None
             assert criterion.certified_at is None
             assert criterion.data_returned_by_api is None
             assert criterion.certification_period is None
@@ -151,7 +149,6 @@ class TestCertifyCriteriaApiParticulier:
         async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
         assert len(respx_mock.calls) == 1
         criterion.refresh_from_db()
-        assert criterion.certified is None
         assert criterion.certified_at is None
         assert criterion.data_returned_by_api == response["json"]
         assert criterion.certification_period is None
@@ -176,7 +173,6 @@ class TestCertifyCriteriaApiParticulier:
             async_certify_criterion_with_api_particulier.call_local(criterion._meta.model_name, criterion.pk)
         assert len(respx_mock.calls) == 1
         criterion.refresh_from_db()
-        assert criterion.certified is None
         assert criterion.certified_at is None
         assert criterion.data_returned_by_api is None
         assert criterion.certification_period is None

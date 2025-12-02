@@ -1185,7 +1185,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -1238,7 +1237,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -1294,7 +1292,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -1376,7 +1373,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at

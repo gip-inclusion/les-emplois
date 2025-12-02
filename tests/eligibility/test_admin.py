@@ -3,6 +3,7 @@ import datetime
 import pytest
 from django.contrib import messages
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertRedirects
 
@@ -11,6 +12,7 @@ from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import AdministrativeCriteria, EligibilityDiagnosis
 from itou.users.enums import UserKind
+from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.admin_utils import build_geiq_diag_post_data, build_iae_diag_post_data
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -22,7 +24,7 @@ def test_selected_criteria_inline(admin_client):
     diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True)
     diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.certifiable().first())
     certifiable = diagnosis.selected_administrative_criteria.get()
-    certifiable.certified = True
+    certifiable.certification_period = InclusiveDateRange(timezone.localdate())
     certifiable.save()
     diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.not_certifiable().first())
     not_certifiable = diagnosis.selected_administrative_criteria.exclude(pk=certifiable.pk).get()

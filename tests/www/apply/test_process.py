@@ -328,7 +328,7 @@ class TestProcessViews:
             days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS
         )
         created_at = now - certification_grace_period - datetime.timedelta(days=1)
-        expires_at = today - datetime.timedelta(days=1)
+        expires_at = today + datetime.timedelta(days=1)
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__author_siae=company,
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -347,12 +347,6 @@ class TestProcessViews:
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(company.members.get())
-        response = client.get(url)
-        assertNotContains(response, CERTIFIED_BADGE_HTML, html=True)
-
-        tomorrow = today + datetime.timedelta(days=1)
-        eligibility_diagnosis.expires_at = tomorrow
-        eligibility_diagnosis.save()
         response = client.get(url)
         assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 
