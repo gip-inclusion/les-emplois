@@ -482,6 +482,10 @@ class TestEvaluationCampaignManager:
             eligibility_diagnosis_id=certified_job_app.eligibility_diagnosis_id,
             administrative_criteria=rsa,
             criteria_certified=True,
+            certification_period=InclusiveDateRange(
+                evaluation_campaign.evaluated_period_start_at,
+                evaluation_campaign.evaluated_period_end_at,
+            ),
         )
         now = timezone.now()
         evaluation_campaign.populate(now)
@@ -517,6 +521,10 @@ class TestEvaluationCampaignManager:
                 eligibility_diagnosis_id=job_app.eligibility_diagnosis_id,
                 administrative_criteria=rsa,
                 criteria_certified=True,
+                certification_period=InclusiveDateRange(
+                    evaluation_campaign.evaluated_period_start_at,
+                    evaluation_campaign.evaluated_period_end_at,
+                ),
             )
         now = timezone.now()
         with django_capture_on_commit_callbacks(execute=True):
