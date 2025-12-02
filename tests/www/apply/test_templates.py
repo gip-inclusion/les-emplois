@@ -18,6 +18,7 @@ from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
+from itou.utils.types import InclusiveDateRange
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
 from tests.eligibility.factories import (
     GEIQEligibilityDiagnosisFactory,
@@ -211,6 +212,7 @@ class TestIAEEligibilityDetail:
             "eligibility_diagnosis": diagnosis,
             "request": request,
             "siae": job_application.to_company,
+            "hiring_start_date": job_application.hiring_start_at,
             "job_seeker": diagnosis.job_seeker,
             "itou_help_center_url": "https://help.com",
             "is_sent_by_authorized_prescriber": True,
@@ -336,6 +338,7 @@ class TestGEIQEligibilityDetail:
         return {
             "request": request,
             "diagnosis": diagnosis,
+            "hiring_start_date": timezone.localdate(),
             "itou_help_center_url": "https://help.com",
         }
 
@@ -432,7 +435,7 @@ class TestCertifiedBadge:
         )
 
         criterion = diagnosis.selected_administrative_criteria.get()
-        rendered = self._render(criterion=criterion)
+        rendered = self._render(criterion=criterion, hiring_start_date=timezone.localdate())
         assert escape(criterion.administrative_criteria.name) in rendered
         assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
@@ -448,12 +451,15 @@ class TestCertifiedBadge:
             certifiable=True, criteria_kinds=[criteria_kind], from_prescriber=random.choice([None, True])
         )
         criterion = diagnosis.selected_administrative_criteria.get()
-        criterion.certified = is_certified
+        criterion.certification_period = (
+            InclusiveDateRange(timezone.localdate()) if is_certified else InclusiveDateRange(empty=True)
+        )
         criterion.certified_at = timezone.now()
 
         rendered = self._render(
             request={"user": {"is_employer": employer}, "from_authorized_prescriber": authorized_prescriber},
             criterion=criterion,
+            hiring_start_date=timezone.localdate(),
         )
         if any([employer, authorized_prescriber]):
             expected, not_expected = (

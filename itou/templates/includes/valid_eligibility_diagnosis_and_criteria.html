@@ -33,7 +33,7 @@
                         <ul>
                         {% endif %}
                         {% for criterion in criteria %}
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion hiring_start_date=hiring_start_date request=request only %}
                         {% endfor %}
                         {% if not flat_criteria_list %}
                         </ul>
