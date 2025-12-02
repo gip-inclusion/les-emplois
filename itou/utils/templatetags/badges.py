@@ -117,17 +117,18 @@ def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=Fals
 
 
 @register.simple_tag
-def criterion_certification_badge(selected_criterion):
+def criterion_certification_badge(selected_criterion, hiring_start_date):
     if not selected_criterion.administrative_criteria.is_certifiable:
         return ""
 
     if selected_criterion.certified_at:
-        if selected_criterion.certified is True:
-            template = "eligibility/includes/badge_certified.html"
-        elif selected_criterion.certified is False:
-            template = "eligibility/includes/badge_not_certified.html"
-        else:
+        if selected_criterion.certification_period is None:
             template = "eligibility/includes/badge_certification_error.html"
+        else:
+            if hiring_start_date in selected_criterion.certification_period:
+                template = "eligibility/includes/badge_certified.html"
+            else:
+                template = "eligibility/includes/badge_not_certified.html"
     else:
         template = "eligibility/includes/badge_certification_in_progress.html"
     return get_template(template).render({"extra_classes": "ms-3"})

@@ -371,16 +371,6 @@ def get_table():
             job_seekers_table.add_columns(
                 [
                     {
-                        "name": f"{column_name}_certifié",
-                        "type": "boolean",
-                        "comment": certification_comment,
-                        "fn": partial(
-                            get_latest_diagnosis_selected_criteria_attribute,
-                            criteria_id=criteria.id,
-                            attribute_name="certified",
-                        ),
-                    },
-                    {
                         "name": f"{column_name}_date_certification",
                         "type": "timestamp with time zone",
                         "comment": f"Date de la dernière {certification_comment}",

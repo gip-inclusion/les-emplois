@@ -133,6 +133,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "eligibility_diagnosis": eligibility_diagnosis,
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+        "hiring_start_date": job_application.hiring_start_at or timezone.localdate(),
         "job_application": job_application,
         "participations": participations,
         "transition_logs": transition_logs,
@@ -257,6 +258,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "eligibility_diagnosis": eligibility_diagnosis,
             "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
+            "hiring_start_date": job_application.hiring_start_at or timezone.localdate(),
             "job_application": job_application,
             "invitation_requests": invitation_requests,
             "participations": participations,
@@ -412,6 +414,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "eligibility_diagnosis": eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "expired_eligibility_diagnosis": None,  # XXX: should we search for an expired diagnosis here ?
+        "hiring_start_date": job_application.hiring_start_at or timezone.localdate(),
         "job_application": job_application,
         "participations": participations,
         "transition_logs": transition_logs,
