@@ -1,6 +1,7 @@
 import logging
 
 import httpx
+from data_inclusion.schema import v0
 from django.conf import settings
 
 
@@ -8,13 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 API_TIMEOUT_SECONDS = 1.0
-API_THEMATIQUES = [
-    "acces-aux-droits-et-citoyennete",
-    "equipement-et-alimentation",
-    "logement-hebergement",
-    "mobilite",
-    "remobilisation",
-]
 
 
 class DataInclusionApiException(Exception):
@@ -32,7 +26,13 @@ class DataInclusionApiV0Client:
     def search_services(self, code_insee: str) -> list[dict]:
         params = {
             "code_insee": code_insee,
-            "thematiques": API_THEMATIQUES,
+            "thematiques": [
+                v0.Thematique.ACCES_AUX_DROITS_ET_CITOYENNETE.value,
+                v0.Thematique.EQUIPEMENT_ET_ALIMENTATION.value,
+                v0.Thematique.LOGEMENT_HEBERGEMENT.value,
+                v0.Thematique.MOBILITE.value,
+                v0.Thematique.REMOBILISATION.value,
+            ],
             "score_qualite_minimum": settings.API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM,
         }
         if settings.API_DATA_INCLUSION_SOURCES:
