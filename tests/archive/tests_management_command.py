@@ -187,7 +187,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
             pytest.param(
                 lambda: JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY, for_snapshot=True),
                 lambda jobseeker: JobApplicationFactory(
-                    job_seeker=jobseeker, eligibility_diagnosis=None, created_at=timezone.now() - INACTIVITY_PERIOD
+                    job_seeker=jobseeker, created_at=timezone.now() - INACTIVITY_PERIOD
                 ),
                 id="jobseeker_with_job_application_without_recent_activity",
             ),
@@ -341,7 +341,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
         old_job_application_kwargs = {
             "job_seeker__joined_days_ago": DAYS_OF_INACTIVITY,
             "created_at": timezone.now() - relativedelta(days=DAYS_OF_INACTIVITY),
-            "eligibility_diagnosis": None,
         }
         recent_job_application_kwargs = {
             **old_job_application_kwargs,
@@ -644,9 +643,6 @@ class TestAnonymizeJobseekersManagementCommand:
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
-            approval=None,
-            eligibility_diagnosis=None,
-            geiq_eligibility_diagnosis=None,
             created_at=timezone.now() - INACTIVITY_PERIOD,
             resume=resume_file,
         )
@@ -673,9 +669,6 @@ class TestAnonymizeJobseekersManagementCommand:
                 job_application = JobApplicationFactory(
                     **job_application_kwargs,
                     job_seeker=jobseeker,
-                    approval=None,
-                    eligibility_diagnosis=None,
-                    geiq_eligibility_diagnosis=None,
                 )
                 if transitions:
                     for from_state, to_state, months in transitions:
@@ -889,8 +882,6 @@ class TestAnonymizeJobseekersManagementCommand:
         job_application_kwargs = {
             "job_seeker": job_seeker,
             "approval": None,
-            "eligibility_diagnosis": None,
-            "geiq_eligibility_diagnosis": None,
             "sent_by_job_seeker": True,
             "created_at": timezone.make_aware(datetime.datetime(2022, 1, 15)),
         }
@@ -1157,6 +1148,7 @@ class TestAnonymizeJobseekersManagementCommand:
             job_seeker__joined_days_ago=DAYS_OF_INACTIVITY,
             job_seeker__notified_days_ago=30,
             created_at=timezone.now() - INACTIVITY_PERIOD,
+            with_iae_eligibility_diagnosis=True,
             eligibility_diagnosis__expires_at=datetime.date(2023, 1, 18),
         )
         ApprovalFactory(
@@ -1509,7 +1501,10 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         prescriber = membership.user
         # The related object prevents deletion.
-        job_application = JobApplicationFactory(sender=prescriber)
+        job_application = JobApplicationFactory(
+            sender=prescriber,
+            with_iae_eligibility_diagnosis=True,
+        )
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages

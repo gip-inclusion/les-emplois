@@ -661,7 +661,6 @@ class TestMergeUsers:
             archived_by=user_2,
             archived_at=timezone.now(),
             transferred_by=user_2,
-            eligibility_diagnosis=None,
         )
         job_app_log = JobApplicationTransitionLog(job_application=job_app, user=user_2)
         job_app_log.save()
