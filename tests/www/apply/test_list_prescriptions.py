@@ -90,9 +90,7 @@ def test_pagination(client):
 
 
 def test_queries(client, snapshot):
-    prescriber = JobApplicationFactory(
-        sent_by_authorized_prescriber_organisation=True, with_iae_eligibility_diagnosis=True
-    ).sender
+    prescriber = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True).sender
     JobApplicationFactory(sender=prescriber, with_approval=True)
     JobApplicationFactory(
         sender=prescriber,
