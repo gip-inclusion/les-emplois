@@ -1,0 +1,78 @@
+{% extends "layout/base.html" %}
+{% load components %}
+{% load static %}
+{% load str_filters %}
+{% load url_add_query %}
+
+{% block title %}
+    {% if city and category %}
+        Service{{ results.paginator.count|pluralizefr }} d'insertion « {{ category.label }} » autour de {{ city }}
+        {% include "includes/pagination_for_title.html" with page=results only %}
+    {% else %}
+        Rechercher un service d'insertion
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Rechercher un service d'insertion</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_extra %}
+    <div class="c-search mt-3 mt-md-4">
+        <div class="c-search__bar">
+            <form>
+                {% include "search/services/includes/form.html" with form=form is_home=False only %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <h2 class="mb-3 mb-md-4">Service{{ results.paginator.count|pluralizefr }}</h2>
+                    <div class="d-block w-100">
+                        <form hx-get="{% url 'search:services_results' %}"
+                              hx-trigger="change delay:.5s"
+                              hx-include="#id_city, #id_category"
+                              hx-indicator="#services-search-results"
+                              hx-target="#services-search-results"
+                              hx-swap="outerHTML"
+                              hx-push-url="true">
+                            <div class="btn-dropdown-filter-group my-3 my-md-4">
+                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.thematics only %}
+                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.receptions only %}
+                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.services only %}
+                                <div class="ms-lg-auto">
+                                    <a href="{% url_add_query request.path city=request.GET.city category=request.GET.category %}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+                                        <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+                                        <span>Effacer tout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {% include "search/services/includes/summary.html" %}
+                    {% include "search/services/includes/results.html" %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+{% endblock %}

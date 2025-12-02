@@ -1,10 +1,14 @@
+import hashlib
+import json
 import logging
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
+from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
+from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -20,6 +24,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
+from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV1Client
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
@@ -28,6 +33,7 @@ from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
     NewSavedSearchForm,
     PrescriberSearchForm,
+    ServiceSearchForm,
     SiaeSearchForm,
 )
 
@@ -352,6 +358,88 @@ def search_prescribers_results(request, template_name="search/prescribers_search
     return render(
         request,
         "search/includes/prescribers_search_results.html" if request.htmx else template_name,
+        context,
+    )
+
+
+@login_not_required
+def search_services_home(request, template_name="search/services/home.html"):
+    """
+    The search home page has a different design from the results page.
+    """
+    return render(request, template_name, {"form": ServiceSearchForm()})
+
+
+@login_not_required
+def search_services_results(request, template_name="search/services/results.html"):
+    city, category = None, None
+    form = ServiceSearchForm(data=request.GET or None)
+
+    if form.is_valid():
+        city = form.cleaned_data["city"]
+        category = form.cleaned_data["category"]
+        thematics = form.cleaned_data["thematics"] or [
+            t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
+        ]
+        receptions = form.cleaned_data["receptions"]
+        services = form.cleaned_data["services"]
+
+        search_query = {
+            "code_commune": city.code_insee,
+            "thematiques": thematics,
+            "modes_accueil": receptions,
+            "types": services,
+        }
+        search_query_hash = hashlib.md5(
+            json.dumps(search_query, sort_keys=True, default=str).encode("utf-8")
+        ).hexdigest()
+        cache_key = f"data_inclusion_api_results:search:{search_query_hash}"
+        cached_data = caches["failsafe"].get(cache_key)
+        if cached_data is None:
+            client = DataInclusionApiV1Client(
+                settings.API_DATA_INCLUSION_BASE_URL,
+                settings.API_DATA_INCLUSION_TOKEN,
+            )
+            try:
+                results = client.search_services(**search_query)
+            except DataInclusionApiException:
+                logger.exception("Failed to search services from data·inclusion API with query=%s", search_query)
+                api_error, results = True, []
+                # 15 minutes seems like a reasonable amount of time for DI to get back on track
+                caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
+            else:
+                api_error, results = (
+                    False,
+                    sorted(
+                        results,
+                        key=lambda i: (
+                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in i["modes_accueil"],
+                            i["source"] == "dora",
+                        ),
+                        reverse=True,
+                    ),
+                )
+                # 6 hours is reasonable enough to get fresh results while still avoiding
+                # hitting the API too much. The API content is updated daily or hourly;
+                # we want changes to be propagated at a reasonable time.
+                caches["failsafe"].set(cache_key, (api_error, results), 6 * 60 * 60)
+        else:
+            api_error, results = cached_data
+    else:
+        api_error, results = None, []
+
+    context = {
+        "form": form,
+        "city": city,
+        "category": category,
+        "api_error": api_error,
+        "results": pager(results, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
+        "matomo_custom_title": "Recherche de services d'insertion",
+        "back_url": reverse("search:services_home"),
+    }
+    return render(
+        request,
+        "search/services/includes/results.html" if request.htmx else template_name,
         context,
     )
 

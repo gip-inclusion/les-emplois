@@ -1,3 +1,4 @@
+from data_inclusion.schema import v1 as data_inclusion_v1
 from django import forms
 from django.http import QueryDict
 from django.urls import reverse_lazy
@@ -164,6 +165,56 @@ class PrescriberSearchForm(forms.Form):
         if not distance:
             distance = self.fields["distance"].initial
         return distance
+
+
+class ServiceSearchForm(forms.Form):
+    city = forms.ModelChoiceField(
+        queryset=City.objects,
+        label="Ville",
+        to_field_name="slug",
+        widget=RemoteAutocompleteSelect2Widget(
+            attrs={
+                "class": "form-control",
+                "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Autour de (Lyon, Lille, Paris…)",
+            }
+        ),
+    )
+    category = forms.TypedChoiceField(
+        coerce=data_inclusion_v1.Categorie,
+        empty_value="",
+        choices=[("", "Sélectionnez une thématique")] + [(c.value, c.label) for c in data_inclusion_v1.Categorie],
+        label="Sélectionnez une thématique",
+        widget=Select2Widget(
+            attrs={"data-placeholder": "Sélectionnez une thématique"},
+        ),
+    )
+    thematics = forms.MultipleChoiceField(
+        choices=[(t.value, t.label) for t in data_inclusion_v1.Thematique],
+        label="Besoin",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    receptions = forms.MultipleChoiceField(
+        choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil],
+        label="Mode d'accueil",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    services = forms.MultipleChoiceField(
+        choices=[(t.value, t.label) for t in data_inclusion_v1.TypeService],
+        label="Type de service",
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not_cleaned_category := self.data.get("category"):
+            self.fields["thematics"].choices = [
+                (t.value, t.label) for t in data_inclusion_v1.Thematique if t.value.startswith(not_cleaned_category)
+            ]
 
 
 class NewSavedSearchForm(forms.ModelForm):

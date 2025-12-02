@@ -69,6 +69,12 @@ NAV_ENTRIES = {
         target=reverse("search:prescribers_home"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),
+    "anonymous-search-services": NavItem(
+        label="Rechercher un service d'insertion",
+        target=reverse("search:services_home"),
+        active_view_names=["search:services_home", "search:services_results"],
+        is_new=True,
+    ),
     # Logged in users.
     "home": NavItem(
         label="Accueil",
@@ -381,6 +387,7 @@ def nav_anonymous(request, *, mobile):
     menu_items = [
         NAV_ENTRIES["anonymous-search-employers"],
         NAV_ENTRIES["anonymous-search-prescribers"],
+        NAV_ENTRIES["anonymous-search-services"],
     ]
     try:
         if request.resolver_match:
