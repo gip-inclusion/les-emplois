@@ -1989,6 +1989,104 @@ def test_list_for_siae_select_applications_batch_accept(client, snapshot):
     assert pretty_indented(accept_button) == snapshot(name="inactive accept button already accepted")
 
 
+def test_list_for_siae_select_applications_batch_accept_geiq(client, snapshot):
+    company = CompanyFactory(with_membership=True, kind=CompanyKind.GEIQ)
+    employer = company.members.first()
+
+    acceptable_app_1 = JobApplicationFactory(
+        pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
+        to_company=company,
+        state=JobApplicationState.PROCESSING,
+    )
+    assert acceptable_app_1.accept.is_available()
+    acceptable_app_2 = JobApplicationFactory(
+        pk=uuid.UUID("22222222-2222-2222-2222-222222222222"),
+        to_company=company,
+        state=JobApplicationState.PRIOR_TO_HIRE,
+    )
+    assert acceptable_app_2.accept.is_available()
+    acceptable_app_3 = JobApplicationFactory(
+        pk=uuid.UUID("33333333-3333-3333-3333-333333333333"),
+        to_company=company,
+        state=JobApplicationState.NEW,
+    )
+    assert acceptable_app_3.accept.is_available()
+
+    unacceptable_app = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
+    assert not unacceptable_app.accept.is_available()
+
+    client.force_login(employer)
+    table_url = reverse("apply:list_for_siae", query={"display": "table", "start_date": "2015-01-01"})
+
+    response = client.get(table_url)
+    simulated_page = parse_response_to_soup(
+        response,
+        # We need the whole body to be able to check modals
+        selector="body",
+    )
+    [action_form] = simulated_page.find_all(
+        "form", attrs={"hx-get": lambda attr: attr and attr.startswith(reverse("apply:list_for_siae_actions"))}
+    )
+    action_url = action_form["hx-get"]
+    assert parse_qs(urlsplit(action_url).query) == {"list_url": [table_url]}
+    assert simulated_page.find(id="batch-action-box").contents == []
+
+    def simulate_applications_selection(application_list):
+        response = client.get(
+            action_url,
+            # Explicitly redefine list_url since Django test client swallows it otherwise
+            query_params={"list_url": table_url, "selected-application": application_list},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{action_url}']", response)
+
+    def get_accept_button():
+        accept_buttons = [
+            span.parent
+            for span in simulated_page.find(id="batch-action-box").select("span")
+            if span.contents == ["Accepter"]
+        ]
+        if not accept_buttons:
+            return None
+        [accept_button] = accept_buttons
+        return accept_button
+
+    def get_confirm_button():
+        return simulated_page.find(id="confirm_no_allowance_modal").find("a")
+
+    assert get_accept_button() is None
+    # Select 1 acceptable application
+    for acceptable_app in [acceptable_app_1, acceptable_app_2, acceptable_app_3]:
+        simulate_applications_selection([acceptable_app.pk])
+        accept_button = get_accept_button()
+        assert accept_button is not None
+        assert pretty_indented(accept_button).replace(str(acceptable_app.pk), "[PK of JobApplication]") == snapshot(
+            name="active accept button"
+        )
+        # button opens a model
+        assert accept_button["data-bs-target"] == "#confirm_no_allowance_modal"
+
+        # Check that the next_url is correctly transmitted
+        confirm_button = get_confirm_button()
+        assert confirm_button["href"] == reverse(
+            "apply:start-accept", kwargs={"job_application_id": acceptable_app.pk}
+        )
+
+    # Test with unacceptable batches
+    simulate_applications_selection([acceptable_app_1.pk, acceptable_app_2.pk, acceptable_app_3.pk])
+    accept_button = get_accept_button()
+    assert pretty_indented(accept_button) == snapshot(name="inactive accept button multiple job applications")
+
+    # the "unnacceptable" job application tooltip only works if the only unnaceptable state is accepted.
+    # update the tooltip if this assert breaks
+    assert set(JobApplicationState) - set(JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES) == {
+        JobApplicationState.ACCEPTED
+    }
+    simulate_applications_selection([unacceptable_app.pk])
+    accept_button = get_accept_button()
+    assert pretty_indented(accept_button) == snapshot(name="inactive accept button already accepted")
+
+
 def test_order(client, subtests):
     company = CompanyFactory(with_membership=True)
     employer = company.members.first()
