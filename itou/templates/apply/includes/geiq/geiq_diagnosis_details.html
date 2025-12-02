@@ -29,7 +29,7 @@
                 <ul>
                     {% for criterion in diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
                         <li>
-                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion request=request only %}
+                            {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion job_application=job_application request=request only %}
                         </li>
                     {% endfor %}
                 </ul>

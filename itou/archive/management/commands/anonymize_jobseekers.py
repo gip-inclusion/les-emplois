@@ -296,7 +296,7 @@ class Command(BaseCommand):
             ),
             number_of_certified_administrative_criteria=Count(
                 "selected_administrative_criteria",
-                filter=Q(selected_administrative_criteria__certified=True),
+                filter=Q(selected_administrative_criteria__certification_period__isempty=False),
             ),
             selected_administrative_criteria_list=ArrayAgg(
                 "administrative_criteria__kind", order_by=["administrative_criteria__kind"]
