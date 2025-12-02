@@ -50,6 +50,7 @@ from itou.users.enums import Title, UserKind
 from itou.users.models import User
 from itou.utils.brevo import MalformedResponseException
 from itou.utils.models import PkSupportRemark
+from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.cities.factories import (
     create_city_geispolsheim,
@@ -1060,7 +1061,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         iae_diagnosis_from_employer_with_approval.selected_administrative_criteria.filter(
             administrative_criteria__kind="AAH"
-        ).update(certified=True)
+        ).update(certification_period=InclusiveDateRange(timezone.localdate()))
 
         JobApplicationFactory(
             job_seeker=iae_diagnosis_from_employer_with_approval.job_seeker,
