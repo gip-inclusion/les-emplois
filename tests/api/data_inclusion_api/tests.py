@@ -62,7 +62,7 @@ class TestDataInclusionSiaeStructure:
         assert response.json()["results"] == [
             {
                 "id": str(company.uid),
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "nom": company.display_name,
                 "siret": company.siret,
                 "description": "",
@@ -238,7 +238,7 @@ class TestDataInclusionPrescriberStructure:
         assert response.json()["results"] == [
             {
                 "id": str(orga.uid),
-                "kind": orga.kind.value,
+                "kind": orga.kind,
                 "nom": orga.name,
                 "siret": orga.siret,
                 "description": "",
@@ -304,7 +304,7 @@ class TestDataInclusionSiaeStructureOldAuth:
         assert response.json()["results"] == [
             {
                 "id": str(company.uid),
-                "kind": company.kind.value,
+                "kind": company.kind,
                 "nom": company.display_name,
                 "siret": company.siret,
                 "description": "",
@@ -471,7 +471,7 @@ class TestDataInclusionPrescriberStructureOldAuth:
         assert response.json()["results"] == [
             {
                 "id": str(orga.uid),
-                "kind": orga.kind.value,
+                "kind": orga.kind,
                 "nom": orga.name,
                 "siret": orga.siret,
                 "description": "",
