@@ -41,11 +41,7 @@ class TestApplyAsPrescriber:
             public_id="11111111-2222-3333-4444-555566667777",
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
-        JobApplicationFactory(
-            job_seeker=job_seeker,
-            sender=prescriber,
-            eligibility_diagnosis=None,
-        )
+        JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
 
         client.force_login(prescriber)
 

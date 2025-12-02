@@ -37,6 +37,7 @@ class TestEmployeeDetailView:
             # Make job application.is_sent_by_authorized_prescriber to be true
             sender_kind=SenderKind.PRESCRIBER,
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
+            with_iae_eligibility_diagnosis=True,
         )
         assert job_application.is_sent_by_authorized_prescriber
         IAEEligibilityDiagnosisFactory(

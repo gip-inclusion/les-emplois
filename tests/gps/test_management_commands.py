@@ -49,7 +49,6 @@ class TestSyncGroupsManagementCommand:
             sender=employer,
             sender_kind=UserKind.EMPLOYER,
             sender_company=CompanyFactory(),
-            eligibility_diagnosis=None,
         )
         geiq_diag_1 = GEIQEligibilityDiagnosisFactory(
             job_seeker=beneficiary,
@@ -75,7 +74,6 @@ class TestSyncGroupsManagementCommand:
             job_seeker=beneficiary,
             sender=prescriber,
             sent_by_authorized_prescriber_organisation=True,
-            eligibility_diagnosis=None,
         )
         geiq_diag_2 = GEIQEligibilityDiagnosisFactory(
             job_seeker=beneficiary,
@@ -93,14 +91,12 @@ class TestSyncGroupsManagementCommand:
         job_app_3 = JobApplicationFactory(
             job_seeker=beneficiary,
             sender=non_authorized_prescriber,
-            eligibility_diagnosis=None,
         )
 
         # self sent job application are ignored
         JobApplicationFactory(
             job_seeker=beneficiary,
             sender=beneficiary,
-            eligibility_diagnosis=None,
         )
 
         assert sync_follow_up_groups_and_members.get_users_contacts([beneficiary.pk]) == {
@@ -150,35 +146,29 @@ class TestSyncGroupsManagementCommand:
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_1,
-            eligibility_diagnosis=None,
         )
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_1,
-            eligibility_diagnosis=None,
         )
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_2,
-            eligibility_diagnosis=None,
             sent_by_authorized_prescriber_organisation=True,
         )
         JobApplicationFactory(
             sender=follower_1,
             job_seeker=beneficiary_2,
-            eligibility_diagnosis=None,
             sent_by_authorized_prescriber_organisation=True,
         )
         JobApplicationFactory(
             sender=follower_2,
             job_seeker=beneficiary_2,
-            eligibility_diagnosis=None,
             sent_by_authorized_prescriber_organisation=True,
         )
         JobApplicationFactory(
             sender=follower_2,
             job_seeker=beneficiary_2,
-            eligibility_diagnosis=None,
             sent_by_authorized_prescriber_organisation=True,
         )
 

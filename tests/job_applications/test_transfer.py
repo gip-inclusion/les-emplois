@@ -86,6 +86,7 @@ def test_transfer():
         to_company=origin_company,
         sent_by_authorized_prescriber_organisation=True,
         state=JobApplicationState.ACCEPTED,
+        with_iae_eligibility_diagnosis=True,
     )
 
     # Conditions should be covered by previous test, but does not hurt (and tests raise)

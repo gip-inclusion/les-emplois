@@ -24,7 +24,6 @@ class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
     job_application = factory.SubFactory(
         JobApplicationFactory,
         sender=None,
-        eligibility_diagnosis=None,
         to_company__with_membership=False,
         to_company__convention=None,
     )
