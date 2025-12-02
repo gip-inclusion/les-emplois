@@ -33,7 +33,6 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         sender=sender,
         message="Third application",
         created_at=now - relativedelta(weeks=2),
-        with_iae_eligibility_diagnosis=True,
     )
     JobApplicationFactory(
         id=uuid.UUID("22222222-2222-2222-2222-222222222222"),
@@ -42,7 +41,6 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         sender=sender,
         message="Second application",
         created_at=now - relativedelta(weeks=3, days=5),
-        with_iae_eligibility_diagnosis=True,
     )
     JobApplicationFactory(
         id=uuid.UUID("33333333-3333-3333-3333-333333333333"),
@@ -51,7 +49,6 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         sender=sender,
         message="First application",
         created_at=now - relativedelta(weeks=8),
-        with_iae_eligibility_diagnosis=True,
     )
 
     client.force_login(hit_pit.members.get())
