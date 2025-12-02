@@ -4985,7 +4985,7 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
 
 
-def test_precriber_details_with_older_valid_approval(client, faker):
+def test_prescriber_details_with_older_valid_approval(client, faker):
     # Ensure that the approval details are displayed for a prescriber
     # when the job seeker has a valid approval created on an older approval
     old_job_application = JobApplicationFactory(with_approval=True, hiring_start_at=faker.past_date(start_date="-3m"))
