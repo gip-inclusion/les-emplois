@@ -2,5 +2,5 @@
 
 {{ criterion.administrative_criteria.name }}
 {% if request.user.is_employer or request.from_authorized_prescriber %}
-    {% criterion_certification_badge criterion %}
+    {% criterion_certification_badge criterion job_application %}
 {% endif %}
