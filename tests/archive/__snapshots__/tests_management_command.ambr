@@ -224,7 +224,7 @@
     dict({
       'applied_at': datetime.date(2022, 1, 1),
       'company_department': '70',
-      'company_has_convention': True,
+      'company_has_convention': False,
       'company_kind': 'GEIQ',
       'company_naf': '4570A',
       'had_approval': False,
@@ -250,7 +250,7 @@
     dict({
       'applied_at': datetime.date(2022, 2, 1),
       'company_department': '71',
-      'company_has_convention': True,
+      'company_has_convention': False,
       'company_kind': 'OPCS',
       'company_naf': '4571A',
       'had_approval': False,

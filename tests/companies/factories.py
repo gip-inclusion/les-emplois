@@ -92,6 +92,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True
 
     class Params:
+        with_convention = factory.LazyAttribute(lambda o: o.kind in CompanyKind.siae_kinds())
         subject_to_iae_rules = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds()),
         )
@@ -124,6 +125,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             )
         )
         for_snapshot = factory.Trait(
+            kind=CompanyKind.EI,
             name="ACME Inc.",
             address_line_1="112 rue de la Croix-Nivert",
             post_code="75015",
@@ -154,8 +156,12 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     post_code = factory.LazyFunction(create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
     source = models.Company.SOURCE_ASP
-    convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
+    convention = factory.Maybe(
+        "with_convention",
+        yes_declaration=factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind")),
+        no_declaration=None,
+    )
 
 
 class CompanyMembershipFactory(factory.django.DjangoModelFactory):
