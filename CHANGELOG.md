@@ -1,5 +1,12 @@
 # Journal des modifications
 
+## 2025-12-01
+
+### Modifié
+
+- [Connexion : Améliorer la connexion automatique via ProConnect](https://github.com/gip-inclusion/les-emplois/pull/7112)
+- [GPS : Améliorer la visibilité/accessibilité des données de GPS](https://github.com/gip-inclusion/les-emplois/pull/7177)
+
 ## 2025-11-24
 
 ### Ajouté
