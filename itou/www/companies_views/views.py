@@ -1,6 +1,7 @@
 import random
 from urllib.parse import urljoin
 
+from data_inclusion.schema import v0 as data_inclusion_v0
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
@@ -76,7 +77,7 @@ def get_data_inclusion_services(code_insee):
 
         services = []
         for s in raw_services:
-            if s["modes_accueil"] != ["en-presentiel"]:
+            if s["modes_accueil"] != [data_inclusion_v0.ModeAccueil.EN_PRESENTIEL]:
                 continue
             s["thematiques_display"] = {displayable_thematique(t) for t in s["thematiques"]}
             s["dora_service_redirect_url"] = reverse(
