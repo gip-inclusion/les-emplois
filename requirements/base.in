@@ -139,6 +139,8 @@ django-hijack  # https://github.com/django-hijack/django-hijack
 # To automatically load .env files at the root of the project
 python-dotenv  # https://github.com/theskumar/python-dotenv
 
+data-inclusion-schema  # https://github.com/gip-inclusion/data-inclusion-schema
+
 # Production requirements
 # ------------------------------------------------------------------------------
 sentry-sdk  # https://github.com/getsentry/sentry-python
