@@ -73,9 +73,9 @@
         {% endif %}
     {% endfor %}
 
-    {% include "includes/pagination.html" with page=results boost=True boost_target="#services-search-results" boost_indicator="#services-search-results" request=request only %}
+    {% include "includes/pagination.html" with page=results boost=True boost_indicator="#services-search-results" request=request only %}
 </div>
 
-{% if request.htmx %}
+{% if request.htmx and not request.htmx.boosted %}
     {% include "search/services/includes/summary.html" %}
 {% endif %}
