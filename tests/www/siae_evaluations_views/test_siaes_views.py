@@ -4,13 +4,18 @@ import uuid
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.humanize.templatetags.humanize import apnumber
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel
+from itou.eligibility.enums import (
+    ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND,
+    AdministrativeCriteriaKind,
+    AdministrativeCriteriaLevel,
+)
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
@@ -843,12 +848,13 @@ class TestSiaeSelectCriteriaView:
                 level2_criterion.administrative_criteria.key: True,
             },
         )
+        required_criteria_count = ADMINISTRATIVE_CRITERIA_LEVEL_2_REQUIRED_FOR_SIAE_KIND[self.siae.kind]
         assertContains(
             response,
-            """
+            f"""
             <ul class="mb-0">
                 <li>Vous devez sélectionner au moins un critère administratif de niveau 1 ou
-                le cumul d'au moins trois critères de niveau 2.</li>
+                le cumul d'au moins {apnumber(required_criteria_count)} critères de niveau 2.</li>
             </ul>
             """,
             html=True,
