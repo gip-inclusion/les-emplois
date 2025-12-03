@@ -439,7 +439,7 @@ def search_services_results(request, template_name="search/services/results.html
     }
     return render(
         request,
-        "search/services/includes/results.html" if request.htmx else template_name,
+        "search/services/includes/results.html" if request.htmx and not request.htmx.boosted else template_name,
         context,
     )
 

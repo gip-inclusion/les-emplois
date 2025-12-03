@@ -25,7 +25,7 @@
 {% block title_extra %}
     <div class="c-search mt-3 mt-md-4">
         <div class="c-search__bar">
-            <form>
+            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results">
                 {% include "search/services/includes/form.html" with form=form is_home=False only %}
             </form>
         </div>
@@ -45,13 +45,18 @@
                               hx-indicator="#services-search-results"
                               hx-target="#services-search-results"
                               hx-swap="outerHTML"
-                              hx-push-url="true">
+                              hx-push-url="true"
+                              hx-disinherit="*">
                             <div class="btn-dropdown-filter-group my-3 my-md-4">
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.thematics only %}
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.receptions only %}
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.services only %}
                                 <div class="ms-lg-auto">
-                                    <a href="{% url_add_query request.path city=request.GET.city category=request.GET.category %}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+                                    <a href="{% url_add_query request.path city=request.GET.city category=request.GET.category %}"
+                                       class="btn btn-ico btn-dropdown-filter"
+                                       aria-label="Réinitialiser les filtres actifs"
+                                       hx-boost="true"
+                                       hx-indicator="inherit">
                                         <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
                                         <span>Effacer tout</span>
                                     </a>
