@@ -2475,8 +2475,14 @@ class TestJobApplicationXlsxExport:
         assert _resolve_title(title=Title.M, nir="") == Title.M
         assert _resolve_title(title="", nir="1") == Title.M
         assert _resolve_title(title="", nir="2") == Title.MME
-        with pytest.raises(KeyError):
+        assert _resolve_title(title="", nir="3") == Title.M
+        assert _resolve_title(title="", nir="4") == Title.MME
+        assert _resolve_title(title="", nir="7") == Title.M
+        assert _resolve_title(title="", nir="8") == Title.MME
+        assert _resolve_title(title=Title.M, nir="8") == Title.M
+        with pytest.raises(ValueError):
             _resolve_title(title="", nir="0")
+            _resolve_title(title="", nir="9")
 
 
 class TestJobApplicationAdminForm:

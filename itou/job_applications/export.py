@@ -6,7 +6,9 @@ from itou.approvals.models import Approval
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.users.enums import Title, UserKind
+from itou.utils import iso_standards
 from itou.utils.export import Format, to_streaming_response
+from itou.utils.france_standards import NIR
 from itou.utils.perms import utils as perms_utils
 from itou.utils.templatetags import str_filters
 
@@ -105,10 +107,13 @@ def _resolve_title(title, nir):
     if title:
         return title
     if nir:
-        return {
-            "1": Title.M,
-            "2": Title.MME,
-        }[nir[0]]
+        match NIR(nir).sex:
+            case iso_standards.Sex.MALE:
+                return Title.M
+            case iso_standards.Sex.FEMALE:
+                return Title.MME
+            case _:
+                raise ValueError("Unexpected sex value")
     return ""
 
 
