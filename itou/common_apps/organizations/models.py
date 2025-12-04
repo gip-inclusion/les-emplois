@@ -205,7 +205,7 @@ class OrganizationAbstract(models.Model):
         elif user.is_employer:
             if self.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:
                 documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409"
-            elif self.kind in [CompanyKind.EA, CompanyKind.OPCS]:
+            elif self.kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
                 documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16925381169681"
             elif self.kind == CompanyKind.GEIQ:
                 documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/15209741332113"
