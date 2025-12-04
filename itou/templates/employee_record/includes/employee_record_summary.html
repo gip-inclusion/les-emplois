@@ -40,6 +40,16 @@
                     <i class="text-disabled">Non renseigné</i>
                 {% endif %}
             </li>
+            {% if display_ntt %}
+                <li>
+                    <small>Numéro technique temporaire</small>
+                    {% if employee_record.ntt %}
+                        <strong>{{ employee_record.ntt }}</strong>
+                    {% else %}
+                        <i class="text-disabled">Non renseigné</i>
+                    {% endif %}
+                </li>
+            {% endif %}
         </ul>
 
         <hr class="my-4">

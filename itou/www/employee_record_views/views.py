@@ -578,6 +578,8 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         "steps": STEPS,
         "step": 5,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 5",
+        # If a NIR is present, no need to show an NTT in step 5 where we want to send a new employee record to ASP
+        "display_ntt": is_ntt_required(job_application.job_seeker.jobseeker_profile.nir),
     }
 
     return render(request, template_name, context)
@@ -609,11 +611,19 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     ]
     updates = sorted(creations + changes, key=itemgetter(1), reverse=True)
 
+    display_ntt = is_ntt_required(job_application.job_seeker.jobseeker_profile.nir)
+    if not display_ntt and employee_record.ntt and employee_record.archived_json is not None:
+        # If a NIR is present, check if a NTT was used in transmitted data
+        job_seeker_data = employee_record.archived_json.get("personnePhysique", {})
+        if job_seeker_data.get("salarieNIR") == employee_record.ntt:
+            display_ntt = True
+
     context = {
         "employee_record": employee_record,
         "updates": updates,
         "matomo_custom_title": "Détail fiche salarié ASP",
         "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("employee_record_views:list")),
+        "display_ntt": display_ntt,
     }
 
     return render(request, template_name, context)
