@@ -4,10 +4,8 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
-from itou.nexus import utils
 from itou.utils.urls import add_url_params
 from tests.users.factories import PrescriberFactory
-from tests.utils.testing import reload_module
 
 
 class TestAutoLogin:
@@ -44,7 +42,6 @@ class TestAutoLogin:
         assert response.status_code == 404
 
     @override_settings(NEXUS_AUTO_LOGIN_KEY=None)
-    @reload_module(utils)
     def test_no_settings(self, client):
         client.force_login(PrescriberFactory())
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"

@@ -1,8 +1,8 @@
 import pytest
 from django.urls import reverse
+from itoutils.nexus.utils import generate_jwt
 from pytest_django.asserts import assertRedirects
 
-from itou.nexus.utils import generate_jwt
 from itou.users.enums import IdentityProvider
 from tests.users.factories import EmployerFactory
 

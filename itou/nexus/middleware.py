@@ -4,8 +4,8 @@ from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
+from itoutils.nexus.utils import decode_jwt
 
-from itou.nexus.utils import decode_jwt
 from itou.users.enums import UserKind
 from itou.users.models import User
 
