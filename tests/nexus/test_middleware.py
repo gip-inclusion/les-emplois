@@ -1,8 +1,8 @@
 import pytest
 from django.urls import reverse
+from itoutils.django.nexus.token import generate_token
 from pytest_django.asserts import assertRedirects
 
-from itou.nexus.utils import generate_jwt
 from itou.users.enums import IdentityProvider
 from tests.users.factories import EmployerFactory
 
@@ -17,7 +17,7 @@ params_tuples = [
 def test_middleware_for_authenticated_user(client, params, expected_params, caplog):
     user = EmployerFactory(membership=True)
     client.force_login(user)
-    params["auto_login"] = generate_jwt(user)
+    params["auto_login"] = generate_token(user)
 
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(response, f"/{expected_params}", fetch_redirect_response=False)
@@ -27,7 +27,7 @@ def test_middleware_for_authenticated_user(client, params, expected_params, capl
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middleware_for_wrong_authenticated_user(client, params, expected_params, caplog):
     user = EmployerFactory(membership=True)
-    params["auto_login"] = generate_jwt(user)
+    params["auto_login"] = generate_token(user)
     # Another user is logged in
     client.force_login(EmployerFactory(membership=True))
 
@@ -48,7 +48,7 @@ def test_middleware_for_wrong_authenticated_user(client, params, expected_params
 
 def test_middleware_multiple_tokens(client, caplog):
     user = EmployerFactory(membership=True)
-    params = [("auto_login", generate_jwt(user)), ("auto_login", generate_jwt(user))]
+    params = [("auto_login", generate_token(user)), ("auto_login", generate_token(user))]
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(response, reverse("home:hp"), fetch_redirect_response=False)
     assert caplog.messages == [
@@ -69,7 +69,7 @@ def test_middleware_invalid_token(client, caplog):
 
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middleware_with_no_existing_user(client, params, expected_params, caplog):
-    jwt = generate_jwt(EmployerFactory.build())
+    jwt = generate_token(EmployerFactory.build())
     params["auto_login"] = jwt
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(
@@ -83,7 +83,7 @@ def test_middleware_with_no_existing_user(client, params, expected_params, caplo
 @pytest.mark.parametrize("params,expected_params", params_tuples)
 def test_middleware_for_unlogged_user(client, params, expected_params, caplog):
     user = EmployerFactory(membership=True)
-    params["auto_login"] = generate_jwt(user)
+    params["auto_login"] = generate_token(user)
 
     response = client.get(reverse("home:hp", query=params))
     assertRedirects(
