@@ -195,7 +195,9 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
                 IAEEligibilityDiagnosisFactory,
                 from_prescriber=True,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
-            )
+                # Don't use the job app sender as author : it's the job seeker...
+            ),
+            to_company=factory.SubFactory(CompanyFactory, with_membership=True, subject_to_iae_rules=True),
         )
 
 
