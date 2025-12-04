@@ -7,6 +7,8 @@ from pytest_django.asserts import assertContains
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordTransition
+from itou.users.enums import LackOfNIRReason
+from itou.utils.templatetags.format_filters import format_nir
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import (
     EmployeeRecordTransitionLogFactory,
@@ -56,6 +58,13 @@ class TestSummaryEmployeeRecords:
             """,
             html=True,
         )
+        assertContains(response, f"<strong>{format_nir(profile.nir)}</strong>", html=True)
+
+        profile.nir = ""
+        profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        profile.save()
+        response = client.get(self.url)
+        assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
 
     def test_technical_infos(self, client, snapshot):
         self.employee_record.siret = "10000000000002"

@@ -1,4 +1,5 @@
 {% load enums %}
+{% load format_filters %}
 {% load wording %}
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
@@ -28,6 +29,16 @@
             <li>
                 <small>Pays de naissance</small>
                 <strong>{{ profile.birth_country }}</strong>
+            </li>
+            <li>
+                <small>Numéro de sécurité sociale</small>
+                {% if profile.nir %}
+                    <strong>{{ profile.nir|format_nir }}</strong>
+                {% elif profile.lack_of_nir_reason %}
+                    <strong>{{ profile.get_lack_of_nir_reason_display }}</strong>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% endif %}
             </li>
         </ul>
 
