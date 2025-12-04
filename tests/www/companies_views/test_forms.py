@@ -1,5 +1,3 @@
-import random
-
 import pytest
 
 from itou.companies.enums import CompanyKind, ContractType
@@ -18,7 +16,7 @@ class TestEditJobDescriptionForm:
         self.guerande_city = create_city_guerande()
 
     def test_clean_contract_type(self):
-        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.OPCS]))
+        company = CompanyFactory(not_opcs_kind=True)
         post_data = {
             "appellation": "10357",
             "contract_type": ContractType.OTHER.value,
@@ -36,7 +34,7 @@ class TestEditJobDescriptionForm:
         assert form.is_valid()
 
     def test_clean_open_positions(self):
-        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.OPCS]))
+        company = CompanyFactory(not_opcs_kind=True)
         post_data = {
             "appellation": "10357",
             "contract_type": ContractType.OTHER.value,
@@ -56,7 +54,7 @@ class TestEditJobDescriptionForm:
         assert form.is_valid()
 
     def test_company_errors(self):
-        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.OPCS]))
+        company = CompanyFactory(not_opcs_kind=True)
         post_data = {}
 
         form = EditJobDescriptionForm(current_company=company, data=post_data)
@@ -96,7 +94,7 @@ class TestEditJobDescriptionForm:
         assert form.is_valid()
 
     def test_company_fields(self):
-        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.OPCS]))
+        company = CompanyFactory(not_opcs_kind=True)
         post_data = {
             "appellation": "10357",
             "custom_name": "custom_name",

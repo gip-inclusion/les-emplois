@@ -1,4 +1,3 @@
-import random
 from datetime import datetime, timedelta
 from unittest import mock
 
@@ -448,7 +447,7 @@ class TestCompanyQuerySet:
         assert not result.has_active_members
 
     def test_can_have_prior_action(self):
-        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]))
+        company = CompanyFactory(not_geiq_kind=True)
         assert company.can_have_prior_action is False
         geiq = CompanyFactory(kind=CompanyKind.GEIQ)
         assert geiq.can_have_prior_action is True
