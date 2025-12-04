@@ -2,18 +2,16 @@ import pytest
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
+from itoutils.django.urls import add_url_params
 from pytest_django.asserts import assertRedirects
 
-from itou.nexus import utils
-from itou.utils.urls import add_url_params
 from tests.users.factories import PrescriberFactory
-from tests.utils.testing import reload_module
 
 
 class TestAutoLogin:
     @pytest.fixture(autouse=True)
     def setup_method(self, mocker):
-        mocker.patch("itou.www.nexus.views.generate_jwt", return_value="JWT")
+        mocker.patch("itoutils.nexus.views.generate_jwt", return_value="JWT")
 
     def test_login_required(self, client):
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"
@@ -44,7 +42,6 @@ class TestAutoLogin:
         assert response.status_code == 404
 
     @override_settings(NEXUS_AUTO_LOGIN_KEY=None)
-    @reload_module(utils)
     def test_no_settings(self, client):
         client.force_login(PrescriberFactory())
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"
