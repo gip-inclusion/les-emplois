@@ -1,10 +1,10 @@
 from django.urls import path
-
-from itou.www.nexus import views
+from itoutils.django.nexus.views import auto_login
 
 
 app_name = "nexus"
 
 urlpatterns = [
-    path("auto-login", views.auto_login, name="auto_login"),
+    path("auto-login", auto_login, name="auto_login"),
+    # There will soon be more views here
 ]
