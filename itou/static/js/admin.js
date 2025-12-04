@@ -31,4 +31,12 @@
       elt.remove();
     }
   });
+  // Auto-scroll to the current app in the menu
+  const current_app_nav = document.querySelector(".current-app");
+  current_app_nav.scrollIntoView(true, {
+      block: 'center',
+      container: 'nearest',
+      inline: 'nearest',
+  });
+  window.scrollBy(0, -100);
 }());
