@@ -2484,7 +2484,11 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         )
         assertMessages(
             response,
-            [messages.Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la décision.")],
+            [
+                messages.Message(
+                    messages.SUCCESS, 'L’entreprise "Les petits jardins" a bien été notifiée de la décision.'
+                )
+            ],
         )
 
         evaluated_siae.refresh_from_db()
@@ -3203,7 +3207,11 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         )
         assertMessages(
             response,
-            [messages.Message(messages.SUCCESS, "Les petits jardins a bien été notifiée de la décision.")],
+            [
+                messages.Message(
+                    messages.SUCCESS, 'L’entreprise "Les petits jardins" a bien été notifiée de la décision.'
+                )
+            ],
         )
 
         evaluated_siae.refresh_from_db()
