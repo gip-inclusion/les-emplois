@@ -11,7 +11,7 @@ from tests.users.factories import PrescriberFactory
 class TestAutoLogin:
     @pytest.fixture(autouse=True)
     def setup_method(self, mocker):
-        mocker.patch("itou.www.nexus.views.generate_jwt", return_value="JWT")
+        mocker.patch("itoutils.nexus.views.generate_jwt", return_value="JWT")
 
     def test_login_required(self, client):
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"
