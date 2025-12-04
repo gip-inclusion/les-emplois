@@ -4,8 +4,8 @@ from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
+from itoutils.django.nexus.token import decode_token
 
-from itou.nexus.utils import decode_jwt
 from itou.users.enums import UserKind
 from itou.users.models import User
 
@@ -31,7 +31,7 @@ class AutoLoginMiddleware(MiddlewareMixin):
             [token] = auto_login
 
         try:
-            decoded_data = decode_jwt(token)
+            decoded_data = decode_token(token)
             email = decoded_data.get("email")
         except ValueError:
             logger.info("Invalid auto login token")
