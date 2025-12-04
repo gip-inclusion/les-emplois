@@ -46,7 +46,7 @@ class TestMarcheCompanyAPI:
 
     def test_list_companies(self):
         api_client = self.api_client()
-        company = CompanyFactory(siret="10000000000001", with_membership=True)
+        company = CompanyFactory(siret="10000000000001", with_membership=True, subject_to_iae_rules=True)
 
         with assertNumQueries(NUM_QUERIES):
             response = api_client.get(self.url, format="json")

@@ -45,7 +45,11 @@ class TestListEmployeeRecords:
     def setup_method(self, client):
         # User must be super user for UI first part (tmp)
         self.company = CompanyFactory(
-            name="Evil Corp.", membership__user__first_name="Elliot", with_membership=True, with_jobs=True
+            name="Evil Corp.",
+            membership__user__first_name="Elliot",
+            with_membership=True,
+            with_jobs=True,
+            subject_to_iae_rules=True,
         )
         self.user = self.company.members.get(first_name="Elliot")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(

@@ -86,6 +86,7 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
                 JobApplicationFactory(
                     state=state,
                     job_seeker=self.user,
+                    with_iae_eligibility_diagnosis=True,
                     eligibility_diagnosis=eligibility_diagnosis,
                     **kwargs,
                 )
@@ -166,7 +167,7 @@ class BaseProlongationFactory(factory.django.DjangoModelFactory):
     reason = ProlongationReason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
-    declared_by_siae = factory.SubFactory(CompanyFactory, with_membership=True)
+    declared_by_siae = factory.SubFactory(CompanyFactory, with_membership=True, subject_to_iae_rules=True)
     created_by = factory.SelfAttribute("declared_by")
 
 

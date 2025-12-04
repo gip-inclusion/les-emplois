@@ -142,7 +142,7 @@ class TestApprovalsListView:
 
     def test_approval_state_filters(self, client):
         now = timezone.localdate()
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
 
         expired_approval = ApprovalFactory(
             start_at=now - datetime.timedelta(days=3 * 365),
@@ -266,7 +266,7 @@ class TestApprovalsListView:
 
     def test_approval_expiry_filters(self, client):
         now = timezone.localdate()
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
 
         in_less_than_1_month = now + relativedelta(days=20)
         approval_1 = ApprovalFactory(
@@ -330,7 +330,7 @@ class TestApprovalsListView:
 
     @patch("itou.www.approvals_views.views.ApprovalListView.paginate_by", 1)
     def test_filter_default(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         # Make sure we have access to page 2
         ApprovalFactory.create_batch(
             ApprovalListView.paginate_by + 1,
@@ -362,7 +362,7 @@ class TestApprovalsListView:
 
     def test_approval_contract_filters(self, client, snapshot):
         now = timezone.localdate()
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
 
         a_year_ago = now - datetime.timedelta(days=365)
         less_than_3_months_ago = now - datetime.timedelta(days=85)
@@ -592,7 +592,7 @@ class TestApprovalsListView:
 
     def test_update_with_htmx(self, client):
         now = timezone.localdate()
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
 
         in_less_than_1_month = now + relativedelta(days=20)
         approval_1 = ApprovalFactory(
@@ -634,7 +634,7 @@ class TestApprovalsListView:
         assertSoupEqual(simulated_page, fresh_page)
 
     def test_update_display_kind_with_htmx(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
 
         approval = ApprovalFactory(
             with_jobapplication=True,
@@ -675,6 +675,7 @@ class TestApprovalsListView:
             use_employee_record=True,
             with_membership=True,
             source=Company.SOURCE_STAFF_CREATED,
+            subject_to_iae_rules=True,
         )
         ApprovalFactory(
             with_jobapplication=True,
@@ -689,7 +690,7 @@ class TestApprovalsListView:
 
 
 def test_list_and_table_empty_snapshot(client, snapshot):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     client.force_login(company.members.get())
     url = reverse("approvals:list")
 

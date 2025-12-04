@@ -32,7 +32,7 @@ class TestInstitutionEmailFactory:
         assert "Vous disposez de 4 semaines pour sélectionner votre échantillon." in email.subject
 
     def test_selected(self):
-        company = CompanyWith2MembershipsFactory()
+        company = CompanyWith2MembershipsFactory(evaluable_kind=True)
         evaluated_siae = EvaluatedSiaeFactory(siae=company, evaluation_campaign__evaluations_asked_at=timezone.now())
         email = SIAEEmailFactory(evaluated_siae).selected()
 

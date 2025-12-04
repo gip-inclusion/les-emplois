@@ -100,7 +100,7 @@ class TestAdminForm:
         if user_kind == UserKind.PRESCRIBER:
             return PrescriberFactory(membership=True, membership__organization__authorized=True)
         if kind == "iae":
-            return EmployerFactory(membership=True)
+            return EmployerFactory(membership=True, membership__company__subject_to_iae_rules=True)
         return EmployerFactory(membership=True, membership__company__kind=CompanyKind.GEIQ)
 
     def get_diag_model(self, kind):

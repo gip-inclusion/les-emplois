@@ -1,5 +1,8 @@
+import random
+
 from django.core.management import call_command
 
+from itou.companies.enums import CompanyKind
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, JobSeekerProfileFactory
@@ -46,7 +49,8 @@ def test_inconsistencies_with_slack_webhook(caplog, settings, mocker):
 
 def test_limit_choices_to_inconsistency_detection(caplog, settings, mocker):
     diag = GEIQEligibilityDiagnosisFactory(from_employer=True)
-    diag._meta.model.objects.filter(pk=diag.pk).update(author_geiq=CompanyFactory())
+    company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]))
+    diag._meta.model.objects.filter(pk=diag.pk).update(author_geiq=company)
     slack_mock = mocker.patch("itou.utils.management.commands.check_inconsistencies.send_slack_message")
     settings.SLACK_INCONSISTENCIES_WEBHOOK_URL = "http://slack.fake"
     call_command("check_inconsistencies")

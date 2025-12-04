@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 from unittest import mock
 
@@ -211,21 +212,21 @@ class TestCompanyModel:
         assert reverse("signup:company_select") in email.body
 
     def test_deactivation_queryset_methods(self):
-        company = CompanyFactory()
+        company = CompanyFactory(subject_to_iae_rules=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 1
         assert Company.objects.active_or_in_grace_period().count() == 1
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyFactory(convention__pending_grace_period=True)
+        company = CompanyFactory(subject_to_iae_rules=True, convention__pending_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 1
         company.delete()
         assert Company.objects.count() == 0
 
-        company = CompanyFactory(convention__after_grace_period=True)
+        company = CompanyFactory(subject_to_iae_rules=True, convention__after_grace_period=True)
         assert Company.objects.count() == 1
         assert Company.objects.active().count() == 0
         assert Company.objects.active_or_in_grace_period().count() == 0
@@ -331,9 +332,12 @@ class TestCompanyModel:
             company.add_or_activate_membership(non_employer)
 
     def test_siret_from_asp_source(self):
-        company = CompanyFactory(with_membership=True, source=Company.SOURCE_ASP)
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, source=Company.SOURCE_ASP)
         antenna = CompanyFactory(
-            with_membership=True, convention=company.convention, source=Company.SOURCE_USER_CREATED
+            subject_to_iae_rules=True,
+            with_membership=True,
+            convention=company.convention,
+            source=Company.SOURCE_USER_CREATED,
         )
 
         assert company.siret != antenna.siret
@@ -444,7 +448,7 @@ class TestCompanyQuerySet:
         assert not result.has_active_members
 
     def test_can_have_prior_action(self):
-        company = CompanyFactory()
+        company = CompanyFactory(kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]))
         assert company.can_have_prior_action is False
         geiq = CompanyFactory(kind=CompanyKind.GEIQ)
         assert geiq.can_have_prior_action is True

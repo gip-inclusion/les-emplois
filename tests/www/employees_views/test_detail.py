@@ -95,7 +95,7 @@ class TestEmployeeDetailView:
         assert pretty_indented(content) == snapshot(name="copy_public_id")
 
     def test_detail_view_no_job_application(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         # Make sure the job seeker infos can be edited by the siae member
         approval = ApprovalFactory(user__created_by=employer)
@@ -122,7 +122,7 @@ class TestEmployeeDetailView:
         assertContains(response, "Candidatures de ce salarié")
 
     def test_multiple_approvals(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         expired_approval = ApprovalFactory(expired=True)
         JobApplicationFactory(

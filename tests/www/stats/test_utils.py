@@ -19,7 +19,7 @@ from tests.utils.testing import get_request
 
 
 def test_can_view_stats_siae():
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     user = company.members.get()
 
     request = get_request(user)

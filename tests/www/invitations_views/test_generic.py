@@ -698,7 +698,7 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         assert user.company_set.count() == 2
 
     def test_inactive_siae(self, client):
-        company = CompanyFactory(convention__is_active=False, with_membership=True)
+        company = CompanyFactory(convention__is_active=False, with_membership=True, subject_to_iae_rules=True)
         invitation = EmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         client.force_login(user)

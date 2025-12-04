@@ -404,6 +404,7 @@ def test_accept_job_application_for_job_seeker_with_approval(admin_client):
     job_application = factories.JobApplicationFactory(
         job_seeker=job_seeker,
         state=JobApplicationState.PROCESSING,
+        to_company__subject_to_iae_rules=True,
     )
 
     url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))

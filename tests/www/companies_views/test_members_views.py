@@ -49,7 +49,10 @@ class TestMembers:
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot, monkeypatch):
         monkeypatch.setattr("itou.common_apps.organizations.views.MAX_PENDING_INVITATION", 1)
-        company = CompanyFactory()
+        company = CompanyFactory(
+            # snapshot includes financial_annex link only for iae kinds, always use an iae kind to prevent flaky test
+            subject_to_iae_rules=True,
+        )
         user = CompanyMembershipFactory(user__for_snapshot=True, company=company).user
         client.force_login(user)
         url = reverse("companies_views:members")

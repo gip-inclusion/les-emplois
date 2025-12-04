@@ -1005,12 +1005,14 @@ class TestCustomApprovalAdminViews:
         assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
 
         # When employee record creation is disabled for that job application
-        job_application = JobApplicationFactory(create_employee_record=False)
+        job_application = JobApplicationFactory(create_employee_record=False, to_company__subject_to_iae_rules=True)
         msg = inline.employee_record_status(job_application)
         assert msg == "Non proposé à la création"
 
         # When hiring start date is before employee record availability date
-        job_application = JobApplicationFactory(hiring_start_at=date(2021, 9, 26))
+        job_application = JobApplicationFactory(
+            hiring_start_at=date(2021, 9, 26), to_company__subject_to_iae_rules=True
+        )
         msg = inline.employee_record_status(job_application)
         assert msg == "Date de début du contrat avant l'interopérabilité"
 

@@ -3,7 +3,6 @@ import random
 import pytest
 from django.urls import reverse
 
-from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats.utils import STATS_PH_ORGANISATION_KIND_WHITELIST
@@ -13,12 +12,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_index_stats_for_employer(snapshot, client):
-    client.force_login(
-        EmployerFactory(
-            membership=True,
-            membership__company__kind=random.choice(CompanyKind.siae_kinds()),
-        )
-    )
+    client.force_login(EmployerFactory(membership=True, membership__company__subject_to_iae_rules=True))
 
     response = client.get(reverse("dashboard:index_stats"))
     assert pretty_indented(parse_response_to_soup(response, selector="#statistiques")) == snapshot()

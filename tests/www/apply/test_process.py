@@ -570,6 +570,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber_organisation=True,
+            to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
 
@@ -592,6 +593,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber_organisation=True,
+            to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
 
@@ -613,6 +615,7 @@ class TestProcessViews:
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certifiable_crit.eligibility_diagnosis,
             sent_by_authorized_prescriber_organisation=True,
+            to_company__subject_to_iae_rules=True,
         )
         prescriber = job_application.sender_prescriber_organization.members.get()
 
@@ -1129,7 +1132,7 @@ class TestProcessViews:
         )
         assertRedirects(response, refusal_reason_url_2)
         post_data = {
-            "refusal_reason": job_applications_enums.RefusalReason.NON_ELIGIBLE,
+            "refusal_reason": job_applications_enums.RefusalReason.HIRED_ELSEWHERE,
         }
         client.post(refusal_reason_url_2, data=post_data)
         assert client.session[refuse_session_name_2] == {
@@ -1139,7 +1142,7 @@ class TestProcessViews:
             },
             "application_ids": [job_application_2.pk],
             "reason": {
-                "refusal_reason": job_applications_enums.RefusalReason.NON_ELIGIBLE,
+                "refusal_reason": job_applications_enums.RefusalReason.HIRED_ELSEWHERE,
                 "refusal_reason_shared_with_job_seeker": False,
             },
         }
@@ -1651,6 +1654,7 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            to_company__subject_to_iae_rules=True,
         )
 
         assert job_application.state.is_processing
@@ -1712,6 +1716,7 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            to_company__subject_to_iae_rules=True,
         )
 
         assert job_application.state.is_processing
@@ -1783,6 +1788,7 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(with_address=True),
+            to_company__evaluable_kind=True,
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -1799,7 +1805,7 @@ class TestProcessViews:
     def test_eligibility_state_for_job_application(self, client):
         """The eligibility diagnosis page must only be accessible
         in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
             to_company=company, job_seeker=JobSeekerFactory(with_address=True)
@@ -2210,7 +2216,9 @@ class TestProcessAcceptViewsInWizard:
 
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
-        self.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
+        self.company = CompanyFactory(
+            with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut", subject_to_iae_rules=True
+        )
         self.job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
@@ -2777,7 +2785,7 @@ class TestProcessAcceptViewsInWizard:
         )
 
         # Now, another company wants to hire the job seeker
-        other_company = CompanyFactory(with_membership=True, with_jobs=True)
+        other_company = CompanyFactory(with_membership=True, with_jobs=True, subject_to_iae_rules=True)
         job_application = JobApplicationFactory(
             approval=approval,
             state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -2857,14 +2865,14 @@ class TestProcessAcceptViewsInWizard:
         )
         job_seeker = job_application.job_seeker
 
-        wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E")
+        wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E", subject_to_iae_rules=True)
         job_app_starting_earlier = JobApplicationFactory(
             job_seeker=job_seeker,
             state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company=wall_e,
             selected_jobs=wall_e.jobs.all(),
         )
-        vice_versa = CompanyFactory(with_membership=True, with_jobs=True, name="Vice-versa")
+        vice_versa = CompanyFactory(with_membership=True, with_jobs=True, name="Vice-versa", subject_to_iae_rules=True)
         job_app_starting_later = JobApplicationFactory(
             job_seeker=job_seeker,
             state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -3763,7 +3771,7 @@ class TestFillJobSeekerInfosForAccept:
             with_ban_geoloc_address=True,
             born_in_france=True,
         )
-        self.company = CompanyFactory(with_membership=True, kind=random.choice(list(CompanyKind)))
+        self.company = CompanyFactory(with_membership=True)
         if self.company.is_subject_to_iae_rules:
             IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         elif self.company.kind == CompanyKind.GEIQ:
@@ -4327,7 +4335,7 @@ class TestProcessTemplates:
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
-        self.job_application = JobApplicationFactory()
+        self.job_application = JobApplicationFactory(to_company__subject_to_iae_rules=True)
         self.employer = self.job_application.to_company.members.first()
         self.url_details = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
@@ -4989,7 +4997,10 @@ def test_prescriber_details_with_older_valid_approval(client, faker):
     # Ensure that the approval details are displayed for a prescriber
     # when the job seeker has a valid approval created on an older approval
     old_job_application = JobApplicationFactory(with_approval=True, hiring_start_at=faker.past_date(start_date="-3m"))
-    new_job_application = JobApplicationSentByPrescriberOrganizationFactory(job_seeker=old_job_application.job_seeker)
+    new_job_application = JobApplicationSentByPrescriberOrganizationFactory(
+        job_seeker=old_job_application.job_seeker,
+        to_company__subject_to_iae_rules=True,
+    )
     po_member = new_job_application.sender_prescriber_organization.members.first()
     client.force_login(po_member)
     response = client.get(

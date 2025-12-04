@@ -147,7 +147,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
-    kind = factory.fuzzy.FuzzyChoice(CompanyKind.siae_kinds())
+    kind = factory.fuzzy.FuzzyChoice(CompanyKind)
     name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")

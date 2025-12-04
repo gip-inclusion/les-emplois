@@ -17,7 +17,11 @@ class TestDisableEmployeeRecords:
     def setup_method(self):
         # User must be super user for UI first part (tmp)
         self.company = CompanyFactory(
-            name="Wanna Corp.", membership__user__first_name="Billy", with_membership=True, with_jobs=True
+            name="Wanna Corp.",
+            membership__user__first_name="Billy",
+            with_membership=True,
+            with_jobs=True,
+            subject_to_iae_rules=True,
         )
         self.user = self.company.members.get(first_name="Billy")
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)

@@ -20,13 +20,15 @@ def run_perms_middleware(user):
 class TestCanCreateSiaeAntenna:
     @pytest.mark.parametrize("admin", [True, False])
     def test_can_create_antenna(self, admin):
-        company = CompanyFactory(with_membership=True, membership__is_admin=admin)
+        company = CompanyFactory(with_membership=True, membership__is_admin=admin, subject_to_iae_rules=True)
         user = company.members.get()
         request = run_perms_middleware(user)
         assert can_create_antenna(request) is admin
 
     def test_siae_admin_without_convention_cannot_create_antenna(self):
-        company = CompanyFactory(with_membership=True, membership__is_admin=True, convention=None)
+        company = CompanyFactory(
+            with_membership=True, membership__is_admin=True, convention=None, subject_to_iae_rules=True
+        )
         user = company.members.get()
         request = run_perms_middleware(user)
         assert can_create_antenna(request) is False
