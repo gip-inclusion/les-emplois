@@ -1254,6 +1254,39 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, self.MONTHLY_INCOME_LABEL)
         assertNotContains(response, self.EITI_CONTRIBUTIONS_LABEL)
 
+    def test_ntt_display(self, client):
+        NTT_MARKUP = "<small>Numéro technique temporaire</small>"
+        employee_record = EmployeeRecord.objects.latest("created_at")
+
+        response = client.get(self.url)
+        # This test can have NIR starting with 1,2,3,4,7 or 8
+        if employee_record.job_application.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
+            # Then NIR and NTT (mandatory with such NIR)
+            assertContains(response, NTT_MARKUP)
+        else:
+            # NIR and not NTT
+            assertNotContains(response, NTT_MARKUP)
+
+            # NIR and NTT
+            employee_record.ntt = "1234567890ABC"  # No validation here, just display
+            employee_record.save()
+            response = client.get(self.url)
+            # For "classic" NIR, NTT is only displayed if no NIR is available
+            assertNotContains(response, NTT_MARKUP)
+
+        # No NIR and NTT
+        employee_record.job_application.job_seeker.jobseeker_profile.nir = ""
+        employee_record.job_application.job_seeker.jobseeker_profile.save()
+        response = client.get(self.url)
+        assertContains(response, NTT_MARKUP)
+        assertContains(response, f"<strong>{employee_record.ntt}</strong>", html=True)
+
+        # No NIR and no NTT
+        employee_record.ntt = None
+        employee_record.save()
+        response = client.get(self.url)
+        assertRedirects(response, reverse("employee_record_views:create", args=(self.job_application.pk,)))
+
     def test_transition_log(self, client):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
 

@@ -427,6 +427,14 @@
                       Pas de numéro de sécurité sociale
                   </strong>
               </li>
+              <li>
+                  <small>
+                      Numéro technique temporaire
+                  </small>
+                  <strong>
+                      1234567890ABC
+                  </strong>
+              </li>
           </ul>
           <hr class="my-4"/>
           <h2 class="h3">
