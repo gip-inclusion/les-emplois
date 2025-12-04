@@ -1040,6 +1040,42 @@ class JobSeekerProfile(models.Model):
         choices=EITIContributions.choices,
     )
 
+    ase_exit = models.BooleanField(
+        verbose_name="sortant de l'ASE (Aide Sociale à l'Enfance)",
+        db_default=False,
+        default=False,
+    )
+    isolated_parent = models.BooleanField(
+        verbose_name="parent isolé",
+        db_default=False,
+        default=False,
+    )
+    housing_issue = models.BooleanField(
+        verbose_name="personne sans hébergement ou hébergée ou ayant un parcours de rue",
+        db_default=False,
+        default=False,
+    )
+    refugee = models.BooleanField(
+        verbose_name="réfugié statutaire ou bénéficiaire de la protection subsidiaire",
+        db_default=False,
+        default=False,
+    )
+    detention_exit_or_ppsmj = models.BooleanField(
+        verbose_name="sortant de détention ou personne placée sous main de justice",
+        db_default=False,
+        default=False,
+    )
+    low_level_in_french = models.BooleanField(
+        verbose_name="maîtrise de la langue française inférieure au niveau A1",
+        db_default=False,
+        default=False,
+    )
+    mobility_issue = models.BooleanField(
+        verbose_name="problème de mobilité",
+        db_default=False,
+        default=False,
+    )
+
     # Jobseeker address in Hexa format
 
     hexa_lane_number = models.CharField(max_length=10, verbose_name="numéro de la voie", blank=True, default="")
