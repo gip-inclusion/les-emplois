@@ -412,23 +412,22 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         form.save()
         job_application.refresh_from_db()
 
-        if job_application.employee_record.exists():
-            # The EmployeeRecord() object exists, usually its status should be NEW or REJECTED
-            return HttpResponseRedirect(
-                reverse("employee_record_views:create_step_4", args=(job_application.id,), query=query)
-            )
+        employee_record_exists = job_application.employee_record.exists()
+        if not employee_record_exists:
+            # The EmployeeRecord() object doesn't exist, so we create one from the job application
+            try:
+                employee_record = EmployeeRecord.from_job_application(job_application)
+                employee_record.save()
+            except ValidationError as ex:
+                # If anything goes wrong during employee record creation, catch it and show error to the user
+                messages.error(
+                    request,
+                    f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
+                )
+            else:
+                employee_record_exists = True
 
-        # The EmployeeRecord() object doesn't exist, so we create one from the job application
-        try:
-            employee_record = EmployeeRecord.from_job_application(job_application)
-            employee_record.save()
-        except ValidationError as ex:
-            # If anything goes wrong during employee record creation, catch it and show error to the user
-            messages.error(
-                request,
-                f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
-            )
-        else:
+        if employee_record_exists:
             return HttpResponseRedirect(
                 reverse("employee_record_views:create_step_4", args=(job_application.id,), query=query)
             )
