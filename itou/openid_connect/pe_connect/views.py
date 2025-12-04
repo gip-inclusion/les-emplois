@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import urlencode
+from itoutils.urls import add_url_params
 
 from itou.external_data.models import ExternalDataImport
 from itou.external_data.tasks import huey_import_user_pe_data
@@ -28,7 +29,7 @@ from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEm
 from itou.openid_connect.utils import init_user_nir_from_session
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params, get_absolute_url
+from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger(__name__)

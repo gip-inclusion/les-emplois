@@ -6,6 +6,7 @@ from django.contrib import auth, messages
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -23,7 +24,6 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory

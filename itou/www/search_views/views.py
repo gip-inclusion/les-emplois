@@ -11,6 +11,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
+from itoutils.urls import add_url_params
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, JobSource, JobSourceTag
@@ -22,7 +23,6 @@ from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
-from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,

@@ -2,13 +2,13 @@ from urllib.parse import quote
 
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationState
-from itou.utils.urls import add_url_params
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory

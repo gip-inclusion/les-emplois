@@ -12,13 +12,13 @@ from django.utils.html import escape
 from django_otp.oath import TOTP
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users import enums as users_enums
 from itou.users.enums import IDENTITY_PROVIDER_SUPPORTED_USER_KIND, IdentityProvider, UserKind
 from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params
 from itou.www.login.constants import ITOU_SESSION_JOB_SEEKER_LOGIN_EMAIL_KEY
 from itou.www.login.forms import ItouLoginForm
 from itou.www.login.views import ExistingUserLoginView

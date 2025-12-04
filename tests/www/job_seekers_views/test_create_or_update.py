@@ -8,6 +8,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
@@ -16,7 +17,7 @@ from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
-from itou.utils.urls import add_url_params, get_zendesk_form_url
+from itou.utils.urls import get_zendesk_form_url
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim, create_test_cities

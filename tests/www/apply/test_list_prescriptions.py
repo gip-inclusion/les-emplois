@@ -8,6 +8,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
@@ -16,7 +17,6 @@ from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import Title
-from itou.utils.urls import add_url_params
 from itou.www.apply.views.list_views import JobApplicationOrder, JobApplicationsDisplayKind
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
