@@ -1,10 +1,11 @@
-from urllib.parse import SplitResult, parse_qsl, urlsplit
+from urllib.parse import SplitResult, urlsplit
 
 from django.conf import settings
 from django.http import QueryDict
 from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.utils.safestring import mark_safe
+from itoutils.urls import add_url_params
 
 from itou.utils.constants import ITOU_HELP_CENTER_URL
 from itou.utils.zendesk import serialize_zendesk_params
@@ -51,34 +52,6 @@ def get_external_link_markup(url, text):
         f'<a href="{url}" rel="noopener" target="_blank" class="has-external-link" '
         f'aria-label="Ouverture dans un nouvel onglet">{text}</a>'
     )
-
-
-def add_url_params(url: str, params: dict[str, str]) -> str:
-    """Add GET params to provided URL being aware of existing.
-
-    :param url: string of target URL
-    :param params: dict containing requested params to be added
-    :return: string with updated URL
-
-    >> url = 'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations
-    >> new_params = {'test': 'value' }
-    >> add_url_params(url, new_params)
-    'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations&test=value
-    """
-
-    # Remove params with None values
-    params = {key: params[key] for key in params if params[key] is not None}
-    try:
-        url_parts = urlsplit(url)
-    except ValueError:
-        # URL is invalid so it's useless to continue.
-        return None
-    query = dict(parse_qsl(url_parts.query))
-    query.update(params)
-
-    new_url = url_parts._replace(query=urlencode(query)).geturl()
-
-    return new_url
 
 
 def get_url_param_value(url: str, key: str) -> str:

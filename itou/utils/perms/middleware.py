@@ -3,6 +3,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django_otp import user_has_device
+from itoutils.urls import add_url_params
 
 from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
@@ -10,7 +11,6 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params
 from itou.www.logout.enums import LogoutWarning
 
 

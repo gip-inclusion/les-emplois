@@ -9,11 +9,11 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import classproperty
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.openid_connect.pro_connect import constants
 from itou.users.enums import IdentityProvider
-from itou.utils.urls import add_url_params
 from tests.utils.testing import reload_module
 
 

@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
+from itoutils.urls import add_url_params
 
 from itou.openid_connect.errors import redirect_with_error_sso_email_conflict_on_registration
 from itou.openid_connect.models import (
@@ -28,7 +29,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url, get_zendesk_form_url
+from itou.utils.urls import get_absolute_url, get_safe_url, get_zendesk_form_url
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 
 

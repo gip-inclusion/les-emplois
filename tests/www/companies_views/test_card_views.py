@@ -4,11 +4,11 @@ import pytest
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils.html import escape
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import ContractType
 from itou.jobs.models import Appellation
-from itou.utils.urls import add_url_params
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
