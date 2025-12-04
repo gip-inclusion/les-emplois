@@ -343,7 +343,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         del self.request.session[self.sessionkey]
         if email := self._build_notification_email(evaluated_siae, sanctions):
             send_email_messages([email])
-            messages.success(self.request, f"{evaluated_siae} a bien été notifiée de la décision.")
+            messages.success(self.request, f'L’entreprise "{evaluated_siae}" a bien été notifiée de la décision.')
         return super().form_valid(form)
 
     def get_success_url(self):
