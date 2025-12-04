@@ -28,10 +28,10 @@
 {% endblock %}
 
 {% block content %}
-    <section class="s-section mb-0">
+    <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="col-12">
+                <div class="s-section__col col-12">
                     <h2 class="mb-3 mb-md-4">Service{{ results.paginator.count|pluralizefr }}</h2>
                     <div class="d-block w-100">
                         <form hx-get="{% url 'search:services_results' %}"
@@ -60,7 +60,7 @@
                 </div>
             </div>
             <div class="s-section__row row">
-                <div class="col-12">
+                <div class="s-section__col col-12">
                     {% include "search/services/includes/summary.html" %}
                     {% include "search/services/includes/results.html" %}
                 </div>
