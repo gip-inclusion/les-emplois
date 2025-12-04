@@ -1,6 +1,5 @@
 import datetime
 import itertools
-import random
 import uuid
 from urllib.parse import parse_qs, unquote, urlsplit
 
@@ -242,9 +241,7 @@ class TestProcessListSiae:
 
     def test_list_for_siae_filtered_by_state_prior_to_hire(self, client):
         PRIOR_TO_HIRE_LABEL = "Action préalable à l’embauche</label>"
-        company = CompanyFactory(
-            with_membership=True, kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ])
-        )
+        company = CompanyFactory(with_membership=True, not_geiq_kind=True)
         employer = company.members.first()
 
         JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
@@ -1595,8 +1592,7 @@ def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
 
     company = CompanyFactory(
         with_membership=True,
-        # GEIQ has more statuses in tooltip
-        kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
+        not_geiq_kind=True,  # GEIQ has more statuses in tooltip
     )
     employer = company.members.first()
 
@@ -1808,8 +1804,7 @@ def test_list_for_siae_select_applications_batch_process(client, snapshot):
 def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
     company = CompanyFactory(
         with_membership=True,
-        # GEIQ has more statuses in tooltip
-        kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
+        not_geiq_kind=True,  # GEIQ has more statuses in tooltip
     )
     employer = company.members.first()
 
