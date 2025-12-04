@@ -117,6 +117,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             to_company__name="Mon SIAE",
             state=JobApplicationState.ACCEPTED,
+            with_approval=True,
             approval=approval,
             job_seeker=approval.user,
             sent_by_authorized_prescriber_organisation=True,
@@ -232,6 +233,7 @@ class TestApprovalDetailView:
         # As employer without modification rights: an other SIAE handles the approval now
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
+            with_approval=True,
             approval=approval,
             job_seeker=job_application.job_seeker,
         )
@@ -490,6 +492,7 @@ class TestApprovalDetailView:
         # New accepted job application: the approval is now handled by an other SIAE
         JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
+            with_approval=True,
             approval=approval,
             job_seeker=job_application.job_seeker,
         )
@@ -613,6 +616,7 @@ def test_remove_approval_button(client, snapshot):
         user__last_name="de Winter",
         company__id=999999,
         company__name="ACI de la Rochelle",
+        company__subject_to_iae_rules=True,
     )
     job_application = JobApplicationFactory(
         hiring_start_at=datetime.date(2021, 3, 1),
@@ -629,6 +633,7 @@ def test_remove_approval_button(client, snapshot):
         to_company=membership.company,
         job_seeker=job_application.job_seeker,
         # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
+        with_approval=True,
         approval=job_application.approval,
         state=JobApplicationState.ACCEPTED,
     )
@@ -666,6 +671,7 @@ def test_remove_approval_button(client, snapshot):
     JobApplicationFactory(
         state=JobApplicationState.ACCEPTED,
         job_seeker=job_application.job_seeker,
+        with_approval=True,
         approval=job_application.approval,
         hiring_start_at=suspension.end_at + datetime.timedelta(days=2),
     )

@@ -85,7 +85,7 @@ SIAE_JOB_APPLICATION_LIST_REFUSED_HTML = (
 
 class TestSiaeJobApplicationListView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         self.user = membership.user
         self.siae = membership.company
 
@@ -720,7 +720,7 @@ class TestSiaeJobApplicationListView:
 
 class TestSiaeSelectCriteriaView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         self.user = membership.user
         self.siae = membership.company
 
@@ -970,7 +970,7 @@ class TestSiaeSelectCriteriaView:
 
 class TestSiaeUploadDocsView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         self.user = membership.user
         self.siae = membership.company
 
@@ -1185,7 +1185,7 @@ class TestSiaeUploadDocsView:
 
 class TestSiaeSubmitProofsView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         self.user = membership.user
         self.company = membership.company
 
@@ -1348,7 +1348,7 @@ class TestSiaeSubmitProofsView:
 
 class TestSiaeCalendarView:
     def setup_method(self):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         self.user = membership.user
         self.siae = membership.company
 
@@ -1398,7 +1398,7 @@ class TestSiaeCalendarView:
 
 class TestSiaeEvaluatedSiaeDetailView:
     def test_access(self, client):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         user = membership.user
         siae = membership.company
 
@@ -1421,7 +1421,7 @@ class TestSiaeEvaluatedSiaeDetailView:
         assert response.status_code == 200
 
     def test_with_certified_criteria(self, client):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         user = membership.user
         siae = membership.company
         job_seeker = JobSeekerFactory()
@@ -1495,7 +1495,7 @@ class TestSiaeEvaluatedSiaeDetailView:
 
 class TestSiaeEvaluatedJobApplicationView:
     def test_access(self, client):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         user = membership.user
         siae = membership.company
 
@@ -1529,7 +1529,7 @@ class TestSiaeEvaluatedJobApplicationView:
         assertContains(response, DDETS_refusal_comment_txt)
 
     def test_accepted_from_certified_criteria(self, client):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         user = membership.user
         siae = membership.company
         job_seeker = JobSeekerFactory()

@@ -44,11 +44,17 @@ from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comm
 
 # fixme vincentporte : convert this method into factory
 def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_siae_kwargs=None):
+    evaluated_siae = EvaluatedSiaeFactory(
+        evaluation_campaign=evaluation_campaign, **(extra_evaluated_siae_kwargs or {})
+    )
+    siae = evaluated_siae.siae
+
     administrative_criteria = AdministrativeCriteria.objects.get(pk=1)
     eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
-        from_employer=True, criteria_kinds=[administrative_criteria.kind]
+        from_employer=True,
+        criteria_kinds=[administrative_criteria.kind],
+        author_siae=siae,
     )
-    siae = eligibility_diagnosis.author_siae
 
     job_application = JobApplicationFactory(
         with_approval=True,
@@ -58,9 +64,6 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_
         hiring_start_at=timezone.localdate() - relativedelta(months=2),
     )
 
-    evaluated_siae = EvaluatedSiaeFactory(
-        evaluation_campaign=evaluation_campaign, siae=siae, **(extra_evaluated_siae_kwargs or {})
-    )
     evaluated_job_application = EvaluatedJobApplicationFactory(
         job_application=job_application, evaluated_siae=evaluated_siae
     )

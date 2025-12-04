@@ -15,7 +15,7 @@ from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, p
 
 
 def test_display_in_sidebar_and_tab(client, snapshot):
-    company = CompanyWith2MembershipsFactory()
+    company = CompanyWith2MembershipsFactory(subject_to_iae_rules=True)
     job_app = JobApplicationFactory(to_company=company, with_iae_eligibility_diagnosis=True)
     url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
     client.force_login(company.members.first())
@@ -76,6 +76,7 @@ def test_add_comment_htmx(client, snapshot, caplog):
         membership1__user__last_name="Abolivier",
         membership2__user__first_name="Bob",
         membership2__user__last_name="Banana",
+        subject_to_iae_rules=True,
     )
     user = company.members.last()
 

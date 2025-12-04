@@ -265,7 +265,9 @@ class TestApply:
     )
     def test_blocked_application(self, client, view_name, post_data):
         # It's possible that for example the user loaded this page before spontaneous applications were closed.
-        company = CompanyFactory(with_jobs=True, with_membership=True, block_job_applications=True)
+        company = CompanyFactory(
+            with_jobs=True, with_membership=True, block_job_applications=True, subject_to_iae_rules=True
+        )
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
@@ -286,7 +288,9 @@ class TestApply:
         ],
     )
     def test_spontaneous_application_blocked(self, client, view_name, post_data):
-        company = CompanyFactory(with_jobs=True, with_membership=True, spontaneous_applications_open_since=None)
+        company = CompanyFactory(
+            with_jobs=True, with_membership=True, spontaneous_applications_open_since=None, subject_to_iae_rules=True
+        )
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
         apply_session = fake_session_initialization(client, company, job_seeker, {"selected_jobs": []})
@@ -308,7 +312,7 @@ class TestApply:
     )
     def test_recruitment_closed_on_position(self, client, view_name, post_data):
         # No block is active, but one of the selected jobs is no longer active.
-        company = CompanyFactory(with_jobs=True, with_membership=True)
+        company = CompanyFactory(with_jobs=True, with_membership=True, subject_to_iae_rules=True)
         job_seeker = JobSeekerFactory()
         client.force_login(PrescriberFactory(membership__organization__authorized=True))
 
@@ -471,7 +475,7 @@ class TestHire:
             assert response.status_code == 404
 
     def test_403_when_trying_to_hire_a_jobseeker_with_invalid_approval(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         job_seeker = user_with_approval_in_waiting_period()
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, job_seeker, {})
@@ -2726,7 +2730,9 @@ class TestDirectHireFullProcess:
         assert response.status_code == 403
 
     def test_hire_as_siae_with_suspension_sanction(self, client):
-        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
+        company = CompanyFactory(
+            romes=("N1101", "N1105"), with_membership=True, with_jobs=True, subject_to_iae_rules=True
+        )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=company),
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
@@ -2748,7 +2754,9 @@ class TestDirectHireFullProcess:
     def test_hire_as_company(self, client, snapshot):
         """Apply as company (and create new job seeker)"""
 
-        company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
+        company = CompanyFactory(
+            romes=("N1101", "N1105"), with_membership=True, with_jobs=True, subject_to_iae_rules=True
+        )
         reset_url_dashboard = reverse("dashboard:index")
 
         user = company.members.first()
@@ -5507,7 +5515,7 @@ class TestFillJobSeekerInfosForHire:
         )
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
-        self.company = CompanyFactory(with_membership=True, kind=random.choice(list(CompanyKind)))
+        self.company = CompanyFactory(with_membership=True)
         if self.company.is_subject_to_iae_rules:
             IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         elif self.company.kind == CompanyKind.GEIQ:

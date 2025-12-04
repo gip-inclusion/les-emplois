@@ -5,8 +5,8 @@ from tests.companies.factories import CompanyFactory
 
 def test_address_fields():
     vannes = create_city_vannes()
-    parent = CompanyFactory(source="ASP", post_code=vannes.post_codes[0])
-    antenna = CompanyFactory(source="USER_CREATED", convention=parent.convention)
+    parent = CompanyFactory(source="ASP", post_code=vannes.post_codes[0], subject_to_iae_rules=True)
+    antenna = CompanyFactory(source="USER_CREATED", convention=parent.convention, subject_to_iae_rules=True)
     assert TABLE.get(column_name="adresse_ligne_1", input=antenna) == parent.address_line_1
     assert TABLE.get(column_name="adresse_ligne_2", input=antenna) == parent.address_line_2
     assert TABLE.get(column_name="code_postal", input=antenna) == parent.post_code
@@ -18,8 +18,10 @@ def test_address_fields():
 
 def test_address_fields_of_antenna():
     vannes = create_city_vannes()
-    parent = CompanyFactory(source="ASP")
-    antenna = CompanyFactory(source="USER_CREATED", convention=parent.convention, post_code=vannes.post_codes[0])
+    parent = CompanyFactory(source="ASP", subject_to_iae_rules=True)
+    antenna = CompanyFactory(
+        source="USER_CREATED", convention=parent.convention, post_code=vannes.post_codes[0], subject_to_iae_rules=True
+    )
     assert TABLE.get(column_name="adresse_ligne_1_c1", input=antenna) == antenna.address_line_1
     assert TABLE.get(column_name="adresse_ligne_2_c1", input=antenna) == antenna.address_line_2
     assert TABLE.get(column_name="code_postal_c1", input=antenna) == antenna.post_code

@@ -24,7 +24,7 @@ class TestLaborExplanationForm:
 
 class TestAdministrativeCriteriaEvaluationForm:
     def test_job_application(self):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, evaluable_kind=True)
         user = company.members.first()
 
         job_seeker = JobSeekerFactory()

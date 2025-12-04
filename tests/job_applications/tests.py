@@ -638,10 +638,8 @@ class TestJobApplicationQuerySet:
         assert qs.first().jobseeker_eligibility_diagnosis is None
 
     def test_with_eligibility_diagnosis_criterion(self):
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, created_at=timezone.now())
-        job_app = JobApplicationFactory(
-            with_approval=True, job_seeker=diagnosis.job_seeker, eligibility_diagnosis=diagnosis
-        )
+        job_app = JobApplicationFactory(with_approval=True)
+        diagnosis = job_app.eligibility_diagnosis
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -1359,6 +1357,7 @@ class TestJobApplicationNotifications:
             job_seeker=job_seeker,
             state=JobApplicationState.ACCEPTED,
             approval=approval,
+            to_company__subject_to_iae_rules=True,
         )
         accepted_by = job_application.to_company.members.first()
         email = job_application.notifications_deliver_approval(accepted_by).build()
@@ -1393,6 +1392,7 @@ class TestJobApplicationNotifications:
             state=JobApplicationState.ACCEPTED,
             approval=approval,
             hiring_end_at=None,
+            to_company__subject_to_iae_rules=True,
         )
         accepted_by = job_application.to_company.members.first()
         email = job_application.notifications_deliver_approval(accepted_by).build()
@@ -1432,6 +1432,7 @@ class TestJobApplicationNotifications:
             state=JobApplicationState.PROCESSING,
             approval=approval,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            to_company__subject_to_iae_rules=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
         with django_capture_on_commit_callbacks(execute=True):
@@ -1656,7 +1657,9 @@ class TestJobApplicationWorkflow:
         job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1677,7 +1680,9 @@ class TestJobApplicationWorkflow:
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1704,7 +1709,9 @@ class TestJobApplicationWorkflow:
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
+            job_seeker=job_seeker,
+            state=JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1726,7 +1733,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+            with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1752,7 +1759,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+            with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1775,7 +1782,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+            with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1923,6 +1930,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=user,
             state=JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
         )
         with pytest.raises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1949,7 +1957,11 @@ class TestJobApplicationWorkflow:
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=user)
         assert diagnosis.is_valid
 
-        job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=user,
+            state=JobApplicationState.PROCESSING,
+            to_company__subject_to_iae_rules=True,
+        )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
@@ -2015,7 +2027,7 @@ class TestJobApplicationWorkflow:
         """
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
-            to_company__kind=CompanyKind.EI,
+            to_company__subject_to_iae_rules=True,
             job_seeker__with_pole_emploi_id=True,
         )
 
@@ -2181,7 +2193,7 @@ class TestJobApplicationXlsxExport:
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
-            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+            with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
         request = RequestFactory()
@@ -2232,7 +2244,7 @@ class TestJobApplicationXlsxExport:
                 job_seeker=job_seeker,
                 state=JobApplicationState.PROCESSING,
                 selected_jobs=Appellation.objects.all(),
-                eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+                with_iae_eligibility_diagnosis=True,
             )
             job_application.accept(user=job_application.to_company.members.first())
         request = RequestFactory()
@@ -2389,7 +2401,7 @@ class TestJobApplicationXlsxExport:
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
-            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
+            with_iae_eligibility_diagnosis=True,
         )
         prescriber = job_application.sender
         assert prescriber.is_prescriber

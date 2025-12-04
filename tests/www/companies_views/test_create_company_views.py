@@ -21,7 +21,7 @@ class TestCreateCompanyView:
         return escape(f"Le SIRET doit commencer par le SIREN {company.siren}")
 
     def test_create_non_preexisting_company_outside_of_siren_fails(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
 
         client.force_login(user)
@@ -57,7 +57,7 @@ class TestCreateCompanyView:
         assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
     def test_create_preexisting_company_outside_of_siren_fails(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
 
         client.force_login(user)
@@ -93,7 +93,7 @@ class TestCreateCompanyView:
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     def test_cannot_create_company_with_same_siret_and_same_kind(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
 
         client.force_login(user)
@@ -127,7 +127,7 @@ class TestCreateCompanyView:
     def test_cannot_create_company_with_same_siret_and_different_kind(self, client, mocker):
         mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
 
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         company.kind = CompanyKind.ETTI
         company.save()
         user = company.members.first()
@@ -160,7 +160,7 @@ class TestCreateCompanyView:
     def test_cannot_create_company_with_same_siren_and_different_kind(self, client, mocker):
         mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
 
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         company.kind = CompanyKind.ETTI
         company.save()
         user = company.members.first()
@@ -199,7 +199,7 @@ class TestCreateCompanyView:
             "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
         )
 
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
 
         client.force_login(user)

@@ -73,7 +73,7 @@ class TestImportSiaeManagementCommands:
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
-        company = CompanyFactory(source=Company.SOURCE_ASP)
+        company = CompanyFactory(source=Company.SOURCE_ASP, subject_to_iae_rules=True)
         assert company.is_active
         assert not get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
 
@@ -300,7 +300,7 @@ class TestCouldSiaeBeDeleted:
         # Check that eligibility diagnoses made by SIAE are blocking its deletion
 
         # No eligibility diagnosis linked
-        company = CompanyWith2MembershipsFactory()
+        company = CompanyWith2MembershipsFactory(subject_to_iae_rules=True)
         assert could_siae_be_deleted(company) is True
 
         # An eligibility diagnosis without related approval

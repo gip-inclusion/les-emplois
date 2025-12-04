@@ -68,7 +68,10 @@ def test_job_seeker_allowed(client, snapshot):
 
 
 def test_employer_create_update_notification_settings(client, snapshot):
-    employer = EmployerFactory(membership=True)
+    employer = EmployerFactory(
+        membership=True,
+        membership__company__subject_to_iae_rules=True,  # Add some notifications, fix to prevent flaky test
+    )
     company = employer.company_set.first()
     client.force_login(employer)
     url = reverse("dashboard:edit_user_notifications")

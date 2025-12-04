@@ -12,7 +12,7 @@ from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_r
 
 
 def test_wizard(snapshot, client):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     approval = ApprovalFactory(for_snapshot=True)
     job_application = JobApplicationFactory(
         to_company=company,
@@ -113,7 +113,7 @@ def test_wizard(snapshot, client):
 
 
 def test_employee_list(client):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     job_application_1 = JobApplicationFactory(to_company=company, with_approval=True)
     # Another one with the same job seeker to ensure we don't have duplicates
     JobApplicationFactory(
@@ -152,7 +152,7 @@ def test_employee_list(client):
 
 
 def test_choose_employee_step_with_a_bad_choice(client):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     job_application = JobApplicationFactory(
         to_company=company,
         to_company__use_employee_record=True,

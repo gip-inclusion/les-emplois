@@ -93,7 +93,9 @@ class TestDashboardView:
         assert pretty_indented(parse_response_to_soup(response, selector=".c-title__main")) == snapshot
 
     def test_user_with_inactive_company_can_still_login_during_grace_period(self, client):
-        company = CompanyFactory(with_membership=True, convention__pending_grace_period=True)
+        company = CompanyFactory(
+            with_membership=True, convention__pending_grace_period=True, subject_to_iae_rules=True
+        )
         user = EmployerFactory()
         company.members.add(user)
         client.force_login(user)
@@ -103,7 +105,7 @@ class TestDashboardView:
         assert response.status_code == 200
 
     def test_user_with_inactive_company_cannot_login_after_grace_period(self, client):
-        company = CompanyFactory(with_membership=True, convention__after_grace_period=True)
+        company = CompanyFactory(with_membership=True, convention__after_grace_period=True, subject_to_iae_rules=True)
         user = EmployerFactory()
         company.members.add(user)
         client.force_login(user)
@@ -209,7 +211,7 @@ class TestDashboardView:
         assertContains(response, geiq_url)
 
     def test_dashboard_applications_count(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         JobApplicationFactory(to_company=company)
         JobApplicationFactory(to_company=company, archived_at=timezone.now())
         JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED)
@@ -426,7 +428,7 @@ class TestDashboardView:
         assertNotContains(response, evaluated_siae_list_url)
 
     def test_dashboard_siae_evaluation_campaign_notifications(self, client, snapshot):
-        membership = CompanyMembershipFactory()
+        membership = CompanyMembershipFactory(company__evaluable_kind=True)
         # Unique institution to avoid constraints failures
         evaluating_institution = InstitutionFactory(kind=InstitutionKind.DDETS_IAE)
         evaluated_siae_with_final_decision = EvaluatedSiaeFactory(

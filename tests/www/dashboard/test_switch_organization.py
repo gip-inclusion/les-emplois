@@ -57,7 +57,7 @@ class TestSwitchCompany:
         assert response.context["request"].current_organization == related_company
 
     def test_can_still_switch_to_inactive_company_during_grace_period(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
         client.force_login(user)
 
@@ -80,11 +80,11 @@ class TestSwitchCompany:
         assert response.context["request"].current_organization == related_company
 
     def test_cannot_switch_to_inactive_company_after_grace_period(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
         client.force_login(user)
 
-        related_company = CompanyFactory(convention__after_grace_period=True)
+        related_company = CompanyFactory(convention__after_grace_period=True, subject_to_iae_rules=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")

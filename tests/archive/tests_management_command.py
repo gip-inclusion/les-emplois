@@ -1084,6 +1084,7 @@ class TestAnonymizeJobseekersManagementCommand:
         for state in [JobApplicationState.ACCEPTED, JobApplicationState.POSTPONED]:
             JobApplicationFactory(
                 job_seeker=iae_diagnosis_from_prescriber_with_several_job_applications.job_seeker,
+                to_company__subject_to_iae_rules=True,
                 eligibility_diagnosis=iae_diagnosis_from_prescriber_with_several_job_applications,
                 created_at=timezone.make_aware(datetime.datetime(2021, 6, 17)),
                 state=state,

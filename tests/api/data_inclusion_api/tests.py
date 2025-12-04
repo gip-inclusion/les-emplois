@@ -81,10 +81,13 @@ class TestDataInclusionSiaeStructure:
         ]
 
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
+        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
+        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True, convention=company_1.convention)
         company_3 = CompanyFactory(
-            siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000000003",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_USER_CREATED,
+            convention=company_1.convention,
         )
 
         with assertNumQueries(NUM_QUERIES):
@@ -113,10 +116,18 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_antenne_with_user_created_and_999(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
+        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
+        company_2 = CompanyFactory(
+            siret="10000000000002",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_ASP,
+            convention=company_1.convention,
+        )
         company_3 = CompanyFactory(
-            siret="10000000099991", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000099991",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_USER_CREATED,
+            convention=company_1.convention,
         )
 
         num_queries = NUM_QUERIES
@@ -193,7 +204,7 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_inactive_excluded(self):
-        CompanyFactory(convention__is_active=False)
+        CompanyFactory(subject_to_iae_rules=True, convention__is_active=False)
 
         num_queries = NUM_QUERIES
         num_queries -= 1  # no siae to fetch
@@ -323,10 +334,13 @@ class TestDataInclusionSiaeStructureOldAuth:
         ]
 
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
+        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
+        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True, convention=company_1.convention)
         company_2 = CompanyFactory(
-            siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000000003",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_USER_CREATED,
+            convention=company_1.convention,
         )
 
         with assertNumQueries(OLD_NUM_QUERIES):
@@ -355,10 +369,18 @@ class TestDataInclusionSiaeStructureOldAuth:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_antenne_with_user_created_and_999(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
+        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
+        company_2 = CompanyFactory(
+            siret="10000000000002",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_ASP,
+            convention=company_1.convention,
+        )
         company_3 = CompanyFactory(
-            siret="10000000099991", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000099991",
+            subject_to_iae_rules=True,
+            source=Company.SOURCE_USER_CREATED,
+            convention=company_1.convention,
         )
 
         num_queries = OLD_NUM_QUERIES
@@ -435,7 +457,7 @@ class TestDataInclusionSiaeStructureOldAuth:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_inactive_excluded(self):
-        CompanyFactory(convention__is_active=False)
+        CompanyFactory(subject_to_iae_rules=True, convention__is_active=False)
 
         num_queries = OLD_NUM_QUERIES
         num_queries -= 1  # no siae to fetch

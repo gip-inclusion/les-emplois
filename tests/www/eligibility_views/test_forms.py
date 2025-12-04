@@ -54,7 +54,7 @@ class TestAdministrativeCriteriaForm:
         assert form.cleaned_data == expected_cleaned_data
 
     def test_criteria_fields(self):
-        company = CompanyFactory()
+        company = CompanyFactory(subject_to_iae_rules=True)
 
         form = AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company)
         assert AdministrativeCriteria.objects.all().count() == len(form.fields)
@@ -160,13 +160,13 @@ class TestAdministrativeCriteriaForm:
         assert form.ERROR_LONG_TERM_JOB_SEEKER in form.errors["__all__"]
 
     def test_no_required_criteria_for_prescriber_with_authorized_organization(self):
-        company = CompanyFactory()
+        company = CompanyFactory(subject_to_iae_rules=True)
 
         assert not AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data={}).is_valid()
         assert AdministrativeCriteriaForm(is_authorized_prescriber=True, siae=company, data={}).is_valid()
 
     def test_no_required_criteria_when_no_siae(self):
-        company = CompanyFactory()
+        company = CompanyFactory(subject_to_iae_rules=True)
 
         assert not AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=company, data={}).is_valid()
         assert AdministrativeCriteriaForm(is_authorized_prescriber=False, siae=None, data={}).is_valid()
@@ -174,7 +174,7 @@ class TestAdministrativeCriteriaForm:
 
 class TestAdministrativeCriteriaEvaluationForm:
     def test_job_application(self):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
 
         job_seeker = JobSeekerFactory()

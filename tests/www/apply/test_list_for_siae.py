@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import random
 import uuid
 from urllib.parse import parse_qs, unquote, urlsplit
 
@@ -43,7 +44,7 @@ class TestProcessListSiae:
     SELECTED_JOBS = "selected_jobs"
 
     def test_list_for_siae(self, client, snapshot):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         city = create_city_saint_andre()
@@ -133,7 +134,7 @@ class TestProcessListSiae:
         assert len(response.context["job_applications_page"].object_list) == 3
 
     def test_list_for_siae_show_criteria(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -184,7 +185,7 @@ class TestProcessListSiae:
         assertNotContains(response, self.SELECTED_JOBS)
 
     def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self, client, subtests):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -241,7 +242,9 @@ class TestProcessListSiae:
 
     def test_list_for_siae_filtered_by_state_prior_to_hire(self, client):
         PRIOR_TO_HIRE_LABEL = "Action préalable à l’embauche</label>"
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(
+            with_membership=True, kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ])
+        )
         employer = company.members.first()
 
         JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
@@ -378,7 +381,7 @@ class TestProcessListSiae:
         assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
     def test_list_for_siae_filtered_by_pass_state(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         today = timezone.localdate()
@@ -441,7 +444,7 @@ class TestProcessListSiae:
         assert response.context["job_applications_page"].object_list == [jobapp_with_expired_pass]
 
     def test_list_for_siae_filtered_by_eligibility_state(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         job_app = JobApplicationFactory(to_company=company)
@@ -516,7 +519,7 @@ class TestProcessListSiae:
         assert set(response.context["job_applications_page"].object_list) == set([job_app, _another_job_app])
 
     def test_list_for_siae_filtered_by_administrative_criteria(self, client):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
         client.force_login(employer)
 
@@ -583,7 +586,7 @@ class TestProcessListSiae:
 
     @freeze_time("2025-03-13")
     def test_list_for_siae_filters_query(self, client, snapshot):
-        company = CompanyFactory(with_membership=True)
+        company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         employer = company.members.first()
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -686,7 +689,7 @@ def test_list_for_siae_message_when_company_got_new_or_processing_or_postponed_a
 
 def test_list_for_siae_no_apply_button(client):
     APPLY_TXT = "Enregistrer une candidature"
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     client.force_login(company.members.get())
     response = client.get(reverse("apply:list_for_siae"))
     assertContains(response, APPLY_TXT)
@@ -698,8 +701,6 @@ def test_list_for_siae_no_apply_button(client):
 
 
 def test_list_for_siae_filter_for_different_kind(client, snapshot):
-    company = CompanyFactory(with_membership=True)
-    client.force_login(company.members.get())
     kind_snapshot = {
         CompanyKind.EA: "non_iae",
         CompanyKind.EATT: "non_iae",
@@ -712,8 +713,8 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         CompanyKind.ETTI: "iae",
     }
     for kind in CompanyKind:
-        company.kind = kind
-        company.save(update_fields=("kind", "updated_at"))
+        company = CompanyFactory(with_membership=True, kind=kind)
+        client.force_login(company.members.get())
         response = client.get(reverse("apply:list_for_siae"), {"display": JobApplicationsDisplayKind.LIST})
         assert response.status_code == 200
         filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
@@ -817,7 +818,7 @@ def test_list_for_siae_htmx_filters(client):
 
 
 def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     employer = company.members.first()
 
     diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
@@ -860,7 +861,7 @@ def test_table_for_siae_hide_criteria_for_non_SIAE_employers(client, subtests):
 
 @freeze_time("2024-11-27", tick=True)
 def test_list_snapshot(client, snapshot):
-    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
+    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True, subject_to_iae_rules=True)
     client.force_login(company.members.get())
     url = reverse("apply:list_for_siae")
 
@@ -1052,7 +1053,7 @@ def test_list_for_siae_exports_download_by_month(client):
     [
         pytest.param({"with_approval": True}, id="with_approval"),
         pytest.param({"with_iae_eligibility_diagnosis": True}, id="with_eligibility_diag"),
-        pytest.param({}, id="no_eligibility_diag"),
+        pytest.param({"to_company__subject_to_iae_rules": True}, id="no_eligibility_diag"),
     ],
 )
 def test_list_for_siae_badge(client, snapshot, job_app_kwargs):
@@ -1592,7 +1593,11 @@ def test_list_for_siae_select_applications_batch_add_to_pool(client, snapshot):
 def test_list_for_siae_select_applications_batch_postpone(client, snapshot):
     MODAL_ID = "postpone_confirmation_modal"
 
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(
+        with_membership=True,
+        # GEIQ has more statuses in tooltip
+        kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
+    )
     employer = company.members.first()
 
     postponable_app_1 = JobApplicationFactory(
@@ -1801,7 +1806,11 @@ def test_list_for_siae_select_applications_batch_process(client, snapshot):
 
 
 def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(
+        with_membership=True,
+        # GEIQ has more statuses in tooltip
+        kind=random.choice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
+    )
     employer = company.members.first()
 
     refusable_app_1 = JobApplicationFactory(
@@ -1896,7 +1905,7 @@ def test_list_for_siae_select_applications_batch_refuse(client, snapshot):
 
 
 def test_list_for_siae_select_applications_batch_accept(client, snapshot):
-    company = CompanyFactory(with_membership=True)
+    company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
     employer = company.members.first()
 
     acceptable_app_1 = JobApplicationFactory(
@@ -2166,7 +2175,7 @@ def test_htmx_order(client):
 
 @freeze_time("2024-11-27", tick=True)
 def test_table_iae_state_and_criteria(client, snapshot):
-    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True)
+    company = CompanyFactory(with_membership=True, not_in_territorial_experimentation=True, subject_to_iae_rules=True)
     employer = company.members.first()
     client.force_login(employer)
     url = reverse("apply:list_for_siae")

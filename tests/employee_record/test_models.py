@@ -75,7 +75,9 @@ class TestEmployeeRecordModel:
 
     def test_creation_without_approval(self):
         with pytest.raises(ValidationError) as exc:
-            job_application = JobApplicationFactory(state=JobApplicationState.ACCEPTED)
+            job_application = JobApplicationFactory(
+                to_company__subject_to_iae_rules=True, state=JobApplicationState.ACCEPTED
+            )
             EmployeeRecord.from_job_application(job_application)
         assert exc.value.message == EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL
 
@@ -144,7 +146,7 @@ class TestEmployeeRecordModel:
         employee_record = EmployeeRecord.from_job_application(job_application)
 
         old_siae, old_approval = job_application.to_company, job_application.approval
-        new_company, new_approval = CompanyFactory(), ApprovalFactory()
+        new_company, new_approval = CompanyFactory(subject_to_iae_rules=True), ApprovalFactory()
 
         employee_record.job_application.to_company = new_company
         employee_record.job_application.approval = new_approval
@@ -301,7 +303,7 @@ class TestEmployeeRecordModel:
 
     @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source_for_antenna(self):
-        main_company = CompanyFactory(source=Company.SOURCE_ASP, siret="10000000000001")
+        main_company = CompanyFactory(subject_to_iae_rules=True, source=Company.SOURCE_ASP, siret="10000000000001")
         employee_record = EmployeeRecordFactory(
             job_application__to_company__siret="10000000000002",
             job_application__to_company__source=Company.SOURCE_USER_CREATED,
