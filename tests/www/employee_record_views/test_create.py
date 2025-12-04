@@ -1135,6 +1135,40 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, "Revenu brut mensuel moyen : ")
         assertNotContains(response, "Taux de cotisation : ")
 
+    def test_ntt_display(self, client):
+        NTT_MARKUP = "<small>Numéro technique temporaire</small>"
+        employee_record = EmployeeRecord.objects.latest("created_at")
+        # NIR and not NTT
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP)
+
+        # NIR and NTT
+        employee_record.ntt = "1234567890ABC"  # No validation here, just display
+        employee_record.save()
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP)
+
+        # No NIR and NTT
+        employee_record.job_application.job_seeker.jobseeker_profile.nir = ""
+        employee_record.job_application.job_seeker.jobseeker_profile.save()
+        response = client.get(self.url)
+        assertContains(response, NTT_MARKUP)
+        assertContains(response, f"<strong>{employee_record.ntt}</strong>", html=True)
+
+        # No NIR and no NTT
+        employee_record.ntt = None
+        employee_record.save()
+        response = client.get(self.url)
+        assertContains(
+            response,
+            """\
+            <li>
+                <small>Numéro technique temporaire</small>
+                <i class="text-disabled">Non renseigné</i>
+            </li>""",
+            html=True,
+        )
+
     def test_transition_log(self, client):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
 

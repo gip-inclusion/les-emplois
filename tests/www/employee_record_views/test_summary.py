@@ -2,7 +2,7 @@ import pgtrigger
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import NotificationStatus, Status
@@ -65,6 +65,57 @@ class TestSummaryEmployeeRecords:
         profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
+
+    def test_display_ntt(self, client):
+        NTT_MARKUP = "<small>Numéro technique temporaire</small>"
+        self.employee_record.ntt = "1234567890ABC"  # No validation here, just display
+        self.employee_record.save()
+
+        client.force_login(self.user)
+
+        # NIR, NTT but nothing in archived_json
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP)
+
+        # NIR, NTT in archived_json
+        # Simplified archived_json structure
+        self.employee_record.archived_json = {"personnePhysique": {"salarieNIR": self.employee_record.ntt}}
+        self.employee_record.save()
+        response = client.get(self.url)
+        assertContains(response, NTT_MARKUP, html=True)
+        assertContains(response, f"<strong>{self.employee_record.ntt}</strong>", html=True)
+
+        # NIR, NTT but NIR in archived_json
+        # Simplified archived_json structure
+        self.employee_record.archived_json = {
+            "personnePhysique": {"salarieNIR": self.job_application.job_seeker.jobseeker_profile.nir}
+        }
+        self.employee_record.save()
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP, html=True)
+
+        # No NIR, NTT but nothing in archived_json
+        self.job_application.job_seeker.jobseeker_profile.nir = ""
+        self.job_application.job_seeker.jobseeker_profile.save()
+        self.employee_record.archived_json = None
+        self.employee_record.save()
+        response = client.get(self.url)
+        assertContains(response, NTT_MARKUP, html=True)
+        assertContains(response, f"<strong>{self.employee_record.ntt}</strong>", html=True)
+
+        # No NIR, no NTT
+        self.employee_record.ntt = None
+        self.employee_record.save()
+        response = client.get(self.url)
+        assertContains(
+            response,
+            """\
+            <li>
+                <small>Numéro technique temporaire</small>
+                <i class="text-disabled">Non renseigné</i>
+            </li>""",
+            html=True,
+        )
 
     def test_technical_infos(self, client, snapshot):
         self.employee_record.siret = "10000000000002"
