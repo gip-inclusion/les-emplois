@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, UpdateView
+from itoutils.urls import add_url_params
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
@@ -17,7 +18,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.gps.enums import Channel
 from itou.www.gps.forms import (
     FollowUpGroupMembershipForm,

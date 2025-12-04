@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from django.utils.html import escape
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -25,7 +26,6 @@ from itou.siae_evaluations.models import (
 )
 from itou.utils.templatetags.format_filters import format_approval_number, format_phone
 from itou.utils.types import InclusiveDateRange
-from itou.utils.urls import add_url_params
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory, IAESelectedAdministrativeCriteriaFactory

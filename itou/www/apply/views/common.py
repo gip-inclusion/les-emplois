@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from django.views.generic import FormView, TemplateView
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
+from itoutils.urls import add_url_params
 
 from itou.asp.forms import BirthPlaceWithBirthdateModelForm, BirthPlaceWithoutBirthdateModelForm
 from itou.asp.models import Country
@@ -19,7 +20,7 @@ from itou.eligibility.utils import geiq_allowance_amount
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
-from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
+from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     BirthDateForm,

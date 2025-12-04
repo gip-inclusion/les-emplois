@@ -9,6 +9,7 @@ from django.shortcuts import reverse
 from django.urls import reverse_lazy
 from django.utils.html import escape
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -20,7 +21,6 @@ from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import UserKind
 from itou.users.models import User
-from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.invitations.factories import (
