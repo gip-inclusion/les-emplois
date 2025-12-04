@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.http import Http404, HttpResponseRedirect
 from django.utils.http import url_has_allowed_host_and_scheme
+from itoutils.django.urls import add_url_params
 from itoutils.nexus.utils import generate_jwt
-
-from itou.utils.urls import add_url_params
 
 
 def auto_login(request):

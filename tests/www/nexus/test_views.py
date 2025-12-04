@@ -2,9 +2,9 @@ import pytest
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
+from itoutils.django.urls import add_url_params
 from pytest_django.asserts import assertRedirects
 
-from itou.utils.urls import add_url_params
 from tests.users.factories import PrescriberFactory
 
 
