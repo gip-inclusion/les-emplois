@@ -246,12 +246,16 @@ def get_user_kind_display(user):
         if user.is_prescriber_with_authorized_org_memberships:
             return "prescripteur habilité"
         return "orienteur"
+    elif user.kind == UserKind.JOB_SEEKER:
+        return "candidat"
     raise ValueError("Invalid user kind: %s", user.kind)
 
 
 @require_POST
-@check_request(is_allowed_to_use_gps)
 def display_contact_info(request, group_id, target_participant_public_id, mode):
+    if not (is_allowed_to_use_gps(request) or request.user.is_job_seeker):
+        raise PermissionDenied
+
     template_name = {
         "email": "gps/includes/member_email.html",
         "phone": "gps/includes/member_phone.html",
@@ -259,18 +263,30 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     if not template_name:
         raise ValueError("Invalid mode: %s", mode)
 
-    follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(members=request.user), pk=group_id)
-    target_participant = get_object_or_404(
-        User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
-        public_id=target_participant_public_id,
-    )
     are_colleagues = False
-    if request.organizations and request.user.kind == target_participant.kind:
-        org_ids = [org.pk for org in request.organizations]
-        if request.user.is_employer:
-            are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
-        if request.user.is_prescriber:
-            are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
+
+    # if user is a job seeker, proceed only if the target is his referent
+    if request.user.is_job_seeker:
+        follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(beneficiary=request.user), pk=group_id)
+        target_participant = get_object_or_404(
+            User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
+            public_id=target_participant_public_id,
+        )
+        if follow_up_group.referent.member != target_participant:
+            raise PermissionDenied
+    # user is employer or prescriber
+    else:
+        follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(members=request.user), pk=group_id)
+        target_participant = get_object_or_404(
+            User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
+            public_id=target_participant_public_id,
+        )
+        if request.organizations and request.user.kind == target_participant.kind:
+            org_ids = [org.pk for org in request.organizations]
+            if request.user.is_employer:
+                are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
+            if request.user.is_prescriber:
+                are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
 
     logger.info(
         "GPS display_contact_information",
