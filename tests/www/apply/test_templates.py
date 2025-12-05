@@ -34,6 +34,8 @@ from tests.utils.testing import get_request, load_template
 from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
 
 
+CERTIFIED_HELP_TEXT = "En savoir plus sur les badges de certification"
+
 # Job applications list (company)
 
 
@@ -288,26 +290,25 @@ class TestIAEEligibilityDetail:
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
         )
-        certified_help_text = "En savoir plus sur les badges de certification"
         # No certifiable criteria
         diagnosis = IAEEligibilityDiagnosisFactory(
             certifiable=True,
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
         rendered = self.template.render(Context(self.default_params(diagnosis)))
-        assert certified_help_text not in rendered
+        assert CERTIFIED_HELP_TEXT not in rendered
 
         # Certifiable criteria, even if not certified.
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         rendered = self.template.render(Context(self.default_params(diagnosis)))
-        assert certified_help_text in rendered
+        assert CERTIFIED_HELP_TEXT in rendered
 
         # Certifiable and certified.
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         criterion = diagnosis.selected_administrative_criteria.get()
         certify_criterion_with_api_particulier(criterion)
         rendered = self.template.render(Context(self.default_params(diagnosis)))
-        assert certified_help_text in rendered
+        assert CERTIFIED_HELP_TEXT in rendered
 
 
 class TestGEIQEligibilityDetail:
@@ -366,7 +367,6 @@ class TestGEIQEligibilityDetail:
     @pytest.mark.usefixtures("api_particulier_settings")
     def test_info_box(self, mocker):
         """Information box about why some criteria are certifiable."""
-        certified_help_text = "En savoir plus sur les badges de certification"
         diagnosis = GEIQEligibilityDiagnosisFactory(
             certifiable=True,
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
@@ -374,13 +374,13 @@ class TestGEIQEligibilityDetail:
         # No certifiable criteria
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
-        assert certified_help_text not in rendered
+        assert CERTIFIED_HELP_TEXT not in rendered
 
         # Certifiable criteria but not certified.
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
-        assert certified_help_text in rendered
+        assert CERTIFIED_HELP_TEXT in rendered
 
         # Certifiable and certified.
         mocker.patch(
@@ -392,7 +392,7 @@ class TestGEIQEligibilityDetail:
         certify_criterion_with_api_particulier(criterion)
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
-        assert certified_help_text in rendered
+        assert CERTIFIED_HELP_TEXT in rendered
 
 
 @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
