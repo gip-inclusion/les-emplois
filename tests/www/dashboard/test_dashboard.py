@@ -761,7 +761,6 @@ class TestDashboardView:
             "Votre diagnostic d’éligibilité IAE a expiré le %s. Pour en savoir plus, veuillez vous rapprocher "
             "d’un prescripteur habilité."
         )
-        INFO_BOX = "Pourquoi certains critères peuvent-ils être certifiés"
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -774,7 +773,6 @@ class TestDashboardView:
         assertContains(response, NO_DIAG_TITLE, html=True, count=1)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
-        assertNotContains(response, INFO_BOX)
 
         # A diagnosis from an employer, without approval yet
         diagnosis = IAEEligibilityDiagnosisFactory(
@@ -788,7 +786,6 @@ class TestDashboardView:
         assertContains(response, NO_DIAG_TITLE, html=True, count=1)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
-        assertNotContains(response, INFO_BOX)
 
         # A diagnosis from an employer with an approval and a job application
         JobApplicationFactory(
@@ -814,7 +811,6 @@ class TestDashboardView:
         assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
-        assertNotContains(response, INFO_BOX)
 
         # An expired diagnosis from an employer with a valid approval and a job application
         with freeze_time(diagnosis.expires_at + timedelta(days=1)):
@@ -836,7 +832,6 @@ class TestDashboardView:
             assertNotContains(response, NO_DIAG_TITLE, html=True)
             assertNotContains(response, NO_DIAG_TEXT, html=True)
             assertNotContains(response, NO_DIAG_BADGE, html=True)
-            assertNotContains(response, INFO_BOX)
 
         # An expired diagnosis with an expired approval
         approval = Approval.objects.first()
@@ -848,7 +843,6 @@ class TestDashboardView:
             assertContains(response, EXPIRED_DIAG_TITLE, html=True, count=1)
             assertContains(response, EXPIRED_DIAG_TEXT % "19/11/2025", html=True, count=1)
             assertContains(response, NO_DIAG_BADGE, html=True, count=1)
-            assertNotContains(response, INFO_BOX)
 
         # A diagnosis from an authorized prescriber, takes precedence over the
         # employer's diagnosis, even if it is older.
@@ -872,7 +866,6 @@ class TestDashboardView:
         assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
-        assertNotContains(response, INFO_BOX)
 
     @freeze_time("2025-05-19")
     def test_jobseeker_geiq_eligibility_diagnosis(self, client, administrative_criteria_annex_1):
@@ -885,7 +878,6 @@ class TestDashboardView:
         EXPIRED_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée</span>"""
         EXPIRED_DIAG_EXPIRATION = "<i>Ce diagnostic a expiré le %s.</i>"
-        INFO_BOX = "Pourquoi certains critères peuvent-ils être certifiés"
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -933,7 +925,6 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertNotContains(response, INFO_BOX)
 
         # An expired diagnosis from an employer with criteria (hence with allowance)
         with freeze_time(diagnosis.expires_at + timedelta(days=1)):
@@ -954,7 +945,6 @@ class TestDashboardView:
                 html=True,
                 count=1,
             )
-            assertNotContains(response, INFO_BOX)
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):

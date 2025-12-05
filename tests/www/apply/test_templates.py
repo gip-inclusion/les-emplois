@@ -310,6 +310,17 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(Context(self.default_params(diagnosis)))
         assert CERTIFIED_HELP_TEXT in rendered
 
+        # Certifiable and certified as seen by a job seeker (on their dashboard).
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        criterion = diagnosis.selected_administrative_criteria.get()
+        certify_criterion_with_api_particulier(criterion)
+        params = self.default_params(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert CERTIFIED_HELP_TEXT not in rendered
+
 
 class TestGEIQEligibilityDetail:
     ELIGIBILITY_TITLE = "Situation administrative du candidat"
@@ -393,6 +404,16 @@ class TestGEIQEligibilityDetail:
         self.create_job_application(diagnosis)
         rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
         assert CERTIFIED_HELP_TEXT in rendered
+
+        # Certifiable and certified as seen by a job seeker (on their dashboard).
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
+        self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert CERTIFIED_HELP_TEXT not in rendered
 
 
 @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
