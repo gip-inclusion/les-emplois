@@ -96,6 +96,14 @@ class TestSummaryEmployeeRecords:
         job_seeker.jobseeker_profile.aah_allocation_since = AllocationDuration.LESS_THAN_6_MONTHS
         job_seeker.jobseeker_profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
 
+        job_seeker.jobseeker_profile.ase_exit = True
+        job_seeker.jobseeker_profile.isolated_parent = True
+        job_seeker.jobseeker_profile.housing_issue = True
+        job_seeker.jobseeker_profile.refugee = True
+        job_seeker.jobseeker_profile.detention_exit_or_ppsmj = True
+        job_seeker.jobseeker_profile.low_level_in_french = True
+        job_seeker.jobseeker_profile.mobility_issue = True
+
         job_seeker.jobseeker_profile.are_allocation_since = AllocationDuration.LESS_THAN_6_MONTHS
         job_seeker.jobseeker_profile.activity_bonus_since = AllocationDuration.LESS_THAN_6_MONTHS
         job_seeker.jobseeker_profile.cape_freelance = True
