@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
 from itou.cities.models import City
@@ -20,6 +20,7 @@ from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
+from itou.www.employee_record_views.views import get_session_ntt_key
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, SiaeFinancialAnnexFactory
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
@@ -33,10 +34,11 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 # Helper functions
 def _get_user_form_data(user):
     form_data = {
-        "title": "M",
+        "title": user.title,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "birthdate": user.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "nir": user.jobseeker_profile.nir,
     }
     if user.jobseeker_profile.birth_country:
         form_data["birth_country"] = user.jobseeker_profile.birth_country_id
@@ -204,12 +206,13 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         )
 
         data = _get_user_form_data(self.job_seeker)
-        data.pop("title")
+        user_title = data.pop("title")
 
         response = client.post(self.url, data=data)
         assert 200 == response.status_code
+        assertFormError(response.context["form"], "title", "Ce champ est obligatoire.")
 
-        data["title"] = "MME"
+        data["title"] = user_title
         response = client.post(self.url, data=data)
 
         assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
@@ -352,12 +355,157 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
         # - simple / fake address
         # - birth place and country
         data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data["birthdate"] = self.job_seeker.jobseeker_profile.birthdate.strftime(
+            DuetDatePickerWidget.INPUT_DATE_FORMAT
+        )  # Keep birthdate coherent with existing NIR
         response = client.post(self.url, data=data)
 
         # Redirects must go to step 2
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
 
         assertRedirects(response, target_url)
+
+    def test_with_nir_readonly(self, client):
+        assert self.job_seeker.jobseeker_profile.nir
+        client.force_login(self.user)
+        response = client.get(self.url)
+        nir_field = parse_response_to_soup(response, selector="#id_nir")
+        assert "disabled" in nir_field.attrs
+        lack_of_nir_field = parse_response_to_soup(response, selector="#id_lack_of_nir")
+        assert lack_of_nir_field["type"] == "hidden"
+
+    def test_no_nir_with_lack_of_nir_reason(self, client, snapshot):
+        valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+
+        client.force_login(self.user)
+
+        response = client.get(self.url)
+        info_box = parse_response_to_soup(response, selector=".c-info")
+        assert pretty_indented(info_box) == snapshot(name="info_box_no_nir")
+
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        del data["nir"]
+        response = client.post(self.url, data=data)
+        assertFormError(
+            response.context["form"],
+            "nir",
+            (
+                "Pour continuer, veuillez entrer un numéro de sécurité sociale valide ou cocher la mention "
+                '"Impossible de renseigner le numéro de sécurité sociale (NIR) ou le numéro '
+                'd’identification d’attente (NIA)" et renseigner un numéro technique temporaire.'
+            ),
+        )
+
+        data["nir"] = valid_nir_for_birthdate
+        data["birthdate"] = self.job_seeker.jobseeker_profile.birthdate.strftime(
+            DuetDatePickerWidget.INPUT_DATE_FORMAT
+        )
+        response = client.post(self.url, data=data)
+        # Redirects must go to step 2
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
+        # And NIR is saved
+        self.job_seeker.jobseeker_profile.refresh_from_db()
+        assert self.job_seeker.jobseeker_profile.nir == valid_nir_for_birthdate
+
+    def test_no_nir_input_nir_already_used(self, client):
+        valid_nir_for_birthdate = self.job_seeker.jobseeker_profile.nir
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+        JobSeekerFactory(jobseeker_profile__nir=valid_nir_for_birthdate)
+
+        client.force_login(self.user)
+        client.get(self.url)
+
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data["nir"] = valid_nir_for_birthdate
+        data["birthdate"] = self.job_seeker.jobseeker_profile.birthdate.strftime(
+            DuetDatePickerWidget.INPUT_DATE_FORMAT
+        )
+        response = client.post(self.url, data=data)
+
+        assertContains(response, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")
+        assertContains(
+            response,
+            reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": self.job_seeker.public_id}),
+        )
+
+    def test_lack_of_nir_with_ntt(self, client):
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
+
+        client.force_login(self.user)
+        client.get(self.url)
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
+        data.pop("nir")
+        data["lack_of_nir"] = True
+
+        valid_ntt = "".join(
+            [
+                "1" if self.job_seeker.title == Title.M else "2",
+                self.company.siren,
+                "leMatriculeDuS414r13",
+            ]
+        )
+
+        data["ntt"] = valid_ntt[:4]  # Too short
+        response = client.post(self.url, data=data)
+        assertFormError(
+            response.context["form"],
+            "ntt",
+            "Le numéro technique temporaire est trop court (minimum 11 caractères autorisés).",
+        )
+
+        data["ntt"] = "3" + valid_ntt[1:]  # Invalid prefix
+        response = client.post(self.url, data=data)
+        assertFormError(response.context["form"], "ntt", "Ce numéro n’est pas valide.")
+
+        data["ntt"] = ("2" if self.job_seeker.title == Title.M else "1") + valid_ntt[1:]  # Invalid prefix for title
+        response = client.post(self.url, data=data)
+        assertFormError(
+            response.context["form"],
+            "ntt",
+            f"Le numéro technique temporaire doit commencer par '{valid_ntt[0]}' pour être cohérent avec la civilité.",
+        )
+
+        data["ntt"] = valid_ntt[0] + "2" + valid_ntt[2:]  # Different SIREN (all our factory SIRET start with 1)
+        response = client.post(self.url, data=data)
+        assertFormError(
+            response.context["form"],
+            "ntt",
+            "Le numéro technique temporaire doit contenir le SIREN de l'entreprise d'accueil aux positions 2 à 10.",
+        )
+
+        employee_record_with_same_ntt = EmployeeRecordFactory(ntt=valid_ntt)
+        data["ntt"] = valid_ntt
+        response = client.post(self.url, data=data)
+        assertFormError(
+            response.context["form"], "ntt", "Ce numéro technique temporaire est déjà associé à un autre salarié."
+        )
+        employee_record_with_same_ntt.job_application.job_seeker = self.job_seeker
+        employee_record_with_same_ntt.job_application.save()
+        response = client.post(self.url, data=data)
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
+        assert client.session[get_session_ntt_key(self.job_application)] == valid_ntt
+
+        # Try without existing employee record with same NTT
+        del client.session[get_session_ntt_key(self.job_application)]
+        employee_record_with_same_ntt.delete()
+        response = client.post(self.url, data=data)
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
+
+        assert client.session[get_session_ntt_key(self.job_application)] == valid_ntt
+
+        # If you go back to step 1, NTT is still there
+        response = client.get(self.url)
+        assertContains(response, valid_ntt)
+
+        # Autre test en Step 4
+        # Remplir NTT en step 1 puis passer jusqu'au Step 4 et vérifier si on stocke bien le NTT
 
 
 class TestCreateEmployeeRecordStep2(CreateEmployeeRecordTestMixin):
@@ -766,6 +914,35 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
             "Il est impossible de créer cette fiche salarié pour la raison suivante",
         )
 
+    @pytest.mark.parametrize("with_nir", [True, False])
+    def test_ntt_no_nir(self, client, with_nir):
+        valid_ntt = "".join(
+            [
+                "1" if self.job_seeker.title == Title.M else "2",
+                self.company.siren,
+                "leMatriculeDuS414r13",
+            ]
+        )
+        # Simulate having filled NTT in step 1
+        session = client.session
+        session[get_session_ntt_key(self.job_application)] = valid_ntt
+        session.save()
+        if not with_nir:  # The job seeker didn't have a NIR after step 1
+            self.job_seeker.jobseeker_profile.nir = ""
+            self.job_seeker.jobseeker_profile.save(update_fields=("nir",))
+
+        client.get(self.url)
+
+        response = client.post(self.url, self._default_step_3_data())
+        assertRedirects(response, reverse("employee_record_views:create_step_4", args=(self.job_application.id,)))
+
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        if with_nir:
+            # If a NIR has been provided since, the NTT is discarded
+            assert employee_record.ntt is None
+        else:
+            assert employee_record.ntt == valid_ntt
+
 
 class TestCreateEmployeeRecordStep3ForEITI(TestCreateEmployeeRecordStep3):
     """
@@ -957,6 +1134,40 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, "Acteur rencontré : ")
         assertNotContains(response, "Revenu brut mensuel moyen : ")
         assertNotContains(response, "Taux de cotisation : ")
+
+    def test_ntt_display(self, client):
+        NTT_MARKUP = "<small>Numéro technique temporaire</small>"
+        employee_record = EmployeeRecord.objects.latest("created_at")
+        # NIR and not NTT
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP)
+
+        # NIR and NTT
+        employee_record.ntt = "1234567890ABC"  # No validation here, just display
+        employee_record.save()
+        response = client.get(self.url)
+        assertNotContains(response, NTT_MARKUP)
+
+        # No NIR and NTT
+        employee_record.job_application.job_seeker.jobseeker_profile.nir = ""
+        employee_record.job_application.job_seeker.jobseeker_profile.save()
+        response = client.get(self.url)
+        assertContains(response, NTT_MARKUP)
+        assertContains(response, f"<strong>{employee_record.ntt}</strong>", html=True)
+
+        # No NIR and no NTT
+        employee_record.ntt = None
+        employee_record.save()
+        response = client.get(self.url)
+        assertContains(
+            response,
+            """\
+            <li>
+                <small>Numéro technique temporaire</small>
+                <i class="text-disabled">Non renseigné</i>
+            </li>""",
+            html=True,
+        )
 
     def test_transition_log(self, client):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)

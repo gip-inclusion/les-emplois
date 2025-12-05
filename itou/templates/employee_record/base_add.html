@@ -1,0 +1,12 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Créer une fiche salarié {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Créer une fiche salarié - {{ request.current_organization.display_name }}</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
