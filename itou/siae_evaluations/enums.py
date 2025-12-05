@@ -50,6 +50,25 @@ EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES = [
     EvaluatedJobApplicationsState.REFUSED_2,
 ]
 
+EVALUATED_JOB_APPLICATIONS_DEFECT = {
+    EvaluatedJobApplicationsState.PENDING: (
+        "Les pièces justificatives requises n’ont pas été transmises aux services de l’État."
+    ),
+    EvaluatedJobApplicationsState.PROCESSING: (
+        "Le dépôt des pièces justificatives sur l’espace en ligne est resté inachevé et n’a, en conséquence, "
+        "pas permis leur transmission aux services de l’État."
+    ),
+    EvaluatedJobApplicationsState.UPLOADED: (
+        "Les pièces justificatives ont été déposées en ligne, mais n’ont pas été transmises aux services de l’État."
+    ),
+    EvaluatedJobApplicationsState.REFUSED: (
+        "Les documents fournis se sont révélés incomplets ou non conformes aux exigences réglementaires."
+    ),
+    EvaluatedJobApplicationsState.REFUSED_2: (
+        "Les documents fournis se sont révélés incomplets ou non conformes aux exigences réglementaires."
+    ),
+}
+
 
 class EvaluatedJobApplicationsSelectCriteriaState(models.TextChoices):
     PENDING = "PENDING"
