@@ -85,7 +85,7 @@ populate_db_with_reference_data: $(VIRTUAL_ENV)
 
 populate_db: populate_db_with_reference_data
 	python manage.py loaddata_bulk itou/fixtures/django/*.json
-	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
+	# python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 # Tests.
 # =============================================================================
