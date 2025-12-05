@@ -1770,6 +1770,13 @@ class TestJoinGroupFromNir:
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
+            "ase_exit": False,
+            "isolated_parent": False,
+            "housing_issue": False,
+            "refugee": False,
+            "detention_exit_or_ppsmj": False,
+            "low_level_in_french": False,
+            "mobility_issue": False,
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1986,6 +1993,13 @@ class TestJoinGroupFromNameAndEmail:
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
+            "ase_exit": False,
+            "isolated_parent": False,
+            "housing_issue": False,
+            "refugee": False,
+            "detention_exit_or_ppsmj": False,
+            "low_level_in_french": False,
+            "mobility_issue": False,
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 

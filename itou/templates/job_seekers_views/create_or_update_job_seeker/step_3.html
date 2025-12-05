@@ -13,31 +13,14 @@
 
 {% block form_content %}
     <fieldset>
-        <legend class="visually-hidden">
-            Situation du
-            {{ is_gps|default:False|yesno:"bénéficiaire,candidat" }}
-        </legend>
+        <legend>Qualification et maîtrise du français</legend>
         {% bootstrap_field form.education_level %}
+        {% bootstrap_field form.low_level_in_french %}
+    </fieldset>
 
+    <fieldset>
+        <legend>Ressources</legend>
         {% bootstrap_field form.resourceless %}
-
-        {% bootstrap_field form.pole_emploi %}
-        <div id="subfields_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
-            <div id="subfields_pole_emploi_id_forgotten" class="collapse{% if not form.pole_emploi_id_forgotten.value %} show{% endif %}">
-                {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
-            </div>
-            {% bootstrap_field form.pole_emploi_id_forgotten %}
-            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
-        </div>
-
-        {% bootstrap_field form.unemployed %}
-        <div id="subfields_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
-            {% bootstrap_field form.unemployed_since wrapper_class="form-group form-group-input-w-lg-66" %}
-        </div>
-
-        {% bootstrap_field form.rqth_employee %}
-        {% bootstrap_field form.oeth_employee %}
-
         {% bootstrap_field form.rsa_allocation %}
         <div id="subfields_rsa_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
             {% bootstrap_field form.has_rsa_allocation wrapper_class="form-group form-group-input-w-lg-66" %}
@@ -53,5 +36,41 @@
         <div id="subfields_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
             {% bootstrap_field form.aah_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
         </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Situation professionnelle</legend>
+        {% bootstrap_field form.unemployed %}
+        <div id="subfields_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
+            {% bootstrap_field form.unemployed_since wrapper_class="form-group form-group-input-w-lg-66" %}
+        </div>
+        {% bootstrap_field form.pole_emploi %}
+        <div id="subfields_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+            <div id="subfields_pole_emploi_id_forgotten" class="collapse{% if not form.pole_emploi_id_forgotten.value %} show{% endif %}">
+                {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
+            </div>
+            {% bootstrap_field form.pole_emploi_id_forgotten %}
+            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Situation de handicap</legend>
+        {% bootstrap_field form.rqth_employee %}
+        {% bootstrap_field form.oeth_employee %}
+    </fieldset>
+
+    <fieldset>
+        <legend>Situation familiale</legend>
+        {% bootstrap_field form.isolated_parent %}
+        {% bootstrap_field form.ase_exit %}
+    </fieldset>
+
+    <fieldset>
+        <legend>Autres situations</legend>
+        {% bootstrap_field form.housing_issue %}
+        {% bootstrap_field form.refugee %}
+        {% bootstrap_field form.detention_exit_or_ppsmj %}
+        {% bootstrap_field form.mobility_issue %}
     </fieldset>
 {% endblock %}
