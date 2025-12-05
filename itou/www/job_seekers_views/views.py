@@ -107,13 +107,17 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
+        fallback_back_url = (
+            reverse("apply:list_prescriptions") if self.request.user.is_employer else reverse("job_seekers_views:list")
+        )
+
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
             "can_edit_iae_eligibility": can_edit_iae_eligibility,
             "matomo_custom_title": "Détail candidat",
             "approval": approval,
-            "back_url": get_safe_url(self.request, "back_url"),
+            "back_url": get_safe_url(self.request, "back_url", fallback_back_url),
             "sent_job_applications": (
                 self.object.job_applications.prescriptions_of(
                     self.request.user,
