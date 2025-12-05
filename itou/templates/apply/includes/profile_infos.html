@@ -1,5 +1,6 @@
 {% load format_filters %}
 {% load matomo %}
+{% load wording %}
 
 <div class="personal-infos">
     <h2>Informations personnelles</h2>
@@ -148,14 +149,10 @@
                 <i class="text-disabled">Aucune information supplémentaire</i>
             {% elif other_infos|length > 1 %}
                 <ul>
-                    {% for item in other_infos %}
-                        <li>{% include "apply/includes/profile_other_info_item.html" with item=item profile=profile only %}</li>
-                    {% endfor %}
+                    {% for item in other_infos %}<li>{{ profile|profile_field_display:item }}</li>{% endfor %}
                 </ul>
             {% else %}
-                {% for item in other_infos %}
-                    <strong>{% include "apply/includes/profile_other_info_item.html" with item=item profile=profile only %}</strong>
-                {% endfor %}
+                <strong>{{ profile|profile_field_display:other_infos.0 }}</strong>
             {% endif %}
         </li>
     </ul>
