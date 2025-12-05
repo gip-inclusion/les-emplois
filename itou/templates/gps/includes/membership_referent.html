@@ -57,7 +57,7 @@
                     </li>
                     <li>
                         <small>Téléphone</small>
-                        {% if user_in_group %}
+                        {% if user_in_group or request.user == job_seeker %}
                             {% if membership.member.phone %}
                                 {% if membership.member_id != request.user.pk %}
                                     <button class="btn-link btn-ico"
@@ -87,7 +87,7 @@
                     </li>
                     <li>
                         <small>Adresse e-mail</small>
-                        {% if user_in_group %}
+                        {% if user_in_group or request.user == job_seeker %}
                             {% if membership.member_id != request.user.pk %}
                                 <button class="btn-link btn-ico"
                                         id="email-{{ membership.member_id }}"

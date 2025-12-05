@@ -26,6 +26,7 @@ from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.cities.factories import create_city_geispolsheim
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -613,6 +614,74 @@ class TestGroupDetailsMembershipTab:
                 "current_user_type": "employeur",
                 "mode": "email",
                 "are_colleagues": True,
+            },
+        ]
+
+        assert pretty_indented(simulated_page) == snapshot
+
+    def test_display_participant_contact_info_as_job_seeker(self, client, snapshot, caplog):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(for_snapshot=True)
+        job_seeker = job_application.job_seeker
+        group = FollowUpGroupFactory(beneficiary=job_seeker)
+        target_participant = FollowUpGroupMembershipFactory(
+            member=PrescriberFactory(
+                first_name="Jean",
+                last_name="Dupont",
+                email="jean@dupont.fr",
+                phone="0123456789",
+            ),
+            follow_up_group=group,
+            is_active=True,
+        ).member
+
+        client.force_login(job_seeker)
+
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+        display_phone_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "phone"))
+        assertContains(response, display_phone_url)
+        display_email_url = reverse("gps:display_contact_info", args=(group.pk, target_participant.public_id, "email"))
+        assertContains(response, display_email_url)
+
+        simulated_page = parse_response_to_soup(
+            response,
+            selector=f"#card-{target_participant.public_id}",
+            replace_in_attr=[
+                ("id", f"card-{target_participant.public_id}", "card'[Public ID of target_participant]"),
+            ],
+        )
+
+        response = client.post(display_phone_url)
+        assertContains(response, target_participant.phone)
+        update_page_with_htmx(simulated_page, f"#phone-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "orienteur",
+                "beneficiary": job_seeker.pk,
+                "current_user": job_seeker.pk,
+                "current_user_type": "candidat",
+                "mode": "phone",
+                "are_colleagues": False,
+            },
+        ]
+
+        response = client.post(display_email_url)
+        assertContains(response, target_participant.email)
+        update_page_with_htmx(simulated_page, f"#email-{target_participant.pk}", response)
+        assert gps_logs(caplog) == [
+            {
+                "message": "GPS display_contact_information",
+                "group": group.pk,
+                "target_participant": target_participant.pk,
+                "target_participant_type": "orienteur",
+                "beneficiary": job_seeker.pk,
+                "current_user": job_seeker.pk,
+                "current_user_type": "candidat",
+                "mode": "email",
+                "are_colleagues": False,
             },
         ]
 
