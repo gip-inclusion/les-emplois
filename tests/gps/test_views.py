@@ -405,6 +405,11 @@ class TestGroupDetailsMembershipTab:
                     f"user_organization_id={prescriber.prescribermembership_set.get().organization_id}",
                     "user_organization_id=[PK of organization]",
                 ),
+                (
+                    "href",
+                    f"/gps/request-new-participant/{beneficiary.public_id}",
+                    "/gps/request-new-participant/[Public ID of beneficiary]",
+                ),
                 ("href", f"beneficiary_id={beneficiary.pk}", "beneficiary_id=[PK of beneficiary]"),
                 ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
                 ("id", f"card-{participant.public_id}", "card-[Public ID of participant]"),
@@ -439,7 +444,7 @@ class TestGroupDetailsMembershipTab:
         assertNotContains(response, display_phone_txt)
 
         assertContains(response, "Ajouter un intervenant")
-        assertContains(response, "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant")
+        assertContains(response, f"/gps/request-new-participant/{beneficiary.public_id}")
 
     def test_group_memberships_order(self, client):
         prescriber = PrescriberFactory(membership=True)

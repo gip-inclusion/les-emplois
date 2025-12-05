@@ -10,7 +10,7 @@
                 <div class="col-12" id="gps_intervenants">
                     <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
                         <h2 class="mb-0">Intervenants</h2>
-                        <a href="{{ request_new_participant_form_url }}" id="request-new-participant-link" class="btn btn-ico btn-primary">
+                        <a href="{% url 'gps:request_new_participant' group.beneficiary.public_id %}" id="request-new-participant-link" class="btn btn-ico btn-primary">
                             <i class="ri-user-add-line" aria-hidden="true"></i>
                             <span>Ajouter un intervenant existant</span>
                         </a>
