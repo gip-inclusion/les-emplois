@@ -8,6 +8,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -36,12 +46,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -280,6 +290,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -308,12 +328,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -529,6 +549,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -739,6 +769,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -1045,6 +1085,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -1958,6 +2008,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -1986,12 +2046,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2236,6 +2296,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -2497,6 +2567,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -2525,12 +2605,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2700,6 +2780,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -2728,12 +2818,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -2954,6 +3044,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -3215,6 +3315,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/apply/prescriptions/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
@@ -3243,12 +3353,12 @@
                       </div>
                       <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
                           <li class="nav-item">
-                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Informations générales
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/apply/prescriptions/list">
                                   Candidatures
                               </a>
                           </li>
@@ -3418,6 +3528,16 @@
           <div class="s-title-02__container container">
               <div class="s-title-02__row row">
                   <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
