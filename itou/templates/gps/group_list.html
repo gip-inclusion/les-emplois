@@ -5,13 +5,13 @@
 {% load static %}
 {% load str_filters %}
 
-{% block title %}GPS - Mes bénéficiaires {{ block.super }}{% endblock %}
+{% block title %}Réseau d'intervenants - Mes bénéficiaires {{ block.super }}{% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur les groupes de suivi" %}
         {% fragment as c_title__main %}
-            <h1>GPS</h1>
-            <p>Guide de partage et de suivi</p>
+            <h1>Réseau d'intervenants</h1>
+            <p>Découvrez qui accompagnent vos bénéficiaires</p>
         {% endfragment %}
         {% fragment as c_title__cta %}
             <a href="{% url 'gps:join_group' %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary">

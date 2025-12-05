@@ -66,6 +66,40 @@ class TestFollowBeneficiary:
         FollowUpGroup.objects.follow_beneficiary(beneficiary, staff)
         assert not FollowUpGroup.objects.exists()
 
+    def test_referent(self):
+        job_seeker = JobSeekerFactory()
+        prescriber_1 = PrescriberFactory()
+        follow_up_group = FollowUpGroupFactory(beneficiary=job_seeker)
+        FollowUpGroupMembershipFactory(
+            member=prescriber_1,
+            follow_up_group=follow_up_group,
+            is_active=False,
+            is_referent_certified=False,
+        )
+
+        # No active nor certified referent
+        assert follow_up_group.referent is None
+
+        # No certified referent but one active membership
+        prescriber_2 = PrescriberFactory()
+        membership_2 = FollowUpGroupMembershipFactory(
+            member=prescriber_2,
+            follow_up_group=follow_up_group,
+            is_active=True,
+            is_referent_certified=False,
+        )
+        assert follow_up_group.referent == membership_2
+
+        # # Certified referent
+        prescriber_3 = PrescriberFactory()
+        membership_3 = FollowUpGroupMembershipFactory(
+            member=prescriber_3,
+            follow_up_group=follow_up_group,
+            is_active=True,
+            is_referent_certified=True,
+        )
+        assert follow_up_group.referent == membership_3
+
     def test_is_active(self):
         beneficiary = JobSeekerFactory()
         prescriber = PrescriberFactory()

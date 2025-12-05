@@ -46,6 +46,13 @@
                             {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
                         {% endfor %}
                     </div>
+
+                    {# Job applications ------------------------------------------------------------------------ #}
+                    <div class="c-box mb-3 mb-md-4">
+                        <h2>Qui accompagne ce salarié ?</h2>
+                        <hr>
+                        {% include "gps/includes/membership_referent.html" %}
+                    </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}

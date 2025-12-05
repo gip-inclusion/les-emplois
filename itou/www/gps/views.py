@@ -64,7 +64,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
                 queryset=FollowUpGroupMembership.objects.filter(is_referent_certified=True).select_related("member")[
                     :1
                 ],
-                to_attr="referent",
+                to_attr="certified_referent",
             ),
         )
     )
@@ -142,27 +142,9 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
             )
         )
 
-        request_new_participant_form_url = add_url_params(
-            "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
-            {
-                "user_name": self.request.user.get_full_name(),
-                "user_id": self.request.user.pk,
-                "user_email": self.request.user.email,
-                "user_organization_name": getattr(self.request.current_organization, "display_name", ""),
-                "user_organization_id": getattr(self.request.current_organization, "pk", ""),
-                "user_type": self.request.user.kind,
-                "beneficiary_name": self.group.beneficiary.get_full_name(),
-                "beneficiary_id": self.group.beneficiary.pk,
-                "beneficiary_email": self.group.beneficiary.email,
-                "success_url": self.request.build_absolute_uri(),
-                "followupgroup_id": self.group.pk,
-            },
-        )
-
         context = context | {
             "gps_memberships": memberships,
             "matomo_custom_title": "Profil GPS - participants",
-            "request_new_participant_form_url": request_new_participant_form_url,
             "active_tab": "memberships",
         }
 
@@ -264,12 +246,16 @@ def get_user_kind_display(user):
         if user.is_prescriber_with_authorized_org_memberships:
             return "prescripteur habilité"
         return "orienteur"
+    elif user.kind == UserKind.JOB_SEEKER:
+        return "candidat"
     raise ValueError("Invalid user kind: %s", user.kind)
 
 
 @require_POST
-@check_request(is_allowed_to_use_gps)
 def display_contact_info(request, group_id, target_participant_public_id, mode):
+    if not (request.user.is_employer or request.user.is_prescriber or request.user.is_job_seeker):
+        raise PermissionDenied
+
     template_name = {
         "email": "gps/includes/member_email.html",
         "phone": "gps/includes/member_phone.html",
@@ -277,18 +263,30 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
     if not template_name:
         raise ValueError("Invalid mode: %s", mode)
 
-    follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(members=request.user), pk=group_id)
-    target_participant = get_object_or_404(
-        User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
-        public_id=target_participant_public_id,
-    )
     are_colleagues = False
-    if request.organizations and request.user.kind == target_participant.kind:
-        org_ids = [org.pk for org in request.organizations]
-        if request.user.is_employer:
-            are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
-        if request.user.is_prescriber:
-            are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
+
+    # if user is a job seeker, proceed only if the target is his referent
+    if request.user.is_job_seeker:
+        follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(beneficiary=request.user), pk=group_id)
+        target_participant = get_object_or_404(
+            User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
+            public_id=target_participant_public_id,
+        )
+        if follow_up_group.referent.member != target_participant:
+            raise PermissionDenied
+    # user is employer or prescriber
+    else:
+        follow_up_group = get_object_or_404(FollowUpGroup.objects.filter(members=request.user), pk=group_id)
+        target_participant = get_object_or_404(
+            User.objects.filter(follow_up_groups__follow_up_group_id=group_id),
+            public_id=target_participant_public_id,
+        )
+        if request.organizations and request.user.kind == target_participant.kind:
+            org_ids = [org.pk for org in request.organizations]
+            if request.user.is_employer:
+                are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
+            if request.user.is_prescriber:
+                are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
 
     logger.info(
         "GPS display_contact_information",
@@ -589,3 +587,30 @@ def beneficiaries_autocomplete(request):
         users = [format_data(user) for user in users_qs[:10]]
 
     return JsonResponse({"results": users})
+
+
+@check_request(is_allowed_to_use_gps)
+def request_new_participant(request, job_seeker_public_id):
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
+    group, _created = FollowUpGroup.objects.get_or_create(beneficiary=job_seeker)
+
+    request_new_participant_form_url = add_url_params(
+        "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
+        {
+            "user_name": request.user.get_full_name(),
+            "user_id": request.user.pk,
+            "user_email": request.user.email,
+            "user_organization_name": getattr(request.current_organization, "display_name", ""),
+            "user_organization_id": getattr(request.current_organization, "pk", ""),
+            "user_type": request.user.kind,
+            "beneficiary_name": group.beneficiary.get_full_name(),
+            "beneficiary_id": group.beneficiary.pk,
+            "beneficiary_email": group.beneficiary.email,
+            "success_url": request.build_absolute_uri(),
+            "followupgroup_id": group.pk,
+        },
+    )
+
+    logger.info("GPS visit_request_new_participant")
+
+    return HttpResponseRedirect(request_new_participant_form_url)
