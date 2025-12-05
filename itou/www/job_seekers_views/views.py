@@ -11,6 +11,7 @@ from django.db.models.functions import Coalesce, Concat, Lower
 from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.defaultfilters import capfirst
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -53,7 +54,8 @@ logger = logging.getLogger(__name__)
 
 
 def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
-    other_infos_keys = [
+    other_infos = []
+    for key in [
         "resourceless",
         "unemployed_since",
         "rqth_employee",
@@ -61,10 +63,17 @@ def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
         "rsa_allocation_since",
         "ass_allocation_since",
         "aah_allocation_since",
-    ]
+    ]:
+        if getattr(jobseeker_profile, key):
+            info = capfirst(JobSeekerProfile._meta.get_field(key).verbose_name)
+            if key.endswith("_since"):
+                since_display = getattr(jobseeker_profile, f"get_{key}_display")().lower()
+                info = f"{info} {since_display}"
+            other_infos.append(info)
+
     return {
         "show_birth_place": jobseeker_profile.birth_country_id == Country.FRANCE_ID,
-        "other_infos": [key for key in other_infos_keys if getattr(jobseeker_profile, key)],
+        "other_infos": other_infos,
     }
 
 
