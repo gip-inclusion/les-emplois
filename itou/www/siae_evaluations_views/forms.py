@@ -104,7 +104,6 @@ TEMPORARY_SUSPENSION = "TEMPORARY_SUSPENSION"
 PERMANENT_SUSPENSION = "PERMANENT_SUSPENSION"
 SUBSIDY_CUT_PERCENT = "SUBSIDY_CUT_PERCENT"
 SUBSIDY_CUT_FULL = "SUBSIDY_CUT_FULL"
-DEACTIVATION = "DEACTIVATION"
 NO_SANCTIONS = "NO_SANCTIONS"
 SANCTION_CHOICES = {
     TRAINING: "Participation à une session de présentation de l’auto-prescription",
@@ -112,7 +111,6 @@ SANCTION_CHOICES = {
     PERMANENT_SUSPENSION: "Retrait définitif de la capacité d’auto-prescription",
     SUBSIDY_CUT_PERCENT: "Suppression d’une partie de l’aide au poste",
     SUBSIDY_CUT_FULL: "Suppression de toute l’aide au poste",
-    DEACTIVATION: "Déconventionnement de la structure",
     NO_SANCTIONS: "Ne pas sanctionner",
 }
 
@@ -248,17 +246,6 @@ class InstitutionEvaluatedSiaeNotifyStep3Form(forms.Form):
                         "aria-label": f"{SANCTION_CHOICES[SUBSIDY_CUT_FULL]} jusqu’au",
                         "placeholder": False,
                     }
-                ),
-            )
-        if DEACTIVATION in sanctions:
-            self.fields["deactivation_reason"] = forms.CharField(
-                label="Préciser ici les modalités à la SIAE",
-                help_text=(
-                    "Les étapes, recours, etc. seront communiqués de façon plus officielle par lettre recommandée "
-                    "avec accusé de réception."
-                ),
-                widget=forms.Textarea(
-                    attrs={"placeholder": "Merci de renseigner ici les détails concernant le déconventionnement"}
                 ),
             )
         if NO_SANCTIONS in sanctions:
