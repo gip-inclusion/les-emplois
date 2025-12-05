@@ -824,6 +824,10 @@ class EvaluatedJobApplication(models.Model):
 
         return evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
 
+    @property
+    def display_defect_reason(self):
+        return evaluation_enums.EVALUATED_JOB_APPLICATIONS_DEFECT[self.compute_state()]
+
     def save_selected_criteria(self, cleaned_keys, changed_keys):
         # cleaned_keys are checked fields when form is submitted.
         #    It contains new AND prexistant choices.

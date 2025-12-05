@@ -82,6 +82,22 @@
                             {% endif %}
                         </div>
                         <div class="card-body">
+                            <h2>Irrégularités constatées</h2>
+                        </div>
+                        <div class="card-body">
+                            {% for evaluated_job_application in evaluated_job_applications %}
+                                <p>
+                                    <strong>PASS IAE {{ evaluated_job_application.job_application.approval.number|format_approval_number }}, {{ evaluated_job_application.job_application.job_seeker.get_full_name }}</strong>
+                                    <br>
+                                    Motif de l'irrégularité : {{ evaluated_job_application.display_defect_reason }}
+                                    {% if sanctions.evaluated_job_applications_sanctions.count %}
+                                        <br>
+                                        Pourcentage d’aide au poste retirée : {{ evaluated_job_application.evaluated_job_application_sanction.subsidy_cut_percent|default:0 }} %
+                                    {% endif %}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        <div class="card-body">
                             {% if is_siae %}
                                 <a class="btn btn-primary float-end" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
                             {% else %}
