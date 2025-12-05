@@ -866,6 +866,27 @@
                   <li>
                       Bénéficiaire de l'AAH depuis moins de 6 mois
                   </li>
+                  <li>
+                      Sortant de l'ASE (Aide Sociale à l'Enfance)
+                  </li>
+                  <li>
+                      Parent isolé
+                  </li>
+                  <li>
+                      Personne sans hébergement ou hébergée ou ayant un parcours de rue
+                  </li>
+                  <li>
+                      Réfugié statutaire ou bénéficiaire de la protection subsidiaire
+                  </li>
+                  <li>
+                      Sortant de détention ou personne placée sous main de justice
+                  </li>
+                  <li>
+                      Maîtrise de la langue française inférieure au niveau A1
+                  </li>
+                  <li>
+                      Problème de mobilité
+                  </li>
               </ul>
           </li>
       </ul>

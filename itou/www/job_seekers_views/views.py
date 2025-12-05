@@ -61,6 +61,13 @@ def jobseeker_personal_infos_display_kwargs(jobseeker_profile):
         "rsa_allocation_since",
         "ass_allocation_since",
         "aah_allocation_since",
+        "ase_exit",
+        "isolated_parent",
+        "housing_issue",
+        "refugee",
+        "detention_exit_or_ppsmj",
+        "low_level_in_french",
+        "mobility_issue",
     ]
     return {
         "show_birth_place": jobseeker_profile.birth_country_id == Country.FRANCE_ID,
