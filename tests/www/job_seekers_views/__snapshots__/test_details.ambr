@@ -261,6 +261,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -510,6 +528,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -717,6 +753,24 @@
                                                   </i>
                                               </li>
                                           </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -1026,6 +1080,345 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_display_job_seeker_referent
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Candidat : Jane DOE
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Valider son éligibilité IAE
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour ce candidat
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Informations
+                                      </h2>
+                                      <div class="c-box mb-3 mb-md-4">
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Informations personnelles
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                                      </i>
+                                                      <span>
+                                                          Modifier
+                                                      </span>
+                                                  </a>
+                                                  <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
+                                                      <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1">
+                                                      </i>
+                                                  </button>
+                                              </div>
+                                          </div>
+                                          <ul class="list-data mb-3">
+                                              <li>
+                                                  <small>
+                                                      Prénom
+                                                  </small>
+                                                  <strong>
+                                                      Jane
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom
+                                                  </small>
+                                                  <strong>
+                                                      DOE
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Téléphone
+                                                  </small>
+                                                  <strong>
+                                                      06 12 34 56 78
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse e-mail
+                                                  </small>
+                                                  <strong>
+                                                      jane.doe@test.local
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Date de naissance
+                                                  </small>
+                                                  <strong>
+                                                      01/01/1990
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse
+                                                  </small>
+                                                  <address>
+                                                      12 rue Georges Bizet, 35000 Rennes
+                                                  </address>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Numéro de sécurité sociale
+                                                  </small>
+                                                  <strong>
+                                                      <span>
+                                                          2
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          90
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          010
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          101
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          25
+                                                      </span>
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Identifiant France Travail
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <form id="display-contact-info-form">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      </form>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                                                  <div class="c-box--results__summary flex-grow-1">
+                                                      <i aria-hidden="true" class="ri-home-smile-line">
+                                                      </i>
+                                                      <div>
+                                                          <div class="d-flex align-items-center gap-2">
+                                                              <h3>
+                                                                  Pierre DUPONT
+                                                              </h3>
+                                                              <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">
+                                                                  c’est vous
+                                                              </span>
+                                                          </div>
+                                                          <span>
+                                                              Prescripteur
+                          pour Les Olivades
+                                                          </span>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                                                  <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <li>
+                                                          <i aria-hidden="true" class="ri-calendar-line fw-normal me-1">
+                                                          </i>
+                                                          Accompagnateur depuis le 01/01/2024
+                                                      </li>
+                                                  </ul>
+                                                  <div>
+                                                      <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                                                          <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                                          </i>
+                                                          <span>
+                                                              Modifier mon intervention
+                                                          </span>
+                                                      </a>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <hr class="m-0"/>
+                                          <div class="c-box--results__body">
+                                              <ul class="list-data">
+                                                  <li>
+                                                      <small>
+                                                          Motif de l’accompagnement
+                                                      </small>
+                                                      <i class="text-disabled">
+                                                          Non renseigné
+                                                      </i>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Adresse e-mail
+                                                      </small>
+                                                      <strong>
+                                                          pierre.dupont@test.local
+                                                      </strong>
+                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
+                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                          </i>
+                                                          <span class="visually-hidden">
+                                                              Copier
+                                                          </span>
+                                                      </button>
+                                                  </li>
+                                                  <li>
+                                                      <small>
+                                                          Téléphone
+                                                      </small>
+                                                      <strong>
+                                                          0612345678
+                                                      </strong>
+                                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                                                          <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                          </i>
+                                                          <span class="visually-hidden">
+                                                              Copier
+                                                          </span>
+                                                      </button>
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <div class="c-info mb-3 mb-md-4">
+                                          <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                              <div class="flex-md-grow-1 align-items-center">
+                                                  <span class="c-info__summary">
+                                                      Découvrez tous les intervenants qui ont accompagné Jane DOE
+                                                  </span>
+                                              </div>
+                                              <div class="mx-2">
+                                                  <a class="btn btn-sm btn-primary" href="/gps/groups/[PK of FollowUpGroup]">
+                                                      <span>
+                                                          Je découvre !
+                                                      </span>
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -1183,7 +1576,7 @@
 # ---
 # name: test_job_application_tab[job seeker job applications view with sent job applications]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1740,6 +2133,23 @@
       }),
       dict({
         'origin': list([
+          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id"
+          FROM "gps_followupgroup"
+          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          ORDER BY "gps_followupgroup"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -2217,6 +2627,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -2478,6 +2906,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -2678,6 +3124,24 @@
                                                   </i>
                                               </li>
                                           </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -2932,6 +3396,24 @@
                                                   </strong>
                                               </li>
                                           </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -3196,6 +3678,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -3396,6 +3896,24 @@
                                                   </i>
                                               </li>
                                           </ul>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="row">
+                                  <div class="col-12">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
                                       </div>
                                   </div>
                               </div>
@@ -3663,6 +4181,24 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="row">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                                      <h2>
+                                          Qui accompagne ce candidat ?
+                                      </h2>
+                                      <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+                                          <div class="c-box--results__header">
+                                              <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                                                  <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                      <i>
+                                                          L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                                      </i>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                       </div>
                   </div>
@@ -3675,7 +4211,7 @@
 # ---
 # name: test_with_approval[SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -4226,6 +4762,23 @@
                  AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s)
           ORDER BY 10 DESC,
                    "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id"
+          FROM "gps_followupgroup"
+          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',
       }),

@@ -107,6 +107,9 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
+        group = FollowUpGroup.objects.filter(beneficiary=self.object).first()
+        user_in_group = False if group is None else group.members.contains(self.request.user)
+
         return super().get_context_data(**kwargs) | {
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "iae_eligibility_diagnosis": iae_eligibility_diagnosis,
@@ -128,6 +131,8 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "group": group,
+            "user_in_group": user_in_group,
         }
 
 

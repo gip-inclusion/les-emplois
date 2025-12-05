@@ -1,0 +1,33 @@
+{% load matomo %}
+{% load str_filters %}
+
+{% if group and group.referent %}
+    <form id="display-contact-info-form">
+        {% csrf_token %}{# Used by htmx posts #}
+    </form>
+    {% include "gps/includes/membership.html" with membership=group.referent %}
+    {% if user_in_group %}
+        <div class="c-info mb-3 mb-md-4">
+            <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                <div class="flex-md-grow-1 align-items-center">
+                    <span class="c-info__summary">Découvrez tous les intervenants qui ont accompagné {{ job_seeker.first_name|title }} {{ job_seeker.last_name|upper }}</span>
+                </div>
+                <div class="mx-2">
+                    <a href="{% url 'gps:group_memberships' group.pk %}" class="btn btn-sm btn-primary">
+                        <span>Je découvre !</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-no-referent">
+        <div class="c-box--results__header">
+            <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+                <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                    <i>L’accompagnateur de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} n’est pas connu de nos services</i>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
