@@ -2,21 +2,23 @@
 # name: TestDashboardView.test_dashboard
   '''
   <form action="/search/employers/results" method="get" role="search">
-      <label class="visually-hidden" for="id_city">
-          Ville
-      </label>
-      <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
-          <div class="input-group-text rounded-start ps-3 pe-2">
-              <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
-              </i>
-          </div>
-          <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-          </select>
-          <div class="input-group-text p-0">
-              <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                  <i aria-hidden="true" class="ri-search-line fw-medium">
+      <div class="c-search__bar__grid">
+          <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
+              <label class="input-group-text mb-0" for="id_city">
+                  <span class="visually-hidden">
+                      Ville
+                  </span>
+                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
                   </i>
-                  <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+              </label>
+              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+              </select>
+          </div>
+          <div class="input-group input-group-xl">
+              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+                  <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
+                  </i>
+                  <span class="me-1">
                       Rechercher
                   </span>
               </button>
@@ -1283,21 +1285,23 @@
                           <div class="c-search mt-3 mt-md-4">
                               <div class="c-search__bar">
                                   <form action="/search/employers/results" method="get" role="search">
-                                      <label class="visually-hidden" for="id_city">
-                                          Ville
-                                      </label>
-                                      <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
-                                          <div class="input-group-text rounded-start ps-3 pe-2">
-                                              <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
-                                              </i>
-                                          </div>
-                                          <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-                                          </select>
-                                          <div class="input-group-text p-0">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                                                  <i aria-hidden="true" class="ri-search-line fw-medium">
+                                      <div class="c-search__bar__grid">
+                                          <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
+                                              <label class="input-group-text mb-0" for="id_city">
+                                                  <span class="visually-hidden">
+                                                      Ville
+                                                  </span>
+                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
                                                   </i>
-                                                  <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+                                              </label>
+                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                              </select>
+                                          </div>
+                                          <div class="input-group input-group-xl">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+                                                  <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
+                                                  </i>
+                                                  <span class="me-1">
                                                       Rechercher
                                                   </span>
                                               </button>
@@ -1438,21 +1442,23 @@
                           <div class="c-search mt-3 mt-md-4">
                               <div class="c-search__bar">
                                   <form action="/search/employers/results" method="get" role="search">
-                                      <label class="visually-hidden" for="id_city">
-                                          Ville
-                                      </label>
-                                      <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
-                                          <div class="input-group-text rounded-start ps-3 pe-2">
-                                              <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled">
-                                              </i>
-                                          </div>
-                                          <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
-                                          </select>
-                                          <div class="input-group-text p-0">
-                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">
-                                                  <i aria-hidden="true" class="ri-search-line fw-medium">
+                                      <div class="c-search__bar__grid">
+                                          <div class="input-group input-group-xl input-group-search flex-nowrap align-items-center">
+                                              <label class="input-group-text mb-0" for="id_city">
+                                                  <span class="visually-hidden">
+                                                      Ville
+                                                  </span>
+                                                  <i aria-hidden="true" class="ri-map-pin-line fw-medium ri-xltext-disabled">
                                                   </i>
-                                                  <span class="d-none d-sm-inline-flex me-0 me-sm-1">
+                                              </label>
+                                              <select class="form-control django-select2" data-ajax--delay="250" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="1" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+                                              </select>
+                                          </div>
+                                          <div class="input-group input-group-xl">
+                                              <button aria-label="Rechercher un emploi inclusif" class="btn btn-block btn-ico btn-link">
+                                                  <i aria-hidden="true" class="ri-search-line ri-xl fw-bold">
+                                                  </i>
+                                                  <span class="me-1">
                                                       Rechercher
                                                   </span>
                                               </button>
