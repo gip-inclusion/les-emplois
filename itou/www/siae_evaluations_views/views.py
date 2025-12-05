@@ -334,7 +334,6 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
             suspension_dates=form.cleaned_data.get("suspension_dates"),
             subsidy_cut_percent=form.cleaned_data.get("subsidy_cut_percent"),
             subsidy_cut_dates=form.cleaned_data.get("subsidy_cut_dates"),
-            deactivation_reason=form.cleaned_data.get("deactivation_reason", ""),
             no_sanction_reason=form.cleaned_data.get("no_sanction_reason", ""),
         )
         evaluated_siae.notified_at = timezone.now()

@@ -936,10 +936,6 @@ class Sanctions(models.Model):
         null=True,
         verbose_name="dates de retrait de l’aide au poste",
     )
-    deactivation_reason = models.TextField(
-        blank=True,
-        verbose_name="explication du déconventionnement de la structure",
-    )
     no_sanction_reason = models.TextField(blank=True, verbose_name="explication de l’absence de sanction")
 
     class Meta:
@@ -964,14 +960,8 @@ class Sanctions(models.Model):
             [
                 self.suspension_dates,
                 self.subsidy_cut_dates,
-                self.deactivation_reason,
             ]
         )
 
     def count_active(self):
-        return (
-            bool(self.training_session)
-            + bool(self.suspension_dates)
-            + bool(self.subsidy_cut_dates)
-            + bool(self.deactivation_reason)
-        )
+        return bool(self.training_session) + bool(self.suspension_dates) + bool(self.subsidy_cut_dates)

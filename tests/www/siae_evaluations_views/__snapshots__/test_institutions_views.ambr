@@ -1896,7 +1896,6 @@
                  "siae_evaluations_sanctions"."suspension_dates",
                  "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
-                 "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -2241,7 +2240,6 @@
                  "siae_evaluations_sanctions"."suspension_dates",
                  "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
-                 "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
@@ -2586,7 +2584,6 @@
                  "siae_evaluations_sanctions"."suspension_dates",
                  "siae_evaluations_sanctions"."subsidy_cut_percent",
                  "siae_evaluations_sanctions"."subsidy_cut_dates",
-                 "siae_evaluations_sanctions"."deactivation_reason",
                  "siae_evaluations_sanctions"."no_sanction_reason"
           FROM "siae_evaluations_evaluatedsiae"
           INNER JOIN "siae_evaluations_evaluationcampaign" ON ("siae_evaluations_evaluatedsiae"."evaluation_campaign_id" = "siae_evaluations_evaluationcampaign"."id")
