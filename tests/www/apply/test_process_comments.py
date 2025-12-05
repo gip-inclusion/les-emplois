@@ -92,7 +92,17 @@ def test_add_comment_htmx(client, snapshot, caplog):
     client.force_login(user)
     job_app_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.id})
     response = client.get(job_app_url)
-    simulated_page = parse_response_to_soup(response, selector="#main")
+    simulated_page = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_app.job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
 
     add_comment_url = reverse("apply:add_comment_for_company", kwargs={"job_application_id": job_app.id})
     response = client.post(
@@ -104,7 +114,20 @@ def test_add_comment_htmx(client, snapshot, caplog):
 
     # Check that a fresh reload gets the same state
     response = client.get(job_app_url)
-    assertSoupEqual(parse_response_to_soup(response, selector="#main"), simulated_page)
+    assertSoupEqual(
+        parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                (
+                    "href",
+                    f"/gps/request-new-participant/{job_app.job_seeker.public_id}",
+                    "/gps/request-new-participant/[Public ID of JobSeeker]",
+                ),
+            ],
+        ),
+        simulated_page,
+    )
 
     comment = JobApplicationComment.objects.filter(created_by=user).order_by("-created_at").first()
     soup = parse_response_to_soup(
@@ -113,6 +136,11 @@ def test_add_comment_htmx(client, snapshot, caplog):
         replace_in_attr=itertools.chain(
             [
                 ("href", f"/apply/{job_app.id}/siae/accept", "/apply/[Pk of JobApplication]/siae/accept"),
+                (
+                    "href",
+                    f"/gps/request-new-participant/{job_app.job_seeker.public_id}",
+                    "/gps/request-new-participant/[Public ID of JobSeeker]",
+                ),
                 (
                     "hx-post",
                     f"/apply/{job_app.id}/siae/comment/{comment.id}/delete",

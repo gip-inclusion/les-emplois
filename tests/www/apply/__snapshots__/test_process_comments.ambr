@@ -427,6 +427,15 @@
                                               L’accompagnateur de Jane DOE n’est pas connu de nos services
                                           </i>
                                       </div>
+                                      <div>
+                                          <a class="btn btn-ico btn-primary btn-block w-100 w-md-auto white-space-nowrap" href="/gps/request-new-participant/[Public ID of JobSeeker]">
+                                              <i aria-hidden="true" class="ri-user-add-line">
+                                              </i>
+                                              <span>
+                                                  Ajouter un intervenant
+                                              </span>
+                                          </a>
+                                      </div>
                                   </div>
                               </div>
                           </div>

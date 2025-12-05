@@ -142,27 +142,9 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
             )
         )
 
-        request_new_participant_form_url = add_url_params(
-            "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
-            {
-                "user_name": self.request.user.get_full_name(),
-                "user_id": self.request.user.pk,
-                "user_email": self.request.user.email,
-                "user_organization_name": getattr(self.request.current_organization, "display_name", ""),
-                "user_organization_id": getattr(self.request.current_organization, "pk", ""),
-                "user_type": self.request.user.kind,
-                "beneficiary_name": self.group.beneficiary.get_full_name(),
-                "beneficiary_id": self.group.beneficiary.pk,
-                "beneficiary_email": self.group.beneficiary.email,
-                "success_url": self.request.build_absolute_uri(),
-                "followupgroup_id": self.group.pk,
-            },
-        )
-
         context = context | {
             "gps_memberships": memberships,
             "matomo_custom_title": "Profil GPS - participants",
-            "request_new_participant_form_url": request_new_participant_form_url,
             "active_tab": "memberships",
         }
 
@@ -589,3 +571,30 @@ def beneficiaries_autocomplete(request):
         users = [format_data(user) for user in users_qs[:10]]
 
     return JsonResponse({"results": users})
+
+
+@check_request(is_allowed_to_use_gps)
+def request_new_participant(request, job_seeker_public_id):
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
+    group, _created = FollowUpGroup.objects.get_or_create(beneficiary=job_seeker)
+
+    request_new_participant_form_url = add_url_params(
+        "https://formulaires.gps.inclusion.gouv.fr/ajouter-intervenant?",
+        {
+            "user_name": request.user.get_full_name(),
+            "user_id": request.user.pk,
+            "user_email": request.user.email,
+            "user_organization_name": getattr(request.current_organization, "display_name", ""),
+            "user_organization_id": getattr(request.current_organization, "pk", ""),
+            "user_type": request.user.kind,
+            "beneficiary_name": group.beneficiary.get_full_name(),
+            "beneficiary_id": group.beneficiary.pk,
+            "beneficiary_email": group.beneficiary.email,
+            "success_url": request.build_absolute_uri(),
+            "followupgroup_id": group.pk,
+        },
+    )
+
+    logger.info("GPS visit_request_new_participant")
+
+    return HttpResponseRedirect(request_new_participant_form_url)

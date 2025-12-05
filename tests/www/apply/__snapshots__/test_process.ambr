@@ -6887,6 +6887,186 @@
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_proxy_subject]
   '[TEST] Candidature de Jane DOE mise en attente par EI Acme inc.'
 # ---
+# name: TestProcessViews.test_referent_info_as_company
+  '''
+  <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
+      <div class="c-box--results__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="c-box--results__summary flex-grow-1">
+                  <i aria-hidden="true" class="ri-community-line">
+                  </i>
+                  <div>
+                      <div class="d-flex align-items-center gap-2">
+                          <h3>
+                              John DOE
+                          </h3>
+                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">
+                              c’est vous
+                          </span>
+                      </div>
+                      <span>
+                          Employeur
+                          pour Acme inc.
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+              <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                  <li>
+                      <i aria-hidden="true" class="ri-calendar-line fw-normal me-1">
+                      </i>
+                      Accompagnateur depuis le 01/01/2024
+                  </li>
+              </ul>
+              <div>
+                  <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                      </i>
+                      <span>
+                          Modifier mon intervention
+                      </span>
+                  </a>
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <ul class="list-data">
+              <li>
+                  <small>
+                      Motif de l’accompagnement
+                  </small>
+                  <i class="text-disabled">
+                      Non renseigné
+                  </i>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      john.doe@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="john.doe@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0606060606
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0606060606" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestProcessViews.test_referent_info_as_prescriber
+  '''
+  <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
+      <div class="c-box--results__header">
+          <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+              <div class="c-box--results__summary flex-grow-1">
+                  <i aria-hidden="true" class="ri-home-smile-line">
+                  </i>
+                  <div>
+                      <div class="d-flex align-items-center gap-2">
+                          <h3>
+                              Pierre DUPONT
+                          </h3>
+                          <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">
+                              c’est vous
+                          </span>
+                      </div>
+                      <span>
+                          Prescripteur
+                          pour Les Olivades
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+              <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                  <li>
+                      <i aria-hidden="true" class="ri-calendar-line fw-normal me-1">
+                      </i>
+                      Accompagnateur depuis le 01/01/2024
+                  </li>
+              </ul>
+              <div>
+                  <a class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap" href="/gps/groups/[PK of FollowUpGroup]/edition">
+                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                      </i>
+                      <span>
+                          Modifier mon intervention
+                      </span>
+                  </a>
+              </div>
+          </div>
+      </div>
+      <hr class="m-0"/>
+      <div class="c-box--results__body">
+          <ul class="list-data">
+              <li>
+                  <small>
+                      Motif de l’accompagnement
+                  </small>
+                  <i class="text-disabled">
+                      Non renseigné
+                  </i>
+              </li>
+              <li>
+                  <small>
+                      Adresse e-mail
+                  </small>
+                  <strong>
+                      pierre.dupont@test.local
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+              <li>
+                  <small>
+                      Téléphone
+                  </small>
+                  <strong>
+                      0612345678
+                  </strong>
+                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" type="button">
+                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                      </i>
+                      <span class="visually-hidden">
+                          Copier
+                      </span>
+                  </button>
+              </li>
+          </ul>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_add_prior_action
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">

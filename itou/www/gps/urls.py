@@ -25,6 +25,11 @@ urlpatterns = [
     path("groups/join/from-nir", views.join_group_from_nir, name="join_group_from_nir"),
     path("groups/join/from-name-email", views.join_group_from_name_and_email, name="join_group_from_name_and_email"),
     path("beneficiaries-autocomplete", views.beneficiaries_autocomplete, name="beneficiaries_autocomplete"),
+    path(
+        "request-new-participant/<uuid:job_seeker_public_id>",
+        views.request_new_participant,
+        name="request_new_participant",
+    ),
     # Backward compatibility - used in bizdev mailing
     path("", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),
     path("groups", RedirectView.as_view(url=reverse_lazy("gps:group_list"), permanent=True)),

@@ -129,6 +129,14 @@
             <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
                 <i>L’accompagnateur de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} n’est pas connu de nos services</i>
             </div>
+            {% if not request.user.is_job_seeker %}
+                <div>
+                    <a href="{% url 'gps:request_new_participant' job_seeker.public_id %}" class="btn btn-ico btn-primary btn-block w-100 w-md-auto white-space-nowrap">
+                        <i class="ri-user-add-line" aria-hidden="true"></i>
+                        <span>Ajouter un intervenant</span>
+                    </a>
+                </div>
+            {% endif %}
         </div>
     {% endif %}
 </div>

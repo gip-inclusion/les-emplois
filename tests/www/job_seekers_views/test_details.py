@@ -73,19 +73,49 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
 
     client.force_login(prescriber_membership.user)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with diag_and_update_eligibility")
 
     client.force_login(iae_employer)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with diag")
 
     non_iae_employer = CompanyMembershipFactory(company__not_subject_to_iae_rules=True).user
 
     client.force_login(non_iae_employer)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot without diag")
 
 
@@ -106,6 +136,11 @@ def test_with_approval(client, snapshot):
         selector="#main",
         replace_in_attr=[
             ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
         ],
     )
     assert pretty_indented(soup) == snapshot(name="HTML page")
@@ -132,18 +167,48 @@ def test_single_geiq_diag_from_prescriber(client, snapshot):
 
     client.force_login(geiq_employer)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with diag and details")
 
     client.force_login(prescriber_membership.user)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with diag but without details")
 
     non_geiq_employer = CompanyMembershipFactory(company__subject_to_iae_rules=True).user
     client.force_login(non_geiq_employer)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot without diag")
 
 
@@ -171,7 +236,17 @@ def test_both_diag_from_prescriber(client, snapshot):
 
     client.force_login(prescriber_membership.user)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with GEIQ & IAE diag")
 
 
@@ -208,17 +283,47 @@ def test_both_diag_from_company(client, snapshot):
     authorized_prescriber = PrescriberMembershipFactory(organization__authorized=True).user
     client.force_login(authorized_prescriber)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with both diag")
 
     client.force_login(geiq_membership.user)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with GEIQ diag")
 
     client.force_login(iae_membership.user)
     response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
     assert pretty_indented(soup) == snapshot(name="snapshot with IAE diag")
 
 
