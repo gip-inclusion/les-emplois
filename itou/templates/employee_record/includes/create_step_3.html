@@ -10,38 +10,19 @@
 <div class="s-section__row row">
     <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
         <div class="c-form">
+            <h2>Situation du {{ request.current_organization|worker_denomination }}</h2>
             <form method="post" class="js-prevent-multiple-submit">
                 {% csrf_token %}
+                {% bootstrap_form_errors form type="all" %}
                 <fieldset>
-                    <legend class="h3">Situation du {{ request.current_organization|worker_denomination }}</legend>
-                    {% bootstrap_form_errors form type="all" %}
-
+                    <legend>Qualification et maîtrise du français</legend>
                     {% bootstrap_field form.education_level %}
+                    {% bootstrap_field form.low_level_in_french %}
+                </fieldset>
 
-                    {% if not is_registered_to_pole_emploi %}
-                        {% collapse_field form.pole_emploi target_id="collapse_pole_emploi" %}
-                        <div id="collapse_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
-                            {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
-                        </div>
-                    {% else %}
-                        <p>Inscrit à France Travail, merci de préciser la durée d'inscription :</p>
-                        <div class="ps-3 pb-1 mb-3 border-start border-primary">
-                            {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
-                        </div>
-                    {% endif %}
-
+                <fieldset>
+                    <legend>Ressources</legend>
                     {% bootstrap_field form.resourceless %}
-
-                    {% collapse_field form.unemployed target_id="collapse_unemployed" %}
-                    <div id="collapse_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
-                        {% bootstrap_field form.unemployed_since wrapper_class="form-group form-group-input-w-lg-66" %}
-                    </div>
-
-                    {% bootstrap_field form.rqth_employee %}
-                    {% bootstrap_field form.oeth_employee %}
-
                     {% collapse_field form.rsa_allocation target_id="collapse_rsa_allocation" %}
                     <div id="collapse_rsa_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.rsa_markup %}
@@ -57,8 +38,45 @@
                     <div id="collapse_aah_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
                         {% bootstrap_field form.aah_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
                     </div>
+                </fieldset>
 
-                    {% if request.current_organization.kind == CompanyKind.EITI %}
+                <fieldset>
+                    <legend>Situation professionnelle</legend>
+                    {% collapse_field form.unemployed target_id="collapse_unemployed" %}
+                    <div id="collapse_unemployed" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.unemployed.value %} show{% endif %}">
+                        {% bootstrap_field form.unemployed_since wrapper_class="form-group form-group-input-w-lg-66" %}
+                    </div>
+
+                    {% if not is_registered_to_pole_emploi %}
+                        {% collapse_field form.pole_emploi target_id="collapse_pole_emploi" %}
+                        <div id="collapse_pole_emploi" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+                            {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
+                        </div>
+                    {% else %}
+                        <p>Inscrit à France Travail, merci de préciser la durée d'inscription :</p>
+                        <div class="ps-3 pb-1 mb-3 border-start border-primary">
+                            {% bootstrap_field form.pole_emploi_id wrapper_class="form-group form-group-input-w-lg-66" %}
+                            {% bootstrap_field form.pole_emploi_since wrapper_class="form-group form-group-input-w-lg-66" %}
+                        </div>
+                    {% endif %}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Situation de handicap</legend>
+                    {% bootstrap_field form.rqth_employee %}
+                    {% bootstrap_field form.oeth_employee %}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Situation familiale</legend>
+                    {% bootstrap_field form.isolated_parent %}
+                    {% bootstrap_field form.ase_exit %}
+                </fieldset>
+
+                {% if request.current_organization.kind == CompanyKind.EITI %}
+                    <fieldset>
+                        <legend>Informations spécifiques au travailleur indépendant</legend>
                         {% collapse_field form.are_allocation target_id="collapse_are_allocation" %}
                         <div id="collapse_are_allocation" class="ps-3 pb-1 mb-3 border-start border-primary collapse{% if form.are_allocation.value %} show{% endif %}">
                             {% bootstrap_field form.are_allocation_since wrapper_class="form-group form-group-input-w-lg-66" %}
@@ -74,7 +92,15 @@
                         {% bootstrap_field form.actor_met_for_business_creation %}
                         {% bootstrap_field form.mean_monthly_income_before_process %}
                         {% bootstrap_field form.eiti_contributions %}
-                    {% endif %}
+                    </fieldset>
+                {% endif %}
+
+                <fieldset>
+                    <legend>Autres situations</legend>
+                    {% bootstrap_field form.housing_issue %}
+                    {% bootstrap_field form.refugee %}
+                    {% bootstrap_field form.detention_exit_or_ppsmj %}
+                    {% bootstrap_field form.mobility_issue %}
                 </fieldset>
 
                 {% url "employee_record_views:create_step_2" job_application.id as secondary_url %}
