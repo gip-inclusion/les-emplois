@@ -86,15 +86,6 @@
                                         {% bootstrap_field form.subsidy_cut_to %}
                                     </section>
                                 {% endif %}
-                                {% if "deactivation_reason" in form.fields %}
-                                    <section>
-                                        <h3 class="mt-5">Déconventionnement de la structure</h3>
-                                        <p>
-                                            La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet ; Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
-                                        </p>
-                                        {% bootstrap_field form.deactivation_reason %}
-                                    </section>
-                                {% endif %}
                                 {% if "no_sanction_reason" in form.fields %}
                                     <section>
                                         <h3 class="mt-5">Ne pas sanctionner</h3>

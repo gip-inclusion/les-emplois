@@ -340,7 +340,6 @@ class SanctionsAdmin(ItouModelAdmin):
         "suspension_dates",
         "subsidy_cut_percent",
         "subsidy_cut_dates",
-        "deactivation_reason",
         "no_sanction_reason",
     ]
     list_filter = ("evaluated_siae__evaluation_campaign__name",)
