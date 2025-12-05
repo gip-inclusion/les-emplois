@@ -22,6 +22,8 @@ from itou.external_data.models import ExternalDataImport
 from itou.geiq_assessments.models import LabelInfos
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
+from itou.nexus.enums import Service
+from itou.nexus.models import APIFullSync
 from itou.siae_evaluations.models import Sanctions
 from itou.users.models import NirModificationRequest
 from tests.cities.factories import create_city_guerande
@@ -101,6 +103,7 @@ def test_all_admin(admin_client, mocker, subtests):
         job_application=JobApplicationFactory(job_seeker=job_seeker),
         to_state=JobApplicationState.PROCESSING,
     )
+    APIFullSync.objects.create(service=Service.DORA)
 
     # Call factories that need parameters
     QPVFactory(code="QP093028")
