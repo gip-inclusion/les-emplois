@@ -55,7 +55,7 @@ class TestEvaluatedSiaeSanctionView:
             '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
         )
 
-    def assertSanctionContent(self, response):
+    def assertSanctionContent(self, response, subsidy_cut_percent=None):
         assertContains(
             response,
             '<h1>Notification de sanction pour <span class="text-info">Les petits jardins</span></h1>',
@@ -83,6 +83,23 @@ class TestEvaluatedSiaeSanctionView:
                     <p>A envoyé une photo de son chat. Séparé de son chat pendant une journée.</p>
                 </div>
             </div>
+            """,
+            html=True,
+            count=1,
+        )
+        subsidy_cut_str = (
+            f"<br>Pourcentage d’aide au poste retirée : {subsidy_cut_percent} %" if subsidy_cut_percent else ""
+        )
+        assertContains(
+            response,
+            f"""
+            <p>
+             <strong>PASS IAE <span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span>,
+             Jane DOE</strong>
+             <br> Motif de l'irrégularité : Les documents fournis se sont révélés incomplets ou non conformes
+             aux exigences réglementaires.
+             {subsidy_cut_str}
+            </p>
             """,
             html=True,
             count=1,
@@ -225,7 +242,7 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
+        self.assertSanctionContent(response, subsidy_cut_percent)
         assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
             name=f"sanctions with subsidy_cut_percent={subsidy_cut_percent}"
         )
