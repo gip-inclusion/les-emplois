@@ -3,16 +3,18 @@
 
 {% bootstrap_form_errors form type="all" %}
 
-<label for="{{ form.city.id_for_label }}" class="visually-hidden">{{ form.city.label }}</label>
-<div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap align-items-center">
-    <div class="input-group-text rounded-start {% if is_home %}ps-0{% else %}ps-3{% endif %} pe-2">
-        <i class="ri-map-pin-line {% if is_home %}ri-xl{% else %}ri-lg{% endif %} text-disabled" aria-hidden="true"></i>
+<div class="c-search__bar__grid">
+    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap align-items-center">
+        <label class="input-group-text mb-0{% if is_home %} ps-0{% endif %}" for="{{ form.city.id_for_label }}">
+            <span class="visually-hidden">{{ form.city.label }}</span>
+            <i class="ri-map-pin-line fw-medium ri-xl{% if is_home %}text-tertiary{% else %}text-disabled{% endif %}" aria-hidden="true"></i>
+        </label>
+        {{ form.city }}
     </div>
-    {{ form.city }}
-    <div class="input-group-text p-0">
-        <button class="btn btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %}" aria-label="Rechercher un emploi inclusif">
-            <i class="ri-search-line fw-medium" aria-hidden="true"></i>
-            <span class="d-none d-sm-inline-flex me-0 me-sm-1">Rechercher</span>
+    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl{% endif %}">
+        <button class="btn btn-block btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %}" aria-label="Rechercher un emploi inclusif">
+            <i class="ri-search-line ri-xl fw-bold" aria-hidden="true"></i>
+            <span class="me-1">Rechercher</span>
         </button>
     </div>
 </div>
