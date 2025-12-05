@@ -236,20 +236,6 @@ class TestEvaluatedSiaeSanctionView:
         self.assertSanctionContent(response)
         assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_deactivation(self, client, snapshot):
-        self.sanctions.training_session = ""
-        self.sanctions.deactivation_reason = "Mauvais comportement, rien ne va. On arrête tout."
-        self.sanctions.save()
-        client.force_login(self.institution_user)
-        response = client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_sanction",
-                kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
-            )
-        )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
-
     def test_no_sanction(self, client, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.no_sanction_reason = "Ça ira pour cette fois."

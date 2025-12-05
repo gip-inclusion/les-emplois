@@ -2064,9 +2064,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             reviewed_at=timezone.make_aware(datetime.datetime(2022, 7, 24)),
         )
         EvaluatedJobApplicationFactory.create_batch(2, evaluated_siae=previous_evaluated_siae_2)
-        Sanctions.objects.create(
-            evaluated_siae=previous_evaluated_siae_2, deactivation_reason="Ça commence à bien faire"
-        )
+        Sanctions.objects.create(evaluated_siae=previous_evaluated_siae_2, training_session="Ça commence à bien faire")
 
         campaign = EvaluationCampaignFactory(
             institution=self.institution, ended_at=timezone.now() - relativedelta(hours=1)
@@ -2085,10 +2083,8 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         FINAL_SUSPENSION = "<li>Retrait définitif de la capacité d’auto-prescription</li>"
         PARTIAL_CUT = "<li>Suppression d’une partie de l’aide au poste</li>"
         TOTAL_CUT = "<li>Suppression de l’aide au poste</li>"
-        DEACTIVATION = "<li>Déconventionnement de la structure</li>"
 
         assertContains(response, NO_SANCTION)
-        assertContains(response, DEACTIVATION)
         assertNotContains(response, TEMP_SUSPENSION)
         assertNotContains(response, FINAL_SUSPENSION)
         assertNotContains(response, PARTIAL_CUT, html=True)
@@ -2111,7 +2107,6 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertNotContains(response, FINAL_SUSPENSION)
         assertContains(response, PARTIAL_CUT, html=True)
         assertNotContains(response, TOTAL_CUT, html=True)
-        assertContains(response, DEACTIVATION)
 
         sanctions_1.suspension_dates = InclusiveDateRange(datetime.date(2022, 3, 1))
         sanctions_1.subsidy_cut_dates = InclusiveDateRange(datetime.date(2022, 3, 1), datetime.date(2022, 3, 2))
@@ -2129,7 +2124,6 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertContains(response, FINAL_SUSPENSION)
         assertNotContains(response, PARTIAL_CUT, html=True)
         assertContains(response, TOTAL_CUT, html=True)
-        assertContains(response, DEACTIVATION)
 
 
 class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
@@ -2299,7 +2293,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep2(InstitutionEvaluatedSiaeNotify
         parser = html5lib.HTMLParser(namespaceHTMLElements=False)
         html = parser.parse(response.content)
         checkboxes = html.findall(".//input[@type='checkbox'][@name='sanctions']")
-        assert len(checkboxes) == 7
+        assert len(checkboxes) == 6
         assert sorted(c.get("value") for c in checkboxes if "checked" in c.attrib) == sorted(checked_values)
 
     def test_get_empty_session(self, client):
@@ -2518,7 +2512,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.suspension_dates is None
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
         assert evaluated_siae.sanctions.subsidy_cut_dates is None
-        assert evaluated_siae.sanctions.deactivation_reason == ""
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2563,7 +2556,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         )
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
         assert evaluated_siae.sanctions.subsidy_cut_dates is None
-        assert evaluated_siae.sanctions.deactivation_reason == ""
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2900,7 +2892,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.suspension_dates == InclusiveDateRange(datetime.date(2023, 1, 1))
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
         assert evaluated_siae.sanctions.subsidy_cut_dates is None
-        assert evaluated_siae.sanctions.deactivation_reason == ""
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -2999,7 +2990,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
             datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
         )
-        assert evaluated_siae.sanctions.deactivation_reason == ""
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -3136,47 +3126,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
             datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
         )
-        assert evaluated_siae.sanctions.deactivation_reason == ""
-        assert evaluated_siae.sanctions.no_sanction_reason == ""
-
-    @freeze_time("2022-10-24 11:11:00")
-    def test_post_deactivation(self, client, mailoutbox):
-        company_membership = CompanyMembershipFactory(
-            company__name="Les petits jardins", user__email="siae@mailinator.com"
-        )
-        evaluated_siae = EvaluatedSiaeFactory(
-            evaluation_campaign__name="Campagne 2022",
-            evaluation_campaign__institution=self.institution,
-            siae=company_membership.company,
-            complete=True,
-            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
-            notification_text="A envoyé une photo de son chat.",
-        )
-        self.login(client, evaluated_siae, sanctions=["DEACTIVATION"])
-        response = client.post(
-            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
-            {"deactivation_reason": "Chat trop vorace."},
-        )
-        assertRedirects(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            ),
-        )
-        assertMessages(response, [])
-
-        evaluated_siae.refresh_from_db()
-        assert evaluated_siae.notified_at == timezone.now()
-        assert evaluated_siae.notification_reason == "INVALID_PROOF"
-        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        assert mailoutbox == []
-        assert evaluated_siae.sanctions.training_session == ""
-        assert evaluated_siae.sanctions.suspension_dates is None
-        assert evaluated_siae.sanctions.subsidy_cut_percent is None
-        assert evaluated_siae.sanctions.subsidy_cut_dates is None
-        assert evaluated_siae.sanctions.deactivation_reason == "Chat trop vorace."
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
@@ -3238,7 +3187,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.suspension_dates is None
         assert evaluated_siae.sanctions.subsidy_cut_percent is None
         assert evaluated_siae.sanctions.subsidy_cut_dates is None
-        assert evaluated_siae.sanctions.deactivation_reason == ""
         assert evaluated_siae.sanctions.no_sanction_reason == "Chat trop mignon."
 
     @freeze_time("2022-10-24 11:11:00")
@@ -3255,7 +3203,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT", "DEACTIVATION"])
+        self.login(client, evaluated_siae, sanctions=["PERMANENT_SUSPENSION", "SUBSIDY_CUT_PERCENT"])
         response = client.post(
             reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
             {
@@ -3263,7 +3211,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 "subsidy_cut_percent": 20,
                 "subsidy_cut_from": datetime.date(2023, 1, 1),
                 "subsidy_cut_to": datetime.date(2023, 6, 1),
-                "deactivation_reason": "Chat trop vorace.",
             },
         )
         assertRedirects(
@@ -3286,7 +3233,6 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.subsidy_cut_dates == InclusiveDateRange(
             datetime.date(2023, 1, 1), datetime.date(2023, 6, 1)
         )
-        assert evaluated_siae.sanctions.deactivation_reason == "Chat trop vorace."
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
 
