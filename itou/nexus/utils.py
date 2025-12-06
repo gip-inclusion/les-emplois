@@ -5,6 +5,8 @@ import time
 from django.conf import settings
 from jwcrypto import jwk, jwt
 
+from itou.nexus.enums import Service
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,3 +31,18 @@ def decode_jwt(token):
     except Exception:
         logger.exception("Could not decrypt jwt")
         raise ValueError
+
+
+SERVICE_MAPPING = {
+    Service.COMMUNAUTE: "la-communauté",
+    Service.DORA: "dora",
+    Service.EMPLOIS: "emplois-de-linclusion",
+    Service.MARCHE: "le-marché",
+    Service.DATA_INCLUSION: "data-inclusion",
+    Service.PILOTAGE: "pilotage",
+    Service.MON_RECAP: "mon-recap",
+}
+
+
+def service_id(id, service):
+    return f"{SERVICE_MAPPING[service]}--{id}"
