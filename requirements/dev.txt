@@ -507,9 +507,9 @@ django-otp==1.6.3 \
     --hash=sha256:93f0011bc4cb6ef278733d75de351f3e2de6fd13ece56cf27b63e1da42322d24 \
     --hash=sha256:f7ff9e6980c4aa9e6b9f7a7477de0a65583891a78e5b8c6cae0ec7cc0f78ce55
     # via -r requirements/test.txt
-django-pgtrigger==4.16.0 \
-    --hash=sha256:0e11c81b680d1114da419dcf0e511b400acdb5d43915bf2f2d17e70f3a91694b \
-    --hash=sha256:67128491bfbf1c34f9753061440149f774a5c1e2335be321703eb401abc226b3
+django-pgtrigger==4.17.0 \
+    --hash=sha256:06048cdeb57e20987fd0bf7dd673512a1413a08868eea248d70dbb970e967175 \
+    --hash=sha256:55d297a756b5b6a8e0c533d3323fda1589c699e7d14aa3fff7fa7d774c46363c
     # via -r requirements/test.txt
 django-redis==6.0.0 \
     --hash=sha256:20bf0063a8abee567eb5f77f375143c32810c8700c0674ced34737f8de4e36c0 \
