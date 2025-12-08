@@ -732,9 +732,9 @@ httpx==0.28.1 \
     # via
     #   -r requirements/test.txt
     #   respx
-huey==2.5.4 \
-    --hash=sha256:0eac1fb2711f6366a1db003629354a0cea470a3db720d5bab0d140c28e993f9c \
-    --hash=sha256:4b7fb217b640fbb46efc4f4681b446b40726593522f093e8ef27c4a8fcb6cfbb
+huey==2.5.5 \
+    --hash=sha256:82ac73343248c5d7acec04814f952c61f7793e11fd99d26ed9030137d32f912c \
+    --hash=sha256:a39010628a9a1a9e91462f9bf33dc243b006a9f21193026ea47ae18949a12581
     # via -r requirements/test.txt
 identify==2.6.15 \
     --hash=sha256:1181ef7608e00704db228516541eb83a88a9f94433a8c80bb9b5bd54b1d81757 \
