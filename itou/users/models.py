@@ -968,21 +968,21 @@ class JobSeekerProfile(models.Model):
 
     rsa_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="allocataire du RSA depuis",
+        verbose_name="bénéficiaire du RSA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="allocataire de l'ASS depuis",
+        verbose_name="bénéficiaire de l'ASS depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="allocataire de l'AAH depuis",
+        verbose_name="bénéficiaire de l'AAH depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
@@ -990,14 +990,14 @@ class JobSeekerProfile(models.Model):
     # Fields specifics to the EITI
     are_allocation_since = models.CharField(
         max_length=2,
-        verbose_name="allocataire de l'ARE depuis",
+        verbose_name="bénéficiaire de l'ARE depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     activity_bonus_since = models.CharField(
         max_length=2,
-        verbose_name="allocataire de la prime d'activité depuis",
+        verbose_name="bénéficiaire de la prime d'activité depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )

@@ -526,7 +526,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="allocataire du RSA depuis",
+                        verbose_name="bénéficiaire du RSA depuis",
                     ),
                 ),
                 (
@@ -540,7 +540,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="allocataire de l'ASS depuis",
+                        verbose_name="bénéficiaire de l'ASS depuis",
                     ),
                 ),
                 (
@@ -554,7 +554,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="allocataire de l'AAH depuis",
+                        verbose_name="bénéficiaire de l'AAH depuis",
                     ),
                 ),
                 (
@@ -832,7 +832,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="allocataire de la prime d'activité depuis",
+                        verbose_name="bénéficiaire de la prime d'activité depuis",
                     ),
                 ),
                 (
@@ -862,7 +862,7 @@ class Migration(migrations.Migration):
                             ("04", "24 mois et plus"),
                         ],
                         max_length=2,
-                        verbose_name="allocataire de l'ARE depuis",
+                        verbose_name="bénéficiaire de l'ARE depuis",
                     ),
                 ),
                 ("cape_freelance", models.BooleanField(default=False, verbose_name="bénéficiaire CAPE")),
