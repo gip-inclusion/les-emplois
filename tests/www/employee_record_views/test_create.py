@@ -7,6 +7,7 @@ from django.contrib.gis.geos import Point
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
@@ -882,8 +883,8 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     SIAE_KIND = random.choice(list(set(CompanyKind.siae_kinds()) - {CompanyKind.EITI}))
 
     # For EITI fields display checks
-    ARE_ALLOCATION_LABEL = "Bénéficiaire de l'ARE depuis"
-    ACTIVITY_BONUS_LABEL = "Bénéficiaire de la prime d'activité depuis"
+    ARE_ALLOCATION_LABEL = escape("Bénéficiaire de l'ARE depuis")
+    ACTIVITY_BONUS_LABEL = escape("Bénéficiaire de la prime d'activité depuis")
     CAPE_FREELANCE_LABEL = "Bénéficiaire CAPE"
     CESA_FREELANCE_LABEL = "Bénéficiaire CESA"
     ACTOR_MET_LABEL = "Acteur rencontré : "
