@@ -2726,7 +2726,7 @@ class TestJobApplicationsEnums:
         """Some reasons are kept for history but not displayed to end users."""
         hidden_choices = RefusalReason.hidden()
         for choice in hidden_choices:
-            reasons = [choice[0] for choice in RefusalReason.displayed_choices()]
+            reasons = [choice[0] for choice in RefusalReason.displayed_choices(kind=CompanyKind.EI)]
             assert len(reasons) > 0
             with subtests.test(choice.label):
                 assert choice.value not in reasons

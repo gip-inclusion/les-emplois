@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 
+from itou.companies.enums import CompanyKind
 from itou.users import enums as users_enums
 
 
@@ -101,14 +102,17 @@ class RefusalReason(models.TextChoices):
         ]
 
     @classmethod
-    def displayed_choices(cls, extra_exclude_enums=None):
+    def displayed_choices(cls, kind):
         """
         Hide values in forms but don't override self.choices method to keep hidden enums visible in Django admin.
         """
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         excluded_enums = cls.hidden()
-        if extra_exclude_enums:
-            excluded_enums += extra_exclude_enums
+        if kind == CompanyKind.GEIQ:
+            excluded_enums += [
+                cls.PREVENT_OBJECTIVES,
+                cls.NON_ELIGIBLE,
+            ]
         return empty + [(enum.value, enum.label) for enum in cls if enum not in excluded_enums]
 
 

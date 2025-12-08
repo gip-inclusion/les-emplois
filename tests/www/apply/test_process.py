@@ -1154,8 +1154,10 @@ class TestProcessViews:
         """Ensure that the `refuse` transition is triggered through the expected workflow for a prescriber."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
+        reason, reason_label = random.choice(
+            job_applications_enums.RefusalReason.displayed_choices(kind=job_application.to_company.kind)
+        )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
@@ -1215,8 +1217,10 @@ class TestProcessViews:
         """Ensure that the `refuse` transition is triggered through the expected workflow for a job seeker."""
 
         state = random.choice(JobApplicationWorkflow.CAN_BE_REFUSED_STATES)
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
         job_application = JobApplicationSentByJobSeekerFactory(state=state)
+        reason, reason_label = random.choice(
+            job_applications_enums.RefusalReason.displayed_choices(kind=job_application.to_company.kind)
+        )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 

@@ -148,10 +148,6 @@ def _get_orienter_and_prescriber_nb(job_applications):
 
 
 class JobApplicationRefusalReasonForm(forms.Form):
-    refusal_reason = forms.ChoiceField(
-        widget=forms.RadioSelect,
-        choices=job_applications_enums.RefusalReason.displayed_choices(),
-    )
     refusal_reason_shared_with_job_seeker = forms.BooleanField(required=False)
 
     def __init__(self, job_applications, *args, **kwargs):
@@ -176,15 +172,12 @@ class JobApplicationRefusalReasonForm(forms.Form):
             label = "Choisir le motif de refus envoyé aux prescripteurs/orienteurs"
         else:
             label = "Choisir le motif de refus"
-        self.fields["refusal_reason"].label = label
 
-        if company.kind == CompanyKind.GEIQ:
-            self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
-                extra_exclude_enums=[
-                    job_applications_enums.RefusalReason.PREVENT_OBJECTIVES,
-                    job_applications_enums.RefusalReason.NON_ELIGIBLE,
-                ]
-            )
+        self.fields["refusal_reason"] = forms.ChoiceField(
+            label=label,
+            widget=forms.RadioSelect,
+            choices=job_applications_enums.RefusalReason.displayed_choices(kind=company.kind),
+        )
 
 
 class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
