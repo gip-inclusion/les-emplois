@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2025-12-08
+
+### Ajouté
+
+- [Admin : Permettre l’import du fichier ACI Convergence / PHC](https://github.com/gip-inclusion/les-emplois/pull/7183)
+- [Éligibilité : Réessayer de certifier les critères administratifs si la tâche a échoué](https://github.com/gip-inclusion/les-emplois/pull/7158)
+
+### Modifié
+
+- [API : Amélioration de la gestion des API pour les services de la Plateforme de l'inclusion](https://github.com/gip-inclusion/les-emplois/pull/7179)
+- [Candidature : Demander les mêmes informations aux entreprises quel que soit leur type (IAE, GEIQ ou autres)](https://github.com/gip-inclusion/les-emplois/pull/7161)
+- [Candidature : Correction d'un bug lors de l'export de candidatures avec un NIA](https://github.com/gip-inclusion/les-emplois/pull/7219)
+- [Contrôle a posteriori : Modification de la politique de notification par mail](https://github.com/gip-inclusion/les-emplois/pull/7110)
+- [Fiche de poste : Envoi des notifications de dépublication aux membres actifs uniquement](https://github.com/gip-inclusion/les-emplois/pull/7031)
+- [Fiche salarié : Ajout du NIR dans le résumé de la fiche salarié](https://github.com/gip-inclusion/les-emplois/pull/7218)
+
 ## 2025-12-01
 
 ### Modifié
