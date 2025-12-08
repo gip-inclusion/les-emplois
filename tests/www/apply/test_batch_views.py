@@ -1162,7 +1162,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "NEW"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
@@ -1252,7 +1252,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_apps = [
             JobApplicationFactory(
                 to_company=company,
@@ -1347,7 +1347,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         job_seeker = JobSeekerFactory()
         refusable_apps = JobApplicationFactory.create_batch(
             2,
@@ -1428,7 +1428,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
@@ -1486,7 +1486,7 @@ class TestBatchRefuse:
         next_url = reverse("apply:list_for_siae", query={"state": "PROCESSING"})
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_app = JobApplicationFactory(
             job_seeker__first_name="Jean",
             job_seeker__last_name="BOND",
@@ -1543,7 +1543,7 @@ class TestBatchRefuse:
         employer = company.members.first()
         client.force_login(employer)
 
-        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices())
+        reason, reason_label = random.choice(job_applications_enums.RefusalReason.displayed_choices(kind=company.kind))
         refusable_apps = [
             JobApplicationFactory(
                 to_company=company,
