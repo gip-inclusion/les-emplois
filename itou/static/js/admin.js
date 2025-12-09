@@ -32,11 +32,7 @@
     }
   });
   // Auto-scroll to the current app in the menu
+  const sidebar_nav = document.querySelector("#nav-sidebar");
   const current_app_nav = document.querySelector(".current-app");
-  current_app_nav.scrollIntoView(true, {
-      block: 'center',
-      container: 'nearest',
-      inline: 'nearest',
-  });
-  window.scrollBy(0, -100);
+  sidebar_nav.scrollTop = current_app_nav.offsetTop;
 }());
