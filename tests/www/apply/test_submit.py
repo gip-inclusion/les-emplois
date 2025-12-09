@@ -5204,6 +5204,16 @@ class TestCheckJobSeekerInformationsForHire:
                 id="job_seeker_with_all_datas",
             ),
             pytest.param(
+                {
+                    "for_snapshot": True,
+                    "born_in_france": True,
+                    "with_pole_emploi_id": True,
+                    "jobseeker_profile__pole_emploi_id": "09443041",
+                    "jobseeker_profile__resourceless": True,
+                },
+                id="job_seeker_with_single_other_data",
+            ),
+            pytest.param(
                 {"for_snapshot": True, "jobseeker_profile__birth_country_id": 126},
                 id="job_seeker_not_born_in_france",
             ),
