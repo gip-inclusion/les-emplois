@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import json
 import random
@@ -19,7 +20,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, Commune, EducationLevel
+from itou.asp.models import AllocationDuration, Commune, EducationLevel, RSAAllocation
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import (
@@ -932,6 +933,62 @@ class TestJobSeekerProfileModel:
                 birth_place=profile_values.birth_place,
                 birth_country=profile_values.birth_country,
             )
+
+    @pytest.mark.parametrize(
+        "factory_kwargs, expect_error",
+        [
+            ({"has_rsa_allocation": "", "rsa_allocation_since": ""}, False),
+            (
+                {
+                    "has_rsa_allocation": RSAAllocation.YES_WITHOUT_MARKUP,
+                    "rsa_allocation_since": AllocationDuration.LESS_THAN_6_MONTHS,
+                },
+                False,
+            ),
+            (
+                {
+                    "has_rsa_allocation": RSAAllocation.NO,
+                    "rsa_allocation_since": "",
+                },
+                False,
+            ),
+            (
+                {
+                    "has_rsa_allocation": RSAAllocation.YES_WITHOUT_MARKUP,
+                    "rsa_allocation_since": "",
+                },
+                True,
+            ),
+            (
+                {
+                    "has_rsa_allocation": RSAAllocation.NO,
+                    "rsa_allocation_since": AllocationDuration.MORE_THAN_24_MONTHS,
+                },
+                True,
+            ),
+            (
+                {
+                    "has_rsa_allocation": "",
+                    "rsa_allocation_since": AllocationDuration.FROM_12_TO_23_MONTHS,
+                },
+                True,
+            ),
+        ],
+    )
+    def test_rsa_constraint(self, factory_kwargs, expect_error):
+        ctxt = (
+            pytest.raises(
+                IntegrityError,
+                match=(
+                    'new row for relation ".*" violates check constraint "jobseekerprofile_rsa_allocation_consistency"'
+                ),
+            )
+            if expect_error
+            else contextlib.nullcontext()
+        )
+        profile = JobSeekerProfileFactory()
+        with ctxt:
+            JobSeekerProfile.objects.filter(pk=profile.pk).update(**factory_kwargs)
 
 
 def user_with_approval_in_waiting_period():
