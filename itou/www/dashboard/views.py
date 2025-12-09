@@ -215,6 +215,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                 {
                     "layout_kind": DashboardStatsLayoutKind.EMPLOYER,
                     "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+                    "can_view_stats_siae_beneficiaries": stats_utils.can_view_stats_siae_beneficiaries(request),
                 }
             )
     elif request.user.is_prescriber:

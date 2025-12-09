@@ -1,13 +1,12 @@
 import pytest
 
+from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
-from tests.prescribers.factories import (
-    PrescriberOrganizationFactory,
-)
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -29,6 +28,23 @@ def test_can_view_stats_siae():
     user.companymembership_set.update(is_admin=False)
     request = get_request(user)
     assert utils.can_view_stats_siae(request)
+
+
+@pytest.mark.parametrize(
+    "kind,expected_result",
+    [
+        (CompanyKind.ACI, True),
+        (CompanyKind.AI, True),
+        (CompanyKind.EI, True),
+        (CompanyKind.EITI, False),
+        (CompanyKind.ETTI, True),
+    ],
+)
+def test_can_view_stats_siae_beneficiaries(kind, expected_result):
+    company = CompanyFactory(kind=kind, with_membership=True, subject_to_iae_rules=True)
+    user = company.members.get()
+    request = get_request(user)
+    assert utils.can_view_stats_siae_beneficiaries(request) is expected_result
 
 
 def test_can_view_stats_ft_as_regular_ft_agency():
