@@ -161,8 +161,8 @@
         </section>
     {% endif %}
 
-    {% if code_insee %}
-        <div hx-get="{% url "companies_views:hx_dora_services" code_insee=code_insee %}" hx-trigger="load"></div>
+    {% if di_widget_token and code_insee %}
+        {% include "companies/di_widget.html" with di_widget_token=di_widget_token di_base_url=di_base_url code_insee=code_insee only %}
     {% endif %}
 
 {% endblock %}
