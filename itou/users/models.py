@@ -929,7 +929,7 @@ class JobSeekerProfile(models.Model):
         choices=EducationLevel.choices,
     )
 
-    resourceless = models.BooleanField(verbose_name="sans ressource", default=False)
+    resourceless = models.BooleanField(verbose_name="sans ressources", default=False)
 
     rqth_employee = models.BooleanField(
         verbose_name="titulaire de la RQTH",
