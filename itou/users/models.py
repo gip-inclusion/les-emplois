@@ -1154,6 +1154,21 @@ class JobSeekerProfile(models.Model):
                     "France."
                 ),
             ),
+            models.CheckConstraint(
+                condition=(
+                    Q(has_rsa_allocation="", rsa_allocation_since="")
+                    | Q(has_rsa_allocation=RSAAllocation.NO, rsa_allocation_since="")
+                    | Q(
+                        has_rsa_allocation__in=[RSAAllocation.YES_WITH_MARKUP, RSAAllocation.YES_WITHOUT_MARKUP],
+                        rsa_allocation_since__in=AllocationDuration.values,
+                    )
+                ),
+                name="jobseekerprofile_rsa_allocation_consistency",
+                violation_error_message=(
+                    "La durée d'allocation RSA doit être spécifiée si et seulement si le demandeur d'emploi est "
+                    "bénéficiaire du RSA."
+                ),
+            ),
             models.UniqueConstraint(
                 "nir",
                 name="jobseekerprofile_unique_nir_if_not_empty",

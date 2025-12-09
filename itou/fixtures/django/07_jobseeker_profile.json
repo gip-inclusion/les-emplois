@@ -223,7 +223,7 @@
       "pole_emploi_since": "",
       "resourceless": false,
       "rqth_employee": false,
-      "rsa_allocation_since": "",
+      "rsa_allocation_since": "01",
       "unemployed_since": ""
     },
     "model": "users.jobseekerprofile",
@@ -269,7 +269,7 @@
       "pole_emploi_since": "",
       "resourceless": false,
       "rqth_employee": false,
-      "rsa_allocation_since": "",
+      "rsa_allocation_since": "02",
       "unemployed_since": ""
     },
     "model": "users.jobseekerprofile",
@@ -315,7 +315,7 @@
       "pole_emploi_since": "",
       "resourceless": false,
       "rqth_employee": false,
-      "rsa_allocation_since": "",
+      "rsa_allocation_since": "03",
       "unemployed_since": ""
     },
     "model": "users.jobseekerprofile",
@@ -361,7 +361,7 @@
       "pole_emploi_since": "",
       "resourceless": false,
       "rqth_employee": false,
-      "rsa_allocation_since": "",
+      "rsa_allocation_since": "02",
       "unemployed_since": ""
     },
     "model": "users.jobseekerprofile",
