@@ -2,14 +2,12 @@ from django.conf import settings
 from django.core.cache import caches
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.metabase.models import DatumKey
-from itou.prescribers.enums import (
-    DTFT_SAFIR_CODE_TO_DEPARTMENTS,
-    PrescriberOrganizationKind,
-)
+from itou.prescribers.enums import DTFT_SAFIR_CODE_TO_DEPARTMENTS, PrescriberOrganizationKind
 from itou.users.enums import UserKind
 
 
@@ -58,6 +56,10 @@ def can_view_stats_siae_etp(request):
         and request.is_current_organization_admin
         and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
     )
+
+
+def can_view_stats_siae_beneficiaries(request):
+    return can_view_stats_siae(request) and request.current_organization.kind != CompanyKind.EITI
 
 
 def can_view_stats_cd(request):

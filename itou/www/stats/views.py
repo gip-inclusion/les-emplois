@@ -25,11 +25,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.analytics.models import StatsDashboardVisit
-from itou.common_apps.address.departments import (
-    DEPARTMENT_TO_REGION,
-    DEPARTMENTS,
-    REGIONS,
-)
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
 from itou.companies import models as companies_models
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
@@ -278,7 +274,7 @@ def stats_siae_orga_etp(request):
     )
 
 
-@check_request(utils.can_view_stats_siae)
+@check_request(utils.can_view_stats_siae_beneficiaries)
 def stats_siae_beneficiaries(request):
     return render_stats_siae(
         request=request,
