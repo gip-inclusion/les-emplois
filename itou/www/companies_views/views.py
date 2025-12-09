@@ -778,8 +778,8 @@ def update_admin_role(request, action, public_id, template_name="companies/updat
 @login_not_required
 def hx_dora_services(request, code_insee, template_name="companies/hx_dora_services.html"):
     context = {
-        "data_inclusion_services": get_data_inclusion_services(code_insee),
-        "dora_base_url": set_dora_utm_query_params(settings.DORA_BASE_URL),
+        "code_insee": code_insee,
+        "di_token": settings.API_DATA_INCLUSION_TOKEN,
     }
     return render(request, template_name, context)
 
@@ -797,5 +797,7 @@ def dora_service_redirect(request, source: str, service_id: str) -> HttpResponse
     except DataInclusionApiException:
         raise Http404()
 
+    url = set_dora_utm_query_params(get_dora_url(source, service_id, service.get("lien_source", None)))
+    return HttpResponseRedirect(url)
     url = set_dora_utm_query_params(get_dora_url(source, service_id, service.get("lien_source", None)))
     return HttpResponseRedirect(url)
