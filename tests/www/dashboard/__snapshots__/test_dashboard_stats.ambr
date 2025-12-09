@@ -27,6 +27,112 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -59,6 +165,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -91,6 +323,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -123,6 +481,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -155,6 +639,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -187,6 +797,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -219,6 +955,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -251,6 +1113,132 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -283,6 +1271,161 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Conventionnement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/cd/orga_etp">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des effectifs annuels et mensuels (ETP)
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 mt-3 mt-lg-4">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/cd/hiring">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures reçues et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/cd/brsa">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des prescriptions pour les publics ARSA
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/cd/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -315,6 +1458,150 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/pe/state/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures émises par France Travail
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/pe/conversion/main">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des parcours des candidats diagnostiqués
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/pe/hiring">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse de l'ensemble des candidatures reçues par les SIAE
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/pe/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/ph/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Données nationales publiques
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-employeurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des employeurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/postes-en-tension/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie des postes difficiles à pourvoir
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -347,6 +1634,159 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-lg-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Mes données
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Conventionnement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/siae/orga_etp">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                          </i>
+                                          <span>
+                                              Suivi des effectifs annuels et mensuels (ETP)
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 mt-3 mt-lg-4">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Recrutement
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/siae/hiring">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Analyse des candidatures reçues et de leur traitement
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/siae/auto_prescription">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi de l’activité d’auto-prescription et du contrôle à posteriori
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="c-box p-0 flex-grow-1 mt-3 mt-lg-5">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Parcours en IAE
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/siae/beneficiaries">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Suivi des bénéficiaires, taux d’encadrement et présence en emploi
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-lg-5 d-flex flex-column">
+                      <h3>
+                          Données brutes
+                      </h3>
+                      <div class="c-box p-0">
+                          <div class="p-3 p-lg-4">
+                              <h4 class="mb-0">
+                                  Export de vos données
+                              </h4>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="/stats/siae/raw">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Découvrir mes jeux de données
+                                          </span>
+                                      </a>
+                                      <span class="badge rounded-pill badge-xs bg-important text-white ms-2">
+                                          Nouveau
+                                      </span>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                      <h3 class="mt-3 mt-lg-4">
+                          Données nationales publiques
+                      </h3>
+                      <div class="c-box p-0 flex-grow-1">
+                          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/conventionnements-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Cartographie du conventionnement IAE
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/cartographies-iae/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Bilan territorial des orientations
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/auto-prescription/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Pratiques d'auto-prescription en SIAE
+                                          </span>
+                                      </a>
+                                  </li>
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord/zoom-prescripteurs/">
+                                          <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal">
+                                          </i>
+                                          <span>
+                                              Profil des prescripteurs
+                                          </span>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
@@ -1590,6 +3030,55 @@
               </div>
           </div>
       </div>
+      <section class="s-section mb-3 mb-md-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
+                  <div class="col mb-3 mb-md-4">
+                      <div class="c-box p-0 h-100">
+                          <div class="p-3 p-lg-4">
+                              <span class="h4 mb-0">
+                                  Données personnalisées
+                              </span>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <p>
+                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels en nous contactant
+                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                      ici
+                                  </a>
+                                  .
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-md-4">
+                      <div class="c-box p-0 h-100">
+                          <div class="p-3 p-lg-4">
+                              <span class="h4 mb-0">
+                                  Données publiques
+                              </span>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                          </i>
+                                          <span>
+                                              Accéder aux tableaux de bord publics
+                                          </span>
+                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
   </div>
   
   '''
