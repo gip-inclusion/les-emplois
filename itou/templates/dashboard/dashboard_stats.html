@@ -67,40 +67,40 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                        {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
-                            <section class="s-section mb-3 mb-md-5">
-                                <div class="s-section__container">
-                                    {% if stats_kpi %}
-                                        {% include "dashboard/includes/stats/_institution_kpi.html" %}
-                                    {% endif %}
-                                    <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                            {% endif %}
+                            {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
+                                <section class="s-section mb-3 mb-md-5">
+                                    <div class="s-section__container">
+                                        {% if stats_kpi %}
+                                            {% include "dashboard/includes/stats/_institution_kpi.html" %}
+                                        {% endif %}
+                                        <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">{% include "dashboard/includes/stats.html" %}</div>
+                                    </div>
+                                </section>
+                            {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
+                                {% include "dashboard/includes/stats/employer.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
+                                {% include "dashboard/includes/stats/prescriber.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_FT %}
+                                {% include "dashboard/includes/stats/prescriber_ft.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
+                                {% include "dashboard/includes/stats/prescriber_dept.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.SD_IAE %}
+                                {% include "dashboard/includes/stats/sd_iae.html" %}
+                            {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
+                                {% include "dashboard/includes/stats/dgefp.html" %}
+                            {% endif %}
+                        </div>
+                        {% if user.is_employer or user.is_prescriber %}
+                            <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
+                                <h2>Événements à venir</h2>
+                                <div class="mt-3 mt-md-4">
+                                    <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=10" title="Événements des emplois de l'inclusion | Livestorm">
+                                    </div>
                                 </div>
-                            </section>
-                        {% elif layout_kind is DashboardStatsLayoutKind.EMPLOYER %}
-                            {% include "dashboard/includes/stats/employer.html" %}
-                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER %}
-                            {% include "dashboard/includes/stats/prescriber.html" %}
-                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_FT %}
-                            {% include "dashboard/includes/stats/prescriber_ft.html" %}
-                        {% elif layout_kind is DashboardStatsLayoutKind.PRESCRIBER_DEPT %}
-                            {% include "dashboard/includes/stats/prescriber_dept.html" %}
-                        {% elif layout_kind is DashboardStatsLayoutKind.SD_IAE %}
-                            {% include "dashboard/includes/stats/sd_iae.html" %}
-                        {% elif layout_kind is DashboardStatsLayoutKind.DGEFP %}
-                            {% include "dashboard/includes/stats/dgefp.html" %}
+                            </div>
                         {% endif %}
                     </div>
-                    {% if user.is_employer or user.is_prescriber %}
-                        <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
-                            <h2>Événements à venir</h2>
-                            <div class="mt-3 mt-md-4">
-                                <div class="js-tac-livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=10" title="Événements des emplois de l'inclusion | Livestorm">
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
