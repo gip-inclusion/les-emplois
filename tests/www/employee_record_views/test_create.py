@@ -881,6 +881,15 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
     URL_NAME = "employee_record_views:create_step_5"
     SIAE_KIND = random.choice(list(set(CompanyKind.siae_kinds()) - {CompanyKind.EITI}))
 
+    # For EITI fields display checks
+    ARE_ALLOCATION_LABEL = "Bénéficiaire de l'ARE depuis"
+    ACTIVITY_BONUS_LABEL = "Bénéficiaire de la prime d'activité depuis"
+    CAPE_FREELANCE_LABEL = "Bénéficiaire CAPE"
+    CESA_FREELANCE_LABEL = "Bénéficiaire CESA"
+    ACTOR_MET_LABEL = "Acteur rencontré : "
+    MONTHLY_INCOME_LABEL = "Revenu brut mensuel moyen : "
+    EITI_CONTRIBUTIONS_LABEL = "Taux de cotisation : "
+
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
         self.pass_step_4(client)
@@ -950,13 +959,13 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
 
     def test_eiti_fields_display(self, client):
         response = client.get(self.url)
-        assertNotContains(response, "Bénéficiaire de l'ARE depuis")
-        assertNotContains(response, "Bénéficiaire de la prime d'activité depuis")
-        assertNotContains(response, "Bénéficiaire CAPE")
-        assertNotContains(response, "Bénéficiaire CESA")
-        assertNotContains(response, "Acteur rencontré : ")
-        assertNotContains(response, "Revenu brut mensuel moyen : ")
-        assertNotContains(response, "Taux de cotisation : ")
+        assertNotContains(response, self.ARE_ALLOCATION_LABEL)
+        assertNotContains(response, self.ACTIVITY_BONUS_LABEL)
+        assertNotContains(response, self.CAPE_FREELANCE_LABEL)
+        assertNotContains(response, self.CESA_FREELANCE_LABEL)
+        assertNotContains(response, self.ACTOR_MET_LABEL)
+        assertNotContains(response, self.MONTHLY_INCOME_LABEL)
+        assertNotContains(response, self.EITI_CONTRIBUTIONS_LABEL)
 
     def test_transition_log(self, client):
         employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
@@ -985,13 +994,13 @@ class TestCreateEmployeeRecordStep5ForEITI(TestCreateEmployeeRecordStep5):
 
     def test_eiti_fields_display(self, client):
         response = client.get(self.url)
-        assertContains(response, "Bénéficiaire de l'ARE depuis")
-        assertContains(response, "Bénéficiaire de la prime d'activité depuis")
-        assertContains(response, "Bénéficiaire CAPE")
-        assertContains(response, "Bénéficiaire CESA")
-        assertContains(response, "Acteur rencontré : ")
-        assertContains(response, "Revenu brut mensuel moyen : ")
-        assertContains(response, "Taux de cotisation : ")
+        assertContains(response, self.ARE_ALLOCATION_LABEL)
+        assertContains(response, self.ACTIVITY_BONUS_LABEL)
+        assertContains(response, self.CAPE_FREELANCE_LABEL)
+        assertContains(response, self.CESA_FREELANCE_LABEL)
+        assertContains(response, self.ACTOR_MET_LABEL)
+        assertContains(response, self.MONTHLY_INCOME_LABEL)
+        assertContains(response, self.EITI_CONTRIBUTIONS_LABEL)
 
 
 class TestUpdateRejectedEmployeeRecord(CreateEmployeeRecordTestMixin):
