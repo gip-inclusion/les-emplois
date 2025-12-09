@@ -470,7 +470,7 @@ class Migration(migrations.Migration):
                         verbose_name="niveau de formation (ASP)",
                     ),
                 ),
-                ("resourceless", models.BooleanField(default=False, verbose_name="sans ressource")),
+                ("resourceless", models.BooleanField(default=False, verbose_name="sans ressources")),
                 (
                     "rqth_employee",
                     models.BooleanField(
