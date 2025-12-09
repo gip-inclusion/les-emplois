@@ -125,9 +125,6 @@
                                       <span class="badge badge-sm rounded-pill bg-info-lighter text-info ms-2">
                                           5
                                       </span>
-                                      <span class="badge badge-sm rounded-pill bg-important text-white ms-2">
-                                          Nouveau
-                                      </span>
                                   </span>
                               </a>
                           </li>
@@ -421,9 +418,6 @@
                           </div>
                           <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                               <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
-                                  <span class="badge badge-sm rounded-pill bg-important text-white mb-3">
-                                      Nouveau
-                                  </span>
                                   <form class="js-prevent-multiple-submit" hx-indicator="#comments-add-sidebar" hx-post="/apply/11111111-1111-1111-1111-111111111111/siae/comment" hx-swap="outerHTML" hx-target="#comments-add-sidebar" hx-vals='{"location": "sidebar"}'>
                                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                       <h3>

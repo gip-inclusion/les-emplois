@@ -3,9 +3,6 @@
 {% load matomo %}
 
 <div class="{% if location == "sidebar" %}c-box c-box--note{% else %}c-form{% endif %} mb-3 mb-md-4" id="comments-add-{{ location }}">
-    {% if location == "sidebar" %}
-        <span class="badge badge-sm rounded-pill bg-important text-white mb-3">Nouveau</span>
-    {% endif %}
     <form hx-post="{% url 'apply:add_comment_for_company' job_application_id=job_application.id %}"
           hx-target="#comments-add-{{ location }}"
           hx-indicator="#comments-add-{{ location }}"
