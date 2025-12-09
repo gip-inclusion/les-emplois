@@ -1,13 +1,16 @@
+import datetime
+
 import pgtrigger
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains
 
+from itou.asp.models import AllocationDuration, Country, EducationLevel, EITIContributions, RSAAllocation
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordTransition
-from itou.users.enums import LackOfNIRReason
+from itou.users.enums import LackOfNIRReason, Title
 from itou.utils.templatetags.format_filters import format_nir
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import (
@@ -65,6 +68,52 @@ class TestSummaryEmployeeRecords:
         profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
+
+    def test_job_seeker_profile_infos_all_fields_etti(self, client, snapshot):
+        client.force_login(self.user)
+        self.company.kind = CompanyKind.ETTI
+        self.company.save()
+        job_seeker = self.job_application.job_seeker
+        job_seeker.first_name = "John"
+        job_seeker.last_name = "Doe"
+        job_seeker.title = Title.M
+        job_seeker.save()
+        job_seeker.jobseeker_profile.birthdate = datetime.date(1990, 1, 1)
+        job_seeker.jobseeker_profile.birth_country = Country.objects.get(name="BORA-BORA")
+        job_seeker.jobseeker_profile.birth_place = None
+        job_seeker.jobseeker_profile.nir = ""
+        job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NO_NIR
+        job_seeker.jobseeker_profile.hexa_lane_name = ""  # No hexa address
+        job_seeker.jobseeker_profile.education_level = EducationLevel.THIRD_CYCLE_OR_ENGINEERING_SCHOOL
+        job_seeker.jobseeker_profile.pole_emploi_since = AllocationDuration.FROM_12_TO_23_MONTHS
+        job_seeker.jobseeker_profile.pole_emploi_id = "12345678"
+        job_seeker.jobseeker_profile.resourceless = True
+        job_seeker.jobseeker_profile.oeth_employee = True
+        job_seeker.jobseeker_profile.rqth_employee = True
+        job_seeker.jobseeker_profile.has_rsa_allocation = RSAAllocation.YES_WITHOUT_MARKUP
+        job_seeker.jobseeker_profile.rsa_allocation_since = AllocationDuration.FROM_6_TO_11_MONTHS
+        job_seeker.jobseeker_profile.ass_allocation_since = AllocationDuration.LESS_THAN_6_MONTHS
+        job_seeker.jobseeker_profile.aah_allocation_since = AllocationDuration.LESS_THAN_6_MONTHS
+        job_seeker.jobseeker_profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
+
+        job_seeker.jobseeker_profile.are_allocation_since = AllocationDuration.LESS_THAN_6_MONTHS
+        job_seeker.jobseeker_profile.activity_bonus_since = AllocationDuration.LESS_THAN_6_MONTHS
+        job_seeker.jobseeker_profile.cape_freelance = True
+        job_seeker.jobseeker_profile.cesa_freelance = True
+        job_seeker.jobseeker_profile.actor_met_for_business_creation = "Crésus"
+        job_seeker.jobseeker_profile.mean_monthly_income_before_process = "123.45"
+        job_seeker.jobseeker_profile.eiti_contributions = EITIContributions.UNDETERMINED
+
+        job_seeker.jobseeker_profile.save()
+        response = client.get(self.url)
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response, ".s-section .s-section__container .s-section__row .s-section__col:first-child .c-box"
+                )
+            )
+            == snapshot
+        )
 
     def test_technical_infos(self, client, snapshot):
         self.employee_record.siret = "10000000000002"

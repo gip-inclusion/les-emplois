@@ -379,6 +379,114 @@
   
   '''
 # ---
+# name: TestSummaryEmployeeRecords.test_job_seeker_profile_infos_all_fields_etti
+  '''
+  <div class="c-box mb-3 mb-md-4">
+      <div>
+          <h2 class="h3">
+              Etat civil
+          </h2>
+          <ul class="list-data">
+              <li>
+                  <small>
+                      Prénom
+                  </small>
+                  <strong>
+                      John
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Nom
+                  </small>
+                  <strong>
+                      Doe
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Date de naissance
+                  </small>
+                  <strong>
+                      1 janvier 1990
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Pays de naissance
+                  </small>
+                  <strong>
+                      BORA-BORA
+                  </strong>
+              </li>
+              <li>
+                  <small>
+                      Numéro de sécurité sociale
+                  </small>
+                  <strong>
+                      Pas de numéro de sécurité sociale
+                  </strong>
+              </li>
+          </ul>
+          <hr class="my-4"/>
+          <h2 class="h3">
+              Domiciliation
+          </h2>
+          <ul class="list-data">
+              <li>
+                  <small>
+                      Adresse
+                  </small>
+                  <address>
+                      Adresse HEXA incomplète
+                  </address>
+              </li>
+          </ul>
+          <hr class="my-4"/>
+          <h2 class="h3">
+              Situation du salarié
+          </h2>
+          <ul class="mb-0">
+              <li>
+                  Troisième cycle ou école d'ingénieur
+              </li>
+              <li>
+                  Inscrit à France Travail depuis de 12 à 23 mois (12345678)
+              </li>
+              <li>
+                  Le salarié ne dispose d'aucune ressource
+              </li>
+              <li>
+                  Salarié sans emploi depuis 24 mois et plus
+              </li>
+              <li>
+                  Bénéficiaire de la loi handicap (OETH)
+              </li>
+              <li>
+                  Titulaire de la RQTH
+              </li>
+              <li>
+                  Bénéficiaire du RSA et non-majoré (depuis de 6 à 11 mois)
+              </li>
+              <li>
+                  Bénéficiaire de l'ASS depuis moins de 6 mois
+              </li>
+              <li>
+                  Bénéficiaire de l'AAH depuis moins de 6 mois
+              </li>
+          </ul>
+          <hr class="my-4"/>
+          <h2 class="h3">
+              Annexe financière
+          </h2>
+          <p>
+              Aucune annexe financière n'a été selectionnée.
+          </p>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestSummaryEmployeeRecords.test_technical_infos[with timestamps]
   '''
   <div class="c-box bg-info-lightest border-info mb-3 mb-md-4" id="technical-infos">
