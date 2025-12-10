@@ -126,14 +126,18 @@ class TestGroupLists:
         client.force_login(user)
 
         # Nominal case
-        # Groups created latelly should come first.
+        # Groups are ordered by started_at, those created later should come first.
         group_1 = FollowUpGroupFactory(for_snapshot=True)
         FollowUpGroupMembershipFactory(
             follow_up_group=group_1,
             member__first_name="John",
             member__last_name="Doe",
         )
-        FollowUpGroup.objects.follow_beneficiary(group_1.beneficiary, user)
+        FollowUpGroupMembershipFactory(
+            follow_up_group=group_1,
+            member=user,
+            started_at="2024-06-21",
+        )
 
         # We are referent
         group_2 = FollowUpGroupMembershipFactory(
@@ -141,6 +145,7 @@ class TestGroupLists:
             follow_up_group__beneficiary__last_name="Le Français",
             is_referent_certified=True,
             member=user,
+            started_at="2024-06-20",
         ).follow_up_group
 
         # old membership

@@ -58,7 +58,7 @@ def group_list(request, current, template_name="gps/group_list.html"):
 
     memberships = (
         qs.annotate(nb_members=Count("follow_up_group__members"))
-        .order_by("-created_at")
+        .order_by("-started_at", "-created_at")
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related(
             Prefetch(
