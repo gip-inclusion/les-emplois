@@ -2970,7 +2970,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
                 "form-1-evaluated_job_application": evaluated_job_app_2.pk,
                 "form-1-subsidy_cut_percent": "0",  # will not be saved
                 "form-2-evaluated_job_application": evaluated_job_app_2.pk,
-                "form-2-subsidy_cut_percent": "",  # will not be saved
+                "form-2-subsidy_cut_percent": "0",  # will not be saved
             },
         )
         assertRedirects(
@@ -3147,7 +3147,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             """
-            <div class="form-group is-invalid">
+            <div class="form-group is-invalid form-group-required">
              <label class="form-label" for="id_form-0-subsidy_cut_percent">
               Pourcentage d’aide retiré à la SIAE
              </label>
@@ -3199,7 +3199,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             </div>
             <input type="hidden" name="form-0-evaluated_job_application" value="0"
                id="id_form-0-evaluated_job_application">
-            <div class="form-group">
+            <div class="form-group form-group-required">
              <label class="form-label" for="id_form-0-subsidy_cut_percent">
               Pourcentage d’aide retiré à la SIAE</label>
              <input type="number"
@@ -3224,7 +3224,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             evaluated_siae.sanctions
 
     @freeze_time("2022-10-24 11:11:00")
-    def test_post_subsidy_cut_need_at_leat_one_form_filled(self, client, mailoutbox):
+    def test_post_subsidy_cut_need_all_forms_filled(self, client, mailoutbox):
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
         )
@@ -3261,17 +3261,61 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             """
-            <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist="">
-             <p>
-              <strong>Votre formulaire contient une erreur</strong>
-             </p>
-             <ul class="mb-0">
-              <li>
-               Un pourcentage compris entre 0 et 100 doit être appliqué sur chacune des auto-prescriptions
-               listées ci-dessous.
-              </li>
-             </ul>
+            <div id="id_form-0-subsidy_cut_percent_error" class="w-100">
+             <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
             </div>
+            """,
+            html=True,
+            count=1,
+        )
+
+        evaluated_siae.refresh_from_db()
+        assert [] == mailoutbox
+        with pytest.raises(Sanctions.DoesNotExist):
+            evaluated_siae.sanctions
+
+    @freeze_time("2022-10-24 11:11:00")
+    def test_post_subsidy_cut_need_at_leat_one_non_zero_form(self, client, mailoutbox):
+        company_membership = CompanyMembershipFactory(
+            company__name="Les petits jardins", user__email="siae@mailinator.com"
+        )
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__name="Campagne 2022",
+            evaluation_campaign__institution=self.institution,
+            siae=company_membership.company,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            notification_text="A envoyé une photo de son chat.",
+        )
+        evaluated_job_app_1 = EvaluatedJobApplication.objects.first()
+        evaluated_job_app_2 = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            complete=True,
+            criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
+
+        response = client.post(
+            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
+            {
+                "form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-evaluated_job_application": evaluated_job_app_1.pk,
+                "form-0-subsidy_cut_percent": "0",
+                "form-1-evaluated_job_application": evaluated_job_app_2.pk,
+                "form-1-subsidy_cut_percent": "0",
+            },
+        )
+        assertContains(
+            response,
+            """
+            <ul class="mb-0">
+             <li>Un pourcentage compris entre 1 et 100 doit être appliqué sur au moins
+              l’une des auto-prescriptions listées ci-dessous.</li>
+            </ul>
             """,
             html=True,
             count=1,

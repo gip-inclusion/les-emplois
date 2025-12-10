@@ -371,22 +371,20 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         if all([form.is_valid() for form in forms.values()]):
             evaluated_siae = self.object
             siae_sanctions_form = forms["siae_sanctions_form"]
-            sanctions = Sanctions(
+            sanctions = Sanctions.objects.create(
                 evaluated_siae=evaluated_siae,
                 training_session=siae_sanctions_form.cleaned_data.get("training_session", ""),
                 suspension_dates=siae_sanctions_form.cleaned_data.get("suspension_dates"),
                 no_sanction_reason=siae_sanctions_form.cleaned_data.get("no_sanction_reason", ""),
             )
-            sanctions.save()
             if formset := forms.get("job_application_sanction_formset"):
                 for form in formset:
                     if subsidy_cut_percent := form.cleaned_data.get("subsidy_cut_percent"):
-                        evaluated_job_application_santion = EvaluatedJobApplicationSanction(
+                        EvaluatedJobApplicationSanction.objects.create(
                             sanctions=sanctions,
                             evaluated_job_application_id=form.cleaned_data.get("evaluated_job_application"),
                             subsidy_cut_percent=subsidy_cut_percent,
                         )
-                        evaluated_job_application_santion.save()
             evaluated_siae.notified_at = timezone.now()
             evaluated_siae.save(update_fields=["notified_at"])
             del self.request.session[self.sessionkey]
@@ -418,13 +416,27 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
         )
         .exclude(notified_at=None)
         .select_related("evaluation_campaign", "sanctions")
-        .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
+        .prefetch_related(
+            "evaluated_job_applications__evaluated_administrative_criteria",
+            "sanctions__evaluated_job_applications_sanctions",
+        )
+    )
+    evaluated_job_applications = evaluated_siae.evaluated_job_applications.select_related(
+        "evaluated_job_application_sanction",
+        "job_application__approval",
+        "job_application__job_seeker",
+    ).prefetch_related(
+        "evaluated_administrative_criteria",
     )
     context = evaluation_campaign_data_context(evaluated_siae)
     context["evaluated_siae"] = evaluated_siae
     context["is_siae"] = viewer_type == "siae"
     context["matomo_custom_title"] = "Notification de sanction"
-    context["evaluated_job_applications"] = evaluated_siae.evaluated_job_applications.all()
+    context["evaluated_job_applications"] = [
+        evaluated_job_application
+        for evaluated_job_application in evaluated_job_applications
+        if evaluated_job_application.compute_state() != evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+    ]
     try:
         context["sanctions"] = evaluated_siae.sanctions
     except EvaluatedSiae.sanctions.RelatedObjectDoesNotExist:

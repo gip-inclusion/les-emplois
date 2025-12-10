@@ -7,6 +7,7 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
     PkSupportRemarkInline,
+    ReadonlyMixin,
     get_admin_view_link,
 )
 from itou.utils.export import to_streaming_response
@@ -81,7 +82,7 @@ class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
         )
 
 
-class EvaluatedJobApplicationSanctionsInline(ItouTabularInline):
+class EvaluatedJobApplicationSanctionsInline(ReadonlyMixin, ItouTabularInline):
     model = models.EvaluatedJobApplicationSanction
     fields = (
         "id_link",
@@ -392,7 +393,7 @@ class SanctionsAdmin(ItouModelAdmin):
 
 
 @admin.register(models.EvaluatedJobApplicationSanction)
-class EvaluatedJobApplicationSanctionAdmin(ItouModelAdmin):
+class EvaluatedJobApplicationSanctionAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = [
         "sanctions",
         "approval",
@@ -426,7 +427,9 @@ class EvaluatedJobApplicationSanctionAdmin(ItouModelAdmin):
     def evaluation_campaign(self, obj):
         return obj.sanctions.evaluated_siae.evaluation_campaign.name
 
-    @admin.display(description="institution", ordering="sanctions__evaluated_siae__evaluation_campaign__institution")
+    @admin.display(
+        description="institution", ordering="sanctions__evaluated_siae__evaluation_campaign__institution__name"
+    )
     def institution(self, obj):
         return obj.sanctions.evaluated_siae.evaluation_campaign.institution
 

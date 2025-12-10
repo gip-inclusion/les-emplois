@@ -245,15 +245,17 @@ class InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationFormSet(forms.Ba
         super().__init__(*args, initial=initial, **kwargs)
 
     def clean(self):
-        """Check that at least one evaluated job evaluation has a non zero percentage"""
+        """
+        Check that at least one evaluated job evaluation has a non zero percentage.
+        Otherwise, this sanction is useless.
+        """
         if any(self.errors):
             return
-
         for form in self.forms:
             if form.cleaned_data.get("subsidy_cut_percent"):
                 return
         raise ValidationError(
-            "Un pourcentage compris entre 0 et 100 doit être appliqué sur chacune des "
+            "Un pourcentage compris entre 1 et 100 doit être appliqué sur au moins l’une des "
             "auto-prescriptions listées ci-dessous."
         )
 
@@ -269,7 +271,7 @@ class InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm(forms.Form)
     evaluated_job_application = forms.IntegerField(widget=forms.HiddenInput())
     subsidy_cut_percent = forms.IntegerField(
         label="Pourcentage d’aide retiré à la SIAE",
-        required=False,
+        required=True,
         min_value=0,
         max_value=100,
         widget=forms.NumberInput(
@@ -277,7 +279,7 @@ class InstitutionEvaluatedSiaeNotifyStep3EvaluatedJobApplicationForm(forms.Form)
         ),
     )
 
-    def __init__(self, *args, evaluated_job_application_to_display=None, **kwargs):
+    def __init__(self, *args, evaluated_job_application_to_display, **kwargs):
         super().__init__(*args, **kwargs)
         self.evaluated_job_application_to_display = evaluated_job_application_to_display
 

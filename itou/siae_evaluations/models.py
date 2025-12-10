@@ -938,7 +938,7 @@ class Sanctions(models.Model):
         return any(
             [
                 self.suspension_dates,
-                self.evaluated_job_applications_sanctions.count(),
+                self.evaluated_job_applications_sanctions.exists(),
             ]
         )
 
