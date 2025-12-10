@@ -145,7 +145,7 @@
                               </div>
                           </div>
                           <div class="modal-footer">
-                              <a aria-label="Ouverture dans un nouvel onglet" class="btn btn-sm btn-primary has-external-link" data-matomo-action="clic" data-matomo-category="inscription-candidat" data-matomo-event="true" data-matomo-option="je-n-ai-pas-d-adresse-email" href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI" rel="noopener" target="_blank">
+                              <a aria-label="Ouverture dans un nouvel onglet" class="btn btn-sm btn-primary has-external-link" data-matomo-action="clic" data-matomo-category="inscription-candidat" data-matomo-event="true" data-matomo-option="je-n-ai-pas-d-adresse-email" href="https://www.laposte.net" rel="noopener" target="_blank">
                                   Créer une adresse e-mail
                               </a>
                           </div>
