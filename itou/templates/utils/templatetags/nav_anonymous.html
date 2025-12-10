@@ -17,7 +17,7 @@
                 <li>
                     <a {% if item.active %}class="is-active"{% endif %} href="{{ item.target }}">
                         {{ item.label }}
-                        {% if item.is_new %}<span class="badge badge-sm rounded-pill bg-important text-white ms-2">nouveau</span>{% endif %}
+                        {% if item.is_new %}<span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>{% endif %}
                     </a>
                 </li>
             {% endfor %}
