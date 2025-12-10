@@ -145,11 +145,12 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -832,11 +833,12 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -3010,11 +3012,12 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -4301,11 +4304,12 @@
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"

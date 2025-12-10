@@ -36,10 +36,21 @@
                         </ul>
                         <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
                     {% elif warning == LogoutWarning.EMPLOYER_INACTIVE_COMPANY %}
+                        <p>Votre compte est actuellement inactif.</p>
+                        <ul>
+                            <li>
+                                <strong>Si vous êtes employeur en SIAE</strong> : votre compte n’est pas ou plus rattaché à une structure conventionnée.
+                            </li>
+                            <li>
+                                <strong>Si vous êtes facilitateur de la clause sociale</strong> : votre compte est en attente de vérification par nos équipes et le réseau Alliances Villes Emploi.
+                            </li>
+                            <li>
+                                <strong>Si vous êtes employeur en GEIQ ou en EA/EATT</strong> : votre compte n’est pas ou plus rattaché à une structure active.
+                            </li>
+                        </ul>
                         <p>
-                            Nous sommes désolés, votre compte n’est malheureusement plus actif car la ou les structures associées ne sont plus conventionnées.
+                            En cas de besoin, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}" class="has-external-link" target="_blank">contacter notre support technique</a>.
                         </p>
-                        <p>Nous espérons vous revoir et vous rendre service à nouveau.</p>
                     {% elif warning == LogoutWarning.FT_NO_FT_ORGANIZATION %}
                         <p>
                             En tant qu’agent France Travail vous devez appartenir à une agence pour vous connecter aux Emplois de l’inclusion.

@@ -232,6 +232,18 @@ class TestCompanyModel:
         company.delete()
         assert Company.objects.count() == 0
 
+        company = CompanyFactory(kind=CompanyKind.OPCS, is_searchable=False)
+        assert Company.objects.count() == 1
+        assert Company.objects.active().count() == 0
+        assert Company.objects.active_or_in_grace_period().count() == 0
+        company.is_searchable = True
+        company.save()
+        assert Company.objects.count() == 1
+        assert Company.objects.active().count() == 1
+        assert Company.objects.active_or_in_grace_period().count() == 1
+        company.delete()
+        assert Company.objects.count() == 0
+
     def test_active_member_with_many_memberships(self):
         company_1 = CompanyWith2MembershipsFactory(membership2__is_active=False)
         user = company_1.members.filter(companymembership__is_admin=False).first()

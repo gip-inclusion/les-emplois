@@ -47,7 +47,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -101,7 +103,9 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                    AND (V0."kind" IN (%s, %s, %s, %s)
+                         OR (V0."is_searchable"
+                             AND V0."kind" = %s)
                          OR V0."source" = %s
                          OR EXISTS
                            (SELECT %s AS "a"
@@ -176,7 +180,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -269,11 +275,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -368,7 +375,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -422,7 +431,9 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                    AND (V0."kind" IN (%s, %s, %s, %s)
+                         OR (V0."is_searchable"
+                             AND V0."kind" = %s)
                          OR V0."source" = %s
                          OR EXISTS
                            (SELECT %s AS "a"
@@ -497,7 +508,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -590,11 +603,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -717,11 +731,12 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -746,11 +761,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -779,7 +795,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -900,11 +918,12 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1027,11 +1046,12 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
-                           AND (NOT (V0."kind" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s,
-                                                   %s))
+                           AND (V0."kind" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -1135,11 +1155,12 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1164,11 +1185,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1196,7 +1218,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -1317,11 +1341,12 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1443,11 +1468,12 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
-                           AND (NOT (V0."kind" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s,
-                                                   %s))
+                           AND (V0."kind" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -1552,11 +1578,12 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1581,11 +1608,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1613,7 +1641,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -1734,11 +1764,12 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1860,11 +1891,12 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
-                           AND (NOT (V0."kind" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s,
-                                                   %s))
+                           AND (V0."kind" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -1968,11 +2000,12 @@
                  (ST_Distance("companies_company"."coords", %s) / %s) AS "distance"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -1997,11 +2030,12 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -2029,7 +2063,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -2150,11 +2186,12 @@
              LIMIT 1) AS "has_active_members"
           FROM "companies_company"
           WHERE (NOT ("companies_company"."siret" = %s)
-                 AND (NOT ("companies_company"."kind" IN (%s,
-                                                          %s,
-                                                          %s,
-                                                          %s,
-                                                          %s))
+                 AND ("companies_company"."kind" IN (%s,
+                                                     %s,
+                                                     %s,
+                                                     %s)
+                      OR ("companies_company"."is_searchable"
+                          AND "companies_company"."kind" = %s)
                       OR "companies_company"."source" = %s
                       OR EXISTS
                         (SELECT %s AS "a"
@@ -2276,11 +2313,12 @@
                    (SELECT V0."id"
                     FROM "companies_company" V0
                     WHERE (NOT (V0."siret" = %s)
-                           AND (NOT (V0."kind" IN (%s,
-                                                   %s,
-                                                   %s,
-                                                   %s,
-                                                   %s))
+                           AND (V0."kind" IN (%s,
+                                              %s,
+                                              %s,
+                                              %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
