@@ -192,6 +192,8 @@ class Command(BaseCommand):
             perms_to_remove = existing_perms - spec_perms
             for perm in perms_to_add:
                 group.permissions.add(perm)
+                self.logger.info(f"group name={group}, permission {perm.codename} added")
             for perm in perms_to_remove:
                 group.permissions.remove(perm)
+                self.logger.info(f"group name={group}, permission {perm.codename} removed")
         self.logger.info("All done!")
