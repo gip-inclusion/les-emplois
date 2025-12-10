@@ -781,11 +781,15 @@ def test_filtered_by_is_stalled(client):
 
 
 def test_filtered_by_organization_members(client):
-    organization = PrescriberOrganizationWith2MembershipFactory(authorized=True)
+    organization = PrescriberOrganizationWith2MembershipFactory(
+        authorized=True, membership1__user__first_name="Alice", membership2__user__first_name="Billy"
+    )
     prescriber = organization.members.first()
     member = organization.members.last()
-    old_member = PrescriberMembershipFactory(organization=organization, user__is_active=False).user
-    other_prescriber_not_in_orga = PrescriberFactory()
+    old_member = PrescriberMembershipFactory(
+        organization=organization, user__is_active=False, user__first_name="Charlie"
+    ).user
+    other_prescriber_not_in_orga = PrescriberFactory(first_name="Deborah")
 
     job_seeker_created_by_user = JobSeekerFactory(
         created_by=prescriber,
