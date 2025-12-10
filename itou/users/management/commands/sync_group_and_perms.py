@@ -183,12 +183,15 @@ class Command(BaseCommand):
             all_codenames = [
                 perm_code for model, perms in raw_permissions.items() for perm_code in to_perm_codenames(model, perms)
             ]
-            perms = Permission.objects.filter(codename__in=all_codenames)
             group, created = Group.objects.get_or_create(name=group)
-            group.permissions.clear()
-            group.permissions.add(*perms)
             if created:
                 self.logger.info(f"group name={group} created")
-            else:
-                self.logger.info(f"permissions of group={group} updated")
+            spec_perms = set(Permission.objects.filter(codename__in=all_codenames))
+            existing_perms = set(group.permissions.all())
+            perms_to_add = spec_perms - existing_perms
+            perms_to_remove = existing_perms - spec_perms
+            for perm in perms_to_add:
+                group.permissions.add(perm)
+            for perm in perms_to_remove:
+                group.permissions.remove(perm)
         self.logger.info("All done!")
