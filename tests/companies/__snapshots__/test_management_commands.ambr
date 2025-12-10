@@ -52,7 +52,9 @@
             (SELECT %s AS "a"
              FROM "companies_company" V0
              WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                    AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                    AND (V0."kind" IN (%s, %s, %s, %s)
+                         OR (V0."is_searchable"
+                             AND V0."kind" = %s)
                          OR V0."source" = %s
                          OR EXISTS
                            (SELECT %s AS "a"
@@ -122,7 +124,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"
@@ -420,7 +424,9 @@
                    (SELECT %s AS "a"
                     FROM "companies_company" V0
                     WHERE (V0."id" = ("companies_jobdescription"."company_id")
-                           AND (NOT (V0."kind" IN (%s, %s, %s, %s, %s))
+                           AND (V0."kind" IN (%s, %s, %s, %s)
+                                OR (V0."is_searchable"
+                                    AND V0."kind" = %s)
                                 OR V0."source" = %s
                                 OR EXISTS
                                   (SELECT %s AS "a"

@@ -18,6 +18,7 @@ from django.utils import timezone
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.companies.enums import (
+    COMPANY_KIND_RESERVED,
     POLE_EMPLOI_SIRET,
     CompanyKind,
     ContractType,
@@ -40,9 +41,11 @@ class CompanyQuerySet(OrganizationQuerySet):
         # See `self.with_count_recent_received_job_apps`.
         has_active_convention = Exists(SiaeConvention.objects.filter(id=OuterRef("convention_id"), is_active=True))
         return (
-            # GEIQ, EA, EATT, ... have no convention logic and thus are always active.
-            # `~` means NOT, similarly to dataframes.
-            ~Q(kind__in=CompanyKind.siae_kinds())
+            # GEIQ, EA & EATT have no convention logic and thus are always active.
+            # COMPANY_KIND_RESERVED is also always active.
+            Q(kind__in=[CompanyKind.GEIQ, CompanyKind.EA, CompanyKind.EATT, COMPANY_KIND_RESERVED])
+            # OPCS need to be specifically searchable to be considered active
+            | Q(kind=CompanyKind.OPCS, is_searchable=True)
             # Staff created companiess are always active until eventually
             # converted to ASP source companies by import_siae script.
             # Such companies are created by our staff when ASP data is lacking

@@ -362,10 +362,10 @@ class TestCompanySignup:
         )
         response = client.get(response.url)
         # Check user is redirected to the welcoming tour
-        assertRedirects(response, reverse("welcoming_tour:index"))
-        # Check user sees the employer tour
+        assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
+        # Which redirects to logout page while waiting for the validation
         response = client.get(response.url)
-        assertContains(response, "Publiez vos offres, augmentez votre visibilité")
+        assertRedirects(response, reverse("logout:warning", kwargs={"kind": "employer_inactive_company"}))
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
 
