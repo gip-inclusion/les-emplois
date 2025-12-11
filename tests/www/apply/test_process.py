@@ -69,6 +69,7 @@ from tests.eligibility.factories import (
     IAESelectedAdministrativeCriteriaFactory,
 )
 from tests.employee_record.factories import EmployeeRecordFactory
+from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -2209,6 +2210,106 @@ class TestProcessViews:
             in mailoutbox[0].body
         )
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mailoutbox[0].body
+
+    def test_display_referent_info_for_company(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sent_by_another_employer=True,
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+
+        no_referent_str = f"L’accompagnateur de {job_seeker.get_full_name()} n’est pas connu de nos services"
+
+        # No referent found
+        assertContains(response, no_referent_str)
+
+        membership = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=job_seeker,
+            member=employer,
+            started_at=datetime.date(2024, 1, 1),
+        )
+        group = membership.follow_up_group
+
+        # Referent is present
+        response = client.get(url)
+        assertNotContains(response, no_referent_str)
+
+        content = parse_response_to_soup(
+            response,
+            selector=f"#card-{membership.member.public_id}",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}/memberships", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"/gps/groups/{group.pk}/edition", "/gps/groups/[PK of FollowUpGroup]/edition"),
+                ("id", f"card-{employer.public_id}", "card-[Public ID of prescriber]"),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{employer.public_id}/phone",
+                    "/gps/display/[PK of group]/[Public ID of participant]/phone",
+                ),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{employer.public_id}/email",
+                    "/gps/display/[PK of group]/[Public ID of participant]/email",
+                ),
+                ("id", f"phone-{employer.pk}", "phone-[PK of participant]"),
+                ("id", f"email-{employer.pk}", "email-[PK of participant]"),
+            ],
+        )
+
+        assert pretty_indented(content) == snapshot()
+
+    def test_display_referent_info_for_prescriber(self, client, snapshot):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        job_application = JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
+        membership = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=job_seeker,
+            member=prescriber,
+            started_at=datetime.date(2024, 1, 1),
+        )
+        group = membership.follow_up_group
+
+        client.force_login(prescriber)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+
+        content = parse_response_to_soup(
+            response,
+            selector=f"#card-{membership.member.public_id}",
+            replace_in_attr=[
+                ("href", f"/gps/groups/{group.pk}/memberships", "/gps/groups/[PK of FollowUpGroup]"),
+                ("href", f"/gps/groups/{group.pk}/edition", "/gps/groups/[PK of FollowUpGroup]/edition"),
+                ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{prescriber.public_id}/phone",
+                    "/gps/display/[PK of group]/[Public ID of participant]/phone",
+                ),
+                (
+                    "hx-post",
+                    f"/gps/display/{group.pk}/{prescriber.public_id}/email",
+                    "/gps/display/[PK of group]/[Public ID of participant]/email",
+                ),
+                ("id", f"phone-{prescriber.pk}", "phone-[PK of participant]"),
+                ("id", f"email-{prescriber.pk}", "email-[PK of participant]"),
+            ],
+        )
+
+        assert pretty_indented(content) == snapshot()
 
 
 class TestProcessAcceptViewsInWizard:

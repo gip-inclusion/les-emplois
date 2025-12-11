@@ -415,6 +415,20 @@
                                       </li>
                                   </ul>
                               </div>
+                              <div class="c-box mb-3 mb-md-4">
+                                  <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                                      <h3>
+                                          Qui accompagne ce candidat ?
+                                      </h3>
+                                  </div>
+                                  <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
+                                      <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                          <i>
+                                              L’accompagnateur de Jane DOE n’est pas connu de nos services
+                                          </i>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
                           <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                               <div class="c-box c-box--note mb-3 mb-md-4" id="comments-add-sidebar">
@@ -777,7 +791,7 @@
 # ---
 # name: test_display_in_sidebar_and_tab
   dict({
-    'num_queries': 22,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -1795,6 +1809,24 @@
           WHERE ("job_applications_jobapplicationcomment"."job_application_id" = %s
                  AND "job_applications_jobapplicationcomment"."company_id" = %s)
           ORDER BY "job_applications_jobapplicationcomment"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id"
+          FROM "gps_followupgroup"
+          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          ORDER BY "gps_followupgroup"."id" ASC
+          LIMIT 1
         ''',
       }),
       dict({
