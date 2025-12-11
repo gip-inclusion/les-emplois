@@ -4,6 +4,7 @@ https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 
 import re
 import string
+import textwrap
 
 from django import template
 from django.template import defaultfilters
@@ -44,3 +45,9 @@ def mask_unless(value, predicate, mask_function=(lambda x: x[0] + "…")):
         return value
 
     return " ".join(mask_function(part) for part in re.split(f"[{re.escape(string.whitespace)}]+", value) if part)
+
+
+@register.filter(is_safe=False)
+@defaultfilters.stringfilter
+def shorten(value, width):
+    return textwrap.shorten(value, width=width, placeholder=" …")

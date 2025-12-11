@@ -832,6 +832,19 @@ class TestUtilsTemplateTags:
             == "F… M… L…"
         )
 
+    def test_shorten(self):
+        text = (
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+            "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        )
+        template = Template("""{% load str_filters %}{{ value|shorten:length }}""")
+
+        assert template.render(Context({"value": text, "length": 23})) == "Lorem ipsum dolor sit …"
+        assert (
+            template.render(Context({"value": text, "length": 58}))
+            == "Lorem ipsum dolor sit amet, consectetur adipiscing elit, …"
+        )
+
     def test_tally_url_custom_template_tag(self, settings):
         settings.TALLY_URL = "https://foobar"
         test_id = 1234
