@@ -17,6 +17,7 @@ class ItouDataDogJSONFormatter(DataDogJSONFormatter):
         wsgi_request = self.get_wsgi_request()
         if wsgi_request is not None:
             if current_org := getattr(wsgi_request, "current_organization", None):
+                log_entry_dict["usr.organization_type"] = current_org._meta.label
                 log_entry_dict["usr.organization_id"] = current_org.pk
             if token := getattr(wsgi_request, "auth", None):
                 if hasattr(token, "datadog_info"):
