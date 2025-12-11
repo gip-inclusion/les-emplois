@@ -253,7 +253,7 @@ class TestProcessViews:
         certified_criterion = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__from_employer=False,
             eligibility_diagnosis__from_prescriber=True,
-            certified=True,
+            criteria_certified=True,
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_criterion.eligibility_diagnosis,
@@ -354,7 +354,7 @@ class TestProcessViews:
                 assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
                 assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
-    def test_details_for_company_certified_criteria_after_expiration(self, client):
+    def test_details_for_company_certified_criteria(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         now = timezone.now()
         today = timezone.localdate(now)
@@ -363,7 +363,7 @@ class TestProcessViews:
             days=AbstractSelectedAdministrativeCriteria.CERTIFICATION_GRACE_PERIOD_DAYS
         )
         created_at = now - certification_grace_period - datetime.timedelta(days=1)
-        expires_at = today - datetime.timedelta(days=1)
+        expires_at = today + datetime.timedelta(days=1)
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__author_siae=company,
             eligibility_diagnosis__job_seeker=job_seeker,
@@ -381,12 +381,6 @@ class TestProcessViews:
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         client.force_login(company.members.get())
-        response = client.get(url)
-        assertNotContains(response, CERTIFIED_BADGE_HTML, html=True)
-
-        tomorrow = today + datetime.timedelta(days=1)
-        eligibility_diagnosis.expires_at = tomorrow
-        eligibility_diagnosis.save()
         response = client.get(url)
         assertContains(response, CERTIFIED_BADGE_HTML, html=True)
 
@@ -3275,7 +3269,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -3323,7 +3316,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -3374,7 +3366,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
@@ -3451,7 +3442,6 @@ class TestProcessAcceptViewsInWizard:
         # certification
         for criterion in to_be_certified_criteria:
             criterion.refresh_from_db()
-            assert criterion.certified
             assert criterion.data_returned_by_api == RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"]
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at

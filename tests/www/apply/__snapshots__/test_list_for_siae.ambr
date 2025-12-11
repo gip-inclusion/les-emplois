@@ -1255,7 +1255,6 @@
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
                  "eligibility_selectedadministrativecriteria"."certified_at",
                  "eligibility_selectedadministrativecriteria"."certification_period",
                  "eligibility_selectedadministrativecriteria"."data_returned_by_api",
@@ -2544,7 +2543,6 @@
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
                  "eligibility_selectedadministrativecriteria"."certified_at",
                  "eligibility_selectedadministrativecriteria"."certification_period",
                  "eligibility_selectedadministrativecriteria"."data_returned_by_api",
@@ -3858,7 +3856,6 @@
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
                  "eligibility_selectedadministrativecriteria"."certified_at",
                  "eligibility_selectedadministrativecriteria"."certification_period",
                  "eligibility_selectedadministrativecriteria"."data_returned_by_api",
@@ -5093,7 +5090,6 @@
         ]),
         'sql': '''
           SELECT "eligibility_selectedadministrativecriteria"."id",
-                 "eligibility_selectedadministrativecriteria"."certified",
                  "eligibility_selectedadministrativecriteria"."certified_at",
                  "eligibility_selectedadministrativecriteria"."certification_period",
                  "eligibility_selectedadministrativecriteria"."data_returned_by_api",

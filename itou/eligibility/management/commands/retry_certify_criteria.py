@@ -33,7 +33,7 @@ class Command(BaseCommand):
             to_recertify = (
                 model.objects.filter(
                     administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
-                    certified=None,
+                    certification_period=None,
                     eligibility_diagnosis__expires_at__gte=today,
                     created_at__lte=timezone.now() - API_PARTICULIER_RETRY_DURATION,
                 )
