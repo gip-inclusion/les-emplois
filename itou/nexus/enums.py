@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Service(models.TextChoices):
-    COMMUNAUTE = "la-communauté", "La communauté"
+    COMMUNAUTE = "la-communaute", "La communauté"
     DATA_INCLUSION = "data-inclusion", "Data inclusion"
     DORA = "dora", "Dora"
     EMPLOIS = "les-emplois", "les emplois"
