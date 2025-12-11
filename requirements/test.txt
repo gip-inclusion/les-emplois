@@ -718,9 +718,9 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-itoutils[django]==25.12.4.0 \
-    --hash=sha256:30ed33741d0f33255a7c30ec5a2f4973580b41067ac0dda89fd17969b446d20f \
-    --hash=sha256:a69aa3158e752ad12e3ea7df8f600eb69167145739bf2f923659fb789c5103b3
+itoutils[django]==25.12.10.0 \
+    --hash=sha256:6d1c7dcbbf0c934be6d162f231f828cb17b2ca691313bda296266f387c5ca921 \
+    --hash=sha256:d2e4291e650b4d712ba9f1d1f99168f74c290ea947efb9bb26ceb01aa0117b64
     # via -r requirements/base.txt
 jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
@@ -759,7 +759,9 @@ jsonschema-specifications==2025.9.1 \
 jwcrypto==1.5.6 \
     --hash=sha256:150d2b0ebbdb8f40b77f543fb44ffd2baeff48788be71f67f03566692fd55789 \
     --hash=sha256:771a87762a0c081ae6166958a954f80848820b2ab066937dc8b8379d65b1b039
-    # via -r requirements/base.txt
+    # via
+    #   -r requirements/base.txt
+    #   itoutils
 lxml==6.0.2 \
     --hash=sha256:058027e261afed589eddcfe530fcc6f3402d7fd7e89bfd0532df82ebc1563dba \
     --hash=sha256:063eccf89df5b24e361b123e257e437f9e9878f425ee9aae3144c77faf6da6d8 \

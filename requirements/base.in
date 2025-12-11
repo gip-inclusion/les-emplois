@@ -105,9 +105,6 @@ hiredis  # https://github.com/redis/hiredis-py
 # Embedding Metabase signed dashboards
 PyJWT  # https://github.com/jpadilla/pyjwt
 
-# Encrypt JWT
-jwcrypto  # https://github.com/latchset/jwcrypto
-
 # Requests alternative including a default time out
 httpx  # https://github.com/encode/httpx/
 
