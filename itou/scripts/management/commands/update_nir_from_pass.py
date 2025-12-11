@@ -10,7 +10,6 @@ import unidecode
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from itou.utils.command import BaseCommand
-from tqdm import tqdm
 
 from itou.approvals.models import Approval
 from itou.utils.management_commands import DeprecatedLoggerMixin
@@ -116,9 +115,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
             "NIR": None,
         }
 
-        pbar = tqdm(total=len(df))
         for _, row in df.iterrows():
-            pbar.update(1)
             try:
                 approval = Approval.objects.get(number=row[APPROVAL_COL])
             except ObjectDoesNotExist:
