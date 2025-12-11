@@ -174,7 +174,7 @@ class LaborInspectorFactory(UserFactory):
 
 
 class JobSeekerFactory(UserFactory):
-    title = random.choice(Title.values)
+    title = factory.fuzzy.FuzzyChoice(Title.values)
     kind = UserKind.JOB_SEEKER
     jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
