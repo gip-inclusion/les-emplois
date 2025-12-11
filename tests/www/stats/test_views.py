@@ -3,20 +3,21 @@ from unittest.mock import patch
 
 import factory
 import pytest
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual, assertRedirects
 
 from itou.analytics.models import StatsDashboardVisit
-from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.enums import DGFT_SAFIR_CODE, PrescriberOrganizationKind
+from itou.utils.apis import metabase as mb
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.www.stats import urls as stats_urls, utils as stats_utils
-from itou.www.stats.views import get_params_aci_asp_ids_for_department
+from itou.www.stats.views import get_params_aci_asp_ids_for_department, render_stats_ph
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
@@ -515,3 +516,73 @@ def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
     response = client.get(reverse("stats:stats_ph_state_main"))
     assert response.status_code == 200
     assert response.context["tally_hidden_fields"] == {"type_prescripteur": organization_kind}
+
+
+@pytest.mark.parametrize(
+    ("org_kind,org_department,org_safir_code,expected_department_filter"),
+    [
+        (
+            PrescriberOrganizationKind.ML,
+            "75",
+            None,
+            [DEPARTMENTS["75"]],
+        ),
+        (
+            PrescriberOrganizationKind.FT,
+            "75",
+            "12345",  # random FT agency
+            [DEPARTMENTS["75"]],
+        ),
+        (
+            PrescriberOrganizationKind.FT,
+            "10",
+            "10038",  # DT
+            [DEPARTMENTS["10"]],
+        ),
+        (
+            PrescriberOrganizationKind.FT,
+            "13",
+            "13992",  # DR (PACA)
+            [DEPARTMENTS[d] for d in REGIONS["Provence-Alpes-Côte d'Azur"]],
+        ),
+        (
+            PrescriberOrganizationKind.FT,
+            "75",  # whatever
+            DGFT_SAFIR_CODE,  # ze DGFT
+            list(DEPARTMENTS.values()),
+        ),
+    ],
+)
+@patch("itou.www.stats.views.render_stats")
+def test_render_stats_ph_params(
+    mock_render_stats,
+    org_kind,
+    org_department,
+    org_safir_code,
+    expected_department_filter,
+):
+    org = PrescriberOrganizationFactory(
+        kind=org_kind,
+        department=org_department,
+        code_safir_pole_emploi=org_safir_code,
+        authorized=True,
+    )
+
+    rf = RequestFactory()
+    request = rf.get("/")
+    request.current_organization = org
+
+    render_stats_ph(
+        request=request,
+        page_title="whatever",
+        with_department_param=True,
+        with_region_param=False,
+        with_department_name=True,
+    )
+
+    assert mock_render_stats.called
+
+    params = mock_render_stats.call_args.kwargs.get("params", {})
+
+    assert mb.DEPARTMENT_FILTER_KEY in params
+    assert params[mb.DEPARTMENT_FILTER_KEY] == expected_department_filter

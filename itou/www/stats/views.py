@@ -481,6 +481,15 @@ def render_stats_ph(
     with_region_param=False,
     with_department_name=True,
 ):
+    if request.current_organization.kind == PrescriberOrganizationKind.FT:
+        return render_stats_ft(
+            request=request,
+            page_title=page_title,
+            extra_params=extra_params,
+            with_department_name=with_department_name,
+            with_region_param=with_region_param,
+        )
+
     department = request.current_organization.department
     params = {}
     if with_department_param:
