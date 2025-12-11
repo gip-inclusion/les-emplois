@@ -190,10 +190,10 @@ class Command(BaseCommand):
             existing_perms = set(group.permissions.all())
             perms_to_add = spec_perms - existing_perms
             perms_to_remove = existing_perms - spec_perms
-            for perm in perms_to_add:
+            for perm in sorted(perms_to_add, key=lambda perm: perm.codename):
                 group.permissions.add(perm)
                 self.logger.info(f"group name={group}, permission {perm.codename} added")
-            for perm in perms_to_remove:
+            for perm in sorted(perms_to_remove, key=lambda perm: perm.codename):
                 group.permissions.remove(perm)
                 self.logger.info(f"group name={group}, permission {perm.codename} removed")
         self.logger.info("All done!")
