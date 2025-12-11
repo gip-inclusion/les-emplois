@@ -2,6 +2,7 @@ import logging
 
 import httpx
 from django.conf import settings
+from django_datadog_logger.formatters.datadog import get_wsgi_request_user
 from itoutils.django.logging import DataDogJSONFormatter
 
 
@@ -19,12 +20,13 @@ class ItouDataDogJSONFormatter(DataDogJSONFormatter):
             if current_org := getattr(wsgi_request, "current_organization", None):
                 log_entry_dict["usr.organization_type"] = current_org._meta.label
                 log_entry_dict["usr.organization_id"] = current_org.pk
+            user = get_wsgi_request_user(wsgi_request)
             if token := getattr(wsgi_request, "auth", None):
                 if hasattr(token, "datadog_info"):
                     log_entry_dict["token"] = token.datadog_info()
                 else:
                     try:
-                        user_pk = wsgi_request.user.pk
+                        user_pk = user.pk
                     except AttributeError:
                         user_pk = None
                     if user_pk is None and not getattr(wsgi_request, NO_RECURSIVE_LOG_FLAG, False):
@@ -33,6 +35,8 @@ class ItouDataDogJSONFormatter(DataDogJSONFormatter):
                         logger.warning(
                             "Request using token (%r) without datadog_info() method: please define one", token
                         )
+            elif user is not None:
+                log_entry_dict["usr.kind"] = user.kind
             if session := getattr(wsgi_request, "session", None):
                 if hijack_history := session.get("hijack_history", []):
                     log_entry_dict["usr.hijack_history"] = hijack_history
