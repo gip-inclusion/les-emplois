@@ -46,6 +46,9 @@
                             {% include "apply/includes/job_application_box_for_user.html" with job_application=job_application_for_card detail_url=detail_url matomo_event_attrs=matomo_event_attrs %}
                         {% endfor %}
                     </div>
+
+                    {# Job referent ------------------------------------------------------------------------ #}
+                    {% include "gps/includes/membership_referent.html" with job_seeker_label="salarié" %}
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                     {% if approval %}

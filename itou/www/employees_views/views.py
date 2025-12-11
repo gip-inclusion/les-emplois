@@ -10,6 +10,7 @@ from itou.approvals.models import (
     Approval,
     ProlongationRequest,
 )
+from itou.gps.models import FollowUpGroup
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
@@ -106,6 +107,13 @@ class EmployeeDetailView(DetailView):
 
         eligibility_diagnosis = job_application and job_application.get_eligibility_diagnosis()
 
+        group = (
+            None
+            if job_application is None
+            else FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
+        )
+        user_in_group = False if group is None else group.members.contains(self.request.user)
+
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = can_edit_personal_information(self.request, self.object)
         context["approval"] = approval
@@ -128,4 +136,8 @@ class EmployeeDetailView(DetailView):
             .select_related("sender", "to_company")
             .prefetch_related("selected_jobs")
         )
+
+        context["group"] = group
+        context["user_in_group"] = user_in_group
+
         return context

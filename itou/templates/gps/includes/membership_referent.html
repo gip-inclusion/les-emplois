@@ -1,0 +1,134 @@
+{% load matomo %}
+{% load str_filters %}
+
+<div class="c-box mb-3 mb-md-4">
+    <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+        <h3>Qui accompagne ce {{ job_seeker_label|default:"candidat" }} ?</h3>
+        {% if group.referent.member_id == request.user.pk %}
+            <div>
+                <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap">
+                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
+                    <span>Modifier mon intervention</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {% if group and group.referent %}
+        <form id="display-contact-info-form">
+            {% csrf_token %}{# Used by htmx posts #}
+        </form>
+        {% with membership=group.referent %}
+            <div class="has-links-inside" id="card-{{ membership.member.public_id }}">
+                <ul class="list-data">
+                    <li class="d-flex flex-row align-items-center">
+                        <small>Accompagnateur</small>
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                            <strong>{{ membership.member.get_full_name }}</strong>
+                            {% if membership.member_id == request.user.pk %}
+                                <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
+                            {% endif %}
+                            {% if membership.is_referent_certified %}
+                                {% include "gps/includes/badge_is_referent_certified_membership.html" %}
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li>
+                        <small>Type</small>
+                        <strong>{{ membership.member.get_kind_display | capfirst }}</strong>
+                    </li>
+                    <li>
+                        <small>Organisation</small>
+                        <strong>{{ membership.organization_name }}</strong>
+                    </li>
+                    <li>
+                        {% if membership.ended_at %}
+                            <small>Accompagnateur du</small> <strong>{{ membership.started_at|date:"d/m/Y" }} au {{ membership.ended_at|date:"d/m/Y" }}</strong>
+                        {% else %}
+                            <small>Accompagnateur depuis le</small> <strong>{{ membership.started_at|date:"d/m/Y" }}</strong>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Motif de l’accompagnement</small>
+                        {% if membership.reason %}
+                            <strong>{{ membership.reason }}</strong>
+                        {% else %}
+                            <i class="text-disabled">Non renseigné</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Téléphone</small>
+                        {% if user_in_group %}
+                            {% if membership.member.phone %}
+                                {% if membership.member_id != request.user.pk %}
+                                    <button class="btn-link btn-ico"
+                                            id="phone-{{ membership.member_id }}"
+                                            hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "phone" %}"
+                                            hx-swap="outerHTML"
+                                            hx-include="#display-contact-info-form"
+                                            {% matomo_event "gps" "clic" "displayed_member_phone" %}>
+                                        <div class="stable-text">
+                                            <i class="ri-phone-line fw-medium" aria-hidden="true"></i>
+                                            <span>Afficher le téléphone</span>
+                                        </div>
+                                        <div class="loading-text">
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            <span>Affichage en cours</span>
+                                        </div>
+                                    </button>
+                                {% else %}
+                                    {% include "gps/includes/member_phone.html" with member=membership.member %}
+                                {% endif %}
+                            {% else %}
+                                <i class="text-disabled">Non renseigné</i>
+                            {% endif %}
+                        {% else %}
+                            <i class="text-disabled">Information non disponible</i>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <small>Adresse e-mail</small>
+                        {% if user_in_group %}
+                            {% if membership.member_id != request.user.pk %}
+                                <button class="btn-link btn-ico"
+                                        id="email-{{ membership.member_id }}"
+                                        hx-post="{% url "gps:display_contact_info" group.pk membership.member.public_id "email" %}"
+                                        hx-swap="outerHTML"
+                                        hx-include="#display-contact-info-form"
+                                        {% matomo_event "gps" "clic" "displayed_member_email" %}>
+                                    <div class="stable-text">
+                                        <i class="ri-mail-line fw-medium" aria-hidden="true"></i>
+                                        <span>Afficher l'email</span>
+                                    </div>
+                                    <div class="loading-text">
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        <span>Affichage en cours</span>
+                                    </div>
+                                </button>
+                            {% else %}
+                                {% include "gps/includes/member_email.html" with member=membership.member %}
+                            {% endif %}
+                        {% else %}
+                            <i class="text-disabled">Information non disponible</i>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        {% endwith %}
+        {% if user_in_group %}
+            <div class="c-info mt-3 mt-md-4">
+                <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoExample" aria-expanded="false" aria-controls="collapseInfoExample">
+                    <span>Découvrez tous les intervenants qui ont accompagné {{ job_seeker.first_name|title }} {{ job_seeker.last_name|upper }}</span>
+                </button>
+                <div class="c-info__detail collapse" id="collapseInfoExample">
+                    <a href="{% url 'gps:group_memberships' group.pk %}">Liste des intervenants</a>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div id="card-no-referent" class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
+            <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                <i>L’accompagnateur de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} n’est pas connu de nos services</i>
+            </div>
+        </div>
+    {% endif %}
+</div>

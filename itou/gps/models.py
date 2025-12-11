@@ -93,6 +93,11 @@ class FollowUpGroup(models.Model):
     def __str__(self):
         return "Groupe de " + self.beneficiary.get_full_name()
 
+    # returns certified referent or latest user to follow beneficiary
+    @property
+    def referent(self):
+        return self.memberships.order_by("-is_referent_certified", "-created_at").filter(is_active=True).first()
+
 
 class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
     pass

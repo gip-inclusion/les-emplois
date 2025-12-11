@@ -76,6 +76,7 @@
                                     {% if geiq_eligibility_diagnosis %}
                                         {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.user.is_employer request=request only %}
                                     {% endif %}
+                                    {% include "gps/includes/membership_referent.html" %}
                                 </div>
                                 {% if approval %}
                                     <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
