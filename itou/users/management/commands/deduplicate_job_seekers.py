@@ -6,7 +6,6 @@ from django.db.models import Case, F, Value, When
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from tqdm import tqdm
 
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication
@@ -180,11 +179,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             prefetch_related_lookups=["approvals", "eligibility_diagnoses"]
         )
 
-        pbar = tqdm(total=len(duplicates_dict.items()))
-
         for pe_id, duplicates in duplicates_dict.items():
-            pbar.update(1)
-
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
 
             # Ensure all users have the same birthdate.
