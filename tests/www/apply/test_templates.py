@@ -36,6 +36,15 @@ from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIE
 
 CERTIFIED_HELP_TEXT = "En savoir plus sur les badges de certification"
 
+
+def situation_tooltip_text(kind):
+    return (
+        "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic"
+        + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
+        + ", elle a peut-être changé depuis cette date."
+    )
+
+
 # Job applications list (company)
 
 
@@ -306,6 +315,29 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
 
+    def test_situation_tooltip(self):
+        """A tooltip explains that the situation may have changed since the diagnosis,
+        do not display it to job seekers."""
+
+        # Prescriber
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True)
+        rendered = self.template.render(Context(self.default_params(diagnosis)))
+        assert situation_tooltip_text("IAE") in rendered
+
+        # Employer
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, from_employer=True)
+        rendered = self.template.render(Context(self.default_params(diagnosis)))
+        assert situation_tooltip_text("IAE") in rendered
+
+        # Job seeker (on their dashboard)
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True)
+        params = self.default_params(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("IAE") not in rendered
+
 
 class TestGEIQEligibilityDetail:
     ELIGIBILITY_TITLE = "Critères administratifs"
@@ -399,6 +431,41 @@ class TestGEIQEligibilityDetail:
         params.update(request=request)
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
+
+    def test_situation_tooltip(self):
+        """A tooltip explains that the situation may have changed since the diagnosis,
+        do not display it to job seekers."""
+
+        # Prescriber
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_prescriber=True)
+        job_app = self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.author
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") in rendered
+
+        # Employer
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_employer=True)
+        self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis) | {
+            "job_application": job_app
+        }  # Employers need infos from job_application
+        request = RequestFactory()
+        request.user = diagnosis.author
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") in rendered
+
+        # Job seeker (on their dashboard)
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True)
+        params = self.default_params_geiq(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") not in rendered
 
 
 @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
