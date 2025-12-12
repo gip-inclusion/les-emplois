@@ -15,7 +15,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.approvals.models import Approval
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
@@ -945,6 +945,44 @@ class TestDashboardView:
                 html=True,
                 count=1,
             )
+
+    @freeze_time("2025-05-19")
+    def test_jobseeker_eligibility_diagnoses(self, client, snapshot):
+        user = JobSeekerFactory(with_address=True)
+        client.force_login(user)
+        url = reverse("dashboard:index")
+
+        # An IAE diagnosis from a prescriber
+        IAEEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            author=PrescriberFactory(for_snapshot=True),
+            author_prescriber_organization__for_snapshot=True,
+            job_seeker=user,
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+                AdministrativeCriteriaKind.AAH,
+                AdministrativeCriteriaKind.PM,
+            ],
+        )
+        # A GEIQ diagnosis from an employer with criteria (hence with allowance)
+        GEIQEligibilityDiagnosisFactory(
+            from_employer=True,
+            author=EmployerFactory(for_snapshot=True),
+            author_geiq__for_snapshot=True,
+            job_seeker=user,
+            criteria_kinds=[
+                AdministrativeCriteriaKind.RSA,
+                AdministrativeCriteriaKind.ASE,
+                AdministrativeCriteriaKind.QPV,
+            ],
+        )
+        response = client.get(url)
+        assert pretty_indented(parse_response_to_soup(response, selector="#iae-eligibility-diagnosis")) == snapshot(
+            name="IAE eligibility block on job seeker dashboard"
+        )
+        assert pretty_indented(parse_response_to_soup(response, selector="#geiq-eligibility-diagnosis")) == snapshot(
+            name="GEIQ eligibility block on job seeker dashboard"
+        )
 
     @override_settings(TALLY_URL="http://tally.fake")
     def test_prescriber_with_authorization_pending_dashboard_must_contain_tally_link(self, client):

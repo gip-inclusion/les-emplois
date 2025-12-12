@@ -221,7 +221,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       John DOE
@@ -229,10 +229,12 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -526,7 +528,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       John DOE
@@ -535,10 +537,12 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -1058,7 +1062,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -1069,10 +1073,12 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -1106,7 +1112,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -1117,10 +1123,12 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
                                                   <i class="text-disabled">
-                                                      Non renseigné
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
                                                   </i>
                                               </li>
                                               <li>
@@ -2660,7 +2668,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -2671,14 +2679,18 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -2978,7 +2990,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -2989,14 +3001,18 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
-                                                  <strong>
-                                                      Allocataire de l'Allocation aux Adultes Handicapés (AAH)
-                              ;
-                          
-                              Problème de mobilité
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Allocataire de l'Allocation aux Adultes Handicapés (AAH)
+                                                      </li>
+                                                      <li>
+                                                          Problème de mobilité
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -3501,7 +3517,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -3512,14 +3528,18 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>
@@ -3795,7 +3815,7 @@
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmé par
+                                                      Confirmée par
                                                   </small>
                                                   <strong>
                                                       Pierre DUPONT
@@ -3806,14 +3826,18 @@
                                               </li>
                                               <li>
                                                   <small>
-                                                      Critères administratifs sélectionnés
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
                                                   </small>
-                                                  <strong>
-                                                      Bénéficiaire du RSA
-                              ;
-                          
-                              Résident ZRR
-                                                  </strong>
+                                                  <ul>
+                                                      <li>
+                                                          Bénéficiaire du RSA
+                                                      </li>
+                                                      <li>
+                                                          Résident ZRR
+                                                      </li>
+                                                  </ul>
                                               </li>
                                               <li>
                                                   <small>

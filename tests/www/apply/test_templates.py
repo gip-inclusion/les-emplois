@@ -36,6 +36,15 @@ from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIE
 
 CERTIFIED_HELP_TEXT = "En savoir plus sur les badges de certification"
 
+
+def situation_tooltip_text(kind):
+    return (
+        "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic"
+        + (" ayant permis la délivrance d’un PASS IAE" if kind == "IAE" else "")
+        + ", elle a peut-être changé depuis cette date."
+    )
+
+
 # Job applications list (company)
 
 
@@ -189,8 +198,7 @@ def test_known_criteria_template_with_partial_zrr_criterion():
 
 
 class TestIAEEligibilityDetail:
-    ELIGIBILITY_TITLE_FROM_PRESCRIBER = "Situation administrative du candidat"
-    ELIGIBILITY_TITLE_FROM_EMPLOYER = "Critères administratifs"
+    ELIGIBILITY_TITLE = "Critères administratifs"
 
     @property
     def template(self):
@@ -217,56 +225,42 @@ class TestIAEEligibilityDetail:
         }
 
     def assert_criteria_name_in_rendered(self, diagnosis, rendered):
+        if not diagnosis.administrative_criteria.all():
+            assert escape("Le prescripteur habilité n’a pas renseigné de critères.") in rendered
         for criterion in diagnosis.administrative_criteria.all():
             assert escape(criterion.name) in rendered
 
-    def test_nominal_case(self):
-        # Eligibility diagnosis made by an employer and job application not sent by an authorized prescriber.
+    def test_diag_from_employer(self):
         diagnosis = IAEEligibilityDiagnosisFactory(
             job_seeker__certifiable=True,
             from_employer=True,
             criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
         )
-        criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
 
+        is_sent_by_authorized_prescriber = random.choice([True, False])
         rendered = self.template.render(
-            Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
+            Context(
+                self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": is_sent_by_authorized_prescriber}
+            )
         )
-        assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
-        assert AdministrativeCriteriaLevel(criteria.level).label in rendered
-        self.assert_criteria_name_in_rendered(diagnosis, rendered)
-
-        # Eligibility diagnosis made by an employer but job application sent by an authorized prescriber.
-        rendered = self.template.render(
-            Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
-        )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
-        assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
     def test_diag_from_prescriber(self):
-        # Diagnosis from prescriber but job application not sent by an authorized prescriber.
+        # Prescribers can make diagnoses without criteria
+        criteria_kinds = [random.choice(list(AdministrativeCriteriaKind.for_iae()) + [None])]
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__born_in_france=True,
-            criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
-            from_prescriber=True,
+            job_seeker__born_in_france=True, criteria_kinds=criteria_kinds, from_prescriber=True
         )
-        criteria = diagnosis.selected_administrative_criteria.get().administrative_criteria
 
+        is_sent_by_authorized_prescriber = random.choice([True, False])
         rendered = self.template.render(
-            Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": False})
+            Context(
+                self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": is_sent_by_authorized_prescriber}
+            )
         )
-        assert self.ELIGIBILITY_TITLE_FROM_EMPLOYER in rendered
+        assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert AdministrativeCriteriaLevel(criteria.level).label in rendered
-
-        # Diagnosis from prescriber and application sent by an authorized prescriber.
-        rendered = self.template.render(
-            Context(self.default_params(diagnosis) | {"is_sent_by_authorized_prescriber": True})
-        )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER in rendered
-        self.assert_criteria_name_in_rendered(diagnosis, rendered)
-        assert AdministrativeCriteriaLevel(criteria.level).label not in rendered
 
     def test_expired_diagnosis(self):
         # Expired Eligibility Diagnosis
@@ -279,7 +273,7 @@ class TestIAEEligibilityDetail:
                 }
             )
         )
-        assert self.ELIGIBILITY_TITLE_FROM_PRESCRIBER not in rendered
+        assert self.ELIGIBILITY_TITLE not in rendered
         assert AdministrativeCriteriaLevel.LEVEL_1.label not in rendered
         assert "Le diagnostic d'éligibilité IAE de ce candidat a expiré" in rendered
 
@@ -321,9 +315,32 @@ class TestIAEEligibilityDetail:
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
 
+    def test_situation_tooltip(self):
+        """A tooltip explains that the situation may have changed since the diagnosis,
+        do not display it to job seekers."""
+
+        # Prescriber
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True)
+        rendered = self.template.render(Context(self.default_params(diagnosis)))
+        assert situation_tooltip_text("IAE") in rendered
+
+        # Employer
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True, from_employer=True)
+        rendered = self.template.render(Context(self.default_params(diagnosis)))
+        assert situation_tooltip_text("IAE") in rendered
+
+        # Job seeker (on their dashboard)
+        diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True)
+        params = self.default_params(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("IAE") not in rendered
+
 
 class TestGEIQEligibilityDetail:
-    ELIGIBILITY_TITLE = "Situation administrative du candidat"
+    ELIGIBILITY_TITLE = "Critères administratifs"
 
     @property
     def template(self):
@@ -414,6 +431,41 @@ class TestGEIQEligibilityDetail:
         params.update(request=request)
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
+
+    def test_situation_tooltip(self):
+        """A tooltip explains that the situation may have changed since the diagnosis,
+        do not display it to job seekers."""
+
+        # Prescriber
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_prescriber=True)
+        job_app = self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.author
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") in rendered
+
+        # Employer
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_employer=True)
+        self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis) | {
+            "job_application": job_app
+        }  # Employers need infos from job_application
+        request = RequestFactory()
+        request.user = diagnosis.author
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") in rendered
+
+        # Job seeker (on their dashboard)
+        diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True)
+        params = self.default_params_geiq(diagnosis)
+        request = RequestFactory()
+        request.user = diagnosis.job_seeker
+        params.update(request=request)
+        rendered = self.template.render(Context(params))
+        assert situation_tooltip_text("GEIQ") not in rendered
 
 
 @pytest.mark.parametrize("factory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory])
