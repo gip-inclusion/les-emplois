@@ -16,8 +16,6 @@
 {% endblock %}
 
 
-{% block nb_columns %}8{% endblock %}
-
 {% block title_navinfo %}
     {% component_navinfo c_navinfo__back_url=back_url c_navinfo__info=c_navinfo__info|default:"" %}
         {% if job.company == request.current_organization %}
