@@ -20,8 +20,12 @@ from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.widgets import OSMWidget
 
 
+def get_admin_url(obj, view="change"):
+    return reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_{view}", args=[obj.pk])
+
+
 def get_admin_view_link(obj, *, content=None, view="change"):
-    url = reverse(f"admin:{obj._meta.app_label}_{obj._meta.model_name}_{view}", args=[obj.pk])
+    url = get_admin_url(obj, view)
     return format_html('<a href="{}">{}</a>', url, content or obj.pk)
 
 
