@@ -1,34 +1,27 @@
 {% load matomo %}
 
-{% with state=state|default:"ok" for_detail=for_detail|default:False %}
-    {% if state == "error" %}
-        {% if job_application %}
-            <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
-                  hx-swap="outerHTML"
-                  class="d-inline-flex">
-                {% csrf_token %}
-                <button class="btn btn-danger btn-ico w-100 w-md-auto"
-                        data-bs-toggle="tooltip"
-                        data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti."
-                        aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}"
-                        {% matomo_event "candidature" "clic" "proposer-rdv" %}>
-                    <div class="stable-text">
-                        <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
-                        <span>Réessayer un envoi</span>
-                    </div>
-                    <div class="loading-text">
-                        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                        <span role="status">Envoi en cours</span>
-                    </div>
-                </button>
-            </form>
-        {% else %}
-            <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
+{% if job_application and invite_btn_state == "retry" %}
+    <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
+          hx-swap="outerHTML"
+          class="d-inline-flex">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-ico w-100 w-md-auto"
+                data-bs-toggle="tooltip"
+                data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti."
+                aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}"
+                {% matomo_event "candidature" "clic" "proposer-rdv" %}>
+            <div class="stable-text">
                 <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
-                Une erreur s’est produite, l’envoi n’a pas abouti
-            </span>
-        {% endif %}
-    {% elif job_application.has_pending_rdv_insertion_invitation_request %}
+                <span>Réessayer un envoi</span>
+            </div>
+            <div class="loading-text">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span role="status">Envoi en cours</span>
+            </div>
+        </button>
+    </form>
+{% elif job_application and invite_btn_state != "fatal" %}
+    {% if job_application.has_pending_rdv_insertion_invitation_request %}
         <span class="text-success text-center flex-grow-1 flex-md-grow-0" role="status">
             <i class="ri-check-line ri-xl fw-medium" aria-hidden="true"></i>
             Invitation envoyée
@@ -58,4 +51,9 @@
             </button>
         </form>
     {% endif %}
-{% endwith %}
+{% else %}
+    <span class="text-danger text-center flex-grow-1 flex-md-grow-0" role="alert">
+        <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
+        Une erreur s’est produite, l’envoi n’a pas abouti
+    </span>
+{% endif %}

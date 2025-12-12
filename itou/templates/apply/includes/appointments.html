@@ -2,7 +2,7 @@
 {% load matomo %}
 
 {% if request.user.is_employer %}
-    {% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
+    {% include "apply/includes/invitation_requests.html" with csrf_token=csrf_token job_application=job_application invitation_requests=invitation_requests invite_btn_state="idle" only %}
 {% endif %}
 
 {% if participations %}
