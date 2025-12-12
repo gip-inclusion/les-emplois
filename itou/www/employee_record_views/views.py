@@ -487,6 +487,11 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     employee_record = job_application.employee_record.full_fetch().latest("created_at")
+    if not employee_record.has_valid_data_filled():
+        # Users should not reach this step if the employee record is not complete
+        # But in case they do, redirect them to step 1 with an error message
+        messages.error(request, "Certaines informations de la fiche salarié sont incomplètes ou invalides.")
+        return HttpResponseRedirect(reverse("employee_record_views:create", args=(job_application.id,)))
 
     if request.method == "POST" and not job_application.hiring_starts_in_future:
         previous_status = employee_record.status
