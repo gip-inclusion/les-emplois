@@ -1,3 +1,4 @@
+import random
 from datetime import timedelta
 
 import pytest
@@ -39,6 +40,33 @@ class TestEmployeeRecordPersonSerializer:
 
         job_seeker.first_name = "Jean-Philippe René Hippolyte Gilbert Dufaël"
         assert serializer.get_prenom(employee_record) == "JEAN-PHILIPPE RENE HIPPOLYTE"
+
+    def test_get_salarieNIR(self):
+        employee_record = EmployeeRecordWithProfileFactory(job_application__job_seeker__jobseeker_profile__nir="")
+        profile = employee_record.job_application.job_seeker.jobseeker_profile
+        serializer = _PersonSerializer(employee_record)
+        # No NIR and no NTT
+        assert serializer.get_salarieNIR(employee_record) == ""
+
+        # No NIR but NTT
+        employee_record.ntt = "11234567890001"
+        assert serializer.get_salarieNIR(employee_record) == "11234567890001"
+
+        # NIR and NTT
+        profile.nir = "22345678901234"
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
+        # NIR and no NTT
+        employee_record.ntt = ""
+        assert serializer.get_salarieNIR(employee_record) == "22345678901234"
+
+        # NIR starting with 7 or 8 and no NTT
+        profile.nir = random.choice(["700123456789036", "800123456789083"])
+        assert serializer.get_salarieNIR(employee_record) == ""
+
+        # NIR starting with 7 or 8 and NTT
+        employee_record.ntt = "11234567890001"
+        assert serializer.get_salarieNIR(employee_record) == "11234567890001"
 
 
 class TestEmployeeRecordAddressSerializer:

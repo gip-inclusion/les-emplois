@@ -427,6 +427,14 @@
                       Pas de numéro de sécurité sociale
                   </strong>
               </li>
+              <li>
+                  <small>
+                      Numéro technique temporaire
+                  </small>
+                  <i class="text-disabled">
+                      Non renseigné
+                  </i>
+              </li>
           </ul>
           <hr class="my-4"/>
           <h2 class="h3">

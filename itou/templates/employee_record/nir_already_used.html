@@ -1,0 +1,25 @@
+{% extends "employee_record/base_add.html" %}
+{% load theme_inclusion %}
+
+{% block title_navinfo %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <h2>Vous ne pouvez pas continuer</h2>
+                    <div class="alert alert-warning">
+                        <p>
+                            Cette fiche salarié ne peut pas être créé ou modifiée.
+                            Veuillez d’abord régulariser le numéro de sécurité sociale.
+                        </p>
+                        <a href="{{ fix_nir_url }}" class="btn btn-primary">Régulariser le n⁰ de sécurité sociale</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
