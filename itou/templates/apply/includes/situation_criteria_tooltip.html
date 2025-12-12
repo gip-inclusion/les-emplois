@@ -1,0 +1,8 @@
+{% if request.user.is_employer or request.user.is_prescriber %}
+    <i class="ri-information-line text-info"
+       data-bs-toggle="tooltip"
+       data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic{% if kind == "IAE" %} ayant permis la délivrance d’un PASS IAE{% endif %}, elle a peut-être changé depuis cette date."
+       aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic{% if kind == "IAE " %} ayant permis la délivrance d’un PASS IAE{% endif %}, elle a peut-être changé depuis cette date."
+       role="button"
+       tabindex="0"></i>
+{% endif %}

@@ -4,14 +4,7 @@
         <li>
             <small>
                 Critères administratifs
-                {% if request.user.is_employer or request.user.is_prescriber %}
-                    <i class="ri-information-line text-info"
-                       data-bs-toggle="tooltip"
-                       data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
-                       aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date."
-                       role="button"
-                       tabindex="0"></i>
-                {% endif %}
+                {% include "apply/includes/situation_criteria_tooltip.html" with request=request kind="IAE" only %}
             </small>
             {% if not selected_administrative_criteria %}
                 <i class="text-disabled">Le prescripteur habilité n’a pas renseigné de critères.</i>
