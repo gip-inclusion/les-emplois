@@ -619,6 +619,7 @@ class TestGroupDetailsMembershipTab:
 
         assert pretty_indented(simulated_page) == snapshot
 
+    @freezegun.freeze_time("2025-01-20")
     def test_display_participant_contact_info_as_job_seeker(self, client, snapshot, caplog):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory(for_snapshot=True)
         job_seeker = job_application.job_seeker
