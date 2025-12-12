@@ -32,7 +32,10 @@
             </strong>
         </li>
         <li>
-            <small>Critères administratifs</small>
+            <small>
+                Critères administratifs
+                {% include "apply/includes/situation_criteria_tooltip.html" with request=request kind=kind only %}
+            </small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
                 {% if not criteria %}
