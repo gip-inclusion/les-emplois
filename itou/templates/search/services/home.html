@@ -1,0 +1,71 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Rechercher un service d'insertion {{ block.super }}{% endblock %}
+
+{% block body_class %}p-home{% endblock %}
+
+{% block content %}
+    {% include "search/includes/generic_search_home.html" with form=form title="Rechercher un service d'insertion" url_search="search:services_results" template_form_name="search/services/includes/form.html" %}
+
+
+    <section class="s-article-figure-01 s-article-figure-01--ltr">
+        <div class="s-article-figure-01__container container container-max-lg">
+            <div class="s-article-figure-01__row row">
+                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
+                    <figure class="w-50 w-md-100">
+                        <img src="{% static "img/home/illustration-03.png" %}" class="img-fluid img-fitcover" width="411" height="291" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
+                    <article>
+                        <h2 class="h1 text-tertiary">Identifier des services</h2>
+                        <p>
+                            La recherche simplifiée vous permet d’identifier les services d’insertion les plus adaptés aux besoins spécifiques de vos bénéficiaires.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-article-figure-01">
+        <div class="s-article-figure-01__container container container-max-lg">
+            <div class="s-article-figure-01__row row">
+                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
+                    <figure class="w-50 w-md-100">
+                        <img src="{% static "img/home/illustration-04.png" %}" loading="lazy" class="img-fluid img-fitcover" width="411" height="291" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
+                    <article>
+                        <h2 class="h1 text-tertiary">Orienter vos bénéficiaires</h2>
+                        <p>
+                            Le formulaire facilite l’orientation de vos bénéficiaires vers la solution identifiée, le tout en moins de 5 minutes.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-article-figure-01 s-article-figure-01--ltr">
+        <div class="s-article-figure-01__container container container-max-lg">
+            <div class="s-article-figure-01__row row">
+                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
+                    <figure class="w-50 w-md-100">
+                        <img src="{% static "img/home/illustration-05.png" %}" loading="lazy" class="img-fluid img-fitcover" width="411" height="291" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
+                    <article>
+                        <h2 class="h1 text-tertiary">Suivre vos demandes</h2>
+                        <p>
+                            La structure partenaire répondra rapidement à votre demande. Vous pourrez suivre l’ensemble de vos demandes d’orientation depuis votre espace.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
