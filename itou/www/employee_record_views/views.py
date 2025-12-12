@@ -224,8 +224,10 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     # Redirect if status is missing or empty and we are not searching by job seeker
     if not form.cleaned_data.get("status") and not any(filters_form.cleaned_data.values()):
         return HttpResponseRedirect(
-            reverse("employee_record_views:list")
-            + f"?status={Status.NEW}&status={Status.REJECTED}&order={form.cleaned_data['order']}"
+            reverse(
+                "employee_record_views:list",
+                query={"status": [Status.NEW, Status.REJECTED], "order": form.cleaned_data["order"]},
+            )
         )
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
@@ -303,12 +305,12 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     """
     job_application = can_create_employee_record(request, job_application_id)
     form = JobSeekerProfileModelForm(data=request.POST or None, instance=job_application.job_seeker)
-    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
+    query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     if request.method == "POST" and form.is_valid():
         form.save()
         return HttpResponseRedirect(
-            reverse("employee_record_views:create_step_2", args=(job_application.pk,)) + query_param
+            reverse("employee_record_views:create_step_2", args=(job_application.pk,), query=query)
         )
 
     context = {
@@ -333,7 +335,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     job_seeker = job_application.job_seeker
     profile = job_seeker.jobseeker_profile
     address_filled = job_seeker.post_code and job_seeker.address_line_1
-    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
+    query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     # Perform a geolocation of the user address if possible:
     # - success : prefill form with geolocated data
@@ -353,11 +355,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(
-                reverse(
-                    "employee_record_views:create_step_3",
-                    args=(job_application.id,),
-                )
-                + query_param
+                reverse("employee_record_views:create_step_3", args=(job_application.id,), query=query)
             )
         else:
             profile.clear_hexa_address()
@@ -384,7 +382,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     """
     job_application = can_create_employee_record(request, job_application_id)
     job_seeker = job_application.job_seeker
-    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
+    query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     # At this point, a job seeker profile must have been created
     if not job_seeker.has_jobseeker_profile:
@@ -411,7 +409,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         if job_application.employee_record.exists():
             # The EmployeeRecord() object exists, usually its status should be NEW or REJECTED
             return HttpResponseRedirect(
-                reverse("employee_record_views:create_step_4", args=(job_application.id,)) + query_param
+                reverse("employee_record_views:create_step_4", args=(job_application.id,), query=query)
             )
 
         # The EmployeeRecord() object doesn't exist, so we create one from the job application
@@ -426,7 +424,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
             )
         else:
             return HttpResponseRedirect(
-                reverse("employee_record_views:create_step_4", args=(job_application.id,)) + query_param
+                reverse("employee_record_views:create_step_4", args=(job_application.id,), query=query)
             )
 
     context = {
@@ -448,7 +446,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     Step 4: Financial annex
     """
     job_application = can_create_employee_record(request, job_application_id)
-    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
+    query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
@@ -463,7 +461,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     if request.method == "POST" and form.is_valid():
         form.employee_record.save()
         return HttpResponseRedirect(
-            reverse("employee_record_views:create_step_5", args=(job_application.id,)) + query_param
+            reverse("employee_record_views:create_step_5", args=(job_application.id,), query=query)
         )
 
     context = {
@@ -492,7 +490,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     if request.method == "POST" and not job_application.hiring_starts_in_future:
         previous_status = employee_record.status
-        back_url = f"{reverse('employee_record_views:list')}?status={previous_status}"
+        back_url = reverse("employee_record_views:list", query={"status": previous_status})
         employee_record.ready(user=request.user)
         toast_title = (
             "La fiche salarié a été renvoyée"
@@ -568,7 +566,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
+    back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 
     if not employee_record.disable.is_available():
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -599,7 +597,7 @@ def reactivate(request, employee_record_id, template_name="employee_record/react
     if not siae_is_allowed(job_application, siae):
         raise PermissionDenied
 
-    back_url = f"{reverse('employee_record_views:list')}?status={employee_record.status}"
+    back_url = reverse("employee_record_views:list", query={"status": employee_record.status})
 
     if employee_record.status != Status.DISABLED:
         messages.error(request, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
