@@ -3,12 +3,13 @@ import random
 
 import freezegun
 import pytest
+from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, EducationLevel
 from itou.cities.models import City
@@ -1010,6 +1011,22 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         log = employee_record.logs.get()
         assert log.transition == EmployeeRecordTransition.READY
         assert log.user == self.user
+
+    def test_redirect_if_missing_value(self, client):
+        self.job_seeker.jobseeker_profile.hexa_commune = None
+        self.job_seeker.jobseeker_profile.save(update_fields=["hexa_commune"])
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        assert employee_record.has_valid_data_filled() is False
+        response = client.get(self.url)
+        assertRedirects(response, reverse("employee_record_views:create", args=(self.job_application.pk,)))
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR, "Certaines informations de la fiche salarié sont incomplètes ou invalides."
+                )
+            ],
+        )
 
 
 class TestCreateEmployeeRecordStep5ForEITI(TestCreateEmployeeRecordStep5):
