@@ -92,6 +92,12 @@ urlpatterns = [
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriptions/list", list_views.list_prescriptions, name="list_prescriptions"),
+    path(
+        "prescriptions/list/filters/<str:field_name>",
+        list_views.autocomplete,
+        name="list_prescriptions_autocomplete",
+        kwargs={"list_kind": list_views.JobApplicationsListKind.SENT},
+    ),
     path("prescriptions/list/exports", list_views.list_prescriptions_exports, name="list_prescriptions_exports"),
     path(
         "prescriptions/list/exports/download",
@@ -104,6 +110,12 @@ urlpatterns = [
         name="list_prescriptions_exports_download",
     ),
     path("siae/list", list_views.list_for_siae, name="list_for_siae"),
+    path(
+        "siae/list/filters/<str:field_name>",
+        list_views.autocomplete,
+        name="list_for_siae_autocomplete",
+        kwargs={"list_kind": list_views.JobApplicationsListKind.RECEIVED},
+    ),
     path("siae/list/exports", list_views.list_for_siae_exports, name="list_for_siae_exports"),
     path(
         "siae/list/exports/download",
