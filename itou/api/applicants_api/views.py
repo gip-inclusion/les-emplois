@@ -85,7 +85,7 @@ L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
 
-Le compte administrateur utilisé peut être membre administrateur d'une ou de plusieurs structures.
+Le compte administrateur utilisé doit être **administrateur de toutes les structures dont il est membre**.
 Par défaut, l'API renvoie les candidatures reçues par la première structure dont le compte est membre
 car la première version avait été pensée ainsi.
 
