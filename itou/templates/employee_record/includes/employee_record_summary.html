@@ -55,6 +55,7 @@
         <h2 class="h3">Situation du {{ request.current_organization|worker_denomination }}</h2>
         <ul class="mb-0">
             <li>{{ profile.get_education_level_display }}</li>
+            {% if profile.low_level_in_french %}<li>Maîtrise de la langue française inférieure au niveau A1</li>{% endif %}
             {% if profile.pole_emploi_since %}
                 <li>
                     Inscrit à France Travail depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
@@ -73,6 +74,10 @@
             {% if profile.rsa_allocation_since %}<li>{{ profile|profile_field_display:'rsa_allocation_since' }}</li>{% endif %}
             {% if profile.ass_allocation_since %}<li>{{ profile|profile_field_display:'ass_allocation_since' }}</li>{% endif %}
             {% if profile.aah_allocation_since %}<li>{{ profile|profile_field_display:'aah_allocation_since' }}</li>{% endif %}
+
+            {% if profile.isolated_parent %}<li>{{ profile|profile_field_display:'isolated_parent' }}</li>{% endif %}
+            {% if profile.ase_exit %}<li>{{ profile|profile_field_display:'ase_exit' }}</li>{% endif %}
+
             {% if request.current_organization.kind == CompanyKind.EITI %}
                 {% if profile.are_allocation_since %}<li>{{ profile|profile_field_display:'are_allocation_since' }}</li>{% endif %}
                 {% if profile.activity_bonus_since %}<li>{{ profile|profile_field_display:'activity_bonus_since' }}</li>{% endif %}
@@ -88,6 +93,12 @@
                     <li>Taux de cotisation : {{ profile.get_eiti_contributions_display|lower }}</li>
                 {% endif %}
             {% endif %}
+            {% if profile.housing_issue %}<li>{{ profile|profile_field_display:'housing_issue' }}</li>{% endif %}
+            {% if profile.refugee %}<li>{{ profile|profile_field_display:'refugee' }}</li>{% endif %}
+            {% if profile.detention_exit_or_ppsmj %}
+                <li>{{ profile|profile_field_display:'detention_exit_or_ppsmj' }}</li>
+            {% endif %}
+            {% if profile.mobility_issue %}<li>{{ profile|profile_field_display:'mobility_issue' }}</li>{% endif %}
         </ul>
 
         <hr class="my-4">

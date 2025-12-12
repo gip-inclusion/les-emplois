@@ -636,6 +636,16 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
 
     URL_NAME = "employee_record_views:create_step_3"
     SIAE_KIND = random.choice(list(set(CompanyKind.siae_kinds()) - {CompanyKind.EITI}))
+    BOOLEAN_FIELDS = [
+        "resourceless",
+        "ase_exit",
+        "isolated_parent",
+        "housing_issue",
+        "refugee",
+        "detention_exit_or_ppsmj",
+        "low_level_in_french",
+        "mobility_issue",
+    ]
 
     @pytest.fixture(autouse=True)
     def setup_method(self, client):
@@ -767,6 +777,25 @@ class TestCreateEmployeeRecordStep3(CreateEmployeeRecordTestMixin):
             "Il est impossible de créer cette fiche salarié pour la raison suivante",
         )
 
+    def test_basic_boolean_fields(self, client):
+        response = client.get(self.url)
+        form = response.context["form"]
+
+        for field_name in self.BOOLEAN_FIELDS:
+            assert not form.initial.get(field_name)
+
+        for field_name in self.BOOLEAN_FIELDS:
+            assert getattr(self.job_seeker.jobseeker_profile, field_name) is False
+            data = {
+                **self._default_step_3_data(),
+                field_name: True,
+            }
+            response = client.post(self.url, data)
+            assertRedirects(response, self.target_url)
+
+            self.job_seeker.jobseeker_profile.refresh_from_db()
+            assert getattr(self.job_seeker.jobseeker_profile, field_name) is True
+
 
 class TestCreateEmployeeRecordStep3ForEITI(TestCreateEmployeeRecordStep3):
     """
@@ -774,6 +803,10 @@ class TestCreateEmployeeRecordStep3ForEITI(TestCreateEmployeeRecordStep3):
     """
 
     SIAE_KIND = CompanyKind.EITI
+    BOOLEAN_FIELDS = TestCreateEmployeeRecordStep3.BOOLEAN_FIELDS + [
+        "cape_freelance",
+        "cesa_freelance",
+    ]
 
     def test_fold_are_allocation(self, client):
         response = client.get(self.url)

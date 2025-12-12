@@ -451,6 +451,9 @@
                   Troisième cycle ou école d'ingénieur
               </li>
               <li>
+                  Maîtrise de la langue française inférieure au niveau A1
+              </li>
+              <li>
                   Inscrit à France Travail depuis de 12 à 23 mois (12345678)
               </li>
               <li>
@@ -473,6 +476,24 @@
               </li>
               <li>
                   Bénéficiaire de l'AAH depuis moins de 6 mois
+              </li>
+              <li>
+                  Parent isolé
+              </li>
+              <li>
+                  Sortant de l'ASE (Aide Sociale à l'Enfance)
+              </li>
+              <li>
+                  Personne sans hébergement ou hébergée ou ayant un parcours de rue
+              </li>
+              <li>
+                  Réfugié statutaire ou bénéficiaire de la protection subsidiaire
+              </li>
+              <li>
+                  Sortant de détention ou personne placée sous main de justice
+              </li>
+              <li>
+                  Problème de mobilité
               </li>
           </ul>
           <hr class="my-4"/>

@@ -791,8 +791,19 @@ class TestStandaloneCreateAsPrescriber:
         response = client.get(next_url)
         assertContains(response, CONFIRM_RESET_MARKUP % from_url)
 
+        boolean_fields = [
+            "ase_exit",
+            "isolated_parent",
+            "housing_issue",
+            "refugee",
+            "detention_exit_or_ppsmj",
+            "low_level_in_french",
+            "mobility_issue",
+        ]
+        true_fields = [field for field in boolean_fields if random.choice([True, False])]
         post_data = {
             "education_level": dummy_job_seeker.jobseeker_profile.education_level,
+            **{field: field in true_fields for field in boolean_fields},
         }
         response = client.post(next_url, data=post_data)
         expected_job_seeker_session["profile"] |= post_data | {
@@ -813,6 +824,13 @@ class TestStandaloneCreateAsPrescriber:
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
+            "ase_exit": "ase_exit" in true_fields,
+            "isolated_parent": "isolated_parent" in true_fields,
+            "housing_issue": "housing_issue" in true_fields,
+            "refugee": "refugee" in true_fields,
+            "detention_exit_or_ppsmj": "detention_exit_or_ppsmj" in true_fields,
+            "low_level_in_french": "low_level_in_french" in true_fields,
+            "mobility_issue": "mobility_issue" in true_fields,
         }
         assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -851,6 +869,8 @@ class TestStandaloneCreateAsPrescriber:
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
+        for field in boolean_fields:
+            assert getattr(new_job_seeker.jobseeker_profile, field) == (field in true_fields)
 
 
 class TestUpdateAsOther:
