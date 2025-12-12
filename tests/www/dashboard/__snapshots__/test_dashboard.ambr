@@ -1158,6 +1158,142 @@
     ]),
   })
 # ---
+# name: TestDashboardView.test_jobseeker_eligibility_diagnoses[GEIQ eligibility block on job seeker dashboard]
+  '''
+  <div class="col-12 col-md-12 col-xxl-12 col-xxxl-12 mb-3 mb-md-5" id="geiq-eligibility-diagnosis">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">
+                  Diagnostic public prioritaire GEIQ valide
+              </span>
+              <span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+                  <i aria-hidden="true" class="ri-check-line">
+                  </i>
+                  Éligibilité GEIQ confirmée
+              </span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <p>
+                  Éligibilité GEIQ confirmée par
+                  <b>
+                      John DOE (Acme inc.)
+                  </b>
+              </p>
+              <p class="mb-2">
+                  <span class="badge badge-sm rounded-pill bg-secondary">
+                      Critères administratifs
+                  </span>
+              </p>
+              <ul>
+                  <li>
+                      <div class="d-flex align-items-center">
+                          <span>
+                              Bénéficiaire du Revenu de Solidarité Active (RSA)
+                          </span>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="d-flex align-items-center">
+                          <span>
+                              Résident en quartier prioritaire de la politique de la ville (QPV)
+                          </span>
+                      </div>
+                  </li>
+                  <li>
+                      <div class="d-flex align-items-center">
+                          <span>
+                              Sortant de l'Aide Sociale à l'Enfance (ASE)
+                          </span>
+                      </div>
+                  </li>
+              </ul>
+              <p>
+                  <i>
+                      Ce diagnostic expire le 19/11/2025.
+                  </i>
+              </p>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestDashboardView.test_jobseeker_eligibility_diagnoses[IAE eligibility block on job seeker dashboard]
+  '''
+  <div class="col-12 col-md-12 col-xxl-12 col-xxxl-6 mb-3 mb-md-5" id="iae-eligibility-diagnosis">
+      <div class="c-box p-0 h-100">
+          <div class="p-3 p-lg-4">
+              <span class="h4 mb-0">
+                  Diagnostic d’éligibilité à l’IAE
+                      
+                          valide
+              </span>
+              <span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
+                  <i aria-hidden="true" class="ri-check-line">
+                  </i>
+                  Éligible à l’IAE
+              </span>
+          </div>
+          <div class="px-3 px-lg-4">
+              <div class="fs-sm mb-lg-5">
+                  <p class="text-success mb-1">
+                      Critères validés
+                              le
+                      <span class="fw-bold">
+                          19/05/2025
+                      </span>
+                      par
+                      <strong>
+                          Pierre DUPONT
+                      </strong>
+                      (Pres. Org.).
+                  </p>
+                  <p class="fs-sm">
+                      <i>
+                          Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date.
+                      </i>
+                  </p>
+                  <p class="mb-2">
+                      <span class="badge badge-sm rounded-pill bg-secondary">
+                          Critères administratifs
+                      </span>
+                  </p>
+                  <ul>
+                      <li>
+                          <div class="d-flex align-items-center">
+                              <span>
+                                  Bénéficiaire du RSA
+                              </span>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="d-flex align-items-center">
+                              <span>
+                                  Allocataire AAH
+                              </span>
+                          </div>
+                      </li>
+                      <li>
+                          <div class="d-flex align-items-center">
+                              <span>
+                                  Problème de mobilité
+                              </span>
+                          </div>
+                      </li>
+                  </ul>
+                  <p class="mb-0">
+                      <i>
+                          Ce diagnostic expire le
+              19/11/2025.
+                      </i>
+                  </p>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: TestDashboardView.test_staff_users[full]
   '''
   <section class="s-section">
