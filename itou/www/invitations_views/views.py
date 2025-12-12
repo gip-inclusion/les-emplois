@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
@@ -56,16 +54,14 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
 
 
 def handle_invited_user_registration_with_pro_connect(request, invitation, invitation_type):
-    params = {
+    query = {
         "user_kind": invitation_type,
         "user_email": invitation.email,
         "channel": ProConnectChannel.INVITATION.value,
         "previous_url": request.get_full_path(),
         "next_url": invitation.acceptance_url_for_existing_user,
     }
-    pro_connect_url = (
-        f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
-    )
+    pro_connect_url = reverse("pro_connect:authorize", query=query) if settings.PRO_CONNECT_BASE_URL else None
     context = {
         "pro_connect_url": pro_connect_url,
         "invitation": invitation,
@@ -110,9 +106,10 @@ def new_user(request, invitation_type, invitation_id):
             return redirect(invitation.acceptance_url_for_existing_user)
 
         # The user exists but he should log in first.
-        login_url = reverse(f"login:{invitation.USER_KIND}")
-        next_step_url = f"{login_url}?next={invitation.acceptance_url_for_existing_user}"
-        return redirect(next_step_url)
+        login_url = reverse(
+            f"login:{invitation.USER_KIND}", query={"next": invitation.acceptance_url_for_existing_user}
+        )
+        return redirect(login_url)
 
     # A new user should be created before joining
     handle_registration = {
