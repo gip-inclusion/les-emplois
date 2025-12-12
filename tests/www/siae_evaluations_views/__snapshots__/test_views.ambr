@@ -1,25 +1,4 @@
 # serializer version: 1
-# name: TestEvaluatedSiaeSanctionView.test_deactivation
-  '''
-  <div class="card-body">
-      <h2>
-          Sanction
-      </h2>
-      <h3 class="mt-5">
-          Déconventionnement de la structure
-      </h3>
-      <p>
-          La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
-      </p>
-      <div class="card">
-          <div class="card-body">
-              Mauvais comportement, rien ne va. On arrête tout.
-          </div>
-      </div>
-  </div>
-  
-  '''
-# ---
 # name: TestEvaluatedSiaeSanctionView.test_no_sanction
   '''
   <div class="card-body">
@@ -57,49 +36,49 @@
   
   '''
 # ---
-# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_full
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[0][sanctions with subsidy_cut_percent=0]
   '''
   <div class="card-body">
       <h2>
           Sanction
       </h2>
       <h3 class="mt-5">
-          Suppression
-                                      
-                                      de l’aide au poste
+          Suppression partielle ou totale de l’aide au poste
       </h3>
       <p>
-          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
-      </p>
-      <p>
-          Dans votre cas, la suppression
-                                      
-                                      de l’aide au poste sera effective à partir du 1 janvier 2023 et jusqu’au 1 juin 2023.
+          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
       </p>
   </div>
   
   '''
 # ---
-# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[100][sanctions with subsidy_cut_percent=100]
   '''
   <div class="card-body">
       <h2>
           Sanction
       </h2>
       <h3 class="mt-5">
-          Suppression
-                                      d’une partie
-                                      de l’aide au poste
+          Suppression partielle ou totale de l’aide au poste
       </h3>
       <p>
-          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants.
+          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
       </p>
+  </div>
+  
+  '''
+# ---
+# name: TestEvaluatedSiaeSanctionView.test_subsidy_cut_rate[10][sanctions with subsidy_cut_percent=10]
+  '''
+  <div class="card-body">
+      <h2>
+          Sanction
+      </h2>
+      <h3 class="mt-5">
+          Suppression partielle ou totale de l’aide au poste
+      </h3>
       <p>
-          Dans votre cas, la suppression
-                                      
-                                          de 35 %
-                                      
-                                      de l’aide au poste sera effective à partir du 1 janvier 2023 et jusqu’au 1 juin 2023.
+          La suppression de l’aide attribuée aux salariés s’apprécie par l'autorité administrative, par imputation de l’année N+1. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision en vue de la récupération, le cas échéant, des montants correspondants. Le pourcentage de retrait s’applique à l’aide attribuée au titre des heures réalisées durant le parcours de la personne sur l’année de contrôle.
       </p>
   </div>
   

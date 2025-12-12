@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import Sanctions
+from itou.siae_evaluations.models import EvaluatedJobApplication, EvaluatedJobApplicationSanction, Sanctions
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
@@ -34,6 +34,7 @@ class TestEvaluatedSiaeSanctionView:
         self.evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            job_app__job_application__for_snapshot=True,
             evaluation_campaign__institution=institution_membership.institution,
             evaluation_campaign__name="Contrôle 2022",
             siae=company_membership.company,
@@ -54,7 +55,7 @@ class TestEvaluatedSiaeSanctionView:
             '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
         )
 
-    def assertSanctionContent(self, response):
+    def assertSanctionContent(self, response, subsidy_cut_percent=None):
         assertContains(
             response,
             '<h1>Notification de sanction pour <span class="text-info">Les petits jardins</span></h1>',
@@ -82,6 +83,25 @@ class TestEvaluatedSiaeSanctionView:
                     <p>A envoyé une photo de son chat. Séparé de son chat pendant une journée.</p>
                 </div>
             </div>
+            """,
+            html=True,
+            count=1,
+        )
+        subsidy_cut_str = (
+            f"<br>Pourcentage d’aide au poste retirée : {subsidy_cut_percent} %"
+            if subsidy_cut_percent is not None
+            else ""
+        )
+        assertContains(
+            response,
+            f"""
+            <p>
+             <strong>PASS IAE <span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span>,
+             Jane DOE</strong>
+             <br> Motif de l'irrégularité : Les documents fournis se sont révélés incomplets ou non conformes
+             aux exigences réglementaires.
+             {subsidy_cut_str}
+            </p>
             """,
             html=True,
             count=1,
@@ -206,11 +226,17 @@ class TestEvaluatedSiaeSanctionView:
         self.assertSanctionContent(response)
         assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
-    def test_subsidy_cut_rate(self, client, snapshot):
+    @pytest.mark.parametrize("subsidy_cut_percent", [0, 10, 100])
+    def test_subsidy_cut_rate(self, client, subsidy_cut_percent, snapshot):
         self.sanctions.training_session = ""
         self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
-        self.sanctions.subsidy_cut_percent = 35
         self.sanctions.save()
+        evaluated_job_application = EvaluatedJobApplication.objects.filter(evaluated_siae=self.evaluated_siae).first()
+        EvaluatedJobApplicationSanction.objects.create(
+            sanctions=self.sanctions,
+            evaluated_job_application=evaluated_job_application,
+            subsidy_cut_percent=subsidy_cut_percent,
+        )
         client.force_login(self.institution_user)
         response = client.get(
             reverse(
@@ -218,23 +244,10 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
-
-    def test_subsidy_cut_full(self, client, snapshot):
-        self.sanctions.training_session = ""
-        self.sanctions.subsidy_cut_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
-        self.sanctions.subsidy_cut_percent = 100
-        self.sanctions.save()
-        client.force_login(self.institution_user)
-        response = client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_sanction",
-                kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
-            )
+        self.assertSanctionContent(response, subsidy_cut_percent)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name=f"sanctions with subsidy_cut_percent={subsidy_cut_percent}"
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
 
     def test_no_sanction(self, client, snapshot):
         self.sanctions.training_session = ""
