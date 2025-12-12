@@ -1841,7 +1841,8 @@
                  AND "gps_followupgroupmembership"."ended_at" IS NULL)
           GROUP BY "gps_followupgroupmembership"."id",
                    1
-          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+          ORDER BY "gps_followupgroupmembership"."started_at" DESC,
+                   "gps_followupgroupmembership"."created_at" DESC
         ''',
       }),
       dict({
@@ -2023,7 +2024,8 @@
                    "gps_followupgroup"."id",
                    T6."id",
                    "users_user"."id"
-          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+          ORDER BY "gps_followupgroupmembership"."started_at" DESC,
+                   "gps_followupgroupmembership"."created_at" DESC
           LIMIT 2
         ''',
       }),
@@ -2285,6 +2287,24 @@
                                   <tbody>
                                       <tr>
                                           <td>
+                                              <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
+                                                  Jane DOE
+                                              </a>
+                                          </td>
+                                          <td>
+                                              juin 2024 –
+                                              <strong>
+                                                  moins d’un mois
+                                              </strong>
+                                          </td>
+                                          <td>
+                                          </td>
+                                          <td>
+                                              2
+                                          </td>
+                                      </tr>
+                                      <tr>
+                                          <td>
                                               <a aria-label="Consulter la fiche de François LE FRANÇAIS" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
                                                   François LE FRANÇAIS
                                               </a>
@@ -2302,24 +2322,6 @@
                                           </td>
                                           <td>
                                               1
-                                          </td>
-                                      </tr>
-                                      <tr>
-                                          <td>
-                                              <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
-                                                  Jane DOE
-                                              </a>
-                                          </td>
-                                          <td>
-                                              juin 2024 –
-                                              <strong>
-                                                  moins d’un mois
-                                              </strong>
-                                          </td>
-                                          <td>
-                                          </td>
-                                          <td>
-                                              2
                                           </td>
                                       </tr>
                                   </tbody>
@@ -2472,7 +2474,8 @@
                  AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
           GROUP BY "gps_followupgroupmembership"."id",
                    1
-          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+          ORDER BY "gps_followupgroupmembership"."started_at" DESC,
+                   "gps_followupgroupmembership"."created_at" DESC
         ''',
       }),
       dict({
@@ -2653,7 +2656,8 @@
                    "gps_followupgroup"."id",
                    T6."id",
                    "users_user"."id"
-          ORDER BY "gps_followupgroupmembership"."created_at" DESC
+          ORDER BY "gps_followupgroupmembership"."started_at" DESC,
+                   "gps_followupgroupmembership"."created_at" DESC
           LIMIT 1
         ''',
       }),
