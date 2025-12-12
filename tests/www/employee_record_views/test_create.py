@@ -81,7 +81,6 @@ class CreateEmployeeRecordTestMixin:
         )
 
         self.job_seeker = self.job_application.job_seeker
-
         self.url = reverse(self.URL_NAME, args=(self.job_application.pk,))
 
         mocker.patch(
@@ -96,6 +95,15 @@ class CreateEmployeeRecordTestMixin:
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
         data = _get_user_form_data(self.job_seeker)
+        if self.job_seeker.jobseeker_profile.nir.startswith(("7", "8")):
+            # An NTT is required to pass step 1
+            data["ntt"] = "".join(
+                [
+                    "1" if self.job_seeker.title == Title.M else "2",
+                    self.company.siren,
+                    "leMatriculeDuS414r13",
+                ]
+            )
         response = client.post(url, data=data)
 
         assertRedirects(response, target_url)

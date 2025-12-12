@@ -121,7 +121,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
         help_text="Ce numéro doit comporter entre 11 et 40 caractères",
     )
 
-    def __init__(self, *args, siren, back_url=None, **kwargs):
+    def __init__(self, *args, siren, mandatory_ntt, back_url=None, **kwargs):
         super().__init__(*args, **kwargs)
         # Not displayed, but still in PROFILE_FIELDS for save()
         self.fields["lack_of_nir_reason"].disabled = True
@@ -129,6 +129,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
 
         self._back_url = back_url
         self._siren = siren  # Used to validate NTT
+        self._mandatory_ntt = mandatory_ntt
 
         # A transient checkbox used to collapse optional block
         self.fields["lack_of_nir"] = forms.BooleanField(
@@ -155,8 +156,12 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
                 ),
             )
 
-            self.fields["lack_of_nir"].widget = forms.HiddenInput()
-            self.fields["ntt"].disabled = True
+            if mandatory_ntt:
+                self.initial["lack_of_nir"] = True
+                self.fields["lack_of_nir"].disabled = True
+            else:
+                self.fields["lack_of_nir"].widget = forms.HiddenInput()
+                self.fields["ntt"].disabled = True
 
         if self["lack_of_nir"].value():
             self.fields["nir"].disabled = True
@@ -197,12 +202,21 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
                     )
 
             elif not self.has_error("ntt"):  # Avoid double error message
-                self.add_error(
-                    "ntt",
-                    forms.ValidationError(
-                        "Le numéro technique temporaire est obligatoire si vous ne disposez pas du NIR ou du NIA."
-                    ),
-                )
+                if self._mandatory_ntt:
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError(
+                            "Le numéro technique temporaire est obligatoire si votre NIA commence par les numéros "
+                            "7 ou 8."
+                        ),
+                    )
+                else:
+                    self.add_error(
+                        "ntt",
+                        forms.ValidationError(
+                            "Le numéro technique temporaire est obligatoire si vous ne disposez pas du NIR ou du NIA."
+                        ),
+                    )
         else:
             if not self.cleaned_data.get("nir"):
                 self.add_error(

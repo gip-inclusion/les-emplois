@@ -18,6 +18,7 @@ from itou.companies.enums import CompanyKind
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordTransition
+from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.models import User
@@ -326,28 +327,37 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     job_application = can_create_employee_record(request, job_application_id)
 
     existing_ntt = None
-    if not job_application.job_seeker.jobseeker_profile.nir:
+    if is_ntt_required(job_application.job_seeker.jobseeker_profile.nir):
         # A NTT might be needed: try to find one on a possibly existing employee record
         employee_record = job_application.employee_record.order_by("-created_at").first()
         if employee_record and employee_record.ntt:
             existing_ntt = employee_record.ntt
         else:
             existing_ntt = get_session_ntt(request, job_application)
-
+    mandatory_ntt = job_application.job_seeker.jobseeker_profile.nir and is_ntt_required(
+        job_application.job_seeker.jobseeker_profile.nir
+    )
     form = NewEmployeeRecordJobSeekerForm(
         data=request.POST or None,
         instance=job_application.job_seeker,
         back_url=get_safe_url(request, "back_url", fallback_url=reverse("employee_record_views:list")),
         siren=job_application.to_company.siren,
         initial={"ntt": existing_ntt} if existing_ntt else {},
+        mandatory_ntt=mandatory_ntt,
     )
     query = {"status": request.GET.get("status")} if request.GET.get("status") else {}
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        if not form.cleaned_data.get("nir"):
+        if form.cleaned_data.get("ntt"):
             # Store NTT for step 3
             set_session_ntt(request, job_application, form.cleaned_data.get("ntt"))
+        elif is_ntt_required(form.instance.jobseeker_profile.nir):
+            # NTT missing and NIR starting with 7 or 8 -> reload form to request NTT
+            return HttpResponseRedirect(
+                reverse("employee_record_views:create", args=(job_application.pk,), query=query)
+            )
+
         return HttpResponseRedirect(
             reverse("employee_record_views:create_step_2", args=(job_application.pk,), query=query)
         )
@@ -357,6 +367,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         "form": form,
         "steps": STEPS,
         "step": 1,
+        "mandatory_ntt": mandatory_ntt,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 1",
         "back_url": get_safe_url(request, "back_url"),
     }

@@ -41,6 +41,20 @@
                                 </ul>
                             </div>
                         </div>
+                    {% elif mandatory_ntt %}
+                        <div class="c-info">
+                            <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoNir78" aria-expanded="true" aria-controls="collapseInfoNir78">
+                                <span>Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?</span>
+                            </button>
+                            <div class="c-info__detail collapse show" id="collapseInfoNir78">
+                                <p>Vous pouvez poursuivre la démarche en renseignant un numéro technique temporaire (NTT).</p>
+                                <p class="mt-0">
+                                    Ce numéro peut être généré par votre logiciel de paie ou créé manuellement.
+                                    <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
+                                </p>
+                            </div>
+                        </div>
+
                     {% endif %}
                 </fieldset>
                 {% url "employee_record_views:list" as secondary_url %}
