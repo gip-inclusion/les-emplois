@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 from allauth.account.views import LoginView
 from allauth.decorators import rate_limit
 from django.conf import settings
@@ -60,12 +58,12 @@ class UserKindLoginMixin:
     def dispatch(self, request, *args, **kwargs):
         if next_url := get_safe_url(request, "next"):
             if get_url_param_value(next_url, "channel") == ProConnectChannel.MAP_CONSEILLER:
-                params = {
+                query = {
                     "user_kind": UserKind.PRESCRIBER,
                     "next_url": next_url,
                     "channel": ProConnectChannel.MAP_CONSEILLER.value,
                 }
-                return HttpResponseRedirect(f"{reverse('pro_connect:authorize')}?{urlencode(params)}")
+                return HttpResponseRedirect(reverse("pro_connect:authorize", query=query))
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -139,7 +137,9 @@ class JobSeekerPreLoginView(LoginNotRequiredMixin, UserKindLoginMixin, FormView)
         return super().form_valid(form)
 
     def get_success_url(self):
-        return f"{reverse('login:existing_user', args=(self.user.public_id,))}?back_url={reverse('login:job_seeker')}"
+        return reverse(
+            "login:existing_user", args=(self.user.public_id,), query={"back_url": reverse("login:job_seeker")}
+        )
 
 
 class ExistingUserLoginView(ItouLoginView):
