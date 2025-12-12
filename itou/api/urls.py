@@ -9,6 +9,7 @@ from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificati
 from itou.api.geiq.views import GeiqJobApplicationListView
 from itou.api.job_application_api.views import JobApplicationSearchView
 from itou.api.marche_api.views import MarcheCompanyView
+from itou.api.mon_recap_api import views
 from itou.api.redoc_views import ItouSpectacularRedocView
 from itou.api.siae_api.viewsets import SiaeViewSet
 from itou.api.token_auth.views import ObtainAuthToken
@@ -49,6 +50,7 @@ urlpatterns = [
     ),
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
     path("candidatures/recherche/", JobApplicationSearchView.as_view(), name="job-applications-search"),
+    path("mon-recap/submit/", views.MonRecapSubmitView.as_view(), name="mon-recap-submit"),
     path("data-inclusion/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("marche/", MarcheCompanyView.as_view(), name="marche-company-list"),
     *router.urls,

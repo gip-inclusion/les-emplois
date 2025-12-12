@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     "itou.rdv_insertion",
     "itou.archive",
     "itou.nexus",
+    "itou.mon_recap",
 ]
 
 # TODO: Remove with Django 6.0
