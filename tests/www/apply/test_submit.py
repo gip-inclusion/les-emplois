@@ -13,6 +13,7 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertFormError,
@@ -42,7 +43,6 @@ from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, initialize_apply_session

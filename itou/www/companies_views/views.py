@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
+from itoutils.urls import add_url_params
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -29,7 +30,7 @@ from itou.utils.auth import LoginNotRequiredMixin, check_request, check_user
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.session import SessionNamespace, SessionNamespaceException
-from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.companies_views import forms as companies_forms
 

@@ -18,6 +18,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+from itoutils.urls import add_url_params
 
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.enums import Origin
@@ -27,7 +28,7 @@ from itou.job_applications.models import JobApplication
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.apis import enums as api_enums
 from itou.utils.emails import get_email_text_template
-from itou.utils.urls import add_url_params, get_absolute_url
+from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger("itou.approvals.admin")

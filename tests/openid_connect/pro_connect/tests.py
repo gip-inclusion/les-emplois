@@ -19,6 +19,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
@@ -41,7 +42,7 @@ from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.urls import add_url_params, get_absolute_url
+from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (

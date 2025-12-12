@@ -778,9 +778,9 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django]==25.12.4.0 \
-    --hash=sha256:30ed33741d0f33255a7c30ec5a2f4973580b41067ac0dda89fd17969b446d20f \
-    --hash=sha256:a69aa3158e752ad12e3ea7df8f600eb69167145739bf2f923659fb789c5103b3
+itoutils[django]==25.12.10.0 \
+    --hash=sha256:6d1c7dcbbf0c934be6d162f231f828cb17b2ca691313bda296266f387c5ca921 \
+    --hash=sha256:d2e4291e650b4d712ba9f1d1f99168f74c290ea947efb9bb26ceb01aa0117b64
     # via -r requirements/test.txt
 jedi==0.19.2 \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
@@ -826,7 +826,9 @@ jsonschema-specifications==2025.9.1 \
 jwcrypto==1.5.6 \
     --hash=sha256:150d2b0ebbdb8f40b77f543fb44ffd2baeff48788be71f67f03566692fd55789 \
     --hash=sha256:771a87762a0c081ae6166958a954f80848820b2ab066937dc8b8379d65b1b039
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   itoutils
 lxml==6.0.2 \
     --hash=sha256:058027e261afed589eddcfe530fcc6f3402d7fd7e89bfd0532df82ebc1563dba \
     --hash=sha256:063eccf89df5b24e361b123e257e437f9e9878f425ee9aae3144c77faf6da6d8 \
