@@ -57,7 +57,7 @@ class TestEvaluatedSiaeSanctionView:
     def assertSanctionContent(self, response):
         assertContains(
             response,
-            '<h1>Notification de sanction pour <span class="text-info">Les petits jardins</span></h1>',
+            '<h1>Décision de sanction pour <span class="text-info">Les petits jardins</span></h1>',
             html=True,
             count=1,
         )

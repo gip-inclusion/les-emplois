@@ -2491,7 +2491,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
+        assert email.subject == "[TEST] Décision de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3169,7 +3169,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mailoutbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "[TEST] Notification de sanction"
+        assert email.subject == "[TEST] Décision de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -4247,5 +4247,6 @@ class TestInstitutionCalendarView:
         evaluation_campaign.calendar.delete()
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
+        assertNotContains(response, calendar_url)
         assertNotContains(response, calendar_url)
         assertNotContains(response, calendar_url)
