@@ -14,7 +14,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.enums import LackOfPoleEmploiId, Title
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import get_zendesk_form_url
@@ -545,6 +545,10 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(check_nir_url, data={"nir": existing_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assertRedirects(response, next_url)
 
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is retrieved
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
+
     @freeze_time("2024-08-30")
     @pytest.mark.parametrize("case", ["not_in_list", "in_list_user", "in_list_organization", "in_list_application"])
     def test_standalone_creation_as_prescriber_existing_email(self, client, snapshot, case):
@@ -626,9 +630,14 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(search_by_email_url, data={"email": existing_job_seeker.email, "confirm": 1})
         assertRedirects(response, next_url)
 
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is retrieved
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
+
     def test_standalone_creation_as_prescriber(self, client):
         from_url = reverse("job_seekers_views:list")
-        user = PrescriberOrganizationFactory(with_membership=True).members.first()
+        prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
+        user = prescriber_organization.members.first()
         client.force_login(user)
         with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
@@ -847,10 +856,7 @@ class TestStandaloneCreateAsPrescriber:
         response = client.post(next_url)
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert (
-            new_job_seeker.jobseeker_profile.created_by_prescriber_organization
-            == user.prescriberorganization_set.first()
-        )
+        assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
         next_url = reverse(
             "job_seekers_views:details",
             kwargs={"public_id": new_job_seeker.public_id},
@@ -869,6 +875,9 @@ class TestStandaloneCreateAsPrescriber:
 
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
         ).exists()
         for field in boolean_fields:
             assert getattr(new_job_seeker.jobseeker_profile, field) == (field in true_fields)
