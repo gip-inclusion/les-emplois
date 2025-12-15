@@ -11,6 +11,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.models import JobSeekerAssignment
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -62,6 +63,10 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
     assert membership.member == diagnosis.author
     assert membership.creator == diagnosis.author
+    assignment = JobSeekerAssignment.objects.get()
+    assert assignment.job_seeker == diagnosis.job_seeker
+    assert assignment.prescriber == diagnosis.author
+    assert assignment.prescriber_organization == prescriber_org
 
     diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
         job_seeker=JobSeekerFactory(),
@@ -76,6 +81,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
     assert membership.member == diagnosis.author
     assert membership.creator == diagnosis.author
+    assert JobSeekerAssignment.objects.count() == 1  # The second diagnosis was from GEIQ, no assignment created
 
     # bad cops:
 
@@ -120,6 +126,10 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
         diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, [administrative_criteria_annex_1]
     )
+    assignment = JobSeekerAssignment.objects.get()
+    assert assignment.job_seeker == diagnosis.job_seeker
+    assert assignment.prescriber == diagnosis.author
+    assert assignment.prescriber_organization == diagnosis.author_prescriber_organization
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
 
