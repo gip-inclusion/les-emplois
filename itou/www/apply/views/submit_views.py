@@ -613,7 +613,10 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 # Check if update is really needed: may change diagnosis expiration date
                 if self.form.has_changed():
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-                        self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
+                        self.geiq_eligibility_diagnosis,
+                        request.user,
+                        request.current_organization if request.user.is_prescriber else None,
+                        self.form.cleaned_data,
                     )
 
             return HttpResponseRedirect(self.get_next_url())
