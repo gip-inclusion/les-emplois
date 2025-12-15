@@ -106,17 +106,19 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # Updating nothing
     with pytest.raises(ValueError, match="Le diagnostic fourni n'est pas un diagnostic GEIQ"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, None, ())
 
     # Trying to update an expired diagnosis
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
     with pytest.raises(ValueError, match="Impossible de modifier un diagnostic GEIQ expiré"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, diagnosis.author, administrative_criteria=())
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+            diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, administrative_criteria=()
+        )
 
     # correct update case:
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-        diagnosis, diagnosis.author, [administrative_criteria_annex_1]
+        diagnosis, diagnosis.author, diagnosis.author_prescriber_organization, [administrative_criteria_annex_1]
     )
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
@@ -125,7 +127,9 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 def test_update_geiq_eligibility_diagnosis_author():
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     other_user = ItouStaffFactory()
-    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, other_user, ())
+    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+        diagnosis, other_user, diagnosis.author_prescriber_organization, ()
+    )
     diagnosis.refresh_from_db()
 
     assert diagnosis.author == other_user

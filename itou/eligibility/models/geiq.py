@@ -221,7 +221,9 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
+    def update_eligibility_diagnosis(
+        cls, diagnosis, author: User, author_organization: PrescriberOrganization, administrative_criteria
+    ):
         if not issubclass(diagnosis.__class__, cls):
             raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
 
