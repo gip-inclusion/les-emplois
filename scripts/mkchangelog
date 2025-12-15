@@ -13,6 +13,8 @@ import subprocess
 import sys
 import tempfile
 
+from django.utils.text import capfirst
+
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +125,14 @@ def main(publish):
 
             log_entries = collections.defaultdict(list)
             for pull_request in list_merged_pull_requests(sprint_start, sprint_end):
-                title = re.sub(r"\[(GEN|ITOU)-[0-9]+\]", "", pull_request["title"]).strip()
+                title = pull_request["title"].strip()
+                try:
+                    category, message = title.split(":", maxsplit=1)
+                except ValueError:
+                    title = capfirst(title)
+                else:
+                    category = category.strip() + "\xa0"
+                    title = f"{capfirst(category)}: {capfirst(message.strip())}"
                 title = f"[{title}]({pull_request['url']})"
                 if re.search(r"\!\[[^]]+]", pull_request["body"]):
                     title += " 🖼"
