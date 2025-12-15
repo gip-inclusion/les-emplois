@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## 2025-12-15
+
+### Ajouté
+
+- [Page d’accueil : ajout d'une bannière pour inviter les candidats et professionnels à répondre à un questionnaire](https://github.com/gip-inclusion/les-emplois/pull/7244)
+
+### Modifié
+
+- [Admin : Correctif pour le défilement automatique vers l'app en cours dans le menu](https://github.com/gip-inclusion/les-emplois/pull/7241)
+- [Admin : Ne plus avoir à faire défiler le menu pour afficher l'app en cours](https://github.com/gip-inclusion/les-emplois/pull/7217)
+- [Candidats : Amélioriation du bouton Retour sur la page de détails du candidat](https://github.com/gip-inclusion/les-emplois/pull/7222)
+- [Demandeur d’emploi : ajout de 7 nouveaux champs sur le profil](https://github.com/gip-inclusion/les-emplois/pull/7250)
+- [Employeur : seules les entreprises OPCS présentes dans le moteur de recherche sont considérés comme actives](https://github.com/gip-inclusion/les-emplois/pull/7248)
+- [GEIQ : suppression de la balise Nouveau dans le menu pour le bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7253)
+- [GPS : modifier les données de bénéficiaire exposée dans l'appel au formulaire d'ajout de bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/7261)
+- [Inscription : Correction du lien mort vers le service laposte.net pour créer une adresse email](https://github.com/gip-inclusion/les-emplois/pull/7245)
+- [Interface : Ajout d'une section pour le référent d'un candidat](https://github.com/gip-inclusion/les-emplois/pull/7194)
+- [Stats : Ne pas afficher les stats IAE aux EITI](https://github.com/gip-inclusion/les-emplois/pull/7239)
+
+### Supprimé
+
+- [Candidature : Suppression du badge Nouveau pour les commentaires de candidature](https://github.com/gip-inclusion/les-emplois/pull/7240)
+- [Contrôle a posteriori : Retirer la sanction "Déconventionnement"](https://github.com/gip-inclusion/les-emplois/pull/7221)
+
 ## 2025-12-08
 
 ### Ajouté
