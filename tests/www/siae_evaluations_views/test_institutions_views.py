@@ -487,7 +487,7 @@ class TestInstitutionEvaluatedSiaeListView:
             response,
             f"""
             <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{sanction_url}">
-                Voir la notification de sanction
+                Voir la décision de sanction
             </a>
             <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Voir le résultat
@@ -4247,4 +4247,5 @@ class TestInstitutionCalendarView:
         evaluation_campaign.calendar.delete()
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
+        assertNotContains(response, calendar_url)
         assertNotContains(response, calendar_url)
