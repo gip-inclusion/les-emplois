@@ -700,7 +700,12 @@ class TestApplyAsJobSeeker:
         assertContains(response, reverse("dashboard:edit_user_info"), count=3)
 
         # GPS : a job seeker must not follow himself
+        # ----------------------------------------------------------------------
         assert not FollowUpGroup.objects.exists()
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker applies
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
 
     def test_apply_as_job_seeker_invalid_nir(self, client):
         """
@@ -1177,6 +1182,13 @@ class TestApplyAsAuthorizedPrescriber:
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
+
         next_url = reverse(
             "apply:application_jobs",
             kwargs={"session_uuid": apply_session_name},
@@ -1240,6 +1252,12 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
+
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+        ).exists()
 
     @freeze_time()
     @pytest.mark.usefixtures("temporary_bucket")
@@ -1483,10 +1501,18 @@ class TestApplyAsAuthorizedPrescriber:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -1584,8 +1610,15 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
         ).exists()
 
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
@@ -1994,10 +2027,18 @@ class TestApplyAsPrescriber:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2058,8 +2099,15 @@ class TestApplyAsPrescriber:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None
         ).exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
@@ -2571,10 +2619,15 @@ class TestApplyAsCompany:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is created by an employer
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2635,9 +2688,14 @@ class TestApplyAsCompany:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
+
+        # Check JobSeekerAssignment: no assignment is created when an application is created by an employer
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_employer(self, client, pdf_file):
@@ -3121,6 +3179,10 @@ class TestDirectHireFullProcess:
         response = client.get(next_url)
         assertTemplateUsed(response, "utils/templatetags/approval_box.html")
         assert response.status_code == 200
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is hired
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.count() == 0
 
     @freeze_time()
     def test_hire_as_geiq(self, client, mocker, settings):
