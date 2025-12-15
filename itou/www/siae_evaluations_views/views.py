@@ -239,7 +239,7 @@ class InstitutionEvaluatedSiaeNotifyMixin(SingleObjectMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(evaluation_campaign_data_context(self.object))
-        context["matomo_custom_title"] = "Notifier la sanction du contrôle"
+        context["matomo_custom_title"] = "Choisir la sanction du contrôle"
         return context
 
     @property

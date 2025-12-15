@@ -335,7 +335,7 @@ class TestInstitutionEvaluatedSiaeListView:
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
-                Notifier la sanction
+                Choisir la sanction
             </a>
             """,
             html=True,
@@ -384,7 +384,7 @@ class TestInstitutionEvaluatedSiaeListView:
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
-                Notifier la sanction
+                Choisir la sanction
             </a>
             """,
             html=True,
@@ -431,7 +431,7 @@ class TestInstitutionEvaluatedSiaeListView:
             response,
             f"""
             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
-                Notifier la sanction
+                Choisir la sanction
             </a>
             """,
             html=True,
@@ -1991,7 +1991,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        assertContains(response, f"Choisir la sanction du contrôle pour {evaluated_siae.siae.name}")
         assertContains(
             response,
             f"""
@@ -2151,7 +2151,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             )
         )
         assertContains(
-            response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}", html=True, count=1
+            response, f"Choisir la sanction du contrôle pour {evaluated_siae.siae.name}", html=True, count=1
         )
         assertContains(
             response,
@@ -2194,7 +2194,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
-        assertContains(response, f"Notifier la sanction du contrôle pour {evaluated_siae.siae.name}")
+        assertContains(response, f"Choisir la sanction du contrôle pour {evaluated_siae.siae.name}")
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post(self, client):
@@ -4247,6 +4247,4 @@ class TestInstitutionCalendarView:
         evaluation_campaign.calendar.delete()
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
-        assertNotContains(response, calendar_url)
-        assertNotContains(response, calendar_url)
         assertNotContains(response, calendar_url)

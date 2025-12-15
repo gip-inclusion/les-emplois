@@ -63,7 +63,7 @@
                                         </a>
                                         {% if evaluated_siae.state == "REFUSED" and not evaluated_siae.notified_at and evaluated_siae.evaluation_is_final %}
                                             <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
-                                                Notifier la sanction
+                                                Choisir la sanction
                                             </a>
                                         {% endif %}
                                     </div>
