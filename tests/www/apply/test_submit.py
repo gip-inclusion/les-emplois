@@ -39,7 +39,7 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -4128,6 +4128,10 @@ class UpdateJobSeekerTestMixin:
 
         assert self.job_seeker.last_checked_at != previous_last_checked_at
 
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is updated
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
+
     def _check_only_administrative_allowed(self, client, user):
         client.force_login(user)
 
@@ -4220,6 +4224,10 @@ class UpdateJobSeekerTestMixin:
         assert self.job_seeker.has_jobseeker_profile is True
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
         assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is updated
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
 
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
