@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-Notification de sanction
+Décision de sanction
 {% endblock %}
