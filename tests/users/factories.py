@@ -344,6 +344,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True
 
     class Params:
+        with_classic_nir = False
         with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
         with_hexa_address = factory.Trait(
             hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
@@ -375,7 +376,10 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def nir(self):
-        gender = random.choice("137") if self.user.title == Title.M else random.choice("248")
+        if self.with_classic_nir:
+            gender = "1" if self.user.title == Title.M else "2"
+        else:
+            gender = random.choice("137") if self.user.title == Title.M else random.choice("248")
         if self.birthdate:
             year = self.birthdate.strftime("%y")
             month = self.birthdate.strftime("%m")
