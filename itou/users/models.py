@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 from collections import Counter
@@ -56,6 +57,9 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserQuerySet(models.QuerySet):
@@ -1566,6 +1570,24 @@ class IdentityCertification(models.Model):
         ]
 
 
+class JobSeekerAssignmentManager(models.Manager):
+    def assign_job_seeker(self, job_seeker, prescriber, prescriber_organization):
+        assert job_seeker.is_job_seeker
+        if prescriber:
+            assert prescriber.is_prescriber
+
+            if prescriber.kind != UserKind.PRESCRIBER:
+                # This should not happen but we don't want to block everything
+                logger.warning("We should not try to add a JobSeekerAssignment on user=%s", prescriber)
+                return
+
+        assignment, created = JobSeekerAssignment.objects.update_or_create(
+            job_seeker=job_seeker, prescriber=prescriber, prescriber_organization=prescriber_organization
+        )
+
+        return assignment, created
+
+
 class JobSeekerAssignment(models.Model):
     """
     An assignment of a job seeker to a prescriber, with or without organization.
@@ -1595,6 +1617,8 @@ class JobSeekerAssignment(models.Model):
         on_delete=models.SET_NULL,
         related_name="organization_assignments",
     )
+
+    objects = JobSeekerAssignmentManager()
 
     class Meta:
         verbose_name = "affectation candidat"
