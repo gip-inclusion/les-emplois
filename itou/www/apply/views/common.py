@@ -452,7 +452,7 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
         if self.diagnosis:
-            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, criteria)
+            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, None, criteria)
         else:
             GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                 self.job_seeker, self.request.user, self.company, criteria
