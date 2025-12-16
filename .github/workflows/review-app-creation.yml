@@ -17,6 +17,7 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  CLEVER_ORG_ID: orga_647d7c8e-c014-4346-b1cb-b97dc8fc6d25
   BRANCH: ${{ github.head_ref }}
 
 jobs:
@@ -59,12 +60,12 @@ jobs:
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org itou_review_apps --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $CLEVER_ORG_ID --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
 
     - name: 🗃 Create database addon
       run: |
-        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org itou_review_apps --plan xxs_sml --yes --addon-version 17 --option direct-host-only=true
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_DB_NAME --org $CLEVER_ORG_ID --plan xxs_sml --yes --addon-version 17 --option direct-host-only=true
         $CLEVER_CLI service link-addon $REVIEW_APP_DB_NAME
 
     - name: 🤝 Link addons & add environment variables
@@ -124,7 +125,7 @@ jobs:
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: ⏭ Skip fixtures
       run:
