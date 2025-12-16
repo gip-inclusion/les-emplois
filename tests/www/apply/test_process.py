@@ -2325,7 +2325,7 @@ class TestProcessAcceptViewsInWizard:
             with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut", subject_to_iae_rules=True
         )
         self.job_seeker = JobSeekerFactory(
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
 
@@ -3133,7 +3133,7 @@ class TestProcessAcceptViewsInWizard:
         jobseeker_profile.save()
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
         other_job_seeker = JobSeekerFactory(
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
 
@@ -3820,7 +3820,7 @@ class TestProcessAcceptViewsInWizard:
         birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
 
         job_seeker = JobSeekerFactory(
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
             jobseeker_profile__birth_place=None,
             jobseeker_profile__birth_country=None,
@@ -3872,7 +3872,7 @@ class TestFillJobSeekerInfosForAccept:
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_geoloc_address=True,
             born_in_france=True,
         )
@@ -5257,7 +5257,7 @@ def test_htmx_reload_contract_type_and_options_in_wizard(client):
         state=job_applications_enums.JobApplicationState.PROCESSING,
         job_seeker__for_snapshot=True,
         job_seeker__with_address=True,
-        job_seeker__with_pole_emploi_id=True,
+        job_seeker__jobseeker_profile__with_pole_emploi_id=True,
         job_seeker__born_in_france=True,  # To avoid job seeker infos step
     )
     employer = job_application.to_company.members.first()

@@ -202,11 +202,6 @@ class JobSeekerFactory(UserFactory):
                 .first(),
             )
         )
-        with_pole_emploi_id = factory.Trait(
-            jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
-            jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
-        )
-
         with_ban_geoloc_address = factory.Trait(
             address_line_1="37 B Rue du Général De Gaulle",
             post_code="67118",
@@ -352,6 +347,11 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_post_code=factory.Faker("postalcode"),
             hexa_commune=factory.LazyFunction(Commune.objects.order_by("?").first),
         )
+        with_pole_emploi_id = factory.Trait(
+            pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
+            pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
+        )
+
         with_required_eiti_fields = factory.Trait(
             actor_met_for_business_creation=factory.Faker("word", locale="en_GB"),  # To match validator
             mean_monthly_income_before_process=factory.Faker("pydecimal", left_digits=5, right_digits=2),

@@ -165,7 +165,7 @@ def test_populate_job_seekers(snapshot):
         jobseeker_profile__nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
-        with_pole_emploi_id=True,
+        jobseeker_profile__with_pole_emploi_id=True,
     )
     job_application_2 = JobApplicationFactory(
         with_approval=True,
@@ -186,7 +186,7 @@ def test_populate_job_seekers(snapshot):
     #  - outside QPV but missing geocoding score
     user_3 = JobSeekerFactory(
         jobseeker_profile__nir="297016314515713",
-        with_pole_emploi_id=True,
+        jobseeker_profile__with_pole_emploi_id=True,
         geocoding_score=None,
         coords=Point(0, 0),  # QPV utils is mocked
     )

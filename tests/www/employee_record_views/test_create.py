@@ -74,7 +74,7 @@ class CreateEmployeeRecordTestMixin:
             to_company=self.company,
             job_seeker__with_mocked_address=True,
             job_seeker__born_in_france=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             job_seeker__jobseeker_profile__with_required_eiti_fields=True,
         )
 
