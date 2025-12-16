@@ -1,5 +1,7 @@
 from django.db import models
 
+from itou.users.enums import UserKind
+
 
 class Service(models.TextChoices):
     COMMUNAUTE = "la-communaute", "La communauté"
@@ -121,3 +123,30 @@ class NexusStructureKind(models.TextChoices):
     SPIP = "SPIP"
     TIERS_LIEUX = "TIERS_LIEUX"
     UDAF = "UDAF"
+
+
+USER_KIND_MAPPING = {
+    Service.EMPLOIS: {
+        UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
+        UserKind.PRESCRIBER: NexusUserKind.GUIDE,
+    },
+    Service.DORA: {
+        "accompagnateur": NexusUserKind.GUIDE,
+        "offreur": NexusUserKind.FACILITY_MANAGER,
+        "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
+        "autre": "",
+    },
+    Service.COMMUNAUTE: {
+        "": "",  # this service does not have a user kind
+    },
+    Service.PILOTAGE: {
+        UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
+        UserKind.PRESCRIBER: NexusUserKind.GUIDE,
+    },
+    Service.MON_RECAP: {
+        "": "",  # this service does not have a user kind
+    },
+    Service.MARCHE: {
+        "SIAE": NexusUserKind.FACILITY_MANAGER,
+    },
+}
