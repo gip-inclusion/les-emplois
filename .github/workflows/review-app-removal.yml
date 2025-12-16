@@ -11,6 +11,7 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  CLEVER_ORG_ID: orga_647d7c8e-c014-4346-b1cb-b97dc8fc6d25
   BRANCH: ${{ github.head_ref }}
 
 
@@ -38,7 +39,7 @@ jobs:
         tar -xvf $CLEVER_TAR_FILE
         echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: 💂 Install Python
       uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v5
@@ -56,4 +57,4 @@ jobs:
 
     - name: 🗑 Delete the review app database
       run: |
-        $CLEVER_CLI addon delete $REVIEW_APP_DB_NAME --org itou_review_apps --yes
+        $CLEVER_CLI addon delete $REVIEW_APP_DB_NAME --org $CLEVER_ORG_ID --yes
