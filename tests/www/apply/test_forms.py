@@ -218,7 +218,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
             job_seeker__with_address=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             job_seeker__born_outside_france=True,
         )
         job_description = JobDescriptionFactory(company=job_application.to_company)
@@ -269,7 +269,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             to_company__kind=CompanyKind.GEIQ,
             state="processing",
             job_seeker__with_address=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             job_seeker__born_outside_france=True,
         )
         job_description = JobDescriptionFactory(company=job_application.to_company)
@@ -316,7 +316,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             state="processing",
             # Make sure all mandatory infos are present to skip the job seeker info step
             job_seeker__born_outside_france=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             job_seeker__with_address=True,
         )
 
@@ -351,7 +351,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             state="processing",
             # Make sure all mandatory infos are present to skip the job seeker info step
             job_seeker__born_outside_france=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             job_seeker__with_address=True,
         )
         job_description = JobDescriptionFactory(company=job_application.to_company)
@@ -383,7 +383,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
                 state="processing",
                 # Make sure all mandatory infos are present to skip the job seeker info step
                 job_seeker__born_in_france=True,
-                job_seeker__with_pole_emploi_id=True,
+                job_seeker__jobseeker_profile__with_pole_emploi_id=True,
                 job_seeker__with_address=True,
             )
 

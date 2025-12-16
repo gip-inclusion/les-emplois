@@ -708,7 +708,7 @@ class TestApplyAsJobSeeker:
         """
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
 
-        user = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__with_pole_emploi_id=True)
         client.force_login(user)
 
         # Entry point.
@@ -759,7 +759,7 @@ class TestApplyAsJobSeeker:
 
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="141068078200557",
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             jobseeker_profile__birthdate=datetime.date(1941, 6, 12),
         )
         client.force_login(job_seeker)
@@ -2121,7 +2121,7 @@ class TestApplyAsPrescriberNirExceptions:
         This NIR account is empty.
         An update is expected.
         """
-        job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
+        job_seeker = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         ApprovalFactory(user=job_seeker)
         company, user = self.create_test_data()
@@ -2211,7 +2211,7 @@ class TestApplyAsPrescriberNirExceptions:
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
             jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NO_NIR,
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
         ApprovalFactory(user=job_seeker)
@@ -5240,7 +5240,7 @@ class TestCheckJobSeekerInformationsForHire:
                 {
                     "for_snapshot": True,
                     "born_in_france": True,
-                    "with_pole_emploi_id": True,
+                    "jobseeker_profile__with_pole_emploi_id": True,
                     "jobseeker_profile__pole_emploi_id": "09443041",
                     "jobseeker_profile__resourceless": True,
                     "jobseeker_profile__rqth_employee": True,
@@ -5264,7 +5264,7 @@ class TestCheckJobSeekerInformationsForHire:
                 {
                     "for_snapshot": True,
                     "born_in_france": True,
-                    "with_pole_emploi_id": True,
+                    "jobseeker_profile__with_pole_emploi_id": True,
                     "jobseeker_profile__pole_emploi_id": "09443041",
                     "jobseeker_profile__resourceless": True,
                 },
@@ -5576,7 +5576,7 @@ class TestFillJobSeekerInfosForHire:
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_geoloc_address=True,
             born_in_france=True,
         )
@@ -6098,7 +6098,7 @@ class TestHireContract:
         self.job_seeker = JobSeekerFactory(
             first_name="Clara",
             last_name="Sion",
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
             with_ban_geoloc_address=True,
             born_in_france=True,
         )

@@ -57,7 +57,7 @@ class TestEligibilityDiagnosisQuerySet:
 
 class TestEligibilityDiagnosisManager:
     def setup_method(self):
-        self.job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        self.job_seeker = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
 
     def test_no_diagnosis(self):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)

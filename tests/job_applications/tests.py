@@ -1578,7 +1578,7 @@ class TestJobApplicationWorkflow:
         """
         When a job seeker's application is accepted, the others are marked obsolete.
         """
-        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        job_seeker = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
@@ -1654,7 +1654,7 @@ class TestJobApplicationWorkflow:
         """
         When an approval already exists, it is reused.
         """
-        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+        job_seeker = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1754,7 +1754,7 @@ class TestJobApplicationWorkflow:
     ):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="",
-            with_pole_emploi_id=True,
+            jobseeker_profile__with_pole_emploi_id=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1804,7 +1804,7 @@ class TestJobApplicationWorkflow:
         """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=JobApplicationState.PROCESSING,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             with_iae_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
@@ -1839,7 +1839,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationState.PROCESSING,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
             with_iae_eligibility_diagnosis=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
@@ -1872,7 +1872,7 @@ class TestJobApplicationWorkflow:
         """
         An authorized prescriber can bypass the waiting period.
         """
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1916,7 +1916,7 @@ class TestJobApplicationWorkflow:
         """
         An "orienteur" cannot bypass the waiting period.
         """
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1942,7 +1942,7 @@ class TestJobApplicationWorkflow:
         A job seeker with a valid diagnosis can start an IAE path
         even if he's in a waiting period.
         """
-        user = JobSeekerFactory(with_pole_emploi_id=True)
+        user = JobSeekerFactory(jobseeker_profile__with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -2028,7 +2028,7 @@ class TestJobApplicationWorkflow:
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
             to_company__subject_to_iae_rules=True,
-            job_seeker__with_pole_emploi_id=True,
+            job_seeker__jobseeker_profile__with_pole_emploi_id=True,
         )
 
         to_company = job_application.to_company
