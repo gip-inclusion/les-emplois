@@ -179,7 +179,7 @@
                 <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
                     {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
                         <span>Pilotage</span>
-                        <span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>
+                        {% new_badge %}
                     {% else %}
                         Pilotage
                     {% endif %}

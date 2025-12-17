@@ -3,6 +3,7 @@ import math
 from django import template
 from django.contrib.messages import constants as message_constants
 from django.templatetags.static import static
+from django.utils.html import format_html
 from django_bootstrap5.templatetags.django_bootstrap5 import bootstrap_field
 
 
@@ -91,3 +92,8 @@ def collapse_field(bound_field, *, target_id, **kwargs):
             raise NotImplementedError("The field must be present once on the page")
         field_spec.widget.attrs[attr] = value
     return bootstrap_field(bound_field, **kwargs)
+
+
+@register.simple_tag
+def new_badge(extra_classes="badge-sm ms-2"):
+    return format_html('<span class="badge rounded-pill bg-important text-white {}">Nouveau</span>', extra_classes)

@@ -1,10 +1,12 @@
 {% load django_bootstrap5 %}
 {% load static %}
+{% load theme_inclusion %}
+
 <div id="upload_panel">
     {% if unfold_details %}
         {% if can_upload_prolongation_report %}
             <hr />
-            <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+            {% new_badge extra_classes="badge-base my-3" %}
 
             <div id="file_upload_part">
                 <h4>Bilan à renseigner : le motif selectionné nécessite l'accord d'un prescripteur habilité</h4>

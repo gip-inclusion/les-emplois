@@ -1,3 +1,5 @@
+{% load theme_inclusion %}
+
 {% if mobile %}
     <nav role="navigation" aria-label="Navigation secondaire pour mobile">
         <ul class="nav nav-tabs flex-column">
@@ -17,7 +19,9 @@
                 <li>
                     <a {% if item.active %}class="is-active"{% endif %} href="{{ item.target }}">
                         {{ item.label }}
-                        {% if item.is_new %}<span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>{% endif %}
+                        {% if item.is_new %}
+                            {% new_badge %}
+                        {% endif %}
                     </a>
                 </li>
             {% endfor %}

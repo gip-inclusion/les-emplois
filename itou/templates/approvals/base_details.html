@@ -5,6 +5,7 @@
 {% load matomo %}
 {% load static %}
 {% load str_filters %}
+{% load theme_inclusion %}
 
 {% block title %}
     PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
@@ -52,7 +53,7 @@
             <li class="nav-item">
                 <a class="nav-link{% if active_tab == "contracts" %} active{% endif %}" href="{% url 'approvals:contracts' public_id=approval.public_id %}?back_url={{ back_url|urlencode }}">
                     Suivi des contrats IAE
-                    <span class="badge badge-sm rounded-pill bg-important text-white ms-2">Nouveau</span>
+                    {% new_badge %}
                 </a>
             </li>
         </ul>

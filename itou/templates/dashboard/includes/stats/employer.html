@@ -1,4 +1,6 @@
 {% load pilotage %}
+{% load theme_inclusion %}
+
 
 <section class="s-section mb-3 mb-lg-5">
     <div class="s-section__container">
@@ -80,7 +82,7 @@
                                     <i class="ri-bar-chart-line ri-lg fw-normal" aria-hidden="true"></i>
                                     <span>Découvrir mes jeux de données</span>
                                 </a>
-                                <span class="badge rounded-pill badge-xs bg-important text-white ms-2">Nouveau</span>
+                                {% new_badge extra_classes="badge-xs ms-2" %}
                             </li>
                         </ul>
                     </div>
