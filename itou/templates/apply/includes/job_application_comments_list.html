@@ -1,4 +1,6 @@
 {% load matomo %}
+{% load str_filters %}
+
 <div class="{% if location == "sidebar" %}c-box{% if not comments %} d-none{% endif %}{% else %}c-form{% endif %} mb-3 mb-md-4"
      id="comments-list-{{ location }}"
      {% if hx_swap_oob %}hx-swap-oob="true"{% endif %}>
@@ -67,7 +69,7 @@
                     <blockquote class="blockquote">
                         {% if location == "sidebar" and comment.message|length > 200 %}
                             <div class="collapse show has-no-transition" id="collapse-comment-{{ comment.id }}">
-                                <p class="mb-0">{{ comment.message|truncatechars:200 }}</p>
+                                <p class="mb-0">{{ comment.message|shorten:200 }}</p>
                                 <button class="btn-link d-inline-block mt-2"
                                         type="button"
                                         data-bs-toggle="collapse"
