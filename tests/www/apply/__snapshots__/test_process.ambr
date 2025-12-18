@@ -3894,6 +3894,35 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
           'IfNode[apply/includes/certification_info_box.html]',
           'IfNode[apply/includes/certification_info_box.html]',
@@ -3987,35 +4016,6 @@
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
           ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_suspended[approvals/models.py]',
-          'Approval.state[approvals/models.py]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'InclusionNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'WithNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'BlockNode',
-          'VariableNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "approvals_suspension"
-          WHERE ("approvals_suspension"."approval_id" = %s
-                 AND "approvals_suspension"."end_at" >= %s
-                 AND "approvals_suspension"."start_at" <= %s)
-          LIMIT 1
         ''',
       }),
       dict({
@@ -5239,6 +5239,35 @@
       }),
       dict({
         'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'IfNode[apply/includes/eligibility_badge.html]',
+          'WithNode[apply/includes/eligibility_badge.html]',
+          'IncludeNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IfNode[apply/includes/eligibility_diagnosis.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
           'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
           'IfNode[apply/includes/certification_info_box.html]',
           'IfNode[apply/includes/certification_info_box.html]',
@@ -5332,35 +5361,6 @@
           WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
           ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_suspended[approvals/models.py]',
-          'Approval.state[approvals/models.py]',
-          'IfNode[utils/templatetags/approval_box.html]',
-          'InclusionNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'WithNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'IfNode[apply/process_base.html]',
-          'BlockNode',
-          'VariableNode[apply/process_details_company.html]',
-          'BlockNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "approvals_suspension"
-          WHERE ("approvals_suspension"."approval_id" = %s
-                 AND "approvals_suspension"."end_at" >= %s
-                 AND "approvals_suspension"."start_at" <= %s)
-          LIMIT 1
         ''',
       }),
       dict({

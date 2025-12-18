@@ -203,14 +203,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
                                                       <i aria-hidden="true" class="ri-error-warning-line">
                                                       </i>
@@ -218,6 +215,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -510,14 +510,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -525,6 +522,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -1044,14 +1044,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -1059,6 +1056,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -1094,14 +1094,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -1109,6 +1106,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -2657,14 +2657,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2672,6 +2669,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -2979,14 +2979,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -2994,6 +2991,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -3506,14 +3506,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -3521,6 +3518,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
@@ -3804,14 +3804,11 @@
                                       <div class="c-box mb-3 mb-md-4">
                                           <div class="row mb-3">
                                               <div class="col-12 col-sm">
-                                                  <h3 class="mb-0">
+                                                  <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
                                                   </h3>
-                                                  <span class="text-success fs-sm">
-                                                      Valide du 14/08/2024 au 14/02/2025
-                                                  </span>
                                               </div>
-                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                              <div class="col-12 col-sm-auto">
                                                   <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
                                                       <i aria-hidden="true" class="ri-check-line">
                                                       </i>
@@ -3819,6 +3816,9 @@
                                                   </span>
                                               </div>
                                           </div>
+                                          <span class="text-success fs-sm">
+                                              Valide du 14/08/2024 au 14/02/2025
+                                          </span>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>

@@ -13,13 +13,13 @@ from tests.www.apply.test_submit import fake_session_initialization
 
 
 class TestJobApplicationGEIQEligibilityDetails:
-    VALID_DIAGNOSIS = "Éligibilité public prioritaire GEIQ validée"
+    VALID_DIAGNOSIS = "Éligibilité GEIQ confirmée"
     # this string does not depends on the diagnosis author
     ALLOWANCE_AND_COMPANY = "à une aide financière de l’État s’élevant à <b>1400 €</b>"
     NO_ALLOWANCE = (
         "Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État."
     )
-    NO_VALID_DIAGNOSIS = "Éligibilité public prioritaire GEIQ non confirmée"
+    NO_VALID_DIAGNOSIS = "Éligibilité GEIQ non confirmée"
     EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic du candidat a expiré"
     CONFIRMATION_MODAL = "Êtes-vous sûr de vouloir continuer sans bénéficier d’une aide financière de l’État ?"
 
