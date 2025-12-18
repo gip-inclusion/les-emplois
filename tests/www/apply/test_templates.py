@@ -218,8 +218,7 @@ class TestIAEEligibilityDetail:
         return {
             "eligibility_diagnosis": diagnosis,
             "request": request,
-            "siae": job_application.to_company,
-            "job_seeker": diagnosis.job_seeker,
+            "job_application": job_application,
             "itou_help_center_url": "https://help.com",
             "is_sent_by_authorized_prescriber": True,
         }
