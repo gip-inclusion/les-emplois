@@ -64,7 +64,7 @@ class EvaluatedJobApplicationsInline(ItouTabularInline):
 
     def job_seeker(self, obj):
         if obj.job_application.job_seeker:
-            return obj.job_application.job_seeker
+            return obj.job_application.job_seeker.display_with_pii
         return self.get_empty_value_display()
 
 
@@ -296,7 +296,7 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin):
 
     def job_seeker(self, obj):
         if obj.job_application.job_seeker:
-            return obj.job_application.job_seeker
+            return obj.job_application.job_seeker.display_with_pii
         return self.get_empty_value_display()
 
 
