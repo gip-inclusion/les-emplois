@@ -137,4 +137,4 @@ def criterion_certification_badge(selected_criterion, job_application):
                 template = "eligibility/includes/badge_not_certified.html"
     else:
         template = "eligibility/includes/badge_certification_in_progress.html"
-    return get_template(template).render({"extra_classes": "ms-3"})
+    return get_template(template).render({"extra_classes": "ms-1"})
