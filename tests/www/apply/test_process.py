@@ -324,11 +324,13 @@ class TestProcessViews:
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
     def test_details_for_company_with_expired_approval(self, client, subtests):
-        # Expired but still retrieved by job_seerk.latest_approval
+        # Expired but still retrieved by job_seeker.latest_approval
         approval = ApprovalFactory(
             start_at=timezone.localdate() - datetime.timedelta(days=3 * 365),
             end_at=timezone.localdate() - datetime.timedelta(days=365),
+            eligibility_diagnosis__expired=True,
         )
+
         company = CompanyFactory(for_snapshot=True, with_membership=True)
         employer = company.members.first()
         client.force_login(employer)
@@ -352,8 +354,6 @@ class TestProcessViews:
                 response = client.get(url)
                 # Check if approval is displayed
                 assertion(response, "Numéro de PASS IAE")
-                assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
-                assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
     def test_details_for_company_certified_criteria_after_expiration(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
