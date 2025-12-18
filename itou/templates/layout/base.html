@@ -64,19 +64,6 @@
         <div class="global-messages-container">
             {% block global_messages %}
                 {% include "includes/demo_accounts.html" %}
-                {% if request.user.is_employer and request.current_organization and request.current_organization.can_use_employee_record %}
-                    <div class="alert alert-info fade show" role="status">
-                        <p class="mb-0">
-                            Le service d’envoi des fiches salariés pourrait connaître des perturbations le 18/12/2025, en raison d’une opération de mise à jour de l'Extranet IAE 2.0 prévue à cette date.
-                            <br>
-                            Nous vous remercions par avance pour votre compréhension.
-                            <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/41781650243089--Mise-%C3%A0-jour-du-formulaire-d-envoi-des-fiches-salari%C3%A9s-%C3%A0-l-ASP"
-                               rel="noopener"
-                               target="_blank"
-                               class="has-external-link">En savoir plus</a>.
-                        </p>
-                    </div>
-                {% endif %}
                 {% if request.user.is_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
                     <div class="alert alert-info fade show" role="status" id="deactivation-job-banner">
                         <p class="mb-0">
