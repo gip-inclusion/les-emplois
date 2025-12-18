@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+
+import django
+from django.conf import settings
+from django.core.management import call_command
+from django_redis.cache import RedisCache
+
+
+def clear_bucket(bucket_name):
+    from itou.utils.storage.s3 import s3_client
+
+    client = s3_client()
+    paginator = client.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=bucket_name):
+        if page["KeyCount"]:
+            client.delete_objects(
+                Bucket=bucket_name,
+                Delete={
+                    "Objects": [{"Key": obj["Key"]} for obj in page["Contents"]],
+                },
+            )
+
+
+def main(bucket_name, admin_password):
+    from django.core.cache import caches
+    from django.db import connection
+
+    from itou.users.models import User
+    from itou.utils.cache import UnclearableCache
+    from itou.utils.enums import ItouEnvironment
+
+    if settings.ITOU_ENVIRONMENT not in {
+        ItouEnvironment.DEMO,
+        ItouEnvironment.DEV,
+        ItouEnvironment.PENTEST,
+        ItouEnvironment.REVIEW_APP,
+    }:
+        raise RuntimeError("Nope.")
+
+    clear_bucket(bucket_name)
+    with connection.cursor() as c:
+        # spatial_ref_sys is managed by PostGIS.
+        c.execute(
+            """
+            DO $$
+            BEGIN
+                EXECUTE (
+                    SELECT string_agg('DROP TABLE IF EXISTS ' || tablename || ' CASCADE;', ' ')
+                    FROM pg_tables
+                    WHERE schemaname = 'public'
+                        AND tablename != 'spatial_ref_sys'
+                );
+            END
+            $$;
+            """
+        )
+        c.execute("DROP TEXT SEARCH CONFIGURATION french_unaccent")
+        c.execute("DROP TEXT SEARCH CONFIGURATION simple_unaccent")
+    call_command("migrate")
+    env = os.environ.copy()
+    env["REQUIREMENTS_PATH"] = "requirements/base.txt"
+    subprocess.run(["make", "populate_db"], check=True, env=env)
+    u = User.objects.get(username="admin")
+    u.set_password(admin_password)
+    u.save(update_fields=["password"])
+
+    for cache_name in caches:
+        cache = caches[cache_name]
+        if isinstance(cache, UnclearableCache):
+            RedisCache.clear(cache)
+        else:
+            cache.clear()
+
+    print(f"Reset of {settings.ITOU_ENVIRONMENT} environment completed successfully.")
+
+
+if __name__ == "__main__":
+    sys.path.insert(0, str(pathlib.Path.cwd()))
+
+    django.setup()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bucket-name", required=True)
+    parser.add_argument("--admin-password", required=True)
+    args = parser.parse_args()
+    main(args.bucket_name, args.admin_password)
