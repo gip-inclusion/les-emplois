@@ -28,7 +28,7 @@
                                 <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">c’est vous</span>
                             {% endif %}
                             {% if membership.is_referent_certified %}
-                                {% include "gps/includes/badge_is_referent_certified_membership.html" %}
+                                {% include "gps/includes/badge_is_referent_certified_membership.html" with badge_size="badge-xs" %}
                             {% endif %}
                         </div>
                     </li>
