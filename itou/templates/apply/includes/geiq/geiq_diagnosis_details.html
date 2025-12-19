@@ -1,11 +1,19 @@
+{% load badges %}
+
 {% if diagnosis.is_valid or job_application.state.is_accepted and diagnosis %}
-    {% if diagnosis.allowance_amount %}
-        <hr class="my-4">
-        <h3>Éligibilité public prioritaire GEIQ validée</h3>
-    {% else %}
-        <hr class="my-4">
-        <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
-    {% endif %}
+    <hr class="my-4">
+    <div class="row mb-3">
+        <div class="col-12 col-md">
+            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ</h3>
+        </div>
+        <div class="col-12 col-sm-auto">
+            {% if diagnosis.allowance_amount %}
+                {% geiq_eligibility_badge is_eligible=True extra_classes="badge-sm" %}
+            {% else %}
+                {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
+            {% endif %}
+        </div>
+    </div>
 
     {% if diagnosis.allowance_amount %}
         <p>
@@ -70,34 +78,37 @@
 {% else %}
     {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
     <hr class="my-4">
-    <div class="row align-items-center">
+    <div class="row">
         <div class="col-12 col-md">
-            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
+            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ</h3>
         </div>
-        {% if request.user.is_employer %}
-            <div class="col-12 col-md-auto">
+        <div class="col-12 col-sm-auto">
+            {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
+            {% if request.user.is_employer %}
                 {% with back_and_next_url=request.get_full_path|urlencode %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">Vérifier</a>
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary ms-2">Vérifier</a>
                 {% endwith %}
-            </div>
-            {# GEIQ eligibility diagnosis expired #}
-            {% if diagnosis and not diagnosis.is_valid %}
-                <div class="alert alert-warning mt-4" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Aide à l'accompagement GEIQ</strong>
-                            </p>
-                            <p class="mb-0">
-                                Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
-                            </p>
-                        </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if request.user.is_employer %}
+        {# GEIQ eligibility diagnosis expired #}
+        {% if diagnosis and not diagnosis.is_valid %}
+            <div class="alert alert-warning mt-4" role="status">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Aide à l'accompagement GEIQ</strong>
+                        </p>
+                        <p class="mb-0">
+                            Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
+                        </p>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         {% endif %}
-    </div>
+    {% endif %}
 {% endif %}
