@@ -6,10 +6,10 @@ from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.siae_evaluations import enums as evaluation_enums
-from itou.siae_evaluations.models import Sanctions
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
@@ -19,6 +19,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
+    SanctionsFactory,
 )
 from tests.users.factories import EmployerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -41,10 +42,23 @@ class TestEvaluatedSiaeSanctionView:
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
         )
-        self.sanctions = Sanctions.objects.create(
+        self.sanctions = SanctionsFactory(
             evaluated_siae=self.evaluated_siae,
             training_session="RDV le 18 avril à 14h dans les locaux de Pôle Emploi.",
+            suspension_dates=None,
         )
+        # Generating a bad history for that company
+        SanctionsFactory.create_batch(
+            3,
+            evaluated_siae__complete=True,
+            evaluated_siae__job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluated_siae__evaluation_campaign__institution=institution_membership.institution,
+            evaluated_siae__siae=company_membership.company,
+            evaluated_siae__notified_at=timezone.now(),  # Not realistic but still working
+            evaluated_siae__notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
+            evaluated_siae__notification_text="A encore envoyé une photo de son chat.",
+        )
+
         self.return_evaluated_siae_list_link_html = (
             '<a class="btn btn-primary float-end" '
             f'href="/siae_evaluation/institution_evaluated_siae_list/{self.evaluated_siae.evaluation_campaign_id}/">'
@@ -103,14 +117,16 @@ class TestEvaluatedSiaeSanctionView:
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_view_as_institution(self, client):
+    def test_view_as_institution(self, client, snapshot):
         client.force_login(self.institution_user)
-        response = client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_sanction",
-                kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_sanction",
+                    kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+                )
             )
-        )
         self.assertSanctionContent(response)
         assertContains(
             response,
@@ -212,14 +228,17 @@ class TestEvaluatedSiaeSanctionView:
         self.sanctions.subsidy_cut_percent = 35
         self.sanctions.save()
         client.force_login(self.institution_user)
-        response = client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_sanction",
-                kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+        with assertSnapshotQueries(snapshot(name="queries")):
+            response = client.get(
+                reverse(
+                    "siae_evaluations_views:institution_evaluated_siae_sanction",
+                    kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+                )
             )
-        )
         self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="card"
+        )
 
     def test_subsidy_cut_full(self, client, snapshot):
         self.sanctions.training_session = ""
