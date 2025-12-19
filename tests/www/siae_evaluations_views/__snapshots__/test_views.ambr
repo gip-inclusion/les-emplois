@@ -1,25 +1,4 @@
 # serializer version: 1
-# name: TestEvaluatedSiaeSanctionView.test_deactivation
-  '''
-  <div class="card-body">
-      <h2>
-          Sanction
-      </h2>
-      <h3 class="mt-5">
-          Déconventionnement de la structure
-      </h3>
-      <p>
-          La suppression du conventionnement s’apprécie par l'autorité administrative. Cette notification s’accompagne d’une demande conforme auprès de l’ASP de la part du préfet. Lorsque le département a participé aux aides financières concernées en application de l'article L. 5132-2, le préfet informe le président du conseil départemental de sa décision.
-      </p>
-      <div class="card">
-          <div class="card-body">
-              Mauvais comportement, rien ne va. On arrête tout.
-          </div>
-      </div>
-  </div>
-  
-  '''
-# ---
 # name: TestEvaluatedSiaeSanctionView.test_no_sanction
   '''
   <div class="card-body">
