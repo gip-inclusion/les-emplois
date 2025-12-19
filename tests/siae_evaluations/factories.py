@@ -1,9 +1,12 @@
+from datetime import UTC, datetime
+
 import factory
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.eligibility.models import AdministrativeCriteria
 from itou.siae_evaluations import models
+from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory
@@ -113,3 +116,21 @@ class EvaluatedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
     evaluated_job_application = factory.SubFactory(EvaluatedJobApplicationFactory)
     administrative_criteria = factory.Iterator(AdministrativeCriteria.objects.all())
     proof = factory.SubFactory(FileFactory)
+
+
+class SanctionsFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Sanctions
+        skip_postgeneration_save = True
+
+    evaluated_siae = factory.SubFactory(EvaluatedSiaeFactory)
+    training_session = factory.Faker("paragraphs", nb=3)
+    suspension_dates = factory.LazyFunction(
+        lambda: InclusiveDateRange(
+            datetime.now(UTC).date(),
+            datetime.now(UTC).date() + relativedelta(months=3),
+        )
+    )
+    no_sanction_reason = ""
+
+    # TODO(ewen): We're omitting subsidy_cut_percent and subsidy_cut_dates here as they will soon be removed.
