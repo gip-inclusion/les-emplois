@@ -22,7 +22,6 @@ from itou.external_data.models import ExternalDataImport
 from itou.geiq_assessments.models import LabelInfos
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
-from itou.siae_evaluations.models import Sanctions
 from itou.users.models import NirModificationRequest
 from tests.cities.factories import create_city_guerande
 from tests.companies.factories import SiaeFinancialAnnexFactory
@@ -43,6 +42,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedJobApplicationFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
+    SanctionsFactory,
 )
 from tests.users.factories import JobSeekerFactory, UserFactory
 
@@ -87,7 +87,7 @@ def test_all_admin(admin_client, mocker, subtests):
     Email.objects.create(to=["foobar@example.com"], cc=[], bcc=[], subject="Hi", body_text="Hello")
     ExternalDataImport.objects.create(user=admin_user)
     evaluated_siae = EvaluatedAdministrativeCriteriaFactory().evaluated_job_application.evaluated_siae
-    Sanctions.objects.create(evaluated_siae=evaluated_siae, training_session="RDV")
+    SanctionsFactory(evaluated_siae=evaluated_siae)
     InstitutionMembershipFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LaborInspectorInvitationFactory(institution=evaluated_siae.evaluation_campaign.institution)
     LabelInfos.objects.create(campaign=AssessmentCampaignFactory(), data=[])
@@ -127,6 +127,7 @@ def test_all_admin(admin_client, mocker, subtests):
             JobSeekerFactory,  # Already used above
             LaborInspectorInvitationFactory,  # Already used above
             QPVFactory,  # Already used above
+            SanctionsFactory,  # Already used above
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
             UserFactory,  # A lot of subfactories, no need to use it
         ):
