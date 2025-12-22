@@ -1,0 +1,322 @@
+[
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--10",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "10",
+    "source_kind": "prescriber",
+    "first_name": "Isabelle",
+    "last_name": "Leclerc",
+    "email": "z.hadji01+milo@gmail.com",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--11",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "11",
+    "source_kind": "prescriber",
+    "first_name": "Anthony",
+    "last_name": "DUPONT",
+    "email": "z.hadji01+milo1@gmail.com",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--12",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "12",
+    "source_kind": "prescriber",
+    "first_name": "Hélène",
+    "last_name": "SUAREZ",
+    "email": "z.hadji01+milo2@gmail.com",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--13",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "13",
+    "source_kind": "prescriber",
+    "first_name": "Selim",
+    "last_name": "ERRADI",
+    "email": "z.hadji01+milo3@gmail.com",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--14",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "14",
+    "source_kind": "prescriber",
+    "first_name": "Samantha",
+    "last_name": "BOYER",
+    "email": "z.hadji01+milo4@gmail.com",
+    "phone": "",
+    "last_login": "2020-12-01T12:45:51.054Z",
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--16",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "16",
+    "source_kind": "employer",
+    "first_name": "Alphonse",
+    "last_name": "Cornille",
+    "email": "demo.emplois+ea@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-31T08:17:07.889Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--25",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "25",
+    "source_kind": "employer",
+    "first_name": "Jean-Claude",
+    "last_name": "Dubois",
+    "email": "demo.emplois+ai@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-31T08:41:22.469Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--28",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "28",
+    "source_kind": "employer",
+    "first_name": "Georges",
+    "last_name": "Remi",
+    "email": "demo.emplois+cap@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2023-06-21T13:58:50.299Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--3",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "3",
+    "source_kind": "prescriber",
+    "first_name": "André",
+    "last_name": "Dufour",
+    "email": "demo.emplois+prescripteur@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-31T13:50:03.932Z",
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--4",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "4",
+    "source_kind": "employer",
+    "first_name": "Daphnée",
+    "last_name": "Delavigne",
+    "email": "demo.emplois+etti@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-31T08:41:07.462Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--5",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "5",
+    "source_kind": "prescriber",
+    "first_name": "Emmanuelle",
+    "last_name": "Dubreuil",
+    "email": "demo.emplois+orienteur-solo@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-28T08:50:54.138Z",
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--6",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "6",
+    "source_kind": "employer",
+    "first_name": "Victor",
+    "last_name": "Lacoste",
+    "email": "demo.emplois+ei@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-08-26T09:01:31.497Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--65",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "65",
+    "source_kind": "prescriber",
+    "first_name": "Barnabé",
+    "last_name": "Lévy",
+    "email": "demo.emplois+prescripteur1@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--66",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "66",
+    "source_kind": "prescriber",
+    "first_name": "Marie-Jeanne",
+    "last_name": "Armstrong",
+    "email": "demo.emplois+prescripteur2@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--67",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "67",
+    "source_kind": "prescriber",
+    "first_name": "Salma",
+    "last_name": "Aboudi",
+    "email": "demo.emplois+prescripteur3@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--7",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "7",
+    "source_kind": "prescriber",
+    "first_name": "Olivier",
+    "last_name": "Dupuy",
+    "email": "demo.emplois+orienteur@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-28T08:42:58.713Z",
+    "auth": "PRO_CONNECT",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--9",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "9",
+    "source_kind": "employer",
+    "first_name": "Laura",
+    "last_name": "Morans",
+    "email": "demo.emplois+geiq@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": "2025-07-24T08:44:08.134Z",
+    "auth": "PRO_CONNECT",
+    "kind": "FACILITY_MANAGER"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--90",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "90",
+    "source_kind": "prescriber",
+    "first_name": "Samira",
+    "last_name": "BOUKHRIS",
+    "email": "contact.gps+samira@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "DJANGO",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--91",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "91",
+    "source_kind": "prescriber",
+    "first_name": "Stéphane",
+    "last_name": "Espinosa",
+    "email": "contact.gps+stephane@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "DJANGO",
+    "kind": "GUIDE"
+  }
+},
+{
+  "model": "nexus.nexususer",
+  "pk": "emplois-de-linclusion--92",
+  "fields": {
+    "source": "les-emplois",
+    "source_id": "92",
+    "source_kind": "prescriber",
+    "first_name": "Mélissa",
+    "last_name": "Benchaïb",
+    "email": "contact.gps+melissa@inclusion.gouv.fr",
+    "phone": "",
+    "last_login": null,
+    "auth": "DJANGO",
+    "kind": "GUIDE"
+  }
+}
+]
