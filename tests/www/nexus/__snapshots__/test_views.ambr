@@ -1,0 +1,428 @@
+# serializer version: 1
+# name: TestLayout.test_footer
+  '''
+  <footer id="footer" role="contentinfo">
+      <section class="s-footer-legal">
+          <div class="s-footer-legal__container container">
+              <div class="s-footer-legal__row row">
+                  <div class="s-footer-legal__col col-12">
+                      <ul>
+                          <li>
+                              <a href="/accessibility/">
+                                  Accessibilité : partiellement conforme
+                              </a>
+                          </li>
+                          <li>
+                              <a href="/static/pdf/syntheseSecurite.pdf" rel="noopener" target="_blank">
+                                  Sécurité : Homologation avec MonServiceSécurisé
+                              </a>
+                          </li>
+                          <li>
+                              <a href="/legal/notice/">
+                                  Mentions légales
+                              </a>
+                          </li>
+                          <li>
+                              <a href="/legal/terms/">
+                                  Conditions générales
+                              </a>
+                          </li>
+                          <li>
+                              <a href="/legal/privacy/">
+                                  Confidentialité
+                              </a>
+                          </li>
+                          <li>
+                              <a href="/stats/">
+                                  Statistiques, lexiques et indicateurs
+                              </a>
+                          </li>
+                      </ul>
+                      <p>
+                          Sauf mention contraire, tous les contenus de ce site sont sous licence
+                          <a aria-label="Licence ouverte Etalab (lien externe)" href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank">
+                              etalab-2.0
+                          </a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </footer>
+  
+  '''
+# ---
+# name: TestLayout.test_header_activated_badge[all_active]
+  '''
+  <header id="header" role="banner">
+      <section class="s-header-nexus">
+          <div class="s-header-nexus__container container">
+              <div class="s-header-nexus__row row">
+                  <div class="s-header-nexus__col s-header-nexus__col--logo-service col-auto d-flex align-items-center">
+                      <button aria-controls="offcanvasNexus" aria-label="Ouvrir le menu de navigation principale pour mobile" class="btn btn-lg btn-ico-only btn-nexus" data-bs-target="#offcanvasNexus" data-bs-toggle="offcanvas" type="button">
+                          <i aria-hidden="true" class="ri-menu-line" id="open">
+                          </i>
+                          <span class="visually-hidden">
+                              Menu
+                          </span>
+                      </button>
+                      <a href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg"/>
+                      </a>
+                  </div>
+                  <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
+                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="pierre.dupont@test.local" data-bs-toggle="tooltip">
+                          <i aria-hidden="true" class="ri-account-circle-line">
+                          </i>
+                          <span class="visually-hidden">
+                              Pierre D
+                          </span>
+                      </span>
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                          <i aria-hidden="true" class="ri-question-line">
+                          </i>
+                          <span class="visually-hidden">
+                              Besoin d'aide ?
+                          </span>
+                      </a>
+                      <form action="/accounts/logout/" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn btn-lg btn-ico-only btn-nexus">
+                              <i aria-hidden="true" class="ri-logout-circle-line">
+                              </i>
+                              <span class="visually-hidden">
+                                  Déconnexion
+                              </span>
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <div class="offcanvas" id="offcanvasNexus">
+          <div class="offcanvas-body">
+              <nav aria-label="Navigation principale pour mobile" role="navigation">
+                  <div class="d-flex align-items-center mb-1">
+                      <strong class="flex-grow-1 mb-0">
+                          TABLEAU DE BORD
+                      </strong>
+                      <div class="d-md-none">
+                          <button aria-label="Fermer le menu de navigation principale pour mobile" class="btn btn-lg btn-ico-only btn-nexus justify-content-center" data-bs-dismiss="offcanvas" type="button">
+                              <i aria-hidden="true" class="ri-close-line" id="close">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portail/accueil">
+                      <i aria-hidden="true" class="ri-home-line">
+                      </i>
+                      <span class="d-md-none d-xl-inline-flex">
+                          Accueil
+                      </span>
+                  </a>
+                  <strong>
+                      GÉRER MES OFFRES
+                  </strong>
+                  <ul>
+                      <li>
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mes offres d’emploi
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mes services d’insertion
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mon activité commerciale
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
+                  <strong>
+                      ACCOMPAGNER & SUIVRE
+                  </strong>
+                  <ul>
+                      <li>
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Commande de carnets
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Suivi d’activité
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Aide de la communauté
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
+              </nav>
+              <ul>
+                  <li>
+                      <span aria-label="Accéder a votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="pierre.dupont@test.local" data-bs-toggle="tooltip">
+                          <i aria-hidden="true" class="ri-account-circle-line">
+                          </i>
+                          <span class="d-md-none d-xl-inline-flex">
+                              Pierre D
+                          </span>
+                      </span>
+                  </li>
+                  <li>
+                      <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <i aria-hidden="true" class="ri-question-line">
+                          </i>
+                          <span class="d-md-none d-xl-inline-flex">
+                              Besoin d'aide ?
+                          </span>
+                      </a>
+                  </li>
+                  <li>
+                      <form action="/accounts/logout/" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn btn-lg btn-ico btn-nexus">
+                              <i aria-hidden="true" class="ri-logout-circle-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Déconnexion
+                              </span>
+                          </button>
+                      </form>
+                  </li>
+                  <li>
+                      <a class="d-none d-md-inline-block d-xl-none" href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg"/>
+                      </a>
+                      <a class="d-md-none d-xl-inline-block px-1" href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg"/>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </header>
+  
+  '''
+# ---
+# name: TestLayout.test_header_activated_badge[only_emplois]
+  '''
+  <header id="header" role="banner">
+      <section class="s-header-nexus">
+          <div class="s-header-nexus__container container">
+              <div class="s-header-nexus__row row">
+                  <div class="s-header-nexus__col s-header-nexus__col--logo-service col-auto d-flex align-items-center">
+                      <button aria-controls="offcanvasNexus" aria-label="Ouvrir le menu de navigation principale pour mobile" class="btn btn-lg btn-ico-only btn-nexus" data-bs-target="#offcanvasNexus" data-bs-toggle="offcanvas" type="button">
+                          <i aria-hidden="true" class="ri-menu-line" id="open">
+                          </i>
+                          <span class="visually-hidden">
+                              Menu
+                          </span>
+                      </button>
+                      <a href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg"/>
+                      </a>
+                  </div>
+                  <div class="s-header-nexus__col s-header-nexus__col--nav col-auto d-flex align-items-center">
+                      <span class="btn btn-lg btn-ico-only btn-nexus" data-bs-title="pierre.dupont@test.local" data-bs-toggle="tooltip">
+                          <i aria-hidden="true" class="ri-account-circle-line">
+                          </i>
+                          <span class="visually-hidden">
+                              Pierre D
+                          </span>
+                      </span>
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                          <i aria-hidden="true" class="ri-question-line">
+                          </i>
+                          <span class="visually-hidden">
+                              Besoin d'aide ?
+                          </span>
+                      </a>
+                      <form action="/accounts/logout/" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn btn-lg btn-ico-only btn-nexus">
+                              <i aria-hidden="true" class="ri-logout-circle-line">
+                              </i>
+                              <span class="visually-hidden">
+                                  Déconnexion
+                              </span>
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <div class="offcanvas" id="offcanvasNexus">
+          <div class="offcanvas-body">
+              <nav aria-label="Navigation principale pour mobile" role="navigation">
+                  <div class="d-flex align-items-center mb-1">
+                      <strong class="flex-grow-1 mb-0">
+                          TABLEAU DE BORD
+                      </strong>
+                      <div class="d-md-none">
+                          <button aria-label="Fermer le menu de navigation principale pour mobile" class="btn btn-lg btn-ico-only btn-nexus justify-content-center" data-bs-dismiss="offcanvas" type="button">
+                              <i aria-hidden="true" class="ri-close-line" id="close">
+                              </i>
+                          </button>
+                      </div>
+                  </div>
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portail/accueil">
+                      <i aria-hidden="true" class="ri-home-line">
+                      </i>
+                      <span class="d-md-none d-xl-inline-flex">
+                          Accueil
+                      </span>
+                  </a>
+                  <strong>
+                      GÉRER MES OFFRES
+                  </strong>
+                  <ul>
+                      <li>
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mes offres d’emploi
+                              </span>
+                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                  <i aria-hidden="true" class="ri-check-line">
+                                  </i>
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mes services d’insertion
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Mon activité commerciale
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
+                  <strong>
+                      ACCOMPAGNER & SUIVRE
+                  </strong>
+                  <ul>
+                      <li>
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Commande de carnets
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Suivi d’activité
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
+                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                  Aide de la communauté
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
+              </nav>
+              <ul>
+                  <li>
+                      <span aria-label="Accéder a votre compte" class="btn btn-lg btn-ico btn-nexus" data-bs-title="pierre.dupont@test.local" data-bs-toggle="tooltip">
+                          <i aria-hidden="true" class="ri-account-circle-line">
+                          </i>
+                          <span class="d-md-none d-xl-inline-flex">
+                              Pierre D
+                          </span>
+                      </span>
+                  </li>
+                  <li>
+                      <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <i aria-hidden="true" class="ri-question-line">
+                          </i>
+                          <span class="d-md-none d-xl-inline-flex">
+                              Besoin d'aide ?
+                          </span>
+                      </a>
+                  </li>
+                  <li>
+                      <form action="/accounts/logout/" method="post">
+                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                          <button class="btn btn-lg btn-ico btn-nexus">
+                              <i aria-hidden="true" class="ri-logout-circle-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Déconnexion
+                              </span>
+                          </button>
+                      </form>
+                  </li>
+                  <li>
+                      <a class="d-none d-md-inline-block d-xl-none" href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus-mini.svg"/>
+                      </a>
+                      <a class="d-md-none d-xl-inline-block px-1" href="">
+                          <img alt="Nexus - La plateforme de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-nexus.svg"/>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </header>
+  
+  '''
+# ---
