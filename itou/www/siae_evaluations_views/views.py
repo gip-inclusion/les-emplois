@@ -373,7 +373,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         if all([form.is_valid() for form in forms.values()]):
             evaluated_siae = self.object
             siae_sanctions_form = forms["siae_sanctions_form"]
-            sanctions = Sanctions.objects.create(
+            self.sanctions = Sanctions.objects.create(
                 evaluated_siae=evaluated_siae,
                 training_session=siae_sanctions_form.cleaned_data.get("training_session", ""),
                 suspension_dates=siae_sanctions_form.cleaned_data.get("suspension_dates"),
@@ -383,20 +383,25 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
                 for form in formset:
                     if subsidy_cut_percent := form.cleaned_data.get("subsidy_cut_percent"):
                         EvaluatedJobApplicationSanction.objects.create(
-                            sanctions=sanctions,
+                            sanctions=self.sanctions,
                             evaluated_job_application_id=form.cleaned_data.get("evaluated_job_application"),
                             subsidy_cut_percent=subsidy_cut_percent,
                         )
             evaluated_siae.notified_at = timezone.now()
             evaluated_siae.save(update_fields=["notified_at"])
             del self.request.session[self.sessionkey]
-            if email := self._build_notification_email(evaluated_siae, sanctions):
+            if email := self._build_notification_email(evaluated_siae, self.sanctions):
                 send_email_messages([email])
                 messages.success(self.request, f'L’entreprise "{evaluated_siae}" a bien été notifiée de la décision.')
             return HttpResponseRedirect(self.get_success_url())
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
+        if self.sanctions.has_significant_sanction:
+            return reverse(
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": self.object.pk},
+            )
         return reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": self.object.evaluation_campaign_id},

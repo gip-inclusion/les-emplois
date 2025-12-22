@@ -68,8 +68,12 @@ class TestEvaluatedSiaeSanctionView:
         self.return_dashboard_link_html = (
             '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
         )
+        self.letter_document_link_html = (
+            '<a href="/static/templates/modele_decision_sanction_controle_a_posteriori.docx" target="_blank"'
+            'class="btn btn-primary">Télécharger le modèle de courrier</a>'
+        )
 
-    def assertSanctionContent(self, response, subsidy_cut_percent=None):
+    def assertSanctionContent(self, snapshot, response, subsidy_cut_percent=None):
         assertContains(
             response,
             '<h1>Décision de sanction pour <span class="text-info">Les petits jardins</span></h1>',
@@ -78,7 +82,7 @@ class TestEvaluatedSiaeSanctionView:
         )
         assertContains(
             response,
-            '<b>Résultat :</b> <b class="text-danger">Négatif</b>',
+            '<b>Résultat de cette campagne de contrôle :</b> <b class="text-danger">Négatif</b>',
             count=1,
         )
         assertContains(
@@ -86,14 +90,18 @@ class TestEvaluatedSiaeSanctionView:
             '<b>Raison principale :</b> <b class="text-info">Pièce justificative incorrecte</b>',
             count=1,
         )
+
+        soup = parse_response_to_soup(response, "#decision-summary")
+        assert pretty_indented(soup) == snapshot(name="decision_summary")
+
         assertContains(
             response,
             """
-            <p>
+            <p class="mb-1">
                 <b>Commentaire de votre DDETS</b>
             </p>
             <div class="card">
-                <div class="card-body">
+                <div class="card-body bg-dark-subtle fst-italic">
                     <p>A envoyé une photo de son chat. Séparé de son chat pendant une journée.</p>
                 </div>
             </div>
@@ -137,7 +145,17 @@ class TestEvaluatedSiaeSanctionView:
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
-    def test_view_as_institution(self, client, snapshot):
+    @pytest.mark.parametrize(
+        "suspension_dates,expected_assert",
+        [
+            (None, assertNotContains),
+            (InclusiveDateRange(datetime.date(2023, 1, 1)), assertContains),
+        ],
+        ids=["non_significant_sanction", "significant_sanction"],
+    )
+    def test_view_as_institution(self, client, snapshot, suspension_dates, expected_assert):
+        self.sanctions.suspension_dates = suspension_dates
+        self.sanctions.save(update_fields=["suspension_dates"])
         client.force_login(self.institution_user)
 
         with assertSnapshotQueries(snapshot(name="queries")):
@@ -147,7 +165,7 @@ class TestEvaluatedSiaeSanctionView:
                     kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
                 )
             )
-        self.assertSanctionContent(response)
+        self.assertSanctionContent(snapshot, response)
         assertContains(
             response,
             self.return_evaluated_siae_list_link_html,
@@ -157,6 +175,11 @@ class TestEvaluatedSiaeSanctionView:
         assertNotContains(
             response,
             self.return_dashboard_link_html,
+            html=True,
+        )
+        expected_assert(
+            response,
+            self.letter_document_link_html,
             html=True,
         )
 
@@ -171,7 +194,14 @@ class TestEvaluatedSiaeSanctionView:
         )
         assert response.status_code == 404
 
-    def test_view_as_siae(self, client):
+    @pytest.mark.parametrize(
+        "suspension_dates",
+        [None, InclusiveDateRange(datetime.date(2023, 1, 1))],
+        ids=["non_significant_sanction", "significant_sanction"],
+    )
+    def test_view_as_siae(self, client, snapshot, suspension_dates):
+        self.sanctions.suspension_dates = suspension_dates
+        self.sanctions.save(update_fields=["suspension_dates"])
         client.force_login(self.employer)
         response = client.get(
             reverse(
@@ -179,7 +209,7 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
+        self.assertSanctionContent(snapshot, response)
         assertContains(
             response,
             self.return_dashboard_link_html,
@@ -189,6 +219,11 @@ class TestEvaluatedSiaeSanctionView:
         assertNotContains(
             response,
             self.return_evaluated_siae_list_link_html,
+            html=True,
+        )
+        assertNotContains(
+            response,
+            self.letter_document_link_html,
             html=True,
         )
 
@@ -211,8 +246,10 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        self.assertSanctionContent(snapshot, response)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="sanction_details"
+        )
 
     def test_temporary_suspension(self, client, snapshot):
         self.sanctions.training_session = ""
@@ -225,8 +262,10 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        self.assertSanctionContent(snapshot, response)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="sanction_details"
+        )
 
     def test_permanent_suspension(self, client, snapshot):
         self.sanctions.training_session = ""
@@ -239,8 +278,10 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        self.assertSanctionContent(snapshot, response)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="sanction_details"
+        )
 
     @pytest.mark.parametrize("subsidy_cut_percent", [10, 100])
     def test_subsidy_cut_rate(self, client, subsidy_cut_percent, snapshot):
@@ -258,7 +299,7 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response, subsidy_cut_percent)
+        self.assertSanctionContent(snapshot, response, subsidy_cut_percent)
         assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
             name=f"sanctions with subsidy_cut_percent={subsidy_cut_percent}"
         )
@@ -287,8 +328,30 @@ class TestEvaluatedSiaeSanctionView:
                 kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
             )
         )
-        self.assertSanctionContent(response)
-        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot
+        self.assertSanctionContent(snapshot, response)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="sanction_details"
+        )
+
+    def test_combined_sanctions(self, client, snapshot):
+        self.sanctions.suspension_dates = InclusiveDateRange(datetime.date(2023, 1, 1), datetime.date(2023, 6, 1))
+        self.sanctions.save()
+        EvaluatedJobApplicationSanctionFactory(
+            sanctions=self.sanctions,
+            evaluated_job_application=self.evaluated_siae.evaluated_job_applications.first(),
+            subsidy_cut_percent=50,
+        )
+        client.force_login(self.institution_user)
+        response = client.get(
+            reverse(
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
+            )
+        )
+        self.assertSanctionContent(snapshot, response, subsidy_cut_percent=50)
+        assert pretty_indented(parse_response_to_soup(response, ".card .card-body:nth-of-type(2)")) == snapshot(
+            name="sanction_details"
+        )
 
 
 def test_sanctions_helper_view(client):

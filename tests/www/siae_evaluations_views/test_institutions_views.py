@@ -2523,8 +2523,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
         assertMessages(response, [])
@@ -2860,8 +2860,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
         assertMessages(response, [])
@@ -2975,8 +2975,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
         assertMessages(response, [])
@@ -3420,8 +3420,8 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+                "siae_evaluations_views:institution_evaluated_siae_sanction",
+                kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
         assertMessages(response, [])
