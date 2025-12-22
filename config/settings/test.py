@@ -85,3 +85,9 @@ NEXUS_METABASE_DB_USER = DATABASES["default"]["USER"]  # noqa: F405
 NEXUS_METABASE_DB_PASSWORD = DATABASES["default"]["PASSWORD"]  # noqa: F405
 NEXUS_AUTO_LOGIN_KEY = {"k": "aTR4ZnR1WlpYYmphbFdtaXVlVjB3alljNjhrWXpfYSE", "kty": "oct"}
 NEXUS_ALLOWED_REDIRECT_HOSTS = ["emplois.fr", "emplois.com"]
+
+
+ASSERT_SNAPSHOT_QUERIES_EXTRA_PACKAGES_ALLOWLIST = [
+    ("rest_framework/mixins.py", "list"),
+    ("xlsx_streaming/streaming.py", "serialize_queryset_by_batch"),
+]

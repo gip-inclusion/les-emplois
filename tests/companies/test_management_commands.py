@@ -7,6 +7,7 @@ from django.contrib.gis.geos import Point
 from django.core import management
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, JobSource
@@ -17,7 +18,6 @@ from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 class TestMoveCompanyData:

@@ -4,6 +4,7 @@ import random
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.job_applications.models import JobApplicationComment
@@ -11,7 +12,7 @@ from itou.www.apply.views.process_views import LAST_COMMENTS_COUNT
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.job_applications.factories import JobApplicationCommentFactory, JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_display_in_sidebar_and_tab(client, snapshot):

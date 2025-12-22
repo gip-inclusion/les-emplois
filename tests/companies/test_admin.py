@@ -9,6 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -26,7 +27,6 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberFactory
 from tests.utils.testing import (
     BASE_NUM_QUERIES,
-    assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
     pretty_indented,

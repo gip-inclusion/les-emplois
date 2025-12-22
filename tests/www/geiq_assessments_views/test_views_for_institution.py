@@ -4,6 +4,7 @@ import uuid
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -16,7 +17,7 @@ from tests.geiq_assessments.factories import (
 )
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestListAssessmentsView:

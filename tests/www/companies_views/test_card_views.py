@@ -4,6 +4,7 @@ import pytest
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils.html import escape
+from itoutils.django.testing import assertSnapshotQueries
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -14,7 +15,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestCardView:

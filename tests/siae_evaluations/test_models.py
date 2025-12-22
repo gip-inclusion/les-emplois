@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.enums import Origin
@@ -49,7 +50,6 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 def create_batch_of_job_applications(company, *, size=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):

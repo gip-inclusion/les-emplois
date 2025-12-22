@@ -7,6 +7,7 @@ from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
 from django.utils.http import urlencode
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
@@ -26,7 +27,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"

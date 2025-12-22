@@ -13,6 +13,7 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
@@ -71,7 +72,6 @@ from tests.users.factories import (
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
 from tests.utils.testing import (
-    assertSnapshotQueries,
     default_storage_ls_files,
     get_session_name,
     parse_response_to_soup,

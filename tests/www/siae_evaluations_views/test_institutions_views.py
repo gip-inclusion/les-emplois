@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import dateformat, timezone
 from django.utils.html import escape
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
@@ -39,7 +40,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.siae_evaluations_views.test_siaes_views import DDETS_refusal_comment_txt
 
 

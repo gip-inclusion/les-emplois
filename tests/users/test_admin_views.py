@@ -10,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessages, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import SenderKind
@@ -33,7 +34,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import parse_response_to_soup
 
 
 def test_add_user(client):

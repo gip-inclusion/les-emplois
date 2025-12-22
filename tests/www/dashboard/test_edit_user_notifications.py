@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.communications import registry as notifications_registry
@@ -12,7 +13,6 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries
 
 
 def test_staff_user_not_allowed(client):

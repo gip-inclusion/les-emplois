@@ -718,10 +718,12 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-itoutils[django]==25.12.10.0 \
-    --hash=sha256:6d1c7dcbbf0c934be6d162f231f828cb17b2ca691313bda296266f387c5ca921 \
-    --hash=sha256:d2e4291e650b4d712ba9f1d1f99168f74c290ea947efb9bb26ceb01aa0117b64
-    # via -r requirements/base.txt
+itoutils[django, django-testing]==25.12.22.1 \
+    --hash=sha256:eb5aa2972e7d0a5b3eac50ef0c9085623862ecceb7d7f8d7f27646767301c1e9 \
+    --hash=sha256:f14c310f9cfc2298dbea09cb91d345d13be5c44aa571ac592b8d01f517a59291
+    # via
+    #   -r requirements/base.txt
+    #   -r requirements/test.in
 jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
     --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
@@ -1792,12 +1794,14 @@ sqlparse==0.5.4 \
     --hash=sha256:99a9f0314977b76d776a0fcb8554de91b9bb8a18560631d6bc48721d07023dcb
     # via
     #   -r requirements/base.txt
-    #   -r requirements/test.in
     #   django
+    #   itoutils
 syrupy==5.0.0 \
     --hash=sha256:3282fe963fa5d4d3e47231b16d1d4d0f4523705e8199eeb99a22a1bc9f5942f2 \
     --hash=sha256:c848e1a980ca52a28715cd2d2b4d434db424699c05653bd1158fb31cf56e9546
-    # via -r requirements/test.in
+    # via
+    #   -r requirements/test.in
+    #   itoutils
 tenacity==9.1.2 \
     --hash=sha256:1169d376c297e7de388d18b4481760d478b0e99a777cad3a9c86e556f4b697cb \
     --hash=sha256:f77bf36710d8b73a50b2dd155c97b870017ad21afe6ab300326b0371b3b05138

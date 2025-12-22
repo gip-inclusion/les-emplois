@@ -2,6 +2,7 @@ import pytest
 import xworkflows
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState
@@ -15,7 +16,6 @@ from tests.job_applications.factories import (
     JobApplicationSentByCompanyFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 def test_transferable_states(subtests):

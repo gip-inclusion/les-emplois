@@ -7,6 +7,7 @@ from django.core.files.storage import default_storage
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.approvals.enums import (
@@ -23,7 +24,6 @@ from tests.users.factories import EmployerFactory
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
     assert_previous_step,
-    assertSnapshotQueries,
     parse_response_to_soup,
     pretty_indented,
 )

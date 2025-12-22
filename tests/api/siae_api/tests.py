@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import DepartmentToken
@@ -12,7 +13,6 @@ from tests.api.utils import _str_with_tz
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 ENDPOINT_URL = reverse("v1:siaes-list")

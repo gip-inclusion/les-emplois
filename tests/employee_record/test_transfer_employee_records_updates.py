@@ -3,13 +3,13 @@ import json
 import freezegun
 import pytest
 from django.test.utils import override_settings
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.management.commands import transfer_employee_records_updates
 from itou.employee_record.models import EmployeeRecordBatch
 from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 @pytest.fixture(name="command")

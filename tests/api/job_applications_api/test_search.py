@@ -4,6 +4,7 @@ from datetime import date
 import pytest
 from django.urls import reverse_lazy
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.api.auth import ServiceAccount
 from itou.api.job_application_api.serializers import JobApplicationSearchResponseSerializer
@@ -21,7 +22,6 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries
 
 
 VALID_SEARCH_DATA = {
