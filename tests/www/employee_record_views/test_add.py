@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.employee_record.enums import Status
@@ -10,7 +11,7 @@ from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
 
 
 def test_wizard(snapshot, client):

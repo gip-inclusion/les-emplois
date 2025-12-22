@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
     assertFormError,
@@ -84,7 +85,6 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspec
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     assert_previous_step,
-    assertSnapshotQueries,
     get_session_name,
     parse_response_to_soup,
     pretty_indented,

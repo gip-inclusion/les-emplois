@@ -5,6 +5,7 @@ import uuid
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -22,7 +23,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 def test_anonymous_user(client):

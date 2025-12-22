@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.eligibility.enums import (
@@ -34,7 +35,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup
+from tests.utils.testing import parse_response_to_soup
 
 
 DDETS_refusal_comment_txt = "Commentaire de la DDETS"

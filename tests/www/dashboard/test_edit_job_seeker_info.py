@@ -5,6 +5,7 @@ import factory
 import pytest
 from django.contrib.gis.geos import Point
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune
@@ -17,7 +18,6 @@ from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'

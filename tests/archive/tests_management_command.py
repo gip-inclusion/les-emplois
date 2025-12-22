@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.approvals.enums import Origin
@@ -74,7 +75,6 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import assertSnapshotQueries
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)

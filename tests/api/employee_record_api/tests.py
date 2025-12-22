@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains
 
 from itou.employee_record.enums import Status
@@ -9,7 +10,6 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 ENDPOINT_URL = reverse("v1:employee-records-list")

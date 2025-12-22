@@ -6,6 +6,7 @@ from django.contrib.gis.geos import Point
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertFormError, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country
@@ -17,7 +18,7 @@ from itou.utils.urls import get_zendesk_form_url
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.users import constants as users_test_constants
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 from tests.www.dashboard.test_edit_job_seeker_info import DISABLED_NIR
 
 

@@ -4,8 +4,7 @@ from django.core import management
 from django.db import connection
 from django.test import override_settings
 from freezegun import freeze_time
-
-from tests.utils.testing import assertSnapshotQueries
+from itoutils.django.testing import assertSnapshotQueries
 
 
 MATOMO_HEADERS = (

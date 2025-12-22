@@ -7,6 +7,7 @@ from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.companies.models import Company
@@ -18,7 +19,6 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
-    assertSnapshotQueries,
     parse_response_to_soup,
     pretty_indented,
 )

@@ -1,13 +1,13 @@
 from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.nexus.management.commands.populate_metabase_nexus import create_table, get_connection
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 @freeze_time()

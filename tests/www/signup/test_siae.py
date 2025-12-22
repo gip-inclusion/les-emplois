@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -18,7 +19,7 @@ from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.testing import ItouClient, assertSnapshotQueries
+from tests.utils.testing import ItouClient
 
 
 class TestCompanySignup:

@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
@@ -11,7 +12,7 @@ from tests.cities.factories import create_city_lyon
 from tests.search.factories import SavedSearchFactory
 from tests.users.factories import PrescriberFactory, random_user_kind_factory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assertSnapshotQueries, parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestSavedSearches:

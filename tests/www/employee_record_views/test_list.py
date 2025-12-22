@@ -9,6 +9,7 @@ from django.template.defaultfilters import title, urlencode
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -30,7 +31,6 @@ from tests.job_applications.factories import (
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import (
     PAGINATION_PAGE_ONE_MARKUP,
-    assertSnapshotQueries,
     parse_response_to_soup,
     pretty_indented,
 )

@@ -6,6 +6,7 @@ from django.core import management
 from django.db import connection, transaction
 from django.utils import timezone
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
@@ -46,7 +47,6 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 @freeze_time("2023-03-10")

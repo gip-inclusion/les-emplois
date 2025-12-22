@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
+from itoutils.django.testing import assertSnapshotQueries
 from rest_framework.test import APIClient
 
 from itou.api.geiq import serializers
@@ -18,7 +19,6 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.testing import assertSnapshotQueries
 
 
 def _api_client():
