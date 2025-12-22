@@ -456,9 +456,9 @@ django-redis==6.0.0 \
     --hash=sha256:20bf0063a8abee567eb5f77f375143c32810c8700c0674ced34737f8de4e36c0 \
     --hash=sha256:2d9cb12a20424a4c4dde082c6122f486628bae2d9c2bee4c0126a4de7fda00dd
     # via -r requirements/base.in
-django-select2==8.4.3 \
-    --hash=sha256:49626ccea8327dde7797d42788094fd362b502a479bc84b016d5c5c5ea976344 \
-    --hash=sha256:c5910cf7c1e1d393af3e96842df8c28c1efa55e23a7c5f26494cadeb3911579f
+django-select2==8.4.7 \
+    --hash=sha256:1868c34938bcfffe44d846f49ab823f971a3cbaab8faad0625ec672a5c63231b \
+    --hash=sha256:75453b27a44af839723376d58e0d6bee6a16fa49b5758f44bc8e420690ab321f
     # via -r requirements/base.in
 django-storages==1.14.6 \
     --hash=sha256:11b7b6200e1cb5ffcd9962bd3673a39c7d6a6109e8096f0e03d46fab3d3aabd9 \
