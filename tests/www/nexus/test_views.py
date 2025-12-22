@@ -105,3 +105,41 @@ class TestLayout:
         NexusUserFactory(email=user.email, source=Service.DORA)
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
+
+
+class TestHomePageView:
+    url = reverse("nexus:homepage")
+    ACTIVATE_SERVICES_H2 = "Mes services actifs"
+    NEW_SERVICES_H2 = "Services à découvrir"
+
+    def test_one_activated_service(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(self.url)
+
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+        assertContains(response, self.ACTIVATE_SERVICES_H2)
+        assertContains(response, self.NEW_SERVICES_H2)
+
+    def test_all_activated_services(self, client, snapshot):
+        user = PrescriberFactory()
+        for service in Service.activable():
+            NexusUserFactory(email=user.email, source=service, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+        assertContains(response, self.ACTIVATE_SERVICES_H2)
+        assertNotContains(response, self.NEW_SERVICES_H2)
+
+    def test_missing_emplois_log(self, client, caplog):
+        # This should not happen for now since there's a les-emplois User -> les-empois should be activated
+        # Still, the code allows it, and it might become possible someday
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.DORA, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        client.get(self.url)
+        assert caplog.messages == [f"User is missing it's NexusUser user={user.pk}", "HTTP 200 OK"]
