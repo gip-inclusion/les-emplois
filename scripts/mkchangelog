@@ -13,9 +13,6 @@ import subprocess
 import sys
 import tempfile
 
-from django.utils.text import capfirst
-
-
 logger = logging.getLogger(__name__)
 
 ADDED = "ajouté"
@@ -33,6 +30,13 @@ LABEL_TITLES = {
     TECH: "Tech",
 }
 
+def capfirst(x):
+    """Imported from django/utils/text.py"""
+    if not x:
+        return x
+    if not isinstance(x, str):
+        x = str(x)
+    return x[0].upper() + x[1:]
 
 def prepare_branch(branch):
     # The remote branch may not exist, ignore errors.
