@@ -15,6 +15,14 @@ from itou.utils.export import to_streaming_response
 admin.site.register(models.Calendar)
 
 
+class DeleteOnlyMixin:
+    def has_add_permission(self, *args, **kwargs):
+        return False
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+
 class EvaluatedSiaesInline(ItouTabularInline):
     model = models.EvaluatedSiae
     fields = ("id_link", "reviewed_at", "state")
@@ -233,10 +241,10 @@ class EvaluationCampaignAdmin(ItouModelAdmin):
 
 
 @admin.register(models.EvaluatedSiae)
-class EvaluatedSiaeAdmin(ItouModelAdmin):
+class EvaluatedSiaeAdmin(DeleteOnlyMixin, ItouModelAdmin):
     list_display = ["evaluation_campaign", "siae", "state", "reviewed_at"]
     list_display_links = ("siae",)
-    readonly_fields = (
+    fields = (
         "evaluation_campaign",
         "siae",
         "reviewed_at",
@@ -274,11 +282,11 @@ class EvaluatedSiaeAdmin(ItouModelAdmin):
 
 
 @admin.register(models.EvaluatedJobApplication)
-class EvaluatedJobApplicationAdmin(ItouModelAdmin):
+class EvaluatedJobApplicationAdmin(DeleteOnlyMixin, ItouModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
     list_select_related = ("evaluated_siae__siae", "job_application__approval", "job_application__job_seeker")
-    readonly_fields = (
+    fields = (
         "evaluated_siae",
         "job_application",
         "approval",
@@ -308,10 +316,10 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin):
 
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
-class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
+class EvaluatedAdministrativeCriteriaAdmin(DeleteOnlyMixin, ItouModelAdmin):
     list_display = ("evaluated_job_application", "administrative_criteria", "submitted_at", "review_state")
     list_display_links = ("administrative_criteria",)
-    readonly_fields = (
+    fields = (
         "evaluated_job_application",
         "administrative_criteria",
         "uploaded_at",
@@ -333,7 +341,7 @@ class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
 
 
 @admin.register(models.Sanctions)
-class SanctionsAdmin(ItouModelAdmin):
+class SanctionsAdmin(DeleteOnlyMixin, ItouModelAdmin):
     list_display = [
         "evaluated_siae",
         "evaluation_campaign",
@@ -341,7 +349,7 @@ class SanctionsAdmin(ItouModelAdmin):
     ]
     list_select_related = ["evaluated_siae__evaluation_campaign__institution", "evaluated_siae__siae"]
     search_fields = ["evaluated_siae__siae__name"]
-    readonly_fields = [
+    fields = [
         "evaluated_siae",
         "training_session",
         "suspension_dates",
