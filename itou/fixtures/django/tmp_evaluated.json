@@ -483,5 +483,57 @@
     "review_state": "PENDING",
     "criteria_certified": false
   }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 18,
+  "fields": {
+    "administrative_criteria": 11,
+    "evaluated_job_application": 1,
+    "proof": null,
+    "uploaded_at": null,
+    "submitted_at": null,
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 19,
+  "fields": {
+    "administrative_criteria": 11,
+    "evaluated_job_application": 2,
+    "proof": "f8e9b486-2601-4598-9635-111df1c983e9",
+    "uploaded_at": "2025-11-20T15:08:01.909Z",
+    "submitted_at": null,
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 20,
+  "fields": {
+    "administrative_criteria": 11,
+    "evaluated_job_application": 3,
+    "proof": "f8e9b486-2601-4598-9635-111df1c983e9",
+    "uploaded_at": "2025-11-20T15:08:01.909Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 21,
+  "fields": {
+    "administrative_criteria": 11,
+    "evaluated_job_application": 4,
+    "proof": "f8e9b486-2601-4598-9635-111df1c983e9",
+    "uploaded_at": "2025-11-20T15:08:01.909Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "REFUSED",
+    "criteria_certified": false
+  }
 }
 ]
