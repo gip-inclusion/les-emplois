@@ -6,8 +6,10 @@ from unittest import mock
 from urllib.parse import quote, urlencode
 
 import httpx
+import jwt
 import pytest
 import respx
+from dateutil.relativedelta import relativedelta
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.messages import Message
@@ -44,6 +46,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
+from tests.openid_connect.pro_connect.testing import OIDC_USERINFO
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -702,6 +705,54 @@ class TestProConnectCallbackView:
                 )
             ],
         )
+
+    # FIXME (alaurent) Remove in a month (old states expiry)
+    @respx.mock
+    def test_old_state_compat(self, client, pro_connect):
+        # Create a prescriber
+        user = PrescriberFactory(
+            **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
+        )
+        # Ask to log a employer -> this was always allowed in the old code
+        authorize_params = {
+            "user_kind": "employer",
+            "next_url": "/next_url",
+            "user_email": user.email,
+            "register": False,
+        }
+
+        # Calling this view is mandatory to start a new session.
+        authorize_url = f"{reverse('pro_connect:authorize')}?{urlencode(authorize_params)}"
+        response = client.get(authorize_url)
+        assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
+
+        # Edit the state
+        # In the old state, we didn't have enforce_kind, and we always had is_login=True
+        state = ProConnectState.objects.get()
+        del state.data["enforce_kind"]
+        state.data["is_login"] = True
+        state.save()
+
+        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
+
+        # Put a issued at in the future to ensure we don't check it
+        user_info = OIDC_USERINFO | {
+            "aud": constants.PRO_CONNECT_CLIENT_ID,
+            "iat": timezone.now() + relativedelta(hours=1),
+        }
+        user_info_jwt = jwt.encode(payload=user_info, key=constants.PRO_CONNECT_CLIENT_SECRET, algorithm="HS256")
+        respx.get(constants.PRO_CONNECT_ENDPOINT_USERINFO).mock(
+            return_value=httpx.Response(200, content=user_info_jwt)
+        )
+
+        state = client.session[constants.PRO_CONNECT_SESSION_KEY]["state"]
+        url = reverse("pro_connect:callback")
+        response = client.get(url, data={"code": "123", "state": state})
+
+        # The user is authenticated even if he is a prescriber that tried to log through a employer login link
+        assertRedirects(response, "/next_url", fetch_redirect_response=False)
+        assert get_user(client).is_authenticated is True
 
 
 class TestProConnectSession:
