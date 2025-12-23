@@ -223,9 +223,9 @@ class OIDConnectUserData:
         readonly_pii_fields_changed = []
         if not created:
             for key, value in user_data_dict.items():
-                # Don't update kind on login, it allows prescribers to log through employer form
-                # which happens a lot...
-                if is_login and key == "kind":
+                # Never update kind the user kind.
+                # We raised in self.check_valid_kind if the kind id different and enforce_kind is True
+                if key == "kind":
                     continue
                 if key in readonly_pii_fields:
                     if getattr(user, key) != value:
