@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2025-12-22
+
+### Modifié
+
+- [Admin : Ajout de l'accès aux SIRETS "ACI Convergence / PHC" pour le support et le pilotage](https://github.com/gip-inclusion/les-emplois/pull/7274)
+- [Contrôle a posteriori : Renommer "Notification de sanction"](https://github.com/gip-inclusion/les-emplois/pull/7267)
+- [Fiche salarié : Ajout d'un bandeau d'information pour le déploiement du 18/12/2025](https://github.com/gip-inclusion/les-emplois/pull/7282)
+- [Fiche salarié : Empêcher l'envoi si des informations sont manquantes](https://github.com/gip-inclusion/les-emplois/pull/7263)
+- [Fiche salarié : Envoi des nouveaux champs (NIR/NIA/NTT ainsi que 7 nouveaux champs concernant la situation du salarié) à l'ASP](https://github.com/gip-inclusion/les-emplois/pull/7275)
+- [Fiches salarié : Ajout de la saisie du NIR/NIA/NTT lors de la création/modification](https://github.com/gip-inclusion/les-emplois/pull/7152)
+- [GPS : Correction de l'ordre d'affichage des groupes de suivi](https://github.com/gip-inclusion/les-emplois/pull/7251)
+- [Interface : Badge "Nouveau" pour la barre de navigation non-connectée et harmonisation de la casse des badges "Nouveau"](https://github.com/gip-inclusion/les-emplois/pull/7281)
+- [Interface : Harmonisation des critères administratifs des blocs "Eligibilité à l’IAE"](https://github.com/gip-inclusion/les-emplois/pull/7154)
+- [Recherche : MAJ du thème pour la barre de recherche](https://github.com/gip-inclusion/les-emplois/pull/7280)
+
 ## 2025-12-15
 
 ### Ajouté
