@@ -267,7 +267,7 @@ class CompanyBaseView(View):
 
 class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
     """
-    Display Inclusion Connect button.
+    Display ProConnect button.
     This page is also shown if an error is detected during
     OAuth callback.
     """
