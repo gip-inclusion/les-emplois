@@ -73,7 +73,7 @@ class TestCompanySignup:
         response = client.get(magic_link)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
@@ -81,6 +81,7 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -189,7 +190,7 @@ class TestCompanySignup:
         response = client.get(magic_link)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
@@ -197,6 +198,7 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -237,7 +239,7 @@ class TestCompanySignup:
         response = client.get(magic_link)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
         next_url = reverse("signup:company_join", args=(company.pk, token))
@@ -245,6 +247,7 @@ class TestCompanySignup:
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -343,13 +346,14 @@ class TestCompanySignup:
         url = reverse("signup:facilitator_user")
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:facilitator_user")
         next_url = reverse("signup:facilitator_join")
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
             "next_url": next_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')

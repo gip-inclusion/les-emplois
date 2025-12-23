@@ -279,6 +279,7 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
             "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:company_join", args=(self.company.pk, self.token)),
+            "register": True,
         }
         pro_connect_url = (
             f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
@@ -641,6 +642,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:prescriber_join_org"),
+        "register": True,
     }
     pro_connect_url = (
         f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
@@ -701,6 +703,7 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
     params = {
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
+        "register": True,
     }
     if join_as_orienteur_with_org or join_authorized_org:
         # Redirect to the join organization view after login or signup.
@@ -848,6 +851,7 @@ class FacilitatorUserView(LoginNotRequiredMixin, FacilitatorBaseMixin, TemplateV
             "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
             "next_url": reverse("signup:facilitator_join"),
+            "register": True,
         }
         pro_connect_url = (
             f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
