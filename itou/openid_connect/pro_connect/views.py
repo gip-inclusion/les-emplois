@@ -50,7 +50,7 @@ class ProConnectStateData:
     channel: str = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
-    is_login: bool = False  # Used to skip kind check and allow login through the wrong user kind
+    enforce_kind: bool = False
     prescriber_session_data: dict = None
 
 
@@ -115,14 +115,15 @@ def pro_connect_authorize(request):
     next_url = request.GET.get("next_url")
     if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
         return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
-    register = request.GET.get("register")
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
     if user_kind not in USER_DATA_CLASSES:
         return _redirect_to_login_page_on_error(error_msg="Wrong user kind.")
 
+    enforce_kind = request.GET.get("register") or request.GET.get("channel") == ProConnectChannel.INVITATION
+
     pc_data = ProConnectStateData(
-        user_kind=user_kind, previous_url=previous_url, next_url=next_url, is_login=not register
+        user_kind=user_kind, previous_url=previous_url, next_url=next_url, enforce_kind=enforce_kind
     )
 
     if channel := request.GET.get("channel"):
@@ -240,7 +241,7 @@ def pro_connect_callback(request):
         is_successful = False
 
     try:
-        user, _ = pc_user_data.create_or_update_user(is_login=pro_connect_state.data.get("is_login"))
+        user, _ = pc_user_data.create_or_update_user(enforce_kind=pro_connect_state.data.get("enforce_kind"))
     except InactiveUserException as e:
         logger.info("ProConnect login attempt with inactive user: %s", e.user)
         messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT))

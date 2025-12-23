@@ -156,11 +156,11 @@ class OIDConnectUserData:
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
-    def check_valid_kind(self, user, user_data_dict, is_login):
-        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
+    def check_valid_kind(self, user, user_data_dict, enforce_kind):
+        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and enforce_kind):
             raise InvalidKindException(user)
 
-    def create_or_update_user(self, is_login=False):
+    def create_or_update_user(self, enforce_kind=True):
         """
         A user is being created or updated from information provided by an identity provider.
         A user is globally unique with the combination of SSO provider + sub (e.g. InclusionConnect:username).
@@ -195,7 +195,7 @@ class OIDConnectUserData:
                     if not self.is_sub_update_allowed(user):
                         raise MultipleSubSameEmailException(user)
                 elif user.identity_provider not in self.allowed_identity_provider_migration:
-                    self.check_valid_kind(user, user_data_dict, is_login)
+                    self.check_valid_kind(user, user_data_dict, enforce_kind)
                     raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
@@ -217,15 +217,15 @@ class OIDConnectUserData:
         if not user.is_active:
             raise InactiveUserException(user)
 
-        self.check_valid_kind(user, user_data_dict, is_login)
+        self.check_valid_kind(user, user_data_dict, enforce_kind)
 
         readonly_pii_fields = user.jobseeker_profile.readonly_pii_fields() if is_jobseeker else set()
         readonly_pii_fields_changed = []
         if not created:
             for key, value in user_data_dict.items():
-                # Don't update kind on login, it allows prescribers to log through employer form
-                # which happens a lot...
-                if is_login and key == "kind":
+                # Never update kind the user kind.
+                # We raised in self.check_valid_kind if the kind id different and enforce_kind is True
+                if key == "kind":
                     continue
                 if key in readonly_pii_fields:
                     if getattr(user, key) != value:
