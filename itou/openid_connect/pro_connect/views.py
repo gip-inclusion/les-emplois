@@ -240,7 +240,7 @@ def pro_connect_callback(request):
         is_successful = False
 
     try:
-        user, _ = pc_user_data.create_or_update_user(is_login=pro_connect_state.data.get("is_login"))
+        user, _ = pc_user_data.create_or_update_user(enforce_kind=not pro_connect_state.data.get("is_login"))
     except InactiveUserException as e:
         logger.info("ProConnect login attempt with inactive user: %s", e.user)
         messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT))
