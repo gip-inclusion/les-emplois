@@ -182,7 +182,7 @@ class JobApplicationQuerySet(models.QuerySet):
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
 
-    def get_unique_fk_objects(self, fk_field):
+    def get_unique_fk_qs(self, fk_field):
         """
         Get unique foreign key objects in a single query.
         TODO: move this method in a custom manager since it's not chainable.
@@ -199,10 +199,12 @@ class JobApplicationQuerySet(models.QuerySet):
             raise RuntimeError("Unauthorized fk_field")
 
         # Use the `_id` field because ordering by a ForeignKey will follow the Meta.ordering but the distinct will not.
-        job_applications = self.order_by(f"{fk_field}_id").distinct(f"{fk_field}_id").select_related(fk_field)
+        return self.order_by(f"{fk_field}_id").distinct(f"{fk_field}_id").select_related(fk_field)
+
+    def get_unique_fk_objects(self, fk_field):
         return [
             getattr(job_application, fk_field)
-            for job_application in job_applications
+            for job_application in self.get_unique_fk_qs(fk_field)
             if getattr(job_application, fk_field)
         ]
 
