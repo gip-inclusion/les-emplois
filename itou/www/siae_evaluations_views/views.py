@@ -315,7 +315,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
         return [
             job_app
             for job_app in self.object.evaluated_job_applications.all()
-            if job_app.compute_state() != evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+            if job_app.compute_state() in evaluation_enums.EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES
         ]
 
     def setup(self, request, *args, **kwargs):
@@ -441,7 +441,8 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     context["evaluated_job_applications"] = [
         evaluated_job_application
         for evaluated_job_application in evaluated_siae.evaluated_job_applications.all()
-        if evaluated_job_application.compute_state() != evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED
+        if evaluated_job_application.compute_state()
+        in evaluation_enums.EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES
     ]
     try:
         context["sanctions"] = evaluated_siae.sanctions

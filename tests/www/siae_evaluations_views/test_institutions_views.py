@@ -13,7 +13,6 @@ from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
-from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -2997,12 +2996,9 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.sanctions.no_sanction_reason == ""
 
     @freeze_time("2022-10-24 11:11:00")
-    @pytest.mark.parametrize("accepted_state", [True, False])
-    def test_post_subsidy_cut_evaluated_job_application_state(self, client, accepted_state):
+    def test_get_subsidy_cut_filters_evaluated_job_applications(self, client):
         """
-        Test the evaluated job application display in the form.
-        Don't display accepted ones. Since the evaluated job app state is computed,
-        play with the evaluated adminitrative criteria state.
+        The formset should list only job applications in sanctionnable states.
         """
         company_membership = CompanyMembershipFactory(
             company__name="Les petits jardins", user__email="siae@mailinator.com"
@@ -3012,108 +3008,77 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep3(InstitutionEvaluatedSiaeNotify
             evaluation_campaign__institution=self.institution,
             siae=company_membership.company,
             complete=True,
-            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-            job_app__job_application__for_snapshot=True,
+            complete__job_app=None,
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat.",
         )
-        evaluated_job_app_1 = EvaluatedJobApplication.objects.first()
-        criterion_state = (
-            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
-            if accepted_state
-            else random.choice(
-                list(
-                    set(evaluation_enums.EvaluatedAdministrativeCriteriaState.values)
-                    - {
-                        evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-                        evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
-                    }
-                )
-            )
-        )
-        evaluated_job_app_2 = EvaluatedJobApplicationFactory(
-            evaluated_siae=evaluated_siae,
-            complete=True,
-            criteria__review_state=criterion_state,
-            job_application__job_seeker__first_name="Vincent",
-            job_application__job_seeker__last_name="Xion",
-            job_application__with_approval=True,
-            job_application__approval__number="123459954321",
-            job_application__approval__start_at=datetime.date(2022, 1, 1),
-            job_application__approval__origin=Origin.PE_APPROVAL,
-            job_application__approval__eligibility_diagnosis=None,
-        )
-        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
-        response = client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
-        assertContains(
-            response,
-            """
-            <div class="c-box--results__summary flex-grow-1">
-             <i class="ri-pass-valid-line" aria-hidden="true"></i>
-             <div>
-              <h3>
-               PASS&nbsp;IAE <span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span>
-               délivré le 01 Janvier 2000
-              </h3>
-              <span>Jane DOE</span>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
-        if accepted_state:
-            assertion = assertNotContains
-        else:
-            assertion = assertContains
-        assertion(
-            response,
-            """
-            <div class="c-box--results__summary flex-grow-1">
-             <i class="ri-pass-valid-line" aria-hidden="true"></i>
-             <div>
-              <h3>
-               PASS&nbsp;IAE <span>12345</span><span class="ms-1">99</span><span class="ms-1">54321</span>
-               délivré le 01 Janvier 2022
-              </h3>
-              <span>Vincent XION</span>
-             </div>
-            </div>
-            """,
-            html=True,
+
+        # PENDING: no criteria
+        pending_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+
+        # PROCESSING: criteria selected but no proof
+        processing_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=processing_job_application, proof=None)
+
+        # UPLOADED: proof uploaded, not submitted
+        uploaded_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=uploaded_job_application,
+            proof=FileFactory(),
+            submitted_at=None,
         )
 
-        response = client.post(
-            reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}),
-            {
-                "form-TOTAL_FORMS": "1" if accepted_state else "2",
-                "form-INITIAL_FORMS": "1" if accepted_state else "2",
-                "form-MIN_NUM_FORMS": "0",
-                "form-MAX_NUM_FORMS": "1",
-                "form-0-evaluated_job_application": evaluated_job_app_1.pk,
-                "form-0-subsidy_cut_percent": "20",
-            }
-            | (
-                {}
-                if accepted_state
-                else {
-                    "form-1-evaluated_job_application": evaluated_job_app_2.pk,
-                    "form-1-subsidy_cut_percent": "20",
-                }
-            ),
+        # SUBMITTED: proof submitted, awaiting review
+        # Should not be displayed (not sanctionnable)
+        submitted_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=submitted_job_application,
+            proof=FileFactory(),
+            submitted_at=timezone.now(),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
         )
-        assertRedirects(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            ),
+
+        # REFUSED
+        refused_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_job_application,
+            proof=FileFactory(),
+            submitted_at=timezone.now(),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        evaluated_siae.refresh_from_db()
-        assert evaluated_siae.notified_at == timezone.now()
-        assert evaluated_siae.notification_reason == "INVALID_PROOF"
-        assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
-        assert EvaluatedJobApplicationSanction.objects.count() == 2 - accepted_state
+
+        # REFUSED_2
+        refused_2_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=refused_2_job_application,
+            proof=FileFactory(),
+            submitted_at=timezone.now(),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+        )
+
+        # ACCEPTED
+        # Should not be displayed (not sanctionnable)
+        accepted_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=accepted_job_application,
+            proof=FileFactory(),
+            submitted_at=timezone.now(),
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+        )
+
+        self.login(client, evaluated_siae, sanctions=["SUBSIDY_CUT"])
+        response = client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+        formset = response.context["forms"]["job_application_sanction_formset"]
+        included_pks = set(formset.evaluated_job_applications_to_sanction.keys())
+
+        expected_pks = {
+            pending_job_application.pk,
+            processing_job_application.pk,
+            uploaded_job_application.pk,
+            refused_job_application.pk,
+            refused_2_job_application.pk,
+        }
+        assert included_pks == expected_pks
 
     @freeze_time("2022-10-24 11:11:00")
     def test_post_subsidy_cut_invalid_data(self, client, mailoutbox):

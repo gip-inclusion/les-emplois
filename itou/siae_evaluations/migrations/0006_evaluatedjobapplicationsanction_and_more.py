@@ -4,7 +4,11 @@ import django.core.validators
 import django.db.models.deletion
 from django.db import migrations, models
 
-from itou.siae_evaluations.enums import EvaluatedAdministrativeCriteriaState, EvaluatedJobApplicationsState
+from itou.siae_evaluations.enums import (
+    EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES,
+    EvaluatedAdministrativeCriteriaState,
+    EvaluatedJobApplicationsState,
+)
 
 
 # From itou.siae_evaluations.models:
@@ -56,7 +60,7 @@ def migrate_subsidy_cut_percent(apps, schema_editor):
         evaluated_job_applications = [
             job_app
             for job_app in EvaluatedJobApplication.objects.filter(evaluated_siae=sanctions.evaluated_siae)
-            if compute_state(job_app) != EvaluatedJobApplicationsState.ACCEPTED
+            if compute_state(job_app) in EVALUATED_JOB_APPLICATIONS_SANCTIONNABLE_STATES
         ]
 
         for evaluated_job_application in evaluated_job_applications:
