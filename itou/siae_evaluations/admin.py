@@ -7,6 +7,7 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
     PkSupportRemarkInline,
+    ReadonlyMixin,
     get_admin_view_link,
 )
 from itou.utils.export import to_streaming_response
@@ -79,6 +80,35 @@ class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
         return get_admin_view_link(
             obj, content=format_html("Lien vers le critère administratif <strong>{}</strong>", obj)
         )
+
+
+class EvaluatedJobApplicationSanctionsInline(ReadonlyMixin, ItouTabularInline):
+    model = models.EvaluatedJobApplicationSanction
+    readonly_fields = (
+        "id_link",
+        "approval",
+        "job_seeker",
+        "subsidy_cut_percent",
+    )
+    list_select_related = (
+        "evaluated_job_application__job_application__approval",
+        "evaluated_job_application__job_application__job_seeker",
+        "sanctions__evaluated_siae__siae",
+    )
+
+    @admin.display(description="lien vers les sanctions par auto-prescription")
+    def id_link(self, obj):
+        return get_admin_view_link(obj, content=format_html("<strong>{}</strong>", obj))
+
+    def approval(self, obj):
+        if obj.evaluated_job_application.job_application.approval:
+            return obj.evaluated_job_application.job_application.approval.number
+        return self.get_empty_value_display()
+
+    def job_seeker(self, obj):
+        if obj.evaluated_job_application.job_application.job_seeker:
+            return obj.evaluated_job_application.job_application.job_seeker
+        return self.get_empty_value_display()
 
 
 def _evaluated_siae_serializer(queryset):
@@ -338,11 +368,10 @@ class SanctionsAdmin(ItouModelAdmin):
         "evaluated_siae",
         "training_session",
         "suspension_dates",
-        "subsidy_cut_percent",
-        "subsidy_cut_dates",
         "no_sanction_reason",
     ]
     list_filter = ("evaluated_siae__evaluation_campaign__name",)
+    inlines = [EvaluatedJobApplicationSanctionsInline]
 
     @admin.display(description="campagne", ordering="evaluated_siae__evaluation_campaign")
     def evaluation_campaign(self, obj):
@@ -351,6 +380,61 @@ class SanctionsAdmin(ItouModelAdmin):
     @admin.display(description="institution", ordering="evaluated_siae__evaluation_campaign__institution")
     def institution(self, obj):
         return obj.evaluated_siae.evaluation_campaign.institution
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(models.EvaluatedJobApplicationSanction)
+class EvaluatedJobApplicationSanctionAdmin(ReadonlyMixin, ItouModelAdmin):
+    list_display = [
+        "sanctions",
+        "approval",
+        "evaluated_job_application",
+        "evaluation_campaign",
+        "institution",
+    ]
+    list_select_related = [
+        "sanctions__evaluated_siae__evaluation_campaign__institution",
+        "sanctions__evaluated_siae__siae",
+        "evaluated_job_application__job_application__approval",
+    ]
+    search_fields = ["sanctions__evaluated_siae__siae__name"]
+    readonly_fields = [
+        "sanctions",
+        "evaluated_job_application",
+        "approval",
+        "job_seeker",
+        "subsidy_cut_percent",
+    ]
+    list_filter = ("sanctions__evaluated_siae__evaluation_campaign__name",)
+
+    def _get_queryset_with_relations(self, request):
+        queryset = super()._get_queryset_with_relations(request)
+        return queryset.select_related(
+            "evaluated_job_application__job_application__approval",
+            "evaluated_job_application__job_application__job_seeker",
+        )
+
+    @admin.display(description="campagne", ordering="sanctions__evaluated_siae__evaluation_campaign")
+    def evaluation_campaign(self, obj):
+        return obj.sanctions.evaluated_siae.evaluation_campaign.name
+
+    @admin.display(
+        description="institution", ordering="sanctions__evaluated_siae__evaluation_campaign__institution__name"
+    )
+    def institution(self, obj):
+        return obj.sanctions.evaluated_siae.evaluation_campaign.institution
+
+    def approval(self, obj):
+        if obj.evaluated_job_application.job_application.approval:
+            return obj.evaluated_job_application.job_application.approval.number
+        return self.get_empty_value_display()
+
+    def job_seeker(self, obj):
+        if obj.evaluated_job_application.job_application.job_seeker:
+            return obj.evaluated_job_application.job_application.job_seeker
+        return self.get_empty_value_display()
 
     def has_delete_permission(self, request, obj=None):
         return False

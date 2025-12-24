@@ -1,0 +1,487 @@
+[
+{
+  "model": "siae_evaluations.calendar",
+  "pk": 1,
+  "fields": {
+    "name": "contrôle pour la période du 20/08/2025 au 20/10/2025",
+    "adversarial_stage_start": "2026-01-01",
+    "html": "<p>\r\n    Retrouvez ci-dessous toutes les dates concernant la campagne de contrôle a posteriori sur les auto-prescriptions du 01/01/2022 au 31/12/2022 (ou du 01/10/2022 au 31/12/2022 pour les DDETS ayant déjà réalisé la campagne optionnelle du 01/01/2022 au 31/09/2022).\r\n</p>\r\n\r\n<div class=\"table-responsive mt-3 mt-md-4\">\r\n    <table class=\"table table-hover\">\r\n        <caption class=\"visually-hidden\">Liste des campagnes de contrôle a posteriori</caption>\r\n        <thead>\r\n            <tr>\r\n                <th scope=\"col\"></th>\r\n                <th scope=\"col\">Dates</th>\r\n                <th scope=\"col\">Acteurs</th>\r\n                <th scope=\"col\">Actions attendues</th>\r\n            </tr>\r\n        </thead>\r\n        <tbody>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 1</span>\r\n                    <span class=\"fw-bold\">Échantillonnage</span>\r\n                </th>\r\n                <td>\r\n                    Du 15 mai 2023\r\n                    <br>\r\n                    au 11 juin 2023\r\n                </td>\r\n                <td>DDETS</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Sélection du taux de SIAE à contrôler sur le département.</li>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 2 – phase amiable</span>\r\n                    <span class=\"fw-bold\">Transmission des pièces justificatives</span>\r\n                </th>\r\n                <td>\r\n                    Du 12 juin 2023\r\n                    <br>\r\n                    au 23 juillet 2023\r\n                </td>\r\n                <td>SIAE</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Sélection des critères servant à justifier chaque auto-prescription sélectionnée</li>\r\n                        <li>Transmission des justificatifs.</li>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 2 – phase amiable</span>\r\n                    <span class=\"fw-bold\">Contrôle des pièces justificatives</span>\r\n                </th>\r\n                <td>\r\n                    Du 12 juin 2023\r\n                    <br>\r\n                    au 31 août 2023\r\n                </td>\r\n                <td>DDETS</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Contrôle des justificatifs.</li>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <td colspan=\"4\" class=\"fst-italic py-5\">\r\n                    Les phase 3 et 4 ne concernent que les SIAE ayant reçu un résultat négatif à l’issue de la phase amiable.\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 3 – phase contradictoire</span>\r\n                    <span class=\"fw-bold\">Transmission des pièces justificatives</span>\r\n                </th>\r\n                <td>\r\n                    Du 1er septembre 2023\r\n                    <br>\r\n                    au 13 octobre 2023\r\n                </td>\r\n                <td>SIAE</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Transmission des résultats de la phase 2.</li>\r\n                        <li>Transmission des nouveaux justificatifs.</li>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 3 – phase contradictoire</span>\r\n                    <span class=\"fw-bold\">Contrôle des pièces justificatives</span>\r\n                </th>\r\n                <td>\r\n                    Du 1er septembre 2023\r\n                    <br>\r\n                    au 27 octobre 2023\r\n                </td>\r\n                <td>DDETS</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Contrôle des nouveaux justificatifs.</li>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n            <tr>\r\n                <th scope=\"row\">\r\n                    <span class=\"d-block\">Phase 4</span>\r\n                    <span class=\"fw-bold\">Déclaration des sanctions</span>\r\n                </th>\r\n                <td>\r\n                    Du 28 octobre 2023\r\n                    <br>\r\n                    au 28 mars 2024\r\n                </td>\r\n                <td>DDETS</td>\r\n                <td>\r\n                    <ul>\r\n                        <li>Transmission des résultats définitifs.</li>\r\n                        <li>Notification à chaque SIAE concernée en précisant :</li>\r\n                        <ul>\r\n                            <li>Le motif du résultat négatif.</li>\r\n                            <li>Les sanctions à appliquer.</li>\r\n                        </ul>\r\n                    </ul>\r\n                </td>\r\n            </tr>\r\n        </tbody>\r\n    </table>\r\n</div>"
+  }
+},
+{
+  "model": "siae_evaluations.evaluationcampaign",
+  "pk": 1,
+  "fields": {
+    "name": "contrôle pour la période du 20/08/2025 au 20/10/2025",
+    "created_at": "2025-11-20T14:11:02.852Z",
+    "percent_set_at": "2025-11-20T14:11:02.859Z",
+    "evaluations_asked_at": "2025-11-20T14:11:02.859Z",
+    "ended_at": "2025-11-20T15:22:14.554Z",
+    "submission_freeze_notified_at": null,
+    "evaluated_period_start_at": "2025-08-20",
+    "evaluated_period_end_at": "2025-10-20",
+    "institution": 2,
+    "chosen_percent": 30,
+    "calendar": 1
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedsiae",
+  "pk": 1,
+  "fields": {
+    "evaluation_campaign": 1,
+    "siae": 249,
+    "reviewed_at": "2025-11-20T15:19:29.909Z",
+    "final_reviewed_at": null,
+    "submission_freezed_at": "2025-11-20T15:21:29.411Z",
+    "notified_at": null,
+    "notification_reason": null,
+    "notification_text": null,
+    "reminder_sent_at": null,
+    "final_state": "REFUSED",
+    "archive_accepted_job_applications_nb": null
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedsiae",
+  "pk": 2,
+  "fields": {
+    "evaluation_campaign": 1,
+    "siae": 2653,
+    "reviewed_at": "2025-11-20T15:19:00.791Z",
+    "final_reviewed_at": "2025-11-20T15:19:00.791Z",
+    "submission_freezed_at": "2025-11-20T15:21:29.411Z",
+    "notified_at": null,
+    "notification_reason": null,
+    "notification_text": null,
+    "reminder_sent_at": null,
+    "final_state": "ACCEPTED",
+    "archive_accepted_job_applications_nb": null
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedsiae",
+  "pk": 3,
+  "fields": {
+    "evaluation_campaign": 1,
+    "siae": 184,
+    "reviewed_at": "2025-11-20T15:19:29.909Z",
+    "final_reviewed_at": null,
+    "submission_freezed_at": "2025-11-20T15:21:29.411Z",
+    "notified_at": null,
+    "notification_reason": null,
+    "notification_text": null,
+    "reminder_sent_at": null,
+    "final_state": "REFUSED",
+    "archive_accepted_job_applications_nb": null
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedsiae",
+  "pk": 4,
+  "fields": {
+    "evaluation_campaign": 1,
+    "siae": 7,
+    "reviewed_at": "2025-11-20T15:11:56.731Z",
+    "final_reviewed_at": "2025-11-20T15:22:14.554Z",
+    "submission_freezed_at": "2025-11-20T15:21:29.411Z",
+    "notified_at": null,
+    "notification_reason": null,
+    "notification_text": null,
+    "reminder_sent_at": null,
+    "final_state": "REFUSED",
+    "archive_accepted_job_applications_nb": null
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedsiae",
+  "pk": 5,
+  "fields": {
+    "evaluation_campaign": 1,
+    "siae": 250,
+    "reviewed_at": "2025-11-20T15:19:29.909Z",
+    "final_reviewed_at": "2025-11-20T15:19:29.909Z",
+    "submission_freezed_at": "2025-11-20T15:21:29.411Z",
+    "notified_at": null,
+    "notification_reason": null,
+    "notification_text": null,
+    "reminder_sent_at": null,
+    "final_state": "ACCEPTED",
+    "archive_accepted_job_applications_nb": null
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 1,
+  "fields": {
+    "job_application": "f9b3aba7-e162-4145-ae65-386d27a531bf",
+    "evaluated_siae": 1,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 2,
+  "fields": {
+    "job_application": "42a427c3-5892-46eb-a09a-626089b15410",
+    "evaluated_siae": 1,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 3,
+  "fields": {
+    "job_application": "a341a47b-a768-42ee-909b-24f0873499ad",
+    "evaluated_siae": 1,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 4,
+  "fields": {
+    "job_application": "91b568fa-bdd4-4389-bf24-40f5a9a14e43",
+    "evaluated_siae": 1,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 5,
+  "fields": {
+    "job_application": "ec16acd9-5b84-4a35-9d83-12c3e3076f72",
+    "evaluated_siae": 2,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 6,
+  "fields": {
+    "job_application": "3fdb4125-8d9f-4b6d-a404-8a39306ffb45",
+    "evaluated_siae": 2,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 7,
+  "fields": {
+    "job_application": "2f49ecb6-91f1-405f-a722-8166b5b3d996",
+    "evaluated_siae": 2,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 8,
+  "fields": {
+    "job_application": "17250b32-7dc9-45cc-a7c7-057669244f47",
+    "evaluated_siae": 3,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 9,
+  "fields": {
+    "job_application": "c5effc9d-4a75-47da-b293-914ab1ac1d50",
+    "evaluated_siae": 3,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 10,
+  "fields": {
+    "job_application": "3ccdab5e-5bd3-470e-a85a-064efa489bb6",
+    "evaluated_siae": 3,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 11,
+  "fields": {
+    "job_application": "ff829de7-b380-4e3b-a956-1981ffd30477",
+    "evaluated_siae": 3,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 12,
+  "fields": {
+    "job_application": "7f47a1ae-1728-496a-b50f-28669bef90ea",
+    "evaluated_siae": 4,
+    "labor_inspector_explanation": "a"
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 13,
+  "fields": {
+    "job_application": "3b063139-a56c-4346-8cd5-22b36081681d",
+    "evaluated_siae": 4,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 14,
+  "fields": {
+    "job_application": "916f68ad-ec50-4402-8343-87549ea59d8d",
+    "evaluated_siae": 4,
+    "labor_inspector_explanation": "a"
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 15,
+  "fields": {
+    "job_application": "98b9d676-3c86-482e-9f99-12bfe5013d22",
+    "evaluated_siae": 4,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 16,
+  "fields": {
+    "job_application": "429ee4de-9cb8-4eac-aa0d-d08ef1f90dd6",
+    "evaluated_siae": 5,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedjobapplication",
+  "pk": 17,
+  "fields": {
+    "job_application": "8aee6374-b383-499e-9845-c2eff54627ec",
+    "evaluated_siae": 5,
+    "labor_inspector_explanation": ""
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 1,
+  "fields": {
+    "administrative_criteria": 9,
+    "evaluated_job_application": 7,
+    "proof": "89e5c815-1976-4c6c-b3f9-65094952e29c",
+    "uploaded_at": "2025-11-20T14:32:07.529Z",
+    "submitted_at": "2025-11-20T14:32:46.504Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 2,
+  "fields": {
+    "administrative_criteria": 10,
+    "evaluated_job_application": 7,
+    "proof": "42230004-24c5-48e2-825d-f981cac0b1f9",
+    "uploaded_at": "2025-11-20T14:32:15.152Z",
+    "submitted_at": "2025-11-20T14:32:46.504Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 3,
+  "fields": {
+    "administrative_criteria": 1,
+    "evaluated_job_application": 5,
+    "proof": "e98cf29e-c2c5-453f-8d83-843939493b45",
+    "uploaded_at": "2025-11-20T14:32:25.079Z",
+    "submitted_at": "2025-11-20T14:32:46.504Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 4,
+  "fields": {
+    "administrative_criteria": 8,
+    "evaluated_job_application": 6,
+    "proof": "ba981fc5-b7b8-4bf9-a309-d9c4d6b891c7",
+    "uploaded_at": "2025-11-20T14:32:39.516Z",
+    "submitted_at": "2025-11-20T14:32:46.504Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 5,
+  "fields": {
+    "administrative_criteria": 9,
+    "evaluated_job_application": 6,
+    "proof": "72449013-8ad4-46f9-b64f-09cdca93f26a",
+    "uploaded_at": "2025-11-20T14:32:44.545Z",
+    "submitted_at": "2025-11-20T14:32:46.504Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 6,
+  "fields": {
+    "administrative_criteria": 15,
+    "evaluated_job_application": 12,
+    "proof": "a29ed8a1-d3a4-46c0-a1c3-241af6e47070",
+    "uploaded_at": "2025-11-20T15:05:15.268Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "REFUSED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 7,
+  "fields": {
+    "administrative_criteria": 17,
+    "evaluated_job_application": 12,
+    "proof": "2205faa2-7a3c-4ad6-9574-51925be1fd48",
+    "uploaded_at": "2025-11-20T15:05:21.057Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 8,
+  "fields": {
+    "administrative_criteria": 18,
+    "evaluated_job_application": 12,
+    "proof": "09bfea69-f9b8-4420-9ea1-2258457ed9b1",
+    "uploaded_at": "2025-11-20T15:05:25.975Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 9,
+  "fields": {
+    "administrative_criteria": 1,
+    "evaluated_job_application": 13,
+    "proof": "5074d3f9-f69c-4604-a0a5-b6c678f8a1aa",
+    "uploaded_at": "2025-11-20T15:05:40.179Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 10,
+  "fields": {
+    "administrative_criteria": 5,
+    "evaluated_job_application": 14,
+    "proof": "e0170877-dcb6-4b94-8adc-3dca870eb74e",
+    "uploaded_at": "2025-11-20T15:06:57.178Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 11,
+  "fields": {
+    "administrative_criteria": 8,
+    "evaluated_job_application": 14,
+    "proof": "215b4aa9-f923-4f7b-a59f-56c24ad36df3",
+    "uploaded_at": "2025-11-20T15:07:03.873Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 12,
+  "fields": {
+    "administrative_criteria": 10,
+    "evaluated_job_application": 14,
+    "proof": "12d326c6-e54b-4715-8040-8c60577cc91a",
+    "uploaded_at": "2025-11-20T15:07:09.241Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "ACCEPTED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 13,
+  "fields": {
+    "administrative_criteria": 2,
+    "evaluated_job_application": 15,
+    "proof": "10583c8a-6f9f-4a83-af73-5b3a63da14e4",
+    "uploaded_at": "2025-11-20T15:06:22.209Z",
+    "submitted_at": "2025-11-20T15:07:11.813Z",
+    "review_state": "REFUSED",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 14,
+  "fields": {
+    "administrative_criteria": 4,
+    "evaluated_job_application": 17,
+    "proof": "9699d4dd-cb4e-4445-b0ad-89abd1d7726e",
+    "uploaded_at": "2025-11-20T15:07:40.975Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 15,
+  "fields": {
+    "administrative_criteria": 6,
+    "evaluated_job_application": 16,
+    "proof": "76ad5822-9bd7-4970-b47a-54996e52e512",
+    "uploaded_at": "2025-11-20T15:07:52.357Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 16,
+  "fields": {
+    "administrative_criteria": 10,
+    "evaluated_job_application": 16,
+    "proof": "6e1439ca-3382-46c7-b8d1-b6f1f725c709",
+    "uploaded_at": "2025-11-20T15:07:56.764Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+},
+{
+  "model": "siae_evaluations.evaluatedadministrativecriteria",
+  "pk": 17,
+  "fields": {
+    "administrative_criteria": 11,
+    "evaluated_job_application": 16,
+    "proof": "f8e9b486-2601-4598-9635-111df1c983e9",
+    "uploaded_at": "2025-11-20T15:08:01.909Z",
+    "submitted_at": "2025-11-20T15:08:04.605Z",
+    "review_state": "PENDING",
+    "criteria_certified": false
+  }
+}
+]
