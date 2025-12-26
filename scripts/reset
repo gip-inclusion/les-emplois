@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+
+import django
+from django.conf import settings
+from django.core.management import call_command
+
+from itou.utils.enums import ItouEnvironment
+
+
+def clear_bucket(bucket_name):
+    from itou.utils.storage.s3 import s3_client
+
+    client = s3_client()
+    paginator = client.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=bucket_name):
+        if page["KeyCount"]:
+            client.delete_objects(
+                Bucket=bucket_name,
+                Delete={
+                    "Objects": [{"Key": obj["Key"]} for obj in page["Contents"]],
+                },
+            )
+
+
+def main(bucket_name, admin_password):
+    from django.core.cache import caches
+    from django.db import connection
+
+    from itou.users.models import User
+
+    clear_bucket(bucket_name)
+    # TODO: Recreate the database addon. There are tables we cannot delete
+    # (spacial_ref_sys), the migrations expect to be able to create the
+    # collation or other objects that don’t get dropped by the script.
+    with connection.cursor() as c:
+        c.execute(
+            """
+            DO $$
+            BEGIN
+                EXECUTE (
+                    SELECT string_agg('DROP TABLE IF EXISTS ' || tablename || ' CASCADE;', ' ')
+                    FROM pg_tables
+                    WHERE schemaname = 'public'
+                        AND tablename != 'spatial_ref_sys'
+                );
+            END
+            $$;
+            """
+        )
+    call_command("migrate")
+    env = os.environ.copy()
+    env["REQUIREMENTS_PATH"] = "requirements/base.txt"
+    subprocess.run(["make", "populate_db"], check=True, env=env)
+    subprocess.run(["make", "populate_db"], check=True, env=env)
+    u = User.objects.get(username="admin")
+    u.set_password(admin_password)
+    u.save(update_fields=["password"])
+
+    for cache_name in caches:
+        caches[cache_name].clear()
+
+
+if __name__ == "__main__":
+    sys.path.insert(0, str(pathlib.Path.cwd()))
+    django.setup()
+    if settings.ITOU_ENVIRONMENT not in {
+        ItouEnvironment.DEMO,
+        ItouEnvironment.DEV,
+        ItouEnvironment.PENTEST,
+        ItouEnvironment.REVIEW_APP,
+    }:
+        raise RuntimeError("Nope.")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bucket-name", required=True)
+    parser.add_argument("--admin-password", required=True)
+    args = parser.parse_args()
+    main(args.bucket_name, args.admin_password)
