@@ -157,7 +157,10 @@ class TestActivateView:
 
         service = random.choice([Service.PILOTAGE, Service.MON_RECAP])
         response = client.post(reverse("nexus:activate", args=(service,)), follow=True)
-        assertRedirects(response, reverse("nexus:homepage"))  # FIXME redirect to service page
+        next_url = (
+            reverse("nexus:pilotage") if service == Service.PILOTAGE else reverse("nexus:homepage")
+        )  # FIXME redirect to service page
+        assertRedirects(response, next_url)
         assertMessages(
             response,
             [messages.Message(messages.SUCCESS, "Service activé", extra_tags="toast")],
@@ -207,4 +210,23 @@ class TestCommunauteView:
         client.force_login(user)
 
         response = client.get(reverse("nexus:communaute"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestPilotageView:
+    def test_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        NexusUserFactory(email=user.email, source=Service.PILOTAGE, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:pilotage"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:pilotage"))
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot

@@ -11,4 +11,5 @@ urlpatterns = [
     path("accueil", views.HomePageView.as_view(), name="homepage"),
     path("activate/<str:service>", views.activate, name="activate"),
     path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
+    path("service/pilotage", views.PilotageView.as_view(), name="pilotage"),
 ]
