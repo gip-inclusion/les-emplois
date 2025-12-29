@@ -1,5 +1,9 @@
 # Journal des modifications
 
+## 2025-12-29
+
+Rien à signaler cette semaine
+
 ## 2025-12-22
 
 ### Modifié
