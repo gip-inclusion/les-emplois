@@ -156,7 +156,7 @@ class OIDConnectUserData:
     def login_allowed_user_kinds(self) -> tuple[UserKind]:
         return IDENTITY_PROVIDER_SUPPORTED_USER_KIND[self.identity_provider]
 
-    def check_valid_kind(self, user, user_data_dict, enforce_kind):
+    def _check_valid_kind(self, user, user_data_dict, enforce_kind):
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and enforce_kind):
             raise InvalidKindException(user)
 
@@ -195,7 +195,7 @@ class OIDConnectUserData:
                     if not self.is_sub_update_allowed(user):
                         raise MultipleSubSameEmailException(user)
                 elif user.identity_provider not in self.allowed_identity_provider_migration:
-                    self.check_valid_kind(user, user_data_dict, enforce_kind)
+                    self._check_valid_kind(user, user_data_dict, enforce_kind)
                     raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
@@ -217,14 +217,14 @@ class OIDConnectUserData:
         if not user.is_active:
             raise InactiveUserException(user)
 
-        self.check_valid_kind(user, user_data_dict, enforce_kind)
+        self._check_valid_kind(user, user_data_dict, enforce_kind)
 
         readonly_pii_fields = user.jobseeker_profile.readonly_pii_fields() if is_jobseeker else set()
         readonly_pii_fields_changed = []
         if not created:
             for key, value in user_data_dict.items():
                 # Never update the user kind.
-                # We only check in self.check_valid_kind if the user.kind is allowed in the authentication context
+                # We only check in self._check_valid_kind if the user.kind is allowed in the authentication context
                 if key == "kind":
                     continue
                 if key in readonly_pii_fields:
