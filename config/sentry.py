@@ -78,7 +78,7 @@ def sentry_init():
         #
         integrations=[
             sentry_logging,
-            DjangoIntegration(),
+            DjangoIntegration(middleware_spans=True),
             HttpxIntegration(),
             HueyIntegration(),
             RedisIntegration(),
