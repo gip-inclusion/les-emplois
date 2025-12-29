@@ -97,6 +97,7 @@ class TestPrescriberSignup:
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
             "next_url": next_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -171,12 +172,13 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -250,12 +252,13 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -347,12 +350,13 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -433,12 +437,13 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -571,11 +576,12 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -645,12 +651,13 @@ class TestPrescriberSignup:
         response = client.get(url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
@@ -770,11 +777,12 @@ class TestPrescriberSignup:
         response = client.get(reverse("signup:prescriber_user"))
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
@@ -837,12 +845,13 @@ class TestPrescriberSignup:
         response = client.get(signup_url)
         pro_connect.assertContainsButton(response)
 
-        # Check IC will redirect to the correct url
+        # Check ProConnect will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
+            "register": True,
             "next_url": next_url,
         }
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")

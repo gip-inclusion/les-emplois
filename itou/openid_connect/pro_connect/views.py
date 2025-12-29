@@ -115,14 +115,15 @@ def pro_connect_authorize(request):
     next_url = request.GET.get("next_url")
     if next_url and not url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS, request.is_secure()):
         return _redirect_to_login_page_on_error(error_msg="Forbidden external url")
-    register = request.GET.get("register")
     if not user_kind:
         return _redirect_to_login_page_on_error(error_msg="User kind missing.")
     if user_kind not in USER_DATA_CLASSES:
         return _redirect_to_login_page_on_error(error_msg="Wrong user kind.")
 
+    enforce_kind = bool(request.GET.get("register")) or request.GET.get("channel") == ProConnectChannel.INVITATION
+
     pc_data = ProConnectStateData(
-        user_kind=user_kind, previous_url=previous_url, next_url=next_url, enforce_kind=bool(register)
+        user_kind=user_kind, previous_url=previous_url, next_url=next_url, enforce_kind=enforce_kind
     )
 
     if channel := request.GET.get("channel"):
