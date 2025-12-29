@@ -47,9 +47,9 @@ class ProConnectStateData:
     next_url: str = None
     user_email: str = None
     user_kind: str = None
-    channel: str = None
     # Tells us where did the user came from so that we can adapt
     # error messages in the callback view.
+    channel: str = None
     enforce_kind: bool = False
     prescriber_session_data: dict = None
 
