@@ -1,0 +1,78 @@
+{% extends "nexus/layout/base.html" %}
+{% load enums %}
+{% load matomo %}
+{% load theme_inclusion %}
+
+
+{% block title %}Commande de carnet {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title">
+                        <div class="c-title__main">
+                            <h1>
+                                <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" alt="Mon Récap">
+                                Commande de carnet
+                                {% if Service.MON_RECAP in activated_services %}
+                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                        <i class="ri-check-line" aria-hidden="true"></i>
+                                        Activé
+                                    </span>
+                                {% endif %}
+                            </h1>
+                        </div>
+                        <div class="c-title__service">
+                            <img src="{% static_theme_images 'logo-monrecap.svg' %}" height="50" alt="Mon Récap">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="text-center">
+                        <div class="mb-3 mb-md-4">
+                            <img src="{% static_theme_images 'nexus/nx-illustration-monrecap.png' %}" alt="">
+                        </div>
+                        {% if Service.MON_RECAP in activated_services %}
+                            <h2 class="h3 mb-md-4">Commandez en quelques clics vos premiers carnets !</h2>
+                            <a href="{{ monrecap_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %} target="_blank">
+                                <span>Commander des carnets</span>
+                            </a>
+                            <br>
+                        {% else %}
+                            <h2 class="h3">Le carnet papier retraçant le parcours d’insertion d’une personne</h2>
+                            <p class="mb-md-4">
+                                Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours.
+                                <br>
+                                Facilitez votre accompagnement et communiquez entre professionnel grâce à un carnet commun.
+                                <br>
+                                Choisissez un outil accessible non numérique.
+                            </p>
+                            <form method="post" action="{{ monrecap_url }}">
+                                {% csrf_token %}
+                                <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                    <span>Activer ce service</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                        <a href="https://mon-recap.inclusion.beta.gouv.fr/"
+                           class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+                           aria-label="Découvrir Mon Récap (lien externe)"
+                           {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %}
+                           target="_blank">Découvrir Mon Récap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
