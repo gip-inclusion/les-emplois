@@ -56,12 +56,6 @@ def strip_sentry_sensitive_data(event, _hint):
     return event
 
 
-sentry_logging = LoggingIntegration(
-    level=logging.INFO,  # Capture info and above as breadcrumbs.
-    event_level=logging.ERROR,  # Send errors as events.
-)
-
-
 def sentry_init():
     try:
         traces_sample_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", ""))
@@ -75,9 +69,11 @@ def sentry_init():
 
     sentry_sdk.init(
         # DSN is read from the SENTRY_DSN environment variable.
-        #
         integrations=[
-            sentry_logging,
+            LoggingIntegration(
+                level=logging.INFO,  # Capture info and above as breadcrumbs.
+                event_level=logging.ERROR,  # Send errors as events.
+            ),
             DjangoIntegration(middleware_spans=True, signals_spans=True, cache_spans=True, db_transaction_spans=True),
             HttpxIntegration(),
             HueyIntegration(),
