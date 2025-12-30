@@ -189,3 +189,22 @@ class TestActivateView:
 
         response = client.get(reverse("nexus:activate", args=(Service.MON_RECAP,)))
         assert response.status_code == 404
+
+
+class TestCommunauteView:
+    def test_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        NexusUserFactory(email=user.email, source=Service.COMMUNAUTE, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:communaute"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:communaute"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
