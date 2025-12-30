@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
+from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
 from itou.nexus.utils import build_user, serialize_user, sync_users
@@ -52,8 +53,19 @@ class NexusMixin(UserPassesTestMixin):
         context["logout_url"] = reverse("account_logout")  # FIXME: Redirect to nexus login page
         context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
         context["emplois_badge_count"] = None
-        if Service.EMPLOIS in self.activated_services_with_memberships:
-            context["emplois_badge_count"] = 0  # FIXME Replace with active job desctiptions
+        if (
+            Service.EMPLOIS in self.activated_services_with_memberships
+            and self.user_kind == NexusUserKind.FACILITY_MANAGER
+        ):
+            if self.request.user.is_employer:
+                context["emplois_badge_count"] = JobDescription.objects.filter(
+                    is_active=True, company_id__in=[company.pk for company in self.request.organizations]
+                ).count()
+            else:
+                # No job descriptions for prescribers
+                # The user may have a facility manager role in another service
+                context["emplois_badge_count"] = 0
+
         context["dora_badge_count"] = None
         # FIXME: Plug into DORA to retreive active services
         # if Service.DORA in self.activated_services_with_memberships:

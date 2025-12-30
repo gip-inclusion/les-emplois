@@ -9,8 +9,10 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusUserFactory
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
@@ -89,7 +91,9 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
 
     def test_header_activated_badge(self, client, snapshot):
-        user = PrescriberFactory(for_snapshot=True)
+        user = EmployerFactory(for_snapshot=True)
+        company = CompanyMembershipFactory(user=user).company
+
         NexusUserFactory(
             email=user.email, kind=NexusUserKind.FACILITY_MANAGER, source=Service.PILOTAGE, auth=Auth.PRO_CONNECT
         )
@@ -99,6 +103,8 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="no_badge")
 
         NexusUserFactory(email=user.email, source=Service.EMPLOIS)
+        create_test_romes_and_appellations(["N1101"])
+        JobDescriptionFactory(company=company)
         NexusUserFactory(email=user.email, source=Service.DORA)
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
