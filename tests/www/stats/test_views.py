@@ -13,7 +13,8 @@ from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.enums import DGFT_SAFIR_CODE, PrescriberOrganizationKind
+from itou.utils.apis import metabase as mb
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.www.stats import urls as stats_urls, utils as stats_utils
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
@@ -515,3 +516,55 @@ def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
     response = client.get(reverse("stats:stats_ph_state_main"))
     assert response.status_code == 200
     assert response.context["tally_hidden_fields"] == {"type_prescripteur": organization_kind}
+
+
+@pytest.fixture
+def ft_agencies_for_stats_ph_raw(db):
+    for dept in ["04", "05", "13", "83"]:  # PACA
+        PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.FT, department=dept, authorized=True)
+    for dept in ["75", "92"]:  # IDF
+        PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.FT, department=dept, authorized=True)
+
+
+@pytest.mark.parametrize(
+    "org_kind,department,code_safir,expected_count",
+    [
+        pytest.param(PrescriberOrganizationKind.FT, "75", DGFT_SAFIR_CODE, 7, id="dgft"),  # All FT + self
+        pytest.param(PrescriberOrganizationKind.FT, "13", "13992", 5, id="drft"),  # PACA FT + self
+        pytest.param(PrescriberOrganizationKind.FT, "04", "04016", 3, id="dtft"),  # Depts 04/05 + self
+        pytest.param(PrescriberOrganizationKind.FT, "75", "12345", 1, id="normal_ft"),  # Only self
+        pytest.param(PrescriberOrganizationKind.ML, "75", None, 1, id="non_ft"),  # Only self
+    ],
+)
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+def test_stats_ph_raw_prescriber_org_pks(
+    client,
+    mocker,
+    ft_agencies_for_stats_ph_raw,
+    org_kind,
+    department,
+    code_safir,
+    expected_count,
+):
+    from itou.www.stats import views as stats_views
+
+    spy_render_stats_ph = mocker.spy(stats_views, "render_stats_ph")
+
+    org = PrescriberOrganizationFactory(
+        kind=org_kind,
+        department=department,
+        code_safir_pole_emploi=code_safir,
+        authorized=True,
+        with_membership=True,
+    )
+    client.force_login(org.members.get())
+
+    response = client.get(reverse("stats:stats_ph_raw"))
+    assert response.status_code == 200
+
+    spy_render_stats_ph.assert_called_once()
+    extra_params = spy_render_stats_ph.call_args.kwargs["extra_params"]
+    assert mb.C1_PRESCRIBER_ORG_FILTER_KEY in extra_params
+    pk_list = extra_params[mb.C1_PRESCRIBER_ORG_FILTER_KEY]
+    assert len(pk_list) == expected_count
+    assert org.pk in pk_list
