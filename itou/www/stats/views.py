@@ -542,12 +542,21 @@ def stats_ph_beneficiaries(request):
 
 @check_request(utils.can_view_stats_ph)
 def stats_ph_raw(request):
+    org = request.current_organization
+    pk_list = [org.pk]
+    if org.is_dgft or org.is_drft or org.is_dtft:
+        pk_list = list(
+            PrescriberOrganization.objects.filter(
+                kind=PrescriberOrganizationKind.FT,
+                department__in=utils.get_stats_ft_departments(org),
+            ).values_list("pk", flat=True)
+        )
     return render_stats_ph(
         request=request,
         page_title="Export complet de vos données",
         with_department_param=False,
         extra_params={
-            mb.C1_PRESCRIBER_ORG_FILTER_KEY: request.current_organization.pk,
+            mb.C1_PRESCRIBER_ORG_FILTER_KEY: pk_list,
         },
     )
 
