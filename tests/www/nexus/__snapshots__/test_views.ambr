@@ -1,4 +1,1325 @@
 # serializer version: 1
+# name: TestHomePageView.test_all_activated_services
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Accueil
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <h2>
+                          <i class="ri-function-line ri-xl fw-normal text-disabled">
+                          </i>
+                          Mes services actifs
+                      </h2>
+                      <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Les Emplois de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder aux Emplois de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              DORA
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder à DORA (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Le marché de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder au marché de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/login/" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Mon Récap
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder à Mon Récap (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Le pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Le pilotage de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder au pilotage de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              La communauté de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder à la communauté de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portail/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr%2Ftopics%2F" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestHomePageView.test_one_activated_service[facility_manager]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Accueil
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <h2>
+                          <i class="ri-function-line ri-xl fw-normal text-disabled">
+                          </i>
+                          Mes services actifs
+                      </h2>
+                      <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Les Emplois de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder aux Emplois de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                          <h2 class="mb-0">
+                              <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
+                              </i>
+                              Services à découvrir - A/B Test V1
+                          </h2>
+                          <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
+                              Qu’est-ce que la Plateforme de l’inlcusion
+                          </a>
+                      </div>
+                      <div class="c-box">
+                          <ul class="list-group list-group-flush">
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  DORA
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Saisissez votre offre de service
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Service identifié par les pro
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Gérez les demandes dans votre espace
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Le marché de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service de mise en relation entre acheteurs et structures d’insertion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Renseignez votre activité
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Recevez des demandes de devis
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Développez votre CA
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Mon Récap
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Démarches et parcours centralisés
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Support accessible
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Commun à tous les pros
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <button class="btn btn-ico btn-primary" type="button">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </button>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Le Pilotage de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Le Pilotage de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service présentant les données sur les politiques publiques d'insertion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Statistiques nationales
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Données sur votre organisation
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Aide à la décision
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <button class="btn btn-ico btn-primary" type="button">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </button>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="La Communauté de L'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  La Communauté de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  L’espace d’entraide des professionnels de l’inclusion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Forum de discussion
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      14 000 utilisateurs actifs
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Fiches métiers
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portail/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                          <h2 class="mb-0">
+                              <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
+                              </i>
+                              Services à découvrir - A/B Test V2
+                          </h2>
+                          <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
+                              Qu’est-ce que la Plateforme de l’inlcusion
+                          </a>
+                      </div>
+                      <div class="c-box">
+                          <div class="row">
+                              <div class="col-12 col-xxl-5">
+                                  <ul class="list-group list-group-flush">
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          DORA
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="doraInfoMore" aria-expanded="true" aria-label="En savoir plus sur DORA" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#doraInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le marché de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Le marché de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le service de mise en relation entre acheteurs et structures d’insertion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="marcheInfoMore" aria-expanded="true" aria-label="En savoir plus sur DORA" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#marcheInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="monrecapInfoMore" aria-expanded="true" aria-label="En savoir plus sur la Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-2">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le service présentant les données sur les politiques publiques d'insertion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="La Communauté de L'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          La Communauté de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          L’espace d’entraide des professionnels de l’inclusion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="communauteInfoMore" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="col-12 col-xxl-7">
+                                  <hr class="mb-4 d-xxl-none"/>
+                                  <div id="nxAccordionInfoMore">
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse show" data-bs-parent="#nxAccordionInfoMore" id="doraInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="DORA" height="60" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          DORA
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Saisissez ou importez votre offre de service
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Service identifié par les professionnels de l’insertion grâce au moteur de recherche
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Gérez vos demandes de mobilisation dans un espace dédié
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="https://dora.inclusion.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="marcheInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le marché de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          Le marché de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le service de mise en relation entre acheteurs et structures d’insertion.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Renseignez votre activité commerciale
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Recevez des demandes de clients publics et privés
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Développez votre activité commerciale
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="monrecapInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="60" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button class="btn btn-ico btn-primary" type="button">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Choisissez un outil accessible non numérique
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l'Inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button class="btn btn-ico btn-primary" type="button">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le service présentant les données sur les politiques publiques d'insertion.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Consultez les statistiques nationales sur l'inclusion dans l'emploi
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Suivez et analysez les données spécifiques à votre organisation
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Prenez des décisions et argumentez grâce aux données
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="communauteInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="La Communauté de l'Inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          La Communauté de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portail/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              L’espace d’entraide des professionnels de l’inclusion.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Posez directement votre question aux 14 000 utilisateurs actifs
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Trouvez une information parmi les 8000 échanges entre pairs
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestHomePageView.test_one_activated_service[guide]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Accueil
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <h2>
+                          <i class="ri-function-line ri-xl fw-normal text-disabled">
+                          </i>
+                          Mes services actifs
+                      </h2>
+                      <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Les Emplois de l’inclusion
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder aux Emplois de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                          <h2 class="mb-0">
+                              <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
+                              </i>
+                              Services à découvrir - A/B Test V1
+                          </h2>
+                          <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
+                              Qu’est-ce que la Plateforme de l’inlcusion
+                          </a>
+                      </div>
+                      <div class="c-box">
+                          <ul class="list-group list-group-flush">
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  DORA
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Saisissez votre offre de service
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Service identifié par les pro
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Gérez les demandes dans votre espace
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Mon Récap
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Démarches et parcours centralisés
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Support accessible
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Commun à tous les pros
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <button class="btn btn-ico btn-primary" type="button">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </button>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Le Pilotage de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Le Pilotage de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service présentant les données sur les politiques publiques d'insertion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Statistiques nationales
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Données sur votre organisation
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Aide à la décision
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <button class="btn btn-ico btn-primary" type="button">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </button>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="La Communauté de L'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  La Communauté de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  L’espace d’entraide des professionnels de l’inclusion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Forum de discussion
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      14 000 utilisateurs actifs
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Fiches métiers
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portail/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                          <h2 class="mb-0">
+                              <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
+                              </i>
+                              Services à découvrir - A/B Test V2
+                          </h2>
+                          <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
+                              Qu’est-ce que la Plateforme de l’inlcusion
+                          </a>
+                      </div>
+                      <div class="c-box">
+                          <div class="row">
+                              <div class="col-12 col-xxl-5">
+                                  <ul class="list-group list-group-flush">
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          DORA
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="doraInfoMore" aria-expanded="true" aria-label="En savoir plus sur DORA" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#doraInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="monrecapInfoMore" aria-expanded="true" aria-label="En savoir plus sur la Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-2">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le service présentant les données sur les politiques publiques d'insertion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="La Communauté de L'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          La Communauté de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          L’espace d’entraide des professionnels de l’inclusion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="communauteInfoMore" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                  </ul>
+                              </div>
+                              <div class="col-12 col-xxl-7">
+                                  <hr class="mb-4 d-xxl-none"/>
+                                  <div id="nxAccordionInfoMore">
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse show" data-bs-parent="#nxAccordionInfoMore" id="doraInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="DORA" height="60" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          DORA
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Saisissez ou importez votre offre de service
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Service identifié par les professionnels de l’insertion grâce au moteur de recherche
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Gérez vos demandes de mobilisation dans un espace dédié
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="https://dora.inclusion.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="monrecapInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="60" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button class="btn btn-ico btn-primary" type="button">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Choisissez un outil accessible non numérique
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l'Inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button class="btn btn-ico btn-primary" type="button">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              Le service présentant les données sur les politiques publiques d'insertion.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Consultez les statistiques nationales sur l'inclusion dans l'emploi
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Suivez et analysez les données spécifiques à votre organisation
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Prenez des décisions et argumentez grâce aux données
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                      <div class="h-100 border-start-xxl ps-xxl-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="communauteInfoMore">
+                                          <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="La Communauté de l'Inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                                  <div>
+                                                      <strong class="d-block fs-lg">
+                                                          La Communauté de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Plateforme de l’inclusion
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portail/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                          <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                              L’espace d’entraide des professionnels de l’inclusion.
+                                          </p>
+                                          <ul class="list-unstyled mb-3 mb-md-4">
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Posez directement votre question aux 14 000 utilisateurs actifs
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Trouvez une information parmi les 8000 échanges entre pairs
+                                                  </span>
+                                              </li>
+                                              <li class="my-md-2">
+                                                  <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme%20commune-01.png"/>
+                                                  <span>
+                                                      Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
+                                                  </span>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
+                                              En savoir plus
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestLayout.test_footer
   '''
   <footer id="footer" role="contentinfo">

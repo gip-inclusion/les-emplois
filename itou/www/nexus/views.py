@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
+from itou.utils.templatetags.url_add_query import autologin_proconnect
 
 
 logger = logging.getLogger(__name__)
@@ -57,4 +58,44 @@ class NexusMixin(UserPassesTestMixin):
 
 class HomePageView(NexusMixin, TemplateView):
     template_name = "nexus/homepage.html"
-    # Empty for now : it's just to test the layout seperately from all the views
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # FIXME: Handle demo environments
+        # Activated services access urls
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            context["emplois_url"] = reverse("dashboard:index")
+        else:
+            # This should not happens for now
+            logger.warning("User is missing it's NexusUser user=%s", self.request.user.pk)
+
+        if Service.DORA in self.activated_services_with_memberships:
+            context["dora_url"] = autologin_proconnect("https://dora.inclusion.gouv.fr/", self.request.user)
+        else:
+            # FIXME
+            context["dora_url"] = autologin_proconnect("https://dora.inclusion.gouv.fr/", self.request.user)
+
+        if Service.MARCHE in self.activated_services_with_memberships:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/login/"
+        else:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/signup/"
+
+        if Service.MON_RECAP in self.activated_services_with_memberships:
+            context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+
+        if Service.PILOTAGE in self.activated_services_with_memberships:
+            context["pilotage_url"] = reverse("dashboard:index_stats")
+
+        if Service.COMMUNAUTE in self.activated_services_with_memberships:
+            context["communaute_url"] = autologin_proconnect(
+                "https://communaute.inclusion.gouv.fr/topics/", self.request.user
+            )
+        else:
+            context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
+
+        context["all_services_activated"] = context["activated_services"] == set(Service.activable())
+        context["new_service_shown"] = next(
+            (service for service in Service.activable() if service not in context["activated_services"]), None
+        )
+        return context
