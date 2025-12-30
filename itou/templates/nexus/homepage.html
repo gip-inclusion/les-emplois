@@ -95,12 +95,26 @@
                                                 <strong class="d-block fs-lg">Mon Récap</strong>
                                                 <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
                                             </div>
+                                            {% if monrecap_url is None %}
+                                                <div class="ms-auto align-self-start">
+                                                    <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                                                        <span class="visually-hidden">Démo inexistante</span>
+                                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                                    </span>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                        <a href="{{ monrecap_url }}"
-                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
-                                           aria-label="Accéder à Mon Récap (lien externe)"
-                                           {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %}
-                                           target="_blank">Accéder</a>
+                                        {% if monrecap_url %}
+                                            <a href="{{ monrecap_url }}"
+                                               class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                               aria-label="Accéder à Mon Récap (lien externe)"
+                                               {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %}
+                                               target="_blank">Accéder</a>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="Accéder à Mon Récap (lien externe)">
+                                                Accéder
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}
@@ -131,12 +145,26 @@
                                                 <strong class="d-block fs-lg">La communauté de l’inclusion</strong>
                                                 <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
                                             </div>
+                                            {% if communaute_url is None %}
+                                                <div class="ms-auto align-self-start">
+                                                    <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                                                        <span class="visually-hidden">Démo inexistante</span>
+                                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                                    </span>
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                        <a href="{{ communaute_url }}"
-                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
-                                           aria-label="Accéder à la communauté de l’inclusion (lien externe)"
-                                           {% matomo_event "nexus" "acceder-service" Service.COMMUNAUTE %}
-                                           target="_blank">Accéder</a>
+                                        {% if communaute_url %}
+                                            <a href="{{ communaute_url }}"
+                                               class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                               aria-label="Accéder à la communauté de l’inclusion (lien externe)"
+                                               {% matomo_event "nexus" "acceder-service" Service.COMMUNAUTE %}
+                                               target="_blank">Accéder</a>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="Accéder à la communauté de l’inclusion (lien externe)">
+                                                Accéder
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endif %}
