@@ -461,7 +461,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section" id="newServicesV1">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -469,7 +469,7 @@
                           <h2 class="mb-0">
                               <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
                               </i>
-                              Services à découvrir - A/B Test V1
+                              Services à découvrir
                           </h2>
                           <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
                               Qu’est-ce que la Plateforme de l’inlcusion
@@ -684,7 +684,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section d-none" id="newServicesV2">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -692,7 +692,7 @@
                           <h2 class="mb-0">
                               <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
                               </i>
-                              Services à découvrir - A/B Test V2
+                              Services à découvrir
                           </h2>
                           <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
                               Qu’est-ce que la Plateforme de l’inlcusion
@@ -1113,7 +1113,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section" id="newServicesV1">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -1121,7 +1121,7 @@
                           <h2 class="mb-0">
                               <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
                               </i>
-                              Services à découvrir - A/B Test V1
+                              Services à découvrir
                           </h2>
                           <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
                               Qu’est-ce que la Plateforme de l’inlcusion
@@ -1297,7 +1297,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section d-none" id="newServicesV2">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -1305,7 +1305,7 @@
                           <h2 class="mb-0">
                               <i class="ri-star-smile-line ri-xl fw-normal text-disabled">
                               </i>
-                              Services à découvrir - A/B Test V2
+                              Services à découvrir
                           </h2>
                           <a class="btn btn-link has-external-link justify-content-start justify-content-md-center" href="https://inclusion.gouv.fr/à-propos/presentation/" target="_blank">
                               Qu’est-ce que la Plateforme de l’inlcusion
