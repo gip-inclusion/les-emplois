@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
@@ -10,6 +11,7 @@ from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
 from itou.nexus.utils import build_user, serialize_user
+from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 
 
@@ -57,7 +59,6 @@ class NexusMixin:
                     is_active=True, company_id__in=[company.pk for company in self.request.organizations]
                 ).count()
 
-        # FIXME: Handle demo environments
         # It's always activated
         context["emplois_url"] = reverse("dashboard:index")
 
@@ -82,6 +83,14 @@ class NexusMixin:
             )
         else:
             context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
+
+        if settings.ITOU_ENVIRONMENT not in [ItouEnvironment.PROD, ItouEnvironment.TEST]:
+            # mask outgoing prod links on non prod live instances
+            context["dora_url"] = "https://staging.dora.inclusion.gouv.fr/"
+            context["marche_url"] = "https://staging.lemarche.inclusion.beta.gouv.fr/"
+            if Service.MON_RECAP in self.activated_services:
+                context["monrecap_url"] = None  # Only keep the activation link
+            context["communaute_url"] = None  # No demo available
 
         if hasattr(self, "service"):
             context["service"] = self.service
