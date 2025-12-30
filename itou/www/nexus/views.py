@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -10,6 +11,7 @@ from django.views.generic import TemplateView
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
 from itou.nexus.utils import build_user, serialize_user, sync_users
+from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 
 
@@ -56,7 +58,6 @@ class NexusMixin(UserPassesTestMixin):
         # if Service.DORA in self.activated_services_with_memberships:
         #     context["dora_badge_count"] = 0
 
-        # FIXME: Handle demo environments
         # services activation or access urls
         if Service.EMPLOIS in self.activated_services_with_memberships:
             context["emplois_url"] = reverse("dashboard:index")
@@ -91,6 +92,14 @@ class NexusMixin(UserPassesTestMixin):
             )
         else:
             context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
+
+        if settings.ITOU_ENVIRONMENT not in [ItouEnvironment.PROD, ItouEnvironment.TEST]:
+            # mask outgoing prod links on non prod live instances
+            context["dora_url"] = "https://staging.dora.inclusion.gouv.fr/"
+            context["marche_url"] = "https://staging.lemarche.inclusion.beta.gouv.fr/"
+            if Service.MON_RECAP in self.activated_services_with_memberships:
+                context["monrecap_url"] = None  # Only keep the activation link
+            context["communaute_url"] = None  # No demo available
 
         return context
 
