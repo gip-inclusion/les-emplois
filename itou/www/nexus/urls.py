@@ -11,6 +11,7 @@ urlpatterns = [
     path("accueil", views.HomePageView.as_view(), name="homepage"),
     path("activate/<str:service>", views.activate, name="activate"),
     path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
+    path("service/marche", views.MarcheView.as_view(), name="marche"),
     path("service/mon-recap", views.MonRecapView.as_view(), name="mon_recap"),
     path("service/pilotage", views.PilotageView.as_view(), name="pilotage"),
 ]
