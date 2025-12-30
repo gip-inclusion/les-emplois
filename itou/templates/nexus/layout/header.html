@@ -61,8 +61,7 @@
                     <strong>GÉRER MES OFFRES</strong>
                     <ul>
                         <li>
-                            {# FIXME #}
-                            <a href="" class="btn btn-lg btn-logo btn-nexus" aria-label="Mes offres d’emploi">
+                            <a href="{% url 'nexus:emplois' %}" class="btn btn-lg btn-logo btn-nexus" aria-label="Mes offres d’emploi">
                                 <img src="{% static_theme_images 'nexus/nx-header-logo-emplois.svg' %}" height="40" alt="">
                                 <span class="d-md-none d-xl-inline-flex flex-grow-1">Fiches de poste</span>
                                 {% if emplois_badge_count is not None %}
