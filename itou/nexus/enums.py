@@ -12,6 +12,18 @@ class Service(models.TextChoices):
     MON_RECAP = "mon-recap", "Mon Recap"
     PILOTAGE = "pilotage", "Le pilotage"
 
+    @classmethod
+    def activable(cls):
+        """Returns the ordered services as displayed in the dashboard"""
+        return [
+            cls.EMPLOIS,
+            cls.DORA,
+            cls.MARCHE,
+            cls.MON_RECAP,
+            cls.PILOTAGE,
+            cls.COMMUNAUTE,
+        ]
+
 
 class Auth(models.TextChoices):
     DJANGO = "DJANGO", "Django"
