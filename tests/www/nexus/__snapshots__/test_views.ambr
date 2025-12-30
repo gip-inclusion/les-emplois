@@ -132,6 +132,135 @@
   
   '''
 # ---
+# name: TestDoraView.test_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                  Services d’insertion
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__service">
+                              <img alt="DORA" height="50" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="./images/nexus/nx-illustration-dora.png"/>
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-dora.png"/>
+                          </div>
+                          <h2 class="h3">
+                              Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi
+                          </h2>
+                          <p class="mb-md-4">
+                              Saisissez ou importez votre offre de service.
+                              <br/>
+                              Service identifié par les professionnels de l’insertion grâce au moteur de recherche.
+                              <br/>
+                              Gérez vos demandes de mobilisation dans un espace dédié.
+                          </p>
+                          <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F" target="_blank">
+                              <span>
+                                  Accéder à mes services d’insertion
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir DORA (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="https://dora.inclusion.gouv.fr/" target="_blank">
+                              Découvrir DORA
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestDoraView.test_not_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="DORA" height="35" src="/static/vendor/theme-inclusion/images/logo-dora-mono.svg"/>
+                                  Services d’insertion
+                              </h1>
+                          </div>
+                          <div class="c-title__service">
+                              <img alt="DORA" height="50" src="/static/vendor/theme-inclusion/images/logo-dora.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="./images/nexus/nx-illustration-dora.png"/>
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-dora.png"/>
+                          </div>
+                          <h2 class="h3">
+                              Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi
+                          </h2>
+                          <p class="mb-md-4">
+                              Saisissez ou importez votre offre de service.
+                              <br/>
+                              Service identifié par les professionnels de l’insertion grâce au moteur de recherche.
+                              <br/>
+                              Gérez vos demandes de mobilisation dans un espace dédié.
+                          </p>
+                          <a class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="/portail/auto-login?next_url=https%3A%2F%2Fdora.inclusion.gouv.fr%2F">
+                              <i aria-hidden="true" class="ri-toggle-line">
+                              </i>
+                              <span>
+                                  Activer ce service
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir DORA (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="dora" href="https://dora.inclusion.gouv.fr/" target="_blank">
+                              Découvrir DORA
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestHomePageView.test_all_activated_services
   '''
   <main class="s-main" id="main" role="main">
@@ -1614,7 +1743,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portail/service/dora">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Services d’insertion
@@ -1787,7 +1916,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portail/service/dora">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Services d’insertion
@@ -1963,7 +2092,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portail/service/dora">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Services d’insertion
@@ -2136,7 +2265,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portail/service/dora">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Services d’insertion

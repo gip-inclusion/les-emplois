@@ -135,6 +135,10 @@ class CommunauteView(NexusMixin, TemplateView):
     template_name = "nexus/communaute.html"
 
 
+class DoraView(NexusMixin, TemplateView):
+    template_name = "nexus/dora.html"
+
+
 class MarcheView(NexusMixin, TemplateView):
     template_name = "nexus/marche.html"
 
