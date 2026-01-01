@@ -42,6 +42,7 @@ python_files = ["tests*.py", "test_*.py"]
 filterwarnings = [
     "error",
     "ignore:.*Use timezone-aware objects to represent datetimes in UTC.*:DeprecationWarning:(botocore|django_datadog_logger)",
+    "ignore:.*The 'strip_cdata' option of HTMLParser\\(\\) has never done anything and will eventually be removed.",
 ]
 addopts = [
     "--reuse-db",
