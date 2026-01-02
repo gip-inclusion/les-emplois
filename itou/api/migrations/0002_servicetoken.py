@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                     "service",
                     models.CharField(
                         choices=[
-                            ("la-communauté", "La communauté"),
+                            ("la-communaute", "La communauté"),
                             ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois"),
