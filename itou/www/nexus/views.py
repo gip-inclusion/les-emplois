@@ -1,12 +1,15 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
+from itou.nexus.utils import build_user, serialize_user, sync_users
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 
 
@@ -83,9 +86,13 @@ class HomePageView(NexusMixin, TemplateView):
 
         if Service.MON_RECAP in self.activated_services_with_memberships:
             context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+        else:
+            context["monrecap_url"] = reverse("nexus:activate", args=(Service.MON_RECAP,))
 
         if Service.PILOTAGE in self.activated_services_with_memberships:
             context["pilotage_url"] = reverse("dashboard:index_stats")
+        else:
+            context["pilotage_url"] = reverse("nexus:activate", args=(Service.PILOTAGE,))
 
         if Service.COMMUNAUTE in self.activated_services_with_memberships:
             context["communaute_url"] = autologin_proconnect(
@@ -99,3 +106,26 @@ class HomePageView(NexusMixin, TemplateView):
             (service for service in Service.activable() if service not in context["activated_services"]), None
         )
         return context
+
+
+def activate(request, service):
+    if request.method != "POST":
+        raise Http404
+
+    try:
+        next_url = {
+            Service.MON_RECAP: reverse("nexus:homepage"),
+            Service.PILOTAGE: reverse("nexus:homepage"),
+        }[service]
+    except KeyError:
+        raise Http404
+
+    try:
+        sync_users([build_user(serialize_user(request.user), service)])
+    except Exception:
+        logger.exception("Error occured during service activation")
+        messages.error(request, "Impossible d'activer le service. Merci de contacter le support", extra_tags="toast")
+        return HttpResponseRedirect(reverse("nexus:homepage"))
+    messages.success(request, "Service activé", extra_tags="toast")
+
+    return HttpResponseRedirect(next_url)

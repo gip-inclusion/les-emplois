@@ -1,8 +1,11 @@
+import random
+
 from django.conf import settings
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
 from itoutils.urls import add_url_params
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
@@ -144,3 +147,45 @@ class TestHomePageView:
 
         client.get(self.url)
         assert caplog.messages == [f"User is missing it's NexusUser user={user.pk}", "HTTP 200 OK"]
+
+
+class TestActivateView:
+    def test_nominal(self, client):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        service = random.choice([Service.PILOTAGE, Service.MON_RECAP])
+        response = client.post(reverse("nexus:activate", args=(service,)), follow=True)
+        assertRedirects(response, reverse("nexus:homepage"))  # FIXME redirect to service page
+        assertMessages(
+            response,
+            [messages.Message(messages.SUCCESS, "Service activé", extra_tags="toast")],
+        )
+        assert NexusUser.objects.filter(source_id=user.pk, source=service)
+
+    def test_invalid_service(self, client):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        service = random.choice(
+            [
+                Service.EMPLOIS,
+                Service.DORA,
+                Service.MARCHE,
+                Service.COMMUNAUTE,
+                Service.DATA_INCLUSION,
+                "some-random-string",
+            ]
+        )
+        response = client.get(reverse("nexus:activate", args=(service,)))
+        assert response.status_code == 404
+
+    def test_invalid_method(self, client):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.EMPLOIS, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:activate", args=(Service.MON_RECAP,)))
+        assert response.status_code == 404

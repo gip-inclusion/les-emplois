@@ -280,11 +280,13 @@
                                                     </ul>
                                                 </div>
                                             </div>
-                                            {# FIXME #}
-                                            <button class="btn btn-ico btn-primary" type="button">
-                                                <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                <span>Activer ce service</span>
-                                            </button>
+                                            <form method="post" action="{{ monrecap_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
                                         </div>
                                     </li>
                                 {% endif %}
@@ -312,11 +314,13 @@
                                                     </ul>
                                                 </div>
                                             </div>
-                                            {# FIXME #}
-                                            <button class="btn btn-ico btn-primary" type="button">
-                                                <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                <span>Activer ce service</span>
-                                            </button>
+                                            <form method="post" action="{{ pilotage_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
                                         </div>
                                     </li>
                                 {% endif %}
@@ -628,11 +632,13 @@
                                                             <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
                                                         </div>
                                                     </div>
-                                                    {# FIXME #}
-                                                    <button class="btn btn-ico btn-primary" type="button">
-                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                        <span>Activer ce service</span>
-                                                    </button>
+                                                    <form method="post" action="{{ monrecap_url }}">
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                                 <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">Le carnet papier retraçant le parcours d’insertion d’une personne.</p>
                                                 <ul class="list-unstyled mb-3 mb-md-4">
@@ -662,11 +668,13 @@
                                                             <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
                                                         </div>
                                                     </div>
-                                                    {# FIXME #}
-                                                    <button class="btn btn-ico btn-primary" type="button">
-                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                        <span>Activer ce service</span>
-                                                    </button>
+                                                    <form method="post" action="{{ pilotage_url }}">
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                                 <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                                     Le service présentant les données sur les politiques publiques d'insertion.
