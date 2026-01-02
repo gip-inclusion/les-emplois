@@ -95,8 +95,6 @@ def test_sync_memberships(factory):
     with freeze_time() as frozen_time:
         membership = factory()
         structure = membership.company if factory == CompanyMembershipFactory else membership.organization
-        sync_users([build_user(serialize_user(membership.user), Service.EMPLOIS)])
-        sync_structures([build_structure(serialize_structure(structure), Service.EMPLOIS)])
 
         assert sync_memberships([build_membership(serialize_membership(membership), Service.EMPLOIS)]) == 1
         nexus_membership = NexusMembership.objects.get()
@@ -117,8 +115,6 @@ def test_sync_memberships(factory):
 def test_sync_membership_old():
     with freeze_time() as frozen_time:
         membership = CompanyMembershipFactory()
-        sync_users([build_user(serialize_user(membership.user), Service.EMPLOIS)])
-        sync_structures([build_structure(serialize_structure(membership.company), Service.EMPLOIS)])
 
         assert sync_memberships([build_membership(serialize_membership(membership), Service.EMPLOIS)]) == 1
         assert NexusMembership.objects.get().updated_at == timezone.now()

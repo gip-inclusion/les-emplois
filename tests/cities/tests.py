@@ -112,11 +112,11 @@ def test_sync_cities(settings, caplog, respx_mock):
         "count=1 label=City removed by collection",
         "\tREMOVED Guérande (44)",
         "Removed location from count=0 JobDescription due to city deletion",
+        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "Removed insee_city from count=0 Company due to city deletion",
         "Removed insee_city from count=0 PrescriberOrganization due to city deletion",
         "Removed insee_city from count=0 User due to city deletion",
         "Removed insee_city from count=0 Institution due to city deletion",
-        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "successfully deleted count=1 cities insee_codes=['44350']",
         "successfully updated count=1 cities",
         "successfully created count=3 new cities",
@@ -181,11 +181,11 @@ def test_sync_cities(settings, caplog, respx_mock):
         "count=1 label=City removed by collection",
         "\tREMOVED L'Abergement-de-Varey (01)",
         "Removed location from count=0 JobDescription due to city deletion",
+        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "Removed insee_city from count=0 Company due to city deletion",
         "Removed insee_city from count=0 PrescriberOrganization due to city deletion",
         "Removed insee_city from count=0 User due to city deletion",
         "Removed insee_city from count=0 Institution due to city deletion",
-        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "successfully deleted count=1 cities insee_codes=['01002']",
         "successfully updated count=0 cities",  # no update to post codes
         "successfully created count=1 new cities",
@@ -356,11 +356,11 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
         "\tREMOVED Saint-Martin-Sepert (19)",
         "\tREMOVED Guérande (44)",
         "Removed location from count=1 JobDescription due to city deletion",
+        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "Removed insee_city from count=0 Company due to city deletion",
         "Removed insee_city from count=0 PrescriberOrganization due to city deletion",
         "Removed insee_city from count=1 User due to city deletion",
         "Removed insee_city from count=0 Institution due to city deletion",
-        "Removed insee_city from count=0 NexusStructure due to city deletion",
         "successfully deleted count=2 cities insee_codes=['19223', '44350']",
         "successfully updated count=0 cities",  # no update to post codes
         "successfully created count=3 new cities",
@@ -372,12 +372,12 @@ def test_sync_cities_with_refill(settings, caplog, respx_mock):
             f"to city={new_city.pk} (previous=19223)"
         ),
         "successfully refilled count=1 new cities for JobDescription",
+        "successfully refilled count=0 new cities for NexusStructure",
         "successfully refilled count=0 new cities for Company",
         "successfully refilled count=0 new cities for PrescriberOrganization",
         f"Refilled User.insee_city for pk={job_seeker_to_refill.pk} to city={new_city.pk} (previous=19223)",
         "successfully refilled count=1 new cities for User",
         "successfully refilled count=0 new cities for Institution",
-        "successfully refilled count=0 new cities for NexusStructure",
     ]
     assert caplog.messages[-1].startswith(
         "Management command itou.cities.management.commands.sync_cities succeeded in"

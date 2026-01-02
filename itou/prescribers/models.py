@@ -10,6 +10,9 @@ from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.nexus.enums import Service
+from itou.nexus.models import NexusStructure
+from itou.nexus.utils import build_structure, serialize_structure, sync_structures
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -231,7 +234,15 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             and self.kind == PrescriberOrganizationKind.ODC
         ):
             self.is_brsa = True
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+        sync_structures([build_structure(serialize_structure(self), Service.EMPLOIS)])
+
+    def delete(self, *args, **kwargs):
+        nexus_source_id = self.pk
+        res = super().delete(*args, **kwargs)
+        NexusStructure.include_old.filter(source_id=nexus_source_id, source=Service.EMPLOIS).delete()
+        return res
 
     def clean(self, *args, **kwargs):
         super().clean()
