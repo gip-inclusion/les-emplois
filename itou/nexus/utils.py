@@ -1,8 +1,13 @@
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
+from itou.companies.models import Company
 from itou.nexus.enums import USER_KIND_MAPPING, Auth, Role, Service
 from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import IdentityProvider
+from itou.users.models import User
 from itou.utils.urls import get_absolute_url
 
 
@@ -192,3 +197,46 @@ def sync_structures(nexus_structures):
             unique_fields=["id"],
         )
     )
+
+
+# Emplois data auto sync
+
+
+@receiver(post_save, sender=User)
+def sync_user_on_save(sender, instance, **kwargs):
+    if instance.is_active and instance.email and (instance.is_employer or instance.is_prescriber):
+        sync_users([build_user(serialize_user(instance), Service.EMPLOIS)])
+        sync_users([build_user(serialize_user(instance), Service.PILOTAGE)], update_only=True)
+        sync_users([build_user(serialize_user(instance), Service.MON_RECAP)], update_only=True)
+
+
+@receiver(post_delete, sender=User)
+def sync_user_on_delete(sender, instance, **kwargs):
+    NexusUser.include_old.filter(
+        source_id=instance.pk, source__in=[Service.EMPLOIS, Service.PILOTAGE, Service.MON_RECAP]
+    ).delete()
+
+
+@receiver(post_save, sender=Company)
+def sync_company_on_save(sender, instance, **kwargs):
+    if instance.is_active:
+        sync_structures([build_structure(serialize_structure(instance), Service.EMPLOIS)])
+
+
+@receiver(post_delete, sender=User)
+def sync_company_on_delete(sender, instance, **kwargs):
+    NexusStructure.include_old.filter(
+        source_id=instance.pk, source__in=[Service.EMPLOIS, Service.PILOTAGE, Service.MON_RECAP]
+    ).delete()
+
+
+@receiver(post_save, sender=PrescriberOrganization)
+def sync_prescriber_org_on_save(sender, instance, **kwargs):
+    sync_structures([build_structure(serialize_structure(instance), Service.EMPLOIS)])
+
+
+@receiver(post_delete, sender=PrescriberOrganization)
+def sync_prescriber_org_on_delete(sender, instance, **kwargs):
+    NexusStructure.include_old.filter(
+        source_id=instance.pk, source__in=[Service.EMPLOIS, Service.PILOTAGE, Service.MON_RECAP]
+    ).delete()

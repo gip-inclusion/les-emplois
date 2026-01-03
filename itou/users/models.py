@@ -36,9 +36,6 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
-from itou.nexus.enums import Service
-from itou.nexus.models import NexusUser
-from itou.nexus.utils import build_user, serialize_user, sync_users
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
@@ -437,11 +434,6 @@ class User(AbstractUser, AddressMixin):
         ]:
             raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
 
-    def sync_for_nexus(self):
-        sync_users([build_user(serialize_user(self), Service.EMPLOIS)])
-        sync_users([build_user(serialize_user(self), Service.PILOTAGE)], update_only=True)
-        sync_users([build_user(serialize_user(self), Service.MON_RECAP)], update_only=True)
-
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding and self._auto_create_job_seeker_profile
 
@@ -482,18 +474,7 @@ class User(AbstractUser, AddressMixin):
                     certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
                 ).delete()
 
-        if self.is_active and self.email and (self.is_employer or self.is_prescriber):
-            self.sync_for_nexus()
-
         self.set_old_values()
-
-    def delete(self, *args, **kwargs):
-        nexus_source_id = self.pk
-        res = super().delete(*args, **kwargs)
-        NexusUser.include_old.filter(
-            source_id=nexus_source_id, source__in=[Service.EMPLOIS, Service.PILOTAGE, Service.MON_RECAP]
-        ).delete()
-        return res
 
     def get_full_name(self):
         """

@@ -26,9 +26,6 @@ from itou.companies.enums import (
     JobSource,
     JobSourceTag,
 )
-from itou.nexus.enums import Service
-from itou.nexus.models import NexusStructure
-from itou.nexus.utils import build_structure, serialize_structure, sync_structures
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import company_signup_token_generator
@@ -370,18 +367,6 @@ class Company(AddressMixin, OrganizationAbstract):
         permissions = [
             ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
         ]
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if self.is_active:
-            sync_structures([build_structure(serialize_structure(self), Service.EMPLOIS)])
-
-    def delete(self, *args, **kwargs):
-        nexus_source_id = self.pk
-        res = super().delete(*args, **kwargs)
-        NexusStructure.include_old.filter(source_id=nexus_source_id, source=Service.EMPLOIS).delete()
-        return res
 
     @property
     def accept_survey_url(self):
