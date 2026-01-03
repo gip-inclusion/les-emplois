@@ -1,0 +1,203 @@
+import logging
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import TemplateView
+
+from itou.companies.models import JobDescription
+from itou.nexus.enums import Auth, NexusUserKind, Service
+from itou.nexus.models import NexusUser
+from itou.nexus.utils import build_user, serialize_user, sync_users
+from itou.utils.enums import ItouEnvironment
+from itou.utils.templatetags.url_add_query import autologin_proconnect
+from itou.utils.urls import get_absolute_url
+
+
+logger = logging.getLogger(__name__)
+
+
+class NexusMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_employer or self.request.user.is_prescriber
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        # Retrieve user data from nexus ressources
+        self.service_users = NexusUser.objects.filter(
+            email=self.request.user.email, source__in=Service.activable()
+        ).prefetch_related("memberships__structure")
+        self.activated_services_with_memberships = {}
+        for service_user in self.service_users:
+            self.activated_services_with_memberships[service_user.source] = [
+                membership.structure for membership in service_user.memberships.all()
+            ]
+
+        if Auth.PRO_CONNECT not in {user.auth for user in self.service_users}:
+            raise PermissionDenied("No ProConnect account detected accross the services")
+
+        if {user.kind for user in self.service_users} == {NexusUserKind.GUIDE}:
+            self.user_kind = NexusUserKind.GUIDE
+        else:
+            self.user_kind = NexusUserKind.FACILITY_MANAGER
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["activated_services"] = set(self.activated_services_with_memberships.keys())
+        context["user_kind"] = self.user_kind
+        context["zendesk_form_url"] = ""  # FIXME: in a following commit
+        context["logout_url"] = reverse("account_logout")  # FIXME: Redirect to nexus login page
+        context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
+        context["emplois_badge_count"] = None
+        if (
+            Service.EMPLOIS in self.activated_services_with_memberships
+            and self.user_kind == NexusUserKind.FACILITY_MANAGER
+        ):
+            if self.request.user.is_employer:
+                context["emplois_badge_count"] = JobDescription.objects.filter(
+                    is_active=True, company_id__in=[company.pk for company in self.request.organizations]
+                ).count()
+            else:
+                # No job descriptions for prescribers
+                # The user may have a facility manager role in another service
+                context["emplois_badge_count"] = 0
+
+        context["dora_badge_count"] = None
+        # FIXME: Plug into DORA to retreive active services
+        # if Service.DORA in self.activated_services_with_memberships:
+        #     context["dora_badge_count"] = 0
+
+        # services activation or access urls
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            context["emplois_url"] = reverse("dashboard:index")
+        else:
+            # This should not happens for now
+            logger.warning("User is missing it's NexusUser user=%s", self.request.user.pk)
+
+        if Service.DORA in self.activated_services_with_memberships:
+            context["dora_url"] = autologin_proconnect("https://dora.inclusion.gouv.fr/", self.request.user)
+        else:
+            # FIXME
+            context["dora_url"] = autologin_proconnect("https://dora.inclusion.gouv.fr/", self.request.user)
+
+        if Service.MARCHE in self.activated_services_with_memberships:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/login/"
+        else:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/signup/"
+
+        if Service.MON_RECAP in self.activated_services_with_memberships:
+            context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+        else:
+            context["monrecap_url"] = reverse("nexus:activate", args=(Service.MON_RECAP,))
+
+        if Service.PILOTAGE in self.activated_services_with_memberships:
+            context["pilotage_url"] = reverse("dashboard:index_stats")
+        else:
+            context["pilotage_url"] = reverse("nexus:activate", args=(Service.PILOTAGE,))
+
+        if Service.COMMUNAUTE in self.activated_services_with_memberships:
+            context["communaute_url"] = autologin_proconnect(
+                "https://communaute.inclusion.gouv.fr/topics/", self.request.user
+            )
+        else:
+            context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
+
+        if settings.ITOU_ENVIRONMENT not in [ItouEnvironment.PROD, ItouEnvironment.TEST]:
+            # mask outgoing prod links on non prod live instances
+            context["dora_url"] = "https://staging.dora.inclusion.gouv.fr/"
+            context["marche_url"] = "https://staging.lemarche.inclusion.beta.gouv.fr/"
+            if Service.MON_RECAP in self.activated_services_with_memberships:
+                context["monrecap_url"] = None  # Only keep the activation link
+            context["communaute_url"] = None  # No demo available
+
+        return context
+
+
+class HomePageView(NexusMixin, TemplateView):
+    template_name = "nexus/homepage.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["all_services_activated"] = context["activated_services"] == set(Service.activable())
+        context["new_service_shown"] = next(
+            (service for service in Service.activable() if service not in context["activated_services"]), None
+        )
+        context["a_b_test_url"] = get_absolute_url(reverse("nexus:homepage")).replace("/", "\\/")
+        return context
+
+
+def activate(request, service):
+    if request.method != "POST":
+        raise Http404
+
+    try:
+        next_url = {
+            Service.MON_RECAP: reverse("nexus:mon_recap"),
+            Service.PILOTAGE: reverse("nexus:pilotage"),
+        }[service]
+    except KeyError:
+        raise Http404
+
+    try:
+        sync_users([build_user(serialize_user(request.user), service)])
+    except Exception:
+        logger.exception("Error occured during service activation")
+        messages.error(request, "Impossible d'activer le service. Merci de contacter le support", extra_tags="toast")
+        return HttpResponseRedirect(reverse("nexus:homepage"))
+    messages.success(request, "Service activé", extra_tags="toast")
+
+    return HttpResponseRedirect(next_url)
+
+
+class CommunauteView(NexusMixin, TemplateView):
+    template_name = "nexus/communaute.html"
+
+
+class DoraView(NexusMixin, TemplateView):
+    template_name = "nexus/dora.html"
+
+
+class EmploisView(NexusMixin, TemplateView):
+    def dispatch(self, request, *args, **kwargs):
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            if self.user_kind != NexusUserKind.FACILITY_MANAGER:
+                # The user doesn't have access to this page anymore
+                return HttpResponseRedirect(reverse("nexus:hompage"))
+            # FIXME Store default structure to session if not there
+            self.current_structure = self.activated_services_with_memberships[Service.EMPLOIS][0]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            return ["nexus/emplois_list.html"]
+        return ["nexus/emplois_inactive.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["job_description_count"] = 0
+        if Service.EMPLOIS in self.activated_services_with_memberships and self.request.user.is_employer:
+            context["job_descriptions"] = JobDescription.objects.filter(
+                is_active=True, company__uid=self.current_structure.source_id
+            )
+            context["job_description_count"] = len(context["job_descriptions"])
+
+        context["current_structure"] = self.current_structure
+        return context
+
+
+class MarcheView(NexusMixin, TemplateView):
+    template_name = "nexus/marche.html"
+
+
+class MonRecapView(NexusMixin, TemplateView):
+    template_name = "nexus/mon_recap.html"
+
+
+class PilotageView(NexusMixin, TemplateView):
+    template_name = "nexus/pilotage.html"
