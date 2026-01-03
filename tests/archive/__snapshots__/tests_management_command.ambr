@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 85,
+    'num_queries': 115,
     'queries': list([
       dict({
         'origin': list([
@@ -1646,7 +1646,41 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "users_user"."id"
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."created_by_id" IN (%s,
                                                  %s,
@@ -1717,7 +1751,36 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "prescribers_prescriberorganization"."id"
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."created_by_id" IN (%s,
                                                                          %s,
@@ -1739,7 +1802,36 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': '''
-          SELECT "prescribers_prescriberorganization"."id"
+          SELECT "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
           FROM "prescribers_prescriberorganization"
           WHERE "prescribers_prescriberorganization"."authorization_updated_by_id" IN (%s,
                                                                                        %s,
@@ -3068,6 +3160,795 @@
                                       %s,
                                       %s,
                                       %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."source" IN (%s,
+                                                %s,
+                                                %s)
+                 AND "nexus_nexususer"."source_id" = %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexusmembership"
+          WHERE "nexus_nexusmembership"."user_id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_user_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "nexus_nexususer"
+          WHERE "nexus_nexususer"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'sync_company_on_delete[nexus/utils.py]',
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexusstructure"."address_line_1",
+                 "nexus_nexusstructure"."address_line_2",
+                 "nexus_nexusstructure"."post_code",
+                 "nexus_nexusstructure"."city",
+                 "nexus_nexusstructure"."department",
+                 "nexus_nexusstructure"."coords",
+                 "nexus_nexusstructure"."geocoding_score",
+                 "nexus_nexusstructure"."geocoding_updated_at",
+                 "nexus_nexusstructure"."ban_api_resolved_address",
+                 "nexus_nexusstructure"."insee_city_id",
+                 "nexus_nexusstructure"."id",
+                 "nexus_nexusstructure"."source",
+                 "nexus_nexusstructure"."source_id",
+                 "nexus_nexusstructure"."source_kind",
+                 "nexus_nexusstructure"."source_link",
+                 "nexus_nexusstructure"."siret",
+                 "nexus_nexusstructure"."name",
+                 "nexus_nexusstructure"."kind",
+                 "nexus_nexusstructure"."email",
+                 "nexus_nexusstructure"."phone",
+                 "nexus_nexusstructure"."website",
+                 "nexus_nexusstructure"."opening_hours",
+                 "nexus_nexusstructure"."accessibility",
+                 "nexus_nexusstructure"."description",
+                 "nexus_nexusstructure"."updated_at"
+          FROM "nexus_nexusstructure"
+          WHERE ("nexus_nexusstructure"."source" IN (%s,
+                                                     %s,
+                                                     %s)
+                 AND "nexus_nexusstructure"."source_id" = %s)
         ''',
       }),
       dict({

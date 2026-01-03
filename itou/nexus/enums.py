@@ -125,11 +125,12 @@ class NexusStructureKind(models.TextChoices):
     UDAF = "UDAF"
 
 
+emplois_kind_mapping = {
+    UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
+    UserKind.PRESCRIBER: NexusUserKind.GUIDE,
+}
 USER_KIND_MAPPING = {
-    Service.EMPLOIS: {
-        UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
-        UserKind.PRESCRIBER: NexusUserKind.GUIDE,
-    },
+    Service.EMPLOIS: emplois_kind_mapping,
     Service.DORA: {
         "accompagnateur": NexusUserKind.GUIDE,
         "offreur": NexusUserKind.FACILITY_MANAGER,
@@ -139,12 +140,11 @@ USER_KIND_MAPPING = {
     Service.COMMUNAUTE: {
         "": "",  # this service does not have a user kind
     },
-    Service.PILOTAGE: {
-        UserKind.EMPLOYER: NexusUserKind.FACILITY_MANAGER,
-        UserKind.PRESCRIBER: NexusUserKind.GUIDE,
-    },
+    Service.PILOTAGE: emplois_kind_mapping,
     Service.MON_RECAP: {
-        "": "",  # this service does not have a user kind
+        # this service does not have a user kind
+        UserKind.EMPLOYER: "",
+        UserKind.PRESCRIBER: "",
     },
     Service.MARCHE: {
         "SIAE": NexusUserKind.FACILITY_MANAGER,

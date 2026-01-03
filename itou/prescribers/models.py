@@ -231,7 +231,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             and self.kind == PrescriberOrganizationKind.ODC
         ):
             self.is_brsa = True
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         super().clean()
