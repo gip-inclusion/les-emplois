@@ -145,28 +145,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
-
-    {% if user.is_job_seeker or user.is_employer or user.is_prescriber %}
-        <div id="job-seekers-and-pros-interview-2025-12" class="alert alert-important alert-dismissible-once d-none my-5" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-chat-1-line ri-xl text-important" aria-hidden="true"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Votre avis nous intéresse</strong>
-                    </p>
-                    <p class="mb-0">
-                        Aidez-nous à faire évoluer la plateforme de l’inclusion en nous donnant votre avis sur ce qu’est un parcours de qualité.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="https://t.maze.co/{{ user.is_job_seeker|yesno:'477293239,477288902' }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-primary has-external-link">Répondre à l’enquête</a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block title_extra %}
