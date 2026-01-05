@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 2026-01-05
+
+### Ajouté
+
+- [Stats : Permettre aux Directions Régionales/Générales/Territoriales de télécharger les données brutes de leur territoire](https://github.com/gip-inclusion/les-emplois/pull/7247)
+
 ## 2025-12-29
 
 Rien à signaler cette semaine
