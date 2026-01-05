@@ -176,14 +176,14 @@
     {% endif %}
 
     {% if not all_services_activated %}
-        <section class="s-section">
+        <section class="s-section" id="newServicesV1">
             <div class="s-section__container container">
                 <div class="s-section__row row">
                     <div class="s-section__col col-12">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
                             <h2 class="mb-0">
                                 <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
-                                Services à découvrir - A/B Test V1
+                                Services à découvrir
                             </h2>
                             <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inlcusion</a>
                         </div>
@@ -390,14 +390,14 @@
             </div>
         </section>
 
-        <section class="s-section">
+        <section class="s-section d-none" id="newServicesV2">
             <div class="s-section__container container">
                 <div class="s-section__row row">
                     <div class="s-section__col col-12">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
                             <h2 class="mb-0">
                                 <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
-                                Services à découvrir - A/B Test V2
+                                Services à découvrir
                             </h2>
                             <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inlcusion</a>
                         </div>
@@ -766,4 +766,36 @@
             </div>
         </section>
     {% endif %}
+{% endblock %}
+
+
+{% block script %}
+    <!-- Matomo A/B test -->
+    <script nonce="{{ CSP_NONCE }}">
+        var _paq = _paq || [];
+        _paq.push(['AbTesting::create', {
+            name: 'NexusServicesADecouvrir', // the name is the same in both environment
+            percentage: 100,
+            includedTargets: [{
+                "attribute": "url",
+                "inverted": "0",
+                "type": "equals_simple",
+                "value": "{{ a_b_test_url }}"
+            }],
+            excludedTargets: [],
+            variations: [{
+                name: 'original',
+                activate: function(event) {}
+            }, {
+                name: 'VariationB',
+                activate: function(event) {
+                    $('#newServicesV1').addClass('d-none');
+                    $('#newServicesV2').removeClass('d-none');
+                }
+            }],
+            trigger: function() {
+                return true;
+            }
+        }]);
+    </script>
 {% endblock %}
