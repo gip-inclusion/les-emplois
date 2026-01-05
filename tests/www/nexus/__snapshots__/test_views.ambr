@@ -323,13 +323,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate/mon-recap" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -362,13 +365,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate/pilotage" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -643,13 +649,16 @@
                                                       </p>
                                                   </div>
                                               </div>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate/mon-recap" method="post">
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                           <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                               Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -691,13 +700,16 @@
                                                       </p>
                                                   </div>
                                               </div>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate/pilotage" method="post">
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                           <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                               Le service présentant les données sur les politiques publiques d’insertion.
@@ -924,13 +936,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate/mon-recap" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -963,13 +978,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate/pilotage" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -1177,13 +1195,16 @@
                                                       </p>
                                                   </div>
                                               </div>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate/mon-recap" method="post">
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                           <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                               Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -1225,13 +1246,16 @@
                                                       </p>
                                                   </div>
                                               </div>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate/pilotage" method="post">
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                           <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                               Le service présentant les données sur les politiques publiques d’insertion.

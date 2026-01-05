@@ -9,4 +9,5 @@ app_name = "nexus"
 urlpatterns = [
     path("auto-login", auto_login, name="auto_login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
+    path("activate/<str:service>", views.activate, name="activate"),
 ]
