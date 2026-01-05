@@ -1970,7 +1970,7 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/homepage">
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
                       <i aria-hidden="true" class="ri-home-line">
                       </i>
                       <span class="d-md-none d-xl-inline-flex">
@@ -2149,7 +2149,7 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/homepage">
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
                       <i aria-hidden="true" class="ri-home-line">
                       </i>
                       <span class="d-md-none d-xl-inline-flex">
@@ -2325,7 +2325,7 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/homepage">
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
                       <i aria-hidden="true" class="ri-home-line">
                       </i>
                       <span class="d-md-none d-xl-inline-flex">
@@ -2504,7 +2504,7 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/homepage">
+                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
                       <i aria-hidden="true" class="ri-home-line">
                       </i>
                       <span class="d-md-none d-xl-inline-flex">

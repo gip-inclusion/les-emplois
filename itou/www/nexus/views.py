@@ -114,11 +114,14 @@ class NexusMixin(UserPassesTestMixin):
                 context["monrecap_url"] = None  # Only keep the activation link
             context["communaute_url"] = None  # No demo available
 
+        context["menu"] = self.menu
+
         return context
 
 
 class HomePageView(NexusMixin, TemplateView):
     template_name = "nexus/homepage.html"
+    menu = "homepage"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -157,13 +160,17 @@ def activate(request, service):
 
 class CommunauteView(NexusMixin, TemplateView):
     template_name = "nexus/communaute.html"
+    menu = Service.COMMUNAUTE
 
 
 class DoraView(NexusMixin, TemplateView):
     template_name = "nexus/dora.html"
+    menu = Service.DORA
 
 
 class EmploisView(NexusMixin, TemplateView):
+    menu = Service.EMPLOIS
+
     def dispatch(self, request, *args, **kwargs):
         if Service.EMPLOIS in self.activated_services_with_memberships:
             if self.user_kind != NexusUserKind.FACILITY_MANAGER:
@@ -194,11 +201,14 @@ class EmploisView(NexusMixin, TemplateView):
 
 class MarcheView(NexusMixin, TemplateView):
     template_name = "nexus/marche.html"
+    menu = Service.MARCHE
 
 
 class MonRecapView(NexusMixin, TemplateView):
     template_name = "nexus/mon_recap.html"
+    menu = Service.MON_RECAP
 
 
 class PilotageView(NexusMixin, TemplateView):
     template_name = "nexus/pilotage.html"
+    menu = Service.PILOTAGE
