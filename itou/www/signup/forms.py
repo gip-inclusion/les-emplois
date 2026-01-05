@@ -83,7 +83,7 @@ class JobSeekerSignupForm(FullnameFormMixin, BirthPlaceWithBirthdateModelForm, B
         max_length=21,  # 15 + 6 white spaces
         strip=True,
         validators=[validate_nir],
-        help_text="Par exemple 2 69 05 49 588 157 80",
+        help_text="Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés.",
     )
     title = forms.ChoiceField(required=True, label="Civilité", choices=BLANK_CHOICE_DASH + Title.choices)
 

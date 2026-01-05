@@ -138,7 +138,7 @@ class CheckJobSeekerNirForm(forms.Form):
         required=True,
         strip=True,
         validators=[validate_nir],
-        help_text=("Par exemple: 2 69 05 49 588 157 80"),
+        help_text="Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés.",
         widget=forms.TextInput(
             attrs={
                 "placeholder": "2 69 05 49 588 157 80",

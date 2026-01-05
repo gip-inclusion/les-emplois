@@ -160,7 +160,7 @@
           </label>
           <input aria-describedby="id_nir_helptext" class="form-control" id="id_nir" maxlength="21" name="nir" required="" type="text"/>
           <div class="form-text" id="id_nir_helptext">
-              Par exemple 2 69 05 49 588 157 80
+              Numéro à 15 chiffres. Les numéros d'identification d'attente sont acceptés.
           </div>
       </div>
       <p>
