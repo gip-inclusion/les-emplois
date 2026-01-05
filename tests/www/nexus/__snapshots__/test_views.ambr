@@ -639,7 +639,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section" id="newServicesV1">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -859,7 +859,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section d-none" id="newServicesV2">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -1546,7 +1546,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section" id="newServicesV1">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
@@ -1727,7 +1727,7 @@
               </div>
           </div>
       </section>
-      <section class="s-section">
+      <section class="s-section d-none" id="newServicesV2">
           <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
