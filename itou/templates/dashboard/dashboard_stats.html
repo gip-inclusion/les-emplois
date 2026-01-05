@@ -48,26 +48,6 @@
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
                             <h2>Pilotage de mon activité</h2>
-                            {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
-                                <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" role="status" id="alert-stats-siae-2025-11">
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                                    <div class="row">
-                                        <div class="col-auto pe-0">
-                                            <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="mb-2">
-                                                <strong>Nouveauté</strong>
-                                            </p>
-                                            <p class="mb-0">
-                                                Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                                                <br>
-                                                En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
                             {% if layout_kind is DashboardStatsLayoutKind.LEGACY %}
                                 <section class="s-section mb-3 mb-md-5">
                                     <div class="s-section__container">

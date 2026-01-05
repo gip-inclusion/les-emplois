@@ -5,28 +5,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -143,28 +121,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -301,28 +257,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -459,28 +393,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -617,28 +529,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -775,28 +665,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -933,28 +801,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1091,28 +937,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1249,28 +1073,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1436,28 +1238,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1612,28 +1392,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1797,28 +1555,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -1982,28 +1718,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -2147,28 +1861,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -2332,28 +2024,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-lg-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-lg-2 mt-3 mt-lg-5">
@@ -3787,28 +3457,6 @@
       <h2>
           Pilotage de mon activité
       </h2>
-      <div class="alert alert-important alert-dismissible-once d-none fade show mt-3 mt-md-4 mb-3 mb-md-5" id="alert-stats-siae-2025-11" role="status">
-          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
-          </button>
-          <div class="row">
-              <div class="col-auto pe-0">
-                  <i aria-hidden="true" class="ri-information-line ri-xl text-important">
-                  </i>
-              </div>
-              <div class="col">
-                  <p class="mb-2">
-                      <strong>
-                          Nouveauté
-                      </strong>
-                  </p>
-                  <p class="mb-0">
-                      Vous pouvez désormais accéder facilement à vos données brutes depuis l'encart dédié.
-                      <br/>
-                      En les téléchargeant, vous pourrez les exploiter librement pour créer vos tableaux de bord personnalisés, vos rapports, vos outils de pilotage interne ou encore les intégrer à votre logiciel de suivi d'activité
-                  </p>
-              </div>
-          </div>
-      </div>
       <section class="s-section mb-3 mb-md-5">
           <div class="s-section__container">
               <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
