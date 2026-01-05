@@ -278,7 +278,14 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin):
     list_display = ("evaluated_siae", "job_application", "approval", "job_seeker")
     list_display_links = ("job_application",)
     list_select_related = ("evaluated_siae__siae", "job_application__approval", "job_application__job_seeker")
-    readonly_fields = ("evaluated_siae", "job_application", "approval", "job_seeker", "state")
+    readonly_fields = (
+        "evaluated_siae",
+        "job_application",
+        "approval",
+        "job_seeker",
+        "state",
+        "labor_inspector_explanation",
+    )
     inlines = [
         EvaluatedAdministrativeCriteriaInline,
     ]
