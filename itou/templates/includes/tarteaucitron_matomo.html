@@ -1,0 +1,120 @@
+{% load static %}
+
+<script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
+
+<script nonce="{{ CSP_NONCE }}">
+    // Tarteaucitron's language is set according to the browser configuration
+    // but a lot of users don't know how to change it.
+    // This can be forced only by using a global `var` statement.
+    // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
+    var tarteaucitronForceLanguage = "fr";
+
+    /* beautify ignore:start */
+    tarteaucitron.init({
+        "privacyUrl": "", /* Privacy policy url */
+        "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
+        "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
+        "cookieName": "tarteaucitron", /* Cookie name */
+        "orientation": "bottom", /* Banner position (top - bottom) */
+        "groupServices": false, /* Group services by category */
+        "showDetailsOnClick": true, /* Click to expand the description */
+        "serviceDefaultState": "wait", /* Default state (true - wait - false) */
+        "showAlertSmall": false, /* Show the small banner on bottom right */
+        "cookieslist": false, /* Show the cookie list */
+        "closePopup": false, /* Show a close X on the banner */
+        "showIcon": true, /* Show cookie icon to manage cookies */
+        //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+        "iconPosition": "BottomRight", /* BottomRight, BottomLeft, TopRight and TopLeft */
+        "adblocker": false, /* Show a Warning if an adblocker is detected */
+        "DenyAllCta" : true, /* Show the deny all button */
+        "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+        "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+        "alwaysNeedConsent": false, /* Ask the consent for "Privacy by design" services */
+        "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+        "removeCredit": true, /* Remove credit link */
+        "moreInfoLink": true, /* Show more info link */
+        "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
+        "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
+        //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+        "readmoreLink": "{% url 'legal-privacy' %}#cookies", /* Change the default readmore link */
+        "mandatory": true, /* Show a message about mandatory cookies */
+        "mandatoryCta": true, /* Show the disabled accept button when mandatory on */
+        "customCloserId": "", /* Optional a11y: Custom element ID used to open the panel */
+        "googleConsentMode": true, /* Enable Google Consent Mode v2 for Google ads and GA4 */
+        "partnersList": false /* Show the number of partners on the popup/middle banner */
+    });
+
+    // Hotjar.
+    (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
+    {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 2360441;{% endif %}
+    {% if ITOU_ENVIRONMENT == "DEMO" or ITOU_ENVIRONMENT == "PENTEST" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
+    tarteaucitron.user.HotjarSv = 6;
+
+    {% if MATOMO_BASE_URL and send_to_matomo %}
+    // Matomo :
+    tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
+    tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
+    tarteaucitron.user.matomoMore = function () {
+        // Executed after trackPageView.
+        window._paq.push(['trackVisibleContentImpressions']);
+    };
+    (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
+    {% endif %}
+    /* beautify ignore:end */
+
+    // livestorm
+    tarteaucitron.services.livestorm = {
+        "key": "livestorm",
+        "type": "video",
+        "name": "Livestorm",
+        "uri": "https://livestorm.co/fr/politique-confidentialite",
+        "needConsent": true,
+        "cookies": [],
+        "js": function() {
+            "use strict";
+            tarteaucitron.fallback(['js-tac-livestorm'], function(x) {
+                var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
+                    height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
+                    url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
+                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
+            });
+        },
+        "fallback": function() {
+            "use strict";
+            var id = 'livestorm';
+            tarteaucitron.fallback(['js-tac-livestorm'], function(elem) {
+                elem.style.width = elem.getAttribute('width');
+                elem.style.height = "365px";
+                return tarteaucitron.engage(id);
+            });
+        }
+    };
+    (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
+</script>
+
+{% if MATOMO_BASE_URL and send_to_matomo %}
+    {# Matomo/Piwik open source web analytics #}
+    <script id="matomo-custom-init" nonce="{{ CSP_NONCE }}">
+        /* beautify ignore:start */
+        window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        window._paq.push(['setCustomDimension', 1, "{{ request.user.kind|default:'anonymous' }}"]);
+        window._paq.push(['setCustomDimension', 3, "{{ request.current_organization.kind|default:'' }}"]);
+        window._paq.push(['setCustomDimension', 4, "{% if request.user.is_job_seeker %}{{ request.user.job_seeker_department }}{% else %}{{ request.current_organization.department|default:'' }}{% endif %}"]);
+
+        {% if matomo_user_id %}window._paq.push(['setUserId', '{{ matomo_user_id }}']);{% endif %}
+
+        window._paq.push(['setCustomUrl', new URL('{{ matomo_custom_url }}', window.location.origin).href]);
+
+        {% if matomo_custom_title|default:"" %}
+            window._paq.push(['setDocumentTitle', '{{ matomo_custom_title }}']);
+        {% else %}
+            /* defaults to a stripped version (no suffix) of the page title. */
+
+            const title = document.title.replace(/- Les emplois de l'inclusion/g,'').trim();
+            window._paq.push(['setDocumentTitle', title]);
+        {% endif %}
+        /* beautify ignore:end */
+    </script>
+    <script src="{% static "js/matomo.js" %}"></script>
+{% endif %}
