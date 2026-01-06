@@ -14,6 +14,7 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
+import datetime
 import re
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, REGIONS
@@ -315,6 +317,15 @@ def render_stats_cd(request, page_title, *, extra_context=None, with_department_
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
         "tally_hidden_fields": {"type_prescripteur": request.current_organization.kind},
+        "pilotage_webinar_banners": [
+            {
+                "title": "Créez de l’emploi inclusif sans financement public supplémentaire",
+                "description": "Le Marché de l’inclusion transforme la commande privée et publique en leviers d’emploi. Suivez les retombées économiques locales des marchés inclusifs et identifiez combien d’ETP sont financés sur votre territoire grâce à la commande privée et publique.",  # noqa: E501
+                "call_to_action": "Je prends un rdv de démonstration",
+                "url": "https://calendar.app.google/cQ1PDKKezS1Yt1FE7",
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2026, 2, 10),
+            }
+        ],
     }
     if extra_context:
         context.update(extra_context)
