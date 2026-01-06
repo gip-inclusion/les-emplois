@@ -342,9 +342,19 @@ def test_cleanup_siaes_after_grace_period(capsys):
         to_company__convention__deactivated_at=old_enough,
         to_company__is_searchable=True,
     ).to_company
+    not_searchable_undeletable_company = JobApplicationFactory(
+        to_company__subject_to_iae_rules=True,
+        to_company__convention__is_active=False,
+        to_company__convention__deactivated_at=old_enough,
+        to_company__is_searchable=False,
+    ).to_company
 
     cleanup_siaes_after_grace_period()
-    assertQuerySetEqual(Company.objects.all(), [company_with_active_convention, undeletable_company], ordered=False)
+    assertQuerySetEqual(
+        Company.objects.all(),
+        [company_with_active_convention, undeletable_company, not_searchable_undeletable_company],
+        ordered=False,
+    )
     undeletable_company.refresh_from_db()
     assert undeletable_company.is_searchable is False
     stdout, stderr = capsys.readouterr()
