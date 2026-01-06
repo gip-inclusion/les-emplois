@@ -195,7 +195,7 @@ def cleanup_siaes_after_grace_period():
         if could_siae_be_deleted(siae):
             siae.delete()
             deletions += 1
-        else:
+        elif siae.is_searchable:
             siae.is_searchable = False
             siae.save(update_fields=["is_searchable", "updated_at"])
             blocked_deletions += 1
