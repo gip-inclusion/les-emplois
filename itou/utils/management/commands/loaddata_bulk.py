@@ -4,7 +4,7 @@ from django.core.management.commands.loaddata import Command as LoadDataCommand
 
 
 class Command(LoadDataCommand):
-    BATCH_SIZE = 10_000
+    BATCH_SIZE = 1_000
 
     def load_label(self, fixture_label):
         self.to_create = defaultdict(list)
