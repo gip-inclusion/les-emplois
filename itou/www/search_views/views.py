@@ -407,6 +407,7 @@ def search_services_results(request, template_name="search/services/results.html
             try:
                 results = client.search_services(**search_query)
             except DataInclusionApiException:
+                logger.exception("Failed to search services from data·inclusion API for query=%s", search_query)
                 messages.error(
                     request,
                     mark_safe(
