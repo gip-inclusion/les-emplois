@@ -1,4 +1,0 @@
-# serializer version: 1
-# name: test_webinar_banner_display
-  "[{'title': 'Des questions sur l’utilisation des tableaux de bord ?', 'description': 'Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.', 'call_to_action': 'Je m’inscris', 'url': 'https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1', 'is_displayable': True}]"
-# ---

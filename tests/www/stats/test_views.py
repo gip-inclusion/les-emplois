@@ -423,25 +423,6 @@ def test_stats_staff(client):
     )
 
 
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
-def test_webinar_banner_display(client, snapshot):
-    client.force_login(ItouStaffFactory())
-    url = reverse("stats:stats_staff_service_indicators")
-
-    with override_settings(PILOTAGE_SHOW_STATS_WEBINAR=True):
-        response = client.get(url)
-        assert response.status_code == 200
-        rendered_banners = [
-            banner | {"is_displayable": True} for banner in response.context["pilotage_webinar_banners"]
-        ]
-        assert str(rendered_banners) == snapshot
-
-    with override_settings(PILOTAGE_SHOW_STATS_WEBINAR=False):
-        response = client.get(url)
-        assert response.status_code == 200
-        assert response.context["pilotage_webinar_banners"] == []
-
-
 @override_settings(
     METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar", TALLY_URL="http://tally.fake"
 )
