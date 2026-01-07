@@ -28,13 +28,13 @@
         {% include "apply/includes/job_description_fields.html" %}
 
         {% bootstrap_field form_accept.hiring_start_at wrapper_class="form-group form-group-input-w-lg-33" %}
+        {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
 
         {# reloadable training and qualification for GEIQ #}
         {% if company.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
         {% endif %}
 
-        {% bootstrap_field form_accept.hiring_end_at wrapper_class="form-group form-group-input-w-lg-33" %}
         {% bootstrap_field form_accept.answer %}
 
         {% itou_buttons_form primary_label="Valider l’embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information secondary_url=back_url reset_url=reset_url %}
