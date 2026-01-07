@@ -1,4 +1,7 @@
-from itou.nexus.enums import Service
+from django.utils import timezone
+
+from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Service
+from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 
 
 SERVICE_MAPPING = {
@@ -14,3 +17,116 @@ SERVICE_MAPPING = {
 
 def service_id(service, id):
     return f"{SERVICE_MAPPING[service]}--{id}"
+
+
+# ------------------------------------------------
+# Sync utils
+
+
+def init_full_sync(service):
+    now = timezone.now()
+    NexusRessourceSyncStatus.objects.update_or_create(
+        service=service,
+        defaults={"in_progress_since": now},
+        create_defaults={"service": service, "in_progress_since": now},
+    )
+    return now
+
+
+def complete_full_sync(service, started_at):
+    return bool(
+        NexusRessourceSyncStatus.objects.filter(service=service, in_progress_since=started_at).update(
+            in_progress_since=None, valid_since=started_at
+        )
+    )
+
+
+def build_user(user_data, service):
+    return NexusUser(
+        source=service,
+        id=service_id(service, user_data["source_id"]),
+        kind=USER_KIND_MAPPING[service][user_data["source_kind"]],
+        **user_data,
+    )
+
+
+def sync_users(nexus_users):
+    update_fields = [
+        "kind",
+        "source_kind",
+        "source_id",
+        "first_name",
+        "last_name",
+        "email",
+        "phone",
+        "last_login",
+        "auth",
+        "updated_at",
+    ]
+    return len(
+        NexusUser.objects.bulk_create(
+            nexus_users,
+            update_conflicts=True,
+            update_fields=update_fields,
+            unique_fields=["id"],
+        )
+    )
+
+
+def build_membership(membership_data, service):
+    return NexusMembership(
+        source=service,
+        user_id=service_id(service, membership_data["user_id"]),
+        structure_id=service_id(service, membership_data["structure_id"]),
+        role=membership_data["role"],
+    )
+
+
+def sync_memberships(nexus_memberships):
+    return len(
+        NexusMembership.objects.bulk_create(
+            nexus_memberships,
+            update_conflicts=True,
+            update_fields=["role", "updated_at"],
+            unique_fields=["user", "structure"],
+        )
+    )
+
+
+def build_structure(structure_data, service):
+    return NexusStructure(
+        source=service,
+        id=service_id(service, structure_data["source_id"]),
+        kind=STRUCTURE_KIND_MAPPING[service][structure_data["source_kind"]],
+        **structure_data,
+    )
+
+
+def sync_structures(nexus_structures):
+    return len(
+        NexusStructure.objects.bulk_create(
+            nexus_structures,
+            update_conflicts=True,
+            update_fields=[
+                "kind",
+                "source_kind",
+                "source_id",
+                "siret",
+                "name",
+                "phone",
+                "email",
+                "address_line_1",
+                "address_line_2",
+                "post_code",
+                "city",
+                "department",
+                "accessibility",
+                "description",
+                "opening_hours",
+                "source_link",
+                "website",
+                "updated_at",
+            ],
+            unique_fields=["id"],
+        )
+    )
