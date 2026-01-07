@@ -47,11 +47,30 @@
             </div>
         </div>
     {% empty %}
-        <div class="c-box c-box--results mb-3 mb-md-4">
-            <div class="c-box--results__body">
-                <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
+        {% if api_error %}
+            <div class="c-box c-box--results mb-3 mb-md-4">
+                <div class="c-box--results__body">
+                    <div class="alert alert-warning show" role="status">
+                        <div class="row">
+                            <div class="col-auto pe-0">
+                                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                            </div>
+                            <div class="col">
+                                <p class="mb-0">
+                                    Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/" target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez réessayer ultérieurement.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <div class="c-box c-box--results mb-3 mb-md-4">
+                <div class="c-box--results__body">
+                    <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
+                </div>
+            </div>
+        {% endif %}
     {% endfor %}
 
     {% include "includes/pagination.html" with page=results boost=True boost_indicator="#services-search-results" request=request only %}

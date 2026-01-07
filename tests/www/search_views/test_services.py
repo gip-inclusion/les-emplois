@@ -2,9 +2,8 @@ import random
 
 import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
-from django.contrib import messages
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertMessages
+from pytest_django.asserts import assertContains
 
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from tests.cities.factories import create_city_vannes
@@ -108,16 +107,13 @@ def test_results_are_cached(client, search_services_route):
     assert search_services_route.call_count == 2
 
 
-def test_api_error(client, search_services_route):
+def test_api_error(snapshot, client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     search_services_route.side_effect = DataInclusionApiException
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    expected_text = """Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/"
-                        target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez
-                        réessayer ultérieurement."""
-    assertMessages(response, [messages.Message(messages.ERROR, expected_text)])
+    assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot()
 
     # Make a second call to check the results were cached
     assert search_services_route.call_count == 1

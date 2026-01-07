@@ -1,4 +1,32 @@
 # serializer version: 1
+# name: test_api_error
+  '''
+  <div id="services-search-results">
+      <div class="c-box c-box--results mb-3 mb-md-4">
+          <div class="c-box--results__body">
+              <div class="alert alert-warning show" role="status">
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-warning">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-0">
+                              Une erreur est survenue lors de l'appel à
+                              <a class="has-external-link" href="https://data.inclusion.gouv.fr/" rel="noopener" target="_blank">
+                                  data·inclusion
+                              </a>
+                              . Veuillez réessayer ultérieurement.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
 # name: test_results_html
   '''
   <div id="services-search-results">

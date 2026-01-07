@@ -6,7 +6,6 @@ from urllib.parse import urlencode
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.core.cache import caches
@@ -14,7 +13,6 @@ from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from itoutils.urls import add_url_params
@@ -378,7 +376,6 @@ def search_services_results(request, template_name="search/services/results.html
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)
 
-    results = []
     if form.is_valid():
         city = form.cleaned_data["city"]
         category = form.cleaned_data["category"]
@@ -398,8 +395,8 @@ def search_services_results(request, template_name="search/services/results.html
             json.dumps(search_query, sort_keys=True, default=str).encode("utf-8")
         ).hexdigest()
         cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:search:{search_query_hash}"
-        results = caches["failsafe"].get(cache_key)
-        if results is None:
+        cached_data = caches["failsafe"].get(cache_key)
+        if cached_data is None:
             client = DataInclusionApiV1Client(
                 settings.API_DATA_INCLUSION_BASE_URL,
                 settings.API_DATA_INCLUSION_TOKEN,
@@ -407,36 +404,36 @@ def search_services_results(request, template_name="search/services/results.html
             try:
                 results = client.search_services(**search_query)
             except DataInclusionApiException:
-                logger.exception("Failed to search services from data·inclusion API for query=%s", search_query)
-                messages.error(
-                    request,
-                    mark_safe(
-                        """Une erreur est survenue lors de l'appel à <a href="https://data.inclusion.gouv.fr/"
-                        target="_blank" rel="noopener" class="has-external-link">data·inclusion</a>. Veuillez
-                        réessayer ultérieurement."""
-                    ),
-                )
-                results = []
+                logger.exception("Failed to search services from data·inclusion API with query=%s", search_query)
+                api_error, results = True, []
                 # 15 minutes seems like a reasonable amount of time for DI to get back on track
-                caches["failsafe"].set(cache_key, results, 60 * 15)
+                caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
             else:
-                results = sorted(
-                    results,
-                    key=lambda i: (
-                        data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in i["modes_accueil"],
-                        i["source"] == "dora",
+                api_error, results = (
+                    False,
+                    sorted(
+                        results,
+                        key=lambda i: (
+                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in i["modes_accueil"],
+                            i["source"] == "dora",
+                        ),
+                        reverse=True,
                     ),
-                    reverse=True,
                 )
                 # 6 hours is reasonable enough to get fresh results while still avoiding
                 # hitting the API too much. The API content is updated daily or hourly;
                 # we want changes to be propagated at a reasonable time.
-                caches["failsafe"].set(cache_key, results, 6 * 60 * 60)
+                caches["failsafe"].set(cache_key, (api_error, results), 6 * 60 * 60)
+        else:
+            api_error, results = cached_data
+    else:
+        api_error, results = None, []
 
     context = {
         "form": form,
         "city": city,
         "category": category,
+        "api_error": api_error,
         "results": pager(results, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
         "matomo_custom_title": "Recherche de services d'insertion",
         "back_url": reverse("search:services_home"),
