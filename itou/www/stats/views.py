@@ -124,8 +124,9 @@ def render_stats(
 
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
+
+    base_context.setdefault("pilotage_webinar_banners", [])
     if request.user.is_authenticated and request.user.is_employer:
-        base_context.setdefault("pilotage_webinar_banners", [])
         base_context["pilotage_webinar_banners"].append(
             {
                 "title": "Nouveauté",
@@ -137,16 +138,6 @@ def render_stats(
             }
         )
 
-    if "pilotage_webinar_banners" not in base_context:
-        base_context["pilotage_webinar_banners"] = [
-            {
-                "title": "Des questions sur l’utilisation des tableaux de bord ?",
-                "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois.",  # noqa: E501
-                "call_to_action": "Je m’inscris",
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1",
-                "is_displayable": lambda: settings.PILOTAGE_SHOW_STATS_WEBINAR,
-            }
-        ]
     base_context["pilotage_webinar_banners"] = [
         banner for banner in base_context["pilotage_webinar_banners"] if banner["is_displayable"]()
     ]

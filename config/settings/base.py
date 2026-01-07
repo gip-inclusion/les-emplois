@@ -831,7 +831,6 @@ BREVO_API_URL = "https://api.brevo.com/v3"
 
 # Pilotage
 # ------------------------------------------------------------------------------
-PILOTAGE_SHOW_STATS_WEBINAR = os.getenv("PILOTAGE_SHOW_STATS_WEBINAR", True) in [True, "True", "true"]
 PILOTAGE_SLACK_WEBHOOK_URL = os.getenv("PILOTAGE_SLACK_WEBHOOK_URL")
 
 # Shared secrets
