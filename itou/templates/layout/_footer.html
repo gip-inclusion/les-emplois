@@ -97,37 +97,6 @@
     </section>
 
     <section class="s-footer-legal">
-        <div class="s-footer-legal__container container">
-            <div class="s-footer-legal__row row">
-                <div class="s-footer-legal__col col-12">
-                    <ul>
-                        <li>
-                            <a href="{% url 'accessibility' %}">Accessibilité : partiellement conforme</a>
-                        </li>
-                        <li>
-                            <a href="https://github.com/gip-inclusion/les-emplois" rel="noopener" target="_blank">Code source</a>
-                        </li>
-                        <li>
-                            <a href="{% static 'pdf/syntheseSecurite.pdf' %}" rel="noopener" target="_blank">Sécurité : Homologation avec MonServiceSécurisé</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'legal-notice' %}">Mentions légales</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'legal-terms' %}">Conditions générales</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'legal-privacy' %}">Confidentialité</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'stats:stats_public' %}">Statistiques, lexiques et indicateurs</a>
-                        </li>
-                    </ul>
-                    <p>
-                        Sauf mention contraire, tous les contenus de ce site sont sous licence <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank" aria-label="Licence ouverte Etalab (lien externe)">etalab-2.0</a>
-                    </p>
-                </div>
-            </div>
-        </div>
+        <div class="s-footer-legal__container container">{% include "layout/_footer_legal_content.html" %}</div>
     </section>
 </footer>
