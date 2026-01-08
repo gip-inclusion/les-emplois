@@ -115,7 +115,7 @@ def activate(request, service):
     try:
         next_url = {
             Service.MON_RECAP: reverse("nexus:homepage"),
-            Service.PILOTAGE: reverse("nexus:homepage"),
+            Service.PILOTAGE: reverse("nexus:pilotage"),
         }[service]
     except KeyError:
         raise Http404
@@ -134,3 +134,7 @@ def activate(request, service):
 
 class CommunauteView(NexusMixin, TemplateView):
     template_name = "nexus/communaute.html"
+
+
+class PilotageView(NexusMixin, TemplateView):
+    template_name = "nexus/pilotage.html"
