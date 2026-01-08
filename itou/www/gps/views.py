@@ -136,7 +136,7 @@ class GroupMembershipsView(GroupDetailsMixin, TemplateView):
         memberships = (
             FollowUpGroupMembership.objects.filter(follow_up_group=self.group)
             .filter(is_active=True)
-            .order_by("-is_referent_certified", "-created_at")
+            .order_by("-is_referent_certified", "-started_at", "-created_at")
             .select_related("member")
             .prefetch_related(
                 "member__prescriberorganization_set",
