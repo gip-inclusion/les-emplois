@@ -7,6 +7,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
+from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
 from itou.nexus.utils import build_user, serialize_user, sync_users
@@ -138,6 +139,35 @@ class CommunauteView(NexusMixin, TemplateView):
 
 class DoraView(NexusMixin, TemplateView):
     template_name = "nexus/dora.html"
+
+
+class EmploisView(NexusMixin, TemplateView):
+    def dispatch(self, request, *args, **kwargs):
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            if self.user_kind != NexusUserKind.FACILITY_MANAGER:
+                # The user doesn't have access to this page anymore
+                return HttpResponseRedirect(reverse("nexus:hompage"))
+            # FIXME Store default structure to session if not there
+            self.current_structure = self.activated_services_with_memberships[Service.EMPLOIS][0]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        if Service.EMPLOIS in self.activated_services_with_memberships:
+            return ["nexus/emplois_list.html"]
+        return ["nexus/emplois_inactive.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["job_description_count"] = 0
+        if Service.EMPLOIS in self.activated_services_with_memberships and self.request.user.is_employer:
+            context["job_descriptions"] = JobDescription.objects.filter(
+                is_active=True, company__uid=self.current_structure.source_id
+            )
+            context["job_description_count"] = len(context["job_descriptions"])
+
+            context["current_structure"] = self.current_structure
+        return context
 
 
 class MarcheView(NexusMixin, TemplateView):

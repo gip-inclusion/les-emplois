@@ -1,14 +1,18 @@
+import datetime
 import random
 
 from django.conf import settings
 from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusUserFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -219,6 +223,42 @@ class TestDoraView:
 
         response = client.get(reverse("nexus:dora"))
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestEmploisViews:
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUser.objects.update(source=Service.DORA)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:emplois"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_list(self, client, snapshot):
+        user = EmployerFactory()
+        company = CompanyMembershipFactory(user=user, company__for_snapshot=True).company
+        client.force_login(user)
+
+        create_test_romes_and_appellations(["N1101"])
+        job = JobDescriptionFactory(
+            company=company,
+            for_snapshot=True,
+            last_employer_update_at=timezone.now() - datetime.timedelta(days=10),
+        )
+
+        response = client.get(reverse("nexus:emplois"))
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    "#main",
+                    replace_in_attr=[
+                        ("href", f"job_description/{job.pk}", "job_description/[PK of JobDescription]"),
+                    ],
+                )
+            )
+            == snapshot
+        )
 
 
 class TestMarcheView:

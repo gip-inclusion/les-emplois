@@ -273,6 +273,239 @@
   
   '''
 # ---
+# name: TestEmploisViews.test_list
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                  Fiches de poste
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div aria-label="Actions sur les groupes de suivi" class="c-title__cta" role="group">
+                              <div class="dropdown dropdown-structure">
+                                  <button aria-controls="switchUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-lg btn-primary btn-ico dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                                      <i aria-hidden="true" class="ri-community-line">
+                                      </i>
+                                      <span>
+                                          Acme inc.
+                                      </span>
+                                  </button>
+                                  <div class="dropdown-menu w-100" id="switchUserDropdown">
+                                      <form action="" method="post">
+                                          <ul class="list-unstyled">
+                                              <li>
+                                                  <button class="dropdown-item dropdown-item__summary" name="organization_id" value="3853">
+                                                      <i aria-hidden="true" class="ri-community-line">
+                                                      </i>
+                                                      <span>
+                                                          EI
+                                                      </span>
+                                                      <strong data-bs-title="El Garage Martinet Nord" data-bs-toggle="tooltip">
+                                                          El Garage Martinet Nord
+                                                      </strong>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <button class="dropdown-item dropdown-item__summary" name="organization_id" value="3611">
+                                                      <i aria-hidden="true" class="ri-community-line">
+                                                      </i>
+                                                      <span>
+                                                          EITI
+                                                      </span>
+                                                      <strong>
+                                                          Terre & mer
+                                                      </strong>
+                                                  </button>
+                                              </li>
+                                          </ul>
+                                      </form>
+                                      <a class="dropdown-item dropdown-item__summary is-last-sticky" href="">
+                                          <i aria-hidden="true" class="ri-add-line">
+                                          </i>
+                                          <span>
+                                              Créer ou rejoindre
+                                          </span>
+                                          <strong>
+                                              une nouvelle structure
+                                          </strong>
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                          <p class="mb-0">
+                              1 RÉSULTAT
+                          </p>
+                          <div aria-label="Actions sur les candidatures" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
+                              <a class="btn btn-outline-primary btn-ico" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="modifier-fiche-de-poste" href=" /company/job_description_list">
+                                  <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                  </i>
+                                  <span>
+                                      Modifier
+                                  </span>
+                              </a>
+                              <a class="btn btn-outline-primary btn-ico" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="creer-fiche-de-poste" href="/company/edit_job_description">
+                                  <i aria-hidden="true" class="ri-add-line ri-lg">
+                                  </i>
+                                  <span>
+                                      Créer une nouvelle fiche de poste
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <div class="table-responsive mt-3 mt-md-4">
+                          <table class="table table-hover">
+                              <caption class="visually-hidden">
+                                  Liste des collaborateurs
+                              </caption>
+                              <thead>
+                                  <tr>
+                                      <th scope="col">
+                                          Métiers
+                                      </th>
+                                      <th scope="col">
+                                          Statut
+                                      </th>
+                                      <th scope="col">
+                                          Localisation
+                                      </th>
+                                      <th scope="col">
+                                          Nbre de postes
+                                      </th>
+                                      <th scope="col">
+                                          Mise a jour
+                                      </th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <a aria-label="Lien vers fiche de poste : 'Agent / Agente cariste de livraison ferroviaire'" class="btn-link" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="clic-fiche-poste" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/portal/service/emplois" title="Agent / Agente cariste de livraison ferroviaire">
+                                              Agent / Agente cariste de livraison ferroviaire
+                                          </a>
+                                      </td>
+                                      <td>
+                                          <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
+                                              Ouvert
+                                          </span>
+                                      </td>
+                                      <td>
+                                          <span class="d-flex align-items-center">
+                                              <i aria-hidden="true" class="ri-map-pin-line me-1">
+                                              </i>
+                                              <span aria-label="Vannes - 56" title="Vannes - 56">
+                                                  Vannes - 56
+                                              </span>
+                                          </span>
+                                      </td>
+                                      <td>
+                                          1
+                                      </td>
+                                      <td>
+                                          <span>
+                                              Il y a 10 jours
+                                          </span>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestEmploisViews.test_not_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                  Fiches de poste
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="Les emplois de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-emplois.png"/>
+                          </div>
+                          <h2 class="h3">
+                              Le service de recrutement et de gestion des PASS IAE
+                          </h2>
+                          <p class="mb-md-4">
+                              Publiez vos fiches de poste.
+                              <br/>
+                              Recevez des candidatures de la part des accompagnateurs et des candidats.
+                              <br/>
+                              Obtenez un
+                              <a class="has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" rel="noopener" target="_blank">
+                                  PASS IAE
+                              </a>
+                              en ligne dès l’embauche d’un candidat.
+                          </p>
+                          <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" type="button">
+                              <i aria-hidden="true" class="ri-toggle-line">
+                              </i>
+                              <span>
+                                  Activer ce service
+                              </span>
+                          </button>
+                          <br/>
+                          <a aria-label="Découvrir Les emplois de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="les-emplois" href="/dashboard/" target="_blank">
+                              Découvrir Les emplois de l’inclusion
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestHomePageView.test_all_activated_services
   '''
   <main class="s-main" id="main" role="main">
@@ -1749,7 +1982,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
@@ -1928,7 +2161,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
@@ -2104,7 +2337,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
