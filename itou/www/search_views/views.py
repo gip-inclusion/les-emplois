@@ -29,7 +29,6 @@ from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
-from itou.www.companies_views.views import DATA_INCLUSION_API_CACHE_PREFIX
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
     NewSavedSearchForm,
@@ -394,7 +393,7 @@ def search_services_results(request, template_name="search/services/results.html
         search_query_hash = hashlib.md5(
             json.dumps(search_query, sort_keys=True, default=str).encode("utf-8")
         ).hexdigest()
-        cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:search:{search_query_hash}"
+        cache_key = f"data_inclusion_api_results:search:{search_query_hash}"
         cached_data = caches["failsafe"].get(cache_key)
         if cached_data is None:
             client = DataInclusionApiV1Client(
