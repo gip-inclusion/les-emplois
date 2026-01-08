@@ -1,0 +1,26 @@
+{% load django_bootstrap5 %}
+
+{% bootstrap_form_errors form type="all" %}
+
+<div class="c-search__bar__grid">
+    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap align-items-center">
+        <label class="input-group-text mb-0{% if is_home %} ps-0{% endif %}" for="{{ form.city.id_for_label }}">
+            <span class="visually-hidden">{{ form.city.label }}</span>
+            <i class="ri-map-pin-line fw-medium ri-xl {% if is_home %}text-tertiary{% else %}text-disabled{% endif %}" aria-hidden="true"></i>
+        </label>
+        {{ form.city }}
+    </div>
+    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap align-items-center">
+        <label class="input-group-text mb-0{% if is_home %} ps-0{% endif %}" for="{{ form.category.id_for_label }}">
+            <span class="visually-hidden">{{ form.category.label }}</span>
+            <i class="ri-list-check-3 fw-medium ri-xl {% if is_home %}text-tertiary{% else %}text-disabled{% endif %}" aria-hidden="true"></i>
+        </label>
+        {{ form.category }}
+    </div>
+    <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl{% endif %}">
+        <button class="btn btn-block btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %} js-search-button" aria-label="Rechercher un service d'insertion">
+            <i class="ri-search-line ri-xl fw-bold" aria-hidden="true"></i>
+            <span class="me-1">Rechercher</span>
+        </button>
+    </div>
+</div>

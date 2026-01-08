@@ -65,7 +65,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
             "distance": 1,
         },
     ]
-    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/api/v0/search/services")
     api_mock.respond(
         200,
         json={
@@ -204,7 +204,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
 
 def test_hx_dora_services(htmx_client, snapshot, settings, respx_mock):
     settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr/"
-    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/api/v0/search/services")
     base_service = {
         "id": "svc1",
         "source": "dora",
@@ -232,7 +232,7 @@ def test_hx_dora_services(htmx_client, snapshot, settings, respx_mock):
 
 def test_hx_dora_services_with_address(htmx_client, snapshot, settings, respx_mock):
     settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr/"
-    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/api/v0/search/services")
     base_service = {
         "id": "svc1",
         "source": "dora",
@@ -266,7 +266,9 @@ def test_dora_service_redirect(client, settings, respx_mock):
     settings.API_DATA_INCLUSION_TOKEN = "fake-token"
     url = reverse("companies_views:dora_service_redirect", kwargs={"source": "dora", "service_id": "foo"})
 
-    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").respond(200, json={"id": "foo", "source": "dora"})
+    respx_mock.get("https://fake.api.gouv.fr/api/v0/services/dora/foo").respond(
+        200, json={"id": "foo", "source": "dora"}
+    )
     response = client.get(url)
     assert response.status_code == 302
     assert response.url == (
@@ -274,6 +276,6 @@ def test_dora_service_redirect(client, settings, respx_mock):
         "?mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService"
     )
 
-    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").respond(500)
+    respx_mock.get("https://fake.api.gouv.fr/api/v0/services/dora/foo").respond(500)
     response = client.get(url)
     assert response.status_code == 404
