@@ -235,8 +235,9 @@ class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
 
-        creating = self.job_application is None
+        return self.confirm_acceptance(creating=self.job_application is None, request=request)
 
+    def confirm_acceptance(self, creating, request):
         try:
             with transaction.atomic():
                 if form_personal_data := self.forms.get("personal_data"):
