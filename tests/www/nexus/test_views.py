@@ -313,3 +313,12 @@ class TestPilotageView:
 
         response = client.get(reverse("nexus:pilotage"))
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestStructuresView:
+    def test_display(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:structures"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot

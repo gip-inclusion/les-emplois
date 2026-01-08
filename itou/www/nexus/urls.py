@@ -9,6 +9,7 @@ app_name = "nexus"
 urlpatterns = [
     path("auto-login", auto_login, name="auto_login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
+    path("structures", views.StructuresView.as_view(), name="structures"),
     path("activate/<str:service>", views.activate, name="activate"),
     path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
     path("service/dora", views.DoraView.as_view(), name="dora"),

@@ -1970,13 +1970,26 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
-                      <i aria-hidden="true" class="ri-home-line">
-                      </i>
-                      <span class="d-md-none d-xl-inline-flex">
-                          Accueil
-                      </span>
-                  </a>
+                  <ul>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
+                              <i aria-hidden="true" class="ri-home-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Accueil
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/structures">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Infos structure
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
                   <strong>
                       GÉRER MES OFFRES
                   </strong>
@@ -2149,13 +2162,26 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
-                      <i aria-hidden="true" class="ri-home-line">
-                      </i>
-                      <span class="d-md-none d-xl-inline-flex">
-                          Accueil
-                      </span>
-                  </a>
+                  <ul>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
+                              <i aria-hidden="true" class="ri-home-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Accueil
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/structures">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Infos structure
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
                   <strong>
                       GÉRER MES OFFRES
                   </strong>
@@ -2325,13 +2351,26 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
-                      <i aria-hidden="true" class="ri-home-line">
-                      </i>
-                      <span class="d-md-none d-xl-inline-flex">
-                          Accueil
-                      </span>
-                  </a>
+                  <ul>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
+                              <i aria-hidden="true" class="ri-home-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Accueil
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/structures">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Infos structure
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
                   <strong>
                       GÉRER MES OFFRES
                   </strong>
@@ -2504,13 +2543,26 @@
                           </button>
                       </div>
                   </div>
-                  <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
-                      <i aria-hidden="true" class="ri-home-line">
-                      </i>
-                      <span class="d-md-none d-xl-inline-flex">
-                          Accueil
-                      </span>
-                  </a>
+                  <ul>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus active" href="/portal/homepage">
+                              <i aria-hidden="true" class="ri-home-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Accueil
+                              </span>
+                          </a>
+                      </li>
+                      <li>
+                          <a aria-label="Retour à l'accueil" class="btn btn-lg btn-ico btn-nexus" href="/portal/structures">
+                              <i aria-hidden="true" class="ri-community-line">
+                              </i>
+                              <span class="d-md-none d-xl-inline-flex">
+                                  Infos structure
+                              </span>
+                          </a>
+                      </li>
+                  </ul>
                   <strong>
                       TROUVER & ORIENTER
                   </strong>
@@ -2998,6 +3050,51 @@
                           <div class="text-center">
                               <img alt="" class="img-fluid" src="/static/img/nexus/presentation_pilotage.png" width="1200"/>
                           </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestStructuresView.test_display
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  Infos structure
+                              </h1>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-02.png"/>
+                          </div>
+                          <p class="mb-md-4">
+                              Prochainement, vous pourrez gérer depuis cet espace toutes les informations de
+                              <br/>
+                              votre structure, sur l’ensemble de vos services connectés.
+                          </p>
+                      </div>
+                      <div class="text-center">
+                          <img alt="" class="img-fluid" src="/static/img/nexus/presentation_infos_structure.png" width="1200"/>
                       </div>
                   </div>
               </div>
