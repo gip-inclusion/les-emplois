@@ -205,7 +205,7 @@
                                           <li>
                                               Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
                   Vous pouvez vous appuyer sur le document
-                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="/nexus/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr%2Fsurveys%2Fdsp%2Fcreate%2F" rel="noreferrer noopener" target="_blank">
+                                              <a aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)" class="has-external-link" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr%2Fsurveys%2Fdsp%2Fcreate%2F" rel="noreferrer noopener" target="_blank">
                                                   diagnostic socio-professionnel de référence
                                               </a>
                                               .
