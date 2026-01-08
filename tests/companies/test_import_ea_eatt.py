@@ -36,7 +36,8 @@ def archive_file_fixture():
     archive = io.BytesIO()
 
     data = [
-        "L|ASP|EA|V1.0|20241231|235959|",  # File header
+        # File header
+        "L|ASP|EA|V1.0|20241231|235959|",
         # Columns headers
         "ITOU|Type d'entreprise adaptée|Numéro de COT/CPOM|Identifiant EA2 Signataire|Siret Signataire"
         "|Dénomination / raison sociale Signataire|Courriel du contact étab signataire|Siret de l'établissement membre"
@@ -59,6 +60,29 @@ def archive_file_fixture():
         "|00000000000002|Nomail SA|5||1||Rue|DE LA MOTTE|77550|77296|",
         # File footer
         "Z|ASP|EA|20241231|235959|4|7|",
+    ]
+    with zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
+        fp.setpassword(b"password")
+        fp.writestr("EA2_ITOU.txt", data="\n".join(data))
+
+    archive.seek(0)
+    return archive
+
+
+@pytest.fixture(name="archive_file_without_companies")
+def archive_file_without_companies_fixture():
+    archive = io.BytesIO()
+
+    data = [
+        # File header
+        "L|ASP|EA|V1.0|20260105|092352|",
+        # Columns headers
+        "ITOU|Type d'entreprise adaptée|Numéro de COT/CPOM|Identifiant EA2 Signataire|Siret Signataire"
+        "|Dénomination / raison sociale Signataire|Courriel du contact étab signataire|Siret de l'établissement membre"
+        "|Dénomination / raison sociale|Identifiant EA2 Etablissement|Numéro entrée ou batiment|Numéro de voie"
+        "|Extension de voie|Code voie|Libelle de la voie|Code Postal|Code INSEE commune|",
+        # File footer
+        "Z|ASP|EA|20260105|092352|0|3|",
     ]
     with zipfile.ZipFile(archive, mode="w", compression=zipfile.ZIP_DEFLATED) as fp:
         fp.setpassword(b"password")
@@ -176,6 +200,17 @@ def test_process_file_from_archive(caplog, snapshot, settings, command, archive_
         "coords",
     ]
     assert list(Company.objects.all().order_by("pk").values_list(*filled_fields)) == snapshot(name="data")
+
+
+def test_process_file_when_there_is_no_company_rows(
+    caplog, snapshot, settings, command, archive_file_without_companies
+):
+    settings.ASP_EA2_UNZIP_PASSWORD = "password"
+
+    command.handle(from_archive=archive_file_without_companies, wet_run=True)
+
+    assert extract_logs(caplog, extra_keys=["info_stats"]) == snapshot(name="logs")
+    assert Company.objects.all().count() == 0
 
 
 @pytest.mark.parametrize(

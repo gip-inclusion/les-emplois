@@ -129,6 +129,10 @@ class Command(BaseCommand):
         else:
             raise RuntimeError("File doesn't conform to the expected format: %s", "Z|ASP|EA|")
 
+        if not rows:
+            self.logger.info("No rows found in file '%s', nothing to be done", file.name)
+            return
+
         info_stats = {}
 
         ea_eatt_df = pd.DataFrame(rows)
