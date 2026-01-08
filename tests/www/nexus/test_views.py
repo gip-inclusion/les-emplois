@@ -204,6 +204,23 @@ class TestCommunauteView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
 
+class TestMarcheView:
+    def test_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.MARCHE, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:marche"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:marche"))
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
 class TestMonRecapView:
     def test_activated(self, client, snapshot):
         user = PrescriberFactory()

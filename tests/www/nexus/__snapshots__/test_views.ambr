@@ -1633,7 +1633,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Prestations commerciales
@@ -1809,7 +1809,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Prestations commerciales
@@ -1988,7 +1988,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Prestations commerciales
@@ -2240,6 +2240,139 @@
           </div>
       </div>
   </header>
+  
+  '''
+# ---
+# name: TestMarcheView.test_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Le marché de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                  Prestations commerciales
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="Le marché de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-marche.png"/>
+                          </div>
+                          <h2 class="h3">
+                              Le service de mise en relation entre acheteurs et structures d’insertion
+                          </h2>
+                          <p class="mb-md-4">
+                              Renseignez votre activité commerciale.
+                              <br/>
+                              Recevez des demandes de clients publics et privés.
+                              <br/>
+                              Développez votre activité commerciale.
+                          </p>
+                          <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/login/" target="_blank">
+                              <span>
+                                  Accéder à mon tableau de bord
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir Le Marché  de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/" target="_blank">
+                              Découvrir Le Marché de l’inclusion
+                          </a>
+                          <div class="text-center">
+                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_marche.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestMarcheView.test_not_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Le marché de l'inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion-mono.svg"/>
+                                  Prestations commerciales
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="Le marché de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-marche-inclusion.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-marche.png"/>
+                          </div>
+                          <h2 class="h3">
+                              Le service de mise en relation entre acheteurs et structures d’insertion
+                          </h2>
+                          <p class="mb-md-4">
+                              Renseignez votre activité commerciale.
+                              <br/>
+                              Recevez des demandes de clients publics et privés.
+                              <br/>
+                              Développez votre activité commerciale.
+                          </p>
+                          <a class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/accounts/signup/">
+                              <i aria-hidden="true" class="ri-toggle-line">
+                              </i>
+                              <span>
+                                  Activer ce service
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir Le Marché  de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="le-marche" href="https://lemarche.inclusion.gouv.fr/" target="_blank">
+                              Découvrir Le Marché de l’inclusion
+                          </a>
+                          <div class="text-center">
+                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_marche.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
   '''
 # ---
