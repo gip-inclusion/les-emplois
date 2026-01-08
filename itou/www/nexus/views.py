@@ -56,17 +56,8 @@ class NexusMixin(UserPassesTestMixin):
         # if Service.DORA in self.activated_services_with_memberships:
         #     context["dora_badge_count"] = 0
 
-        return context
-
-
-class HomePageView(NexusMixin, TemplateView):
-    template_name = "nexus/homepage.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
         # FIXME: Handle demo environments
-        # Activated services access urls
+        # services activation or access urls
         if Service.EMPLOIS in self.activated_services_with_memberships:
             context["emplois_url"] = reverse("dashboard:index")
         else:
@@ -101,6 +92,15 @@ class HomePageView(NexusMixin, TemplateView):
         else:
             context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
 
+        return context
+
+
+class HomePageView(NexusMixin, TemplateView):
+    template_name = "nexus/homepage.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         context["all_services_activated"] = context["activated_services"] == set(Service.activable())
         context["new_service_shown"] = next(
             (service for service in Service.activable() if service not in context["activated_services"]), None
@@ -130,3 +130,7 @@ def activate(request, service):
     messages.success(request, f"Service activé||Vous avez bien activé le service {service.label}", extra_tags="toast")
 
     return HttpResponseRedirect(next_url)
+
+
+class CommunauteView(NexusMixin, TemplateView):
+    template_name = "nexus/communaute.html"

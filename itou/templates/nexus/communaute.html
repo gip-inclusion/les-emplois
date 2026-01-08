@@ -1,0 +1,90 @@
+{% extends "nexus/layout/base.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Aide de la commuauté {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title align-items-center">
+                        <div class="c-title__main">
+                            <h1>
+                                <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="35" alt="La communauté de l’inclusion">
+                                Aide de la communauté
+                                {% if Service.COMMUNAUTE in activated_services %}
+                                    <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                        <i class="ri-check-line" aria-hidden="true"></i>
+                                        Activé
+                                    </span>
+                                {% endif %}
+                            </h1>
+                        </div>
+                        <div class="c-title__service d-none d-lg-block">
+                            <img src="{% static_theme_images 'logo-communaute-inclusion.svg' %}" height="50" alt="La communauté de l’inclusion">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="text-center">
+                        <div class="mb-3 mb-md-4">
+                            <img src="{% static_theme_images 'nexus/nx-illustration-communaute.png' %}" alt="">
+                        </div>
+                        <h2 class="h3">L’espace d’entraide des professionnels de l’inclusion</h2>
+                        <p class="mb-md-4">
+                            Posez directement votre question aux 14 000 utilisateurs actifs.
+                            <br>
+                            Trouvez une information parmi les 8000 échanges entre pairs.
+                            <br>
+                            Améliorez vos pratiques professionnelles en lisant nos fiches pratiques.
+                        </p>
+                        {% if Service.COMMUNAUTE in activated_services %}
+                            <div class="d-flex justify-content-center gap-2 flex-column flex-sm-row">
+                                <a href="https://communaute.inclusion.gouv.fr/search" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.COMMUNAUTE %} target="_blank">
+                                    <span>Lancer une recherche</span>
+                                </a>
+                                <a href="https://communaute.inclusion.gouv.fr/forum/espace-d%C3%A9changes-113/topic/create/"
+                                   class="btn btn-lg btn-outline-primary has-external-link"
+                                   {% matomo_event "nexus" "acceder-service" Service.COMMUNAUTE %}
+                                   target="_blank">
+                                    <span>Poser une question</span>
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{{ communaute_url }}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                <span>Activer ce service</span>
+                            </a>
+                            <br>
+                        {% endif %}
+                        <a href="https://communaute.inclusion.gouv.fr/"
+                           class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+                           aria-label="Découvrir La Communauté de l’inclusion (lien externe)"
+                           target="_blank"
+                           {% matomo_event "nexus" "decouvrir-service" Service.COMMUNAUTE %}>
+                            Découvrir La Communauté de l’inclusion
+                        </a>
+                        <div class="text-center">
+                            <img src="{% static 'img/nexus/presentation_communaute.png' %}" alt="" class="img-fluid" width=1200 %>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,4 +1,143 @@
 # serializer version: 1
+# name: TestCommunauteView.test_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                  Aide de la communauté
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="La communauté de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-communaute.png"/>
+                          </div>
+                          <h2 class="h3">
+                              L’espace d’entraide des professionnels de l’inclusion
+                          </h2>
+                          <p class="mb-md-4">
+                              Posez directement votre question aux 14 000 utilisateurs actifs.
+                              <br/>
+                              Trouvez une information parmi les 8000 échanges entre pairs.
+                              <br/>
+                              Améliorez vos pratiques professionnelles en lisant nos fiches pratiques.
+                          </p>
+                          <div class="d-flex justify-content-center gap-2 flex-column flex-sm-row">
+                              <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/search" target="_blank">
+                                  <span>
+                                      Lancer une recherche
+                                  </span>
+                              </a>
+                              <a class="btn btn-lg btn-outline-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/forum/espace-d%C3%A9changes-113/topic/create/" target="_blank">
+                                  <span>
+                                      Poser une question
+                                  </span>
+                              </a>
+                          </div>
+                          <a aria-label="Découvrir La Communauté de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
+                              Découvrir La Communauté de l’inclusion
+                          </a>
+                          <div class="text-center">
+                              <img %="" alt="" class="img-fluid" src="/static/img/nexus/presentation_communaute.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestCommunauteView.test_not_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg"/>
+                                  Aide de la communauté
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="La communauté de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-communaute.png"/>
+                          </div>
+                          <h2 class="h3">
+                              L’espace d’entraide des professionnels de l’inclusion
+                          </h2>
+                          <p class="mb-md-4">
+                              Posez directement votre question aux 14 000 utilisateurs actifs.
+                              <br/>
+                              Trouvez une information parmi les 8000 échanges entre pairs.
+                              <br/>
+                              Améliorez vos pratiques professionnelles en lisant nos fiches pratiques.
+                          </p>
+                          <a class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
+                              <i aria-hidden="true" class="ri-toggle-line">
+                              </i>
+                              <span>
+                                  Activer ce service
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir La Communauté de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
+                              Découvrir La Communauté de l’inclusion
+                          </a>
+                          <div class="text-center">
+                              <img %="" alt="" class="img-fluid" src="/static/img/nexus/presentation_communaute.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestHomePageView.test_all_activated_services
   '''
   <main class="s-main" id="main" role="main">
@@ -1523,7 +1662,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Aide de la communauté
@@ -1699,7 +1838,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Aide de la communauté
@@ -1878,7 +2017,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Aide de la communauté
@@ -2046,7 +2185,7 @@
                           </a>
                       </li>
                       <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Aide de la communauté
