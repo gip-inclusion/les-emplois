@@ -370,6 +370,16 @@
     }),
   ])
 # ---
+# name: test_process_file_when_there_is_no_company_rows[logs]
+  list([
+    dict({
+      'funcName': 'process_file',
+      'levelno': 20,
+      'message': "No rows found in file 'EA2_ITOU.txt', nothing to be done",
+      'module': 'import_ea_eatt',
+    }),
+  ])
+# ---
 # name: test_retrieve_archive_of_the_week[logs]
   list([
     dict({
