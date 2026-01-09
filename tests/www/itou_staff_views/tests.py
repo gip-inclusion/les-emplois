@@ -29,8 +29,8 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
-from itou.users.models import NirModificationRequest, User
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
@@ -50,6 +50,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -863,6 +864,115 @@ class TestMergeUsers:
                 f"{membership_model.__module__}.{membership_model.__name__}.updated_by : [{membership.pk}]"
             ),
             f"Fusion utilisateurs {user_1.pk} ← {user_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
+    def test_merge_assignments(self, client, caplog):
+        org = PrescriberOrganizationFactory()
+        prescriber_1 = PrescriberFactory(membership__organization=org)
+        prescriber_2 = PrescriberFactory(membership=None)
+
+        # JSA(job_seeker, from_user, None)
+        # will get: JSA(job_seeker, to_user, None)
+        assignment_1 = JobSeekerAssignmentFactory(prescriber=prescriber_2, prescriber_organization=None)
+
+        # JSA(job_seeker, from_user, None) ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, None)
+        assignment_2 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_2, prescriber_organization=None, last_action_kind=ActionKind.IAE_ELIGIBILITY
+        )
+        assignment_2_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            job_seeker=assignment_2.job_seeker,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
+        )
+
+        # JSA(job_seeker, from_user, None), most recent ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, None) with updated_at and last_action_kind of from_user's assignment
+        assignment_3_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1, prescriber_organization=None, last_action_kind=ActionKind.GEIQ_ELIGIBILITY
+        )
+        assignment_3 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_2,
+            job_seeker=assignment_3_to_user.job_seeker,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        )
+
+        # JSA(job_seeker, from_user, orgaA)
+        # will get: JSA(job_seeker, to_user, orgaA)
+        assignment_4 = JobSeekerAssignmentFactory(prescriber=prescriber_2, prescriber_organization=org)
+
+        # JSA(job_seeker, from_user, orgaA) ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, orgaA) ; JSA(job_seeker, to_user, None)
+        assignment_5_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_5 = JobSeekerAssignmentFactory(
+            job_seeker=assignment_5_to_user.job_seeker,
+            prescriber=prescriber_2,
+            prescriber_organization=org,
+            last_action_kind=ActionKind.APPLY,
+        )
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))
+        client.post(url, data={"user_to_keep": "to_user"})
+
+        updated_assignment_1 = JobSeekerAssignment.objects.get(pk=assignment_1.pk)
+        assert updated_assignment_1.prescriber == prescriber_1
+        assert updated_assignment_1.prescriber_organization is None
+        assert updated_assignment_1.last_action_kind == assignment_1.last_action_kind
+        assert updated_assignment_1.created_at == assignment_1.created_at
+        assert updated_assignment_1.updated_at == assignment_1.updated_at
+
+        updated_assignment_2_to_user = JobSeekerAssignment.objects.get(pk=assignment_2_to_user.pk)
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+        assert updated_assignment_2_to_user.prescriber == prescriber_1
+        assert updated_assignment_2_to_user.prescriber_organization == assignment_2.prescriber_organization
+        assert (
+            updated_assignment_2_to_user.last_action_kind == assignment_2_to_user.last_action_kind
+        )  # assignment_2_to_user was last updated, take its last_action_kind
+        assert updated_assignment_2_to_user.created_at == min(assignment_2.created_at, assignment_2_to_user.created_at)
+        assert updated_assignment_2_to_user.updated_at == max(assignment_2.updated_at, assignment_2_to_user.updated_at)
+
+        updated_assignment_3_to_user = JobSeekerAssignment.objects.get(pk=assignment_3_to_user.pk)
+        assert updated_assignment_3_to_user.prescriber == prescriber_1
+        assert updated_assignment_3_to_user.last_action_kind == assignment_3.last_action_kind
+        assert updated_assignment_3_to_user.created_at == assignment_3_to_user.created_at
+        assert updated_assignment_3_to_user.updated_at == assignment_3.updated_at
+
+        updated_assignment_4 = JobSeekerAssignment.objects.get(pk=assignment_4.pk)
+        assert updated_assignment_4.prescriber == prescriber_1
+        assert updated_assignment_4.prescriber_organization == org
+        assert updated_assignment_4.last_action_kind == assignment_4.last_action_kind
+        assert updated_assignment_4.created_at == assignment_4.created_at
+        assert updated_assignment_4.updated_at == assignment_4.updated_at
+
+        updated_assignment_5 = JobSeekerAssignment.objects.get(pk=assignment_5.pk)
+        updated_assignment_5_to_user = JobSeekerAssignment.objects.get(pk=assignment_5_to_user.pk)
+        assert updated_assignment_5.prescriber == prescriber_1
+        assert updated_assignment_5.prescriber_organization == org
+        assert updated_assignment_5.last_action_kind == assignment_5.last_action_kind
+        assert updated_assignment_5.created_at == assignment_5.created_at
+        assert updated_assignment_5.updated_at == assignment_5.updated_at
+        assert updated_assignment_5_to_user.prescriber == prescriber_1
+        assert updated_assignment_5_to_user.prescriber_organization is None
+        assert updated_assignment_5_to_user.last_action_kind == assignment_5_to_user.last_action_kind
+        assert updated_assignment_5_to_user.created_at == assignment_5_to_user.created_at
+        assert updated_assignment_5_to_user.updated_at == assignment_5_to_user.updated_at
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+            "itou.users.models.JobSeekerAssignment.prescriber updated : "
+            f"[{assignment_3_to_user.pk}, {assignment_2_to_user.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+            "itou.users.models.JobSeekerAssignment.prescriber moved : "
+            f"[{assignment_5.pk}, {assignment_4.pk}, {assignment_1.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
             "HTTP 302 Found",
         ]
 
