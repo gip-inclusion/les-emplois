@@ -2,8 +2,12 @@ from django.core.management import call_command
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
+from pytest_django.asserts import assertQuerySetEqual
 
+from itou.nexus.enums import Service
 from itou.nexus.management.commands.populate_metabase_nexus import create_table, get_connection
+from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.nexus.utils import build_user, serialize_user, service_id, sync_users
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
@@ -200,3 +204,83 @@ def test_populate_metabase_nexus(snapshot):
                 timezone.now(),
             ),
         ]
+
+
+def test_sync_data():
+    authorized_prescriber = PrescriberFactory(email="1@mailinator.com")
+    employer = EmployerFactory(email="2@mailinator.com")
+    prescriber_1 = PrescriberFactory(email="3@mailinator.com")
+    prescriber_2 = PrescriberFactory(email="4@mailinator.com")
+
+    company_1 = CompanyMembershipFactory(
+        user=employer,
+        company__uid="11111111-1111-1111-1111-111111111111",
+        company__insee_city=create_city_saint_andre(),
+    ).company
+    company_2 = CompanyMembershipFactory(
+        user=employer,
+        is_admin=False,
+        company__uid="22222222-2222-2222-2222-222222222222",
+    ).company
+    organization_1 = PrescriberMembershipFactory(
+        user=authorized_prescriber,
+        organization__uid="33333333-3333-3333-3333-333333333333",
+        organization__authorized=True,
+    ).organization
+    organization_2 = PrescriberMembershipFactory(
+        user=prescriber_1,
+        organization__uid="44444444-4444-4444-4444-444444444444",
+    ).organization
+
+    call_command("nexus_sync_data")
+
+    assertQuerySetEqual(
+        NexusUser.objects.values_list("pk", flat=True),
+        [
+            service_id(Service.EMPLOIS, authorized_prescriber.pk),
+            service_id(Service.EMPLOIS, prescriber_1.pk),
+            service_id(Service.EMPLOIS, prescriber_2.pk),
+            service_id(Service.EMPLOIS, employer.pk),
+        ],
+        ordered=False,
+    )
+    assertQuerySetEqual(
+        NexusMembership.objects.values_list("user_id", "structure_id"),
+        [
+            (service_id(Service.EMPLOIS, authorized_prescriber.pk), service_id(Service.EMPLOIS, organization_1.uid)),
+            (service_id(Service.EMPLOIS, prescriber_1.pk), service_id(Service.EMPLOIS, organization_2.uid)),
+            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_1.uid)),
+            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_2.uid)),
+        ],
+        ordered=False,
+    )
+    assertQuerySetEqual(
+        NexusStructure.objects.values_list("pk", flat=True),
+        [
+            service_id(Service.EMPLOIS, organization_1.uid),
+            service_id(Service.EMPLOIS, organization_2.uid),
+            service_id(Service.EMPLOIS, company_1.uid),
+            service_id(Service.EMPLOIS, company_2.uid),
+        ],
+        ordered=False,
+    )
+
+    # Check Pilotage and Mon-Récap data sync
+    # mock old users for pilotage and mon_recap
+    sync_users([build_user(serialize_user(employer), service) for service in [Service.PILOTAGE, Service.MON_RECAP]])
+    NexusRessourceSyncStatus.objects.update(valid_since=timezone.now())
+    assert NexusUser.objects.filter().count() == 0
+
+    call_command("nexus_sync_data")
+    assertQuerySetEqual(
+        NexusUser.objects.values_list("pk", flat=True),
+        [
+            service_id(Service.EMPLOIS, authorized_prescriber.pk),
+            service_id(Service.EMPLOIS, prescriber_1.pk),
+            service_id(Service.EMPLOIS, prescriber_2.pk),
+            service_id(Service.EMPLOIS, employer.pk),
+            service_id(Service.MON_RECAP, employer.pk),
+            service_id(Service.PILOTAGE, employer.pk),
+        ],
+        ordered=False,
+    )

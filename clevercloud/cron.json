@@ -26,6 +26,7 @@
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh retry_certify_criteria --wet-run",
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh send_users_to_brevo --wet-run",
   "0 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh clearsessions",
+  "15 3 * * * CRON_ENABLED=1 $ROOT/clevercloud/run_management_command.sh nexus_sync_data",
   "30 3 * * * $ROOT/clevercloud/run_management_command.sh fetch_riae_contracts",
   "0 4 * * * $ROOT/clevercloud/run_management_command.sh metabase_data stalled-job-seekers --wet-run",
   "30 4 * * * $ROOT/clevercloud/run_management_command.sh redact_zendesk_attachments",
