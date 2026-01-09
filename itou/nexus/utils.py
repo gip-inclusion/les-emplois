@@ -1,3 +1,5 @@
+import logging
+
 from django.utils import timezone
 
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Role, Service
@@ -5,6 +7,8 @@ from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusSt
 from itou.users.enums import IdentityProvider
 from itou.utils.urls import get_absolute_url
 
+
+logger = logging.getLogger(__name__)
 
 SERVICE_MAPPING = {
     Service.COMMUNAUTE: "la-communauté",
@@ -62,10 +66,16 @@ def serialize_user(user):
 
 
 def build_user(user_data, service):
+    try:
+        kind = USER_KIND_MAPPING[service][user_data["source_kind"]]
+    except KeyError:
+        kind = ""
+        logger.exception("Invalid user kind=%s", user_data["source_kind"])
+
     return NexusUser(
         source=service,
         id=service_id(service, user_data["source_id"]),
-        kind=USER_KIND_MAPPING[service][user_data["source_kind"]],
+        kind=kind,
         **user_data,
     )
 
@@ -159,10 +169,16 @@ def serialize_structure(structure):
 
 
 def build_structure(structure_data, service):
+    try:
+        kind = STRUCTURE_KIND_MAPPING[service][structure_data["source_kind"]]
+    except KeyError:
+        kind = ""
+        logger.exception("Invalid structure kind=%s", structure_data["source_kind"])
+
     return NexusStructure(
         source=service,
         id=service_id(service, structure_data["source_id"]),
-        kind=STRUCTURE_KIND_MAPPING[service][structure_data["source_kind"]],
+        kind=kind,
         **structure_data,
     )
 
