@@ -118,6 +118,8 @@ def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=Fals
 
 @register.simple_tag
 def criterion_certification_badge(selected_criterion, hiring_start_date):
+    if hiring_start_date is None:
+        raise ValueError("A hiring_start_date must be provided.")
     if not selected_criterion.administrative_criteria.is_certifiable:
         return ""
 
