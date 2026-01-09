@@ -253,7 +253,6 @@ NAV_ENTRIES = {
     "labor-inspector-geiq-assessments": NavItem(
         label="Bilans d’exécution GEIQ",
         icon="ri-list-check-3",
-        is_new=True,  # TODO(xfernandez) Remove on 2025/09/01
         target=reverse("geiq_assessments_views:list_for_institution"),
         active_view_names=[
             "geiq_assessments_views:details_for_institution",
