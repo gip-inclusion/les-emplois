@@ -554,7 +554,14 @@ class EvaluatedSiae(models.Model):
         choices=evaluation_enums.EvaluatedSiaeNotificationReason.choices,
         verbose_name="raison principale",
     )
-    notification_text = models.TextField(blank=True, null=True, verbose_name="commentaire")
+    notification_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="commentaire destiné à la structure",
+        help_text="Pour la sanction “Participation à une session de présentation "
+        "de l’auto-prescription” ou en l’absence de sanction, ce commentaire "
+        "sera communiqué par e-mail à l'employeur.",
+    )
 
     reminder_sent_at = models.DateTimeField(verbose_name="rappel envoyé le", null=True, blank=True)
 

@@ -2246,16 +2246,20 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             response,
             f"""
             <div class="form-group is-invalid form-group-required">
-                <label class="form-label" for="id_notification_text">Commentaire</label>
+                <label class="form-label" for="id_notification_text">Commentaire destiné à la structure</label>
                 <textarea name="notification_text" cols="40" rows="10"
                     placeholder="{placeholder}"
                     class="form-control is-invalid"
                     required aria-invalid="true"
-                    aria-describedby="id_notification_text_error"
+                    aria-describedby="id_notification_text_helptext id_notification_text_error"
                     id="id_notification_text">
                 </textarea>
                 <div id="id_notification_text_error" class="w-100">
                     <div class="invalid-feedback d-block">Ce champ est obligatoire.</div>
+                </div>
+                <div id="id_notification_text_helptext" class="form-text">
+                    Pour la sanction “Participation à une session de présentation de l’auto-prescription”
+                    ou en l’absence de sanction, ce commentaire sera communiqué par e-mail à l'employeur.
                 </div>
             </div>
             """,
