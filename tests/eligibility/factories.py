@@ -4,7 +4,6 @@ import factory
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from faker import Faker
-from psycopg.types.range import DateRange
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
@@ -132,7 +131,7 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
 
     @factory.post_generation
     def identity_certification(obj, create, extracted, **kwargs):
-        if isinstance(obj.certification_period, DateRange):
+        if obj.certification_period is not None:
             IdentityCertification.objects.create(
                 certifier=IdentityCertificationAuthorities.API_PARTICULIER,
                 jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
