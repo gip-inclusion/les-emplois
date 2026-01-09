@@ -101,3 +101,19 @@ def check_nullable_date_order_constraint(
         violation_error_code=violation_error_code,
         violation_error_message=violation_error_message,
     )
+
+
+class HasDataChangedMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_old_values()
+
+    def set_old_values(self):
+        self._old_values = self.__dict__.copy()
+
+    def has_data_changed(self, fields):
+        if hasattr(self, "_old_values"):
+            for field in fields:
+                if getattr(self, field) != self._old_values[field]:
+                    return True
+        return False

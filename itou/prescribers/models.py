@@ -19,6 +19,7 @@ from itou.prescribers.enums import (
 )
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
+from itou.utils.models import HasDataChangedMixin
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
@@ -66,7 +67,7 @@ class PrescriberOrganizationManager(models.Manager):
         return organization
 
 
-class PrescriberOrganization(AddressMixin, OrganizationAbstract):
+class PrescriberOrganization(AddressMixin, OrganizationAbstract, HasDataChangedMixin):
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 

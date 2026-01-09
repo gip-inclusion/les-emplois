@@ -28,6 +28,7 @@ from itou.companies.enums import (
 )
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
+from itou.utils.models import HasDataChangedMixin
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -227,7 +228,7 @@ class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
         return super().get_queryset().defer("fields_history")
 
 
-class Company(AddressMixin, OrganizationAbstract):
+class Company(AddressMixin, OrganizationAbstract, HasDataChangedMixin):
     """
     Structures d'insertion par l'activité économique.
 
