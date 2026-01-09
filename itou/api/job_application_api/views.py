@@ -30,6 +30,8 @@ Cette API retourne la liste de candidatures correspondant à une recherche selon
 - Prénom du candidat
 - Date de naissance du candidat
 
+Cette API est à l’usage exclusif des conseils départementaux.
+
 # Permissions
 
 L’utilisation de cette API nécessite un token d’autorisation spécifique à chaque conseil départemental.
