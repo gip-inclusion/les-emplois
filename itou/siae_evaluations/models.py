@@ -277,11 +277,7 @@ class EvaluationCampaign(models.Model):
                 ).prefetch_related(
                     Prefetch(
                         "eligibility_diagnosis__selected_administrative_criteria",
-                        queryset=(
-                            SelectedAdministrativeCriteria.objects.exclude(
-                                Q(certification_period=None) | Q(certification_period__isempty=True)
-                            )
-                        ),
+                        queryset=SelectedAdministrativeCriteria.objects.filter(certification_period__isempty=False),
                         to_attr="certified_administrative_criteria",
                     )
                 ):
