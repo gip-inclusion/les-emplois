@@ -14,6 +14,11 @@ class Service(models.TextChoices):
     MON_RECAP = "mon-recap", "Mon Récap"
     PILOTAGE = "pilotage", "Le pilotage de l’inclusion"
 
+    @classmethod
+    def local(cls):
+        """Returns the services managed by this code base"""
+        return [cls.EMPLOIS, cls.MON_RECAP, cls.PILOTAGE]
+
 
 class Auth(models.TextChoices):
     DJANGO = "DJANGO", "Django"
