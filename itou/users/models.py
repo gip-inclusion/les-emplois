@@ -52,6 +52,7 @@ from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.emails import get_email_message
 from itou.utils.france_standards import NIR
+from itou.utils.models import HasDataChangedMixin
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -258,7 +259,7 @@ class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
         return users_qs
 
 
-class User(AbstractUser, AddressMixin):
+class User(AbstractUser, AddressMixin, HasDataChangedMixin):
     """
     Custom user model.
 
@@ -402,7 +403,6 @@ class User(AbstractUser, AddressMixin):
     def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
         super().__init__(*args, **kwargs)
         self._auto_create_job_seeker_profile = _auto_create_job_seeker_profile
-        self.set_old_values()
 
     def __str__(self):
         return f"{self.kind} — pk={self.pk}"
@@ -410,16 +410,6 @@ class User(AbstractUser, AddressMixin):
     @property
     def display_with_pii(self):
         return f"{self.get_full_name()} — {self.email}"
-
-    def set_old_values(self):
-        self._old_values = self.__dict__.copy()
-
-    def has_data_changed(self, fields):
-        if hasattr(self, "_old_values"):
-            for field in fields:
-                if getattr(self, field) != self._old_values[field]:
-                    return True
-        return False
 
     def validate_identity_provider(self):
         if self.identity_provider == IdentityProvider.FRANCE_CONNECT and self.kind != UserKind.JOB_SEEKER:
