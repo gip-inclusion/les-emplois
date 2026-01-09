@@ -49,7 +49,7 @@ def test_dora_iframe_not_displayed_without_token(client, settings):
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
     response = client.get(url)
 
-    assert response.status_code == 200
+    assertNotContains(response, "Découvrez l'offre d'insertion disponible sur votre territoire")
     soup = parse_response_to_soup(response)
 
     section = soup.find("section", {"data-content-name": "dora-di-banner"})
