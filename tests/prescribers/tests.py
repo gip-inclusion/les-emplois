@@ -23,7 +23,7 @@ from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.models import User
+from itou.users.models import JobSeekerAssignment, User
 from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
@@ -33,7 +33,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerAssignmentFactory, PrescriberFactory
 
 
 class TestPrescriberOrganizationManager:
@@ -278,6 +278,66 @@ class TestPrescriberOrganizationModel:
         else:
             assert PrescriberOrganization.objects.count() == 2
             assert geiq_diagnosis.author_prescriber_organization_id == organization_1.pk
+
+    @pytest.mark.parametrize("wet_run", [True, False])
+    def test_merge_two_organizations_with_assignments(self, wet_run):
+        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        prescriber_1 = job_application_1.sender
+        organization_1 = job_application_1.sender_prescriber_organization
+
+        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        organization_2 = job_application_2.sender_prescriber_organization
+
+        # Assignment without prescriber, and without similar assignment in the other organization
+        # (ie. no assignment with the same job seeker and no prescriber): will be updated
+        assignment_1 = JobSeekerAssignmentFactory(
+            prescriber=None,
+            prescriber_organization=organization_1,
+        )
+        # Assignment without prescriber, with a similar assignment in the other org: will be deleted
+        assignment_2 = JobSeekerAssignmentFactory(
+            prescriber=None,
+            prescriber_organization=organization_1,
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=assignment_2.job_seeker,
+            prescriber=None,
+            prescriber_organization=organization_2,
+        )
+        # Assignment with prescriber, without similar assignment in the other org: will be updated
+        assignment_3 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            prescriber_organization=organization_1,
+        )
+        # Assignment with prescriber, with a similar assignment in the other org: will be deleted
+        assignment_4 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            prescriber_organization=organization_1,
+        )
+        JobSeekerAssignmentFactory(
+            job_seeker=assignment_4.job_seeker,
+            prescriber=prescriber_1,
+            prescriber_organization=organization_2,
+        )
+
+        assert JobSeekerAssignment.objects.count() == 6
+        call_command("merge_organizations", from_id=organization_1.id, to_id=organization_2.id, wet_run=wet_run)
+        assignment_1.refresh_from_db()
+        assignment_3.refresh_from_db()
+        if wet_run:
+            assert PrescriberOrganization.objects.count() == 1
+            assert JobSeekerAssignment.objects.count() == 4
+            assert assignment_1.prescriber_organization_id == organization_2.pk
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+            assert assignment_3.prescriber_organization_id == organization_2.pk
+            assert not JobSeekerAssignment.objects.filter(pk=assignment_4.pk).exists()
+        else:
+            assert PrescriberOrganization.objects.count() == 2
+            assert JobSeekerAssignment.objects.count() == 6
+            assert assignment_1.prescriber_organization_id == organization_1.pk
+            assert JobSeekerAssignment.objects.filter(pk=assignment_3.pk).exists()
+            assert assignment_3.prescriber_organization_id == organization_1.pk
+            assert JobSeekerAssignment.objects.filter(pk=assignment_4.pk).exists()
 
 
 class TestPrescriberOrganizationAdmin:
