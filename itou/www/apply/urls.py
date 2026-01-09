@@ -85,8 +85,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:session_uuid>/hire/contract",
-        submit_views.ContractForHireView.as_view(),
-        name="hire_contract",
+        submit_views.ContractInfosForHireView.as_view(),
+        name="hire_contract_infos",
         kwargs={"hire_process": True},
     ),
     # List.
@@ -177,7 +177,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:session_uuid>/accept/contract",
-        process_views.ContractForAcceptView.as_view(),
+        process_views.ContractInfosForAcceptView.as_view(),
         name="accept_contract_infos",
     ),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),

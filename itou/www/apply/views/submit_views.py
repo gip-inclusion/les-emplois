@@ -816,7 +816,7 @@ class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGE
 
 
 class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJobSeekerInfosView):
-    template_name = "apply/submit/fill_job_seeker_infos.html"
+    template_name = "apply/submit/hire_fill_job_seeker_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
@@ -831,7 +831,7 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
         )
 
     def get_success_url(self):
-        return reverse("apply:hire_contract", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.apply_session.name})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -844,8 +844,8 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
         return context
 
 
-class ContractForHireView(ApplicationBaseView, common_views.BaseAcceptView):
-    template_name = "apply/submit/hire_confirmation.html"
+class ContractInfosForHireView(ApplicationBaseView, common_views.BaseAcceptView):
+    template_name = "apply/submit/hire_contract_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
         self.job_application = None
