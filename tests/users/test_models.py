@@ -17,6 +17,7 @@ from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
@@ -1374,15 +1375,16 @@ class TestJobSeekerAssignment:
             (False, True),
         ],
     )
-    def test_assign_job_seeker(self, with_prescriber, with_organization):
+    def test_assign_job_seeker(self, with_prescriber, with_organization, snapshot):
         job_seeker = JobSeekerFactory()
         prescriber = PrescriberFactory() if with_prescriber else None
         organization = PrescriberOrganizationFactory() if with_organization else None
 
         # Creation
         with freezegun.freeze_time("2025-11-14 12:00:01"):
-            assignment, created = JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
-        assert created is True
+            with assertSnapshotQueries(snapshot(name="assignment creation sql queries")):
+                JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+        assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
         assert assignment.prescriber_organization == organization
@@ -1391,8 +1393,9 @@ class TestJobSeekerAssignment:
 
         # Update
         with freezegun.freeze_time("2025-11-15 18:00:01"):
-            assignment, created = JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
-        assert created is False
+            with assertSnapshotQueries(snapshot(name="assignment update sql queries")):
+                JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+        assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
         assert assignment.prescriber_organization == organization
