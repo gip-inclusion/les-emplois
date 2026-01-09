@@ -1573,7 +1573,7 @@ class IdentityCertification(models.Model):
 
 
 class JobSeekerAssignmentManager(models.Manager):
-    def assign_job_seeker(self, job_seeker, prescriber, prescriber_organization):
+    def upsert_assignment(self, job_seeker, prescriber, prescriber_organization):
         assert job_seeker.is_job_seeker
         if prescriber:
             if prescriber.kind != UserKind.PRESCRIBER:
@@ -1581,11 +1581,15 @@ class JobSeekerAssignmentManager(models.Manager):
                 logger.warning("We should not try to add a JobSeekerAssignment on user=%s", prescriber)
                 return
 
-        assignment, created = JobSeekerAssignment.objects.update_or_create(
+        assignment = JobSeekerAssignment(
             job_seeker=job_seeker, prescriber=prescriber, prescriber_organization=prescriber_organization
         )
-
-        return assignment, created
+        JobSeekerAssignment.objects.bulk_create(
+            [assignment],
+            update_conflicts=True,
+            update_fields=["updated_at"],
+            unique_fields=["job_seeker", "prescriber", "prescriber_organization"],
+        )
 
 
 class JobSeekerAssignment(models.Model):

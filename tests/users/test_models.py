@@ -1330,21 +1330,21 @@ class TestJobSeekerAssignment:
         prescriber = PrescriberFactory()
 
         with pytest.raises(AssertionError):
-            JobSeekerAssignment.objects.assign_job_seeker(not_a_job_seeker, prescriber, None)
+            JobSeekerAssignment.objects.upsert_assignment(not_a_job_seeker, prescriber, None)
 
     @pytest.mark.parametrize("factory", [JobSeekerFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
     def test_is_prescriber(self, factory, caplog):
         not_a_prescriber = factory()
         job_seeker = JobSeekerFactory()
 
-        JobSeekerAssignment.objects.assign_job_seeker(job_seeker, not_a_prescriber, None)
+        JobSeekerAssignment.objects.upsert_assignment(job_seeker, not_a_prescriber, None)
         assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
 
     def test_prescriber_and_or_organization(self):
         job_seeker = JobSeekerFactory()
 
         with pytest.raises(IntegrityError):
-            JobSeekerAssignment.objects.assign_job_seeker(job_seeker, None, None)
+            JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None)
 
     @pytest.mark.parametrize(
         "with_prescriber,with_organization",
@@ -1359,8 +1359,8 @@ class TestJobSeekerAssignment:
         organization = PrescriberOrganizationFactory() if with_organization else None
         assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
 
-        # assign_job_seeker updates the existing assignment
-        JobSeekerAssignment.objects.assign_job_seeker(assignment.job_seeker, prescriber, organization)
+        # upsert_assignment updates the existing assignment
+        JobSeekerAssignment.objects.upsert_assignment(assignment.job_seeker, prescriber, organization)
 
         with pytest.raises(IntegrityError):
             JobSeekerAssignmentFactory(
@@ -1383,7 +1383,7 @@ class TestJobSeekerAssignment:
         # Creation
         with freezegun.freeze_time("2025-11-14 12:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment creation sql queries")):
-                JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
@@ -1394,7 +1394,7 @@ class TestJobSeekerAssignment:
         # Update
         with freezegun.freeze_time("2025-11-15 18:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment update sql queries")):
-                JobSeekerAssignment.objects.assign_job_seeker(job_seeker, prescriber, organization)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
