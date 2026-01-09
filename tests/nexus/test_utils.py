@@ -22,7 +22,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.nexus.factories import NexusRessourceSyncStatusFactory
 from tests.nexus.utils import assert_structure_equals, assert_user_equals
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 
 
 class TestUsers:
@@ -90,6 +90,12 @@ class TestUsers:
             assert sync_users([build_user(serialize_user(user), Service.EMPLOIS)], update_only=True) == 1
             assert NexusUser.objects.get().updated_at == timezone.now()
 
+    def test_build_user_invalid_kind(self, caplog):
+        user = JobSeekerFactory()
+        nexus_user = build_user(serialize_user(user), Service.EMPLOIS)
+        assert nexus_user.kind == ""
+        assert caplog.messages == ["Invalid user kind=job_seeker"]
+
 
 class TestMemberships:
     @pytest.mark.parametrize("factory", [CompanyMembershipFactory, PrescriberMembershipFactory])
@@ -129,6 +135,14 @@ class TestMemberships:
             assert NexusMembership.objects.exists() is False
             assert sync_memberships([build_membership(serialize_membership(membership), Service.EMPLOIS)]) == 1
             assert NexusMembership.objects.get().updated_at == timezone.now()
+
+    def test_build_structure_invalid_kind(self, caplog):
+        structure = CompanyFactory()
+        structure.kind = "bad_kind"
+
+        nexus_structure = build_structure(serialize_structure(structure), Service.EMPLOIS)
+        assert nexus_structure.kind == ""
+        assert caplog.messages == ["Invalid structure kind=bad_kind"]
 
 
 class TestStructures:
