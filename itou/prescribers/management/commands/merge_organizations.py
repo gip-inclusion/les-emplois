@@ -48,6 +48,27 @@ def _model_sanity_check():
         )
 
 
+def _get_job_seeker_assignments(from_id, to_id):
+    from_org_assignments = users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=from_id)
+    to_org_assignments = {
+        (assignment.job_seeker, assignment.prescriber): assignment
+        for assignment in users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=to_id)
+    }
+
+    assignments_to_update = []
+    assignments_ids_to_delete = []
+    for from_org_assignment in from_org_assignments:
+        to_org_assignment = to_org_assignments.get((from_org_assignment.job_seeker, from_org_assignment.prescriber))
+        if to_org_assignment and from_org_assignment.updated_at < to_org_assignment.updated_at:
+            assignments_ids_to_delete.append(from_org_assignment.pk)
+            continue
+        if to_org_assignment:
+            assignments_ids_to_delete.append(to_org_assignment.pk)
+        from_org_assignment.prescriber_organization_id = to_id
+        assignments_to_update.append(from_org_assignment)
+    return assignments_to_update, assignments_ids_to_delete
+
+
 def organization_merge_into(from_id, to_id):
     _model_sanity_check()
 
@@ -101,6 +122,11 @@ def organization_merge_into(from_id, to_id):
     )
     logger.info("| Invitations: %s", invitations.count())
 
+    # Move assignments not already present in the destination organization. If an assignment already exists, delete
+    # the oldest one between the two (JobSeekerAssignment.prescriber_organization is not a CASCADE field)
+    assignments_to_update, assignments_ids_to_delete = _get_job_seeker_assignments(from_id, to_id)
+    logger.info("| Job seeker assignments: %s", len(assignments_to_update))
+
     logger.info(
         "INTO organization 'ID %s - SIRET %s - %s'",
         to_id,
@@ -122,8 +148,10 @@ def organization_merge_into(from_id, to_id):
     invitations.update(organization_id=to_id)
     prolongations.update(prescriber_organization_id=to_id)
     prolongation_requests.update(prescriber_organization_id=to_id)
+    _, deleted_assignments = users_models.JobSeekerAssignment.objects.filter(pk__in=assignments_ids_to_delete).delete()
+    users_models.JobSeekerAssignment.objects.bulk_update(assignments_to_update, fields=["prescriber_organization_id"])
     _, deleted_objs = from_organization.delete()
-    logger.info("Deleted organization ID %s, deleted objects: %s", from_id, deleted_objs)
+    logger.info("Deleted organization ID %s, deleted objects: %s", from_id, deleted_objs | deleted_assignments)
 
 
 class Command(BaseCommand):
