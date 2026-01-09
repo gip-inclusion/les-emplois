@@ -3023,9 +3023,9 @@
       }),
       dict({
         'origin': list([
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3080,8 +3080,8 @@
       }),
       dict({
         'origin': list([
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -3133,8 +3133,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3169,8 +3169,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -3305,8 +3305,8 @@
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -3440,7 +3440,7 @@
       dict({
         'origin': list([
           'Company.has_member[common_apps/organizations/models.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3461,7 +3461,7 @@
         'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -3478,10 +3478,10 @@
           'JobSeekerPersonalDataForm.__init__[users/forms.py]',
           'JobSeekerPersonalDataForm.__init__[common_apps/nir/forms.py]',
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
+          'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
+          'ContractInfosForHireView.get[www/apply/views/common.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -3539,10 +3539,10 @@
       }),
       dict({
         'origin': list([
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
+          'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
+          'ContractInfosForHireView.get[www/apply/views/common.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -3558,9 +3558,9 @@
       dict({
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
-          'ContractForHireView.get_forms[www/apply/views/common.py]',
-          'ContractForHireView.get[www/apply/views/common.py]',
-          'ContractForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
+          'ContractInfosForHireView.get[www/apply/views/common.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -3623,7 +3623,7 @@
           'IfNode[layout/base.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/hire_confirmation.html]',
+          'ExtendsNode[apply/submit/hire_contract_infos_step.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3643,7 +3643,7 @@
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
           'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/hire_confirmation.html]',
+          'ExtendsNode[apply/submit/hire_contract_infos_step.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
