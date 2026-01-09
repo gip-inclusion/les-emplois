@@ -182,6 +182,9 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
     def get_error_url(self):
         raise NotImplementedError
 
+    def get_success_url(self):
+        raise NotImplementedError
+
     def clean_session(self):
         pass
 
