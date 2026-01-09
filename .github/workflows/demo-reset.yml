@@ -1,0 +1,43 @@
+name: Reset demo environment
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+env:
+  ADMIN_PASSWORD: ${{ secrets.DEMO_ADMIN_PASSWORD }}
+  BUCKET_NAME: ${{ secrets.DEMO_BUCKET_NAME }}
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_CLI_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_CLI_TAR_FILE: clever-tools-latest_linux.tar.gz
+  CLEVER_SECRET: ${{ secrets.DEMO_CLEVER_SECRET }}
+  CLEVER_TOKEN: ${{ secrets.DEMO_CLEVER_TOKEN }}
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🤝 Set the private key for Clever SSH
+        run: |
+          mkdir ~/.ssh
+          echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIEG+zB8Lo9ByLS5JSC8zIGQhVOAyWMHbmppafWEz8LSsz7a+IdvpBriDMamtn4OmchdQm+Y1GlTgsKB7rIM4HYtBNe0FPeMsveL6GQ/y9ztOLBKES05XOLbyZhCA2ZfXlx5SJT/5n+2SsArrcPlNkA/HWO+RyugZhApkrxmfvzLBosbE0hgts0ZJ/JbpQElYou49kDN3WwlrgYDfv6cn2r1K9No+CIvhu7ESOEG/NV+z42Fu9ZtANJiGKEBotXGwKU64cQdGvCA2CP87Yg1DSRQIpTs6OVRfEABXJ/SExtbGEuesdx/xEYIgiFdc1+7jYEtqEB+WpenWIZp8r9Cq3" >> ~/.ssh/known_hosts
+          echo "sshgateway-clevercloud-customers.services.clever-cloud.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFsvDx3AczrEJoF7WdyL8JaOTywQs3vR1AOEKW/i/Jlh" >>~/.ssh/known_hosts
+          touch ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+          echo "${{ secrets.DEMO_CLEVER_SSH_PRIVATE_KEY }}" >~/.ssh/id_ed25519
+
+      - name: 🧫 Reset the demo environment on CleverCloud
+        run: |
+          curl $CLEVER_CLI_DOWNLOAD_URL > $CLEVER_CLI_TAR_FILE
+          tar -xvf $CLEVER_CLI_TAR_FILE
+          echo "Clever CLI version: $($CLEVER_CLI version)"
+          $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+          $CLEVER_CLI link app_ff3016cf-4ca6-46e3-a87d-77cf6f8f023f --alias demo-app
+          OUTPUT_FILE=$(mktemp)
+          # Always returns error code 0, as the SSH command succeeds.
+          echo "source .bashrc && cd app_* && scripts/reset --bucket-name $BUCKET_NAME --admin-password $ADMIN_PASSWORD" | \
+              $CLEVER_CLI ssh --alias demo-app | tee $OUTPUT_FILE
+          grep --quiet "Reset of DEMO environment completed successfully." $OUTPUT_FILE
