@@ -18,6 +18,17 @@ from tests.nexus.factories import (
 )
 
 
+def transform_membership(membership):
+    return (
+        membership.id,
+        membership.source,
+        membership.source_id,
+        membership.user_id,
+        membership.structure_id,
+        membership.role,
+    )
+
+
 class NexusApiTestMixin:
     def api_client(self, service=None):
         headers = {}
@@ -76,7 +87,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
                 "memberships": [
-                    {"structure_id": structure.source_id, "role": "ADMINISTRATOR"},
+                    {"id": "1", "structure_id": structure.source_id, "role": "ADMINISTRATOR"},
                 ],
             }
         ]
@@ -89,9 +100,9 @@ class TestUserAPI(NexusApiTestMixin):
 
         assertQuerySetEqual(
             NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.ADMINISTRATOR)],
+            [("dora--1", Service.DORA, "1", user.pk, structure.pk, Role.ADMINISTRATOR)],
             ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
+            transform=transform_membership,
         )
 
     def test_update_user(self):
@@ -154,7 +165,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
                 "memberships": [
-                    {"structure_id": structure.source_id, "role": "ADMINISTRATOR"},
+                    {"id": "abc", "structure_id": structure.source_id, "role": "ADMINISTRATOR"},
                 ],
             }
         ]
@@ -167,9 +178,9 @@ class TestUserAPI(NexusApiTestMixin):
 
         assertQuerySetEqual(
             NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.ADMINISTRATOR)],
+            [("dora--abc", Service.DORA, "abc", user.pk, structure.pk, Role.ADMINISTRATOR)],
             ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
+            transform=transform_membership,
         )
 
     def test_update_user_update_membership(self):
@@ -185,7 +196,9 @@ class TestUserAPI(NexusApiTestMixin):
             last_login=timezone.now().isoformat(),
             auth="PRO_CONNECT",
         )
-        membership = NexusMembershipFactory(role=Role.ADMINISTRATOR, user=user, source=Service.DORA)
+        membership = NexusMembershipFactory(
+            id="dora--2", source_id="2", role=Role.ADMINISTRATOR, user=user, source=Service.DORA
+        )
         structure = membership.structure
         data = [
             {
@@ -198,7 +211,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
                 "memberships": [
-                    {"structure_id": structure.source_id, "role": "COLLABORATOR"},
+                    {"id": "2", "structure_id": structure.source_id, "role": "COLLABORATOR"},
                 ],
             }
         ]
@@ -211,9 +224,9 @@ class TestUserAPI(NexusApiTestMixin):
 
         assertQuerySetEqual(
             NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.COLLABORATOR)],
+            [("dora--2", Service.DORA, "2", user.pk, structure.pk, Role.COLLABORATOR)],
             ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
+            transform=transform_membership,
         )
 
     def test_ignore_memberships_from_missing_structure(self, caplog):
@@ -230,7 +243,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
                 "memberships": [
-                    {"structure_id": "3918bb96-9a69-428c-b01c-1cbea7141988", "role": "ADMINISTRATOR"},
+                    {"id": "3", "structure_id": "3918bb96-9a69-428c-b01c-1cbea7141988", "role": "ADMINISTRATOR"},
                 ],
             }
         ]
@@ -288,8 +301,8 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": user.last_login.isoformat(),
                 "auth": user.auth,
                 "memberships": [
-                    {"structure_id": structure_1.source_id, "role": "ADMINISTRATOR"},
-                    {"structure_id": structure_2.source_id, "role": "ADMINISTRATOR"},
+                    {"id": "1", "structure_id": structure_1.source_id, "role": "ADMINISTRATOR"},
+                    {"id": "2", "structure_id": structure_2.source_id, "role": "ADMINISTRATOR"},
                 ],
             },
             {
@@ -302,7 +315,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
                 "memberships": [
-                    {"structure_id": structure_1.source_id, "role": "COLLABORATOR"},
+                    {"id": "3", "structure_id": structure_1.source_id, "role": "COLLABORATOR"},
                 ],
             },
         ]
@@ -321,12 +334,12 @@ class TestUserAPI(NexusApiTestMixin):
         assertQuerySetEqual(
             NexusMembership.objects.all(),
             [
-                (Service.DORA, user.pk, structure_1.pk, Role.ADMINISTRATOR),
-                (Service.DORA, user.pk, structure_2.pk, Role.ADMINISTRATOR),
-                (Service.DORA, "dora--my-id", structure_1.pk, Role.COLLABORATOR),
+                ("dora--1", Service.DORA, "1", user.pk, structure_1.pk, Role.ADMINISTRATOR),
+                ("dora--2", Service.DORA, "2", user.pk, structure_2.pk, Role.ADMINISTRATOR),
+                ("dora--3", Service.DORA, "3", "dora--my-id", structure_1.pk, Role.COLLABORATOR),
             ],
             ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
+            transform=transform_membership,
         )
 
     def test_delete_user(self):
@@ -361,7 +374,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_login": emplois_user.last_login.isoformat(),
                 "auth": emplois_user.auth,
                 "memberships": [
-                    {"structure_id": emplois_structure.source_id, "role": "ADMINISTRATOR"},
+                    {"id": "1", "structure_id": emplois_structure.source_id, "role": "ADMINISTRATOR"},
                 ],
             },
         ]
@@ -381,11 +394,9 @@ class TestUserAPI(NexusApiTestMixin):
         )
         assertQuerySetEqual(
             NexusMembership.objects.all(),
-            [
-                (Service.DORA, dora_user_id, dora_structure.pk, Role.ADMINISTRATOR),
-            ],
+            [("dora--1", Service.DORA, "1", dora_user_id, dora_structure.pk, Role.ADMINISTRATOR)],
             ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
+            transform=transform_membership,
         )
 
     def test_validate_payload(self):
@@ -404,6 +415,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "auth": "MAGIC LINK",  # missing underscore
                 "memberships": [
                     {
+                        "id": "1",
                         "structure_id": structure.source_id,
                         "role": "administrator",  # should be in upper case
                     },

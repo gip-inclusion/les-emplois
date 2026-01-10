@@ -1,0 +1,387 @@
+[
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-1",
+      "structure": "emplois-de-linclusion--6e3b7e85-5461-4a9d-a1b8-a1dd645a7794",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-1"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-10",
+      "structure": "emplois-de-linclusion--77a77f2c-9948-4542-89dd-e9d64e84c036",
+      "user": "emplois-de-linclusion--6"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-10"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-11",
+      "structure": "emplois-de-linclusion--c14fcde6-37ea-4c66-81f9-f78ed09f0d7b",
+      "user": "emplois-de-linclusion--16"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-11"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-12",
+      "structure": "emplois-de-linclusion--980a15ad-d838-45d6-a379-edd0cfabaf76",
+      "user": "emplois-de-linclusion--25"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-12"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-2",
+      "structure": "emplois-de-linclusion--ba5db832-0080-4e0b-af5e-d0c59d6e8111",
+      "user": "emplois-de-linclusion--6"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-2"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "c-23",
+      "structure": "emplois-de-linclusion--6e3b7e85-5461-4a9d-a1b8-a1dd645a7794",
+      "user": "emplois-de-linclusion--28"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-23"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-24",
+      "structure": "emplois-de-linclusion--a1c096d5-01f2-47c5-bdd5-ad70c2f9da3c",
+      "user": "emplois-de-linclusion--28"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-24"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-25",
+      "structure": "emplois-de-linclusion--613e4df2-f229-4cd9-9a03-8b526495003b",
+      "user": "emplois-de-linclusion--28"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-25"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-26",
+      "structure": "emplois-de-linclusion--1c1e332d-6f5a-4885-a0f1-2dc35356e4d7",
+      "user": "emplois-de-linclusion--28"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-26"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-27",
+      "structure": "emplois-de-linclusion--cb783d00-a045-4321-9908-b16467f1ed36",
+      "user": "emplois-de-linclusion--28"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-27"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-28",
+      "structure": "emplois-de-linclusion--96c6a632-94f0-409a-8125-ebf48769c0e7",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-28"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "c-29",
+      "structure": "emplois-de-linclusion--00496d01-0840-4ab9-b0e1-11542494359d",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-29"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "c-3",
+      "structure": "emplois-de-linclusion--ba5db832-0080-4e0b-af5e-d0c59d6e8111",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-3"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "c-5",
+      "structure": "emplois-de-linclusion--2ad2b2b4-8217-490e-853d-fa736f43187a",
+      "user": "emplois-de-linclusion--9"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-5"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-6",
+      "structure": "emplois-de-linclusion--00496d01-0840-4ab9-b0e1-11542494359d",
+      "user": "emplois-de-linclusion--6"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-6"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-7",
+      "structure": "emplois-de-linclusion--7ac8c0ad-11fc-4585-ab4c-36f18f49d848",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-7"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-8",
+      "structure": "emplois-de-linclusion--77a77f2c-9948-4542-89dd-e9d64e84c036",
+      "user": "emplois-de-linclusion--4"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-8"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "c-9",
+      "structure": "emplois-de-linclusion--7ac8c0ad-11fc-4585-ab4c-36f18f49d848",
+      "user": "emplois-de-linclusion--6"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--c-9"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-10",
+      "structure": "emplois-de-linclusion--7a563d1d-4bcf-47b7-9493-639be48f2674",
+      "user": "emplois-de-linclusion--66"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-10"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-11",
+      "structure": "emplois-de-linclusion--7a563d1d-4bcf-47b7-9493-639be48f2674",
+      "user": "emplois-de-linclusion--67"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-11"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-12",
+      "structure": "emplois-de-linclusion--7de5f43c-9ad1-4d87-aeda-3c76c96cac48",
+      "user": "emplois-de-linclusion--90"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-12"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-13",
+      "structure": "emplois-de-linclusion--6501803e-34bf-4a2e-9440-a3143385f6cd",
+      "user": "emplois-de-linclusion--91"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-13"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-14",
+      "structure": "emplois-de-linclusion--a03a63d9-cedb-4b8f-9ee7-ab6dd3ece8ed",
+      "user": "emplois-de-linclusion--92"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-14"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-15",
+      "structure": "emplois-de-linclusion--ff017023-690e-44fb-a84d-3ab187792e68",
+      "user": "emplois-de-linclusion--3"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-15"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-16",
+      "structure": "emplois-de-linclusion--ff017023-690e-44fb-a84d-3ab187792e68",
+      "user": "emplois-de-linclusion--65"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-16"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-17",
+      "structure": "emplois-de-linclusion--ec4aef24-6a6a-483c-a6bb-4751af4b385f",
+      "user": "emplois-de-linclusion--3"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-17"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-18",
+      "structure": "emplois-de-linclusion--ec4aef24-6a6a-483c-a6bb-4751af4b385f",
+      "user": "emplois-de-linclusion--67"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-18"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-2",
+      "structure": "emplois-de-linclusion--7a563d1d-4bcf-47b7-9493-639be48f2674",
+      "user": "emplois-de-linclusion--3"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-2"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-3",
+      "structure": "emplois-de-linclusion--8d7718fd-4e98-4daf-a65e-ff67f6c094f8",
+      "user": "emplois-de-linclusion--7"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-3"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-4",
+      "structure": "emplois-de-linclusion--d82671bc-11b8-467f-a3f3-0c9f89a1d250",
+      "user": "emplois-de-linclusion--10"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-4"
+  },
+  {
+    "fields": {
+      "role": "ADMINISTRATOR",
+      "source": "les-emplois",
+      "source_id": "p-5",
+      "structure": "emplois-de-linclusion--d82671bc-11b8-467f-a3f3-0c9f89a1d250",
+      "user": "emplois-de-linclusion--11"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-5"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-6",
+      "structure": "emplois-de-linclusion--d82671bc-11b8-467f-a3f3-0c9f89a1d250",
+      "user": "emplois-de-linclusion--12"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-6"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-7",
+      "structure": "emplois-de-linclusion--d82671bc-11b8-467f-a3f3-0c9f89a1d250",
+      "user": "emplois-de-linclusion--13"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-7"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-8",
+      "structure": "emplois-de-linclusion--d82671bc-11b8-467f-a3f3-0c9f89a1d250",
+      "user": "emplois-de-linclusion--14"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-8"
+  },
+  {
+    "fields": {
+      "role": "COLLABORATOR",
+      "source": "les-emplois",
+      "source_id": "p-9",
+      "structure": "emplois-de-linclusion--7a563d1d-4bcf-47b7-9493-639be48f2674",
+      "user": "emplois-de-linclusion--65"
+    },
+    "model": "nexus.nexusmembership",
+    "pk": "emplois-de-linclusion--p-9"
+  }
+]

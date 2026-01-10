@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from citext import CIEmailField
 from django.db import models
@@ -10,6 +11,7 @@ from itou.nexus.enums import Auth, NexusStructureKind, NexusUserKind, Role, Serv
 from itou.utils.validators import validate_siret
 
 
+logger = logging.getLogger(__name__)
 # Set a default threshold so that we don't have to handle empty threshold for services without a full sync
 DEFAULT_VALID_SINCE = datetime.datetime(2025, 12, 1, tzinfo=datetime.UTC)
 
@@ -33,6 +35,15 @@ class NexusModelMixin:
             setattr(self, "_threshold", ressource_sync_status.timestamp)
             return self._threshold
         return DEFAULT_VALID_SINCE
+
+    def check_diff(self, instance):
+        diff = []
+        field_names = {field.name for field in self._meta.get_fields()} - {"updated_at", "memberships"}
+        for field_name in field_names:
+            if getattr(self, field_name) != getattr(instance, field_name):
+                diff.append(field_name)
+        if diff:
+            logger.warning("NexusSync: diff detected on instance=%s fields=[%s]", self, ", ".join(diff))
 
 
 class NexusManager(models.Manager.from_queryset(NexusQuerySet)):
@@ -104,6 +115,10 @@ class NexusStructure(NexusModelMixin, AddressMixin, models.Model):
 
 
 class NexusMembership(NexusModelMixin, models.Model):
+    id = models.CharField(verbose_name="ID unique", primary_key=True)
+    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
+    source_id = models.CharField(verbose_name="ID Source")
+
     user = models.ForeignKey(
         NexusUser,
         verbose_name="utilisateur",
@@ -116,7 +131,6 @@ class NexusMembership(NexusModelMixin, models.Model):
         related_name="memberships",
         on_delete=models.CASCADE,
     )
-    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
     role = models.CharField(verbose_name="rôle", choices=Role.choices)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)

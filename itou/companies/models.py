@@ -26,8 +26,16 @@ from itou.companies.enums import (
     JobSource,
     JobSourceTag,
 )
+from itou.nexus.utils import (
+    COMPANY_TRACKED_FIELDS,
+    delete_emplois_memberships,
+    delete_emplois_structure,
+    sync_emplois_memberships,
+    sync_emplois_structures,
+)
 from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
+from itou.utils.models import HasDataChangedMixin
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -227,7 +235,7 @@ class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
         return super().get_queryset().defer("fields_history")
 
 
-class Company(AddressMixin, OrganizationAbstract):
+class Company(AddressMixin, OrganizationAbstract, HasDataChangedMixin):
     """
     Structures d'insertion par l'activité économique.
 
@@ -367,6 +375,24 @@ class Company(AddressMixin, OrganizationAbstract):
         permissions = [
             ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
         ]
+
+    def should_sync_to_nexus(self):
+        return self.is_active and self.kind != COMPANY_KIND_RESERVED
+
+    def save(self, *args, **kwargs):
+        adding = self._state.adding
+        super().save(*args, **kwargs)
+
+        # is_active relies on foreign objects so we can't check has_data_changed() first
+        if self.should_sync_to_nexus():
+            if adding or self.has_data_changed(COMPANY_TRACKED_FIELDS):
+                sync_emplois_structures([self])
+        else:
+            delete_emplois_structure(self)
+
+    def delete(self, *args, **kwargs):
+        delete_emplois_structure(self)
+        return super().delete(*args, **kwargs)
 
     @property
     def accept_survey_url(self):
@@ -647,6 +673,31 @@ class CompanyMembership(MembershipAbstract):
         constraints = [
             models.UniqueConstraint(fields=["user", "company"], name="user_company_unique"),
         ]
+
+    def should_sync_to_nexus(self):
+        return (
+            self.is_active
+            and self.user.is_active
+            and self.company.is_active
+            and self.company.kind != COMPANY_KIND_RESERVED
+        )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.should_sync_to_nexus():
+            sync_emplois_memberships([self])
+        else:
+            delete_emplois_memberships([self])
+
+    def delete(self, *args, **kwargs):
+        delete_emplois_memberships([self])
+        return super().delete(*args, **kwargs)
+
+    @property
+    def nexus_id(self):
+        # used to avoid id collision between PrescriberMembership and CompanyMemberships
+        return f"c-{self.pk}"
 
 
 class JobDescriptionQuerySet(models.QuerySet):

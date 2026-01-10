@@ -961,6 +961,7 @@
       }),
       dict({
         'origin': list([
+          'UserQuerySet.update[users/models.py]',
           'Command.reset_notified_professionals_with_recent_activity[archive/management/commands/anonymize_professionals.py]',
           'Command.handle[archive/management/commands/anonymize_professionals.py]',
           'Command.execute[utils/command.py]',
