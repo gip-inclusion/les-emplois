@@ -10,6 +10,13 @@ from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.nexus.utils import (
+    PRESCRIBER_ORG_TRACKED_FIELDS,
+    delete_emplois_memberships,
+    delete_emplois_structure,
+    sync_emplois_memberships,
+    sync_emplois_structures,
+)
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -227,12 +234,21 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract, HasDataChangedM
         ]
 
     def save(self, *args, **kwargs):
+        adding = self._state.adding
+
         if (
             self.authorization_status == PrescriberAuthorizationStatus.VALIDATED
             and self.kind == PrescriberOrganizationKind.ODC
         ):
             self.is_brsa = True
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+        if adding or self.has_data_changed(PRESCRIBER_ORG_TRACKED_FIELDS):
+            sync_emplois_structures([self])
+
+    def delete(self, *args, **kwargs):
+        delete_emplois_structure(self)
+        return super().delete(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         super().clean()
@@ -377,6 +393,21 @@ class PrescriberMembership(MembershipAbstract):
 
     class Meta:
         unique_together = ("user_id", "organization_id")
+
+    def should_sync_to_nexus(self):
+        return self.is_active and self.user.is_active
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.should_sync_to_nexus():
+            sync_emplois_memberships([self])
+        else:
+            delete_emplois_memberships([self])
+
+    def delete(self, *args, **kwargs):
+        delete_emplois_memberships([self])
+        return super().delete(*args, **kwargs)
 
     @property
     def nexus_id(self):

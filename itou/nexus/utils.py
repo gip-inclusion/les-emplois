@@ -47,6 +47,19 @@ def complete_full_sync(service, started_at):
     )
 
 
+USER_TRACKED_FIELDS = [
+    "id",
+    "kind",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "last_login",
+    "identity_provider",
+    "is_active",
+]
+
+
 def serialize_user(user):
     # Serialize the user to reproduce the data received in the API
     return {
@@ -107,6 +120,14 @@ def sync_users(nexus_users, update_only=False):
     )
 
 
+MEMBERSHIP_TRACKED_FIELDS = [
+    "user_id",
+    "organization_id",
+    "role",
+    "is_active",
+]
+
+
 def serialize_membership(membership):
     # Serialize the membership to reproduce the data received in the API
     structure = getattr(membership, "company", None) or membership.organization
@@ -138,6 +159,25 @@ def sync_memberships(nexus_memberships):
             unique_fields=["id"],
         )
     )
+
+
+PRESCRIBER_ORG_TRACKED_FIELDS = [
+    "uid",
+    "kind",
+    "siret",
+    "name",
+    "phone",
+    "email",
+    "address_line_1",
+    "address_line_2",
+    "post_code",
+    "city",
+    "department",
+    "website",
+    "description",
+]
+
+COMPANY_TRACKED_FIELDS = PRESCRIBER_ORG_TRACKED_FIELDS + ["brand"]
 
 
 def serialize_structure(structure):
@@ -222,11 +262,25 @@ def sync_emplois_users(users):
     sync_users(pilotage_users + monrecap_users, update_only=True)
 
 
+def delete_emplois_users(users):
+    NexusUser.include_old.filter(source_id__in=[user.pk for user in users], source__in=Service.local()).delete()
+
+
 def sync_emplois_structures(structures):
     sync_structures([build_structure(serialize_structure(structure), Service.EMPLOIS) for structure in structures])
+
+
+def delete_emplois_structure(structure):
+    NexusStructure.include_old.filter(source_id=structure.uid, source=Service.EMPLOIS).delete()
 
 
 def sync_emplois_memberships(memberships):
     sync_memberships(
         [build_membership(serialize_membership(membership), Service.EMPLOIS) for membership in memberships]
     )
+
+
+def delete_emplois_memberships(memberships):
+    NexusMembership.include_old.filter(
+        source_id__in=[membership.nexus_id for membership in memberships], source=Service.EMPLOIS
+    ).delete()

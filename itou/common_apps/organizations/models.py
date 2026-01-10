@@ -8,6 +8,7 @@ from django.forms import ValidationError
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
+from itou.nexus.utils import MEMBERSHIP_TRACKED_FIELDS, delete_emplois_memberships, sync_emplois_memberships
 from itou.utils.emails import get_email_message
 
 
@@ -268,6 +269,32 @@ class MembershipQuerySet(models.QuerySet):
         user_field = memberships.model._meta.get_field("user")
         remote_field_lookup = user_field.remote_field.name  # for exemple "companymemberships"
         return user_field.related_model.objects.filter(**{f"{remote_field_lookup}__in": memberships})
+
+    def update(self, **kwargs):
+        from itou.companies.models import CompanyMembership
+        from itou.prescribers.models import PrescriberMembership
+
+        if self.model in (PrescriberMembership, CompanyMembership):
+            if kwargs.keys() & MEMBERSHIP_TRACKED_FIELDS:
+                if self.model == PrescriberMembership:
+                    qs = self.select_related("user", "organization")
+                else:
+                    qs = self.select_related("user", "company")
+                for field, value in kwargs.items():
+                    for membership in qs:
+                        setattr(membership, field, value)
+                to_sync = []
+                to_delete = []
+                for membership in qs:
+                    if membership.should_sync_to_nexus():
+                        to_sync.append(membership)
+                    else:
+                        to_delete.append(membership)
+                if to_sync:
+                    sync_emplois_memberships(to_sync)
+                if to_delete:
+                    delete_emplois_memberships(to_delete)
+        return super().update(**kwargs)
 
 
 class ActiveMembershipManager(models.Manager.from_queryset(MembershipQuerySet)):
