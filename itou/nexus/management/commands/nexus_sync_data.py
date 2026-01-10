@@ -41,14 +41,14 @@ class Command(BaseCommand):
         )
 
         for users in self.batched(queryset):
-            nexus_utils.sync_emplois_users(users)
+            nexus_utils.sync_emplois_users(users, check_unsynchronized=self.check_unsynchronized)
 
     def sync_memberships(self):
         employers_qs = (
             CompanyMembership.objects.active().select_related("company").only("company__uid", "user_id", "is_admin")
         )
         for memberships in self.batched(employers_qs):
-            nexus_utils.sync_emplois_memberships(memberships)
+            nexus_utils.sync_emplois_memberships(memberships, check_unsynchronized=self.check_unsynchronized)
 
         prescribers_qs = (
             PrescriberMembership.objects.active()
@@ -56,19 +56,23 @@ class Command(BaseCommand):
             .only("organization__uid", "user_id", "is_admin")
         )
         for memberships in self.batched(prescribers_qs):
-            nexus_utils.sync_emplois_memberships(memberships)
+            nexus_utils.sync_emplois_memberships(memberships, check_unsynchronized=self.check_unsynchronized)
 
     def sync_structures(self):
         prescribers_qs = PrescriberOrganization.objects.select_related("insee_city")
         company_qs = Company.objects.active().exclude(kind=COMPANY_KIND_RESERVED).select_related("insee_city")
 
         for companies in self.batched(company_qs):
-            nexus_utils.sync_emplois_structures(companies)
+            nexus_utils.sync_emplois_structures(companies, check_unsynchronized=self.check_unsynchronized)
 
         for organizations in self.batched(prescribers_qs):
-            nexus_utils.sync_emplois_structures(organizations)
+            nexus_utils.sync_emplois_structures(organizations, check_unsynchronized=self.check_unsynchronized)
 
-    def handle(self, *args, **kwargs):
+    def add_arguments(self, parser):
+        parser.add_argument("--no-checks", action="store_true", help="Don't check unsynchronized data")
+
+    def handle(self, *args, no_checks=False, **kwargs):
+        self.check_unsynchronized = not no_checks
         start_at_vals = [nexus_utils.init_full_sync(service) for service in Service.local()]
         self.sync_users()
         self.sync_structures()

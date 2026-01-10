@@ -63,7 +63,7 @@ USER_TRACKED_FIELDS = [
 def serialize_user(user):
     # Serialize the user to reproduce the data received in the API
     return {
-        "source_id": user.pk,
+        "source_id": str(user.pk),
         "source_kind": user.kind,
         "first_name": user.first_name,
         "last_name": user.last_name,
@@ -189,7 +189,7 @@ def serialize_structure(structure):
         source_link = get_absolute_url(source_link)
 
     return {
-        "source_id": structure.uid,
+        "source_id": str(structure.uid),
         "source_kind": structure.kind,
         "siret": structure.siret,
         "name": name,
@@ -254,9 +254,12 @@ def sync_structures(nexus_structures):
 
 
 # Sync emplois data
-def sync_emplois_users(users):
+def sync_emplois_users(users, check_unsynchronized=False):
     emplois_users = [build_user(serialize_user(user), Service.EMPLOIS) for user in users]
+    if check_unsynchronized:
+        check_unsynchronized_objects(emplois_users)
     sync_users(emplois_users)
+    # How do I handle thoose ?
     pilotage_users = [build_user(serialize_user(user), Service.PILOTAGE) for user in users]
     monrecap_users = [build_user(serialize_user(user), Service.MON_RECAP) for user in users]
     sync_users(pilotage_users + monrecap_users, update_only=True)
@@ -266,21 +269,39 @@ def delete_emplois_users(users):
     NexusUser.include_old.filter(source_id__in=[user.pk for user in users], source__in=Service.local()).delete()
 
 
-def sync_emplois_structures(structures):
-    sync_structures([build_structure(serialize_structure(structure), Service.EMPLOIS) for structure in structures])
+def sync_emplois_structures(structures, check_unsynchronized=False):
+    new_structures = [build_structure(serialize_structure(structure), Service.EMPLOIS) for structure in structures]
+    if check_unsynchronized:
+        check_unsynchronized_objects(new_structures)
+    sync_structures(new_structures)
 
 
 def delete_emplois_structure(structure):
     NexusStructure.include_old.filter(source_id=structure.uid, source=Service.EMPLOIS).delete()
 
 
-def sync_emplois_memberships(memberships):
-    sync_memberships(
-        [build_membership(serialize_membership(membership), Service.EMPLOIS) for membership in memberships]
-    )
+def sync_emplois_memberships(memberships, check_unsynchronized=False):
+    new_memberships = [
+        build_membership(serialize_membership(membership), Service.EMPLOIS) for membership in memberships
+    ]
+    if check_unsynchronized:
+        check_unsynchronized_objects(new_memberships)
+    sync_memberships(new_memberships)
 
 
 def delete_emplois_memberships(memberships):
     NexusMembership.include_old.filter(
         source_id__in=[membership.nexus_id for membership in memberships], source=Service.EMPLOIS
     ).delete()
+
+
+def check_unsynchronized_objects(new_objects):
+    if not new_objects:
+        return
+    pks = [obj.pk for obj in new_objects]
+    old_objects = {obj.pk: obj for obj in new_objects[0]._meta.model.objects.filter(pk__in=pks)}
+    for new_obj in new_objects:
+        if old_obj := old_objects.get(new_obj.pk):
+            new_obj.check_diff(old_obj)
+        else:
+            logger.warning("NexusSync: Missing instance=%s", new_obj)
