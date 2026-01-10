@@ -109,7 +109,6 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
 
     class Params:
         criteria_certified = factory.Trait(
-            certified=True,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
             certification_period=factory.LazyAttribute(
                 lambda obj: InclusiveDateRange(
@@ -119,12 +118,12 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
             ),
         )
         criteria_not_certified = factory.Trait(
-            certified=False,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+            certification_period=InclusiveDateRange(empty=True),
         )
         criteria_certification_error = factory.Trait(
-            certified=None,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+            certification_period=None,
         )
 
     eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
@@ -132,7 +131,7 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
 
     @factory.post_generation
     def identity_certification(obj, create, extracted, **kwargs):
-        if obj.certified is not None:
+        if obj.certification_period is not None:
             IdentityCertification.objects.create(
                 certifier=IdentityCertificationAuthorities.API_PARTICULIER,
                 jobseeker_profile=obj.eligibility_diagnosis.job_seeker.jobseeker_profile,
