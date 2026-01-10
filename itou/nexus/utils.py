@@ -76,6 +76,8 @@ def sync_users(nexus_users):
 def build_membership(membership_data, service):
     return NexusMembership(
         source=service,
+        id=service_id(service, membership_data["source_id"]),
+        source_id=membership_data["source_id"],
         user_id=service_id(service, membership_data["user_id"]),
         structure_id=service_id(service, membership_data["structure_id"]),
         role=membership_data["role"],
@@ -87,8 +89,8 @@ def sync_memberships(nexus_memberships):
         NexusMembership.objects.bulk_create(
             nexus_memberships,
             update_conflicts=True,
-            update_fields=["role", "updated_at"],
-            unique_fields=["user", "structure"],
+            update_fields=["role", "updated_at", "user", "structure"],
+            unique_fields=["id"],
         )
     )
 

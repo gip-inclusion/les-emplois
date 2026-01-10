@@ -648,6 +648,11 @@ class CompanyMembership(MembershipAbstract):
             models.UniqueConstraint(fields=["user", "company"], name="user_company_unique"),
         ]
 
+    @property
+    def nexus_id(self):
+        # used to avoid id collision between PrescriberMembership and CompanyMemberships
+        return f"c-{self.pk}"
+
 
 class JobDescriptionQuerySet(models.QuerySet):
     def with_job_applications_count(self, filters=None):

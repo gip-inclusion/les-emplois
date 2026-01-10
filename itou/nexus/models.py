@@ -104,6 +104,10 @@ class NexusStructure(NexusModelMixin, AddressMixin, models.Model):
 
 
 class NexusMembership(NexusModelMixin, models.Model):
+    id = models.CharField(verbose_name="ID unique", primary_key=True)
+    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
+    source_id = models.CharField(verbose_name="ID Source")
+
     user = models.ForeignKey(
         NexusUser,
         verbose_name="utilisateur",
@@ -116,7 +120,6 @@ class NexusMembership(NexusModelMixin, models.Model):
         related_name="memberships",
         on_delete=models.CASCADE,
     )
-    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
     role = models.CharField(verbose_name="rôle", choices=Role.choices)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
