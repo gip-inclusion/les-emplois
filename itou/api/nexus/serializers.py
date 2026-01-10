@@ -4,6 +4,7 @@ from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Ro
 
 
 class MembershipSerializer(serializers.Serializer):
+    id = serializers.CharField(source="source_id")
     structure_id = serializers.CharField()
     role = serializers.ChoiceField(choices=Role.choices)
 

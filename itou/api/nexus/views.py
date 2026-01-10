@@ -1,6 +1,5 @@
 import logging
 
-from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -62,11 +61,10 @@ class UsersView(NexusApiMixin, generics.GenericAPIView):
                 logger.warning("NexusAPI: Ignoring memberships for structure=%s", membership.structure_id)
 
         # Write in database
-        updated_at = timezone.now()
         nexus_utils.sync_users(users)
         nexus_utils.sync_memberships(filtered_memberships)
-        # Remove old memberships (they don't exist anymore)
-        NexusMembership.objects.filter(user__in=users, updated_at__lt=updated_at).delete()
+        # Remove memberships we didn't receive for those users, they don't exist anymore
+        NexusMembership.objects.filter(user__in=users).exclude(id__in=[m.pk for m in filtered_memberships]).delete()
 
     def delete(self, request, *args, **kwargs):
         serializer = DeleteObjectSerializer(data=request.data)

@@ -377,6 +377,10 @@ class PrescriberMembership(MembershipAbstract):
     class Meta:
         unique_together = ("user_id", "organization_id")
 
+    @property
+    def nexus_id(self):
+        return f"p-{self.pk}"
+
     def request_for_invitation(self, requestor: dict):
         """
         A new user can ask for an invitation to join a prescriber organization.
