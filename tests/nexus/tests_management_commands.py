@@ -4,7 +4,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.nexus.enums import Service
+from itou.nexus.enums import Role, Service
 from itou.nexus.management.commands.populate_metabase_nexus import create_table, get_connection
 from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 from itou.nexus.utils import build_user, serialize_user, service_id, sync_users
@@ -206,33 +206,57 @@ def test_populate_metabase_nexus(snapshot):
         ]
 
 
-def test_sync_data():
+def test_sync_data(caplog):
     authorized_prescriber = PrescriberFactory(email="1@mailinator.com")
     employer = EmployerFactory(email="2@mailinator.com")
     prescriber_1 = PrescriberFactory(email="3@mailinator.com")
     prescriber_2 = PrescriberFactory(email="4@mailinator.com")
 
-    company_1 = CompanyMembershipFactory(
+    company_membership_1 = CompanyMembershipFactory(
         user=employer,
         company__uid="11111111-1111-1111-1111-111111111111",
         company__insee_city=create_city_saint_andre(),
-    ).company
-    company_2 = CompanyMembershipFactory(
+    )
+    company_membership_2 = CompanyMembershipFactory(
         user=employer,
         is_admin=False,
         company__uid="22222222-2222-2222-2222-222222222222",
-    ).company
-    organization_1 = PrescriberMembershipFactory(
+    )
+    prescriber_membership_1 = PrescriberMembershipFactory(
         user=authorized_prescriber,
         organization__uid="33333333-3333-3333-3333-333333333333",
         organization__authorized=True,
-    ).organization
-    organization_2 = PrescriberMembershipFactory(
+    )
+    prescriber_membership_2 = PrescriberMembershipFactory(
         user=prescriber_1,
         organization__uid="44444444-4444-4444-4444-444444444444",
-    ).organization
+    )
+
+    NexusUser.objects.all().delete()
+    NexusStructure.objects.all().delete()
+    # no need to delete NexusMembership, they were all removed when removing the users
 
     call_command("nexus_sync_data")
+    assert set(caplog.messages[:-1]) == {
+        f"NexusSync: Missing instance=NexusUser object (emplois-de-linclusion--{authorized_prescriber.pk})",
+        f"NexusSync: Missing instance=NexusUser object (emplois-de-linclusion--{employer.pk})",
+        f"NexusSync: Missing instance=NexusUser object (emplois-de-linclusion--{prescriber_1.pk})",
+        f"NexusSync: Missing instance=NexusUser object (emplois-de-linclusion--{prescriber_2.pk})",
+        "NexusSync: Missing instance=NexusStructure object "
+        "(emplois-de-linclusion--22222222-2222-2222-2222-222222222222)",
+        "NexusSync: Missing instance=NexusStructure object "
+        "(emplois-de-linclusion--11111111-1111-1111-1111-111111111111)",
+        "NexusSync: Missing instance=NexusStructure object "
+        "(emplois-de-linclusion--44444444-4444-4444-4444-444444444444)",
+        "NexusSync: Missing instance=NexusStructure object "
+        "(emplois-de-linclusion--33333333-3333-3333-3333-333333333333)",
+        f"NexusSync: Missing instance=NexusMembership object (emplois-de-linclusion--{company_membership_1.nexus_id})",
+        f"NexusSync: Missing instance=NexusMembership object (emplois-de-linclusion--{company_membership_2.nexus_id})",
+        "NexusSync: Missing instance=NexusMembership object "
+        f"(emplois-de-linclusion--{prescriber_membership_1.nexus_id})",
+        "NexusSync: Missing instance=NexusMembership object "
+        f"(emplois-de-linclusion--{prescriber_membership_2.nexus_id})",
+    }
 
     assertQuerySetEqual(
         NexusUser.objects.values_list("pk", flat=True),
@@ -247,23 +271,41 @@ def test_sync_data():
     assertQuerySetEqual(
         NexusMembership.objects.values_list("user_id", "structure_id"),
         [
-            (service_id(Service.EMPLOIS, authorized_prescriber.pk), service_id(Service.EMPLOIS, organization_1.uid)),
-            (service_id(Service.EMPLOIS, prescriber_1.pk), service_id(Service.EMPLOIS, organization_2.uid)),
-            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_1.uid)),
-            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_2.uid)),
+            (
+                service_id(Service.EMPLOIS, authorized_prescriber.pk),
+                service_id(Service.EMPLOIS, prescriber_membership_1.organization.uid),
+            ),
+            (
+                service_id(Service.EMPLOIS, prescriber_1.pk),
+                service_id(Service.EMPLOIS, prescriber_membership_2.organization.uid),
+            ),
+            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_membership_1.company.uid)),
+            (service_id(Service.EMPLOIS, employer.pk), service_id(Service.EMPLOIS, company_membership_2.company.uid)),
         ],
         ordered=False,
     )
     assertQuerySetEqual(
         NexusStructure.objects.values_list("pk", flat=True),
         [
-            service_id(Service.EMPLOIS, organization_1.uid),
-            service_id(Service.EMPLOIS, organization_2.uid),
-            service_id(Service.EMPLOIS, company_1.uid),
-            service_id(Service.EMPLOIS, company_2.uid),
+            service_id(Service.EMPLOIS, prescriber_membership_1.organization.uid),
+            service_id(Service.EMPLOIS, prescriber_membership_2.organization.uid),
+            service_id(Service.EMPLOIS, company_membership_1.company.uid),
+            service_id(Service.EMPLOIS, company_membership_2.company.uid),
         ],
         ordered=False,
     )
+
+    # Sync again to check there no warning logs
+    caplog.clear()
+    call_command("nexus_sync_data")
+    assert caplog.messages[:-1] == []
+
+    # Using no-checks option
+    NexusUser.objects.all().delete()
+    NexusStructure.objects.all().delete()
+    caplog.clear()
+    call_command("nexus_sync_data", no_checks=True)
+    assert caplog.messages[:-1] == []
 
     # Check Pilotage and Mon-Récap data sync
     # mock old users for pilotage and mon_recap
@@ -284,3 +326,19 @@ def test_sync_data():
         ],
         ordered=False,
     )
+
+    # With a diff detected
+    NexusUser.objects.filter(source_id=prescriber_1.pk).update(first_name="Fifi")
+    NexusStructure.objects.filter(source_id=company_membership_1.company.uid).update(name="Carrouf")
+    NexusMembership.objects.filter(source_id=f"c-{company_membership_1.pk}").update(role=Role.COLLABORATOR)
+    caplog.clear()
+    call_command("nexus_sync_data")
+    assert caplog.messages[:-1] == [
+        f"NexusSync: diff detected on instance=NexusUser object (emplois-de-linclusion--{prescriber_1.pk}) "
+        "fields=[first_name]",
+        "NexusSync: diff detected on instance=NexusStructure object "
+        "(emplois-de-linclusion--11111111-1111-1111-1111-111111111111) "
+        "fields=[name]",
+        "NexusSync: diff detected on instance=NexusMembership object "
+        f"(emplois-de-linclusion--{company_membership_1.nexus_id}) fields=[role]",
+    ]
