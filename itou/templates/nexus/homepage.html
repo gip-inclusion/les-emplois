@@ -1,0 +1,1074 @@
+{% extends "nexus/layout/base.html" %}
+{% load enums %}
+{% load matomo %}
+{% load theme_inclusion %}
+
+{% block title %}Tableau de bord {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    {% enums "nexus" "NexusUserKind" as NexusUserKind %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title">
+                        <div class="c-title__main">
+                            <h1>Accueil</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if activated_services %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <h2>
+                            <i class="ri-function-line ri-xl fw-normal text-disabled"></i>
+                            Mes services actifs
+                        </h2>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                            {% if Service.EMPLOIS in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" alt="Les emplois de l’inclusion">
+                                            <div>
+                                                <strong class="d-block fs-lg">Les Emplois de l’inclusion</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                        </div>
+                                        <a href="{{ emplois_url }}"
+                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                           aria-label="Accéder aux Emplois de l’inclusion (lien externe)"
+                                           {% matomo_event "nexus" "acceder-service" Service.EMPLOIS %}
+                                           target="_blank">Accéder</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if Service.DORA in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="35" alt="DORA">
+                                            <div>
+                                                <strong class="d-block fs-lg">DORA</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                        </div>
+                                        <a href="{{ dora_url }}"
+                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                           aria-label="Accéder à DORA (lien externe)"
+                                           {% matomo_event "nexus" "acceder-service" Service.DORA %}
+                                           target="_blank">Accéder</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if Service.MARCHE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" alt="Le marché de l’inclusion">
+                                            <div>
+                                                <strong class="d-block fs-lg">Le marché de l’inclusion</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                        </div>
+                                        <a href="{{ marche_url }}"
+                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                           aria-label="Accéder au marché de l’inclusion (lien externe)"
+                                           {% matomo_event "nexus" "acceder-service" Service.MARCHE %}
+                                           target="_blank">Accéder</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if Service.MON_RECAP in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" alt="Mon Récap">
+                                            <div>
+                                                <strong class="d-block fs-lg">Mon Récap</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                            {% if monrecap_url is None %}
+                                                <div class="ms-auto align-self-start">
+                                                    <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                                                        <span class="visually-hidden">Démo inexistante</span>
+                                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if monrecap_url %}
+                                            <a href="{{ monrecap_url }}"
+                                               class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                               aria-label="Accéder à Mon Récap (lien externe)"
+                                               {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %}
+                                               target="_blank">Accéder</a>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="Accéder à Mon Récap (lien externe)">
+                                                Accéder
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if Service.PILOTAGE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="35" alt="Le pilotage de l’inclusion">
+                                            <div>
+                                                <strong class="d-block fs-lg">Le pilotage de l’inclusion</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                        </div>
+                                        <a href="{{ pilotage_url }}"
+                                           class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                           aria-label="Accéder au pilotage de l’inclusion (lien externe)"
+                                           {% matomo_event "nexus" "acceder-service" Service.PILOTAGE %}
+                                           target="_blank">Accéder</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if Service.COMMUNAUTE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    <div class="c-box h-100">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="35" alt="La communauté de l’inclusion">
+                                            <div>
+                                                <strong class="d-block fs-lg">La communauté de l’inclusion</strong>
+                                                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                            </div>
+                                            {% if communaute_url is None %}
+                                                <div class="ms-auto align-self-start">
+                                                    <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                                                        <span class="visually-hidden">Démo inexistante</span>
+                                                        <i class="ri-close-line" aria-hidden="true"></i>
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% if communaute_url %}
+                                            <a href="{{ communaute_url }}"
+                                               class="btn btn-outline-primary btn-block has-external-link mt-3"
+                                               aria-label="Accéder à la communauté de l’inclusion (lien externe)"
+                                               {% matomo_event "nexus" "acceder-service" Service.COMMUNAUTE %}
+                                               target="_blank">Accéder</a>
+                                        {% else %}
+                                            <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="Accéder à la communauté de l’inclusion (lien externe)">
+                                                Accéder
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not all_services_activated %}
+        <section class="s-section" id="newServicesV1">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inlcusion</a>
+                        </div>
+                        <div class="c-box">
+                            <ul class="list-group list-group-flush">
+                                {% if Service.EMPLOIS not in activated_services %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" alt="Les emplois de l’inclusion">
+                                                <div>
+                                                    <strong class="d-block fs-lg">Les Emplois de l’inclusion</strong>
+                                                    <p class="mb-0 fs-sm">Le service de recrutement et de gestion des PASS IAE.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Publiez vos recrutements
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Recevez des candidatures
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Obtenez un PASS IAE
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                            <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.EMPLOIS %} type="button">
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </button>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if Service.DORA not in activated_services %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="35" alt="DORA">
+                                                <div>
+                                                    <strong class="d-block fs-lg">DORA</strong>
+                                                    <p class="mb-0 fs-sm">Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Saisissez votre offre de service
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Service identifié par les pro
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Gérez les demandes dans votre espace
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" alt="Le marché de l’inclusion">
+                                                <div>
+                                                    <strong class="d-block fs-lg">Le marché de l’inclusion</strong>
+                                                    <p class="mb-0 fs-sm">Le service de mise en relation entre acheteurs et structures d’insertion.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Renseignez votre activité
+                                                        </li>
+
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Recevez des demandes de devis
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Développez votre CA
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if Service.MON_RECAP not in activated_services %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" alt="Mon Récap">
+                                                <div>
+                                                    <strong class="d-block fs-lg">Mon Récap</strong>
+                                                    <p class="mb-0 fs-sm">Le carnet papier retraçant le parcours d’insertion d’une personne.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Démarches et parcours centralisés
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Support accessible
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Commun à tous les pros
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <form method="post" action="{{ monrecap_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-block btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if Service.PILOTAGE not in activated_services %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="35" alt="Le Pilotage de l’inclusion">
+                                                <div>
+                                                    <strong class="d-block fs-lg">Le Pilotage de l’inclusion</strong>
+                                                    <p class="mb-0 fs-sm">Le service présentant les données sur les politiques publiques d’insertion.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Statistiques nationales
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Données sur votre organisation
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Aide à la décision
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <form method="post" action="{{ pilotage_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-block btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if Service.COMMUNAUTE not in activated_services %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                            <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="35" alt="La Communauté de l’inclusion">
+                                                <div>
+                                                    <strong class="d-block fs-lg">La Communauté de l’inclusion</strong>
+                                                    <p class="mb-0 fs-sm">L’espace d’entraide des professionnels de l’inclusion.</p>
+                                                    <ul class="list-inline fs-xs">
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Forum de discussion
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            14 000 utilisateurs actifs
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <i class="ri-check-line ri-sm"></i>
+                                                            Fiches métiers
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="s-section d-none" id="newServicesV2">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inlcusion</a>
+                        </div>
+                        <div class="c-box">
+                            <div class="row d-none d-xxl-flex">
+                                <div class="col-5" id="nxAccordionListGroup">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" alt="Les emplois de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">Les Emplois de l’inclusion</strong>
+                                                            <p class="mb-0 fs-sm">Le service de recrutement et de gestion des PASS IAE.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur les Emplois de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#emploisInfoMore"
+                                                            aria-expanded="{% if Service.EMPLOIS == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="emploisInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="35" alt="DORA">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">DORA</strong>
+                                                            <p class="mb-0 fs-sm">Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur DORA"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#doraInfoMore"
+                                                            aria-expanded="{% if Service.DORA == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="doraInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" alt="Le marché de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">Le marché de l’inclusion</strong>
+                                                            <p class="mb-0 fs-sm">Le service de mise en relation entre acheteurs et structures d’insertion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur le marché de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#marcheInfoMore"
+                                                            aria-expanded="{% if Service.MARCHE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="marcheInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" alt="Mon Récap">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">Mon Récap</strong>
+                                                            <p class="mb-0 fs-sm">Le carnet papier retraçant le parcours d’insertion d’une personne.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur la Mon Récap"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#monrecapInfoMore"
+                                                            aria-expanded="{% if Service.MON_RECAP == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="monrecapInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="35" alt="Le Pilotage de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">Le Pilotage de l’inclusion</strong>
+                                                            <p class="mb-0 fs-sm">Le service présentant les données sur les politiques publiques d’insertion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur Le Pilotage de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#pilotageInfoMore"
+                                                            aria-expanded="{% if Service.PILOTAGE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="pilotageInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="35" alt="La Communauté de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block fs-sm">La Communauté de l’inclusion</strong>
+                                                            <p class="mb-0 fs-sm">L’espace d’entraide des professionnels de l’inclusion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur La Communauté de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#communauteInfoMore"
+                                                            aria-expanded="{% if Service.COMMUNAUTE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="communauteInfoMore">
+                                                        <i class="ri-arrow-drop-right-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-7" id="nxAccordionInfoMore">
+                                    {% if Service.EMPLOIS not in activated_services %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.EMPLOIS == new_service_shown %} show{% endif %}" id="emploisInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="60" alt="Les emplois de l’inclusion">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">Les Emplois de l’inclusion</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                                <button class="btn btn-ico btn-primary" type="button">
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">Le service de recrutement et de gestion des PASS IAE.</p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Publiez vos fiches de poste</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Recevez des candidatures de la part des accompagnateurs et des candidats</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>
+                                                        Obtenez un
+                                                        <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">PASS IAE</a>
+                                                        en ligne dès l’embauche d’un candidat
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                            <a href="{% url 'home:hp' %}" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.EMPLOIS %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                    {% if Service.DORA not in activated_services %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.DORA == new_service_shown %} show{% endif %}" id="doraInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="60" alt="DORA">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">DORA</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                                Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                            </p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Saisissez ou importez votre offre de service</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Service identifié par les professionnels de l’insertion grâce au moteur de recherche</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Gérez vos demandes de mobilisation dans un espace dédié</span>
+                                                </li>
+                                            </ul>
+                                            <a href="https://dora.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.DORA %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                    {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.MARCHE == new_service_shown %} show{% endif %}" id="marcheInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="60" alt="Le marché de l’inclusion">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">Le marché de l’inclusion</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                                Le service de mise en relation entre acheteurs et structures d’insertion.
+                                            </p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Renseignez votre activité commerciale</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Recevez des demandes de clients publics et privés</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Développez votre activité commerciale</span>
+                                                </li>
+                                            </ul>
+                                            <a href="https://lemarche.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MARCHE %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                    {% if Service.MON_RECAP not in activated_services %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.MON_RECAP == new_service_shown %} show{% endif %}" id="monrecapInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="60" alt="Mon Récap">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">Mon Récap</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                <form method="post" action="{{ monrecap_url }}">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">Le carnet papier retraçant le parcours d’insertion d’une personne.</p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Choisissez un outil accessible non numérique</span>
+                                                </li>
+                                            </ul>
+                                            <a href="https://mon-recap.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                    {% if Service.PILOTAGE not in activated_services %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.PILOTAGE == new_service_shown %} show{% endif %}" id="pilotageInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="60" alt="Le Pilotage de l’inclusion">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">Le Pilotage de l’inclusion</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                <form method="post" action="{{ pilotage_url }}">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                                Le service présentant les données sur les politiques publiques d’insertion.
+                                            </p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Consultez les statistiques nationales sur l’inclusion dans l’emploi</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Suivez et analysez les données spécifiques à votre organisation</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Prenez des décisions et argumentez grâce aux données</span>
+                                                </li>
+                                            </ul>
+                                            <a href="https://pilotage.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.PILOTAGE %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                    {% if Service.COMMUNAUTE not in activated_services %}
+                                        <div class="h-100 border-start ps-4 collapse{% if Service.COMMUNAUTE == new_service_shown %} show{% endif %}" id="communauteInfoMore" data-bs-parent="#nxAccordionInfoMore">
+                                            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                                <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                    <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="60" alt="La Communauté de l’inclusion">
+                                                    <div>
+                                                        <strong class="d-block fs-lg">La Communauté de l’inclusion</strong>
+                                                        <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+                                                    </div>
+                                                </div>
+                                                <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            </div>
+                                            <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">L’espace d’entraide des professionnels de l’inclusion.</p>
+                                            <ul class="list-unstyled mb-3 mb-md-4">
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Posez directement votre question aux 14 000 utilisateurs actifs</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Trouvez une information parmi les 8000 échanges entre pairs</span>
+                                                </li>
+                                                <li class="my-md-2">
+                                                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                    <span>Améliorez vos pratiques professionnelles en lisant nos fiches pratiques</span>
+                                                </li>
+                                            </ul>
+                                            <a href="https://communaute.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.COMMUNAUTE %} target="_blank">En savoir plus</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row d-xxl-none">
+                                <div class="col-12" id="nxAccordionListGroupCollapse">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" alt="Les emplois de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block">Les Emplois de l’inclusion</strong>
+                                                            <p class="mb-0">Le service de recrutement et de gestion des PASS IAE.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur les Emplois de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#emploisInfoCollapse"
+                                                            aria-expanded="{% if Service.EMPLOIS == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="emploisInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.EMPLOIS == new_service_shown %} show{% endif %}" id="emploisInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Publiez vos fiches de poste</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Recevez des candidatures de la part des accompagnateurs et des candidats</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>
+                                                                Obtenez un
+                                                                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">PASS IAE</a>
+                                                                en ligne dès l’embauche d’un candidat
+                                                            </span>
+                                                        </li>
+                                                    </ul>
+                                                    <a href="{% url 'home:hp' %}" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.EMPLOIS %} target="_blank">En savoir plus</a>
+                                                    {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                                    <button class="btn btn-ico btn-primary" type="button">
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="35" alt="DORA">
+                                                        <div>
+                                                            <strong class="d-block">DORA</strong>
+                                                            <p class="mb-0">Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur DORA"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#doraInfoCollapse"
+                                                            aria-expanded="{% if Service.DORA == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="doraInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.DORA == new_service_shown %} show{% endif %}" id="doraInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Saisissez ou importez votre offre de service</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Service identifié par les professionnels de l’insertion grâce au moteur de recherche</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Gérez vos demandes de mobilisation dans un espace dédié</span>
+                                                        </li>
+                                                    </ul>
+                                                    <a href="https://dora.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.DORA %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" alt="Le marché de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block">Le marché de l’inclusion</strong>
+                                                            <p class="mb-0">Le service de mise en relation entre acheteurs et structures d’insertion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur le marché de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#marcheInfoCollapse"
+                                                            aria-expanded="{% if Service.MARCHE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="marcheInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.MARCHE == new_service_shown %} show{% endif %}" id="marcheInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Renseignez votre activité commerciale</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Recevez des demandes de clients publics et privés</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Développez votre activité commerciale</span>
+                                                        </li>
+                                                    </ul>
+                                                    <a href="https://lemarche.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MARCHE %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" alt="Mon Récap">
+                                                        <div>
+                                                            <strong class="d-block">Mon Récap</strong>
+                                                            <p class="mb-0">Le carnet papier retraçant le parcours d’insertion d’une personne.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur la Mon Récap"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#monrecapInfoCollapse"
+                                                            aria-expanded="{% if Service.MON_RECAP == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="monrecapInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.MON_RECAP == new_service_shown %} show{% endif %}" id="monrecapInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Choisissez un outil accessible non numérique</span>
+                                                        </li>
+                                                    </ul>
+                                                    <form method="post" action="{{ monrecap_url }}">
+                                                        <a href="https://mon-recap.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %} target="_blank">En savoir plus</a>
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-pilotage-inclusion-mono.svg' %}" height="35" alt="Le Pilotage de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block">Le Pilotage de l’inclusion</strong>
+                                                            <p class="mb-0">Le service présentant les données sur les politiques publiques d’insertion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur Le Pilotage de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#pilotageInfoCollapse"
+                                                            aria-expanded="{% if Service.PILOTAGE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="pilotageInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.PILOTAGE == new_service_shown %} show{% endif %}" id="pilotageInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Consultez les statistiques nationales sur l’inclusion dans l’emploi</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Suivez et analysez les données spécifiques à votre organisation</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Prenez des décisions et argumentez grâce aux données</span>
+                                                        </li>
+                                                    </ul>
+                                                    <form method="post" action="{{ pilotage_url }}">
+                                                        <a href="https://pilotage.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.PILOTAGE %} target="_blank">En savoir plus</a>
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            <li class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center gap-3 position-relative">
+                                                    <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                        <img src="{% static_theme_images 'logo-communaute-inclusion-mono.svg' %}" height="35" alt="La Communauté de l’inclusion">
+                                                        <div>
+                                                            <strong class="d-block">La Communauté de l’inclusion</strong>
+                                                            <p class="mb-0">L’espace d’entraide des professionnels de l’inclusion.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                                                            type="button"
+                                                            aria-label="En savoir plus sur La Communauté de l’inclusion"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#communauteInfoCollapse"
+                                                            aria-expanded="{% if Service.COMMUNAUTE == new_service_shown %}true{% else %}false{% endif %}"
+                                                            aria-controls="communauteInfoCollapse">
+                                                        <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="collapse{% if Service.COMMUNAUTE == new_service_shown %} show{% endif %}" id="communauteInfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+                                                    <ul class="list-unstyled my-3">
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Posez directement votre question aux 14 000 utilisateurs actifs</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Trouvez une information parmi les 8000 échanges entre pairs</span>
+                                                        </li>
+                                                        <li class="my-md-1">
+                                                            <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                                                            <span>Améliorez vos pratiques professionnelles en lisant nos fiches pratiques</span>
+                                                        </li>
+                                                    </ul>
+                                                    <a href="https://communaute.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.COMMUNAUTE %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+
+{% block script %}
+    <!-- Matomo A/B test -->
+    <script nonce="{{ CSP_NONCE }}">
+        var _paq = _paq || [];
+        _paq.push(['AbTesting::create', {
+            name: 'NexusServicesADecouvrir', // the name is the same in both environment
+            percentage: 100,
+            includedTargets: [{
+                "attribute": "url",
+                "inverted": "0",
+                "type": "equals_simple",
+                "value": "{{ a_b_test_url }}"
+            }],
+            excludedTargets: [],
+            variations: [{
+                name: 'original',
+                activate: function(event) {}
+            }, {
+                name: 'VariationB',
+                activate: function(event) {
+                    $('#newServicesV1').addClass('d-none');
+                    $('#newServicesV2').removeClass('d-none');
+                }
+            }],
+            trigger: function() {
+                return true;
+            }
+        }]);
+    </script>
+{% endblock %}

@@ -19,6 +19,18 @@ class Service(models.TextChoices):
         """Returns the services managed by this code base"""
         return [cls.EMPLOIS, cls.MON_RECAP, cls.PILOTAGE]
 
+    @classmethod
+    def activable(cls):
+        """Returns the ordered services as displayed in the dashboard"""
+        return [
+            cls.EMPLOIS,
+            cls.DORA,
+            cls.MARCHE,
+            cls.MON_RECAP,
+            cls.PILOTAGE,
+            cls.COMMUNAUTE,
+        ]
+
 
 class Auth(models.TextChoices):
     DJANGO = "DJANGO", "Django"
