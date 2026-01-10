@@ -36,6 +36,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
+from itou.nexus.utils import USER_TRACKED_FIELDS, delete_emplois_users, sync_emplois_users
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
@@ -83,6 +84,24 @@ class UserQuerySet(models.QuerySet):
 
     def eligibility_pending(self, siae=None):
         return self.exclude(self.get_eligibility_validated_lookup(siae=siae))
+
+    def update(self, **kwargs):
+        if kwargs.keys() & set(USER_TRACKED_FIELDS):
+            for field, value in kwargs.items():
+                for user in self:
+                    setattr(user, field, value)
+            to_sync = []
+            to_delete = []
+            for user in self:
+                if user.should_sync_to_nexus():
+                    to_sync.append(user)
+                else:
+                    to_delete.append(user)
+            if to_sync:
+                sync_emplois_users(to_sync)
+            if to_delete:
+                delete_emplois_users(to_delete)
+        return super().update(**kwargs)
 
 
 class ItouUserManager(UserManager.from_queryset(UserQuerySet)):
@@ -424,6 +443,9 @@ class User(AbstractUser, AddressMixin, HasDataChangedMixin):
         ]:
             raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
 
+    def should_sync_to_nexus(self):
+        return bool(self.is_active and self.email and (self.is_employer or self.is_prescriber))
+
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding and self._auto_create_job_seeker_profile
 
@@ -447,6 +469,7 @@ class User(AbstractUser, AddressMixin, HasDataChangedMixin):
             if "update_fields" in kwargs and "last_login" in kwargs["update_fields"]:
                 kwargs["update_fields"].append("first_login")
 
+        adding = self._state.adding
         super().save(*args, **kwargs)
 
         if self.is_job_seeker:
@@ -464,7 +487,17 @@ class User(AbstractUser, AddressMixin, HasDataChangedMixin):
                     certifier=IdentityCertificationAuthorities.API_FT_RECHERCHE_INDIVIDU_CERTIFIE
                 ).delete()
 
+        if adding or self.has_data_changed(USER_TRACKED_FIELDS):
+            if self.should_sync_to_nexus():
+                sync_emplois_users([self])
+            else:
+                delete_emplois_users([self])
+
         self.set_old_values()
+
+    def delete(self, *args, **kwargs):
+        delete_emplois_users([self])
+        return super().delete(*args, **kwargs)
 
     def get_full_name(self):
         """
