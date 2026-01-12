@@ -41,6 +41,11 @@ sont rendues disponibles par [Docker](https://docs.docker.com/) et
 - [Installer Docker](https://docs.docker.com/engine/install/)
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
+Créer le dossier pour la db
+```sh
+mkdir ./docker/dev/postgres
+```
+
 Démarrez les dépendances de développement avec la commande :
 ```sh
 docker compose up
