@@ -143,7 +143,7 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
         return HttpResponseRedirect(self.get_success_url())
 
 
-class BaseAcceptView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
+class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
     template_name = None
 
     def test_func(self):
