@@ -624,14 +624,18 @@ class TestEditUserInfoView:
         )
         assert user.jobseeker_profile.birth_country_id is None
 
-    def test_fields_readonly_with_certified_criteria(self, client):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         job_seeker = JobSeekerFactory(
             title=Title.M,
             born_in_france=True,
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            certifiable_by_api_particulier=True,
+        )
         client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)

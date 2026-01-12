@@ -543,7 +543,7 @@ class TestEditJobSeekerInfo:
         assertContains(response, "Ce champ est obligatoire.")
         assert response.context["form"].errors["address_for_autocomplete"] == ["Ce champ est obligatoire."]
 
-    def test_fields_readonly_with_certified_criteria(self, client, mocker):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client, mocker):
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -556,6 +556,7 @@ class TestEditJobSeekerInfo:
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
             criteria_certified=True,
+            certifiable_by_api_particulier=True,
         )
         job_seeker = selected_criteria.eligibility_diagnosis.job_seeker
 

@@ -245,14 +245,18 @@ class TestFranceConnect:
 
             user.delete()
 
-    def test_update_readonly_with_certified_criteria(self, caplog):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            certifiable_by_api_particulier=True,
+        )
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user, created = fc_user_data.create_or_update_user()
         assert created is False
