@@ -15,9 +15,13 @@ def one_request_per_minute(mocker):
 def test_throttling(client, user_factory, one_request_per_minute):
     if user_factory is not None:
         client.force_login(user_factory())
-    response = client.get(reverse("search:employers_home"))
+        url = reverse("dashboard:index")
+    else:
+        url = reverse("search:employers_home")
+
+    response = client.get(url)
     assert response.status_code == 200
-    response = client.get(reverse("search:employers_home"))
+    response = client.get(url)
     assertContains(
         response,
         "<p>Vous avez effectué trop de requêtes. Réessayez dans 60 secondes.</p>",

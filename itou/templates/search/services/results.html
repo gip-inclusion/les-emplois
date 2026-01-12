@@ -52,7 +52,7 @@
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.receptions only %}
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.services only %}
                                 <div class="ms-lg-auto">
-                                    <a href="{% url_add_query request.path city=request.GET.city category=request.GET.category %}"
+                                    <a href="{% url_add_query request.path city=request.GET.city|default:None category=request.GET.category|default:None %}"
                                        class="btn btn-ico btn-dropdown-filter"
                                        aria-label="Réinitialiser les filtres actifs"
                                        hx-boost="true"

@@ -35,16 +35,19 @@ from tests.utils.testing import get_request
         (partial(EmployerFactory, membership=True), IdentityProvider.DJANGO, True),
         (partial(EmployerFactory, membership=True), IdentityProvider.INCLUSION_CONNECT, True),
         (partial(EmployerFactory, membership=True), IdentityProvider.PRO_CONNECT, False),
-        (LaborInspectorFactory, IdentityProvider.DJANGO, False),
+        (partial(LaborInspectorFactory, membership=True), IdentityProvider.DJANGO, False),
     ],
 )
 def test_redirect_to_pc_activation_view(client, user_factory, identity_provider, is_redirected):
     user = user_factory(identity_provider=identity_provider)
     client.force_login(user)
-    response = client.get(reverse("search:employers_home"), follow=True)
+
     if is_redirected:
+        response = client.get(reverse("search:employers_home"))
         assertRedirects(response, reverse("dashboard:activate_pro_connect_account"))
     else:
+        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+            response = client.get(reverse("search:employers_home"), follow=True)
         assert response.status_code == 200
 
 
