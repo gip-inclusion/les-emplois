@@ -1484,7 +1484,7 @@
                                                         "had_memberships_in_authorized_organization",
                                                         "identity_provider")
           SELECT *
-          FROM UNNEST((%s)::UUID[], (%s)::date[], (%s)::date[], (%s)::date[], (%s)::date[], (%s)::varchar(3)[], (%s)::varchar(3)[], (%s)::varchar(50)[], (%s)::integer[], (%s)::integer[], (%s)::integer[], (%s)::boolean[], (%s)::varchar(20)[])
+          FROM UNNEST((%s)::UUID[], (%s)::date[], (%s)::date[], (%s)::date[], (%s)::date[], (%s)::varchar[], (%s)::varchar[], (%s)::varchar[], (%s)::integer[], (%s)::integer[], (%s)::integer[], (%s)::boolean[], (%s)::varchar[])
         ''',
       }),
       dict({
