@@ -719,7 +719,7 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-itoutils[django, django-testing]==25.12.22.1 \
+itoutils[django,django-testing]==25.12.22.1 \
     --hash=sha256:eb5aa2972e7d0a5b3eac50ef0c9085623862ecceb7d7f8d7f27646767301c1e9 \
     --hash=sha256:f14c310f9cfc2298dbea09cb91d345d13be5c44aa571ac592b8d01f517a59291
     # via
@@ -1137,9 +1137,9 @@ patchy==2.10.0 \
     --hash=sha256:e7dc3610d20b8ce30af2ddbfa4a1ed67f066269fa6b10094f16dc798b80119da \
     --hash=sha256:f5c13adee5db3eea36a702ae3ab95f24d2c62d28d3a2246cc2f329e2e3e0cd74
     # via -r requirements/test.in
-pathspec==0.12.1 \
-    --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
-    --hash=sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712
+pathspec==1.0.3 \
+    --hash=sha256:bac5cf97ae2c2876e2d25ebb15078eb04d76e4b98921ee31c6f85ade8b59444d \
+    --hash=sha256:e80767021c1cc524aa3fb14bedda9c34406591343cc42797b386ce7b9354fb6c
     # via djlint
 pillow==12.1.0 \
     --hash=sha256:00162e9ca6d22b7c3ee8e61faa3c3253cd19b6a37f126cad04f2f88b306f557d \
