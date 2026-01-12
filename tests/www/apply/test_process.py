@@ -251,13 +251,12 @@ class TestProcessViews:
     def test_details_for_company_from_list(self, client, snapshot):
         """Display the details of a job application coming from the job applications list."""
 
-        certified_criterion = IAESelectedAdministrativeCriteriaFactory(
+        criterion = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__from_employer=False,
             eligibility_diagnosis__from_prescriber=True,
-            certified=True,
         )
         job_application = JobApplicationFactory(
-            eligibility_diagnosis=certified_criterion.eligibility_diagnosis,
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
             sent_by_authorized_prescriber_organisation=True,
             resume=None,
             with_approval=True,
