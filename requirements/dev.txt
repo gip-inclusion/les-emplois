@@ -754,9 +754,9 @@ httpx==0.28.1 \
     # via
     #   -r requirements/test.txt
     #   respx
-huey==2.5.5 \
-    --hash=sha256:82ac73343248c5d7acec04814f952c61f7793e11fd99d26ed9030137d32f912c \
-    --hash=sha256:a39010628a9a1a9e91462f9bf33dc243b006a9f21193026ea47ae18949a12581
+huey==2.6.0 \
+    --hash=sha256:1b9df9d370b49c6d5721ba8a01ac9a787cf86b3bdc584e4679de27b920395c3f \
+    --hash=sha256:8d11f8688999d65266af1425b831f6e3773e99415027177b8734b0ffd5e251f6
     # via -r requirements/test.txt
 identify==2.6.15 \
     --hash=sha256:1181ef7608e00704db228516541eb83a88a9f94433a8c80bb9b5bd54b1d81757 \
