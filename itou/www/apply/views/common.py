@@ -164,11 +164,17 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
             form.is_bound = True
             form.data = form.initial
 
+        session = self.get_session()
+        if session is None:
+            contract_form_data = {}
+        else:
+            contract_form_data = session.get("contract_form_data", {})
         forms["accept"] = AcceptForm(
             instance=self.job_application,
             company=self.company,
             job_seeker=self.job_seeker,
             data=self.request.POST or None,
+            initial=contract_form_data,
         )
 
         return forms
@@ -178,15 +184,6 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
 
     def get_reset_url(self):
         raise NotImplementedError
-
-    def get_error_url(self):
-        raise NotImplementedError
-
-    def get_success_url(self):
-        raise NotImplementedError
-
-    def clean_session(self):
-        pass
 
     def get_context_data(self, **kwargs):
         form_accept = self.forms["accept"]
@@ -237,6 +234,83 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
                 context=self.get_context_data(),
                 headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
             )
+
+        # Store accept form data in session
+        session = self.get_session()
+        session.set("contract_form_data", self.forms["accept"].cleaned_data)
+        return HttpResponseClientRedirect(self.get_success_url())
+
+
+class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
+    template_name = None
+
+    def test_func(self):
+        return self.request.user.is_employer
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+        self.forms = None
+
+    def get_forms(self):
+        forms = super().get_forms()
+
+        # Make the other forms appear as bound with initial data to trigger validation
+        for form in forms.values():
+            form.is_bound = True
+            form.data = form.initial
+
+        session = self.get_session()
+        if session is None:
+            contract_form_data = {}
+        else:
+            contract_form_data = session.get("contract_form_data", {})
+
+        forms["accept"] = AcceptForm(
+            instance=self.job_application,
+            company=self.company,
+            job_seeker=self.job_seeker,
+            data=contract_form_data,
+        )
+
+        return forms
+
+    def get_back_url(self):
+        raise NotImplementedError
+
+    def get_reset_url(self):
+        raise NotImplementedError
+
+    def get_error_url(self):
+        raise NotImplementedError
+
+    def get_success_url(self):
+        raise NotImplementedError
+
+    def clean_session(self):
+        pass
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form_accept"] = self.forms["accept"]
+        context["back_url"] = self.get_back_url()
+        context["reset_url"] = self.get_reset_url()
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.forms = self.get_forms()
+        if not all([form.is_valid() for form in self.forms.values()]):
+            messages.error(request, "Certaines informations sont manquantes ou invalides")
+            return HttpResponseRedirect(self.get_back_url())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.forms = self.get_forms()
+        if not all([form.is_valid() for form in self.forms.values()]):
+            messages.error(request, "Certaines informations sont manquantes ou invalides")
+            return HttpResponseRedirect(self.get_back_url())
 
         return self.confirm_acceptance(creating=self.job_application is None, request=request)
 
@@ -300,8 +374,7 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
             job_application.save(update_fields=["geiq_eligibility_diagnosis", "updated_at"])
 
         self.clean_session()
-
-        return HttpResponseClientRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):

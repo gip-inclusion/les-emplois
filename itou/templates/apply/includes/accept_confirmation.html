@@ -1,0 +1,117 @@
+{% load buttons_form %}
+{% load enums %}
+{% load str_filters %}
+
+{% enums "companies" "ContractType" as ContractType %}
+<h2>Vérifiez les informations avant de confirmer l’embauche</h2>
+<div class="c-form">
+    <h3>Récapitulatif du contrat</h3>
+    <ul class="list-data mb-3">
+        <li>
+            <small>Entreprise</small>
+            <span>
+                <strong>{{ to_company.display_name }}</strong>
+                {# djlint: off #}
+                ({{ to_company.kind }}{% if to_company.city %} à {{ to_company.city|title }}{% endif %})
+                {# djlint: on #}
+            </span>
+        </li>
+        {% if form_accept.is_geiq %}
+            <li>
+                <small>Durée d’accompagnement avant contrat</small>
+                <strong>{{ form_accept.cleaned_data.prehiring_guidance_days }} {{ form_accept.cleaned_data.prehiring_guidance_days|pluralizefr:"jour,jours" }}</strong>
+            </li>
+            <li>
+                <small>Type de contrat</small>
+                <strong>{{ form_accept.get_display_for_choices.contract_type }}</strong>
+            </li>
+            <li>
+                <small>Contrat associé à une VAE inversée</small>
+                <strong>{{ form_accept.cleaned_data.inverted_vae_contract|yesno:"Oui,Non" }}</strong>
+            </li>
+            {% if form_accept.cleaned_data.contract_type == ContractType.OTHER %}
+                <li>
+                    <small>Précisions sur le type de contrat</small>
+                    <strong>{{ form_accept.cleaned_data.contract_type_details }}</strong>
+                </li>
+            {% endif %}
+            <li>
+                <small>Nombre d’heures par semaine</small>
+                <strong>{{ form_accept.cleaned_data.nb_hours_per_week }} {{ form_accept.cleaned_data.nb_hours_per_week|pluralizefr:"heure,heures" }}</strong>
+            </li>
+        {% endif %}
+        <li>
+            <small>Poste retenu</small>
+            {% if form_accept.cleaned_data.hired_job == form_accept.OTHER_HIRED_JOB %}
+                <i class="text-disabled">Nouveau poste lié à un nouveau métier</i>
+            {% elif form_accept.cleaned_data.hired_job %}
+                <strong>{{ form_accept.get_display_for_choices.hired_job }}</strong>
+            {% else %}
+                <i class="text-disabled">Non renseigné</i>
+            {% endif %}
+        </li>
+        {% if form_accept.cleaned_data.hired_job == form_accept.OTHER_HIRED_JOB %}
+            <li>
+                <small>Nouveau poste</small>
+                <strong>{{ form_accept.cleaned_data.appellation }}</strong>
+            </li>
+            <li>
+                <small>Localisation du nouveau poste</small>
+                <strong>{{ form_accept.cleaned_data.location }}</strong>
+            </li>
+        {% endif %}
+        <li>
+            <small>Date de début du contrat</small>
+            <strong>{{ form_accept.cleaned_data.hiring_start_at|date:"d/m/Y" }}</strong>
+        </li>
+        <li>
+            <small>Date prévisionnelle de fin du contrat</small>
+            {% if form_accept.cleaned_data.hiring_end_at %}
+                <strong>{{ form_accept.cleaned_data.hiring_end_at|date:"d/m/Y" }}</strong>
+            {% else %}
+                <i class="text-disabled">Non renseigné</i>
+            {% endif %}
+        </li>
+        {% if form_accept.is_geiq %}
+            <li>
+                <small>Type de qualification visé</small>
+                <strong>{{ form_accept.get_display_for_choices.qualification_type }}</strong>
+            </li>
+            <li>
+                <small>Niveau de qualification</small>
+                <strong>{{ form_accept.get_display_for_choices.qualification_level }}</strong>
+            </li>
+            <li>
+                <small>Durée de formation prévue</small>
+                <strong>{{ form_accept.cleaned_data.planned_training_hours }} {{ form_accept.cleaned_data.planned_training_hours|pluralizefr:"heure,heures" }}</strong>
+            </li>
+        {% endif %}
+        <li class="has-forced-line-break">
+            <small>Réponse au candidat</small>
+            {% if form_accept.cleaned_data.answer %}
+                <blockquote class="blockquote mt-2 mb-0">
+                    {{ form_accept.cleaned_data.answer|linebreaksbr }}
+                </blockquote>
+            {% else %}
+                <i class="text-disabled">Non renseigné</i>
+            {% endif %}
+        </li>
+    </ul>
+    <div class="alert alert-warning" role="status">
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+            </div>
+            <div class="col">
+                <p class="mb-2">
+                    <strong>Attention : ce récapitulatif ne vaut pas confirmation.</strong>
+                </p>
+                <p class="mb-0">Pour valider l’acceptation, veuillez cliquer sur le bouton "Confirmer l’embauche".</p>
+            </div>
+        </div>
+    </div>
+    <form method="post" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% itou_buttons_form primary_label="Confirmer l’embauche" primary_aria_label="Confirmer l’embauche de "|add:job_seeker.get_full_name reset_url=reset_url secondary_url=back_url show_mandatory_fields_mention=False %}
+    </form>
+</div>

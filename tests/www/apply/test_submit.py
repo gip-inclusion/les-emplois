@@ -85,9 +85,9 @@ LINK_RESET_MARKUP = (
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
-ACCEPT_BUTTON_MARKUP = (
-    '<button type="submit" class="btn btn-block btn-primary" aria-label="Valider l’embauche de %s">'
-    "<span>Valider l’embauche</span>"
+CONFIRM_BUTTON_MARKUP = (
+    '<button type="submit" class="btn btn-block btn-primary" aria-label="Confirmer l’embauche de %s">'
+    "<span>Confirmer l’embauche</span>"
     "</button>"
 )
 NEXT_BUTTON_MARKUP = (
@@ -3073,18 +3073,18 @@ class TestDirectHireFullProcess:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         # No missing data to fill - skip to contract
-        next_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, next_url)
+        contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, contract_url)
 
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
 
-        # Hire confirmation
+        # Contract infos
         # ----------------------------------------------------------------------
-        response = client.get(next_url)
+        response = client.get(contract_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, ACCEPT_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
         assertContains(response, check_infos_url)  # Back button URL
 
@@ -3095,7 +3095,7 @@ class TestDirectHireFullProcess:
             "answer": "",
         }
         response = client.post(
-            next_url,
+            contract_url,
             data=post_data,
             headers={"hx-request": "true"},
         )
@@ -3104,13 +3104,23 @@ class TestDirectHireFullProcess:
             response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
         )
         post_data = post_data | {"confirmed": "True"}
-        response = client.post(next_url, headers={"hx-request": "true"}, data=post_data)
+        response = client.post(contract_url, headers={"hx-request": "true"}, data=post_data)
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, confirmation_url, status_code=200, fetch_redirect_response=False)
+        # Confirmation
+        # ----------------------------------------------------------------------
+        response = client.get(confirmation_url)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
+        assertContains(response, contract_url)  # Back button URL
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
 
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=user, to_company=company
         )
         next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -3233,7 +3243,6 @@ class TestDirectHireFullProcess:
         contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
         response = client.get(fill_job_seeker_infos_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Suivant")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
@@ -3269,11 +3278,11 @@ class TestDirectHireFullProcess:
             },
         }
 
-        # Hire confirmation
+        # Contract infos
         # ----------------------------------------------------------------------
         response = client.get(contract_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, ACCEPT_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
         assertContains(
             response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
@@ -3303,12 +3312,21 @@ class TestDirectHireFullProcess:
         )
         post_data = post_data | {"confirmed": "True"}
         response = client.post(contract_url, headers={"hx-request": "true"}, data=post_data)
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, confirmation_url, status_code=200, fetch_redirect_response=False)
+        # Confirmation
+        # ----------------------------------------------------------------------
+        response = client.get(confirmation_url)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
+        assertContains(response, contract_url)  # Back button URL
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+        response = client.post(confirmation_url)
 
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=user, to_company=company
         )
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
         assert job_application.job_seeker == job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -5601,6 +5619,7 @@ class TestFillJobSeekerInfosForHire:
 
     def accept_contract(self, client, session_uuid):
         accept_contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": session_uuid})
         post_data = {
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
@@ -5625,6 +5644,13 @@ class TestFillJobSeekerInfosForHire:
             data=post_data,
             headers={"hx-request": "true"},
         )
+        assertRedirects(
+            response,
+            confirmation_url,
+            status_code=200,
+            fetch_redirect_response=False,
+        )
+        response = client.post(confirmation_url)
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=self.company.members.first(), to_company=self.company
         )
@@ -5632,12 +5658,7 @@ class TestFillJobSeekerInfosForHire:
             expected_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
         else:
             expected_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        assertRedirects(
-            response,
-            expected_url,
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        assertRedirects(response, expected_url, fetch_redirect_response=False)
         return job_application
 
     def test_no_missing_data_iae(self, client, snapshot):
@@ -6148,12 +6169,21 @@ class TestHireContract:
             headers={"hx-request": "true"},
             data=post_data,
         )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+        assertRedirects(response, confirmation_url, status_code=200)
+        response = client.get(confirmation_url)
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
+        # If you go back to contract infos, data is pre-filled
+        response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
+        assertContains(response, f'value="{hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)}"')
+
+        response = client.post(confirmation_url)
         job_application = JobApplication.objects.select_related("job_seeker").get(
             sender=company.members.first(), to_company=company
         )
         next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200)
+        assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -6215,12 +6245,18 @@ class TestHireContract:
             data=post_data,
             headers={"hx-request": "true"},
         )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+        assertRedirects(response, confirmation_url, status_code=200)
+        response = client.get(confirmation_url)
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
 
         job_application = JobApplication.objects.select_related("job_seeker").get(
             sender=company.members.first(), to_company=company
         )
         next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200)
+        assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -6273,10 +6309,16 @@ class TestHireContract:
             headers={"hx-request": "true"},
             data=post_data,
         )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+        assertRedirects(response, confirmation_url, status_code=200)
+        response = client.get(confirmation_url)
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
 
         job_application = JobApplication.objects.get(sender=company.members.first(), to_company=company)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        assert response.url == next_url
+        assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -6352,12 +6394,18 @@ class TestHireContract:
             headers={"hx-request": "true"},
             data=post_data,
         )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+        assertRedirects(response, confirmation_url, status_code=200)
+        response = client.get(confirmation_url)
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
 
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=company.members.first(), to_company=company
         )
         next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
-        assertRedirects(response, next_url, status_code=200)
+        assertRedirects(response, next_url)
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
@@ -6372,6 +6420,194 @@ class TestHireContract:
         assert job_application.job_seeker.jobseeker_profile.birth_country_id == other_country.pk
 
         assert apply_session.name not in client.session
+
+
+class TestHireConfirmation:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        self.job_seeker = JobSeekerFactory(
+            first_name="Clara",
+            last_name="Sion",
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+            born_in_france=True,
+        )
+        # This is the city matching with_ban_geoloc_address trait
+        self.city = create_city_geispolsheim()
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_first_geocoding_data,
+        )
+
+    def test_as_iae(self, client, snapshot):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        hiring_start_at = timezone.localdate()
+        apply_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {"hiring_start_at": hiring_start_at},
+            },
+        )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(confirmation_url)
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, "Éligible à l’IAE")
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+        assertContains(
+            response,
+            """\
+            <li>
+                <small>Poste retenu</small>
+                    <i class="text-disabled">Non renseigné</i>
+            </li>""",
+            html=True,
+        )
+
+        response = client.post(confirmation_url)
+        job_application = JobApplication.objects.select_related("job_seeker").get(
+            sender=company.members.first(), to_company=company
+        )
+        next_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
+        assertRedirects(response, next_url)
+
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.sender_kind == SenderKind.EMPLOYER
+        assert job_application.sender_company == company
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == JobApplicationState.ACCEPTED
+        assert job_application.answer == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume is None
+        assert job_application.hiring_start_at == hiring_start_at
+
+        assert apply_session.name not in client.session
+
+    def test_as_iae_missing_data(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        apply_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {"hiring_start_at": None},
+            },
+        )
+
+        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
+
+        response = client.post(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
+        assert not JobApplication.objects.exists()
+
+    def test_as_geiq(self, client, snapshot):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        client.force_login(company.members.first())
+        hiring_start_at = timezone.localdate()
+        hiring_end_at = hiring_start_at + datetime.timedelta(days=30)
+        apply_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {
+                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "answer": "OK",
+                    "prehiring_guidance_days": 4,
+                    "nb_hours_per_week": 5,
+                    "planned_training_hours": 6,
+                    "contract_type": ContractType.OTHER,
+                    "contract_type_details": "Contrat spécifique pour ce test",
+                    "qualification_type": QualificationType.CQP,
+                    "qualification_level": QualificationLevel.LEVEL_3,
+                    "hired_job": company.job_description_through.first().pk,
+                },
+            },
+        )
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
+
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(confirmation_url)
+        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+        assertContains(response, hiring_end_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
+        job_application = JobApplication.objects.select_related("job_seeker").get(
+            sender=company.members.first(), to_company=company
+        )
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(response, next_url)
+
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.sender_kind == SenderKind.EMPLOYER
+        assert job_application.sender_company == company
+        assert job_application.sender_prescriber_organization is None
+        assert job_application.state == JobApplicationState.ACCEPTED
+        assert job_application.answer == "OK"
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.resume is None
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at == hiring_end_at
+        assert job_application.prehiring_guidance_days == 4
+        assert job_application.nb_hours_per_week == 5
+        assert job_application.planned_training_hours == 6
+        assert job_application.contract_type == ContractType.OTHER
+        assert job_application.contract_type_details == "Contrat spécifique pour ce test"
+        assert job_application.qualification_type == QualificationType.CQP
+        assert job_application.qualification_level == QualificationLevel.LEVEL_3
+        assert job_application.hired_job_id == company.job_description_through.first().pk
+
+        assert apply_session.name not in client.session
+
+    def test_as_geiq_missing_data(self, client):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        client.force_login(company.members.first())
+        hiring_start_at = timezone.localdate()
+        hiring_end_at = hiring_start_at + datetime.timedelta(days=30)
+        apply_session = fake_session_initialization(
+            client,
+            company,
+            self.job_seeker,
+            {
+                "selected_jobs": [],
+                "contract_form_data": {
+                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "answer": "OK",
+                    "prehiring_guidance_days": 4,
+                    "nb_hours_per_week": 5,
+                    "planned_training_hours": 6,
+                    "contract_type": "",  # Missing
+                    "contract_type_details": "Contrat spécifique pour ce test",
+                    "qualification_type": QualificationType.CQP,
+                    "qualification_level": QualificationLevel.LEVEL_3,
+                    "hired_job": company.job_description_through.first().pk,
+                },
+            },
+        )
+        response = client.get(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
+
+        response = client.post(reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name}))
+        assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
+        assert not JobApplication.objects.exists()
 
 
 class TestNewHireProcessInfo:

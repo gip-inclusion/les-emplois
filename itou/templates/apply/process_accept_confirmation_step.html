@@ -1,0 +1,5 @@
+{% extends "apply/process_accept_base.html" %}
+
+{% block content_extend %}
+    {% include "apply/includes/accept_confirmation.html" with form_accept=form_accept job_seeker=job_seeker to_company=job_application.to_company csrf_token=csrf_token back_url=back_url reset_url=reset_url only %}
+{% endblock %}

@@ -27,6 +27,7 @@ from itou.users.enums import UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin, PoleEmploiFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
+from itou.utils.choices import get_choices_label
 from itou.utils.perms.utils import can_view_personal_information
 from itou.utils.templatetags.str_filters import mask_unless, pluralizefr
 from itou.utils.types import InclusiveDateRange
@@ -543,6 +544,19 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             # A job description has been selected is the list: link it to current hiring
             instance.hired_job_id = self.cleaned_data.get("hired_job")
         return instance
+
+    def get_display_for_choices(self):
+        # Used to provide a nice representation of selected choices in the confirmation page
+        displays = {}
+        if not self.is_valid():
+            return displays
+        hired_job = self.cleaned_data.get("hired_job")
+        if hired_job != self.OTHER_HIRED_JOB:
+            displays["hired_job"] = get_choices_label(self.fields["hired_job"].choices, hired_job)
+        if self.is_geiq:
+            for field in ["contract_type", "qualification_type", "qualification_level"]:
+                displays[field] = get_choices_label(self.fields[field].choices, self.cleaned_data[field])
+        return displays
 
 
 class PriorActionForm(forms.ModelForm):

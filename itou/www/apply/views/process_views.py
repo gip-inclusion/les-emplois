@@ -639,20 +639,14 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
     def get_session(self):
         return self.accept_session
 
-    def clean_session(self):
-        self.accept_session.delete()
-
     def get_back_url(self):
         other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
         if other_forms:
             return reverse("apply:accept_fill_job_seeker_infos", kwargs={"session_uuid": self.accept_session.name})
         return None
 
-    def get_error_url(self):
-        return self.request.get_full_path()
-
     def get_success_url(self):
-        return self.reset_url
+        return reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -708,6 +702,33 @@ class ReloadContractTypeAndOptions(AcceptHTMXFragmentView):
 class ReloadJobDescriptionFields(AcceptHTMXFragmentView):
     template_name = "apply/includes/job_description_fields.html"
     NO_ERROR_FIELDS = ("appellation", "location")
+
+
+class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmationView):
+    template_name = "apply/process_accept_confirmation_step.html"
+
+    def get_session(self):
+        return self.accept_session
+
+    def clean_session(self):
+        self.accept_session.delete()
+
+    def get_error_url(self):
+        return self.request.get_full_path()
+
+    def get_back_url(self):
+        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+
+    def get_success_url(self):
+        return self.reset_url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["job_application"] = self.job_application
+        context["job_seeker"] = self.job_seeker
+        context["can_view_personal_information"] = True  # SIAE members have access to personal info
+        context["matomo_custom_title"] = "Confirmation d'acceptation de candidature"
+        return context
 
 
 @require_POST
