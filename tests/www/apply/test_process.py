@@ -359,7 +359,7 @@ class TestProcessViews:
                 assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
                 assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
-    def test_details_for_company_certified_criteria(self, client):
+    def test_details_for_company_with_identity_certified_by_api_particulier(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         now = timezone.now()
         today = timezone.localdate(now)
@@ -375,6 +375,11 @@ class TestProcessViews:
             eligibility_diagnosis__created_at=created_at,
             eligibility_diagnosis__expires_at=expires_at,
             criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
         )
         eligibility_diagnosis = selected_criteria.eligibility_diagnosis
         job_application = JobApplicationFactory(
@@ -560,11 +565,16 @@ class TestProcessViews:
         )
         assert pretty_indented(content) == snapshot(name="copy_public_id")
 
-    def test_details_for_prescriber_certified_criteria(self, client):
+    def test_details_for_prescriber_identity_certified_by_api_particulier(self, client):
         certified_crit = IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__from_employer=False,
             eligibility_diagnosis__from_prescriber=True,
             criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
         )
         job_application = JobApplicationFactory(
             eligibility_diagnosis=certified_crit.eligibility_diagnosis,
@@ -3945,7 +3955,7 @@ class TestProcessAcceptViewsInWizard:
         )
 
     @freeze_time("2025-06-06")
-    def test_certified_criteria_birth_fields_not_readonly_if_empty(self, client):
+    def test_identity_certified_by_api_particulier_birth_fields_not_readonly_if_empty(self, client):
         birth_place = Commune.objects.by_insee_code_and_period("07141", datetime.date(1990, 1, 1))
 
         job_seeker = JobSeekerFactory(
@@ -3958,6 +3968,11 @@ class TestProcessAcceptViewsInWizard:
             eligibility_diagnosis__job_seeker=job_seeker,
             eligibility_diagnosis__author_siae=self.company,
             criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

@@ -12,6 +12,8 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.external_data.apis import pe_connect
 from itou.external_data.models import ExternalDataImport
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
@@ -197,13 +199,21 @@ class TestPoleEmploiConnect:
 
             user.delete()
 
-    def test_update_readonly_with_certified_criteria(self, caplog):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=PEAMU_USERINFO["sub"],
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
+        )
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
         user, created = peamu_user_data.create_or_update_user()
         assert created is False

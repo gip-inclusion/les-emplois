@@ -12,6 +12,8 @@ from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.asp.models import Commune, Country, RSAAllocation
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
@@ -1177,7 +1179,7 @@ class TestUpdateForSender:
             count=1,
         )
 
-    def test_fields_readonly_with_certified_criteria(self, client):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         job_seeker = JobSeekerFactory(
@@ -1190,6 +1192,11 @@ class TestUpdateForSender:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
             criteria_not_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
         )
 
         client.force_login(user)

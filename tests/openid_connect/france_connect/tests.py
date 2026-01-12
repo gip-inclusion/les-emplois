@@ -19,6 +19,8 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
@@ -245,14 +247,22 @@ class TestFranceConnect:
 
             user.delete()
 
-    def test_update_readonly_with_certified_criteria(self, caplog):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=FC_USERINFO["sub"],
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             born_in_france=True,
             title=Title.M,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
+        )
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
         user, created = fc_user_data.create_or_update_user()
         assert created is False

@@ -11,6 +11,8 @@ from pytest_django.asserts import assertContains, assertFormError, assertNotCont
 
 from itou.asp.models import Commune, Country
 from itou.cities.models import City
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
@@ -624,14 +626,22 @@ class TestEditUserInfoView:
         )
         assert user.jobseeker_profile.birth_country_id is None
 
-    def test_fields_readonly_with_certified_criteria(self, client):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         job_seeker = JobSeekerFactory(
             title=Title.M,
             born_in_france=True,
             jobseeker_profile__birthdate=date(1978, 12, 20),
             jobseeker_profile__nir="178122978200508",
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
+        )
         client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_info")
         response = client.get(url)

@@ -15,6 +15,8 @@ from itou.asp.models import Commune, Country, EducationLevel
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.companies.models import SiaeFinancialAnnex
+from itou.eligibility.enums import AdministrativeCriteriaKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordTransition
 from itou.users.enums import LackOfNIRReason, Title
@@ -328,10 +330,15 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             count=1,
         )
 
-    def test_accept_personal_data_readonly_with_certified_criteria(self, client):
+    def test_accept_personal_data_readonly_with_identity_certified_by_api_particulier(self, client):
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=self.job_seeker,
             criteria_certified=True,
+            administrative_criteria=AdministrativeCriteria.objects.filter(
+                kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+            )
+            .order_by("?")
+            .first(),
         )
         client.force_login(self.user)
         response = client.get(self.url)
