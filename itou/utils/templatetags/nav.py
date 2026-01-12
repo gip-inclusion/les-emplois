@@ -96,6 +96,12 @@ NAV_ENTRIES = {
         target=reverse("search:prescribers_results"),
         active_view_names=["search:prescribers_home", "search:prescribers_results"],
     ),
+    "services-search": NavItem(
+        label="Un service d'insertion",
+        target=reverse("search:services_results"),
+        active_view_names=["search:services_home", "search:services_results"],
+        is_new=True,
+    ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
         label="Mes candidatures",
@@ -366,6 +372,7 @@ def nav(request):
                 items=[
                     NAV_ENTRIES["employers-search"],
                     NAV_ENTRIES["prescribers-search"],
+                    NAV_ENTRIES["services-search"],
                 ],
             )
         )

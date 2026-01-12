@@ -186,3 +186,75 @@
   
   '''
 # ---
+# name: test_results_html_link[anonymous]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+      <span>
+          Voir la fiche détaillée
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
+# name: test_results_html_link[employer]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-employer" rel="noopener" target="_blank">
+      <span>
+          Orienter
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
+# name: test_results_html_link[itou_staff]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-itou_staff" rel="noopener" target="_blank">
+      <span>
+          Voir la fiche détaillée
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
+# name: test_results_html_link[jobseeker]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-job_seeker" rel="noopener" target="_blank">
+      <span>
+          Voir la fiche détaillée
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
+# name: test_results_html_link[labor_inspector]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-labor_inspector" rel="noopener" target="_blank">
+      <span>
+          Voir la fiche détaillée
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
+# name: test_results_html_link[prescriber]
+  '''
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-prescriber" rel="noopener" target="_blank">
+      <span>
+          Orienter
+      </span>
+      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+      </i>
+  </a>
+  
+  '''
+# ---
