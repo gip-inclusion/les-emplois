@@ -37,6 +37,6 @@
 
         {% bootstrap_field form_accept.answer %}
 
-        {% itou_buttons_form primary_label="Valider l’embauche" primary_aria_label="Valider l’embauche de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information secondary_url=back_url reset_url=reset_url %}
+        {% itou_buttons_form secondary_url=back_url reset_url=reset_url %}
     </form>
 </div>

@@ -89,6 +89,12 @@ urlpatterns = [
         name="hire_contract_infos",
         kwargs={"hire_process": True},
     ),
+    path(
+        "<uuid:session_uuid>/hire/confirm",
+        submit_views.ConfirmationForHireView.as_view(),
+        name="hire_confirmation",
+        kwargs={"hire_process": True},
+    ),
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriptions/list", list_views.list_prescriptions, name="list_prescriptions"),
@@ -191,6 +197,11 @@ urlpatterns = [
         "<uuid:session_uuid>/accept/contract",
         process_views.ContractInfosForAcceptView.as_view(),
         name="accept_contract_infos",
+    ),
+    path(
+        "<uuid:session_uuid>/accept/confirm",
+        process_views.ConfirmationForAcceptView.as_view(),
+        name="accept_confirmation",
     ),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
     path("<uuid:job_application_id>/siae/transfer", transfer_views.transfer, name="transfer"),

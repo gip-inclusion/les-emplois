@@ -1,0 +1,19 @@
+{% extends "apply/submit_base.html" %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>
+                {% include 'apply/includes/_submit_title.html' %}
+                {% include 'apply/includes/eligibility_badge.html' with job_seeker=job_seeker is_subject_to_iae_rules=is_subject_to_iae_rules is_subject_to_geiq_rules=is_subject_to_geiq_rules eligibility_diagnosis=eligibility_diagnosis geiq_eligibility_diagnosis=geiq_eligibility_diagnosis force_valid_approval=True only %}
+            </h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content_extend %}
+    {% include "apply/includes/accept_confirmation.html" with form_accept=form_accept job_seeker=job_seeker to_company=siae csrf_token=csrf_token back_url=back_url reset_url=reset_url only %}
+{% endblock %}

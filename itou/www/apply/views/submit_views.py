@@ -865,6 +865,36 @@ class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInf
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
 
+    def get_success_url(self):
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.eligibility_diagnosis:
+            # The job_seeker object already contains a lot of information: no need to re-retrieve it
+            self.eligibility_diagnosis.job_seeker = self.job_seeker
+
+        context["expired_eligibility_diagnosis"] = None
+        return context
+
+
+class ConfirmationForHireView(ApplicationBaseView, common_views.BaseConfirmationView):
+    template_name = "apply/submit/hire_confirmation_step.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.job_application = None
+        return super().setup(request, *args, **kwargs)
+
+    def get_session(self):
+        return self.apply_session
+
+    def clean_session(self):
+        self.apply_session.delete()
+
+    def get_back_url(self):
+        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.apply_session.name})
+
     def get_error_url(self):
         return self.request.get_full_path()
 
@@ -881,6 +911,7 @@ class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInf
             self.eligibility_diagnosis.job_seeker = self.job_seeker
 
         context["expired_eligibility_diagnosis"] = None
+        context["matomo_custom_title"] = "Confirmation d'embauche"
         return context
 
 

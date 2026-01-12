@@ -2470,6 +2470,9 @@ class TestProcessAcceptViewsInWizard:
     def get_contract_info_step_url(self, session_uuid):
         return reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid})
 
+    def get_confirm_step_url(self, session_uuid):
+        return reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid})
+
     def start_accept_job_application(self, client, job_application, next_url=None):
         url_accept = reverse(
             "apply:start-accept",
@@ -2551,7 +2554,24 @@ class TestProcessAcceptViewsInWizard:
         # I guess it's normal as it's an AJAX response.
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
-            assertRedirects(response, reset_url, status_code=200, fetch_redirect_response=False)
+            assertRedirects(
+                response, self.get_confirm_step_url(session_uuid), status_code=200, fetch_redirect_response=False
+            )
+        return response
+
+    def confirm_step(self, client, session_uuid, *, reset_url, assert_successful=True):
+        url_confirm = self.get_confirm_step_url(session_uuid)
+        response = client.get(url_confirm)
+        assertContains(response, "Confirmer l’embauche", count=3)  # alert + button label + button aria-label
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
+        assertContains(response, BACK_BUTTON_ARIA_LABEL)
+        response = client.post(url_confirm)
+        if assert_successful:
+            assertRedirects(
+                response,
+                reset_url,
+                fetch_redirect_response=False,
+            )
         return response
 
     _nominal_cases = list(
@@ -2587,8 +2607,14 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
-        response = self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
-        next_url = response.url
+        self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
+
+        # If you go back to contract infos, data is pre-filled
+        response = client.get(self.get_contract_info_step_url(session_uuid))
+        assertContains(response, f'value="{hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)}"')
+
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
@@ -2640,6 +2666,7 @@ class TestProcessAcceptViewsInWizard:
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
         self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data, reset_url=next_url)
+        self.confirm_step(client, session_uuid, reset_url=next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
@@ -2708,8 +2735,14 @@ class TestProcessAcceptViewsInWizard:
         post_data |= {"confirmed": True}
         response = client.post(contract_infos_url, data=post_data, follow=False, headers={"hx-request": "true"})
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
-        assert response.status_code == 200
-        assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(
+            response, self.get_confirm_step_url(session_uuid), status_code=200, fetch_redirect_response=False
+        )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         mocked_request.assert_called_once()
 
         # Perform some checks on job description now attached to job application
@@ -2845,6 +2878,8 @@ class TestProcessAcceptViewsInWizard:
         self.fill_contract_info_step(
             client, job_application, session_uuid, post_data=post_data, assert_successful=True
         )
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
 
     def test_no_address(self, client):
         job_application = self.create_job_application(with_iae_eligibility_diagnosis=True)
@@ -2904,6 +2939,8 @@ class TestProcessAcceptViewsInWizard:
         response = client.post(self.get_job_seeker_info_step_url(session_uuid), data=post_data)
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
         self.fill_contract_info_step(client, job_application, session_uuid)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.address_line_1 == "37 B Rue du Général De Gaulle"
 
@@ -2924,6 +2961,8 @@ class TestProcessAcceptViewsInWizard:
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
         self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=True, post_data={})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
 
     def test_no_diagnosis(self, client):
         # if no, should not see the confirm button, nor accept posted data
@@ -2989,6 +3028,8 @@ class TestProcessAcceptViewsInWizard:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
         self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         suspension = job_application.approval.suspension_set.in_progress().last()
@@ -3032,6 +3073,8 @@ class TestProcessAcceptViewsInWizard:
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
         self.fill_contract_info_step(client, job_application, session_uuid)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
         job_application.refresh_from_db()
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
@@ -3077,6 +3120,11 @@ class TestProcessAcceptViewsInWizard:
         self.fill_contract_info_step(
             client, job_application, session_uuid, post_data=post_data, with_previous_step=True
         )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
 
         # First job application has been accepted.
         # All other job applications are obsolete.
@@ -3107,6 +3155,11 @@ class TestProcessAcceptViewsInWizard:
         self.fill_contract_info_step(
             client, job_app_starting_earlier, session_uuid, post_data=post_data, with_previous_step=False
         )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_app_starting_earlier.pk}),
+        )
         job_app_starting_earlier.refresh_from_db()
 
         # Second job application has been accepted.
@@ -3135,6 +3188,11 @@ class TestProcessAcceptViewsInWizard:
         }
         self.fill_contract_info_step(
             client, job_app_starting_later, session_uuid, post_data=post_data, with_previous_step=False
+        )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_app_starting_later.pk}),
         )
         job_app_starting_later.refresh_from_db()
 
@@ -3199,6 +3257,11 @@ class TestProcessAcceptViewsInWizard:
         assert jobseeker_profile.nir != NEW_NIR  # Not saved yet
 
         self.fill_contract_info_step(client, job_application, session_uuid)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.nir == NEW_NIR
 
@@ -3265,6 +3328,11 @@ class TestProcessAcceptViewsInWizard:
         )  # Not saved yet
 
         self.fill_contract_info_step(client, job_application, session_uuid)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
@@ -3303,6 +3371,11 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.job_seeker.jobseeker_profile.nir != NEW_NIR
 
         self.fill_contract_info_step(client, job_application, session_uuid)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         job_application.job_seeker.refresh_from_db()
         # New NIR is set and the lack_of_nir_reason is cleaned
         assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
@@ -3357,6 +3430,11 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         self.fill_contract_info_step(client, job_application, session_uuid)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
 
         job_application.refresh_from_db()
         assert job_application.job_seeker.approvals.count() == 1
@@ -3442,6 +3520,11 @@ class TestProcessAcceptViewsInWizard:
         assert jobseeker_profile.birth_place != birth_place
 
         self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=True)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         mocked_request.assert_called_once()
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
@@ -3494,6 +3577,11 @@ class TestProcessAcceptViewsInWizard:
         self.fill_contract_info_step(
             client, job_application, session_uuid, assert_successful=True, with_previous_step=False
         )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         mocked_request.assert_called_once()
 
         # certification
@@ -3545,6 +3633,11 @@ class TestProcessAcceptViewsInWizard:
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         self.fill_contract_info_step(
             client, job_application, session_uuid, assert_successful=True, with_previous_step=False
+        )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
         )
         mocked_request.assert_called_once()
         # certification
@@ -3619,6 +3712,11 @@ class TestProcessAcceptViewsInWizard:
         assert jobseeker_profile.birth_place != birth_place
 
         self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=True)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         mocked_request.assert_called_once()
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.birth_country == birth_country
@@ -3682,6 +3780,11 @@ class TestProcessAcceptViewsInWizard:
             post_data=post_data,
             assert_successful=True,
             with_previous_step=True,
+        )
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
         )
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -3810,6 +3913,11 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=True)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
 
     @freeze_time("2024-09-11")
     def test_accept_born_in_france_no_birth_place(self, client, mocker):
@@ -3936,6 +4044,11 @@ class TestProcessAcceptViewsInWizard:
         assert refreshed_job_seeker.jobseeker_profile.birth_country_id != Country.FRANCE_ID
 
         self.fill_contract_info_step(client, job_application, session_uuid)
+        self.confirm_step(
+            client,
+            session_uuid,
+            reset_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+        )
         refreshed_job_seeker = User.objects.select_related("jobseeker_profile").get(pk=job_seeker.pk)
         assert refreshed_job_seeker.jobseeker_profile.birth_place_id == birth_place.pk
         assert refreshed_job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
@@ -3992,8 +4105,13 @@ class TestFillJobSeekerInfosForAccept:
         )
         assertRedirects(
             response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}),
             status_code=200,
+        )
+        response = client.post(reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}))
+        assertRedirects(
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             fetch_redirect_response=False,
         )
 
@@ -4505,6 +4623,196 @@ class TestFillJobSeekerInfosForAccept:
         else:
             assert self.job_seeker.jobseeker_profile.pole_emploi_id == ""
             assert self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason != ""
+
+
+class TestAcceptConfirmation:
+    @pytest.fixture(autouse=True)
+    def setup_method(self, settings, mocker):
+        self.job_seeker = JobSeekerFactory(
+            first_name="Clara",
+            last_name="Sion",
+            jobseeker_profile__with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+            born_in_france=True,
+        )
+        # This is the city matching with_ban_geoloc_address trait
+        self.city = create_city_geispolsheim()
+
+        settings.API_BAN_BASE_URL = "http://ban-api"
+        mocker.patch(
+            "itou.utils.apis.geocoding.get_geocoding_data",
+            side_effect=mock_get_first_geocoding_data,
+        )
+
+    def test_as_iae(self, client, snapshot):
+        hiring_start_at = timezone.localdate()
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        accept_session = initialize_accept_session(
+            client,
+            {
+                "job_application_id": job_application.pk,
+                "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+                "contract_form_data": {"hiring_start_at": hiring_start_at},
+            },
+        )
+        accept_session.save()
+        confirmation_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
+
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(confirmation_url)
+        assertContains(response, "Confirmer l’embauche de Clara SION")
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
+        assertRedirects(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+
+        job_application.refresh_from_db()
+        assert job_application.job_seeker == self.job_seeker
+        assert job_application.state == JobApplicationState.ACCEPTED
+        assert job_application.answer == ""
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.hiring_start_at == hiring_start_at
+
+        assert accept_session.name not in client.session
+
+    def test_as_iae_missing_data(self, client):
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        accept_session = initialize_accept_session(
+            client,
+            {
+                "job_application_id": job_application.pk,
+                "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+                "contract_form_data": {"hiring_start_at": None},
+            },
+        )
+        accept_session.save()
+
+        response = client.get(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name}))
+
+        response = client.post(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name}))
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationState.PROCESSING
+
+    def test_as_geiq(self, client, snapshot):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        hiring_start_at = timezone.localdate()
+        hiring_end_at = hiring_start_at + datetime.timedelta(days=30)
+        accept_session = initialize_accept_session(
+            client,
+            {
+                "selected_jobs": [],
+                "job_application_id": job_application.pk,
+                "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+                "contract_form_data": {
+                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "answer": "OK",
+                    "prehiring_guidance_days": 4,
+                    "nb_hours_per_week": 5,
+                    "planned_training_hours": 6,
+                    "contract_type": ContractType.OTHER,
+                    "contract_type_details": "Contrat spécifique pour ce test",
+                    "qualification_type": QualificationType.CQP,
+                    "qualification_level": QualificationLevel.LEVEL_3,
+                    "hired_job": company.job_description_through.first().pk,
+                },
+            },
+        )
+        accept_session.save()
+        confirmation_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
+
+        with assertSnapshotQueries(snapshot(name="view queries")):
+            response = client.get(confirmation_url)
+        assertContains(response, "Confirmer l’embauche de Clara SION")
+        assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
+        assertContains(response, hiring_end_at.strftime("%d/%m/%Y"))
+
+        response = client.post(confirmation_url)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        assertRedirects(response, next_url)
+
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationState.ACCEPTED
+        assert job_application.answer == "OK"
+        assert list(job_application.selected_jobs.all()) == []
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at == hiring_end_at
+        assert job_application.prehiring_guidance_days == 4
+        assert job_application.nb_hours_per_week == 5
+        assert job_application.planned_training_hours == 6
+        assert job_application.contract_type == ContractType.OTHER
+        assert job_application.contract_type_details == "Contrat spécifique pour ce test"
+        assert job_application.qualification_type == QualificationType.CQP
+        assert job_application.qualification_level == QualificationLevel.LEVEL_3
+        assert job_application.hired_job_id == company.job_description_through.first().pk
+
+        assert accept_session.name not in client.session
+
+    def test_as_geiq_missing_data(self, client):
+        company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True, with_jobs=True)
+        GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_prescriber=True)
+        client.force_login(company.members.first())
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationState.PROCESSING,
+            job_seeker=self.job_seeker,
+            to_company=company,
+        )
+        hiring_start_at = timezone.localdate()
+        hiring_end_at = hiring_start_at + datetime.timedelta(days=30)
+        accept_session = initialize_accept_session(
+            client,
+            {
+                "selected_jobs": [],
+                "job_application_id": job_application.pk,
+                "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+                "contract_form_data": {
+                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+                    "answer": "OK",
+                    "prehiring_guidance_days": 4,
+                    "nb_hours_per_week": 5,
+                    "planned_training_hours": 6,
+                    "contract_type": ContractType.OTHER,
+                    "contract_type_details": "Contrat spécifique pour ce test",
+                    "qualification_type": "",  # Missing
+                    "qualification_level": QualificationLevel.LEVEL_3,
+                    "hired_job": company.job_description_through.first().pk,
+                },
+            },
+        )
+        accept_session.save()
+        response = client.get(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name}))
+
+        response = client.post(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
+        assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name}))
+        job_application.refresh_from_db()
+        assert job_application.state == JobApplicationState.PROCESSING
 
 
 class TestProcessTemplates:

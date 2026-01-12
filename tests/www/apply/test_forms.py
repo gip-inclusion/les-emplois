@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
@@ -227,6 +227,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         client.force_login(job_application.to_company.members.first())
         accept_session = self.initialize_accept_session(client, job_application)
         url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
+        url_accept_confirmation = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
 
         response = client.get(url_accept_contract)
         assert response.status_code == 200
@@ -247,9 +248,15 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             "confirmed": True,
         }
 
-        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data, follow=True)
+        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data)
 
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
+        assertRedirects(response, url_accept_confirmation, status_code=200)
+
+        response = client.get(url_accept_confirmation)
+        assert response.status_code == 200
+
+        response = client.post(url_accept_confirmation, follow=True)
         assert response.status_code == 200
 
         job_application.refresh_from_db()
@@ -278,6 +285,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         client.force_login(job_application.to_company.members.first())
         accept_session = self.initialize_accept_session(client, job_application)
         url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
+        url_accept_confirmation = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
 
         response = client.get(url_accept_contract)
         assert response.status_code == 200
@@ -299,7 +307,13 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             "confirmed": "True",
         }
 
-        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data, follow=True)
+        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data)
+        assertRedirects(response, url_accept_confirmation, status_code=200)
+
+        response = client.get(url_accept_confirmation)
+        assert response.status_code == 200
+
+        response = client.post(url_accept_confirmation, follow=True)
         assert response.status_code == 200
 
         job_application.refresh_from_db()
@@ -325,6 +339,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         client.force_login(job_application.to_company.members.first())
         accept_session = self.initialize_accept_session(client, job_application)
         url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
+        url_accept_confirmation = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
 
         post_data = {
             "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
@@ -340,10 +355,9 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             "confirmed": "True",
         }
 
-        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data, follow=True)
-
-        assert response.status_code == 200
+        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data)
         assertContains(response, CANNOT_BACKDATE_TEXT)
+
         # Testing a redirect with htmx is really incomplete, so we also check hiring status
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationState.PROCESSING
@@ -363,10 +377,15 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         client.force_login(job_application.to_company.members.first())
         accept_session = self.initialize_accept_session(client, job_application)
         url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
-        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data, follow=True)
+        url_accept_confirmation = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
+        response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data)
 
-        assert response.status_code == 200
+        assertRedirects(response, url_accept_confirmation, status_code=200)
+        response = client.get(url_accept_confirmation)
         assertNotContains(response, CANNOT_BACKDATE_TEXT)
+
+        response = client.post(url_accept_confirmation, follow=True)
+        assert response.status_code == 200
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationState.ACCEPTED
 
