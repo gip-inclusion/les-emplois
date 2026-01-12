@@ -309,8 +309,8 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, company, job_seeker, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, company, job_seeker, initial=None, **kwargs):
+        super().__init__(*args, initial=initial, **kwargs)
         self.company = company
         self.is_geiq = company.kind == CompanyKind.GEIQ
         self.job_seeker = job_seeker
@@ -328,8 +328,10 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         # That's why some fields are already filled in with obsolete data.
         # Erase them now to start from new.
         for field in ["answer", "hiring_start_at", "hiring_end_at", "contract_type", "contract_type_details"]:
-            self.initial[field] = ""
-        self.initial["nb_hours_per_week"] = None
+            if initial is None or field not in initial:
+                self.initial[field] = ""
+        if initial is None or "nb_hours_per_week" not in initial:
+            self.initial["nb_hours_per_week"] = None
         post_data = kwargs.get("data")
 
         # Remove or make GEIQ specific fields mandatory
@@ -347,8 +349,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if self.is_geiq:
             # Change default size (too large)
             self.fields["contract_type_details"].widget.attrs.update({"rows": 2})
-            self.initial["prehiring_guidance_days"] = 0
-            self.initial["planned_training_hours"] = 0
+            for field in ["prehiring_guidance_days", "planned_training_hours"]:
+                if initial is None or field not in initial:
+                    self.initial[field] = 0
             self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple {}.".format(
                 timezone.localdate().strftime("%d/%m/%Y"),
             )
