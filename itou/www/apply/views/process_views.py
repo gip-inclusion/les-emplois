@@ -629,7 +629,7 @@ class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJo
         return context
 
 
-class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseAcceptView):
+class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInfosView):
     template_name = "apply/process_accept_contract_infos_step.html"
 
     def setup(self, request, *args, **kwargs):

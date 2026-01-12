@@ -844,7 +844,7 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
         return context
 
 
-class ContractInfosForHireView(ApplicationBaseView, common_views.BaseAcceptView):
+class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInfosView):
     template_name = "apply/submit/hire_contract_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
