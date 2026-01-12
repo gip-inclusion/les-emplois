@@ -166,6 +166,14 @@
                                       Un prescripteur habilité
                                   </a>
                               </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
@@ -486,6 +494,14 @@
                                       Un prescripteur habilité
                                   </a>
                               </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
@@ -776,6 +792,14 @@
                               <li>
                                   <a href="/search/prescribers/results">
                                       Un prescripteur habilité
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
                                   </a>
                               </li>
                           </ul>
@@ -1107,6 +1131,14 @@
                                       Un prescripteur habilité
                                   </a>
                               </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
@@ -1430,6 +1462,14 @@
                                       Un prescripteur habilité
                                   </a>
                               </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
+                                  </a>
+                              </li>
                           </ul>
                       </div>
                   </li>
@@ -1718,6 +1758,14 @@
                               <li>
                                   <a href="/search/prescribers/results">
                                       Un prescripteur habilité
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="/search/services/results">
+                                      Un service d'insertion
+                                      <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                          Nouveau
+                                      </span>
                                   </a>
                               </li>
                           </ul>

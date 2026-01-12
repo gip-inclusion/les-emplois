@@ -29,12 +29,18 @@
                         {% endif %}
                     </ul>
                     <div class="mt-md-1">
-                        <a href="{% dora_service_url service mtm_campaign="lesemplois" mtm_kwd="rechservice-accueil" %}"
+                        <a href="{% dora_service_url service source=request.user.kind|default:"accueil" %}"
                            class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link"
                            target="_blank"
                            rel="noopener"
                            aria-label="Voir la fiche de {{ service.structure.nom }} sur DORA (ouverture dans un nouvel onglet)">
-                            <span>Voir la fiche détaillée</span>
+                            <span>
+                                {% if user.is_employer or user.is_prescriber %}
+                                    Orienter
+                                {% else %}
+                                    Voir la fiche détaillée
+                                {% endif %}
+                            </span>
                             <i class="ri-external-link-line fw-normal ms-2" aria-hidden="true"></i>
                         </a>
                     </div>

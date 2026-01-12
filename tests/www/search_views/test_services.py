@@ -1,4 +1,5 @@
 import random
+from functools import partial
 
 import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
@@ -8,7 +9,13 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from tests.cities.factories import create_city_vannes
-from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
@@ -90,18 +97,46 @@ def test_invalid_query_parameters(client):
 
 
 def test_results_html(snapshot, client, search_services_route):
+    expected_items = 4
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assertContains(response, "4 résultats")
+    assertContains(response, f"{expected_items} résultats")
     assertContains(
         response,
         f"<title>Services d'insertion « {category.label} » autour de {city} - Les emplois de l'inclusion</title>",
         html=True,
         count=1,
     )
+    assertContains(response, "Voir la fiche détaillée", count=expected_items)
     assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot()
+
+
+@pytest.mark.parametrize(
+    "user_factory",
+    [
+        pytest.param(None, id="anonymous"),
+        pytest.param(JobSeekerFactory, id="jobseeker"),
+        pytest.param(partial(EmployerFactory, membership=True), id="employer"),
+        pytest.param(partial(PrescriberFactory, membership=True), id="prescriber"),
+        pytest.param(partial(LaborInspectorFactory, membership=True), id="labor_inspector"),
+        pytest.param(ItouStaffFactory, id="itou_staff"),
+    ],
+)
+def test_results_html_link(snapshot, client, search_services_route, user_factory):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+
+    if user_factory:
+        client.force_login(user_factory())
+    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    assert (
+        pretty_indented(
+            parse_response_to_soup(response, selector="#services-search-results > .c-box--results:first-child a")
+        )
+        == snapshot()
+    )
 
 
 def test_results_ordering(client, search_services_route):
