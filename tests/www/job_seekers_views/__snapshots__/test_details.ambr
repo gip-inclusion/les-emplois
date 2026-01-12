@@ -1481,18 +1481,6 @@
                                                   </li>
                                               </ul>
                                           </div>
-                                          <div class="c-info mt-3 mt-md-4">
-                                              <button aria-controls="collapseInfoExample" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseInfoExample" data-bs-toggle="collapse" type="button">
-                                                  <span>
-                                                      Découvrez tous les intervenants qui ont accompagné Jane DOE
-                                                  </span>
-                                              </button>
-                                              <div class="c-info__detail collapse" id="collapseInfoExample">
-                                                  <a href="/gps/groups/[PK of FollowUpGroup]">
-                                                      Liste des intervenants
-                                                  </a>
-                                              </div>
-                                          </div>
                                       </div>
                                   </div>
                               </div>
