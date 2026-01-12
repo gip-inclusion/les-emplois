@@ -6,7 +6,8 @@ envs/secrets.env
 # Config
 docker-compose.override.yml
 docker-compose-prod.yml
-docker/dev/postgres/
+docker/dev/postgres/*
+!docker/dev/postgres/.gitkeep
 docker/prod/
 
 # Project specific
