@@ -114,16 +114,22 @@
                 </ul>
             </div>
         {% endwith %}
-        {% if user_in_group %}
-            <div class="c-info mt-3 mt-md-4">
-                <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoExample" aria-expanded="false" aria-controls="collapseInfoExample">
-                    <span>Découvrez tous les intervenants qui ont accompagné {{ job_seeker.first_name|title }} {{ job_seeker.last_name|upper }}</span>
-                </button>
-                <div class="c-info__detail collapse" id="collapseInfoExample">
-                    <a href="{% url 'gps:group_memberships' group.pk %}">Liste des intervenants</a>
+        {% with prescribers_count=group.members.count|add:"-1" %}
+            {% if user_in_group and prescribers_count > 0 %}
+                <div class="c-info mt-3 mt-md-4">
+                    <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoExample" aria-expanded="false" aria-controls="collapseInfoExample">
+                        {% if prescribers_count == 1 %}
+                            <span>Découvrez l'autre intervenant qui a accompagné {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
+                        {% else %}
+                            <span>Découvrez les {{ prescribers_count }} autres intervenants qui ont accompagné {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
+                        {% endif %}
+                    </button>
+                    <div class="c-info__detail collapse" id="collapseInfoExample">
+                        <a href="{% url 'gps:group_memberships' group.pk %}">Liste des intervenants</a>
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        {% endwith %}
     {% else %}
         <div id="card-no-referent" class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
             <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">

@@ -2310,6 +2310,59 @@ class TestProcessViews:
 
         assert pretty_indented(content) == snapshot()
 
+    def test_display_prescriber_count(self, client, snapshot):
+        job_seeker = JobSeekerFactory()
+
+        # text displayed if 2 prescribers are following this job seeker
+        TWO_PRESCRIBERS_TEXT = (
+            f"Découvrez l'autre intervenant qui a accompagné {job_seeker.first_name} {job_seeker.last_name.upper()}"
+        )
+        # text displayed if more than 2 prescribers are following this job seeker
+        MORE_THAN_2_PRESCRIBERS_TEXT = (
+            "Découvrez les 2 autres intervenants qui ont accompagné "
+            f"{job_seeker.first_name} {job_seeker.last_name.upper()}"
+        )
+
+        prescriber = PrescriberFactory(
+            membership=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+        job_application = JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
+        membership = FollowUpGroupMembershipFactory(
+            follow_up_group__beneficiary=job_seeker,
+            member=prescriber,
+            started_at=datetime.date(2024, 1, 1),
+        )
+        group = membership.follow_up_group
+
+        client.force_login(prescriber)
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = client.get(url)
+
+        assertNotContains(response, TWO_PRESCRIBERS_TEXT)
+        assertNotContains(response, MORE_THAN_2_PRESCRIBERS_TEXT)
+
+        FollowUpGroupMembershipFactory(
+            follow_up_group=group,
+            member=PrescriberFactory(membership=True),
+            started_at=datetime.date(2024, 1, 1),
+        )
+        response = client.get(url)
+
+        assertContains(response, TWO_PRESCRIBERS_TEXT)
+        assertNotContains(response, MORE_THAN_2_PRESCRIBERS_TEXT)
+
+        FollowUpGroupMembershipFactory(
+            follow_up_group=group,
+            member=PrescriberFactory(membership=True),
+            started_at=datetime.date(2024, 1, 1),
+        )
+        response = client.get(url)
+
+        assertNotContains(response, TWO_PRESCRIBERS_TEXT)
+        assertContains(response, MORE_THAN_2_PRESCRIBERS_TEXT)
+
 
 class TestProcessAcceptViewsInWizard:
     BIRTH_COUNTRY_LABEL = "Pays de naissance"
