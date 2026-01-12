@@ -328,10 +328,11 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
             count=1,
         )
 
-    def test_accept_personal_data_readonly_with_certified_criteria(self, client):
+    def test_accept_personal_data_readonly_with_identity_certified_by_api_particulier(self, client):
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=self.job_seeker,
             criteria_certified=True,
+            certifiable_by_api_particulier=True,
         )
         client.force_login(self.user)
         response = client.get(self.url)

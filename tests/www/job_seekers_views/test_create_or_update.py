@@ -1177,7 +1177,7 @@ class TestUpdateForSender:
             count=1,
         )
 
-    def test_fields_readonly_with_certified_criteria(self, client):
+    def test_fields_readonly_with_identity_certified_by_api_particulier(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         job_seeker = JobSeekerFactory(
@@ -1190,6 +1190,7 @@ class TestUpdateForSender:
         IAESelectedAdministrativeCriteriaFactory(
             eligibility_diagnosis__job_seeker=job_seeker,
             criteria_not_certified=True,
+            certifiable_by_api_particulier=True,
         )
 
         client.force_login(user)

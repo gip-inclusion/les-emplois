@@ -197,13 +197,17 @@ class TestPoleEmploiConnect:
 
             user.delete()
 
-    def test_update_readonly_with_certified_criteria(self, caplog):
+    def test_update_readonly_with_identity_certified_by_api_particulier(self, caplog):
         job_seeker = JobSeekerFactory(
             username=PEAMU_USERINFO["sub"],
             identity_provider=IdentityProvider.PE_CONNECT,
             born_in_france=True,
         )
-        IAESelectedAdministrativeCriteriaFactory(eligibility_diagnosis__job_seeker=job_seeker, criteria_certified=True)
+        IAESelectedAdministrativeCriteriaFactory(
+            eligibility_diagnosis__job_seeker=job_seeker,
+            criteria_certified=True,
+            certifiable_by_api_particulier=True,
+        )
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
         user, created = peamu_user_data.create_or_update_user()
         assert created is False

@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import factory
 from dateutil.relativedelta import relativedelta
@@ -7,7 +8,7 @@ from faker import Faker
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility import models
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models.common import AbstractEligibilityDiagnosisModel
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.models.iae import AdministrativeCriteria
@@ -125,6 +126,13 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
         criteria_certification_error = factory.Trait(
             certified=None,
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
+        )
+        certifiable_by_api_particulier = factory.Trait(
+            administrative_criteria=factory.LazyFunction(
+                lambda: AdministrativeCriteria.objects.get(
+                    kind=random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
+                )
+            )
         )
 
     eligibility_diagnosis = factory.SubFactory(IAEEligibilityDiagnosisFactory, from_employer=True)
