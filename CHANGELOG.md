@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2026-01-12
+
+### Ajouté
+
+- [Interface : Ajouter un lien vers le code source dans le footer](https://github.com/gip-inclusion/les-emplois/pull/7324)
+- [Nexus : Mise en place de l'API de synchro de données avec les différents services de la PDI](https://github.com/gip-inclusion/les-emplois/pull/7190)
+
+### Modifié
+
+- [Admin : Empêcher la modification des objets du contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/7311)
+- [Contrôle a posteriori : Ajout de textes pour expliquer que le commentaire de la sanction sera visible par la SIAE](https://github.com/gip-inclusion/les-emplois/pull/7330)
+- [Contrôle a posteriori : Sanction de retrait total ou partiel de l’aide au poste : un champ % par PASS](https://github.com/gip-inclusion/les-emplois/pull/7187)
+- [Fiches salarié : Mise à jour de la commune de Pierrefitte-sur-Seine](https://github.com/gip-inclusion/les-emplois/pull/7287)
+- [GEIQ : Rapprocher les champs dates de début et de fin de contrat dans le formulaire d’embauche](https://github.com/gip-inclusion/les-emplois/pull/7326)
+- [GEIQ : Suppression de la balise Nouveau pour le bilan d'exécution dans le menu des inspecteurs du travail](https://github.com/gip-inclusion/les-emplois/pull/7333)
+- [GPS : Correction de l'ordre d'affichage des membres d'un groupe de suivi](https://github.com/gip-inclusion/les-emplois/pull/7329)
+- [Inscription/Candidature : Modification du texte d'aide pour les champs NIR car les NIA sont maintenant acceptés](https://github.com/gip-inclusion/les-emplois/pull/7312)
+- [Pilotage : Modification bandeaux stats](https://github.com/gip-inclusion/les-emplois/pull/7321)
+
+### Supprimé
+
+- [Page d’accueil : Suppression de la bannière de demande d’avis pour les candidats et professionnels](https://github.com/gip-inclusion/les-emplois/pull/7310)
+
 ## 2026-01-05
 
 ### Ajouté
