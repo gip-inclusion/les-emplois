@@ -1,5 +1,6 @@
 from django import template
 from django.template.loader import get_template
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import ApprovalStatus
@@ -117,9 +118,7 @@ def geiq_eligibility_badge(*, is_eligible, extra_classes="", for_job_seeker=Fals
 
 
 @register.simple_tag
-def criterion_certification_badge(selected_criterion, hiring_start_date):
-    if hiring_start_date is None:
-        raise ValueError("A hiring_start_date must be provided.")
+def criterion_certification_badge(selected_criterion, job_application):
     if not selected_criterion.administrative_criteria.is_certifiable:
         return ""
 
@@ -127,7 +126,12 @@ def criterion_certification_badge(selected_criterion, hiring_start_date):
         if selected_criterion.certification_period is None:
             template = "eligibility/includes/badge_certification_error.html"
         else:
-            if hiring_start_date in selected_criterion.certification_period:
+            certification_as_of = (
+                job_application.hiring_start_at
+                if job_application and job_application.state == JobApplicationState.ACCEPTED
+                else timezone.localdate()
+            )
+            if certification_as_of in selected_criterion.certification_period:
                 template = "eligibility/includes/badge_certified.html"
             else:
                 template = "eligibility/includes/badge_not_certified.html"

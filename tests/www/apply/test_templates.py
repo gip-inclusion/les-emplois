@@ -219,7 +219,7 @@ class TestIAEEligibilityDetail:
             "eligibility_diagnosis": diagnosis,
             "request": request,
             "siae": job_application.to_company,
-            "hiring_start_date": job_application.hiring_start_at,
+            "job_application": job_application,
             "job_seeker": diagnosis.job_seeker,
             "itou_help_center_url": "https://help.com",
             "is_sent_by_authorized_prescriber": True,
@@ -343,14 +343,14 @@ class TestGEIQEligibilityDetail:
     def template(self):
         return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
 
-    def default_params_geiq(self, diagnosis):
+    def default_params_geiq(self, diagnosis, job_application):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         # Use an authorized prescriber to not have to deal with the template heavily relying on user.is_employer
         request = get_request(authorized_prescriber)
         return {
             "request": request,
             "diagnosis": diagnosis,
-            "hiring_start_date": timezone.localdate(),
+            "job_application": job_application,
             "itou_help_center_url": "https://help.com",
         }
 
@@ -384,9 +384,9 @@ class TestGEIQEligibilityDetail:
             criteria_kinds=[criteria_kind],
         )
         criterion = diagnosis.selected_administrative_criteria.get()
-        self.create_job_application(diagnosis)
+        job_application = self.create_job_application(diagnosis)
         certify_criterion_with_api_particulier(criterion)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert self.ELIGIBILITY_TITLE in rendered
         self.assert_criteria_name_in_rendered(diagnosis, rendered)
 
@@ -398,14 +398,14 @@ class TestGEIQEligibilityDetail:
             criteria_kinds=[AdministrativeCriteriaKind.CAP_BEP],
         )
         # No certifiable criteria
-        self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
+        job_application = self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert CERTIFIED_HELP_TEXT not in rendered
 
         # Certifiable criteria but not certified.
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
+        job_application = self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_application)))
         assert CERTIFIED_HELP_TEXT in rendered
 
         # Certifiable and certified.
@@ -416,14 +416,14 @@ class TestGEIQEligibilityDetail:
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         criterion = diagnosis.selected_administrative_criteria.get()
         certify_criterion_with_api_particulier(criterion)
-        self.create_job_application(diagnosis)
-        rendered = self.template.render(Context(self.default_params_geiq(diagnosis)))
+        job_app = self.create_job_application(diagnosis)
+        rendered = self.template.render(Context(self.default_params_geiq(diagnosis, job_app)))
         assert CERTIFIED_HELP_TEXT in rendered
 
         # Certifiable and certified as seen by a job seeker (on their dashboard).
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
-        self.create_job_application(diagnosis)
-        params = self.default_params_geiq(diagnosis)
+        job_application = self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis, job_application)
         params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
@@ -435,24 +435,22 @@ class TestGEIQEligibilityDetail:
         # Prescriber
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_prescriber=True)
         job_app = self.create_job_application(diagnosis)
-        params = self.default_params_geiq(diagnosis)
+        params = self.default_params_geiq(diagnosis, job_app)
         params.update(request=get_request(diagnosis.author))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") in rendered
 
         # Employer
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_employer=True)
-        self.create_job_application(diagnosis)
-        params = self.default_params_geiq(diagnosis) | {
-            "job_application": job_app
-        }  # Employers need infos from job_application
+        job_app = self.create_job_application(diagnosis)
+        params = self.default_params_geiq(diagnosis, job_app)
         params.update(request=get_request(diagnosis.author))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") in rendered
 
         # Job seeker (on their dashboard)
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True)
-        params = self.default_params_geiq(diagnosis)
+        params = self.default_params_geiq(diagnosis, job_app)
         params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") not in rendered
@@ -474,7 +472,7 @@ class TestCertifiedBadge:
         )
 
         criterion = diagnosis.selected_administrative_criteria.get()
-        rendered = self._render(criterion=criterion, hiring_start_date=timezone.localdate())
+        rendered = self._render(criterion=criterion, job_application=None)
         assert escape(criterion.administrative_criteria.name) in rendered
         assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
@@ -506,7 +504,7 @@ class TestCertifiedBadge:
         rendered = self._render(
             request=request,
             criterion=criterion,
-            hiring_start_date=timezone.localdate(),
+            job_application=None,
         )
         if displayed:
             expected, not_expected = (
