@@ -62,12 +62,17 @@ class TestEvaluatedSiaeSanctionView:
         )
 
         self.return_evaluated_siae_list_link_html = (
-            '<a class="btn btn-primary float-end" '
+            '<a class="btn btn-ico btn-link ps-0" aria-label="Retour à la page précédente" '
             f'href="/siae_evaluation/institution_evaluated_siae_list/{self.evaluated_siae.evaluation_campaign_id}/">'
-            "Revenir à la liste des SIAE</a>"
+            '<i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>'
+            "<span>Retour</span>"
+            "</a>"
         )
         self.return_dashboard_link_html = (
-            '<a class="btn btn-primary float-end" href="/dashboard/">Retour au Tableau de bord</a>'
+            '<a class="btn btn-ico btn-link ps-0" aria-label="Retour à la page précédente" href="/dashboard/">'
+            '<i class="ri-arrow-drop-left-line ri-xl fw-medium" aria-hidden="true"></i>'
+            "<span>Retour</span>"
+            "</a>"
         )
 
     def assertSanctionContent(self, response, subsidy_cut_percent=None):

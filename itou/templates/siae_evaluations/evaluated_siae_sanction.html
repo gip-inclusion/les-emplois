@@ -5,6 +5,15 @@
 
 {% block title %}Décision de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
 
+{% block title_navinfo %}
+    {% if is_siae %}
+        {% url "dashboard:index" as back_url %}
+    {% else %}
+        {% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id as back_url %}
+    {% endif %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
@@ -99,13 +108,6 @@
                                     {% endif %}
                                 </p>
                             {% endfor %}
-                        </div>
-                        <div class="card-body">
-                            {% if is_siae %}
-                                <a class="btn btn-primary float-end" href="{% url "dashboard:index" %}">Retour au Tableau de bord</a>
-                            {% else %}
-                                <a class="btn btn-primary float-end" href="{% url 'siae_evaluations_views:institution_evaluated_siae_list' evaluated_siae.evaluation_campaign_id %}">Revenir à la liste des SIAE</a>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
