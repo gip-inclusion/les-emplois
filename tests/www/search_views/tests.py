@@ -1,5 +1,6 @@
 from urllib.parse import quote
 
+import pytest
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst, urlencode as urlencode_filter
 from django.templatetags.static import static
@@ -8,7 +9,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
 from django.utils.http import urlencode
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractType, JobSource, JobSourceTag
@@ -25,7 +26,7 @@ from tests.companies.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import PrescriberFactory
+from tests.users.factories import PrescriberFactory, random_user_kind_factory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup
 
@@ -45,6 +46,17 @@ class TestSearchCompany:
     URL = reverse_lazy("search:employers_results")
     no_spontaneous_applications_str = "Cet employeur ne souhaite pas recevoir de candidatures pour le moment"
     applications_open_str = "Cette structure vous intéresse ?"
+
+    def test_home_anonymous(self, client):
+        response = client.get(reverse("search:employers_home"))
+        assertContains(response, "Rechercher un emploi inclusif")
+
+    def test_home_connected(self, client):
+        client.force_login(random_user_kind_factory())
+
+        with pytest.warns(RuntimeWarning, match="Access to 'employer_search_home' while authenticated"):
+            response = client.get(reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:employers_results"))
 
     def test_not_existing(self, client):
         response = client.get(self.URL, {"city": "foo-44"})
@@ -549,10 +561,16 @@ class TestSearchCompany:
 
 
 class TestSearchPrescriber:
-    def test_home(self, client):
-        url = reverse("search:prescribers_home")
-        response = client.get(url)
+    def test_home_anonymous(self, client):
+        response = client.get(reverse("search:prescribers_home"))
         assertContains(response, "Rechercher des prescripteurs habilités")
+
+    def test_home_connected(self, client):
+        client.force_login(random_user_kind_factory())
+
+        with pytest.warns(RuntimeWarning, match="Access to 'search_prescribers_home' while authenticated"):
+            response = client.get(reverse("search:prescribers_home"))
+        assertRedirects(response, reverse("search:prescribers_results"))
 
     def test_invalid(self, client):
         response = client.get(reverse("search:prescribers_results"), {"city": "foo-44"})

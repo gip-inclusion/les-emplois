@@ -60,7 +60,7 @@ class TestApprovalProlongation:
 
         client.force_login(self.employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("dashboard:index")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
@@ -389,7 +389,7 @@ class TestApprovalProlongation:
 
         client.force_login(self.employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("dashboard:index")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"

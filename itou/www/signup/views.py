@@ -298,7 +298,7 @@ class CompanyJoinView(CompanyBaseView):
             messages.error(
                 request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur."
             )
-            return HttpResponseRedirect(reverse("search:employers_home"))
+            return HttpResponseRedirect(reverse("search:employers_results"))
 
         CompanyMembership.objects.create(
             user=request.user,
@@ -737,7 +737,7 @@ def prescriber_join_org(request):
         messages.error(
             request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
         )
-        return HttpResponseRedirect(reverse("search:employers_home"))
+        return HttpResponseRedirect(reverse("search:employers_results"))
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]

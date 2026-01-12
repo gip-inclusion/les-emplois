@@ -94,11 +94,11 @@ class TestRenderAnnouncementCampaign:
             campaign=campaign, title="Item C", description="Item C", priority=2, user_kind_tags=[user.kind]
         )
 
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:employers_results"))
         assertNotContains(response, MODAL_ID)
 
         client.force_login(user)
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:employers_results"))
         assertContains(response, MODAL_ID)
 
         content = parse_response_to_soup(response, f"#{MODAL_ID}")
@@ -111,7 +111,7 @@ class TestRenderAnnouncementCampaign:
         user = random_user_kind_factory()
         client.force_login(user)
 
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:employers_results"))
         assert response.status_code == 200
         content = parse_response_to_soup(response)
         assert len(content.select("#news-modal")) == 0
@@ -121,7 +121,7 @@ class TestRenderAnnouncementCampaign:
         user = random_user_kind_factory()
         client.force_login(user)
 
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:employers_results"))
         assert response.status_code == 200
         content = parse_response_to_soup(response)
         assert len(content.select("#news-modal")) == 0
@@ -148,7 +148,7 @@ class TestRenderAnnouncementCampaign:
         )
 
         client.force_login(JobSeekerFactory())
-        response = client.get(reverse("search:employers_home"))
+        response = client.get(reverse("search:employers_results"))
         assert response.status_code == 200
         content = parse_response_to_soup(response, "#news-modal")
         assert pretty_indented(content) == snapshot

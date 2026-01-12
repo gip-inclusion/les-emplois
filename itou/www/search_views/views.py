@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import warnings
 from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
@@ -10,6 +11,7 @@ from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.urls import reverse
@@ -50,8 +52,10 @@ logger = logging.getLogger(__name__)
 
 @login_not_required
 def employer_search_home(request, template_name="search/siaes_search_home.html"):
-    context = {"siae_search_form": SiaeSearchForm()}
-    return render(request, template_name, context)
+    if request.user.is_authenticated:
+        warnings.warn("Access to 'employer_search_home' while authenticated", category=RuntimeWarning)
+        return HttpResponseRedirect(reverse("search:employers_results"))
+    return render(request, template_name, {"siae_search_form": SiaeSearchForm()})
 
 
 class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, FormView):
@@ -77,7 +81,6 @@ class EmployerSearchBaseView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Form
         saved_searches = SavedSearch.add_city_name_attr(saved_searches)
 
         context = {
-            "back_url": reverse("search:employers_home"),
             "clear_filters_url": add_url_params(
                 self.request.path, {"city": kwargs["form"].data.get("city")} | self.get_job_seeker_query_string()
             ),
@@ -322,9 +325,10 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
     """
     The search home page has a different design from the results page.
     """
-    form = PrescriberSearchForm()
-    context = {"form": form}
-    return render(request, template_name, context)
+    if request.user.is_authenticated:
+        warnings.warn("Access to 'search_prescribers_home' while authenticated", category=RuntimeWarning)
+        return HttpResponseRedirect(reverse("search:prescribers_results"))
+    return render(request, template_name, {"form": PrescriberSearchForm()})
 
 
 @login_not_required
@@ -368,6 +372,9 @@ def search_services_home(request, template_name="search/services/home.html"):
     """
     The search home page has a different design from the results page.
     """
+    if request.user.is_authenticated:
+        warnings.warn("Access to 'search_services_home' while authenticated", category=RuntimeWarning)
+        return HttpResponseRedirect(reverse("search:services_results"))
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 

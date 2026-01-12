@@ -1654,7 +1654,7 @@
                   ou par vous même.
               </i>
           </p>
-          <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers">
+          <a class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center" href="/search/employers/results">
               <i aria-hidden="true" class="ri-briefcase-line ri-lg fw-normal">
               </i>
               <span>

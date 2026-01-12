@@ -437,7 +437,7 @@ def test_non_staff_cant_join_a_company(client):
     token = company.get_token()
     url = reverse("signup:company_join", args=(company.pk, token))
 
-    response = client.get(url)
+    response = client.get(url, follow=True)
     assertMessages(
         response,
         [
@@ -447,7 +447,7 @@ def test_non_staff_cant_join_a_company(client):
             )
         ],
     )
-    assertRedirects(response, reverse("search:employers_home"))
+    assertRedirects(response, reverse("search:employers_results"))
 
     # Check `User` state.
     assert not company.has_admin(user)

@@ -41,7 +41,7 @@ class TestApprovalSuspendView:
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("dashboard:index")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspend", kwargs={"approval_id": approval.pk})
         url = f"{url}?{params}"
@@ -167,7 +167,7 @@ class TestApprovalSuspendView:
 
         client.force_login(employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("dashboard:index")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"

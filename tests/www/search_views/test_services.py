@@ -3,11 +3,12 @@ import random
 import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from tests.cities.factories import create_city_vannes
+from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 
@@ -68,10 +69,18 @@ def search_services_route_fixture(respx_mock, settings):
     )
 
 
-def test_home(client):
-    url = reverse("search:services_home")
-    response = client.get(url)
+def test_home_anonymous(client):
+    response = client.get(reverse("search:services_home"))
     assertContains(response, "Rechercher un service d'insertion")
+
+
+def test_home_connected(client):
+    user_factory = random.choice([EmployerFactory, PrescriberFactory])
+    client.force_login(user_factory(membership=True))
+
+    with pytest.warns(RuntimeWarning, match="Access to 'search_services_home' while authenticated"):
+        response = client.get(reverse("search:services_home"))
+    assertRedirects(response, reverse("search:services_results"))
 
 
 def test_invalid_query_parameters(client):

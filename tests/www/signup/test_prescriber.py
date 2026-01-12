@@ -1052,7 +1052,7 @@ class TestProConnectPrescribersViewsExceptions:
         # The user should be redirected to home page with a warning, the session isn't flushed
         assert client.session.get(pro_connect.session_key)
         assert auth.get_user(client).is_authenticated
-        assertRedirects(response, reverse("search:employers_home"))
+        assertRedirects(response, reverse("search:employers_results"))
         assertMessages(
             response,
             [
