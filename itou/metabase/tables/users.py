@@ -11,5 +11,6 @@ TABLE.add_columns(
         get_column_from_field(get_model_field(User, "first_name"), name="prenom"),
         get_column_from_field(get_model_field(User, "last_name"), name="nom"),
         get_column_from_field(get_model_field(User, "last_login"), name="dernière_connexion"),
+        get_column_from_field(get_model_field(User, "date_joined"), name="date_inscription", field_type="date"),
     ]
 )
