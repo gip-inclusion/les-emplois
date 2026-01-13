@@ -37,6 +37,7 @@ from tests.institutions.factories import (
 from tests.invitations.factories import LaborInspectorInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.nexus.factories import NexusRessourceSyncStatusFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -108,6 +109,9 @@ def test_all_admin(admin_client, mocker, subtests):
     GEIQEligibilityDiagnosisFactory(from_employer=True)
     IAEEligibilityDiagnosisFactory(from_employer=True)
 
+    # Call this factory first as it might shadow other items if created later
+    NexusRessourceSyncStatusFactory()
+
     # Call all factories to create at least one instance of each model with a factory
     for factory_class in get_all_factories():
         if factory_class._meta.model not in admin_registered_models:
@@ -128,6 +132,7 @@ def test_all_admin(admin_client, mocker, subtests):
             JobApplicationFactory,  # Already used above
             JobSeekerFactory,  # Already used above
             LaborInspectorInvitationFactory,  # Already used above
+            NexusRessourceSyncStatusFactory,  # Already used above
             QPVFactory,  # Already used above
             SanctionsFactory,  # Called by EvaluatedJobApplicationSanctionFactory
             SiaeFinancialAnnexFactory,  # Called by SiaeConventionFactory
