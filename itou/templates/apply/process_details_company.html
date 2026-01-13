@@ -104,7 +104,7 @@
 
                             {# Job application info ------------------------------------------------------------------------- #}
                             <div class="c-box mb-3 mb-md-4">
-                                <h3>Candidature</h3>
+                                <h3>Qui oriente cet usager ?</h3>
                                 {# Sender info ------------------------------------------------------------------------- #}
                                 {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
@@ -130,7 +130,9 @@
                             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
                             {# Job seeker referent ------------------------------------------------------------------------- #}
-                            {% include "gps/includes/membership_referent.html" with job_seeker=job_application.job_seeker %}
+                            {% if job_application.sender.pk != group.referent.member_id %}
+                                {% include "gps/includes/membership_referent.html" with job_seeker=job_application.job_seeker alternative_title="Qui d'autre accompagne cet usager ?" %}
+                            {% endif %}
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                             {% block sidebar %}
