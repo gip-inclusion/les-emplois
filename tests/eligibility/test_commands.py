@@ -20,7 +20,11 @@ class TestRetryCertifyCriteria:
             "itou.eligibility.management.commands.retry_certify_criteria.async_certify_criterion_with_api_particulier",
             autospec=True,
         )
-        factory = partial(IAESelectedAdministrativeCriteriaFactory, eligibility_diagnosis__certifiable=True)
+        factory = partial(
+            IAESelectedAdministrativeCriteriaFactory,
+            eligibility_diagnosis__certifiable=True,
+            certifiable_by_api_particulier=True,
+        )
         # Just created, ignored.
         factory(criteria_certification_error=True)
         to_retry = []

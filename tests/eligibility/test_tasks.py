@@ -8,14 +8,14 @@ from freezegun import freeze_time
 from huey.exceptions import RetryTask
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import async_certify_criterion_with_api_particulier, certify_criterion_with_api_particulier
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import JobSeekerProfile
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
-    RESPONSES,
-    ResponseKind,
+    RESPONSES as API_PARTICULIER_RESPONSES,
+    ResponseKind as ApiParticulierResponseKind,
 )
 from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -42,12 +42,12 @@ def fake_multiple_errors(response):
 )
 @pytest.mark.usefixtures("api_particulier_settings")
 class TestCertifyCriteriaApiParticulier:
-    @pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+    @pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
     @freeze_time("2025-01-06")
     def test_queue_task(self, criteria_kind, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[criteria_kind])
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
-        response = RESPONSES[criteria_kind][ResponseKind.CERTIFIED]
+        response = API_PARTICULIER_RESPONSES[criteria_kind][ApiParticulierResponseKind.CERTIFIED]
         respx_mock.get(settings.API_PARTICULIER_BASE_URL + api_particulier.ENDPOINTS[criteria_kind]).respond(
             status_code=response["status_code"], json=response["json"]
         )
@@ -98,8 +98,12 @@ class TestCertifyCriteriaApiParticulier:
             # bubble up for a retry.
             (404, {}, None, False),
             (
-                RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["status_code"],
-                RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["json"],
+                API_PARTICULIER_RESPONSES[AdministrativeCriteriaKind.RSA][
+                    ApiParticulierResponseKind.UNPROCESSABLE_CONTENT
+                ]["status_code"],
+                API_PARTICULIER_RESPONSES[AdministrativeCriteriaKind.RSA][
+                    ApiParticulierResponseKind.UNPROCESSABLE_CONTENT
+                ]["json"],
                 None,
                 None,
             ),
@@ -133,7 +137,9 @@ class TestCertifyCriteriaApiParticulier:
     def test_ignores_api_particulier_internal_error(self, factory, respx_mock):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
-        response = RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR]
+        response = API_PARTICULIER_RESPONSES[AdministrativeCriteriaKind.RSA][
+            ApiParticulierResponseKind.PROVIDER_UNKNOWN_ERROR
+        ]
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
             status_code=response["status_code"], json=response["json"]
         )
@@ -154,7 +160,11 @@ class TestCertifyCriteriaApiParticulier:
     ):
         eligibility_diagnosis = factory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         criterion = eligibility_diagnosis.selected_administrative_criteria.get()
-        response = mutate_response(RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.PROVIDER_UNKNOWN_ERROR])
+        response = mutate_response(
+            API_PARTICULIER_RESPONSES[AdministrativeCriteriaKind.RSA][
+                ApiParticulierResponseKind.PROVIDER_UNKNOWN_ERROR
+            ]
+        )
         respx_mock.get("https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite").respond(
             status_code=response["status_code"], json=response["json"]
         )
