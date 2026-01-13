@@ -5,6 +5,7 @@ from data_inclusion.schema import v1 as data_inclusion_v1
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
+from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from tests.cities.factories import create_city_vannes
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -13,8 +14,7 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 
 @pytest.fixture(name="search_services_route")
 def search_services_route_fixture(respx_mock, settings):
-    settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr"
-    return respx_mock.route(url=f"{settings.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
+    return respx_mock.route(url=f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
         json={
             "items": [
                 {

@@ -1,11 +1,5 @@
-import random
-from urllib.parse import urljoin
-
-from data_inclusion.schema import v0 as data_inclusion_v0
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_not_required
-from django.core.cache import caches
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models.functions import Coalesce
 from django.http import Http404, HttpResponseRedirect
@@ -25,7 +19,6 @@ from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV0Client
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.auth import LoginNotRequiredMixin, check_request, check_user
 from itou.utils.pagination import pager
@@ -37,89 +30,6 @@ from itou.www.companies_views import forms as companies_forms
 
 
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
-
-DATA_INCLUSION_API_CACHE_PREFIX = "data_inclusion_api_results"
-
-
-def displayable_thematique(thematique):
-    """Remove the sub-themes (anything after the "--"), capitalize and use spaces instead of dashes."""
-    return thematique.split("--")[0].upper().replace("-", " ")
-
-
-def set_dora_utm_query_params(url: str) -> str:
-    utm_params = {"mtm_campaign": "LesEmplois", "mtm_kwd": "GeneriqueDecouvrirService"}
-    return add_url_params(url, params=utm_params)
-
-
-def get_dora_url(source, id, original_url=None):
-    if source == "dora" and original_url:
-        return original_url
-    return urljoin(settings.DORA_BASE_URL, f"/services/di--{source}--{id}")
-
-
-def get_data_inclusion_services(code_insee):
-    if not settings.API_DATA_INCLUSION_BASE_URL or not code_insee:
-        return []
-    cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{timezone.localdate()}"
-    cache = caches["failsafe"]
-    results = cache.get(cache_key)
-    if results is None:
-        client = DataInclusionApiV0Client(
-            settings.API_DATA_INCLUSION_BASE_URL,
-            settings.API_DATA_INCLUSION_TOKEN,
-        )
-        try:
-            raw_services = client.search_services(code_insee)
-        except DataInclusionApiException:
-            # 15 minutes seems like a reasonable amount of time for DI to get back on track
-            cache.set(cache_key, [], 60 * 15)
-            return []
-
-        services = []
-        for s in raw_services:
-            if s["modes_accueil"] != [data_inclusion_v0.ModeAccueil.EN_PRESENTIEL]:
-                continue
-            s["thematiques_display"] = {displayable_thematique(t) for t in s["thematiques"]}
-            s["dora_service_redirect_url"] = reverse(
-                "companies_views:dora_service_redirect",
-                kwargs={
-                    "source": s["source"],
-                    "service_id": s["id"],
-                },
-            )
-            services.append(s)
-
-        random.shuffle(services)
-
-        results = []
-        department = code_insee[:2]
-        if code_insee.startswith("97") or code_insee.startswith("98"):
-            department = code_insee[:3]
-        if department in ["59", "67"]:
-            for svc in services:
-                if svc["source"] == "soliguide":
-                    results.append(svc)
-                    services.remove(svc)
-                    break
-
-        while len(results) < 3 and services:
-            for service in services:
-                if service["thematiques_display"] - set().union(
-                    *[prev_service["thematiques_display"] for prev_service in results]
-                ):
-                    results.append(service)
-                    break
-            else:
-                results.append(services[0])
-            services.remove(results[-1])
-
-        random.shuffle(results)
-
-        # 6 hours is reasonable enough to get fresh results while still avoiding
-        # hitting the API too much. The API content is updated daily or hourly;
-        # we want changes to be propagated at a reasonable time.
-        cache.set(cache_key, results, 60 * 60 * 6)
-    return results
 
 
 def report_tally_url(user, company, job_description=None):
@@ -190,6 +100,8 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
             "back_url": back_url,
             "matomo_custom_title": "Détails de la fiche de poste",
             "code_insee": code_insee,
+            "di_widget_token": settings.API_DATA_INCLUSION_WIDGET_TOKEN,
+            "di_base_url": global_constants.API_DATA_INCLUSION_BASE_URL,
             "report_tally_url": report_tally_url(self.request.user, company, self.job_description),
             "job_app_to_transfer": None,
         }
@@ -597,6 +509,8 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
             "other_job_descriptions": other_job_descriptions,
             "matomo_custom_title": "Fiche de la structure d'insertion",
             "code_insee": self.company.insee_city.code_insee if self.company.insee_city else None,
+            "di_widget_token": settings.API_DATA_INCLUSION_WIDGET_TOKEN,
+            "di_base_url": global_constants.API_DATA_INCLUSION_BASE_URL,
             "siae_card_absolute_url": get_absolute_url(
                 reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
             ),
@@ -775,29 +689,3 @@ def update_admin_role(request, action, public_id, template_name="companies/updat
         success_url=reverse("companies_views:members"),
         template_name=template_name,
     )
-
-
-@login_not_required
-def hx_dora_services(request, code_insee, template_name="companies/hx_dora_services.html"):
-    context = {
-        "data_inclusion_services": get_data_inclusion_services(code_insee),
-        "dora_base_url": set_dora_utm_query_params(settings.DORA_BASE_URL),
-    }
-    return render(request, template_name, context)
-
-
-@login_not_required
-def dora_service_redirect(request, source: str, service_id: str) -> HttpResponseRedirect:
-    client = DataInclusionApiV0Client(
-        settings.API_DATA_INCLUSION_BASE_URL,
-        settings.API_DATA_INCLUSION_TOKEN,
-    )
-
-    try:
-        # No caching: we want to have a hit every time.
-        service = client.retrieve_service(source=source, id_=service_id)
-    except DataInclusionApiException:
-        raise Http404()
-
-    url = set_dora_utm_query_params(get_dora_url(source, service_id, service.get("lien_source", None)))
-    return HttpResponseRedirect(url)

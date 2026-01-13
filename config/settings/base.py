@@ -439,10 +439,8 @@ API_INSEE_PASSWORD = os.getenv("API_INSEE_PASSWORD")
 API_INSEE_SIRENE_URL = os.getenv("API_INSEE_SIRENE_URL")
 API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL")
 
-API_DATA_INCLUSION_BASE_URL = os.getenv("API_DATA_INCLUSION_BASE_URL")
 API_DATA_INCLUSION_TOKEN = os.getenv("API_DATA_INCLUSION_TOKEN")
-API_DATA_INCLUSION_SOURCES = os.getenv("API_DATA_INCLUSION_SOURCES")
-API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM = os.getenv("API_DATA_INCLUSION_SCORE_QUALITE_MINIMUM", 0.6)
+API_DATA_INCLUSION_WIDGET_TOKEN = os.getenv("API_DATA_INCLUSION_WIDGET_TOKEN")
 
 API_GEIQ_LABEL_BASE_URL = os.getenv("API_GEIQ_LABEL_BASE_URL")
 API_GEIQ_LABEL_TOKEN = os.getenv("API_GEIQ_LABEL_TOKEN")
@@ -736,6 +734,7 @@ CONTENT_SECURITY_POLICY = {
             "https://pilotage.inclusion.beta.gouv.fr",
             "https://communaute.inclusion.gouv.fr",
             "https://inclusion.beta.gouv.fr",
+            "https://api.data-inclusion.beta.gouv.fr",
             "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
             "data:",  # For downloading Metabase questions as PNG on Firefox etc
         ],
