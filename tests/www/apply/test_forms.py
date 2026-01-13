@@ -198,7 +198,7 @@ class TestAcceptForm:
 
 
 class TestJobApplicationAcceptFormInWizardWithGEIQFields:
-    def initialize_and_get_accept_contract_form_url(self, client, job_application):
+    def initialize_accept_session(self, client, job_application):
         accept_session = initialize_accept_session(
             client,
             {
@@ -207,7 +207,7 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
             },
         )
         accept_session.save()
-        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
+        return accept_session
 
     def test_save_geiq_form_fields_from_view(self, client, faker):
         # non-GEIQ accept case tests are in `tests_process.py`
@@ -225,7 +225,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         city = City.objects.order_by("?").first()
 
         client.force_login(job_application.to_company.members.first())
-        url_accept_contract = self.initialize_and_get_accept_contract_form_url(client, job_application)
+        accept_session = self.initialize_accept_session(client, job_application)
+        url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
 
         response = client.get(url_accept_contract)
         assert response.status_code == 200
@@ -275,7 +276,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         job_description = JobDescriptionFactory(company=job_application.to_company)
 
         client.force_login(job_application.to_company.members.first())
-        url_accept_contract = self.initialize_and_get_accept_contract_form_url(client, job_application)
+        accept_session = self.initialize_accept_session(client, job_application)
+        url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
 
         response = client.get(url_accept_contract)
         assert response.status_code == 200
@@ -321,7 +323,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         )
 
         client.force_login(job_application.to_company.members.first())
-        url_accept_contract = self.initialize_and_get_accept_contract_form_url(client, job_application)
+        accept_session = self.initialize_accept_session(client, job_application)
+        url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
 
         post_data = {
             "hiring_start_at": f"{faker.past_date(start_date='-1d'):%Y-%m-%d}",
@@ -358,7 +361,8 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         post_data |= {"hired_job": job_description.pk}
 
         client.force_login(job_application.to_company.members.first())
-        url_accept_contract = self.initialize_and_get_accept_contract_form_url(client, job_application)
+        accept_session = self.initialize_accept_session(client, job_application)
+        url_accept_contract = reverse("apply:accept_contract_infos", kwargs={"session_uuid": accept_session.name})
         response = client.post(url_accept_contract, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
