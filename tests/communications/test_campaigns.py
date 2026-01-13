@@ -73,12 +73,13 @@ class TestAnnouncementCampaignAdmin:
 
 
 class TestRenderAnnouncementCampaign:
+    MODAL_ID = "news-modal"
+
     @pytest.fixture(autouse=True)
     def empty_announcements_cache(self, empty_active_announcements_cache):
         pass
 
     def test_campaign_rendered_dashboard(self, client, snapshot):
-        MODAL_ID = "news-modal"
         campaign = AnnouncementCampaignFactory(max_items=3, start_date=date.today().replace(day=1), live=True)
         user = random_user_kind_factory()
         AnnouncementItemFactory(
@@ -95,16 +96,29 @@ class TestRenderAnnouncementCampaign:
         )
 
         response = client.get(reverse("search:employers_home"))
-        assertNotContains(response, MODAL_ID)
+        assertNotContains(response, self.MODAL_ID)
 
         client.force_login(user)
         response = client.get(reverse("search:employers_home"))
-        assertContains(response, MODAL_ID)
+        assertContains(response, self.MODAL_ID)
 
-        content = parse_response_to_soup(response, f"#{MODAL_ID}")
+        content = parse_response_to_soup(response, f"#{self.MODAL_ID}")
         assert pretty_indented(content) == snapshot
         assert len(content.select("li > div")) == 3
         assert "Item D" not in str(content)
+
+    def test_campaign_rendering_logged_in_logged_out(self, client):
+        AnnouncementCampaignFactory(with_items_for_every_user_kind=True)
+
+        client.force_login(random_user_kind_factory())
+        response = client.get(
+            reverse("dashboard:index"), follow=True
+        )  # Follow redirection if job seeker is missing infos
+        assertContains(response, self.MODAL_ID)
+
+        client.logout()
+        response = client.get(reverse("search:employers_home"))
+        assertNotContains(response, self.MODAL_ID)
 
     def test_campaign_not_rendered_without_items(self, client):
         AnnouncementCampaignFactory()
