@@ -24,6 +24,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
+from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV1Client
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
@@ -397,7 +398,7 @@ def search_services_results(request, template_name="search/services/results.html
         cached_data = caches["failsafe"].get(cache_key)
         if cached_data is None:
             client = DataInclusionApiV1Client(
-                settings.API_DATA_INCLUSION_BASE_URL,
+                global_constants.API_DATA_INCLUSION_BASE_URL,
                 settings.API_DATA_INCLUSION_TOKEN,
             )
             try:

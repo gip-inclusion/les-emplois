@@ -3,6 +3,7 @@ ITOU_HELP_CENTER_URL = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_HELP_CENTER_URL = "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 EMPLOIS_SITE_URL = "https://emplois.inclusion.beta.gouv.fr"
+API_DATA_INCLUSION_BASE_URL = "https://api.data.inclusion.gouv.fr"
 POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
 FRANCE_TRAVAIL_EMAIL_SUFFIX = "@francetravail.fr"
 
