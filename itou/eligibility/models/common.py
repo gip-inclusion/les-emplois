@@ -99,11 +99,10 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             return SenderKind(self.sender_kind).label
 
     def schedule_certification(self):
-        if settings.API_PARTICULIER_TOKEN:
-            for criterion in self.selected_administrative_criteria.filter(
-                administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
-            ):
-                async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
+        for criterion in self.selected_administrative_criteria.filter(
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier()
+        ):
+            async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
