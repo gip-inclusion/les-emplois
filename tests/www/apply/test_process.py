@@ -2212,12 +2212,12 @@ class TestProcessViews:
 
     def test_display_referent_info_for_company(self, client, snapshot):
         job_seeker = JobSeekerFactory(for_snapshot=True)
-        company = CompanyFactory(for_snapshot=True, with_membership=True)
+        company = CompanyFactory(with_membership=True)
 
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
-            sent_by_another_employer=True,
+            sent_by_company=True,
         )
         employer = job_application.to_company.members.first()
         client.force_login(employer)
@@ -2235,31 +2235,49 @@ class TestProcessViews:
             member=employer,
             started_at=datetime.date(2024, 1, 1),
         )
+
         group = membership.follow_up_group
 
-        # Referent is present
+        # Referent is present but not displayed
         response = client.get(url)
         assertNotContains(response, no_referent_str)
+        assertNotContains(response, "<h3>Qui d'autre accompagne cet usager ?</h3>", html=True)
+
+        prescriber = PrescriberFactory(
+            membership=True,
+            for_snapshot=True,
+            membership__organization__name="Les Olivades",
+            membership__organization__authorized=True,
+        )
+
+        membership = FollowUpGroupMembershipFactory(
+            follow_up_group=group,
+            member=prescriber,
+            started_at=datetime.date(2025, 1, 1),
+        )
+
+        # Referent is present but and displayed
+        response = client.get(url)
 
         content = parse_response_to_soup(
             response,
-            selector=f"#card-{membership.member.public_id}",
+            selector=f"#card-{prescriber.public_id}",
             replace_in_attr=[
                 ("href", f"/gps/groups/{group.pk}/memberships", "/gps/groups/[PK of FollowUpGroup]"),
                 ("href", f"/gps/groups/{group.pk}/edition", "/gps/groups/[PK of FollowUpGroup]/edition"),
-                ("id", f"card-{employer.public_id}", "card-[Public ID of prescriber]"),
+                ("id", f"card-{prescriber.public_id}", "card-[Public ID of prescriber]"),
                 (
                     "hx-post",
-                    f"/gps/display/{group.pk}/{employer.public_id}/phone",
+                    f"/gps/display/{group.pk}/{prescriber.public_id}/phone",
                     "/gps/display/[PK of group]/[Public ID of participant]/phone",
                 ),
                 (
                     "hx-post",
-                    f"/gps/display/{group.pk}/{employer.public_id}/email",
+                    f"/gps/display/{group.pk}/{prescriber.public_id}/email",
                     "/gps/display/[PK of group]/[Public ID of participant]/email",
                 ),
-                ("id", f"phone-{employer.pk}", "phone-[PK of participant]"),
-                ("id", f"email-{employer.pk}", "email-[PK of participant]"),
+                ("id", f"phone-{prescriber.pk}", "phone-[PK of participant]"),
+                ("id", f"email-{prescriber.pk}", "email-[PK of participant]"),
             ],
         )
 
