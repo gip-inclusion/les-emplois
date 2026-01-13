@@ -2647,7 +2647,7 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.usefixtures("api_particulier_settings")
     @freeze_time("2024-09-11")
     def test_select_other_job_description_for_job_application(self, client, mocker):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3404,7 +3404,7 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3501,7 +3501,7 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3554,7 +3554,7 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3610,7 +3610,7 @@ class TestProcessAcceptViewsInWizard:
     @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
-        criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
+        criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
         mocked_request = mocker.patch(
             "itou.utils.apis.api_particulier._request",
             return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
@@ -3630,7 +3630,7 @@ class TestProcessAcceptViewsInWizard:
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
-            administrative_criteria__kind__in=CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
+            administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
             eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
         ).all()
 
