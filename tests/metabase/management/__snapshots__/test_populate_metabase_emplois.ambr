@@ -7385,7 +7385,7 @@
 # ---
 # name: test_populate_users
   dict({
-    'num_queries': 17,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -7433,7 +7433,7 @@
         ]),
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_utilisateurs_v0" ("id" integer,"email" varchar,"type" varchar,"prenom" varchar,"nom" varchar,"dernière_connexion" timestamp WITH TIME ZONE,
-                                                                                                                                                                                  "date_mise_à_jour_metabase" date)
+                                                                                                                                                                                  "date_inscription" date,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -7489,6 +7489,15 @@
           'Command.execute[utils/command.py]',
         ]),
         'sql': 'COMMENT ON COLUMN "z_new_utilisateurs_v0"."dernière_connexion" IS \'dernière connexion\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_users[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': 'COMMENT ON COLUMN "z_new_utilisateurs_v0"."date_inscription" IS \'date d’inscription\'',
       }),
       dict({
         'origin': list([
@@ -7565,6 +7574,7 @@
                                         "prenom",
                                         "nom",
                                         "dernière_connexion",
+                                        "date_inscription",
                                         "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',
