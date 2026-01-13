@@ -13,7 +13,6 @@ from huey.exceptions import RetryTask
 from itou.users.enums import IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification
 from itou.utils.apis import api_particulier
-from itou.utils.enums import ItouEnvironment
 from itou.utils.types import InclusiveDateRange
 
 
@@ -21,11 +20,8 @@ logger = logging.getLogger("APIParticulierClient")
 
 
 def certify_criterion_with_api_particulier(criterion):
-    if settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV:
-        logging.info(
-            "API particulier is not configured in %s, certification was skipped.",
-            settings.ITOU_ENVIRONMENT,
-        )
+    if settings.API_PARTICULIER_BASE_URL is None:
+        logging.info("API particulier is not configured, certification was skipped.")
         return
     job_seeker = criterion.eligibility_diagnosis.job_seeker
     if not api_particulier.has_required_info(job_seeker):
