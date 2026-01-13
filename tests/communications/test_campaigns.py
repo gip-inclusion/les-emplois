@@ -108,6 +108,8 @@ class TestRenderAnnouncementCampaign:
 
     def test_campaign_not_rendered_without_items(self, client):
         AnnouncementCampaignFactory()
+        user = random_user_kind_factory()
+        client.force_login(user)
 
         response = client.get(reverse("search:employers_home"))
         assert response.status_code == 200
@@ -116,6 +118,8 @@ class TestRenderAnnouncementCampaign:
 
     def test_campaign_not_rendered_draft(self, client):
         AnnouncementCampaignFactory(live=False, with_item=True)
+        user = random_user_kind_factory()
+        client.force_login(user)
 
         response = client.get(reverse("search:employers_home"))
         assert response.status_code == 200
