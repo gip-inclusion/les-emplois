@@ -4,7 +4,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.asp.models import Commune
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
+from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.utils.apis import api_particulier
 from itou.utils.mocks.api_particulier import (
@@ -44,7 +44,7 @@ def test_build_params_from(snapshot):
         pytest.param(GEIQEligibilityDiagnosisFactory, id="geiq"),
     ],
 )
-@pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+@pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
 @freeze_time("2025-01-06")
 def test_not_certified(criteria_kind, factory, respx_mock, caplog):
     eligibility_diagnosis = factory(

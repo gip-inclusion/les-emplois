@@ -458,7 +458,7 @@ def test_certifiable(AdministrativeCriteriaClass):
 @pytest.mark.parametrize(
     "EligibilityDiagnosisFactory", [IAEEligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory]
 )
-@pytest.mark.parametrize("criteria_kind", CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS)
+@pytest.mark.parametrize("criteria_kind", AdministrativeCriteriaKind.certifiable_by_api_particulier())
 @freeze_time("2024-09-12")
 def test_certify_criterion(mocker, EligibilityDiagnosisFactory, criteria_kind):
     mocker.patch(
