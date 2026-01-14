@@ -6,8 +6,8 @@
 
 {% enums "companies" "CompanyKind" as CompanyKind %}
 
-<div class="c-form" id="acceptFormDiv">
-    <form id="acceptForm" method="post" hx-post="{{ request.get_full_path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">
+<div class="c-form">
+    <form method="post" class="js-format-nir">
         {% if has_form_error %}
             <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
                 <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>

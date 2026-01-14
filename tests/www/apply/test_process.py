@@ -2515,48 +2515,17 @@ class TestProcessAcceptViewsInWizard:
             reset_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         contract_info_url = self.get_contract_info_step_url(session_uuid)
         response = client.get(contract_info_url)
-        assertContains(response, "Confirmation de l’embauche")
         if with_previous_step:
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
             assertContains(response, BACK_BUTTON_ARIA_LABEL)
         else:
             assertContains(response, LINK_RESET_MARKUP % reset_url)
             assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
-        # Make sure modal is hidden.
-        assert response.headers.get("HX-Trigger") is None
 
         post_data = self._accept_contract_post_data(job_application=job_application, post_data=post_data)
-        response = client.post(contract_info_url, headers={"hx-request": "true"}, data=post_data)
-
+        response = client.post(contract_info_url, data=post_data)
         if assert_successful:
-            # Easier to debug than just a « sorry, the modal goes on a strike ».
-            if response.context["has_form_error"]:
-                forms = [
-                    response.context["form_accept"],
-                    response.context["form_user_address"],
-                    response.context["form_personal_data"],
-                    response.context.get("form_birth_place"),
-                ]
-                for form in forms:
-                    if form:
-                        logger.error(f"{form.errors=}")
-            assert not response.context["has_form_error"]
-            assert (
-                response.headers["HX-Trigger"] == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-            )
-        else:
-            assert response.headers.get("HX-Trigger") is None
-
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(contract_info_url, headers={"hx-request": "true"}, data=post_data)
-        # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
-        # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
-        # I guess it's normal as it's an AJAX response.
-        # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
-        if assert_successful:
-            assertRedirects(
-                response, self.get_confirm_step_url(session_uuid), status_code=200, fetch_redirect_response=False
-            )
+            assertRedirects(response, self.get_confirm_step_url(session_uuid), fetch_redirect_response=False)
         return response
 
     def confirm_step(self, client, session_uuid, *, reset_url, assert_successful=True):
@@ -2723,21 +2692,8 @@ class TestProcessAcceptViewsInWizard:
         city = City.objects.order_by("?").first()
         appellation = Appellation.objects.get(rome_id="M1805")
         post_data |= {"location": city.pk, "appellation": appellation.pk}
-        response = client.post(
-            contract_infos_url,
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assertTemplateUsed(response, "apply/includes/job_application_accept_form.html")
-        assert response.status_code == 200
-
-        # Modal window
-        post_data |= {"confirmed": True}
-        response = client.post(contract_infos_url, data=post_data, follow=False, headers={"hx-request": "true"})
-        # Caution: should redirect after that point, but done via HTMX we get a 200 status code
-        assertRedirects(
-            response, self.get_confirm_step_url(session_uuid), status_code=200, fetch_redirect_response=False
-        )
+        response = client.post(contract_infos_url, data=post_data)
+        assertRedirects(response, self.get_confirm_step_url(session_uuid), fetch_redirect_response=False)
         self.confirm_step(
             client,
             session_uuid,
@@ -4083,7 +4039,6 @@ class TestFillJobSeekerInfosForAccept:
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
             "answer": "",
-            "confirmed": True,
         }
         if job_application.to_company.kind == CompanyKind.GEIQ:
             create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)  # For hired_job field
@@ -4101,12 +4056,10 @@ class TestFillJobSeekerInfosForAccept:
         response = client.post(
             reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
             data=post_data,
-            headers={"hx-request": "true"},
         )
         assertRedirects(
             response,
             reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}),
-            status_code=200,
         )
         response = client.post(reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}))
         assertRedirects(
@@ -5668,7 +5621,7 @@ def test_htmx_reload_contract_type_and_options_in_wizard(client):
         "answer": "",
     }
     response = client.post(contract_url, data=data)
-    form_soup = parse_response_to_soup(response, selector="#acceptForm")
+    form_soup = parse_response_to_soup(response, selector=".c-form > form")
 
     # Update form soup with htmx call
     reload_url = reverse(
@@ -5687,7 +5640,7 @@ def test_htmx_reload_contract_type_and_options_in_wizard(client):
 
     # Check that a complete re-POST returns the exact same form
     response = client.post(contract_url, data=data)
-    reloaded_form_soup = parse_response_to_soup(response, selector="#acceptForm")
+    reloaded_form_soup = parse_response_to_soup(response, selector=".c-form > form")
     assertSoupEqual(form_soup, reloaded_form_soup)
 
 

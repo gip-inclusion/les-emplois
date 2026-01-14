@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
-from django.template.response import TemplateResponse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.generic import FormView, TemplateView
@@ -19,7 +18,6 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
-from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -201,11 +199,6 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
         context["hire_process"] = self.job_application is None
         return context
 
-    def get_template_names(self):
-        if self.request.htmx:
-            return "apply/includes/job_application_accept_form.html"
-        return super().get_template_names()
-
     def missing_or_invalid_job_seeker_infos(self):
         other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
         return bool(other_forms and not all([form.is_valid() for form in other_forms.values()]))
@@ -227,18 +220,10 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
             context = self.get_context_data(**kwargs)
             return self.render_to_response(context)
 
-        if request.htmx and not request.POST.get("confirmed"):
-            return TemplateResponse(
-                request=request,
-                template="apply/includes/job_application_accept_form.html",
-                context=self.get_context_data(),
-                headers=hx_trigger_modal_control("js-confirmation-modal", "show"),
-            )
-
         # Store accept form data in session
         session = self.get_session()
         session.set("contract_form_data", self.forms["accept"].cleaned_data)
-        return HttpResponseClientRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, TemplateView):
