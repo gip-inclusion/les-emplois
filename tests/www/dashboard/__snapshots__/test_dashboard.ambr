@@ -1318,8 +1318,8 @@
                                               Admin
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
+                                      <div class="px-3 px-lg-4">
+                                          <p class="d-flex justify-content-between align-items-center mb-3 mb-lg-5">
                                               <a class="btn-link btn-ico" href="/admin/">
                                                   <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
                                                   </i>
@@ -1338,34 +1338,47 @@
                                               Exports de données
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/staff/export-job-applications-unknown-to-ft">
-                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Candidatures inconnues de France Travail
-                                                  </span>
-                                              </a>
-                                          </p>
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/staff/export-ft-api-rejections">
-                                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Rejets de l'API FranceTravail
-                                                  </span>
-                                              </a>
-                                          </p>
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/staff/export-cta">
-                                                  <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Export des prescripteurs et employeurs
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="px-3 px-lg-4">
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/export-job-applications-unknown-to-ft">
+                                                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Candidatures inconnues de France Travail
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/export-ft-api-rejections">
+                                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Rejets de l'API FranceTravail
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/export-cta">
+                                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Export des prescripteurs et employeurs
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://stats.inclusion.beta.gouv.fr/auth/login?redirect=%2Fquestion%2F7519-utilisateurs-institutionnels" rel="noopener" target="_blank">
+                                                      <i aria-hidden="true" class="ri-list-check-3 ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Liste des utilisateurs institutionnels
+                                                      </span>
+                                                      <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+                                                      </i>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
@@ -1376,25 +1389,27 @@
                                               Actions
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/staff/merge-users">
-                                                  <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Fusion de comptes
-                                                  </span>
-                                              </a>
-                                          </p>
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/staff/import-aci-convergence-phc">
-                                                  <i aria-hidden="true" class="ri-upload-line ri-lg fw-normal">
-                                                  </i>
-                                                  <span>
-                                                      Import ACI Convergence / PHC
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="px-3 px-lg-4">
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/merge-users">
+                                                      <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Fusion de comptes
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/import-aci-convergence-phc">
+                                                      <i aria-hidden="true" class="ri-upload-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Import ACI Convergence / PHC
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
@@ -1405,16 +1420,18 @@
                                               Statistiques
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                                  </i>
-                                                  <span>
-                                                      Indicateurs à suivre
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="px-3 px-lg-4">
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
+                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                      </i>
+                                                      <span>
+                                                          Indicateurs à suivre
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
@@ -1475,8 +1492,8 @@
                                               Admin
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
+                                      <div class="px-3 px-lg-4">
+                                          <p class="d-flex justify-content-between align-items-center mb-3 mb-lg-5">
                                               <a class="btn-link btn-ico" href="/admin/">
                                                   <i aria-hidden="true" class="ri-key-2-line ri-lg fw-normal">
                                                   </i>
@@ -1495,16 +1512,18 @@
                                               Statistiques
                                           </span>
                                       </div>
-                                      <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                                          <p class="mb-3 mb-lg-5">
-                                              <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
-                                                  <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
-                                                  </i>
-                                                  <span>
-                                                      Indicateurs à suivre
-                                                  </span>
-                                              </a>
-                                          </p>
+                                      <div class="px-3 px-lg-4">
+                                          <ul class="list-unstyled mb-lg-5">
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/stats/staff/service_indicators">
+                                                      <i aria-hidden="true" class="ri-bar-chart-line ri-lg fw-normal align-self-start">
+                                                      </i>
+                                                      <span>
+                                                          Indicateurs à suivre
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
