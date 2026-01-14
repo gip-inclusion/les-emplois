@@ -4,23 +4,25 @@
             <div class="p-3 p-lg-4">
                 <span class="h4 m-0">Actions</span>
             </div>
-            <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-                {% if perms.users.merge_users %}
-                    <p class="mb-3 mb-lg-5">
-                        <a href="{% url 'itou_staff_views:merge_users' %}" class="btn-link btn-ico">
-                            <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Fusion de comptes</span>
-                        </a>
-                    </p>
-                {% endif %}
-                {% if perms.companies.import_aci_convergence_phc %}
-                    <p class="mb-3 mb-lg-5">
-                        <a href="{% url 'itou_staff_views:import_aci_convergence_phc' %}" class="btn-link btn-ico">
-                            <i class="ri-upload-line ri-lg fw-normal" aria-hidden="true"></i>
-                            <span>Import ACI Convergence / PHC</span>
-                        </a>
-                    </p>
-                {% endif %}
+            <div class="px-3 px-lg-4">
+                <ul class="list-unstyled mb-lg-5">
+                    {% if perms.users.merge_users %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'itou_staff_views:merge_users' %}" class="btn-link btn-ico">
+                                <i class="ri-key-2-line ri-lg fw-normal" aria-hidden="true"></i>
+                                <span>Fusion de comptes</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if perms.companies.import_aci_convergence_phc %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'itou_staff_views:import_aci_convergence_phc' %}" class="btn-link btn-ico">
+                                <i class="ri-upload-line ri-lg fw-normal" aria-hidden="true"></i>
+                                <span>Import ACI Convergence / PHC</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
