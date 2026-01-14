@@ -56,13 +56,14 @@ class UserAdapter(DefaultAccountAdapter):
         authenticated user.
         Tests are in itou.openid_connect.***.tests.
         """
-        redirect_url = reverse("search:employers_home")
+        redirect_url = get_safe_url(request, "redirect_url", fallback_url=reverse("search:employers_home"))
+
         # ProConnect
         pro_session = request.session.get(PRO_CONNECT_SESSION_KEY)
         if pro_session:
             token = pro_session["token"]
             if token:
-                params = {"token": token}
+                params = {"token": token, "redirect_url": redirect_url}
                 pro_connect_base_logout_url = reverse("pro_connect:logout")
                 return f"{pro_connect_base_logout_url}?{urlencode(params)}"
         # FranceConnect

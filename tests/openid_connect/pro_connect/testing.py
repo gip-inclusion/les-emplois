@@ -85,7 +85,11 @@ def mock_oauth_dance(
 
 
 def assert_and_mock_forced_logout(client, response, expected_redirect_url=reverse("search:employers_home")):
-    assertRedirects(response, reverse("pro_connect:logout") + "?token=123456", fetch_redirect_response=False)
+    expected_logout_url = add_url_params(
+        reverse("pro_connect:logout"),
+        {"redirect_url": expected_redirect_url, "token": "123456"},
+    )
+    assertRedirects(response, expected_logout_url, fetch_redirect_response=False)
     response = client.get(response.url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_LOGOUT)
     query_params = parse_qs(urlparse(response.url).query)
