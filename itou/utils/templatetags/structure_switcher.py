@@ -11,7 +11,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def structure_switcher(context, mobile):
+def structure_switcher(context, mode):
     try:
         request = context["request"]
         current_organization = getattr(request, "current_organization", None)
@@ -61,9 +61,10 @@ def structure_switcher(context, mobile):
             },
         }
         template_context.update(userkind_context[request.user.kind])
-        template_name = (
-            "layout/_structure_switcher_offcanvas.html" if mobile else "layout/_structure_switcher_nav.html"
-        )
+        template_name = {
+            "mobile": "layout/_structure_switcher_offcanvas.html",
+            "nav": "layout/_structure_switcher_nav.html",
+        }[mode]
         template = get_template(template_name)
         return template.render(template_context)
     except Exception as e:

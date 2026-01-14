@@ -27,7 +27,7 @@
                                     {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=False csrf_token=csrf_token only %}
                                 </div>
                             </li>
-                            {% structure_switcher mobile=False %}
+                            {% structure_switcher mode="nav" %}
                         </ul>
                     </nav>
                 </div>
@@ -43,7 +43,7 @@
 
     <div class="offcanvas" id="offcanvasNav" aria-label="Barre de navigation principale">
         <div class="offcanvas-header offcanvas-header--structure">
-            <div class="dropdown dropdown-structure flex-grow-1 py-4">{% structure_switcher mobile=True %}</div>
+            <div class="dropdown dropdown-structure flex-grow-1 py-4">{% structure_switcher mode="mobile" %}</div>
             <div class="border-start border-nuance-08 d-xl-none">
                 <button type="button" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
                     <i class="ri-close-line" aria-hidden="true"></i>
