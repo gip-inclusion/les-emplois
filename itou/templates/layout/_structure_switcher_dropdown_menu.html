@@ -1,4 +1,4 @@
-<form action="{% url 'dashboard:switch_organization' %}" method="post">
+<form action="{% url 'dashboard:switch_organization' %}?next_url={{ next_url|urlencode }}" method="post">
     {% csrf_token %}
     <ul class="list-unstyled">
         {% for org in organizations %}

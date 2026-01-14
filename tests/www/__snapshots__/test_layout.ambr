@@ -15,7 +15,7 @@
                   </strong>
               </button>
               <div class="dropdown-menu" id="switchStructureDropdownMobile">
-                  <form action="/dashboard/switch-organization" method="post">
+                  <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>
@@ -388,7 +388,7 @@
                   </span>
               </button>
               <div class="dropdown-menu w-100" id="switchStructureDropdown">
-                  <form action="/dashboard/switch-organization" method="post">
+                  <form action="/dashboard/switch-organization?next_url=/dashboard/" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>

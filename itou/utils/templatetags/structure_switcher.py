@@ -1,5 +1,6 @@
 from django import template
 from django.template.loader import get_template
+from django.urls import reverse
 
 from itou.companies.perms import can_create_antenna
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -24,6 +25,7 @@ def structure_switcher(context, mode):
             "organizations": organizations,
             "show_company_switcher_menu": len(organizations) >= 2 or create_antenna_perm,
             "user": request.user,
+            "next_url": reverse("dashboard:index"),
         }
         userkind_context = {
             UserKind.JOB_SEEKER: {
