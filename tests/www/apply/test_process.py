@@ -2492,7 +2492,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid,
         post_data=None,
         assert_successful=True,
-        next_url=None,
+        reset_url=None,
         with_previous_step=True,
     ):
         """
@@ -2503,15 +2503,16 @@ class TestProcessAcceptViewsInWizard:
         - POST: hide the modal and redirect to the next url.
 
         """
-        next_url = next_url or reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        if reset_url is None:
+            reset_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         contract_info_url = self.get_contract_info_step_url(session_uuid)
         response = client.get(contract_info_url)
         assertContains(response, "Confirmation de l’embauche")
         if with_previous_step:
-            assertContains(response, CONFIRM_RESET_MARKUP % next_url)
+            assertContains(response, CONFIRM_RESET_MARKUP % reset_url)
             assertContains(response, BACK_BUTTON_ARIA_LABEL)
         else:
-            assertContains(response, LINK_RESET_MARKUP % next_url)
+            assertContains(response, LINK_RESET_MARKUP % reset_url)
             assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
@@ -2545,8 +2546,8 @@ class TestProcessAcceptViewsInWizard:
         # I guess it's normal as it's an AJAX response.
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
-            assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
-        return response, next_url
+            assertRedirects(response, reset_url, status_code=200, fetch_redirect_response=False)
+        return response
 
     _nominal_cases = list(
         product(
@@ -2581,7 +2582,8 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
-        _, next_url = self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
+        response = self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
+        next_url = response.url
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
@@ -2632,9 +2634,7 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
-        _, next_url = self.fill_contract_info_step(
-            client, job_application, session_uuid, post_data=post_data, next_url=next_url
-        )
+        self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data, reset_url=next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.hiring_start_at == hiring_start_at
@@ -2781,7 +2781,7 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
-        response, _ = self.fill_contract_info_step(
+        response = self.fill_contract_info_step(
             client, job_application, session_uuid, post_data=post_data, assert_successful=False
         )
 
@@ -2794,7 +2794,7 @@ class TestProcessAcceptViewsInWizard:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
         }
-        response, _ = self.fill_contract_info_step(
+        response = self.fill_contract_info_step(
             client, job_application, session_uuid, post_data=post_data, assert_successful=False
         )
         assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
@@ -2826,7 +2826,7 @@ class TestProcessAcceptViewsInWizard:
                 "hiring_start_at": job_application.hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
             },
         )
-        response, _ = self.fill_contract_info_step(
+        response = self.fill_contract_info_step(
             client, job_application, session_uuid, post_data=post_data, assert_successful=False
         )
         assertFormError(
