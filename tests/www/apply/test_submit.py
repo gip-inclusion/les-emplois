@@ -3094,19 +3094,9 @@ class TestDirectHireFullProcess:
             "hiring_end_at": "",
             "answer": "",
         }
-        response = client.post(
-            contract_url,
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(contract_url, headers={"hx-request": "true"}, data=post_data)
+        response = client.post(contract_url, data=post_data)
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, confirmation_url, status_code=200, fetch_redirect_response=False)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
@@ -3301,19 +3291,9 @@ class TestDirectHireFullProcess:
             "qualification_level": QualificationLevel.LEVEL_4,
             "hired_job": company.job_description_through.first().pk,
         }
-        response = client.post(
-            contract_url,
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(contract_url, headers={"hx-request": "true"}, data=post_data)
+        response = client.post(contract_url, data=post_data)
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, confirmation_url, status_code=200, fetch_redirect_response=False)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
@@ -5639,17 +5619,8 @@ class TestFillJobSeekerInfosForHire:
                     "hired_job": JobDescriptionFactory(company=self.company).pk,
                 }
             )
-        response = client.post(
-            accept_contract_url,
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            confirmation_url,
-            status_code=200,
-            fetch_redirect_response=False,
-        )
+        response = client.post(accept_contract_url, data=post_data)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         response = client.post(confirmation_url)
         job_application = JobApplication.objects.select_related("job_seeker__jobseeker_profile").get(
             sender=self.company.members.first(), to_company=self.company
@@ -6155,22 +6126,10 @@ class TestHireContract:
             "answer": "",
         }
         response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            headers={"hx-request": "true"},
-            data=post_data,
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}), data=post_data
         )
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
-        assertRedirects(response, confirmation_url, status_code=200)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         response = client.get(confirmation_url)
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
@@ -6241,12 +6200,10 @@ class TestHireContract:
             "confirmed": "True",
         }
         response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}), data=post_data
         )
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
-        assertRedirects(response, confirmation_url, status_code=200)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         response = client.get(confirmation_url)
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
@@ -6295,22 +6252,10 @@ class TestHireContract:
             "qualification_level": QualificationLevel.LEVEL_4,
         }
         response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            data=post_data,
-            headers={"hx-request": "true"},
-        )
-        assert response.status_code == 200
-        assert (
-            response.headers.get("HX-Trigger") == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-        )
-        post_data = post_data | {"confirmed": "True"}
-        response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            headers={"hx-request": "true"},
-            data=post_data,
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}), data=post_data
         )
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
-        assertRedirects(response, confirmation_url, status_code=200)
+        assertRedirects(response, confirmation_url)
         response = client.get(confirmation_url)
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
@@ -6387,15 +6332,12 @@ class TestHireContract:
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
             "answer": "",
-            "confirmed": "True",
         }
         response = client.post(
-            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}),
-            headers={"hx-request": "true"},
-            data=post_data,
+            reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}), data=post_data
         )
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session.name})
-        assertRedirects(response, confirmation_url, status_code=200)
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         response = client.get(confirmation_url)
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
