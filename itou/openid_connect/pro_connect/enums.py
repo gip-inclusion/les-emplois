@@ -8,3 +8,4 @@ class ProConnectChannel(str, enum.Enum):
 
     INVITATION = "invitation"
     MAP_CONSEILLER = "map_conseiller"
+    NEXUS = "nexus"

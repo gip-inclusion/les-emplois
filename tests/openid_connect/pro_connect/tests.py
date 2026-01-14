@@ -30,7 +30,7 @@ from pytest_django.asserts import (
 )
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
-from itou.openid_connect.models import InvalidKindException
+from itou.openid_connect.models import InvalidKindException, RegisterForbiddenException
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.openid_connect.pro_connect.models import (
@@ -275,6 +275,14 @@ class TestProConnectModel:
                 pc_user_data.create_or_update_user()
 
             user.delete()
+
+    def test_login_only(self, pro_connect):
+        pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
+        with pytest.raises(RegisterForbiddenException):
+            pc_user_data.create_or_update_user(login_only=True)
+
+        PrescriberFactory(email=pc_user_data.email, identity_provider=users_enums.IdentityProvider.DJANGO)
+        pc_user_data.create_or_update_user(login_only=True)
 
 
 class TestProConnectAuthorizeView:
@@ -1063,3 +1071,27 @@ class TestProConnectMapChannel:
         response = client.post(reverse("account_logout"))
         pro_connect.assert_and_mock_forced_logout(client, response)
         assert get_user(client).is_authenticated is False
+
+
+class TestProConnectNexusChannel:
+    @respx.mock
+    def test_callback_existing_user(self, client, pro_connect):
+        PrescriberFactory(email=pro_connect.oidc_userinfo["email"])
+
+        pro_connect.mock_oauth_dance(
+            client,
+            UserKind.PRESCRIBER,
+            channel=ProConnectChannel.NEXUS.value,
+        )
+        assert get_user(client).is_authenticated is True
+
+    @respx.mock
+    def test_callback_new_user(self, client, pro_connect):
+        pro_connect.mock_oauth_dance(
+            client,
+            UserKind.PRESCRIBER,
+            channel=ProConnectChannel.NEXUS.value,
+            expected_redirect_url=reverse("search:employers_home"),  # Default previous url
+        )
+        assert get_user(client).is_authenticated is False
+        assert not User.objects.exists()

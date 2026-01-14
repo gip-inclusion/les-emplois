@@ -21,6 +21,7 @@ from itou.openid_connect.models import (
     InactiveUserException,
     InvalidKindException,
     MultipleUsersFoundException,
+    RegisterForbiddenException,
 )
 from itou.openid_connect.pro_connect import constants
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
@@ -241,7 +242,10 @@ def pro_connect_callback(request):
         is_successful = False
 
     try:
-        user, _ = pc_user_data.create_or_update_user(enforce_kind=pro_connect_state.data.get("enforce_kind"))
+        user, _ = pc_user_data.create_or_update_user(
+            enforce_kind=pro_connect_state.data.get("enforce_kind"),
+            login_only=pro_connect_state.data["channel"] == ProConnectChannel.NEXUS,
+        )
     except InactiveUserException as e:
         logger.info("ProConnect login attempt with inactive user: %s", e.user)
         messages.error(request, e.format_message_html(IdentityProvider.PRO_CONNECT))
@@ -271,6 +275,17 @@ def pro_connect_callback(request):
             ),
         )
         user = e.users[0]
+    except RegisterForbiddenException:
+        messages.error(
+            request,
+            format_html(
+                "Vous n'avez pas encore de compte avec cette adresse e-mail. "
+                "Pour utiliser ce service, merci de vous créer un compte sur "
+                "<a href='{}'>les emplois de l’inclusion</a>",
+                reverse("signup:choose_user_kind"),
+            ),
+        )
+        return HttpResponseRedirect(pro_connect_state.data["previous_url"])
 
     code_safir_pole_emploi = user_data.get("custom", {}).get("structureTravail")
     # Only handle user creation for the moment, not updates.
