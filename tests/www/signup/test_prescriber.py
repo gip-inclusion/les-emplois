@@ -974,13 +974,9 @@ class TestProConnectPrescribersViewsExceptions:
         )
         # Follow the redirection.
         response = client.get(response.url)
-        assertRedirects(
-            response,
-            add_url_params(pro_connect.logout_url, {"token": 123456}),
-            fetch_redirect_response=False,
-        )
 
         # The user should be logged out and redirected to the home page.
+        pro_connect.assert_and_mock_forced_logout(client, response)
         assert not client.session.get(PRO_CONNECT_SESSION_KEY)
         assert not auth.get_user(client).is_authenticated
 
