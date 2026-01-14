@@ -1,14 +1,11 @@
 from django.urls import reverse
+from itoutils.urls import add_url_params
+from pytest_django.asserts import assertRedirects
 
-from tests.companies.factories import (
-    CompanyFactory,
-)
+from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.prescribers import factories as prescribers_factories
-from tests.users.factories import (
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 class TestSwitchCompany:
@@ -119,6 +116,22 @@ class TestSwitchCompany:
 
         response = client.post(url, data={"organization_id": "Une entreprise entière"})
         assert response.status_code == 400
+
+    def test_switch_company_redirection(self, client):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        client.force_login(user)
+
+        related_company = CompanyFactory(with_membership=True)
+        related_company.members.add(user)
+
+        url = reverse("dashboard:switch_organization")
+        response = client.post(url, data={"organization_id": related_company.pk})
+        assertRedirects(response, reverse("dashboard:index"))
+
+        url = add_url_params(reverse("dashboard:switch_organization"), {"next_url": "/other_url"})
+        response = client.post(url, data={"organization_id": related_company.pk}, follow=False)
+        assertRedirects(response, "/other_url", fetch_redirect_response=False)
 
 
 class TestSwitchOrganization:
