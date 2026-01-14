@@ -71,6 +71,10 @@ class MultipleUsersFoundException(Exception):
         super().__init__(*args)
 
 
+class RegisterForbiddenException(Exception):
+    pass
+
+
 class OIDConnectQuerySet(models.QuerySet):
     def cleanup(self, at=None):
         at = at if at else timezone.now() - OIDC_STATE_CLEANUP
@@ -160,7 +164,7 @@ class OIDConnectUserData:
         if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and enforce_kind):
             raise InvalidKindException(user)
 
-    def create_or_update_user(self, *, enforce_kind=True):
+    def create_or_update_user(self, *, enforce_kind=True, login_only=False):
         """
         A user is being created or updated from information provided by an identity provider.
         A user is globally unique with the combination of SSO provider + sub (e.g. InclusionConnect:username).
@@ -205,6 +209,8 @@ class OIDConnectUserData:
                 # NB: if we already have a user with the same username but with a different email and a different
                 # provider the code will break here. We know it but since it's highly unlikely we just added a test
                 # on this behaviour. No need to do a fancy bypass if it's never used.
+                if login_only:
+                    raise RegisterForbiddenException
                 user = User.objects.create_user(**user_data_dict)
                 created = True
         else:
