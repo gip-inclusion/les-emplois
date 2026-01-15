@@ -12,9 +12,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
 
 env:
-  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
-  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
-  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/${{ vars.CLEVER_CLI_VERSION }}/clever-tools-${{ vars.CLEVER_CLI_VERSION }}_linux.tar.gz
+  CLEVER_TAR_FILE: clever-tools-${{ vars.CLEVER_CLI_VERSION }}_linux.tar.gz
+  CLEVER_CLI: clever-tools-${{ vars.CLEVER_CLI_VERSION }}_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   CLEVER_ORG_ID: orga_647d7c8e-c014-4346-b1cb-b97dc8fc6d25
