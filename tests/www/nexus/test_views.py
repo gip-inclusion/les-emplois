@@ -146,6 +146,11 @@ class TestHomePageView:
         assertContains(response, self.ACTIVATE_SERVICES_H2)
         assertNotContains(response, self.NEW_SERVICES_H2)
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestActivateMonRecapView:
     url = reverse("nexus:activate_mon_recap")
@@ -198,6 +203,11 @@ class TestCommunauteView:
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestDoraView:
     url = reverse("nexus:dora")
@@ -216,6 +226,11 @@ class TestDoraView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
 
 
 class TestEmploisViews:
@@ -255,6 +270,11 @@ class TestEmploisViews:
             == snapshot
         )
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestMarcheView:
     url = reverse("nexus:marche")
@@ -273,6 +293,11 @@ class TestMarcheView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
 
 
 class TestMonRecapView:
@@ -293,6 +318,11 @@ class TestMonRecapView:
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestPilotageView:
     url = reverse("nexus:pilotage")
@@ -312,6 +342,11 @@ class TestPilotageView:
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestStructuresView:
     url = reverse("nexus:structures")
@@ -323,6 +358,11 @@ class TestStructuresView:
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
 
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
 
 class TestContactView:
     url = reverse("nexus:contact")
@@ -333,3 +373,25 @@ class TestContactView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_anonymous(self, client):
+        # Don't redirect to les emplois default login page
+        response = client.get(self.url)
+        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
+
+
+class TestLoginView:
+    def test_authenticated(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(reverse("nexus:login"))
+        assertRedirects(response, reverse("nexus:homepage"))
+
+    def test_anonymous(self, client, pro_connect, snapshot):
+        response = client.get(reverse("nexus:login"))
+        soup = parse_response_to_soup(response, "#main")
+        for a_tags in soup.find_all("a", attrs={"href": True}):
+            if a_tags["href"].startswith("/static/pdf/syntheseSecurite"):
+                a_tags["href"] = "/static/pdf/syntheseSecurite.pdf"  # Normalize href for CI
+        assert pretty_indented(soup) == snapshot

@@ -2,15 +2,20 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
-from django.urls import reverse
+from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
 from itou.nexus.utils import build_user, serialize_user
+from itou.openid_connect.pro_connect.enums import ProConnectChannel
+from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils.enums import ItouEnvironment
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 from itou.utils.urls import get_absolute_url
@@ -21,8 +26,13 @@ logger = logging.getLogger(__name__)
 TALLY_URL = "https://tally.so/embed/Bza9Je?dynamicHeight=1"
 
 
+# All class using this mixin will redirect unauthenticated users to nexus login page
+@method_decorator(login_required(login_url=reverse_lazy("nexus:login")), name="dispatch")
 class NexusMixin:
     menu = None
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -199,3 +209,27 @@ class ContactView(NexusMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["tally_url"] = TALLY_URL
         return context
+
+
+@login_not_required
+def login(request, template_name="nexus/login.html"):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("nexus:homepage"))
+
+    params = {
+        # we don't care which kind is chosen since we only allow login and both kinds are commutable
+        "user_kind": UserKind.PRESCRIBER,
+        "previous_url": request.get_full_path(),
+        "channel": ProConnectChannel.NEXUS,
+        "next_url": reverse("nexus:homepage"),
+    }
+    pro_connect_url = reverse("pro_connect:authorize", query=params) if settings.PRO_CONNECT_BASE_URL else None
+    return render(
+        request,
+        template_name,
+        context={
+            "pro_connect_url": pro_connect_url,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
+            "tally_url": TALLY_URL,
+        },
+    )

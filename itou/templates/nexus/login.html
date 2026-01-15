@@ -1,0 +1,40 @@
+{% extends "nexus/layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load theme_inclusion %}
+
+{% block title %}Connexion {{ block.super }}{% endblock %}
+
+{% block content %}
+    <section class="s-section-nx-connect">
+        <div class="s-section-nx-connect__form">
+            <div class="c-title">
+                <div class="c-title__main">
+                    <h1>Se connecter</h1>
+                </div>
+            </div>
+            <hr>
+            {% bootstrap_messages %}
+            <div class="my-auto d-flex flex-column align-items-center">
+                <div class="mb-3 mb-md-4">
+                    <img src="{% static_theme_images 'logo-nexus.png' %}" class="img-fluid" alt="">
+                </div>
+                <div class="c-box bg-light mb-3">
+                    <h2 class="h4 mb-md-4">Veuillez vous identifier avec ProConnect pour continuer</h2>
+                    {% include "pro_connect/includes/button.html" with login=True %}
+                </div>
+                <a href="{{ tally_url }}" class="btn btn-link">
+                    <span>Besoin d'aide ?</span>
+                </a>
+            </div>
+            <div id="footer" class="mt-auto s-footer-legal">{% include "layout/_footer_legal_content.html" with no_mb=True %}</div>
+        </div>
+        <div class="s-section-nx-connect__bg">
+            <div>
+                <strong class="d-block mb-4">BIENVENUE</strong>
+                <h2 class="h1">Tous les services de la Plateforme de l’inclusion, à un seul endroit.</h2>
+                <hr class="my-4">
+                <p>Vous facilitez l’insertion professionnelle pour tous, nous vous y aidons</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
