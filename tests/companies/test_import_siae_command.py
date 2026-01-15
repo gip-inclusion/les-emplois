@@ -31,7 +31,7 @@ from itou.companies.management.commands._import_siae.vue_structure import (
     get_siret_to_siae_row,
     get_vue_structure_df,
 )
-from itou.companies.models import Company, SiaeConvention
+from itou.companies.models import Company, SiaeConvention, SiaeFinancialAnnex
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
@@ -164,11 +164,20 @@ class TestImportSiaeManagementCommands:
         existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
         # Get AF created by SiaeConventionFactory
         deletable_af = existing_convention.financial_annexes.first()
+        # and create an existing AF that should not be modified
+        existing_af = existing_convention.financial_annexes.create(
+            number="ACI972180023A0M0",
+            state=SiaeFinancialAnnex.STATE_ARCHIVED,
+            start_at=datetime.date(2018, 7, 1),
+            end_at=datetime.date(2018, 12, 31),
+        )
+        af_updated_at = existing_af.updated_at
         to_create, to_delete = get_creatable_and_deletable_afs(af_number_to_row)
+        existing_af.refresh_from_db()
+        assert existing_af.updated_at == af_updated_at  # No update should have happened
         assert to_delete == [deletable_af]
         # This list comes from the fixture file
         assert sorted((af.number, af.start_at.isoformat(), af.end_at.isoformat()) for af in to_create) == [
-            ("ACI972180023A0M0", "2018-07-01", "2018-12-31"),
             ("ACI972180023A0M1", "2018-07-01", "2018-12-31"),
             ("ACI972180024A0M0", "2018-07-01", "2018-12-31"),
             ("ACI972180024A0M1", "2018-07-01", "2018-12-31"),
