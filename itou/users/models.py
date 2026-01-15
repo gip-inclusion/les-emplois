@@ -476,11 +476,18 @@ class User(AbstractUser, AddressMixin):
 
         self.set_old_values()
 
+    # def get_full_name(self):
+    #     """
+    #     Return the first_name plus the last_name, with a space in between.
+    #     """
+    #     full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
+    #     return full_name.strip()[:70]
+
     def get_full_name(self):
         """
-        Return the first_name plus the last_name, with a space in between.
+        Return the last_name plus the first_name, with a space in between.
         """
-        full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
+        full_name = f"{self.last_name.upper()} {self.first_name.strip().title()}"
         return full_name.strip()[:70]
 
     def get_truncated_full_name(self):
