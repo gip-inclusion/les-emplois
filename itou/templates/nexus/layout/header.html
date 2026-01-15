@@ -27,7 +27,7 @@
                         <i class="ri-account-circle-line" aria-hidden="true"></i>
                         <span class="visually-hidden">{{ user_name }}</span>
                     </span>
-                    <a href="{{ zendesk_form_url }}" class="btn btn-lg btn-ico-only btn-nexus">
+                    <a href="{% url 'nexus:contact' %}" class="btn btn-lg btn-ico-only btn-nexus">
                         <i class="ri-question-line" aria-hidden="true"></i>
                         <span class="visually-hidden">Besoin d'aide ?</span>
                     </a>
@@ -141,7 +141,7 @@
                         </span>
                     </li>
                     <li>
-                        <a href="{{ zendesk_form_url }}" class="btn btn-lg btn-ico btn-nexus" aria-label="Besoin d'aide ?">
+                        <a href="{% url 'nexus:contact' %}" class="btn btn-lg btn-ico btn-nexus" aria-label="Besoin d'aide ?">
                             <i class="ri-question-line" aria-hidden="true"></i>
                             <span class="d-md-none d-xl-inline-flex">Besoin d'aide ?</span>
                         </a>

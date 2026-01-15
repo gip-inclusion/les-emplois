@@ -322,3 +322,14 @@ class TestStructuresView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestContactView:
+    url = reverse("nexus:contact")
+
+    def test_display(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot

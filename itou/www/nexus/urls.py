@@ -17,4 +17,5 @@ urlpatterns = [
     path("service/marche", views.MarcheView.as_view(), name="marche"),
     path("service/mon-recap", views.MonRecapView.as_view(), name="mon_recap"),
     path("service/pilotage", views.PilotageView.as_view(), name="pilotage"),
+    path("contact", views.ContactView.as_view(), name="contact"),
 ]

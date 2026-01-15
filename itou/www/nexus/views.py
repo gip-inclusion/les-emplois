@@ -18,8 +18,12 @@ from itou.utils.urls import get_absolute_url
 
 logger = logging.getLogger(__name__)
 
+TALLY_URL = "https://tally.so/embed/Bza9Je?dynamicHeight=1"
+
 
 class NexusMixin:
+    menu = None
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -49,7 +53,6 @@ class NexusMixin:
         context = super().get_context_data(**kwargs)
         context["activated_services"] = self.activated_services
         context["user_kind"] = self.user_kind
-        context["zendesk_form_url"] = ""  # FIXME: in a following commit
         context["logout_url"] = reverse("account_logout")  # FIXME: Redirect to nexus login page
         context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
         context["emplois_badge_count"] = None
@@ -187,3 +190,12 @@ class PilotageView(NexusMixin, TemplateView):
 class StructuresView(NexusMixin, TemplateView):
     template_name = "nexus/structures.html"
     menu = "structures"
+
+
+class ContactView(NexusMixin, TemplateView):
+    template_name = "nexus/contact.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tally_url"] = TALLY_URL
+        return context

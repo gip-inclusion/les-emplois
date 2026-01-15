@@ -138,6 +138,25 @@
   
   '''
 # ---
+# name: TestContactView.test_display
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col">
+                      <iframe data-tally-src="https://tally.so/embed/Bza9Je?dynamicHeight=1" frameborder="0" height="100%" marginheight="0" marginwidth="0" title="Formulaire de contact" width="100%">
+                      </iframe>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestDoraView.test_activated
   '''
   <main class="s-main" id="main" role="main">
@@ -2327,7 +2346,7 @@
                               John D
                           </span>
                       </span>
-                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
@@ -2457,7 +2476,7 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
@@ -2519,7 +2538,7 @@
                               John D
                           </span>
                       </span>
-                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
@@ -2649,7 +2668,7 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
@@ -2711,7 +2730,7 @@
                               John D
                           </span>
                       </span>
-                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
@@ -2841,7 +2860,7 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
@@ -2903,7 +2922,7 @@
                               John D
                           </span>
                       </span>
-                      <a class="btn btn-lg btn-ico-only btn-nexus" href="">
+                      <a class="btn btn-lg btn-ico-only btn-nexus" href="/portal/contact">
                           <i aria-hidden="true" class="ri-question-line">
                           </i>
                           <span class="visually-hidden">
@@ -3022,7 +3041,7 @@
                           </span>
                       </li>
                       <li>
-                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="">
+                          <a aria-label="Besoin d'aide ?" class="btn btn-lg btn-ico btn-nexus" href="/portal/contact">
                               <i aria-hidden="true" class="ri-question-line">
                               </i>
                               <span class="d-md-none d-xl-inline-flex">
