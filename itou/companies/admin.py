@@ -64,8 +64,8 @@ class JobsInline(ItouTabularInline):
 
 class FinancialAnnexesInline(ReadonlyMixin, ItouTabularInline):
     model = models.SiaeFinancialAnnex
-    fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
     readonly_fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
+    show_change_link = True
 
     ordering = (
         "-end_at",
