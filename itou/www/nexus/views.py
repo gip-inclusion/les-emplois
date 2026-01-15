@@ -50,8 +50,12 @@ class NexusMixin:
         context["logout_url"] = reverse("account_logout")  # FIXME: Redirect to nexus login page
         context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
         context["emplois_badge_count"] = None
-        if Service.EMPLOIS in self.activated_services:
-            context["emplois_badge_count"] = 0  # FIXME Replace with active job desctiptions
+        if Service.EMPLOIS in self.activated_services and self.user_kind == NexusUserKind.FACILITY_MANAGER:
+            # No job descriptions for prescribers : The user may have a facility manager role in another service
+            if self.request.user.is_employer:
+                context["emplois_badge_count"] = JobDescription.objects.filter(
+                    is_active=True, company_id__in=[company.pk for company in self.request.organizations]
+                ).count()
 
         # FIXME: Handle demo environments
         # It's always activated

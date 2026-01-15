@@ -99,7 +99,8 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
 
     def test_header_activated_badge(self, client, snapshot):
-        user = EmployerFactory(for_snapshot=True, membership=True)
+        user = EmployerFactory(for_snapshot=True)
+        company = CompanyMembershipFactory(user=user).company
         client.force_login(user)
 
         NexusUser.objects.update(source=Service.PILOTAGE)  # disable EMPLOIS service
@@ -107,6 +108,8 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="no_badge")
 
         NexusUserFactory(email=user.email, source=Service.EMPLOIS)
+        create_test_romes_and_appellations(["N1101"])
+        JobDescriptionFactory(company=company)
         NexusUserFactory(email=user.email, source=Service.DORA)
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
