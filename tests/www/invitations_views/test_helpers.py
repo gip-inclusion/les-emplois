@@ -1,7 +1,4 @@
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import RequestFactory
 
 from itou.www.invitations_views.helpers import accept_all_pending_invitations
 from tests.invitations.factories import (
@@ -10,26 +7,17 @@ from tests.invitations.factories import (
     PrescriberWithOrgInvitationFactory,
 )
 from tests.users.factories import EmployerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.tests import get_response_for_middlewaremixin
+from tests.utils.testing import get_request
 
 
 def test_anonymous_user():
-    request = RequestFactory()
-    request.user = AnonymousUser()
+    request = get_request(AnonymousUser())
     assert accept_all_pending_invitations(request) == 0
 
 
-def fake_request():
-    request = RequestFactory().get("/")
-    SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
-    MessageMiddleware(get_response_for_middlewaremixin).process_request(request)
-    return request
-
-
 def test_accept_prescriber_invitations():
-    request = fake_request()
     prescriber = PrescriberFactory()
-    request.user = prescriber
+    request = get_request(prescriber)
 
     valid_invitation_1 = PrescriberWithOrgInvitationFactory(email=prescriber.email)
     valid_invitation_2 = PrescriberWithOrgInvitationFactory(email=prescriber.email)
@@ -44,34 +32,32 @@ def test_accept_prescriber_invitations():
 
 
 def test_accept_employer_invitations():
-    request = fake_request()
-    prescriber = EmployerFactory()
-    request.user = prescriber
+    employer = EmployerFactory()
+    request = get_request(employer)
 
-    valid_invitation_1 = EmployerInvitationFactory(email=prescriber.email)
-    valid_invitation_2 = EmployerInvitationFactory(email=prescriber.email)
+    valid_invitation_1 = EmployerInvitationFactory(email=employer.email)
+    valid_invitation_2 = EmployerInvitationFactory(email=employer.email)
     # non pending invitations
-    EmployerInvitationFactory(email=prescriber.email, expired=True)
-    EmployerInvitationFactory(email=prescriber.email, accepted=True)
+    EmployerInvitationFactory(email=employer.email, expired=True)
+    EmployerInvitationFactory(email=employer.email, accepted=True)
     # other user kind invitations
-    PrescriberWithOrgInvitationFactory(email=prescriber.email)
-    LaborInspectorInvitationFactory(email=prescriber.email)
+    PrescriberWithOrgInvitationFactory(email=employer.email)
+    LaborInspectorInvitationFactory(email=employer.email)
 
     assert accept_all_pending_invitations(request) == [valid_invitation_1, valid_invitation_2]
 
 
 def test_accept_labor_inspector_invitations():
-    request = fake_request()
-    prescriber = LaborInspectorFactory()
-    request.user = prescriber
+    labor_inspector = LaborInspectorFactory()
+    request = get_request(labor_inspector)
 
-    valid_invitation_1 = LaborInspectorInvitationFactory(email=prescriber.email)
-    valid_invitation_2 = LaborInspectorInvitationFactory(email=prescriber.email)
+    valid_invitation_1 = LaborInspectorInvitationFactory(email=labor_inspector.email)
+    valid_invitation_2 = LaborInspectorInvitationFactory(email=labor_inspector.email)
     # non pending invitations
-    LaborInspectorInvitationFactory(email=prescriber.email, expired=True)
-    LaborInspectorInvitationFactory(email=prescriber.email, accepted=True)
+    LaborInspectorInvitationFactory(email=labor_inspector.email, expired=True)
+    LaborInspectorInvitationFactory(email=labor_inspector.email, accepted=True)
     # other user kind invitations
-    EmployerInvitationFactory(email=prescriber.email)
-    PrescriberWithOrgInvitationFactory(email=prescriber.email)
+    EmployerInvitationFactory(email=labor_inspector.email)
+    PrescriberWithOrgInvitationFactory(email=labor_inspector.email)
 
     assert accept_all_pending_invitations(request) == [valid_invitation_1, valid_invitation_2]

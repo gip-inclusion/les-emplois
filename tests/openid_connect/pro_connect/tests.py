@@ -12,12 +12,11 @@ import respx
 from dateutil.relativedelta import relativedelta
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages import Message
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -53,6 +52,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
+from tests.utils.testing import get_request
 
 
 class TestProConnectModel:
@@ -801,10 +801,7 @@ class TestProConnectSession:
                 assert key in pc_session_dict.keys()
                 assert pc_session_dict[key] is None
 
-        request = RequestFactory().get("/")
-        middleware = SessionMiddleware(lambda x: x)
-        middleware.process_request(request)
-        request.session.save()
+        request = get_request(AnonymousUser())
         pc_session.bind_to_request(request)
         assert request.session.get(constants.PRO_CONNECT_SESSION_KEY)
 

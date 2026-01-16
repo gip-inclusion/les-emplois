@@ -3,7 +3,6 @@ import random
 
 import pytest
 from django.template import Context
-from django.test.client import RequestFactory
 from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
@@ -29,6 +28,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.testing import get_request, load_template
 from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
@@ -209,9 +209,7 @@ class TestIAEEligibilityDetail:
             eligibility_diagnosis=diagnosis,
             hiring_start_at=datetime.date(2024, 8, 3),
         )
-        request = RequestFactory()
-        request.user = diagnosis.author
-        request.from_authorized_prescriber = diagnosis.author.is_prescriber_with_authorized_org_memberships
+        request = get_request(diagnosis.author)
         if diagnosis.is_from_employer:
             job_application.to_company = diagnosis.author_siae
             job_application.save()
@@ -309,9 +307,7 @@ class TestIAEEligibilityDetail:
         criterion = diagnosis.selected_administrative_criteria.get()
         certify_criterion_with_api_particulier(criterion)
         params = self.default_params(diagnosis)
-        request = RequestFactory()
-        request.user = diagnosis.job_seeker
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
 
@@ -332,9 +328,7 @@ class TestIAEEligibilityDetail:
         # Job seeker (on their dashboard)
         diagnosis = IAEEligibilityDiagnosisFactory(certifiable=True)
         params = self.default_params(diagnosis)
-        request = RequestFactory()
-        request.user = diagnosis.job_seeker
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("IAE") not in rendered
 
@@ -347,9 +341,9 @@ class TestGEIQEligibilityDetail:
         return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
 
     def default_params_geiq(self, diagnosis):
-        request = RequestFactory()
-        # Force the value to not have to deal with the template heavily relying on user.is_employer
-        request.from_authorized_prescriber = True
+        authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
+        # Use an authorized prescriber to not have to deal with the template heavily relying on user.is_employer
+        request = get_request(authorized_prescriber)
         return {
             "request": request,
             "diagnosis": diagnosis,
@@ -426,9 +420,7 @@ class TestGEIQEligibilityDetail:
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, criteria_kinds=[AdministrativeCriteriaKind.RSA])
         self.create_job_application(diagnosis)
         params = self.default_params_geiq(diagnosis)
-        request = RequestFactory()
-        request.user = diagnosis.job_seeker
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert CERTIFIED_HELP_TEXT not in rendered
 
@@ -440,9 +432,7 @@ class TestGEIQEligibilityDetail:
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True, from_prescriber=True)
         job_app = self.create_job_application(diagnosis)
         params = self.default_params_geiq(diagnosis)
-        request = RequestFactory()
-        request.user = diagnosis.author
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.author))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") in rendered
 
@@ -452,18 +442,14 @@ class TestGEIQEligibilityDetail:
         params = self.default_params_geiq(diagnosis) | {
             "job_application": job_app
         }  # Employers need infos from job_application
-        request = RequestFactory()
-        request.user = diagnosis.author
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.author))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") in rendered
 
         # Job seeker (on their dashboard)
         diagnosis = GEIQEligibilityDiagnosisFactory(certifiable=True)
         params = self.default_params_geiq(diagnosis)
-        request = RequestFactory()
-        request.user = diagnosis.job_seeker
-        params.update(request=request)
+        params.update(request=get_request(diagnosis.job_seeker))
         rendered = self.template.render(Context(params))
         assert situation_tooltip_text("GEIQ") not in rendered
 

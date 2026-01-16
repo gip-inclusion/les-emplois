@@ -259,7 +259,7 @@ def get_response_for_middlewaremixin(request):
     return HttpResponse()
 
 
-def get_request(user):
+def get_request(user, with_perms_middleware=True):
     from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 
     factory = RequestFactory()
@@ -267,7 +267,8 @@ def get_request(user):
     request.user = user
     SessionMiddleware(get_response_for_middlewaremixin)(request)
     MessageMiddleware(get_response_for_middlewaremixin)(request)
-    ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
+    if with_perms_middleware:
+        ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
     return request
 
 

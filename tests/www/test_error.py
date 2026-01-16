@@ -2,15 +2,15 @@ import types
 from unittest.mock import call
 
 import pytest
-from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.auth.models import AnonymousUser
 from django.middleware.csrf import CsrfViewMiddleware
-from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
 from itou.utils import constants as global_constants
 from itou.www.error import server_error
 from tests.companies.factories import CompanyFactory
+from tests.utils.testing import get_request
 from tests.utils.tests import get_response_for_middlewaremixin
 
 
@@ -61,10 +61,7 @@ def test_error_handling_ignores_nav_error(client, exc_count, mocker, user_factor
 
 
 def test_handler500_view():
-    factory = RequestFactory()
-    request = factory.get("/")
-    request.user = None
-    SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
+    request = get_request(AnonymousUser())
     CsrfViewMiddleware(get_response_for_middlewaremixin).process_request(request)
     response = server_error(request)
     assertContains(
