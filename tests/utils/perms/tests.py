@@ -1,7 +1,6 @@
 from functools import partial
 
 import pytest
-from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertRedirects
@@ -20,6 +19,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.testing import get_request
 
 
 @pytest.mark.parametrize(
@@ -77,7 +77,6 @@ class TestEmployeeRecord:
 
 class TestUtils:
     def test_can_edit_personal_information(self):
-        request = RequestFactory()
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
@@ -133,14 +132,12 @@ class TestUtils:
         }
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
-                request.user = locals()[user_type]
-                request.from_authorized_prescriber = request.user == authorized_prescriber
+                request = get_request(locals()[user_type])
                 assert can_edit_personal_information(request, locals()[other_user_type]) is expected, (
                     f"{user_type} can_edit_personal_information {other_user_type}"
                 )
 
     def test_can_view_personal_information(self):
-        request = RequestFactory()
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
         unauthorized_prescriber = PrescriberFactory()
         employer = CompanyFactory(with_membership=True).members.first()
@@ -184,8 +181,7 @@ class TestUtils:
         }
         for user_type, user_specs in specs.items():
             for other_user_type, expected in user_specs.items():
-                request.user = locals()[user_type]
-                request.from_authorized_prescriber = request.user == authorized_prescriber
+                request = get_request(locals()[user_type])
                 assert can_view_personal_information(request, locals()[other_user_type]) is expected, (
                     f"{user_type} can_view_personal_information {other_user_type}"
                 )

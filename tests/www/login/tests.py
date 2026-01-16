@@ -5,8 +5,8 @@ from urllib.parse import urlencode
 import pytest
 import respx
 from django.contrib import messages
+from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
-from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
 from django_otp.oath import TOTP
@@ -32,7 +32,7 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.testing import parse_response_to_soup, pretty_indented, reload_module
+from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented, reload_module
 
 
 PRO_CONNECT_BTN = 'class="proconnect-button"'
@@ -70,7 +70,8 @@ class TestItouLoginForm:
             "login": user.email,
             "password": DEFAULT_PASSWORD,
         }
-        form = ItouLoginForm(data=form_data, request=RequestFactory().get("/"))
+        request = get_request(AnonymousUser())
+        form = ItouLoginForm(data=form_data, request=request)
         assert not form.is_valid()
         assert "FranceConnect" in form.errors["__all__"][0]
 

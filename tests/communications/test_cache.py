@@ -4,7 +4,6 @@ from unittest import mock
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
-from django.test import RequestFactory
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
@@ -13,6 +12,7 @@ from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import JobSeekerFactory, random_user_kind_factory
+from tests.utils.testing import get_request
 
 
 class TestAnnouncementCampaignCache:
@@ -22,8 +22,7 @@ class TestAnnouncementCampaignCache:
 
     def test_active_announcement_campaign_context_processor_cached(self):
         campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
-        request = RequestFactory().get("/")
-        request.user = random_user_kind_factory()
+        request = get_request(random_user_kind_factory())
 
         with assertNumQueries(0):
             context = active_announcement_campaign(request)
@@ -63,8 +62,7 @@ class TestAnnouncementCampaignCache:
             assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
-        request = RequestFactory().get("/")
-        request.user = random_user_kind_factory()
+        request = get_request(random_user_kind_factory())
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
@@ -74,8 +72,7 @@ class TestAnnouncementCampaignCache:
             assert active_announcement_campaign(request) == {"display_campaign_announce": False}
 
     def test_costless_announcement_campaign_cache_for_anonymous_user(self):
-        request = RequestFactory().get("/")
-        request.user = AnonymousUser()
+        request = get_request(AnonymousUser())
 
         with assertNumQueries(0):
             assert active_announcement_campaign(request) == {"display_campaign_announce": False}
@@ -83,8 +80,7 @@ class TestAnnouncementCampaignCache:
     @freeze_time("2024-01-31")
     def test_active_announcement_campaign_cache_timeout(self):
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
-        request = RequestFactory().get("/")
-        request.user = random_user_kind_factory()
+        request = get_request(random_user_kind_factory())
 
         with assertNumQueries(0):
             assert active_announcement_campaign(request)["active_campaign_announce"] == campaign

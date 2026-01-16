@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Max
 from django.forms.models import model_to_dict
-from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -64,7 +63,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import excel_date_format, get_rows_from_streaming_response
+from tests.utils.testing import excel_date_format, get_request, get_rows_from_streaming_response
 
 
 def assertIn(subtext, whole_text):
@@ -2196,9 +2195,7 @@ class TestJobApplicationXlsxExport:
             with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
-        request = RequestFactory()
-        request.user = job_application.to_company.members.first()
-        request.from_authorized_prescriber = False
+        request = get_request(job_application.to_company.members.first())
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
@@ -2247,9 +2244,7 @@ class TestJobApplicationXlsxExport:
                 with_iae_eligibility_diagnosis=True,
             )
             job_application.accept(user=job_application.to_company.members.first())
-        request = RequestFactory()
-        request.user = job_application.to_company.members.first()
-        request.from_authorized_prescriber = False
+        request = get_request(job_application.to_company.members.first())
 
         assert job_seeker.approvals.last().is_in_waiting_period
 
@@ -2298,9 +2293,7 @@ class TestJobApplicationXlsxExport:
         )
         job_application.refuse(user=job_application.to_company.members.get())
 
-        request = RequestFactory()
-        request.user = job_application.to_company.members.first()
-        request.from_authorized_prescriber = False
+        request = get_request(job_application.to_company.members.first())
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
@@ -2358,9 +2351,7 @@ class TestJobApplicationXlsxExport:
             hiring_start_at=start,
             state=JobApplicationState.ACCEPTED,
         )
-        request = RequestFactory()
-        request.user = company.members.first()
-        request.from_authorized_prescriber = False
+        request = get_request(company.members.first())
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
@@ -2410,9 +2401,7 @@ class TestJobApplicationXlsxExport:
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        request = RequestFactory()
-        request.user = prescriber
-        request.from_authorized_prescriber = False
+        request = get_request(prescriber)
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename", request=request)
         assert get_rows_from_streaming_response(response) == [
