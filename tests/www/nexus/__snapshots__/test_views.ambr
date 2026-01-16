@@ -2105,7 +2105,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Commande de carnets
@@ -2284,7 +2284,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Commande de carnets
@@ -2463,7 +2463,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Commande de carnets
@@ -2631,7 +2631,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Commande de carnets
@@ -2702,6 +2702,134 @@
           </div>
       </div>
   </header>
+  
+  '''
+# ---
+# name: TestMonRecapView.test_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
+                                  Commande de carnet
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="Mon Récap" height="50" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" height="152" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-monrecap.png" width="216"/>
+                          </div>
+                          <h2 class="h3 mb-md-4">
+                              Commandez en quelques clics vos premiers carnets !
+                          </h2>
+                          <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
+                              <span>
+                                  Commander des carnets
+                              </span>
+                          </a>
+                          <br/>
+                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                              Découvrir Mon Récap
+                          </a>
+                          <div class="text-center">
+                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_monrecap.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: TestMonRecapView.test_not_activated
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
+                                  Commande de carnet
+                              </h1>
+                          </div>
+                          <div class="c-title__service d-none d-lg-block">
+                              <img alt="Mon Récap" height="50" src="/static/vendor/theme-inclusion/images/logo-monrecap.svg"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="text-center">
+                          <div class="mb-3 mb-md-4">
+                              <img alt="" height="152" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-monrecap.png" width="216"/>
+                          </div>
+                          <h2 class="h3">
+                              Le carnet papier retraçant le parcours d’insertion d’une personne
+                          </h2>
+                          <p class="mb-md-4">
+                              Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours.
+                              <br/>
+                              Facilitez votre accompagnement et communiquez entre professionnel grâce à un carnet commun.
+                              <br/>
+                              Choisissez un outil accessible non numérique.
+                          </p>
+                          <form action="/portal/activate_mon_recap" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <button class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                  <i aria-hidden="true" class="ri-toggle-line">
+                                  </i>
+                                  <span>
+                                      Activer ce service
+                                  </span>
+                              </button>
+                          </form>
+                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                              Découvrir Mon Récap
+                          </a>
+                          <div class="text-center">
+                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_monrecap.png" width="1200"/>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
   
   '''
 # ---

@@ -147,7 +147,7 @@ class TestActivateMonRecapView:
         client.force_login(user)
 
         response = client.post(self.url, follow=True)
-        assertRedirects(response, reverse("nexus:homepage"))  # FIXME redirect to service page
+        assertRedirects(response, reverse("nexus:mon_recap"))
         assertMessages(
             response,
             [
@@ -178,6 +178,25 @@ class TestCommunauteView:
     def test_activated(self, client, snapshot):
         user = PrescriberFactory()
         NexusUserFactory(email=user.email, source=Service.COMMUNAUTE, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestMonRecapView:
+    url = reverse("nexus:mon_recap")
+
+    def test_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.MON_RECAP, auth=Auth.PRO_CONNECT)
         client.force_login(user)
 
         response = client.get(self.url)

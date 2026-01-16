@@ -100,7 +100,7 @@ def activate_mon_recap(request):
     if request.method != "POST":
         raise Http404
 
-    next_url = reverse("nexus:homepage")
+    next_url = reverse("nexus:mon_recap")
     try:
         ActivatedService.objects.create(user=request.user, service=Service.MON_RECAP)
     except Exception:
@@ -115,3 +115,8 @@ def activate_mon_recap(request):
 class CommunauteView(NexusMixin, TemplateView):
     template_name = "nexus/communaute.html"
     service = Service.COMMUNAUTE
+
+
+class MonRecapView(NexusMixin, TemplateView):
+    template_name = "nexus/mon_recap.html"
+    service = Service.MON_RECAP
