@@ -232,7 +232,7 @@ class TestIAEEligibilityDetail:
 
     def test_diag_from_employer(self):
         diagnosis = IAEEligibilityDiagnosisFactory(
-            job_seeker__certifiable=True,
+            certifiable=True,
             from_employer=True,
             criteria_kinds=[random.choice(list(AdministrativeCriteriaKind.for_iae()))],
         )

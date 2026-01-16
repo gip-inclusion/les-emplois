@@ -550,10 +550,10 @@ class TestEditJobSeekerInfo:
         )
         selected_criteria = IAESelectedAdministrativeCriteriaFactory(
             # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+            eligibility_diagnosis__certifiable=True,
             eligibility_diagnosis__job_seeker__created_by=factory.SelfAttribute("..author"),
             eligibility_diagnosis__job_seeker__title=Title.M,
             eligibility_diagnosis__job_seeker__jobseeker_profile__nir="178121111111151",
-            eligibility_diagnosis__job_seeker__certifiable=True,
             eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=datetime.date(1978, 12, 1),
             criteria_certified=True,
         )
