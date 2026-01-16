@@ -29,7 +29,7 @@ def can_view_stats_dashboard_widget(request):
     It should be displayed to all professional users, even when no specific can_view_stats_* condition
     is available to them.
     """
-    return request.user.is_employer or request.user.is_prescriber or request.user.is_labor_inspector
+    return request.user.kind in UserKind.professionals()
 
 
 def can_view_stats_siae(request):
