@@ -167,16 +167,36 @@ class TestBaseNotification:
         assert not manageable_notification(self.user, self.organization).should_send()
         assert not manageable_non_applicable_notification(self.user, self.organization).should_send()
 
-    def test_method_get_context(self):
+    def test_method_get_context_prescriber(self):
         assert BaseNotification(self.user, self.organization).get_context() == {
             "user": self.user,
             "structure": self.organization,
             "forward_from_user": None,
+            "structure_label": "organisation",
         }
         assert BaseNotification(self.user, self.organization, kw1=1, kw2=2).get_context() == {
             "user": self.user,
             "structure": self.organization,
             "forward_from_user": None,
+            "structure_label": "organisation",
+            "kw1": 1,
+            "kw2": 2,
+        }
+
+    def test_method_get_context_employer(self):
+        user = EmployerFactory()
+        company = CompanyMembershipFactory(user=user).company
+        assert BaseNotification(user, company).get_context() == {
+            "user": user,
+            "structure": company,
+            "forward_from_user": None,
+            "structure_label": "structure",
+        }
+        assert BaseNotification(user, company, kw1=1, kw2=2).get_context() == {
+            "user": user,
+            "structure": company,
+            "forward_from_user": None,
+            "structure_label": "structure",
             "kw1": 1,
             "kw2": 2,
         }
