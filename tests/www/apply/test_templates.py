@@ -1,5 +1,6 @@
 import datetime
 import random
+from functools import partial
 
 import pytest
 from django.template import Context
@@ -29,7 +30,7 @@ from tests.job_applications.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.testing import get_request, load_template
 from tests.www.eligibility_views.utils import CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML
 
@@ -475,11 +476,18 @@ class TestCertifiedBadge:
         assertNotInHTML(CERTIFIED_BADGE_HTML, rendered)
         assertNotInHTML(NOT_CERTIFIED_BADGE_HTML, rendered)
 
-    @pytest.mark.parametrize("employer", [True, False])
-    @pytest.mark.parametrize("authorized_prescriber", [True, False])
+    @pytest.mark.parametrize(
+        "user_factory,displayed",
+        [
+            (EmployerFactory, True),
+            (partial(PrescriberFactory, membership__organization__authorized=True), True),
+            (PrescriberFactory, False),
+        ],
+        ids=["employer", "authorized_prescriber", "prescriber"],
+    )
     @pytest.mark.parametrize("is_certified", [True, False])
     def test_badge_is_only_displayed_to_employer_or_authorized_prescriber(
-        self, factory, employer, authorized_prescriber, is_certified
+        self, factory, user_factory, displayed, is_certified
     ):
         criteria_kind = random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))
         diagnosis = factory(
@@ -489,11 +497,9 @@ class TestCertifiedBadge:
         criterion.certified = is_certified
         criterion.certified_at = timezone.now()
 
-        rendered = self._render(
-            request={"user": {"is_employer": employer}, "from_authorized_prescriber": authorized_prescriber},
-            criterion=criterion,
-        )
-        if any([employer, authorized_prescriber]):
+        request = get_request(user_factory())
+        rendered = self._render(request=request, criterion=criterion)
+        if displayed:
             expected, not_expected = (
                 (CERTIFIED_BADGE_HTML, NOT_CERTIFIED_BADGE_HTML)
                 if is_certified
