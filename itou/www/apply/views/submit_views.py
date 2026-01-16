@@ -383,7 +383,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.sender.kind not in UserKind.actors():
             logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
@@ -681,7 +681,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         for employer in company_recipients:
             job_application.notifications_new_for_employer(employer).send()
         job_application.notifications_new_for_job_seeker.send()
-        if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.request.user.kind in UserKind.actors():
             job_application.notifications_new_for_proxy.send()
         return job_application
 

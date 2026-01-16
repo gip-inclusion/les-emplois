@@ -237,7 +237,7 @@ def annotate_title(base_title, archived_choice):
             raise ValueError(archived_choice)
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for prescribers and employers.
@@ -314,7 +314,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     )
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
@@ -334,7 +334,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     return render(request, template_name, context)
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),

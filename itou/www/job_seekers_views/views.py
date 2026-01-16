@@ -282,7 +282,7 @@ class GetOrCreateJobSeekerStartView(View):
         self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if request.user.kind not in UserKind.actors():
             raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte candidat.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -422,7 +422,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.sender.kind not in UserKind.actors():
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
@@ -1305,7 +1305,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         }
 
 
-@check_user(lambda user: user.is_job_seeker or user.is_employer or user.is_prescriber)
+@check_user(lambda user: user.is_job_seeker or user.is_actor)
 def nir_modification_request(request, public_id, template_name="job_seekers_views/nir_modification_request.html"):
     job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
     if not can_view_personal_information(request, job_seeker):

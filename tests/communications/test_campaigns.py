@@ -144,7 +144,7 @@ class TestRenderAnnouncementCampaign:
             title="Item C",
             description="Item C",
             priority=2,
-            user_kind_tags=[UserKind.PRESCRIBER, UserKind.EMPLOYER],
+            user_kind_tags=UserKind.actors(),
         )
 
         client.force_login(JobSeekerFactory())
