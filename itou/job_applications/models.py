@@ -15,7 +15,7 @@ from xworkflows import before_transition
 from itou.approvals.models import Approval, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import CompanyMembership
+from itou.companies.models import Company, CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.eligibility.models.geiq import (
@@ -41,6 +41,7 @@ from itou.job_applications.enums import (
     RefusalReason,
     SenderKind,
 )
+from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
@@ -508,15 +509,14 @@ class JobApplicationQuerySet(models.QuerySet):
         )
 
     def prescriptions_of(self, user, organization=None):
-        if user.is_prescriber:
-            if organization:
-                return self.filter(
-                    (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
-                    | Q(sender_prescriber_organization=organization)
-                )
-            else:
-                return self.filter(sender=user)
-        elif user.is_employer and organization:
+        if organization is None and user.is_prescriber:
+            return self.filter(sender=user)
+        if organization and isinstance(organization, PrescriberOrganization) and user.is_prescriber:
+            return self.filter(
+                (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
+                | Q(sender_prescriber_organization=organization)
+            )
+        if organization and isinstance(organization, Company) and user.is_employer:
             return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
 
