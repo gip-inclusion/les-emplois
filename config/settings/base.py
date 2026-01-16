@@ -734,7 +734,7 @@ CONTENT_SECURITY_POLICY = {
             "https://pilotage.inclusion.beta.gouv.fr",
             "https://communaute.inclusion.gouv.fr",
             "https://inclusion.beta.gouv.fr",
-            "https://api.data-inclusion.beta.gouv.fr",
+            "https://api.data.inclusion.gouv.fr",
             "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
             "data:",  # For downloading Metabase questions as PNG on Firefox etc
         ],
