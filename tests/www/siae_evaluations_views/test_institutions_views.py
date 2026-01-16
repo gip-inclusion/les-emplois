@@ -1998,10 +1998,9 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertContains(
             response,
             f"""
-            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
+            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/"
+            class="btn-link">
              Revoir les 5 auto-prescriptions
-             <i class="ri-external-link-line" aria-hidden="true">
-             </i>
             </a>""",
             html=True,
             count=1,
@@ -2023,7 +2022,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
             <h3>
              Historique des campagnes de contrôle
             </h3>
-            <ul class="list-unstyled">
+            <ul class="list-unstyled mb-0">
              <li>
               Période du 01/01/2022 au 31/12/2022 :
               <b class="text-danger">Négatif</b>
@@ -2147,10 +2146,9 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
         assertContains(
             response,
             f"""
-            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
+            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/"
+            class="btn-link">
              Revoir l’auto-prescription
-             <i class="ri-external-link-line" aria-hidden="true">
-             </i>
             </a>""",
             html=True,
             count=1,
@@ -2160,7 +2158,7 @@ class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotify
             response,
             """
             <h3>Historique des campagnes de contrôle</h3>
-            <ul class="list-unstyled">
+            <ul class="list-unstyled mb-0">
              <li>
               Période du 17/05/2023 au 16/07/2023 :
               <b class="text-success">Positif</b>

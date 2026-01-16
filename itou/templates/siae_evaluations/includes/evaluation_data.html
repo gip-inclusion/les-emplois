@@ -1,57 +1,59 @@
 {% load str_filters %}
-<div class="card c-card has-links-inside">
-    <div class="card-body">
-        <h2 class="mt-2">Données</h2>
-        <hr class="my-4">
-        <h3>
-            Campagne du {{ evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }}
-        </h3>
-        <ul>
-            <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
-            {% if expected_crits_count %}
-                <li>
-                    {{ not_submitted_percent|floatformat:"0" }} % justificatifs non soumis par la SIAE (dont {{ uploaded_count }} téléversé{{ uploaded_count|pluralizefr }} sur {{ expected_crits_count }} attendu{{ expected_crits_count|pluralizefr }})
-                </li>
-            {% endif %}
-        </ul>
-        <a target="_blank" href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
-            {% if job_apps_count == 1 %}
-                l’auto-prescription
-            {% else %}
-                les {{ job_apps_count }} auto-prescriptions
-            {% endif %}
-            <i class="ri-external-link-line" aria-hidden="true"></i></a>
-        <hr class="my-4">
-        <h3>Historique des campagnes de contrôle</h3>
-        <ul class="list-unstyled">
-            {% for old_evaluated_siae in evaluation_history %}
-                <li>
-                    Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
-                    {% if old_evaluated_siae.state == "ACCEPTED" %}
-                        <b class="text-success">Positif</b>
-                    {% else %}
-                        <b class="text-danger">Négatif</b>
-                        {% if old_evaluated_siae.sanctions %}
-                            <ul class="ms-3">
-                                {% if old_evaluated_siae.sanctions.training_session %}
-                                    <li>Participation à une session de présentation de l’auto-prescription</li>
-                                {% endif %}
-                                {% if old_evaluated_siae.sanctions.suspension_dates and old_evaluated_siae.sanctions.suspension_dates.upper %}
-                                    <li>Retrait temporaire de la capacité d’auto-prescription</li>
-                                {% elif old_evaluated_siae.sanctions.suspension_dates %}
-                                    <li>Retrait définitif de la capacité d’auto-prescription</li>
-                                {% endif %}
-                                {% if old_evaluated_siae.sanctions.evaluated_job_applications_sanctions.count %}
-                                    <li>Suppression partielle ou totale de l’aide au poste</li>
-                                {% endif %}
-                                {% if old_evaluated_siae.sanctions.no_sanction_reason %}<li>Ne pas sanctionner</li>{% endif %}
-                            </ul>
-                        {% endif %}
+
+<div class="c-box mb-3 mb-md-4">
+    <h3>Données</h3>
+    <p>
+        Campagne du {{ evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }}
+    </p>
+    <ul class="fs-sm">
+        <li>{{ refused_percent|floatformat:"0" }} % justificatifs refusés lors de votre contrôle</li>
+        {% if expected_crits_count %}
+            <li>
+                {{ not_submitted_percent|floatformat:"0" }} % justificatifs non soumis par la SIAE (dont {{ uploaded_count }} téléversé{{ uploaded_count|pluralizefr }} sur {{ expected_crits_count }} attendu{{ expected_crits_count|pluralizefr }})
+            </li>
+        {% endif %}
+    </ul>
+    <a target="_blank" href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}" class="btn-link">Revoir
+        {% if job_apps_count == 1 %}
+            l’auto-prescription
+        {% else %}
+            les {{ job_apps_count }} auto-prescriptions
+        {% endif %}
+    </a>
+</div>
+
+<div class="c-box mb-3 mb-md-4">
+    <h3>Historique des campagnes de contrôle</h3>
+    <ul class="list-unstyled mb-0">
+        {% for old_evaluated_siae in evaluation_history %}
+            <li>
+                Période du {{ old_evaluated_siae.evaluation_campaign.evaluated_period_start_at|date:"d/m/Y" }} au {{ old_evaluated_siae.evaluation_campaign.evaluated_period_end_at|date:"d/m/Y" }} :
+                {% if old_evaluated_siae.state == "ACCEPTED" %}
+                    <b class="text-success">Positif</b>
+                {% else %}
+                    <b class="text-danger">Négatif</b>
+                    {% if old_evaluated_siae.sanctions %}
+                        <ul class="ms-3 fs-sm">
+                            {% if old_evaluated_siae.sanctions.training_session %}
+                                <li>Participation à une session de présentation de l’auto-prescription</li>
+                            {% endif %}
+                            {% if old_evaluated_siae.sanctions.suspension_dates and old_evaluated_siae.sanctions.suspension_dates.upper %}
+                                <li>Retrait temporaire de la capacité d’auto-prescription</li>
+                            {% elif old_evaluated_siae.sanctions.suspension_dates %}
+                                <li>Retrait définitif de la capacité d’auto-prescription</li>
+                            {% endif %}
+                            {% if old_evaluated_siae.sanctions.evaluated_job_applications_sanctions.count %}
+                                <li>Suppression partielle ou totale de l’aide au poste</li>
+                            {% endif %}
+                            {% if old_evaluated_siae.sanctions.no_sanction_reason %}<li>Ne pas sanctionner</li>{% endif %}
+                        </ul>
                     {% endif %}
-                </li>
-            {% empty %}
-                <li>Pas de données historisées</li>
-            {% endfor %}
-        </ul>
-    </div>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>
+                <i class="text-disabled">Pas de données historisées</i>
+            </li>
+        {% endfor %}
+    </ul>
 </div>

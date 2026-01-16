@@ -77,8 +77,8 @@ class TestEvaluatedSiaeSanctionView:
         )
         self.letter_document_href = static("templates/modele_decision_sanction_controle_a_posteriori.docx")
         self.letter_document_link_html = (
-            f'<a href="{self.letter_document_href}" target="_blank"'
-            'class="btn btn-primary">Télécharger le modèle de courrier</a>'
+            f'<a href="{self.letter_document_href}" target="_blank" '
+            'class="btn btn-outline-primary btn-block btn-ico bg-white">Télécharger le modèle de courrier</a>'
         )
 
     def assertSanctionContent(self, snapshot, response, is_siae, subsidy_cut_percent=None):
