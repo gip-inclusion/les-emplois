@@ -22,6 +22,13 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, **options):
+        for model, diagnosis_accessor in [
+            (SelectedAdministrativeCriteria, "eligibility_diagnosis_id"),
+            (GEIQSelectedAdministrativeCriteria, "geiq_eligibility_diagnosis_id"),
+        ]:
+            self.retry_api_particulier_criteria(model, diagnosis_accessor)
+
+    def retry_api_particulier_criteria(self, model, diagnosis_accessor):
         now = timezone.now()
         today = timezone.localdate(now)
         profile_required_fields = api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS.copy()
@@ -29,40 +36,36 @@ class Command(BaseCommand):
         # can be certified. birth_place is only specified when birth_country is
         # France, removing the field makes the query simpler.
         profile_required_fields.remove("birth_place")
-        for model, diagnosis_accessor in [
-            (SelectedAdministrativeCriteria, "eligibility_diagnosis_id"),
-            (GEIQSelectedAdministrativeCriteria, "geiq_eligibility_diagnosis_id"),
-        ]:
-            to_recertify = (
-                model.objects.filter(
-                    administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
-                    certification_period=None,
-                    eligibility_diagnosis__expires_at__gte=today,
-                    created_at__lte=now - API_PARTICULIER_RETRY_DURATION,
-                )
-                .exclude(
-                    or_queries(
-                        [
-                            Exists(
-                                JobApplication.objects.filter(
-                                    state=JobApplicationState.ACCEPTED,
-                                    hiring_start_at__lte=today,
-                                    **{diagnosis_accessor: OuterRef("eligibility_diagnosis_id")},
-                                )
-                            ),
-                            *[
-                                Q(**{f"eligibility_diagnosis__job_seeker__{field}": ""})
-                                for field in api_particulier.USER_REQUIRED_FIELDS
-                            ],
-                            *[
-                                Q(**{f"eligibility_diagnosis__job_seeker__jobseeker_profile__{field}": None})
-                                for field in profile_required_fields
-                            ],
-                            Q(last_certification_attempt_at__gte=now - timedelta(days=7)),
-                        ],
-                    )
-                )
-                .order_by("pk")
+        to_recertify = (
+            model.objects.filter(
+                administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
+                certification_period=None,
+                eligibility_diagnosis__expires_at__gte=today,
+                created_at__lte=now - API_PARTICULIER_RETRY_DURATION,
             )
-            for criterion in to_recertify:
-                async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
+            .exclude(
+                or_queries(
+                    [
+                        Exists(
+                            JobApplication.objects.filter(
+                                state=JobApplicationState.ACCEPTED,
+                                hiring_start_at__lte=today,
+                                **{diagnosis_accessor: OuterRef("eligibility_diagnosis_id")},
+                            )
+                        ),
+                        *[
+                            Q(**{f"eligibility_diagnosis__job_seeker__{field}": ""})
+                            for field in api_particulier.USER_REQUIRED_FIELDS
+                        ],
+                        *[
+                            Q(**{f"eligibility_diagnosis__job_seeker__jobseeker_profile__{field}": None})
+                            for field in profile_required_fields
+                        ],
+                        Q(last_certification_attempt_at__gte=now - timedelta(days=7)),
+                    ],
+                )
+            )
+            .order_by("pk")
+        )
+        for criterion in to_recertify:
+            async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
