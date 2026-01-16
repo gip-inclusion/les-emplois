@@ -1,11 +1,13 @@
 import logging
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
-from itou.nexus.models import NexusUser
+from itou.nexus.models import ActivatedService, NexusUser
 from itou.nexus.utils import build_user, serialize_user
 from itou.utils.templatetags.url_add_query import autologin_proconnect
 
@@ -64,6 +66,8 @@ class NexusMixin:
 
         if Service.MON_RECAP in self.activated_services:
             context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+        else:
+            context["monrecap_url"] = reverse("nexus:activate_mon_recap")
 
         context["pilotage_url"] = reverse("dashboard:index_stats")
 
@@ -87,3 +91,19 @@ class HomePageView(NexusMixin, TemplateView):
             (service for service in Service.activable() if service not in context["activated_services"]), None
         )
         return context
+
+
+def activate_mon_recap(request):
+    if request.method != "POST":
+        raise Http404
+
+    next_url = reverse("nexus:homepage")
+    try:
+        ActivatedService.objects.create(user=request.user, service=Service.MON_RECAP)
+    except Exception:
+        logger.exception("Service already activated")
+    messages.success(
+        request, f"Service activé||Vous avez bien activé le service {Service.MON_RECAP.label}", extra_tags="toast"
+    )
+
+    return HttpResponseRedirect(next_url)

@@ -323,13 +323,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate_mon_recap" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -641,13 +644,16 @@
                                                   </p>
                                               </div>
                                           </div>
-                                          <button class="btn btn-ico btn-primary" type="button">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </button>
+                                          <form action="/portal/activate_mon_recap" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </form>
                                       </div>
                                       <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                           Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -918,16 +924,19 @@
                                                       </span>
                                                   </li>
                                               </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate_mon_recap" method="post">
+                                                  <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                                                      En savoir plus
+                                                  </a>
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                       </li>
                                       <li class="list-group-item list-group-item-action">
@@ -1182,13 +1191,16 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </button>
+                                      <form action="/portal/activate_mon_recap" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <button class="btn btn-ico btn-block btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </button>
+                                      </form>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -1433,13 +1445,16 @@
                                                   </p>
                                               </div>
                                           </div>
-                                          <button class="btn btn-ico btn-primary" type="button">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </button>
+                                          <form action="/portal/activate_mon_recap" method="post">
+                                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                              <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </button>
+                                          </form>
                                       </div>
                                       <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                           Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -1659,16 +1674,19 @@
                                                       </span>
                                                   </li>
                                               </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <button class="btn btn-ico btn-primary" type="button">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </button>
+                                              <form action="/portal/activate_mon_recap" method="post">
+                                                  <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                                                      En savoir plus
+                                                  </a>
+                                                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                  <button class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap">
+                                                      <i aria-hidden="true" class="ri-toggle-line">
+                                                      </i>
+                                                      <span>
+                                                          Activer ce service
+                                                      </span>
+                                                  </button>
+                                              </form>
                                           </div>
                                       </li>
                                       <li class="list-group-item list-group-item-action">

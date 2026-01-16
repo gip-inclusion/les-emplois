@@ -1,11 +1,18 @@
 from django.conf import settings
+from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
 from itoutils.urls import add_url_params
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
-from itou.nexus.models import NexusUser
+from itou.nexus.models import ActivatedService, NexusUser
 from itou.users.enums import UserKind
 from tests.nexus.factories import NexusUserFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -130,3 +137,36 @@ class TestHomePageView:
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
         assertContains(response, self.ACTIVATE_SERVICES_H2)
         assertNotContains(response, self.NEW_SERVICES_H2)
+
+
+class TestActivateMonRecapView:
+    url = reverse("nexus:activate_mon_recap")
+
+    def test_nominal(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.post(self.url, follow=True)
+        assertRedirects(response, reverse("nexus:homepage"))  # FIXME redirect to service page
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    f"Service activé||Vous avez bien activé le service {Service.MON_RECAP.label}",
+                    extra_tags="toast",
+                )
+            ],
+        )
+        assertQuerySetEqual(
+            ActivatedService.objects.all(),
+            [(user.pk, Service.MON_RECAP)],
+            transform=lambda o: (o.user_id, o.service),
+        )
+
+    def test_invalid_method(self, client):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert response.status_code == 404

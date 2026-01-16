@@ -134,11 +134,13 @@
                                 {% if Service.MON_RECAP not in activated_services %}
                                     {% component_nexus_new_service_v1 name="Mon Récap" logo="logo-monrecap-mono.svg" description=description li_1="Démarches et parcours centralisés" li_2="Support accessible" li_3="Commun à tous les pros" activate_button=activate_button %}
                                         {% fragment as activate_button %}
-                                            {# FIXME #}
-                                            <button class="btn btn-ico btn-primary" type="button">
-                                                <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                <span>Activer ce service</span>
-                                            </button>
+                                            <form method="post" action="{{ monrecap_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-block btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
                                         {% endfragment %}
                                         {% fragment as description %}
                                             Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -314,11 +316,13 @@
                                     {% if Service.MON_RECAP not in activated_services %}
                                         {% component_nexus_new_service_v2_details name="Mon Récap" id="monrecapInfoMore" logo="logo-monrecap-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://mon-recap.inclusion.beta.gouv.fr/" service=Service.MON_RECAP new_service_shown=new_service_shown activate_button=activate_button %}
                                             {% fragment as activate_button %}
-                                                {# FIXME #}
-                                                <button class="btn btn-ico btn-primary" type="button">
-                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                    <span>Activer ce service</span>
-                                                </button>
+                                                <form method="post" action="{{ monrecap_url }}">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                </form>
                                             {% endfragment %}
                                             {% fragment as description %}
                                                 Le carnet papier retraçant le parcours d’insertion d’une personne.
@@ -462,12 +466,14 @@
                                         {% if Service.MON_RECAP not in activated_services %}
                                             {% component_nexus_new_service_v2_responsive name="Mon Récap" id="monrecapInfoCollapse" logo="logo-monrecap-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.MON_RECAP new_service_shown=new_service_shown buttons=buttons %}
                                                 {% fragment as buttons %}
-                                                    <a href="https://mon-recap.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %} target="_blank">En savoir plus</a>
-                                                    {# FIXME #}
-                                                    <button class="btn btn-ico btn-primary" type="button">
-                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
-                                                        <span>Activer ce service</span>
-                                                    </button>
+                                                    <form method="post" action="{{ monrecap_url }}">
+                                                        <a href="https://mon-recap.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %} target="_blank">En savoir plus</a>
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
                                                 {% endfragment %}
                                                 {% fragment as description %}
                                                     Le carnet papier retraçant le parcours d’insertion d’une personne.
