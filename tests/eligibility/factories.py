@@ -42,7 +42,9 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
             ),
         )
         certifiable = factory.Trait(
-            job_seeker__certifiable=True,
+            # A birth_place is required. It could either be using
+            # born_in_france or born_outside_france. The latter means less SQL queries.
+            job_seeker__born_outside_france=True,
             from_employer=factory.Maybe(
                 "from_prescriber",
                 yes_declaration=None,
