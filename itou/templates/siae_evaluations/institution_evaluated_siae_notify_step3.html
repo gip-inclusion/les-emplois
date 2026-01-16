@@ -111,9 +111,15 @@
                     </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
+                    {% include "siae_evaluations/includes/recommendations_box.html" %}
                     {% include "siae_evaluations/includes/evaluation_data.html" %}
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% include "siae_evaluations/includes/recommendations_modal.html" %}
 {% endblock %}

@@ -2115,6 +2115,19 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assertNotContains(response, FINAL_SUSPENSION)
         assertContains(response, SUBSIDY_CUT, html=True)
 
+    @freeze_time("2023-06-24 11:11:00")
+    def test_legal_notice_modal(self, client):
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign__institution=self.institution,
+            complete=True,
+            job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+        )
+        self.login(client, evaluated_siae)
+        response = client.get(reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk}))
+
+        assertContains(response, "#recommandations_modal")
+        assertContains(response, "Voir les recommandations")
+
 
 class TestInstitutionEvaluatedSiaeNotifyViewStep1(InstitutionEvaluatedSiaeNotifyViewAccessTestMixin):
     urlname = "siae_evaluations_views:institution_evaluated_siae_notify_step1"
