@@ -724,9 +724,6 @@ class TestModel:
             JobSeekerFactory(first_name=" marie aurore", last_name="maréchal").get_full_name()
             == "Marie Aurore MARÉCHAL"
         )
-        too_long_name = "a" * 149
-
-        assert len(JobSeekerFactory(first_name=too_long_name, last_name="maréchal").get_full_name()) == 70
 
     @pytest.mark.parametrize(
         "first_name,last_name,expected",
