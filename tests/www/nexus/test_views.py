@@ -208,3 +208,22 @@ class TestMonRecapView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestPilotageView:
+    url = reverse("nexus:pilotage")
+
+    def test_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(email=user.email, source=Service.PILOTAGE, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+    def test_not_activated(self, client, snapshot):
+        user = PrescriberFactory()
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
