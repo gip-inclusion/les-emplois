@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.core.files.storage import storages
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains
 
 from itou.users.enums import UserKind
@@ -66,8 +68,12 @@ class TestNewsRender:
 
     def test_only_live_campaigns_rendered(self, client):
         campaign = AnnouncementCampaignFactory(with_item=True)
-        AnnouncementCampaignFactory(with_item=True, live=False)
-        AnnouncementCampaignFactory(live=True)  # no item
+        AnnouncementCampaignFactory(
+            with_item=True, live=False, start_date=(timezone.localdate() - relativedelta(months=1)).replace(day=1)
+        )
+        AnnouncementCampaignFactory(
+            live=True, start_date=(timezone.localdate() - relativedelta(months=2)).replace(day=1)
+        )  # no item
 
         response = client.get(reverse("announcements:news"))
         assert response.status_code == 200
@@ -77,7 +83,14 @@ class TestNewsRender:
     def test_pagination(self, client):
         items_per_page = 12
         total_items = items_per_page + 2
-        campaigns = AnnouncementCampaignFactory.create_batch(total_items, with_items_for_every_user_kind=True)
+        campaigns = []
+        for i in range(total_items):
+            campaigns.append(
+                AnnouncementCampaignFactory(
+                    with_items_for_every_user_kind=True,
+                    start_date=(timezone.localdate() - relativedelta(months=i)).replace(day=1),
+                )
+            )
 
         url = reverse("announcements:news")
         second_page_url = f"{url}?page=2"
@@ -107,7 +120,10 @@ class TestNewsRender:
         assert_content_matches_snapshot(client.get(url))
 
         # it's also possible that there are live campaigns without content for my user kind
-        AnnouncementItemFactory(user_kind_tags=[UserKind.PRESCRIBER])
+        AnnouncementItemFactory(
+            user_kind_tags=[UserKind.PRESCRIBER],
+            campaign__start_date=(timezone.localdate() - relativedelta(months=1)).replace(day=1),
+        )
         client.force_login(JobSeekerFactory())
         assert_content_matches_snapshot(client.get(url))
 

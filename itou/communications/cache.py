@@ -12,7 +12,9 @@ SENTINEL_ACTIVE_ANNOUNCEMENT = object()
 
 def update_active_announcement_cache():
     campaign = (
-        AnnouncementCampaign.objects.filter(start_date=timezone.localdate().replace(day=1), live=True)
+        AnnouncementCampaign.objects.filter(
+            start_date=timezone.localdate().replace(day=1), live=True, items__isnull=False
+        )
         .prefetch_related("items")
         .first()
     )

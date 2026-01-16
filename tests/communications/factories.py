@@ -2,7 +2,6 @@ import uuid
 from datetime import date
 
 import factory
-from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from faker import Faker
 
@@ -34,7 +33,7 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
                 AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[user_kind], priority=i + 1)
             AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[], priority=0)
 
-    start_date = factory.Sequence(lambda n: (timezone.localdate() - relativedelta(months=n)).replace(day=1))
+    start_date = factory.LazyFunction(lambda: timezone.localdate().replace(day=1))
 
 
 class AnnouncementItemFactory(factory.django.DjangoModelFactory):
