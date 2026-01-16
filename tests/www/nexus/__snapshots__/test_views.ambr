@@ -362,13 +362,13 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                           <i aria-hidden="true" class="ri-toggle-line">
                                           </i>
                                           <span>
                                               Activer ce service
                                           </span>
-                                      </button>
+                                      </a>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -689,13 +689,13 @@
                                                   </p>
                                               </div>
                                           </div>
-                                          <button class="btn btn-ico btn-primary" type="button">
+                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                               <i aria-hidden="true" class="ri-toggle-line">
                                               </i>
                                               <span>
                                                   Activer ce service
                                               </span>
-                                          </button>
+                                          </a>
                                       </div>
                                       <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                           Le service présentant les données sur les politiques publiques d’insertion.
@@ -972,13 +972,13 @@
                                               <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
                                                   En savoir plus
                                               </a>
-                                              <button class="btn btn-ico btn-primary" type="button">
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                                   <i aria-hidden="true" class="ri-toggle-line">
                                                   </i>
                                                   <span>
                                                       Activer ce service
                                                   </span>
-                                              </button>
+                                              </a>
                                           </div>
                                       </li>
                                       <li class="list-group-item list-group-item-action">
@@ -1221,13 +1221,13 @@
                                               </ul>
                                           </div>
                                       </div>
-                                      <button class="btn btn-ico btn-primary" type="button">
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                           <i aria-hidden="true" class="ri-toggle-line">
                                           </i>
                                           <span>
                                               Activer ce service
                                           </span>
-                                      </button>
+                                      </a>
                                   </div>
                               </li>
                               <li class="list-group-item list-group-item-action">
@@ -1481,13 +1481,13 @@
                                                   </p>
                                               </div>
                                           </div>
-                                          <button class="btn btn-ico btn-primary" type="button">
+                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                               <i aria-hidden="true" class="ri-toggle-line">
                                               </i>
                                               <span>
                                                   Activer ce service
                                               </span>
-                                          </button>
+                                          </a>
                                       </div>
                                       <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
                                           Le service présentant les données sur les politiques publiques d’insertion.
@@ -1713,13 +1713,13 @@
                                               <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
                                                   En savoir plus
                                               </a>
-                                              <button class="btn btn-ico btn-primary" type="button">
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
                                                   <i aria-hidden="true" class="ri-toggle-line">
                                                   </i>
                                                   <span>
                                                       Activer ce service
                                                   </span>
-                                              </button>
+                                              </a>
                                           </div>
                                       </li>
                                       <li class="list-group-item list-group-item-action">

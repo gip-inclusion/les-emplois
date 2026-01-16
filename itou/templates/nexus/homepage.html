@@ -148,11 +148,10 @@
                                 {% if Service.PILOTAGE not in activated_services %}
                                     {% component_nexus_new_service_v1 name="Le Pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" description=description li_1="Statistiques nationales" li_2="Données sur votre organisation" li_3="Aide à la décision" activate_button=activate_button %}
                                         {% fragment as activate_button %}
-                                            {# FIXME #}
-                                            <button class="btn btn-ico btn-primary" type="button">
+                                            <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
                                                 <i class="ri-toggle-line" aria-hidden="true"></i>
                                                 <span>Activer ce service</span>
-                                            </button>
+                                            </a>
                                         {% endfragment %}
                                         {% fragment as description %}
                                             Le service présentant les données sur les politiques publiques d’insertion.
@@ -338,11 +337,10 @@
                                     {% if Service.PILOTAGE not in activated_services %}
                                         {% component_nexus_new_service_v2_details name="Le Pilotage de l’inclusion" id="pilotageInfoMore" logo="logo-pilotage-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://pilotage.inclusion.beta.gouv.fr/" service=Service.PILOTAGE new_service_shown=new_service_shown activate_button=activate_button %}
                                             {% fragment as activate_button %}
-                                                {# FIXME #}
-                                                <button class="btn btn-ico btn-primary" type="button">
+                                                <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
                                                     <i class="ri-toggle-line" aria-hidden="true"></i>
                                                     <span>Activer ce service</span>
-                                                </button>
+                                                </a>
                                             {% endfragment %}
                                             {% fragment as description %}
                                                 Le service présentant les données sur les politiques publiques d’insertion.
@@ -489,11 +487,10 @@
                                             {% component_nexus_new_service_v2_responsive name="Le Pilotage de l’inclusion" id="pilotageInfoCollapse" logo="logo-pilotage-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.PILOTAGE new_service_shown=new_service_shown buttons=buttons %}
                                                 {% fragment as buttons %}
                                                     <a href="https://pilotage.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.PILOTAGE %} target="_blank">En savoir plus</a>
-                                                    {# FIXME #}
-                                                    <button class="btn btn-ico btn-primary" type="button">
+                                                    <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
                                                         <i class="ri-toggle-line" aria-hidden="true"></i>
                                                         <span>Activer ce service</span>
-                                                    </button>
+                                                    </a>
                                                 {% endfragment %}
                                                 {% fragment as description %}
                                                     Le service présentant les données sur les politiques publiques d’insertion.

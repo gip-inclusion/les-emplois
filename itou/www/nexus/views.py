@@ -65,8 +65,7 @@ class NexusMixin:
         if Service.MON_RECAP in self.activated_services:
             context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
 
-        if Service.PILOTAGE in self.activated_services:
-            context["pilotage_url"] = reverse("dashboard:index_stats")
+        context["pilotage_url"] = reverse("dashboard:index_stats")
 
         if Service.COMMUNAUTE in self.activated_services:
             context["communaute_url"] = autologin_proconnect(

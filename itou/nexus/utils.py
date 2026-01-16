@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
-from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 from itou.users.enums import IdentityProvider
 
 
@@ -160,3 +160,8 @@ def sync_structures(nexus_structures):
             unique_fields=["id"],
         )
     )
+
+
+# Activate pilotage
+def activate_pilotage(user):
+    ActivatedService.objects.get_or_create(user=user, service=Service.PILOTAGE)
