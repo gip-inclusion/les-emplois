@@ -462,7 +462,7 @@ class Company(AddressMixin, OrganizationAbstract):
     def get_token(self):
         return company_signup_token_generator.make_token(self)
 
-    def new_signup_activation_email_to_official_contact(self, request):
+    def new_signup_activation_email_to_official_contact(self):
         """
         Send email to siae.auth_email with a magic link to continue signup.
         """

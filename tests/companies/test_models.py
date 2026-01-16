@@ -5,7 +5,6 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
-from django.test import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -171,10 +170,7 @@ class TestCompanyModel:
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         with mock.patch("itou.utils.tokens.CompanySignupTokenGenerator.make_token", return_value=token):
-            factory = RequestFactory()
-            request = factory.get("/")
-
-            message = company.new_signup_activation_email_to_official_contact(request)
+            message = company.new_signup_activation_email_to_official_contact()
             with django_capture_on_commit_callbacks(execute=True):
                 message.send()
 

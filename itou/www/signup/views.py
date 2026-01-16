@@ -220,7 +220,7 @@ def company_select(request, template_name="signup/company_select.html"):
                 ),
             )
         else:
-            company_selected.new_signup_activation_email_to_official_contact(request).send()
+            company_selected.new_signup_activation_email_to_official_contact().send()
             message = (
                 f"Nous venons d'envoyer un e-mail à l'adresse {company_selected.obfuscated_auth_email} "
                 f"pour continuer votre inscription. Veuillez consulter votre boite "
