@@ -1,3 +1,6 @@
+from itou.companies.models import Company
+
+
 class BaseNotification:
     REQUIRED = ["can_be_disabled", "name", "category"]
 
@@ -36,6 +39,7 @@ class BaseNotification:
             "user": self.user,
             "structure": self.structure,
             "forward_from_user": self.forward_from_user,
+            "structure_label": "structure" if isinstance(self.structure, Company) else "organisation",
         }
 
     def validate_context(self):
