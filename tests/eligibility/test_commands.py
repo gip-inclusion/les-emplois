@@ -15,7 +15,7 @@ from tests.job_applications.factories import JobApplicationFactory
 
 
 class TestRetryCertifyCriteria:
-    def test_identifies_criteria_to_retry(self, mocker):
+    def test_identifies_criteria_to_retry_api_particulier(self, mocker):
         certify_criterion_task = mocker.patch(
             "itou.eligibility.management.commands.retry_certify_criteria.async_certify_criterion_with_api_particulier",
             autospec=True,
