@@ -36,8 +36,8 @@
                 </div>
             </div>
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-7 order-1">
-                    <div class="card c-card mb-4">
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    <div class="card c-card mb-3 mb-md-4">
                         <div class="card-body">
                             <h2 class="mt-2">Bilan</h2>
                             <p class="mb-1">
@@ -164,25 +164,21 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="s-section__col col-12 col-xxl-5 order-2">
+                <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
                     {% if not is_siae and sanctions.has_significant_sanction %}
-                        <div class="card c-card has-links-inside mb-4">
-                            <div class="card-body">
-                                <h2 class="mt-2">Courrier de sanction</h2>
-                                La DGEFP met à votre disposition un modèle de courrier à télécharger.
-                                <p>
-                                    La décision prise <b>nécessite l’envoi d’une lettre recommandée avec accusé de réception</b>.
-                                    <br />
-                                    Vous devez notifier à la SIAE la sanction applicable, au plus tard 5 mois après le début de la phase contradictoire
-                                    (<a href="{% url 'siae_evaluations_views:campaign_calendar' evaluated_siae.evaluation_campaign.pk %}" target="_blank">Voir calendrier</a>).
-                                </p>
-                                <p>
-                                    Pour rédiger votre notification, appuyez-vous sur les éléments figurant dans le détail de la décision afin de transmettre à la SIAE toutes les informations nécessaires.
-                                </p>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{% static 'templates/modele_decision_sanction_controle_a_posteriori.docx' %}" target="_blank" class="btn btn-primary">Télécharger le modèle de courrier</a>
-                                </div>
-                            </div>
+                        <div class="c-box mb-3 mb-md-4">
+                            <h3>Courrier de sanction</h3>
+                            <p>La DGEFP met à votre disposition un modèle de courrier à télécharger.</p>
+                            <p class="fs-sm">
+                                La décision prise <b>nécessite l’envoi d’une lettre recommandée avec accusé de réception</b>.
+                                <br>
+                                Vous devez notifier à la SIAE la sanction applicable, au plus tard 5 mois après le début de la phase contradictoire
+                                (<a href="{% url 'siae_evaluations_views:campaign_calendar' evaluated_siae.evaluation_campaign.pk %}" target="_blank">Voir calendrier</a>).
+                            </p>
+                            <p class="fs-sm">
+                                Pour rédiger votre notification, appuyez-vous sur les éléments figurant dans le détail de la décision afin de transmettre à la SIAE toutes les informations nécessaires.
+                            </p>
+                            <a href="{% static 'templates/modele_decision_sanction_controle_a_posteriori.docx' %}" target="_blank" class="btn btn-outline-primary btn-block btn-ico bg-white">Télécharger le modèle de courrier</a>
                         </div>
                     {% endif %}
                     {% include "siae_evaluations/includes/evaluation_data.html" %}
