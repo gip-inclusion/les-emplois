@@ -465,7 +465,7 @@ def test_certify_criterion(mocker, EligibilityDiagnosisFactory, criteria_kind):
         "itou.utils.apis.api_particulier._request",
         return_value=RESPONSES[criteria_kind][ResponseKind.CERTIFIED]["json"],
     )
-    job_seeker = JobSeekerFactory(certifiable=True)
+    job_seeker = JobSeekerFactory(born_in_france=True)
     eligibility_diagnosis = EligibilityDiagnosisFactory(
         job_seeker=job_seeker, certifiable=True, criteria_kinds=[criteria_kind]
     )
