@@ -33,7 +33,7 @@
                         {% endif %}
                         SIRET {{ request.current_organization.siret|format_siret }}
                     {% endif %}
-                {% elif user.is_employer %}
+                {% elif request.from_employer %}
                     {{ request.current_organization.kind }} -
                     SIRET {{ request.current_organization.siret|format_siret }}
                 {% endif %}
@@ -41,7 +41,7 @@
         {% endif %}
     {% endfragment %}
     {% fragment as c_title__cta %}
-        {% if user.is_employer %}
+        {% if request.from_employer %}
             {% if request.current_organization.is_subject_to_iae_rules or request.current_organization.kind == CompanyKind.GEIQ %}
                 {% comment %}
                 NOTE(vperron):
