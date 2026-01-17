@@ -1,7 +1,7 @@
 {% load datetime_filters %}
 {% load matomo %}
 
-{% if request.user.is_employer %}
+{% if request.from_employer %}
     {% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
 {% endif %}
 

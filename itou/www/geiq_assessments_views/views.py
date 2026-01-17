@@ -38,7 +38,7 @@ from itou.geiq_assessments.notifications import (
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.utils.apis import geiq_label
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
 from itou.www.geiq_assessments_views.export import (
@@ -119,7 +119,7 @@ def get_allowance_stats_for_institution(assessment, *, for_assessment_details=Fa
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.html"):
     if not company_has_access_to_assessments(request.current_organization):
         raise Http404
@@ -140,7 +140,7 @@ def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.h
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def create_assessment(request, template_name="geiq_assessments_views/create.html"):
     if not company_has_access_to_assessments(request.current_organization):
         raise Http404
@@ -262,7 +262,7 @@ class AssessmentDetailsTab(models.TextChoices):
     RESULT = "result", "Résultat"
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
     if not company_has_access_to_assessments(request.current_organization):
         raise Http404
@@ -332,9 +332,9 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: request.from_employer or request.user.is_labor_inspector)
 def assessment_get_file(request, pk, *, file_field):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
@@ -360,7 +360,7 @@ def assessment_get_file(request, pk, *, file_field):
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_sync_file(request, pk, *, file_field):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
@@ -396,7 +396,7 @@ def assessment_sync_file(request, pk, *, file_field):
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def upload_action_financial_assessment(
     request, pk, template_name="geiq_assessments_views/action_financial_assessment_upload.html"
 ):
@@ -418,7 +418,7 @@ def upload_action_financial_assessment(
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_comment(request, pk, template_name="geiq_assessments_views/assessment_comment.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(companies=request.current_organization, submitted_at__isnull=True), pk=pk
@@ -443,7 +443,7 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_contracts_sync(request, pk):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
@@ -471,9 +471,9 @@ class ContractsAction(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: request.from_employer or request.user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
         contract_filter_kwargs = {}
     elif request.user.is_labor_inspector:
@@ -484,7 +484,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
 
     back_url, can_validate, can_invalidate, stats = None, False, False, None  # defined to please the linters
-    if request.user.is_employer:
+    if request.from_employer:
         back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         if not assessment.submitted_at:
             can_validate = not assessment.contracts_selection_validated_at
@@ -502,7 +502,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         if action == ContractsAction.VALIDATE:
             if not can_validate:
                 raise PermissionDenied
-            if request.user.is_employer:
+            if request.from_employer:
                 assessment.contracts_selection_validated_at = timezone.now()
                 assessment.save(update_fields=("contracts_selection_validated_at",))
                 logger.info(
@@ -524,7 +524,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         elif action == ContractsAction.INVALIDATE:
             if not can_invalidate:
                 raise PermissionDenied
-            if request.user.is_employer:
+            if request.from_employer:
                 assessment.contracts_selection_validated_at = None
                 assessment.save(update_fields=("contracts_selection_validated_at",))
                 logger.info(
@@ -550,7 +550,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
         return HttpResponseRedirect(next_url)
 
-    if request.user.is_employer:
+    if request.from_employer:
         stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
     elif request.user.is_labor_inspector:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
@@ -575,9 +575,9 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
 
 @require_safe
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: request.from_employer or request.user.is_labor_inspector)
 def assessment_contracts_export(request, pk):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
         contract_filter_kwargs = {}
     elif request.user.is_labor_inspector:
@@ -609,7 +609,7 @@ class AssessmentContractDetailsTab(models.TextChoices):
     EXIT = "exit", "Sortie"
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: request.from_employer or request.user.is_labor_inspector)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
 ):
@@ -617,7 +617,7 @@ def assessment_contracts_details(
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
         raise Http404
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {
@@ -633,7 +633,7 @@ def assessment_contracts_details(
     contract = get_object_or_404(contract_qs, pk=contract_pk)
 
     editable = False
-    if request.user.is_employer:
+    if request.from_employer:
         if not contract.employee.assessment.submitted_at:
             editable = not contract.employee.assessment.contracts_selection_validated_at
     elif request.user.is_labor_inspector:
@@ -654,11 +654,11 @@ def assessment_contracts_details(
 
 
 @require_POST
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: request.from_employer or request.user.is_labor_inspector)
 def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {
@@ -676,7 +676,7 @@ def assessment_contracts_toggle(
     )
     assessment = contract.employee.assessment
     if (
-        request.user.is_employer
+        request.from_employer
         and not assessment.contracts_selection_validated_at
         and contract.allowance_requested != new_value
     ):
@@ -692,7 +692,7 @@ def assessment_contracts_toggle(
     from_list = bool(request.GET.get("from_list"))
     stats = None
     if from_list:
-        if request.user.is_employer:
+        if request.from_employer:
             stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
         elif request.user.is_labor_inspector:
             stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
@@ -708,7 +708,7 @@ def assessment_contracts_toggle(
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment_kpi.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(contracts_synced_at__isnull=False)
@@ -732,7 +732,7 @@ def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def assessment_result(request, pk, template_name="geiq_assessments_views/assessment_result.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(final_reviewed_at__isnull=False)

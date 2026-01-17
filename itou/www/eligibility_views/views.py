@@ -85,7 +85,7 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
     form_class = AdministrativeCriteriaForm
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def dispatch(self, request, *args, **kwargs):
         if not self.company.is_subject_to_iae_rules:
