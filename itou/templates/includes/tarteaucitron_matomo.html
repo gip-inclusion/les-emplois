@@ -15,40 +15,40 @@
         "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
         "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
         "cookieName": "tarteaucitron", /* Cookie name */
-        "orientation": "bottom", /* Banner position (top - bottom) */
+        "orientation": "bottom", /* Banner position (top - bottom - middle - popup) */
         "groupServices": false, /* Group services by category */
         "showDetailsOnClick": true, /* Click to expand the description */
         "serviceDefaultState": "wait", /* Default state (true - wait - false) */
         "showAlertSmall": false, /* Show the small banner on bottom right */
-        "cookieslist": false, /* Show the cookie list */
-        "closePopup": false, /* Show a close X on the banner */
+        "cookieslist": false, /* Show the cookie list in a mini banner */
+        "cookieslistEmbed": false, /* Show the cookie list on the control panel */
         "showIcon": true, /* Show cookie icon to manage cookies */
-        //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
-        "iconPosition": "BottomRight", /* BottomRight, BottomLeft, TopRight and TopLeft */
+        // "iconSrc": "", /* Optional: URL or base64 encoded image */
+        "iconPosition": "BottomRight", /* Position of the icon between BottomRight, BottomLeft, TopRight and TopLeft */
         "adblocker": false, /* Show a Warning if an adblocker is detected */
-        "DenyAllCta" : true, /* Show the deny all button */
-        "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+        "DenyAllCta": true, /* Show the deny all button */
+        "AcceptAllCta": true, /* Show the accept all button when highPrivacy on */
         "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
         "alwaysNeedConsent": false, /* Ask the consent for "Privacy by design" services */
         "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
         "removeCredit": true, /* Remove credit link */
         "moreInfoLink": true, /* Show more info link */
         "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
-        "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
-        //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
-        "readmoreLink": "{% url 'legal-privacy' %}#cookies", /* Change the default readmore link */
+        "useExternalJs": false, /* If false, the tarteaucitron.services.js file and lang files will be loaded */
+        // "cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for subdomain website */
+        "readmoreLink": "", /* Change the default readmore link pointing to tarteaucitron.io */
         "mandatory": true, /* Show a message about mandatory cookies */
         "mandatoryCta": true, /* Show the disabled accept button when mandatory on */
-        "customCloserId": "", /* Optional a11y: Custom element ID used to open the panel */
+        // "customCloserId": "", /* Optional a11y: Custom element ID used to open the panel */
         "googleConsentMode": true, /* Enable Google Consent Mode v2 for Google ads and GA4 */
-        "partnersList": false /* Show the number of partners on the popup/middle banner */
+        "bingConsentMode": true, /* Enable Bing Consent Mode for Clarity and Bing Ads */
+        "pianoConsentMode": true, /* Enable Piano Analytics Consent Mode */
+        "pianoConsentModeEssential": false, /* Load in Essential mode instead of opt-out by default */
+        "softConsentMode": false, /* Soft consent mode (consent is required to load the services) */
+        "dataLayer": false, /* Send an event to dataLayer with the services status */
+        "serverSide": false, /* Server side only, tags are not loaded client side */
+        "partnersList": false /* Details the number of partners on the popup and middle banner */
     });
-
-    // Hotjar.
-    (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
-    {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 2360441;{% endif %}
-    {% if ITOU_ENVIRONMENT == "DEMO" or ITOU_ENVIRONMENT == "PENTEST" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
-    tarteaucitron.user.HotjarSv = 6;
 
     {% if MATOMO_BASE_URL and send_to_matomo %}
     // Matomo :
@@ -90,6 +90,64 @@
         }
     };
     (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
+
+    // metabase
+    tarteaucitron.services.metabase = {
+        "key": "metabase",
+        "type": "other",
+        "name": "Metabase",
+        "uri": "https://www.metabase.com/privacy-policies",
+        "needConsent": true,
+        "cookies": [],
+        "js": function() {
+            "use strict";
+            tarteaucitron.fallback(['js-tac-metabase'], function(x) {
+                var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'metabase iframe'),
+                    height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
+                    url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
+                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
+            });
+        },
+        "fallback": function() {
+            "use strict";
+            var id = 'metabase';
+            tarteaucitron.fallback(['js-tac-metabase'], function(elem) {
+                elem.style.width = elem.getAttribute('width');
+                elem.style.height = "365px";
+                return tarteaucitron.engage(id);
+            });
+        }
+    };
+    (tarteaucitron.job = tarteaucitron.job || []).push('metabase');
+
+    // tally
+    tarteaucitron.services.tally = {
+        "key": "tally",
+        "type": "other",
+        "name": "Tally",
+        "uri": "https://tally.so/help/terms-and-privacy",
+        "needConsent": true,
+        "cookies": [],
+        "js": function() {
+            "use strict";
+            tarteaucitron.fallback(['js-tac-tally'], function(x) {
+                var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'tally iframe'),
+                    height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
+                    url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
+                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
+            });
+        },
+        "fallback": function() {
+            "use strict";
+            var id = 'tally';
+            tarteaucitron.fallback(['js-tac-tally'], function(elem) {
+                elem.style.width = elem.getAttribute('width');
+                elem.style.height = "365px";
+                return tarteaucitron.engage(id);
+            });
+        }
+    };
+    (tarteaucitron.job = tarteaucitron.job || []).push('tally');
 </script>
 
 {% if MATOMO_BASE_URL and send_to_matomo %}

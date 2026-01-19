@@ -187,8 +187,8 @@ ASSET_INFOS = {
     },
     "tarteaucitronjs": {
         "download": {
-            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.19.0.tgz",
-            "sha256": "01ecf4f76cc55a358905daa38f2f0bfbec13bc842e53a829800a06ced744abed",
+            "url": "https://registry.npmjs.org/tarteaucitronjs/-/tarteaucitronjs-1.29.0.tgz",
+            "sha256": "0c9ed170128a57a981740c7322f1567bfdf1b7722c054e1782d9c69c9f910786",
         },
         "extract": {
             "origin": "package",
@@ -204,11 +204,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v3.2.4.zip",
-            "sha256": "006c3087f3ff41514e8d550d38c16bce91d05c3f41a780d2a0c008187b33c896",
+            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v3.3.1.zip",
+            "sha256": "a29ed25144ce79508383fa5f08d76cdca391f4119872684948626d5d60f15506",
         },
         "extract": {
-            "origin": "itou-theme-3.2.4/dist",
+            "origin": "itou-theme-3.3.1/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
