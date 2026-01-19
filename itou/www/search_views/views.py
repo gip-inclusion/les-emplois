@@ -414,7 +414,7 @@ def search_services_results(request, template_name="search/services/results.html
                     sorted(
                         results,
                         key=lambda i: (
-                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in i["modes_accueil"],
+                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in (i["modes_accueil"] or []),
                             i["source"] == "dora",
                         ),
                         reverse=True,
