@@ -5,7 +5,11 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import (
+    assertRedirects,
+    assertTemplateNotUsed,
+    assertTemplateUsed,
+)
 
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from tests.approvals.factories import ApprovalFactory
@@ -15,6 +19,8 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestUpdateEligibilityView:
+    PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+
     @pytest.mark.parametrize(
         "factory,status_code",
         [
@@ -59,11 +65,13 @@ class TestUpdateEligibilityView:
             query={"back_url": reverse("job_seekers_views:list")},
         )
         response = client.get(url)
+        assertTemplateNotUsed(response, self.PREFILLED_TEMPLATE)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="0")
 
         # With an expired eligibility diagnosis
         IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, expired=True)
         response = client.get(url)
+        assertTemplateNotUsed(response, self.PREFILLED_TEMPLATE)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="0")
 
         response = client.post(url, {"level_1_1": True})
@@ -72,6 +80,36 @@ class TestUpdateEligibilityView:
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=None)
         assert diag.is_valid is True
         assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
+
+    def test_standalone_no_valid_eligibility_diagnosis_prefilled(self, client, snapshot):
+        # If no valid diagnosis exists but the job seeker profile was updated recently,
+        # the form should be prefilled with the criteria from the job seeker profile.
+        prescriber = PrescriberFactory(membership__organization__authorized=True)
+        job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__isolated_parent=True)
+
+        client.force_login(prescriber)
+
+        # Without a eligibility diagnosis
+        url = reverse(
+            "eligibility_views:update_iae",
+            kwargs={"job_seeker_public_id": job_seeker.public_id},
+            query={"back_url": reverse("job_seekers_views:list")},
+        )
+        response = client.get(url)
+        assertTemplateUsed(response, self.PREFILLED_TEMPLATE)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="prefilled form")
+
+        # With an expired eligibility diagnosis
+        IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, expired=True)
+        response = client.get(url)
+        assertTemplateUsed(response, self.PREFILLED_TEMPLATE)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="prefilled form")
+
+        # Test when the job seeker profile was last checked more than 24 hours ago
+        job_seeker.last_checked_at = timezone.now() - timezone.timedelta(hours=25)
+        job_seeker.save(update_fields=["last_checked_at"])
+        response = client.get(url)
+        assertTemplateNotUsed(response, self.PREFILLED_TEMPLATE)
 
     @freeze_time("2025-03-22")
     def test_standalone_valid_eligibility_diagnosis(self, client, snapshot):

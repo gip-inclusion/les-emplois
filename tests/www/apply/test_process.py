@@ -27,7 +27,7 @@ from pytest_django.asserts import (
 )
 
 from itou.approvals.models import Approval, Suspension
-from itou.asp.models import Commune, Country
+from itou.asp.models import AllocationDuration, Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
@@ -1661,10 +1661,14 @@ class TestProcessViews:
         assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
 
     def test_eligibility(self, client):
+        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
+            job_seeker=JobSeekerFactory(
+                with_address_in_qpv=True,
+                last_checked_at=timezone.now() - datetime.timedelta(hours=25),  # Prevent prefilled criteria
+            ),
             to_company__subject_to_iae_rules=True,
         )
 
@@ -1685,6 +1689,23 @@ class TestProcessViews:
         response = client.get(url)
         assert response.status_code == 200
         assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertTemplateNotUsed(response, PREFILLED_TEMPLATE)
+
+        # Update profile to now have some pre-filled criteria
+        job_application.job_seeker.jobseeker_profile.aah_allocation_since = AllocationDuration.FROM_6_TO_11_MONTHS
+        job_application.job_seeker.jobseeker_profile.rqth_employee = True
+        job_application.job_seeker.jobseeker_profile.save(update_fields=["aah_allocation_since", "rqth_employee"])
+        job_application.job_seeker.last_checked_at = timezone.now()
+        job_application.job_seeker.save(update_fields=["last_checked_at"])
+        response = client.get(url)
+        assert response.status_code == 200
+        assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
+        assertTemplateUsed(response, PREFILLED_TEMPLATE, count=1)
+        prefilled_criteria = [c.kind for c in response.context["form"].initial["administrative_criteria"]]
+        assert AdministrativeCriteriaKind.AAH in prefilled_criteria
+        assert AdministrativeCriteriaKind.TH in prefilled_criteria
+        assert response.context["form"].initial["level_1_3"] is True  # AAH criterion
+        assert response.context["form"].initial["level_2_10"] is True  # TH / rqth_employee criterion
 
         # Ensure that some criteria are mandatory.
         post_data = {
@@ -1751,7 +1772,7 @@ class TestProcessViews:
         )
         response = client.get(url)
         assert response.status_code == 200
-        assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+        assertTemplateUsed(response, "eligibility/includes/criteria_filled_from_job_seeker.html", count=1)
         assertContains(
             response,
             f"""
