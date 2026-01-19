@@ -207,7 +207,7 @@ class InvitePrescriberView(BaseInviteUserView):
     back_url = reverse_lazy("prescribers_views:members")
 
     def test_func(self):
-        return self.request.user.is_prescriber
+        return self.request.from_prescriber
 
     def get_initial_data(self):
         request_invitation_form = signup_forms.PrescriberRequestInvitationForm(data=self.request.GET)
