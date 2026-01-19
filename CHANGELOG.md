@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2026-01-19
+
+### Ajouté
+
+- [Recherche services d’insertion : Ajout de la version non-connectée](https://github.com/gip-inclusion/les-emplois/pull/7215)
+
+### Modifié
+
+- [Contrôle a posteriori : Ajouter un lien retour à la page précédente](https://github.com/gip-inclusion/les-emplois/pull/7337)
+- [Contrôle a posteriori : Refonte de l’écran récapitulatif de la décision](https://github.com/gip-inclusion/les-emplois/pull/7304)
+- [Interface : Changer la formulation dans les candidatures côté employeur](https://github.com/gip-inclusion/les-emplois/pull/7358)
+- [Interface : Préciser le nombre d'intervenants dans l'encart ‘découvrez tous les intervenants’](https://github.com/gip-inclusion/les-emplois/pull/7338)
+- [Interface : Remplacer les encarts de service DORA par le widget data⋅inclusion](https://github.com/gip-inclusion/les-emplois/pull/7243)
+- [Pilotage : Ajout de la date d'inscription des pros](https://github.com/gip-inclusion/les-emplois/pull/7365)
+
 ## 2026-01-12
 
 ### Ajouté
