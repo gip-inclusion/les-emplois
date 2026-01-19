@@ -628,7 +628,7 @@ class User(AbstractUser, AddressMixin):
     @cached_property
     def is_prescriber_with_authorized_org_memberships(self):
         return (
-            self.is_prescriber
+            self.is_prescriber  # Replace with user.is_actor
             and self.prescribermembership_set.filter(
                 organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED
             ).exists()
