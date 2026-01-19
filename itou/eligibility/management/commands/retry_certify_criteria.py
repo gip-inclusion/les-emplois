@@ -6,7 +6,12 @@ from itoutils.django.commands import dry_runnable
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models import GEIQSelectedAdministrativeCriteria, SelectedAdministrativeCriteria
-from itou.eligibility.tasks import API_PARTICULIER_RETRY_DURATION, async_certify_criterion_with_api_particulier
+from itou.eligibility.tasks import (
+    API_PARTICULIER_RETRY_DURATION,
+    API_POLE_EMPLOI_RETRY_DURATION,
+    async_certify_criterion_with_api_particulier,
+    async_certify_criterion_with_france_travail,
+)
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.apis import api_particulier
@@ -27,6 +32,7 @@ class Command(BaseCommand):
             (GEIQSelectedAdministrativeCriteria, "geiq_eligibility_diagnosis_id"),
         ]:
             self.retry_api_particulier_criteria(model, diagnosis_accessor)
+            self.retry_france_travail_criteria(model, diagnosis_accessor)
 
     def retry_api_particulier_criteria(self, model, diagnosis_accessor):
         now = timezone.now()
@@ -69,3 +75,37 @@ class Command(BaseCommand):
         )
         for criterion in to_recertify:
             async_certify_criterion_with_api_particulier(criterion._meta.model_name, criterion.pk)
+
+    def retry_france_travail_criteria(self, model, diagnosis_accessor):
+        now = timezone.now()
+        today = timezone.localdate(now)
+        to_recertify = (
+            model.objects.filter(
+                Q(certification_period=None) | Q(certification_period__upper__lte=today),
+                administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_france_travail(),
+                eligibility_diagnosis__expires_at__gte=today,
+                created_at__lte=now - API_POLE_EMPLOI_RETRY_DURATION,
+            )
+            .exclude(
+                or_queries(
+                    [
+                        Exists(
+                            JobApplication.objects.filter(
+                                state=JobApplicationState.ACCEPTED,
+                                hiring_start_at__lte=today,
+                                **{diagnosis_accessor: OuterRef("eligibility_diagnosis_id")},
+                            )
+                        ),
+                        Q(
+                            Q(eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=None)
+                            | Q(eligibility_diagnosis__job_seeker__jobseeker_profile__nir="")
+                        )
+                        & Q(eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id=""),
+                        Q(last_certification_attempt_at__gte=now - timedelta(days=7)),
+                    ],
+                )
+            )
+            .order_by("pk")
+        )
+        for criterion in to_recertify:
+            async_certify_criterion_with_france_travail(criterion._meta.model_name, criterion.pk)
