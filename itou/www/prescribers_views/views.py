@@ -10,7 +10,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -52,7 +52,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def overview(request, template_name="prescribers/overview.html"):
     organization = get_current_org_or_404(request)
     if not organization.is_authorized:
@@ -69,7 +69,7 @@ class MemberList(BaseMemberList):
     template_name = "prescribers/members.html"
 
     def test_func(self):
-        return self.request.user.is_prescriber
+        return self.request.from_prescriber
 
     def get_invitation_url(self):
         return reverse("invitations_views:invite_prescriber_with_org")
@@ -80,7 +80,7 @@ class MemberList(BaseMemberList):
         return context
 
 
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def deactivate_member(request, public_id, template_name="prescribers/deactivate_member.html"):
     user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
@@ -91,7 +91,7 @@ def deactivate_member(request, public_id, template_name="prescribers/deactivate_
     )
 
 
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def update_admin_role(request, action, public_id, template_name="prescribers/update_admins.html"):
     if action not in ["add", "remove"]:
         raise BadRequest

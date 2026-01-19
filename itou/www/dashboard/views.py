@@ -148,7 +148,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.from_employer:
         context.update(_employer_dashboard_context(request))
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if current_org := request.current_organization:
             context["stalled_job_seekers_count"] = User.objects.linked_job_seeker_ids(
                 request.user,
@@ -218,7 +218,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                     "can_view_stats_siae_beneficiaries": stats_utils.can_view_stats_siae_beneficiaries(request),
                 }
             )
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if stats_utils.can_view_stats_cd(request):
             context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER_DEPT
         elif stats_utils.can_view_stats_ft(request):
