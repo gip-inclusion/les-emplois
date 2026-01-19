@@ -2352,6 +2352,7 @@
           WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
                  AND "eligibility_administrativecriteria"."kind" IN (%s,
                                                                      %s,
+                                                                     %s,
                                                                      %s))
           LIMIT 1
         ''',
@@ -3697,6 +3698,7 @@
           INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
           WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
                  AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
                                                                      %s,
                                                                      %s))
           LIMIT 1
