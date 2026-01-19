@@ -52,6 +52,17 @@ def search_services_route_fixture(respx_mock, settings):
                         "description": "Coupe aussi les cheveux longs",
                     },
                 },
+                {
+                    "service": {
+                        "id": "svc4",
+                        "source": "autre",
+                        "nom": "Coupe entre autres les cheveux",
+                        "modes_accueil": None,
+                        "structure": {"nom": "Coiffeur"},
+                        "code_postal": "56260",
+                        "description": "Coupe entre autres les cheveux longs",
+                    },
+                },
             ]
         },
     )
@@ -74,7 +85,7 @@ def test_results_html(snapshot, client, search_services_route):
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assertContains(response, "3 résultats")
+    assertContains(response, "4 résultats")
     assertContains(
         response,
         f"<title>Services d'insertion « {category.label} » autour de {city} - Les emplois de l'inclusion</title>",
@@ -89,7 +100,7 @@ def test_results_ordering(client, search_services_route):
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assert [service["id"] for service in response.context["results"].object_list] == ["svc2", "svc3", "svc1"]
+    assert [service["id"] for service in response.context["results"].object_list] == ["svc2", "svc3", "svc1", "svc4"]
 
 
 def test_results_are_cached(client, search_services_route):
