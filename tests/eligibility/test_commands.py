@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
 from itou.eligibility.models.iae import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState
+from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
 from tests.job_applications.factories import JobApplicationFactory
 
@@ -60,6 +61,84 @@ class TestRetryCertifyCriteria:
                 state=JobApplicationState.ACCEPTED,
             )
             to_retry.append(crit_with_accepted_job_app_in_the_future)
+
+        call_command("retry_certify_criteria", wet_run=True)
+        expected_retries = [call(crit._meta.model_name, crit.pk) for crit in to_retry]
+        assert certify_criterion_task.mock_calls == expected_retries
+
+    def test_identifies_criteria_to_retry_pole_emploi(self, mocker):
+        certify_criterion_task = mocker.patch(
+            "itou.eligibility.management.commands.retry_certify_criteria.async_certify_criterion_with_france_travail",
+            autospec=True,
+        )
+        rqth = AdministrativeCriteria.objects.get(kind=AdministrativeCriteriaKind.TH)
+        factory = partial(
+            IAESelectedAdministrativeCriteriaFactory,
+            eligibility_diagnosis__certifiable=True,
+            administrative_criteria=rqth,
+        )
+        # Just created, ignored.
+        factory(criteria_certification_error=True)
+        to_retry = []
+        real_now = timezone.now()
+        with freeze_time(timezone.now() - timedelta(days=2)):
+            # Ignored criteria:
+            factory(criteria_certified=True)
+            factory(criteria_not_certified=True)
+            other_criteria_kinds = AdministrativeCriteriaKind.common() - CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS
+            not_retryable_kind = random.choice(list(other_criteria_kinds))
+            factory(administrative_criteria=AdministrativeCriteria.objects.get(kind=not_retryable_kind))
+            factory(criteria_certification_error=True, eligibility_diagnosis__expires_at=date(2023, 1, 1))
+            crit_with_accepted_job_app = factory(criteria_certification_error=True)
+            JobApplicationFactory(
+                eligibility_diagnosis=crit_with_accepted_job_app.eligibility_diagnosis,
+                hiring_start_at=timezone.localdate(),
+                state=JobApplicationState.ACCEPTED,
+            )
+            factory(
+                criteria_certification_error=True,
+                eligibility_diagnosis__job_seeker__jobseeker_profile__nir="",
+                eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="",
+            )
+            factory(
+                criteria_certification_error=True,
+                eligibility_diagnosis__certifiable=False,
+                eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=None,
+                eligibility_diagnosis__job_seeker__jobseeker_profile__pole_emploi_id="",
+            )
+            factory(
+                criteria_certification_error=True,
+                last_certification_attempt_at=real_now - timedelta(days=6, hours=23, minutes=59),
+            )
+
+            # Criteria to retry:
+            to_retry.append(factory(criteria_certification_error=True))  # Has NIR and birthdate.
+            to_retry.append(
+                factory(
+                    criteria_certification_error=True,
+                    eligibility_diagnosis__job_seeker__jobseeker_profile__with_pole_emploi_id=True,
+                    eligibility_diagnosis__job_seeker__jobseeker_profile__birthdate=None,
+                    eligibility_diagnosis__job_seeker__jobseeker_profile__nir="",
+                )
+            )
+            crit_with_job_app = factory(criteria_certification_error=True)
+            JobApplicationFactory(eligibility_diagnosis=crit_with_job_app.eligibility_diagnosis)
+            to_retry.append(crit_with_job_app)
+            crit_with_accepted_job_app_in_the_future = factory(criteria_certification_error=True)
+            JobApplicationFactory(
+                eligibility_diagnosis=crit_with_accepted_job_app_in_the_future.eligibility_diagnosis,
+                hiring_start_at=timezone.localdate() + timedelta(days=7),
+                state=JobApplicationState.ACCEPTED,
+            )
+            to_retry.append(crit_with_accepted_job_app_in_the_future)
+            crit_expired_certification = factory(
+                criteria_certified=True,
+                certification_period=InclusiveDateRange(
+                    timezone.localdate() - timedelta(days=2),
+                    timezone.localdate(),
+                ),
+            )
+            to_retry.append(crit_expired_certification)
 
         call_command("retry_certify_criteria", wet_run=True)
         expected_retries = [call(crit._meta.model_name, crit.pk) for crit in to_retry]
