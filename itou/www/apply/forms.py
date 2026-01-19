@@ -961,13 +961,13 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
     def get_sender_prescriber_organization_choices(self):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
-        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
+        sender_orgs = [(sender.id, sender.display_name) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda org: org[0])
 
     def get_sender_companies_choices(self):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_company")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
-        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
+        sender_orgs = [(sender.id, sender.display_name) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda org: org[0])
 
 
@@ -1004,7 +1004,7 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
     def get_to_companies_choices(self):
         to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
         to_companies = [company for company in to_companies if company.display_name]
-        to_companies = [(company.id, company.display_name.title()) for company in to_companies]
+        to_companies = [(company.id, company.display_name) for company in to_companies]
         return sorted(to_companies, key=lambda company: company[1])
 
 
