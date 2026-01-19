@@ -2374,7 +2374,7 @@ class TestJobApplicationXlsxExport:
                 datetime.datetime(1990, 1, 1),
                 "Rennes",
                 "35000",
-                "Acme inc.",
+                "ACME Inc.",
                 "EI",
                 "Candidature spontanée",
                 "Ma structure",

@@ -2741,7 +2741,7 @@
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
   Commentaire de l’employeur :
   
@@ -2754,13 +2754,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_job_seeker_subject]
-  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI Acme inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   Commentaire de l’employeur :
   
@@ -2777,13 +2777,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI Acme inc.'
+  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
   Commentaire de l’employeur :
   
@@ -2796,13 +2796,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_subject]
-  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -2811,13 +2811,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_job_seeker_subject]
-  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de J… D… au sein de la structure EI Acme inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de J… D… au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   -----
   
@@ -2830,13 +2830,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de J… D… ajoutée au vivier par EI Acme inc.'
+  '[TEST] Candidature de J… D… ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a décidé d’intégrer votre candidature à son vivier, afin de pouvoir l’étudier de nouveau pour de futures opportunités.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -2845,13 +2845,13 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_job_seeker_subject]
-  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI Acme inc.'
+  '[TEST] Votre candidature a été ajoutée au vivier de l’entreprise EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI Acme inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   -----
   
@@ -2864,7 +2864,7 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI Acme inc.'
+  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[copy_public_id]
   '''
@@ -6829,7 +6829,7 @@
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
   Commentaire de l’employeur:
   
@@ -6842,13 +6842,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_subject]
-  '[TEST] Votre candidature mise en attente par EI Acme inc.'
+  '[TEST] Votre candidature mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
+  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   Commentaire de l’employeur:
   
@@ -6865,13 +6865,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE mise en attente par EI Acme inc.'
+  '[TEST] Candidature de Jane DOE mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
   Commentaire de l’employeur:
   
@@ -6884,13 +6884,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_subject]
-  '[TEST] Votre candidature mise en attente par EI Acme inc.'
+  '[TEST] Votre candidature mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -6899,13 +6899,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_job_seeker_subject]
-  '[TEST] Votre candidature mise en attente par EI Acme inc.'
+  '[TEST] Votre candidature mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de J… D… au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
+  La candidature de J… D… au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   -----
   
@@ -6918,13 +6918,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_proxy_subject]
-  '[TEST] Candidature de J… D… mise en attente par EI Acme inc.'
+  '[TEST] Candidature de J… D… mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_job_seeker_body]
   '''
   Bonjour,
   
-  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  Suite à votre candidature au sein de la structure EI ACME Inc., l’employeur a mis votre candidature en attente.
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -6933,13 +6933,13 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_job_seeker_subject]
-  '[TEST] Votre candidature mise en attente par EI Acme inc.'
+  '[TEST] Votre candidature mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_proxy_body]
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
+  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   -----
   
@@ -6952,7 +6952,7 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE mise en attente par EI Acme inc.'
+  '[TEST] Candidature de Jane DOE mise en attente par EI ACME Inc.'
 # ---
 # name: test_add_prior_action
   '''

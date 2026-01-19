@@ -2313,7 +2313,7 @@
                           50 ans et plus
                       </td>
                       <td>
-                          Acme inc.
+                          ACME Inc.
                       </td>
                       <td>
                           -
@@ -2359,7 +2359,7 @@
                           Fin d'une formation
                       </td>
                       <td>
-                          John DOE - Acme inc.
+                          John DOE - ACME Inc.
                       </td>
                       <td>
                           Ack CEPTÉ
@@ -2381,7 +2381,7 @@
                           RQTH - Reconnaissance de la qualité de travailleur handicapé
                       </td>
                       <td>
-                          John DOE - Acme inc.
+                          John DOE - ACME Inc.
                       </td>
                       <td>
                           Apou VÉPAR - Une orga
@@ -2462,7 +2462,7 @@
                           50 ans et plus
                       </td>
                       <td>
-                          Acme inc.
+                          ACME Inc.
                       </td>
                       <td>
                           -
@@ -2508,7 +2508,7 @@
                           Fin d'une formation
                       </td>
                       <td>
-                          John DOE - Acme inc.
+                          John DOE - ACME Inc.
                       </td>
                       <td>
                           Ack CEPTÉ
@@ -2530,7 +2530,7 @@
                           RQTH - Reconnaissance de la qualité de travailleur handicapé
                       </td>
                       <td>
-                          John DOE - Acme inc.
+                          John DOE - ACME Inc.
                       </td>
                       <td>
                           Apou VÉPAR - Une orga
@@ -4615,7 +4615,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une siae
+                          Une SIAE
                       </td>
                       <td>
                           <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Modifier la suspension" data-bs-toggle="tooltip" href="/approvals/suspension/1/action/edit/?back_url=/approvals/details/[Public ID of Approval]">
@@ -4647,7 +4647,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une autre siae
+                          Une autre SIAE
                       </td>
                       <td>
                       </td>
@@ -4735,7 +4735,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une siae
+                          Une SIAE
                       </td>
                       <td>
                       </td>
@@ -4756,7 +4756,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une autre siae
+                          Une autre SIAE
                       </td>
                       <td>
                       </td>
@@ -4835,7 +4835,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une siae
+                          Une SIAE
                       </td>
                       <td>
                       </td>
@@ -4856,7 +4856,7 @@
                           Contrat de travail suspendu depuis plus de 15 jours
                       </td>
                       <td>
-                          Une autre siae
+                          Une autre SIAE
                       </td>
                       <td>
                       </td>
@@ -5041,7 +5041,7 @@
 # ---
 # name: test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=Aci+de+la+rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=ACI+de+la+Rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
       <i aria-hidden="true" class="ri-pass-expired-line fw-medium">
       </i>
       <span>

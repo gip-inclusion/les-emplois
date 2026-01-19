@@ -59,7 +59,7 @@
                                   Sélectionnez une structure
                               </option>
                               <option value="[PK of Company]">
-                                  EI - Acme inc.
+                                  EI - ACME Inc.
                               </option>
                           </select>
                       </div>
@@ -115,7 +115,7 @@
                                   Sélectionnez une structure
                               </option>
                               <option value="[PK of Company]">
-                                  EI - Acme inc.
+                                  EI - ACME Inc.
                               </option>
                           </select>
                       </div>
@@ -148,7 +148,7 @@
   '''
 # ---
 # name: TestProcessTransferJobApplication.test_job_application_transfer_enabled[transfer message]
-  'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
+  'La candidature de <>Html Escaped<> DOE a bien été transférée à ACME Inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
 # name: test_step_1[progress]
   '''

@@ -340,7 +340,7 @@ class TestCompanySignup:
 
         # Checks that the SIRET and  the enterprise name are present in the second step
         response = client.post(url, data=post_data, follow=True)
-        assertContains(response, "Centre communal")
+        assertContains(response, "CENTRE COMMUNAL")
         assertContains(response, format_siret(FAKE_SIRET))
 
         # Now, we're on the second page.

@@ -5319,7 +5319,7 @@
       datetime.datetime(1990, 1, 1, 0, 0),
       'Rennes',
       '35000',
-      'Acme inc.',
+      'ACME Inc.',
       'EI',
       'Candidature spontanée',
       'Orienteur',
@@ -5377,7 +5377,7 @@
       datetime.datetime(1990, 1, 1, 0, 0),
       'Rennes',
       '35000',
-      'Acme inc.',
+      'ACME Inc.',
       'EI',
       'Candidature spontanée',
       'Orienteur',
@@ -6701,7 +6701,7 @@
                                   Sélectionnez une structure
                               </option>
                               <option value="2222">
-                                  EI - Acme inc.
+                                  EI - ACME Inc.
                               </option>
                               <option value="3333">
                                   EITI - Superbe snapshot
@@ -6781,7 +6781,7 @@
                                   Sélectionnez une structure
                               </option>
                               <option value="2222">
-                                  EI - Acme inc.
+                                  EI - ACME Inc.
                               </option>
                               <option value="3333">
                                   EITI - Superbe snapshot
@@ -6875,7 +6875,7 @@
                                   Sélectionnez une structure
                               </option>
                               <option value="2222">
-                                  EI - Acme inc.
+                                  EI - ACME Inc.
                               </option>
                               <option value="3333">
                                   EITI - Superbe snapshot

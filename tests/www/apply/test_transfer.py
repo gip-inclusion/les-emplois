@@ -266,8 +266,8 @@ def test_step_1(client, snapshot):
         html=True,
         count=1,
     )
-    assertContains(response, other_company.name.capitalize())
-    assertContains(response, job_application.to_company.name.capitalize())
+    assertContains(response, other_company.name)
+    assertContains(response, job_application.to_company.name)
     assertNotContains(response, POSTULER)
     assertContains(
         response,
