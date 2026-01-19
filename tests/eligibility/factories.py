@@ -113,7 +113,7 @@ class IAESelectedAdministrativeCriteriaFactory(factory.django.DjangoModelFactory
             certified_at=factory.SelfAttribute(".eligibility_diagnosis.created_at"),
             certification_period=factory.LazyAttribute(
                 lambda obj: InclusiveDateRange(
-                    obj.eligibility_diagnosis.created_at,
+                    timezone.localdate(obj.eligibility_diagnosis.created_at),
                     obj.eligibility_diagnosis.expires_at,
                 )
             ),
