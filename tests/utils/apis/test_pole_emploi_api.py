@@ -534,7 +534,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
         # Use a context manager to reuse the same HTTP client.
         # See BasePoleEmploiApiClient._httpx_client
         with self.api_client as client:
-            data = client.certify_rqth(jobseeker_profile=JobSeekerProfileFactory())
+            data = client.rqth(jobseeker_profile=JobSeekerProfileFactory())
         for key, value in expected_data.items():
             assert data[key] == value
         assert data["raw_response"] == json_response

@@ -432,7 +432,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
 
         return data["jetonUsager"]
 
-    def certify_rqth(self, jobseeker_profile):
+    def rqth(self, jobseeker_profile):
         jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
         data = self._request(
             f"{self.base_url}{Endpoints.RQTH}",
