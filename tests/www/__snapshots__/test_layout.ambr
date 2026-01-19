@@ -11,7 +11,7 @@
                       EI
                   </span>
                   <strong>
-                      Acme inc.
+                      ACME Inc.
                   </strong>
               </button>
               <div class="dropdown-menu" id="switchStructureDropdownMobile">
@@ -26,7 +26,7 @@
                                       EI
                                   </span>
                                   <strong>
-                                      Acme inc.
+                                      ACME Inc.
                                   </strong>
                               </button>
                           </li>
@@ -384,7 +384,7 @@
                   <i aria-hidden="true" class="ri-community-line">
                   </i>
                   <span>
-                      EI - Acme inc.
+                      EI - ACME Inc.
                   </span>
               </button>
               <div class="dropdown-menu w-100" id="switchStructureDropdown">
@@ -399,7 +399,7 @@
                                       EI
                                   </span>
                                   <strong>
-                                      Acme inc.
+                                      ACME Inc.
                                   </strong>
                               </button>
                           </li>

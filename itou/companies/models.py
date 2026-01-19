@@ -385,7 +385,7 @@ class Company(AddressMixin, OrganizationAbstract):
     def display_name(self):
         if self.brand:
             return self.brand
-        return self.name.capitalize()
+        return self.name
 
     @property
     def is_active(self):

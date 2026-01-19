@@ -152,9 +152,9 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        assertContains(response, COMPANY_VANNES.capitalize())
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_VANNES)
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
 
         # 15 km
         response = client.get(self.URL, {"city": guerande.slug, "distance": 15})
@@ -164,8 +164,8 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
 
         # 100 km and 44
         response = client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
@@ -175,8 +175,8 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
 
         # 100 km and 56
         response = client.get(self.URL, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
@@ -185,7 +185,7 @@ class TestSearchCompany:
             '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
         )
-        assertContains(response, COMPANY_VANNES.capitalize())
+        assertContains(response, COMPANY_VANNES)
 
     def test_departments_without_neighbors(self, client):
         kourou_coords = Point(5.1614382, -52.6482039)
@@ -381,8 +381,8 @@ class TestSearchCompany:
 
         # Using SiaeSearchForm.DISTANCE_DEFAULT.
         response = client.get(self.URL, {"city": guerande.slug})
-        guerande_opt = f'<option value="{company_guerande.pk}">{company_guerande.name.capitalize()}</option>'
-        vannes_opt = f'<option value="{company_vannes.pk}">{company_vannes.name.capitalize()}</option>'
+        guerande_opt = f'<option value="{company_guerande.pk}">{company_guerande.name}</option>'
+        vannes_opt = f'<option value="{company_vannes.pk}">{company_vannes.name}</option>'
         assertContains(response, guerande_opt, html=True, count=1)
         assertNotContains(response, vannes_opt, html=True)
         simulated_page = parse_response_to_soup(response)
@@ -810,9 +810,9 @@ class TestJobDescriptionSearchView:
             '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">3</span>',
             html=True,
         )
-        assertContains(response, COMPANY_VANNES.capitalize())
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_VANNES)
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
 
         # 15 km
         response = client.get(self.URL, {"city": guerande.slug, "distance": 15})
@@ -821,8 +821,8 @@ class TestJobDescriptionSearchView:
             '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
         )
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
 
         # 100 km and 44
         response = client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
@@ -831,8 +831,8 @@ class TestJobDescriptionSearchView:
             '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
         )
-        assertContains(response, COMPANY_GUERANDE.capitalize())
-        assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
+        assertContains(response, COMPANY_GUERANDE)
+        assertContains(response, COMPANY_SAINT_ANDRE)
         assertContains(response, "56 - Morbihan")  # the other department is still visible in the filters
 
         # 100 km and 56
@@ -842,7 +842,7 @@ class TestJobDescriptionSearchView:
             '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
         )
-        assertContains(response, COMPANY_VANNES.capitalize())
+        assertContains(response, COMPANY_VANNES)
 
     def test_order_by(self, client):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))

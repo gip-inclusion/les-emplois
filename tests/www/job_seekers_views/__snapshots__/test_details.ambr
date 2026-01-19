@@ -532,7 +532,7 @@
                                                   </small>
                                                   <strong>
                                                       John DOE
-                  (Acme inc.)
+                  (ACME Inc.)
                                                   </strong>
                                               </li>
                                               <li>
@@ -1568,7 +1568,7 @@
                                                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
                                                   </i>
                                                   <span>
-                                                      Acme inc.
+                                                      ACME Inc.
                                                   </span>
                                               </a>
                                           </p>
@@ -1610,7 +1610,7 @@
                                                   <i aria-hidden="true" class="ri-community-line fw-medium ri-sm me-1">
                                                   </i>
                                                   <span>
-                                                      Autre entreprise
+                                                      Autre Entreprise
                                                   </span>
                                               </a>
                                           </p>

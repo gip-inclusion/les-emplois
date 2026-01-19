@@ -627,7 +627,7 @@
               "candidat_pass_iae_date_debut": "2000-01-01",
               "candidat_pass_iae_date_fin": "3000-01-01",
               "entreprise_type": "EI",
-              "entreprise_nom": "Acme inc.",
+              "entreprise_nom": "ACME Inc.",
               "entreprise_siret": "012345678910",
               "entreprise_adresse": "112 rue de la Croix-Nivert, 75015 Paris",
               "entreprise_employeur_email": "contact@acmeinc.com",

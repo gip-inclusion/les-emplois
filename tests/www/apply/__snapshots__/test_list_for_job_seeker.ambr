@@ -1400,7 +1400,7 @@
                           Entreprise d'insertion
                       </span>
                       <h3>
-                          Acme inc.
+                          ACME Inc.
                       </h3>
                   </div>
               </div>
@@ -1429,7 +1429,7 @@
                   <p class="fs-sm mb-0 flex-grow-1">
                       Émise le 27 novembre 2024 par
                       <strong>
-                          Acme inc.
+                          ACME Inc.
                       </strong>
                       <i aria-hidden="true" class="ri-community-line me-1">
                       </i>
@@ -1449,7 +1449,7 @@
                           Entreprise d'insertion
                       </span>
                       <h3>
-                          Acme inc.
+                          ACME Inc.
                       </h3>
                   </div>
               </div>
@@ -1495,7 +1495,7 @@
                           Entreprise d'insertion
                       </span>
                       <h3>
-                          Acme inc.
+                          ACME Inc.
                       </h3>
                   </div>
               </div>
@@ -1554,7 +1554,7 @@
                   <tr class="align-top">
                       <td>
                           <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                              Acme inc.
+                              ACME Inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-danger" id="state_[PK of JobApplication]">
                               Candidature déclinée
@@ -1581,7 +1581,7 @@
                   <tr class="align-top">
                       <td>
                           <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                              Acme inc.
+                              ACME Inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-info" id="state_[PK of JobApplication]">
                               Nouvelle candidature
@@ -1596,7 +1596,7 @@
                       <td>
                           <i aria-hidden="true" class="ri-community-line">
                           </i>
-                          Acme inc.
+                          ACME Inc.
                       </td>
                       <td class="text-end w-50px align-middle">
                           <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir ma candidature" data-bs-toggle="tooltip" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
@@ -1608,7 +1608,7 @@
                   <tr class="align-top">
                       <td>
                           <a class="btn-link d-block" href="/apply/[PK of JobApplication]/jobseeker/details?back_url=/apply/job_seeker/list%3Fdisplay%3Dtable">
-                              Acme inc.
+                              ACME Inc.
                           </a>
                           <span class="badge rounded-pill text-nowrap badge-sm bg-success" id="state_[PK of JobApplication]">
                               Candidature acceptée
