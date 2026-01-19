@@ -1,6 +1,8 @@
 from urllib.parse import quote
 
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
@@ -39,6 +41,8 @@ class TestApplyAsPrescriber:
             first_name="Alain",
             last_name="Zorro",
             public_id="11111111-2222-3333-4444-555566667777",
+            jobseeker_profile__with_education_level_above_cap_bep=True,  # Avoid auto-filled criteria
+            jobseeker_profile__birthdate=timezone.localdate() - relativedelta(years=30),  # Avoid auto-filled criteria
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
         JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
