@@ -4,6 +4,7 @@ import json
 import logging
 import re
 import time
+from urllib.parse import urljoin
 
 import httpx
 from django.conf import settings
@@ -443,7 +444,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     def rqth(self, jobseeker_profile):
         jeton_usager = self.rechercher_usager(jobseeker_profile=jobseeker_profile)
         data = self._request(
-            f"{self.base_url}{Endpoints.RQTH}",
+            urljoin(self.base_url, Endpoints.RQTH),
             method="GET",
             jeton_usager=jeton_usager,
         )
