@@ -3,9 +3,9 @@ import functools
 from collections import defaultdict
 
 from django.conf import settings
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Exists, F, OuterRef, Value
-from django.db.models.functions import Concat, Lower
+from django.db.models.functions import Coalesce, Concat, Lower, NullIf
 from django.http import Http404, JsonResponse
 from django.http.response import HttpResponse
 from django.shortcuts import render
@@ -33,7 +33,7 @@ from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     JobApplicationInternalTransferForm,
     PrescriberFilterJobApplicationsForm,
-    get_field_label_from_instance_func,
+    get_field_label_from_instance_funcs,
 )
 from itou.www.apply.views.process_views import DEFAULT_ADD_TO_POOL_ANSWER
 from itou.www.stats.utils import can_view_stats_ft
@@ -576,27 +576,48 @@ def autocomplete(request, list_kind, field_name):
         raise Http404
 
     term = request.GET.get("term", "").strip()
-    field_display = get_field_label_from_instance_func(field_name, request)
+    field_display, qs_infos = get_field_label_from_instance_funcs(field_name, request)
 
     job_applications = _get_job_applications_qs(request, list_kind=list_kind)
-    objects = job_applications.get_unique_fk_objects(field_name)
+    if field_name == "sender_company":
+        job_applications = job_applications.annotate(
+            sender_company_display_name=Coalesce(
+                NullIf(F("sender_company__brand"), Value("")), F("sender_company__name")
+            )
+        )
+    elif field_name == "to_company":
+        job_applications = job_applications.annotate(
+            to_company_display_name=Coalesce(NullIf(F("to_company__brand"), Value("")), F("to_company__name"))
+        )
+
+    fields = qs_infos["fields"]
+    term_queries = []
+    for bit in term.split():
+        or_queries = models.Q.create(
+            [(f"{field}__{qs_infos['lookup']}", bit) for field in fields],
+            connector=models.Q.OR,
+        )
+        term_queries.append(or_queries)
+    job_applications = job_applications.filter(models.Q.create(term_queries))
 
     results = []
     if term:
-        case_folded_term = term.casefold()
-        matches = []
-        for obj in objects:
-            obj_display = field_display(obj)  # This can be expensive
-            case_folded_display = obj_display.casefold()
-            if case_folded_term in case_folded_display:
-                # Store results in sorting order
-                matches.append((case_folded_display.index(case_folded_term), obj_display, obj.pk))
-        results = [
-            {
-                "text": match[1],
-                "id": match[2],
-            }
-            for match in sorted(matches)[:20]
+        objects = [
+            getattr(job_app, field_name)
+            for job_app in job_applications.order_by(*fields, f"{field_name}_id")
+            .distinct(*fields, f"{field_name}_id")
+            .select_related(field_name)[:20]
         ]
+
+        for obj in objects:
+            if field_name == "job_seeker" and not can_view_personal_information(request, obj):
+                # Skip masked job seekers
+                continue
+            results.append(
+                {
+                    "text": field_display(obj),
+                    "id": obj.pk,
+                }
+            )
 
     return JsonResponse({"results": results}, safe=False)

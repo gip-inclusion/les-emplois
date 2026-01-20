@@ -169,12 +169,13 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."job_seeker_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON ("users_user"."first_name",
+                              "users_user"."last_name",
+                              "job_applications_jobapplication"."job_seeker_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -257,8 +258,12 @@
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" ON ("job_applications_jobapplication"."job_seeker_id" = "users_user"."id")
           WHERE ("job_applications_jobapplication"."sender_company_id" = %s
-                 AND NOT ("job_applications_jobapplication"."to_company_id" = %s))
-          ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
+            AND NOT ("job_applications_jobapplication"."to_company_id" = %s)
+            AND (UPPER(UNACCENT("users_user"."first_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' OR UPPER(UNACCENT("users_user"."last_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% '))
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC,
+                   "job_applications_jobapplication"."job_seeker_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),
@@ -434,12 +439,13 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON ("users_user"."first_name",
+                              "users_user"."last_name",
+                              "job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -520,10 +526,14 @@
                              "users_user"."upcoming_deletion_notified_at",
                              "users_user"."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
           WHERE ("job_applications_jobapplication"."sender_company_id" = %s
-                 AND NOT ("job_applications_jobapplication"."to_company_id" = %s))
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
+            AND NOT ("job_applications_jobapplication"."to_company_id" = %s)
+            AND (UPPER(UNACCENT("users_user"."first_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' OR UPPER(UNACCENT("users_user"."last_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% '))
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC,
+                   "job_applications_jobapplication"."sender_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),
@@ -699,12 +709,12 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."to_company_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON ("to_company_display_name",
+                              "job_applications_jobapplication"."to_company_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -749,6 +759,7 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             COALESCE(NULLIF(T3."brand", %s), T3."name") AS "to_company_display_name",
                              T3."id",
                              T3."address_line_1",
                              T3."address_line_2",
@@ -789,8 +800,11 @@
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" T3 ON ("job_applications_jobapplication"."to_company_id" = T3."id")
           WHERE ("job_applications_jobapplication"."sender_company_id" = %s
-                 AND NOT ("job_applications_jobapplication"."to_company_id" = %s))
-          ORDER BY "job_applications_jobapplication"."to_company_id" ASC
+            AND NOT ("job_applications_jobapplication"."to_company_id" = %s)
+            AND UPPER(UNACCENT(COALESCE(NULLIF(T3."brand", %s), T3."name"))::text) LIKE '%%' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' AND UPPER(UNACCENT(COALESCE(NULLIF(T3."brand", %s), T3."name"))::text) LIKE ' %% ' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ')
+          ORDER BY 46 ASC,
+                   "job_applications_jobapplication"."to_company_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),
@@ -912,12 +926,13 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."job_seeker_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON (T4."first_name",
+                              T4."last_name",
+                              "job_applications_jobapplication"."job_seeker_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -999,10 +1014,14 @@
                              T4."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
           INNER JOIN "users_user" T4 ON ("job_applications_jobapplication"."job_seeker_id" = T4."id")
-          WHERE (("job_applications_jobapplication"."sender_id" = %s
-                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                 OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
-          ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
+          WHERE ((("job_applications_jobapplication"."sender_id" = %s
+                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                  OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+            AND (UPPER(UNACCENT(T4."first_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' OR UPPER(UNACCENT(T4."last_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% '))
+          ORDER BY T4."first_name" ASC,
+                   T4."last_name" ASC,
+                   "job_applications_jobapplication"."job_seeker_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),
@@ -1124,12 +1143,13 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON ("users_user"."first_name",
+                              "users_user"."last_name",
+                              "job_applications_jobapplication"."sender_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -1210,11 +1230,15 @@
                              "users_user"."upcoming_deletion_notified_at",
                              "users_user"."allow_next_sso_sub_update"
           FROM "job_applications_jobapplication"
-          LEFT OUTER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
-          WHERE (("job_applications_jobapplication"."sender_id" = %s
-                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                 OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
-          ORDER BY "job_applications_jobapplication"."sender_id" ASC
+          INNER JOIN "users_user" ON ("job_applications_jobapplication"."sender_id" = "users_user"."id")
+          WHERE ((("job_applications_jobapplication"."sender_id" = %s
+                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                  OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+            AND (UPPER(UNACCENT("users_user"."first_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' OR UPPER(UNACCENT("users_user"."last_name")::text) LIKE UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% '))
+          ORDER BY "users_user"."first_name" ASC,
+                   "users_user"."last_name" ASC,
+                   "job_applications_jobapplication"."sender_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),
@@ -1336,12 +1360,12 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
-          SELECT DISTINCT ON ("job_applications_jobapplication"."to_company_id") "job_applications_jobapplication"."id",
+          SELECT DISTINCT ON ("to_company_display_name",
+                              "job_applications_jobapplication"."to_company_id") "job_applications_jobapplication"."id",
                              "job_applications_jobapplication"."job_seeker_id",
                              "job_applications_jobapplication"."eligibility_diagnosis_id",
                              "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
@@ -1386,6 +1410,7 @@
                              "job_applications_jobapplication"."planned_training_hours",
                              "job_applications_jobapplication"."inverted_vae_contract",
                              "job_applications_jobapplication"."diagoriente_invite_sent_at",
+                             COALESCE(NULLIF("companies_company"."brand", %s), "companies_company"."name") AS "to_company_display_name",
                              "companies_company"."id",
                              "companies_company"."address_line_1",
                              "companies_company"."address_line_2",
@@ -1425,10 +1450,13 @@
                              "companies_company"."fields_history"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
-          WHERE (("job_applications_jobapplication"."sender_id" = %s
-                  AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
-                 OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
-          ORDER BY "job_applications_jobapplication"."to_company_id" ASC
+          WHERE ((("job_applications_jobapplication"."sender_id" = %s
+                   AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                  OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
+            AND UPPER(UNACCENT(COALESCE(NULLIF("companies_company"."brand", %s), "companies_company"."name"))::text) LIKE '%%' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ' AND UPPER(UNACCENT(COALESCE(NULLIF("companies_company"."brand", %s), "companies_company"."name"))::text) LIKE ' %% ' || UPPER(REPLACE(REPLACE(REPLACE((UNACCENT(%s)), E'\\', E'\\\\'), E' %% ', E'\\ %% '), E'_', E'\\_')) || ' %% ')
+          ORDER BY 46 ASC,
+                   "job_applications_jobapplication"."to_company_id" ASC
+          LIMIT 20
         ''',
       }),
     ]),

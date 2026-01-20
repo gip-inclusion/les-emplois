@@ -696,16 +696,46 @@ class BirthDateForm(forms.ModelForm):
         birthdate.help_text = "Au format JJ/MM/AAAA, par exemple 20/12/1978."
 
 
-def get_field_label_from_instance_func(field_name, request):
+def get_field_label_from_instance_funcs(field_name, request):
+    # Keep both dictionaries in sync:
+    # the fields_display function must match the qs_annotation one (insensitive case)
     fields_display = {
-        "sender": lambda sender: sender.get_full_name(),
-        "sender_prescriber_organization": lambda org: org.display_name,
-        "sender_company": lambda company: company.display_name,
-        "to_company": lambda company: company.display_name,
         "job_seeker": lambda job_seeker: job_seeker.get_full_name(),
+        "sender": lambda sender: sender.get_full_name(),
+        "sender_company": lambda company: company.display_name,
+        "sender_prescriber_organization": lambda org: org.display_name,
+        "to_company": lambda company: company.display_name,
+    }
+    qs_infos = {
+        "job_seeker": {
+            "fields": (
+                "job_seeker__first_name",
+                "job_seeker__last_name",
+            ),
+            "lookup": "unaccent__istartswith",
+        },
+        "sender": {
+            "fields": (
+                "sender__first_name",
+                "sender__last_name",
+            ),
+            "lookup": "unaccent__istartswith",
+        },
+        "sender_company": {
+            "fields": ("sender_company_display_name",),
+            "lookup": "unaccent__icontains",
+        },
+        "sender_prescriber_organization": {
+            "fields": ("sender_prescriber_organization__name",),
+            "lookup": "unaccent__icontains",
+        },
+        "to_company": {
+            "fields": ("to_company_display_name",),
+            "lookup": "unaccent__icontains",
+        },
     }
     if request.user.is_employer:
-        return fields_display[field_name]
+        return fields_display[field_name], qs_infos[field_name]
     elif request.user.is_prescriber:
         if field_name == "job_seeker":
 
@@ -714,8 +744,8 @@ def get_field_label_from_instance_func(field_name, request):
                     job_seeker.get_full_name(), predicate=can_view_personal_information(request, job_seeker)
                 )
 
-            return field_display
-        return fields_display[field_name]
+            return field_display, qs_infos[field_name]
+        return fields_display[field_name], qs_infos[field_name]
     raise ValueError("Unsupported user kind")
 
 
@@ -886,9 +916,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     )
 
     def _configure_autocomplete_field(self, form_field_name, model_field_name, request, autocomplete_view_name=None):
-        self.fields[form_field_name].widget.label_from_instance = get_field_label_from_instance_func(
+        self.fields[form_field_name].widget.label_from_instance = get_field_label_from_instance_funcs(
             model_field_name, request
-        )
+        )[0]
         self.fields[form_field_name].queryset = self.fields[form_field_name].queryset.filter(
             pk__in=self.job_applications_qs.get_unique_fk_qs(model_field_name).values_list(
                 f"{model_field_name}_id", flat=True

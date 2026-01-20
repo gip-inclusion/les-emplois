@@ -1169,7 +1169,7 @@ class TestAutocomplete:
             "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
             "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
             "to_company": (
-                "ciété c",
+                "société c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
             ),
         }
@@ -1233,12 +1233,11 @@ class TestAutocomplete:
         autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "job_seeker"})
 
         response = client.get(autocomplete_url, {"term": "Y"})
-        assert response.json() == {"results": [{"id": job_application.job_seeker.pk, "text": "Y… C…"}]}
+        assert response.json() == {"results": []}
 
-        response = client.get(autocomplete_url, {"term": "r"})
+        response = client.get(autocomplete_url, {"term": "e"})
         assert response.json() == {
             "results": [
-                {"id": other_job_application.job_seeker.pk, "text": "R… C…"},
                 {"id": third_application.job_seeker.pk, "text": "Ethan COOPER"},
             ]
         }
@@ -1246,12 +1245,8 @@ class TestAutocomplete:
         job_seeker.last_login = timezone.now()
         job_seeker.save(update_fields=["last_login"])
 
-        response = client.get(autocomplete_url, {"term": "r"})
-        assert response.json() == {
-            "results": [
-                {"id": other_job_application.job_seeker.pk, "text": "R… C…"},
-            ]
-        }
+        response = client.get(autocomplete_url, {"term": "e"})
+        assert response.json() == {"results": []}
 
         # sender field
         autocomplete_url = reverse("apply:list_prescriptions_autocomplete", kwargs={"field_name": "sender"})
@@ -1263,7 +1258,7 @@ class TestAutocomplete:
                 {"id": job_application.sender.pk, "text": "John DOE"},
             ]
         }
-        response = client.get(autocomplete_url, {"term": "c"})
+        response = client.get(autocomplete_url, {"term": "jo bl"})
         assert response.json() == {
             "results": [
                 {"id": third_application.sender.pk, "text": "John BLACK"},
@@ -1308,7 +1303,7 @@ class TestAutocomplete:
             "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
             "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
             "to_company": (
-                "ciété c",
+                "société c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
             ),
         }
