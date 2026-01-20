@@ -690,7 +690,7 @@ class TestMergeUsers:
             requested_by=user_2,
         )
 
-        if user_2.is_employer:
+        if isinstance(factory, EmployerFactory):
             employee_record_log = EmployeeRecordTransitionLogFactory(user=user_2)
 
         client.force_login(ItouStaffFactory(is_superuser=True))
@@ -759,7 +759,7 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
-        if user_2.is_employer:
+        if isinstance(factory, EmployerFactory):
             expected_messages.insert(
                 13,
                 f"{prefix}itou.employee_record.models.EmployeeRecordTransitionLog.user : [{employee_record_log.pk}]",

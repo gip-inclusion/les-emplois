@@ -1,8 +1,8 @@
 import logging
 
 from itou.communications.dispatch.base import BaseNotification
-from itou.companies.models import CompanyMembership
-from itou.prescribers.models import PrescriberMembership
+from itou.companies.models import Company, CompanyMembership
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.emails import get_email_message
 
 
@@ -33,9 +33,9 @@ class EmailNotification(BaseNotification):
             and self.structure
             and (self.user.is_prescriber or self.user.is_employer)
         ):
-            if self.user.is_prescriber:
+            if isinstance(self.structure, PrescriberOrganization):
                 memberships = PrescriberMembership.objects.filter(organization=self.structure).select_related("user")
-            elif self.user.is_employer:
+            elif isinstance(self.structure, Company):
                 memberships = CompanyMembership.objects.filter(company=self.structure).select_related("user")
             members = [m.user for m in memberships]
             if self.user not in members:
