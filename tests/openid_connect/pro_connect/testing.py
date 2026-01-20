@@ -30,6 +30,9 @@ OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
 }
 
 
+ID_TOKEN = "123456"
+
+
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(
@@ -62,7 +65,7 @@ def mock_oauth_dance(
     response = client.get(authorize_url)
     assert response.url.startswith(constants.PRO_CONNECT_ENDPOINT_AUTHORIZE)
 
-    token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+    token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
     respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
     user_info = oidc_userinfo or OIDC_USERINFO.copy()
@@ -87,7 +90,7 @@ def mock_oauth_dance(
 def assert_and_mock_forced_logout(client, response, expected_redirect_url=reverse("search:employers_home")):
     expected_logout_url = add_url_params(
         reverse("pro_connect:logout"),
-        {"redirect_url": expected_redirect_url, "token": "123456"},
+        {"redirect_url": expected_redirect_url, "token": ID_TOKEN},
     )
     assertRedirects(response, expected_logout_url, fetch_redirect_response=False)
     response = client.get(response.url)
