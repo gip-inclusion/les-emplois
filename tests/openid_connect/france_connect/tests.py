@@ -44,7 +44,7 @@ FC_USERINFO = {
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
 def mock_oauth_dance(client, expected_route="dashboard:index", matching_nonces=True, valid_id_token=True):
-    # No session is created with France Connect in contrary to Inclusion Connect
+    # No session is created with France Connect in contrary to ProConnect
     # so there's no use to go through france_connect:authorize
     id_token_nonce = str(uuid.uuid4())
     private_key = ec.generate_private_key(ec.SECP256R1())

@@ -42,7 +42,7 @@ def mock_oauth_dance(
     expected_route="dashboard:index",
     user_info=None,
 ):
-    # No session is created with PEAMU in contrary to Inclusion Connect
+    # No session is created with PEAMU in contrary to ProConnect
     # so there's no use to go through pe_connect:authorize
 
     token_json = {"access_token": "7890123", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}

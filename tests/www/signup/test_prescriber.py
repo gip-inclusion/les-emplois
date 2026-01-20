@@ -167,7 +167,7 @@ class TestPrescriberSignup:
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 3: Inclusion Connect button
+        # Step 3: ProConnect button
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
@@ -247,7 +247,7 @@ class TestPrescriberSignup:
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 3: Inclusion Connect button
+        # Step 3: ProConnect button
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
@@ -345,7 +345,7 @@ class TestPrescriberSignup:
         }
         response = client.post(url, data=post_data)
 
-        # Step 5: Inclusion Connect button
+        # Step 5: ProConnect button
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
@@ -432,7 +432,7 @@ class TestPrescriberSignup:
         }
         response = client.post(url, data=post_data)
 
-        # Step 4: Inclusion Connect button
+        # Step 4: ProConnect button
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
@@ -571,7 +571,7 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_check_already_exists")
         response = client.get(url)
 
-        # Step 2: Inclusion Connect button
+        # Step 2: ProConnect button
         url = reverse("signup:prescriber_user")
         assertContains(response, url)
         response = client.get(url)
@@ -646,7 +646,7 @@ class TestPrescriberSignup:
         response = client.post(url, data=post_data)
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 3: Inclusion Connect button
+        # Step 3: ProConnect button
         url = reverse("signup:prescriber_user")
         assertRedirects(response, url)
         response = client.get(url)
@@ -788,7 +788,7 @@ class TestPrescriberSignup:
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        # Connect with Inclusion Connect.
+        # Connect with ProConnect
         response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
@@ -858,7 +858,7 @@ class TestPrescriberSignup:
         url = escape(f"{pro_connect.authorize_url}?{urlencode(params)}")
         assertContains(response, url + '"')
 
-        # Connect with Inclusion Connect.
+        # Connect with ProConnect
         response = pro_connect.mock_oauth_dance(
             client,
             KIND_PRESCRIBER,
@@ -964,7 +964,7 @@ class TestProConnectPrescribersViewsExceptions:
         response = client.get(signup_url)
         pro_connect.assertContainsButton(response)
 
-        # Connect with Inclusion Connect.
+        # Connect with ProConnect
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         response = pro_connect.mock_oauth_dance(
@@ -1035,7 +1035,7 @@ class TestProConnectPrescribersViewsExceptions:
         response = client.get(signup_url)
         pro_connect.assertContainsButton(response)
 
-        # Connect with Inclusion Connect.
+        # Connect with ProConnect
         previous_url = signup_url
         next_url = reverse("signup:prescriber_join_org")
         response = pro_connect.mock_oauth_dance(
@@ -1107,7 +1107,7 @@ class TestProConnectPrescribersViewsExceptions:
         response = client.get(signup_url)
         pro_connect.assertContainsButton(response)
 
-        # Connect with Inclusion Connect.
+        # Connect with ProConnect
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
         response = pro_connect.mock_oauth_dance(
@@ -1151,7 +1151,7 @@ class TestProConnectPrescribersViewsExceptions:
     @respx.mock
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """
-        A user creates a prescriber account on Itou with Inclusion Connect.
+        A user creates a prescriber account on Itou with ProConnect
         He wants to join a Pôle emploi organization
         but his e-mail suffix is wrong. An error should be raised.
         """
@@ -1174,7 +1174,7 @@ class TestProConnectPrescribersViewsExceptions:
         response = client.post(check_email_url, data=post_data, follow=True)
         pro_connect.assertContainsButton(response)
 
-        # Connect with Inclusion Connect but, this time, don't use a PE email.
+        # Connect with ProConnect but, this time, don't use a PE email.
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
         wrong_email = "athos@touspourun.com"
