@@ -878,7 +878,7 @@ class TestProConnectLogout:
             ),
             fetch_redirect_response=False,
         )
-        response = client.get(post_logout_redirect_uri)
+        response = client.get(add_url_params(post_logout_redirect_uri, {"state": signed_state}))
         assertRedirects(response, reverse("search:employers_home"))
 
     @respx.mock
