@@ -2415,7 +2415,7 @@ class TestAutocomplete:
                 "tion de prescripteurs",
                 {
                     "id": prescriber_org_application.sender_prescriber_organization.pk,
-                    "text": "Association De Prescripteurs",
+                    "text": "Association de Prescripteurs",
                 },
             ),
         }
