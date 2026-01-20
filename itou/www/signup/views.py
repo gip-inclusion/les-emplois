@@ -662,7 +662,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
 @push_url_in_history(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_user(request, template_name="signup/prescriber_user.html"):
     """
-    Display Inclusion Connect button.
+    Display ProConnect button.
     This page is also shown if an error is detected during
     OAuth callback.
     """
@@ -839,7 +839,7 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
 
 class FacilitatorUserView(LoginNotRequiredMixin, FacilitatorBaseMixin, TemplateView):
     """
-    Display Inclusion Connect button.
+    Display ProConnect button.
     This page is also shown if an error is detected during
     OAuth callback.
     """

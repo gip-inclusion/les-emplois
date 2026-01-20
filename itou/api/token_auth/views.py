@@ -36,9 +36,9 @@ class ObtainAuthToken(LoginNotRequiredMixin, drf_authtoken_views.ObtainAuthToken
 
 
 ObtainAuthToken.__doc__ = f"""\
-**Route majoritairement utilisée pour les comptes n’ayant pas activé Inclusion Connect.**
+**Route majoritairement utilisée pour les comptes n’ayant pas activé ProConnect.**
 
-Si vous avez activé Inclusion Connect pour votre compte, vous pouvez obtenir un jeton d’accès aux
+Si vous avez activé ProConnect pour votre compte, vous pouvez obtenir un jeton d’accès aux
 APIs depuis un **compte administrateur de la structure** de la manière suivante :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}

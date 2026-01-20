@@ -139,7 +139,7 @@ class OIDConnectUserData:
     """
     Transforms data provided by the /userinfo endpoint into a Django-like User object.
     Note that this matches OpenID minimal claims (profile and email).
-    FranceConnect and Inclusion Connect apps inherit from this class to match specific identity provider's logic.
+    FranceConnect and ProConnect apps inherit from this class to match specific identity provider's logic.
     """
 
     email: str
