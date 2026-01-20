@@ -34,7 +34,7 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
         logger.info("API_BAN_BASE_URL is not defined, geocoding will NOT be done")
         return None
 
-    api_url = f"{settings.API_BAN_BASE_URL}/search/"
+    api_url = f"{settings.API_BAN_BASE_URL}/geocodage/search/"
 
     args = {"q": address, "limit": limit}
 
@@ -113,7 +113,7 @@ def _addresses_to_csv(addresses):
 
 
 def batch(addresses):
-    url = urllib.parse.urljoin(settings.API_BAN_BASE_URL, "/search/csv/")
+    url = urllib.parse.urljoin(settings.API_BAN_BASE_URL, "/geocodage/search/csv/")
     with httpx.stream(
         "POST",
         url,

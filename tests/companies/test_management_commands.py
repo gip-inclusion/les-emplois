@@ -174,7 +174,7 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     companies_factories.CompanyFactory(coords="POINT (5.43567 12.123876)", geocoding_score=0.9)
 
     settings.API_BAN_BASE_URL = "https://geo.foo"
-    respx_mock.post("https://geo.foo/search/csv/").respond(
+    respx_mock.post("https://geo.foo/geocodage/search/csv/").respond(
         200,
         text=(
             "id;result_label;result_score;latitude;longitude\n"

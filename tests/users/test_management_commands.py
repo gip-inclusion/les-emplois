@@ -812,7 +812,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
     JobSeekerFactory(with_address_in_qpv=True)
 
     settings.API_BAN_BASE_URL = "https://geo.foo"
-    respx_mock.post("https://geo.foo/search/csv/").respond(
+    respx_mock.post("https://geo.foo/geocodage/search/csv/").respond(
         200,
         text=(
             "id;result_label;result_score;latitude;longitude\n"

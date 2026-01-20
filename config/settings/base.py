@@ -423,7 +423,7 @@ SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (
 )
 
 # https://adresse.data.gouv.fr/faq
-API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
+API_BAN_BASE_URL = "https://data.geopf.fr"
 
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
@@ -702,15 +702,13 @@ csp_connect_src = [
     "*.hotjar.com",
     "*.hotjar.io",
     "wss://*.hotjar.com",
+    API_BAN_BASE_URL,
 ]
 
 if MATOMO_BASE_URL:
     csp_img_src.append(MATOMO_BASE_URL)
     csp_script_src.append(MATOMO_BASE_URL)
     csp_connect_src.append(MATOMO_BASE_URL)
-
-if API_BAN_BASE_URL:
-    csp_connect_src.append(API_BAN_BASE_URL)
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {

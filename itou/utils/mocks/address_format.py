@@ -4,7 +4,7 @@ from itou.asp.models import Commune
 from itou.utils.apis.exceptions import AddressLookupError
 
 
-# https://api-adresse.data.gouv.fr/search/?q=42+Rue+du+clos+de+la+Grange%2C+58160+Sauvigny-les-Bois&limit=1
+# https://data.geopf.fr/geocodage/search/?q=42+Rue+du+clos+de+la+Grange%2C+58160+Sauvigny-les-Bois&limit=1
 BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK = {
     "score": 0.8107390909090908,
     "address_line_1": "Rue du Clos de la Grange",

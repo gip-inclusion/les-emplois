@@ -8,7 +8,9 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEO
 
 def test_get_geocoding_data(caplog, snapshot, respx_mock, settings):
     settings.API_BAN_BASE_URL = "https://geo.foo"
-    respx_mock.get(f"{settings.API_BAN_BASE_URL}/search/").respond(200, json=BAN_GEOCODING_API_WITH_RESULT_RESPONSE)
+    respx_mock.get(f"{settings.API_BAN_BASE_URL}/geocodage/search/").respond(
+        200, json=BAN_GEOCODING_API_WITH_RESULT_RESPONSE
+    )
 
     result = geocoding.get_geocoding_data("")
     # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
@@ -30,7 +32,9 @@ def test_get_geocoding_data(caplog, snapshot, respx_mock, settings):
 
 def test_get_geocoding_data_error(caplog, snapshot, respx_mock, settings):
     settings.API_BAN_BASE_URL = "https://geo.foo"
-    respx_mock.get(f"{settings.API_BAN_BASE_URL}/search/").respond(200, json=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    respx_mock.get(f"{settings.API_BAN_BASE_URL}/geocodage/search/").respond(
+        200, json=BAN_GEOCODING_API_NO_RESULT_MOCK
+    )
 
     with pytest.raises(GeocodingDataError):
         geocoding.get_geocoding_data("")
@@ -42,7 +46,9 @@ def test_get_geocoding_data_try_without_post_code_if_no_results_for_drom_and_com
     caplog, snapshot, respx_mock, settings, post_code
 ):
     settings.API_BAN_BASE_URL = "https://geo.foo"
-    respx_mock.get(f"{settings.API_BAN_BASE_URL}/search/").respond(200, json=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    respx_mock.get(f"{settings.API_BAN_BASE_URL}/geocodage/search/").respond(
+        200, json=BAN_GEOCODING_API_NO_RESULT_MOCK
+    )
 
     with pytest.raises(GeocodingDataError):
         geocoding.get_geocoding_data("HOWELL CENTER", post_code=post_code)

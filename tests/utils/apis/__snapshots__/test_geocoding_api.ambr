@@ -8,7 +8,7 @@
     tuple(
       'itou.utils.apis.geocoding',
       20,
-      'Geocoding error, no result found for `https://geo.foo/search/?q=&limit=1`',
+      'Geocoding error, no result found for `https://geo.foo/geocodage/search/?q=&limit=1`',
     ),
   ])
 # ---
@@ -17,12 +17,12 @@
     tuple(
       'itou.utils.apis.geocoding',
       20,
-      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1&postcode=97000`',
+      'Geocoding error, no result found for `https://geo.foo/geocodage/search/?q=HOWELL+CENTER&limit=1&postcode=97000`',
     ),
     tuple(
       'itou.utils.apis.geocoding',
       20,
-      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1`',
+      'Geocoding error, no result found for `https://geo.foo/geocodage/search/?q=HOWELL+CENTER&limit=1`',
     ),
   ])
 # ---
@@ -31,12 +31,12 @@
     tuple(
       'itou.utils.apis.geocoding',
       20,
-      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1&postcode=98999`',
+      'Geocoding error, no result found for `https://geo.foo/geocodage/search/?q=HOWELL+CENTER&limit=1&postcode=98999`',
     ),
     tuple(
       'itou.utils.apis.geocoding',
       20,
-      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1`',
+      'Geocoding error, no result found for `https://geo.foo/geocodage/search/?q=HOWELL+CENTER&limit=1`',
     ),
   ])
 # ---
