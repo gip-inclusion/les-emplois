@@ -309,6 +309,7 @@ def pro_connect_callback(request):
     if not is_successful:
         logout_url_params = {
             "redirect_url": pro_connect_state.data["previous_url"],
+            "token": token_data["id_token"],
         }
         next_url = f"{reverse('pro_connect:logout')}?{urlencode(logout_url_params)}"
         return HttpResponseRedirect(next_url)
@@ -332,13 +333,6 @@ def pro_connect_logout(request):
     token = request.GET.get("token")
     post_logout_redirect_url = reverse("pro_connect:logout_callback")
     redirect_url = get_safe_url(request, "redirect_url", fallback_url=reverse("search:employers_home"))
-
-    # Fallback on session data.
-    if not token:
-        pc_session = request.session.get(constants.PRO_CONNECT_SESSION_KEY)
-        if not pc_session:
-            raise KeyError("Missing session key.")
-        token = pc_session["token"]
 
     logout_state = ProConnectState.save_state(data={"redirect_url": redirect_url})
 
