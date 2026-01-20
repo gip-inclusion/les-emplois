@@ -46,7 +46,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
-from tests.openid_connect.pro_connect.testing import OIDC_USERINFO
+from tests.openid_connect.pro_connect.testing import ID_TOKEN, OIDC_USERINFO
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -339,7 +339,7 @@ class TestProConnectAuthorizeView:
 class TestProConnectCallbackView:
     @respx.mock
     def test_callback_invalid_state(self, client, pro_connect):
-        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
         respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
         url = reverse("pro_connect:callback")
@@ -741,7 +741,7 @@ class TestProConnectCallbackView:
         state.data["is_login"] = True
         state.save()
 
-        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
+        token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
         respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
         # Put a issued at in the future to ensure we don't check it
@@ -871,7 +871,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": 123456,
+                    "id_token_hint": ID_TOKEN,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },
@@ -898,7 +898,7 @@ class TestProConnectLogout:
             add_url_params(
                 constants.PRO_CONNECT_ENDPOINT_LOGOUT,
                 {
-                    "id_token_hint": 123456,
+                    "id_token_hint": ID_TOKEN,
                     "state": signed_state,
                     "post_logout_redirect_uri": post_logout_redirect_uri,
                 },
