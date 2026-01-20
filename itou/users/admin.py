@@ -70,7 +70,7 @@ class EmailAddressInline(ReadonlyMixin, ItouTabularInline):
 class DisabledNotificationsMixin:
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        if obj.user.is_employer:
+        if isinstance(obj, CompanyMembership):
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.company)
         elif obj.user.is_prescriber:
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.organization)
