@@ -699,7 +699,7 @@ class BirthDateForm(forms.ModelForm):
 def get_field_label_from_instance_func(field_name, request):
     fields_display = {
         "sender": lambda sender: sender.get_full_name(),
-        "sender_prescriber_organization": lambda org: org.display_name.title(),
+        "sender_prescriber_organization": lambda org: org.display_name,
         "sender_company": lambda company: company.display_name,
         "to_company": lambda company: company.display_name,
         "job_seeker": lambda job_seeker: job_seeker.get_full_name(),
