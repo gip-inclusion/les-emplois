@@ -28,6 +28,7 @@ from tests.invitations.factories import (
     LaborInspectorInvitationFactory,
     PrescriberWithOrgInvitationFactory,
 )
+from tests.openid_connect.pro_connect.testing import ID_TOKEN
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -654,7 +655,13 @@ class ProConnectSignupTestAcceptInvitation:
             channel="invitation",
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(
+                pro_connect.logout_url,
+                {
+                    "redirect_url": previous_url,
+                    "token": ID_TOKEN,
+                },
+            ),
         )
         # After logout, the SSO redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = client.get(previous_url, follow=True)

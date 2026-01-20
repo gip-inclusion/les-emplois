@@ -25,6 +25,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.signup.forms import PrescriberChooseKindForm
+from tests.openid_connect.pro_connect.testing import ID_TOKEN
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import ItouClient
@@ -1114,7 +1115,13 @@ class TestProConnectPrescribersViewsExceptions:
             KIND_PRESCRIBER,
             previous_url=previous_url,
             next_url=next_url,
-            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(
+                pro_connect.logout_url,
+                {
+                    "redirect_url": previous_url,
+                    "token": ID_TOKEN,
+                },
+            ),
         )
 
         # IC logout redirects to previous_url
@@ -1179,7 +1186,13 @@ class TestProConnectPrescribersViewsExceptions:
             previous_url=previous_url,
             next_url=next_url,
             user_info_email=wrong_email,
-            expected_redirect_url=add_url_params(pro_connect.logout_url, {"redirect_url": previous_url}),
+            expected_redirect_url=add_url_params(
+                pro_connect.logout_url,
+                {
+                    "redirect_url": previous_url,
+                    "token": ID_TOKEN,
+                },
+            ),
         )
 
         # IC logout redirects to previous_url
