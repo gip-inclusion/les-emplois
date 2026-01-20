@@ -884,7 +884,7 @@ class TestProConnectLogout:
     @respx.mock
     def test_logout_with_redirection(self, client, pro_connect):
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
-        expected_redirection = reverse("dashboard:index")
+        expected_redirection = reverse("search:prescribers_home")
 
         params = {"redirect_url": expected_redirection}
         logout_url = f"{reverse('pro_connect:logout')}?{urlencode(params)}"
