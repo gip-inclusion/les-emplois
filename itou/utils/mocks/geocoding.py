@@ -1,4 +1,4 @@
-# https://api-adresse.data.gouv.fr/search/?q=10+PL+5+MARTYRS+LYCEE+BUFFON&limit=1&postcode=75015
+# https://data.geopf.fr/geocodage/search/?q=10+PL+5+MARTYRS+LYCEE+BUFFON&limit=1&postcode=75015
 BAN_GEOCODING_API_RESULT_MOCK = {
     "type": "Feature",
     "geometry": {"type": "Point", "coordinates": [2.316754, 48.838411]},
@@ -31,7 +31,7 @@ BAN_GEOCODING_API_WITH_RESULT_RESPONSE = {
     "limit": 1,
 }
 
-# https://api-adresse.data.gouv.fr/search/?q=10+PL+5+ANATOLE&limit=1&postcode=75010
+# https://data.geopf.fr/geocodage/search/?q=10+PL+5+ANATOLE&limit=1&postcode=75010
 BAN_GEOCODING_API_NO_RESULT_MOCK = {
     "type": "FeatureCollection",
     "version": "draft",

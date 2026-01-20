@@ -153,7 +153,7 @@ class AddressAutocompleteWidget(RemoteAutocompleteSelect2Widget):
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         return super().build_attrs(base_attrs, extra_attrs=extra_attrs) | {
-            "data-ajax--url": f"{settings.API_BAN_BASE_URL}/search/",
+            "data-ajax--url": f"{settings.API_BAN_BASE_URL}/geocodage/search/",
             "data-minimum-input-length": 3,
             "data-placeholder": "Ex. 102 Quai de Jemmapes 75010 Paris",
         }
