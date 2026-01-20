@@ -2406,7 +2406,7 @@ class TestAutocomplete:
 
         matching_terms_and_results = {
             "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
-            "sender": ("Ice lew", {"id": job_application.sender.pk, "text": "Alice LEWIS"}),
+            "sender": ("alIce lew", {"id": job_application.sender.pk, "text": "Alice LEWIS"}),
             "sender_company": (
                 "envoy",
                 {"id": sent_by_employer_application.sender_company.pk, "text": "L'entreprise envoyeuse"},
