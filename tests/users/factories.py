@@ -315,6 +315,7 @@ class JobSeekerFactory(UserFactory):
         if create:
             with triggers.update_context():
                 self.save()
+                self.refresh_from_db()
 
     @factory.post_generation
     def with_mocked_address(self, create, extracted, **kwargs):
@@ -334,6 +335,7 @@ class JobSeekerFactory(UserFactory):
         if create:
             with triggers.update_context():
                 self.save()
+                self.refresh_from_db()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
