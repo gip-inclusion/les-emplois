@@ -64,7 +64,7 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 # ITOU settings
 # -------------
 
-API_BAN_BASE_URL = "https://data.geopf.fr"
+API_GEOPF_BASE_URL = "https://data.geopf.fr"
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL", "https://api.insee.fr/metadonnees/")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")

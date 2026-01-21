@@ -458,7 +458,7 @@ class TestStandaloneCreateAsPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,

@@ -1733,7 +1733,7 @@ class TestJoinGroupFromNir:
             "fill_mode": "ban_api",
         }
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -1952,7 +1952,7 @@ class TestJoinGroupFromNameAndEmail:
             "fill_mode": "ban_api",
         }
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,

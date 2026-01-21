@@ -318,7 +318,7 @@ class TestEditUserInfoView:
         assertContains(response, 'id="id_ban_api_resolved_address"')
 
     @freeze_time("2023-03-10")
-    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @override_settings(API_GEOPF_BASE_URL="http://ban-api")
     def test_update_address(self, client, snapshot):
         user = JobSeekerFactory(with_address=True, jobseeker_profile__nir="178122978200508")
         client.force_login(user)

@@ -2399,7 +2399,7 @@ class TestProcessAcceptViewsInWizard:
             with_ban_api_mocked_address=True,
         )
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         settings.TALLY_URL = "https://tally.so"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
@@ -3954,7 +3954,7 @@ class TestFillJobSeekerInfosForAccept:
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_first_geocoding_data,
