@@ -69,14 +69,15 @@ class UsersView(NexusApiMixin, generics.GenericAPIView):
         NexusMembership.objects.filter(user__in=users, updated_at__lt=updated_at).delete()
 
     def delete(self, request, *args, **kwargs):
-        serializer = DeleteObjectSerializer(data=request.data)
+        serializer = DeleteObjectSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         if self.perform_delete(serializer):
             return Response({}, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     def perform_delete(self, serializer):
-        deleted, _details = NexusUser.objects.filter(source=self.source, **serializer.validated_data).delete()
+        source_ids = [data["source_id"] for data in serializer.validated_data]
+        deleted, _details = NexusUser.objects.filter(source=self.source, source_id__in=source_ids).delete()
         return deleted
 
 
@@ -94,14 +95,15 @@ class StructuresView(NexusApiMixin, generics.GenericAPIView):
         nexus_utils.sync_structures(structures)
 
     def delete(self, request, *args, **kwargs):
-        serializer = DeleteObjectSerializer(data=request.data)
+        serializer = DeleteObjectSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         if self.perform_delete(serializer):
             return Response({}, status=status.HTTP_200_OK)
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     def perform_delete(self, serializer):
-        deleted, _details = NexusStructure.objects.filter(source=self.source, **serializer.validated_data).delete()
+        source_ids = [data["source_id"] for data in serializer.validated_data]
+        deleted, _details = NexusStructure.objects.filter(source=self.source, source_id__in=source_ids).delete()
         return deleted
 
 

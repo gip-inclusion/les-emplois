@@ -334,17 +334,22 @@ class TestUserAPI(NexusApiTestMixin):
 
     def test_delete_user(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
-        membership = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
 
-        response = api_client.delete(self.url, data={"id": membership.user.source_id}, content_type="application/json")
+        response = api_client.delete(
+            self.url,
+            data=[{"id": membership_1.user.source_id}, {"id": membership_2.user.source_id}],
+            content_type="application/json",
+        )
         assert response.status_code == 200
         assert NexusUser.objects.count() == 0
         assert NexusMembership.objects.count() == 0  # Also removes the linked memberships
-        assert NexusStructure.objects.count() == 1
+        assert NexusStructure.objects.count() == 2
 
     def test_delete_unknown_user(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
-        response = api_client.delete(self.url, data={"id": "my-id"}, content_type="application/json")
+        response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
         assert response.status_code == 404
 
     def test_ignore_other_sources(self):
@@ -550,20 +555,23 @@ class TestStructureAPI(NexusApiTestMixin):
 
     def test_delete_structure(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
-        membership = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
 
         response = api_client.delete(
-            self.url, data={"id": membership.structure.source_id}, content_type="application/json"
+            self.url,
+            data=[{"id": membership_1.structure.source_id}, {"id": membership_2.structure.source_id}],
+            content_type="application/json",
         )
         assert response.status_code == 200
-        assert NexusUser.objects.count() == 1
+        assert NexusUser.objects.count() == 2
         assert NexusMembership.objects.count() == 0  # Also removes the linked memberships
         assert NexusStructure.objects.count() == 0
 
     def test_delete_unknown_structure(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
 
-        response = api_client.delete(self.url, data={"id": "my-di"}, content_type="application/json")
+        response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
         assert response.status_code == 404
 
     def test_validate_payload(self):
