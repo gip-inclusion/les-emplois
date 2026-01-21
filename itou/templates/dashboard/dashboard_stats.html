@@ -26,7 +26,6 @@
                {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
                 {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
                     <span>Pilotage</span>
-                    {% new_badge %}
                 {% else %}
                     Pilotage
                 {% endif %}
