@@ -1,6 +1,7 @@
 import csv
 import os.path
 from io import StringIO
+from urllib.parse import urljoin
 
 import httpx
 import pandas as pd
@@ -110,7 +111,7 @@ class Command(BaseCommand):
 
         try:
             r = httpx.post(
-                settings.API_GEOPF_BASE_URL + "/geocodage/search/csv",
+                urljoin(settings.API_GEOPF_BASE_URL, "/geocodage/search/csv"),
                 data=params,
                 files={"data": csv_bytes.encode("utf-8")},
             )

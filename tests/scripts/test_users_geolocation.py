@@ -2,6 +2,7 @@ import csv
 import os
 import os.path
 from io import StringIO
+from urllib.parse import urljoin
 
 import pytest
 import respx
@@ -19,11 +20,11 @@ def mock_ban_api(user_id):
         f"""{user_id};10 rue du Moulin du Gue;35400;Saint-Malo;"""
         f"""10 Rue du Moulin du Gue 35400 Saint-Malo;0.97;48.658983;-1.963752\r\n""",
     )
-    respx.post(django_settings.API_GEOPF_BASE_URL + "/geocodage/search/csv").mock(return_value=resp)
+    respx.post(urljoin(django_settings.API_GEOPF_BASE_URL, "/geocodage/search/csv")).mock(return_value=resp)
 
 
 @pytest.fixture(autouse=True)
-def override_API_GEOPF_base_url(settings):
+def override_api_ban_base_url(settings):
     settings.API_GEOPF_BASE_URL = "https://foobar.com"
 
 
