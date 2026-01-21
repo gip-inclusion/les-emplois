@@ -72,7 +72,7 @@ class DisabledNotificationsMixin:
     def disabled_notifications(self, obj):
         if isinstance(obj, CompanyMembership):
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.company)
-        elif obj.user.is_prescriber:
+        elif isinstance(obj, PrescriberMembership):
             notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.organization)
         else:
             notification_settings, _ = NotificationSettings.get_or_create(obj.user)
