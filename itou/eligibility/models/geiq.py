@@ -161,7 +161,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
     def allowance_amount(self) -> int:
         # Only authorized prescribers may create a GEIQ diagnosis, so if the author is a prescriber
         # he was authorized when he created it
-        return geiq_allowance_amount(self.author.is_prescriber, self.administrative_criteria.all())
+        return geiq_allowance_amount(self.author_kind == UserKind.PRESCRIBER, self.administrative_criteria.all())
 
     @property
     def author_structure(self):
