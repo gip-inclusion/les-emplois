@@ -811,7 +811,7 @@ def test_update_job_seeker_coords(settings, capsys, respx_mock):
     )  # score too low
     JobSeekerFactory(with_address_in_qpv=True)
 
-    settings.API_BAN_BASE_URL = "https://geo.foo"
+    settings.API_GEOPF_BASE_URL = "https://geo.foo"
     respx_mock.post("https://geo.foo/geocodage/search/csv/").respond(
         200,
         text=(

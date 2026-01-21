@@ -19,12 +19,12 @@ def mock_ban_api(user_id):
         f"""{user_id};10 rue du Moulin du Gue;35400;Saint-Malo;"""
         f"""10 Rue du Moulin du Gue 35400 Saint-Malo;0.97;48.658983;-1.963752\r\n""",
     )
-    respx.post(django_settings.API_BAN_BASE_URL + "/geocodage/search/csv").mock(return_value=resp)
+    respx.post(django_settings.API_GEOPF_BASE_URL + "/geocodage/search/csv").mock(return_value=resp)
 
 
 @pytest.fixture(autouse=True)
-def override_api_ban_base_url(settings):
-    settings.API_BAN_BASE_URL = "https://foobar.com"
+def override_API_GEOPF_base_url(settings):
+    settings.API_GEOPF_BASE_URL = "https://foobar.com"
 
 
 def run_command(*args, **kwargs):

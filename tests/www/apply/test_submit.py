@@ -932,7 +932,7 @@ class TestApplyAsAuthorizedPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -1691,7 +1691,7 @@ class TestApplyAsPrescriber:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -2288,7 +2288,7 @@ class TestApplyAsCompany:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
         [self.city] = create_test_cities(["67"], num_per_department=1)
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -2741,7 +2741,7 @@ class TestApplyAsCompany:
 class TestDirectHireFullProcess:
     @pytest.fixture(autouse=True)
     def setup_method(self, settings, mocker):
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -3129,7 +3129,7 @@ class TestDirectHireFullProcess:
         reset_url_dashboard = reverse("dashboard:index")
         job_seeker = JobSeekerFactory(born_outside_france=True)
         geispolsheim = create_city_geispolsheim()
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_first_geocoding_data,
@@ -3703,7 +3703,7 @@ class UpdateJobSeekerTestMixin:
         self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
         self.job_seeker_session_key = f"job_seeker-{self.job_seeker.public_id}"
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_first_geocoding_data,
@@ -5588,7 +5588,7 @@ class TestFillJobSeekerInfosForHire:
         elif self.company.kind == CompanyKind.GEIQ:
             GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_first_geocoding_data,
@@ -6105,7 +6105,7 @@ class TestHireContract:
         # This is the city matching with_ban_geoloc_address trait
         self.city = create_city_geispolsheim()
 
-        settings.API_BAN_BASE_URL = "http://ban-api"
+        settings.API_GEOPF_BASE_URL = "http://ban-api"
         mocker.patch(
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_first_geocoding_data,

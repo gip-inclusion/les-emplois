@@ -110,7 +110,7 @@ def geocode_siae(siae):
         geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
 
         siae.geocoding_score = geocoding_data["score"]
-        # If the score is greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable:
+        # If the score is greater than API_GEOPF_RELIABLE_MIN_SCORE, coords are reliable:
         # use data returned by the BAN API because it's better written using accents etc.
         # while the source data is in all caps etc.
         # Otherwise keep the old address (which is probably wrong or incomplete).

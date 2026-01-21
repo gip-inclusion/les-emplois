@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
         try:
             r = httpx.post(
-                settings.API_BAN_BASE_URL + "/geocodage/search/csv",
+                settings.API_GEOPF_BASE_URL + "/geocodage/search/csv",
                 data=params,
                 files={"data": csv_bytes.encode("utf-8")},
             )

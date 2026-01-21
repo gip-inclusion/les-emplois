@@ -422,8 +422,8 @@ SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (
     ItouEnvironment.REVIEW_APP,
 )
 
-# https://adresse.data.gouv.fr/faq
-API_BAN_BASE_URL = "https://data.geopf.fr"
+# https://geoservices.ign.fr/documentation/services/services-geoplateforme/geocodage
+API_GEOPF_BASE_URL = "https://data.geopf.fr"
 
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL")
@@ -702,7 +702,7 @@ csp_connect_src = [
     "*.hotjar.com",
     "*.hotjar.io",
     "wss://*.hotjar.com",
-    API_BAN_BASE_URL,
+    API_GEOPF_BASE_URL,
 ]
 
 if MATOMO_BASE_URL:
