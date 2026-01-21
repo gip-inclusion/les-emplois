@@ -27,7 +27,7 @@
 
             {% include "apply/includes/job_application_fill_user_infos_form.html" with form_personal_data=form_personal_data form_user_address=form_user_address form_birth_data=form_birth_data request=request only %}
 
-            {% itou_buttons_form primary_label="Valider les informations" primary_aria_label="Valider les informations de "|add:job_seeker.get_full_name|mask_unless:can_view_personal_information reset_url=reset_url secondary_url=back_url %}
+            {% itou_buttons_form reset_url=reset_url secondary_url=back_url %}
         </form>
     </div>
 {% endblock %}

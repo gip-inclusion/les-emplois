@@ -124,6 +124,11 @@ LINK_RESET_MARKUP = (
     ' aria-label="Annuler la saisie de ce formulaire">'
 )
 CONFIRM_RESET_MARKUP = '<a href="%s" class="btn btn-sm btn-danger">Confirmer l\'annulation</a>'
+NEXT_BUTTON_MARKUP = (
+    '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
+    "<span>Suivant</span>"
+    "</button>"
+)
 
 
 class TestProcessViews:
@@ -2576,7 +2581,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]))
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
@@ -2628,7 +2633,7 @@ class TestProcessAcceptViewsInWizard:
             "reset_url": next_url,
         }
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, LINK_RESET_MARKUP % next_url)
         assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
@@ -2668,7 +2673,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         contract_infos_url = self.get_contract_info_step_url(session_uuid)
         assertRedirects(response, contract_infos_url, fetch_redirect_response=False)
@@ -2721,7 +2726,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         contract_infos_url = self.get_contract_info_step_url(session_uuid)
         assertRedirects(response, contract_infos_url, fetch_redirect_response=False)
@@ -2750,7 +2755,7 @@ class TestProcessAcceptViewsInWizard:
         client.force_login(employer)
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         contract_infos_url = self.get_contract_info_step_url(session_uuid)
         assertRedirects(response, contract_infos_url, fetch_redirect_response=False)
@@ -2777,7 +2782,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
@@ -2816,7 +2821,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
@@ -2860,7 +2865,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         post_data = {
             "ban_api_resolved_address": "",
             "address_line_1": "",
@@ -2914,7 +2919,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
@@ -2974,7 +2979,7 @@ class TestProcessAcceptViewsInWizard:
         client.force_login(other_employer)
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
@@ -3014,7 +3019,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
@@ -3062,7 +3067,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         post_data = {
@@ -3146,7 +3151,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         # Check that the NIR field has been removed
         assertNotContains(response, NIR_FIELD_ID)
 
@@ -3154,7 +3159,7 @@ class TestProcessAcceptViewsInWizard:
         job_application.job_seeker.created_by = PrescriberFactory()
         job_application.job_seeker.save()
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         # Check that the NIR field has been removed
         assertNotContains(response, NIR_FIELD_ID)
 
@@ -3169,7 +3174,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         # Check that the NIR field is present
         assertContains(response, NIR_FIELD_ID)
 
@@ -3212,7 +3217,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         post_data = {
             "pole_emploi_id": jobseeker_profile.pole_emploi_id,
@@ -3238,7 +3243,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         post_data = self._accept_jobseeker_post_data(job_application=job_application)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
@@ -3276,7 +3281,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
@@ -3316,7 +3321,7 @@ class TestProcessAcceptViewsInWizard:
         session_uuid = self.start_accept_job_application(client, job_application)
         jobseeker_info_url = self.get_job_seeker_info_step_url(session_uuid)
         response = client.get(jobseeker_info_url)
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
@@ -3348,7 +3353,7 @@ class TestProcessAcceptViewsInWizard:
         client.force_login(employer)
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
         self.fill_contract_info_step(client, job_application, session_uuid)
@@ -3390,7 +3395,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, self.BIRTH_COUNTRY_LABEL)
         assertContains(response, self.BIRTH_PLACE_LABEL)
 
@@ -3583,7 +3588,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, self.BIRTH_COUNTRY_LABEL)
         assertContains(response, self.BIRTH_PLACE_LABEL)
 
@@ -3655,7 +3660,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         assertContains(response, self.BIRTH_COUNTRY_LABEL)
         assertContains(response, self.BIRTH_PLACE_LABEL)
 
@@ -3705,7 +3710,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         post_data = {
             "ban_api_resolved_address": job_seeker.geocoding_address,
@@ -3759,7 +3764,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         birth_place = (
             Commune.objects.filter(
@@ -3822,7 +3827,7 @@ class TestProcessAcceptViewsInWizard:
         client.force_login(job_application.to_company.members.get())
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         post_data = self._accept_jobseeker_post_data(job_application=job_application)
         post_data["birth_country"] = Country.FRANCE_ID
@@ -3863,7 +3868,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         post_data = self._accept_jobseeker_post_data(job_application=job_application)
         post_data["birth_country"] = Country.objects.order_by("?").exclude(group=Country.Group.FRANCE).first().pk
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid, post_data=post_data)
@@ -3911,7 +3916,7 @@ class TestProcessAcceptViewsInWizard:
 
         session_uuid = self.start_accept_job_application(client, job_application)
         response = client.get(self.get_job_seeker_info_step_url(session_uuid))
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
         form = response.context["form_birth_data"]
         assert form.fields["birth_place"].disabled is False
         assert form.fields["birth_country"].disabled is False
@@ -4153,7 +4158,7 @@ class TestFillJobSeekerInfosForAccept:
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Accepter la candidature de Clara SION")
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         COUNTRY_FIELD_ID = 'id="id_birth_country"'
         PLACE_FIELD_ID = 'id="id_birth_place"'
@@ -4261,7 +4266,7 @@ class TestFillJobSeekerInfosForAccept:
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Accepter la candidature de Clara SION")
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         if in_france:
             new_country = Country.objects.get(pk=Country.FRANCE_ID)
@@ -4366,7 +4371,7 @@ class TestFillJobSeekerInfosForAccept:
 
         response = client.get(fill_job_seeker_infos_url)
         assertContains(response, "Accepter la candidature de Clara SION")
-        assertContains(response, "Valider les informations")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
         response = client.get(accept_contract_infos_url)
@@ -4456,7 +4461,7 @@ class TestFillJobSeekerInfosForAccept:
             assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
             assertContains(response, "Accepter la candidature de Clara SION")
-            assertContains(response, "Valider les informations")
+            assertContains(response, NEXT_BUTTON_MARKUP, html=True)
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
             # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
