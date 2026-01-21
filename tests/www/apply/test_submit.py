@@ -90,6 +90,11 @@ ACCEPT_BUTTON_MARKUP = (
     "<span>Valider l’embauche</span>"
     "</button>"
 )
+NEXT_BUTTON_MARKUP = (
+    '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
+    "<span>Suivant</span>"
+    "</button>"
+)
 
 
 def fake_session_initialization(client, company, job_seeker, data):
@@ -3228,12 +3233,12 @@ class TestDirectHireFullProcess:
         contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
         response = client.get(fill_job_seeker_infos_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, "Valider les informations")
+        assertContains(response, "Suivant")
         check_infos_url = reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
         )
         assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
-        assertContains(response, check_infos_url)  # Back button URL
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         NEW_POLE_EMPLOI_ID = "1234567A"
         post_data = {
@@ -5982,7 +5987,7 @@ class TestFillJobSeekerInfosForHire:
             assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
             assertContains(response, "Déclarer l’embauche de Clara SION")
-            assertContains(response, "Valider les informations")
+            assertContains(response, NEXT_BUTTON_MARKUP, html=True)
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
             # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
