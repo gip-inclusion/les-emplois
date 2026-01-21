@@ -30,7 +30,7 @@ BATCH_GEOCODE_API_PARAMS = {
 
 
 def call_ban_geocoding_api(address, post_code=None, limit=1):
-    api_url = f"{settings.API_GEOPF_BASE_URL}/geocodage/search/"
+    api_url = urllib.parse.urljoin(settings.API_GEOPF_BASE_URL, "/geocodage/search/")
 
     args = {"q": address, "limit": limit}
 

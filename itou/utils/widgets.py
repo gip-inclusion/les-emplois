@@ -4,6 +4,7 @@ Specific widgets used in forms.
 
 import datetime
 import operator
+from urllib.parse import urljoin
 
 from django import forms
 from django.conf import settings
@@ -153,7 +154,7 @@ class AddressAutocompleteWidget(RemoteAutocompleteSelect2Widget):
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         return super().build_attrs(base_attrs, extra_attrs=extra_attrs) | {
-            "data-ajax--url": f"{settings.API_GEOPF_BASE_URL}/geocodage/search/",
+            "data-ajax--url": urljoin(settings.API_GEOPF_BASE_URL, "/geocodage/search/"),
             "data-minimum-input-length": 3,
             "data-placeholder": "Ex. 102 Quai de Jemmapes 75010 Paris",
         }
