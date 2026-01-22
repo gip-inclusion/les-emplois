@@ -7,7 +7,6 @@ from django.db.models import Prefetch, Q
 from django.forms import ValidationError
 from django.utils import timezone
 
-from itou.companies.enums import CompanyKind
 from itou.utils.emails import get_email_message
 
 
@@ -192,6 +191,9 @@ class OrganizationAbstract(models.Model):
         return self.active_members.exists()
 
     #### Emails ####
+    def get_documentation_link(self):
+        return None
+
     def add_admin_email(self, user):
         """
         Tell a member he is an administrator now.
@@ -199,16 +201,7 @@ class OrganizationAbstract(models.Model):
         to = [user.email]
         subject = "common/emails/add_admin_email_subject.txt"
         body = "common/emails/add_admin_email_body.txt"
-        documentation_link = None
-        if user.is_prescriber:
-            documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617"
-        elif user.is_employer:
-            if self.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:
-                documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409"
-            elif self.kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
-                documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16925381169681"
-            elif self.kind == CompanyKind.GEIQ:
-                documentation_link = "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/15209741332113"
+        documentation_link = self.get_documentation_link()
         context = {"structure": self, "documentation_link": documentation_link, "user": user}
 
         return get_email_message(to, context, subject, body)
