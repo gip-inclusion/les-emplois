@@ -104,5 +104,8 @@
     dict({
       'rdvi_participations': <class 'itou.rdv_insertion.models.Participation'>,
     }),
+    dict({
+      'activated_services': <class 'itou.nexus.models.ActivatedService'>,
+    }),
   ])
 # ---

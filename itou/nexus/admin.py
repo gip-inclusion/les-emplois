@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 
-from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 from itou.utils.admin import ItouGISMixin, ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 from itou.utils.enums import ItouEnvironment
 
@@ -181,3 +181,8 @@ if settings.ITOU_ENVIRONMENT != ItouEnvironment.PROD:
 @admin.register(NexusRessourceSyncStatus)
 class NexusRessourceSyncStatusAdmin(ItouModelAdmin):
     list_display = ("service", "valid_since", "in_progress_since")
+
+
+@admin.register(ActivatedService)
+class ActivatedServiceAdmin(ItouModelAdmin):
+    list_display = ("user", "service", "created_at")
