@@ -117,6 +117,11 @@ class CommunauteView(NexusMixin, TemplateView):
     service = Service.COMMUNAUTE
 
 
+class MarcheView(NexusMixin, TemplateView):
+    template_name = "nexus/marche.html"
+    service = Service.MARCHE
+
+
 class MonRecapView(NexusMixin, TemplateView):
     template_name = "nexus/mon_recap.html"
     service = Service.MON_RECAP
