@@ -51,6 +51,7 @@ from itou.utils.admin import (
     get_admin_view_link,
     get_structure_view_link,
 )
+from itou.utils.validators import is_france_travail_id_format
 
 
 logger = logging.getLogger(__name__)
@@ -552,6 +553,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
             if "@" not in search_term:
                 search_fields.append("first_name__unaccent")
                 search_fields.append("last_name__unaccent")
+            if is_france_travail_id_format(search_term):
+                search_fields.append("jobseeker_profile__pole_emploi_id__iexact")
         return search_fields
 
     def get_inlines(self, request, obj):
@@ -1019,6 +1022,8 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             if "@" not in search_term:
                 search_fields.append("user__first_name__unaccent")
                 search_fields.append("user__last_name__unaccent")
+            if is_france_travail_id_format(search_term):
+                search_fields.append("pole_emploi_id__iexact")
         return search_fields
 
 

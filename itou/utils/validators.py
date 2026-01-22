@@ -37,12 +37,16 @@ def validate_naf(naf):
         raise ValidationError("Le code NAF doit être composé de de 4 chiffres et d'une lettre.")
 
 
+def is_france_travail_id_format(id):
+    is_old_format = len(id) == 8 and id[:7].isdigit() and id[7:].isalnum()
+    is_new_format = len(id) == 11 and id.isdigit()
+    return is_old_format or is_new_format
+
+
 def validate_pole_emploi_id(pole_emploi_id):
     if not pole_emploi_id.isascii():
         raise ValidationError("L’identifiant France Travail ne doit pas contenir de caractères spéciaux.")
-    is_old_format = len(pole_emploi_id) == 8 and pole_emploi_id[:7].isdigit() and pole_emploi_id[7:].isalnum()
-    is_new_format = len(pole_emploi_id) == 11 and pole_emploi_id.isdigit()
-    if not (is_new_format or is_old_format):
+    if not is_france_travail_id_format(pole_emploi_id):
         raise ValidationError("Le format de l’identifiant France Travail est invalide.")
 
 
