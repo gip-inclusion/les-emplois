@@ -182,3 +182,8 @@ class MonRecapView(NexusMixin, TemplateView):
 class PilotageView(NexusMixin, TemplateView):
     template_name = "nexus/pilotage.html"
     menu = Service.PILOTAGE
+
+
+class StructuresView(NexusMixin, TemplateView):
+    template_name = "nexus/structures.html"
+    menu = "structures"

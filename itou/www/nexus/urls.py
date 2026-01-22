@@ -10,6 +10,7 @@ urlpatterns = [
     path("auto-login", auto_login, name="auto_login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
     path("activate_mon_recap", views.activate_mon_recap, name="activate_mon_recap"),
+    path("structures", views.StructuresView.as_view(), name="structures"),
     path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
     path("service/dora", views.DoraView.as_view(), name="dora"),
     path("service/emplois", views.EmploisView.as_view(), name="emplois"),
