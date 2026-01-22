@@ -1,4 +1,3 @@
-import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from django.urls import reverse
@@ -57,7 +56,6 @@ class TestWelcomingTour:
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
-    @respx.mock
     def test_new_prescriber_sees_welcoming_tour_test(self, client, pro_connect):
         session = client.session
         session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
@@ -69,7 +67,6 @@ class TestWelcomingTour:
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
-    @respx.mock
     def test_new_employer_sees_welcoming_tour(self, client, pro_connect):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()

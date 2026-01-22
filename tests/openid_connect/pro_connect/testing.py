@@ -33,8 +33,7 @@ OIDC_USERINFO_FT_WITH_SAFIR = OIDC_USERINFO | {
 ID_TOKEN = "123456"
 
 
-# Make sure this decorator is before test definition, not here.
-# @respx.mock
+# Make sure to use respx_mock fixture or @respx.mock decorator on tests using this helper.
 def mock_oauth_dance(
     client,
     user_kind,

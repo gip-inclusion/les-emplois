@@ -337,7 +337,6 @@ class TestProConnectAuthorizeView:
 
 
 class TestProConnectCallbackView:
-    @respx.mock
     def test_callback_invalid_state(self, client, pro_connect):
         token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": ID_TOKEN}
         respx.post(constants.PRO_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
@@ -356,7 +355,6 @@ class TestProConnectCallbackView:
         response = client.get(url)
         assert response.status_code == 302
 
-    @respx.mock
     def test_callback_prescriber_created(self, client, pro_connect):
         ### User does not exist.
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
@@ -368,7 +366,6 @@ class TestProConnectCallbackView:
         assert user.kind == "prescriber"
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    @respx.mock
     def test_callback_employer_created(self, client, pro_connect):
         ### User does not exist.
         pro_connect.mock_oauth_dance(client, UserKind.EMPLOYER)
@@ -380,7 +377,6 @@ class TestProConnectCallbackView:
         assert user.kind == UserKind.EMPLOYER
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    @respx.mock
     def test_callback_existing_django_user(self, client, pro_connect):
         # User created with django already exists on Itou but some attributes differs.
         # Update all fields
@@ -399,7 +395,6 @@ class TestProConnectCallbackView:
         assert user.has_sso_provider
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
-    @respx.mock
     def test_callback_allows_employer_on_prescriber_login_only(self, client, pro_connect):
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.EMPLOYER)
@@ -425,7 +420,6 @@ class TestProConnectCallbackView:
         assert user.kind == UserKind.EMPLOYER
         assert get_user(client).is_authenticated is True
 
-    @respx.mock
     def test_callback_allows_prescriber_on_employer_login_only(self, client, pro_connect):
         pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.PRESCRIBER)
@@ -451,7 +445,6 @@ class TestProConnectCallbackView:
         assert user.kind == UserKind.PRESCRIBER
         assert get_user(client).is_authenticated is True
 
-    @respx.mock
     def test_callback_refuses_job_seekers(self, client, pro_connect):
         pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
         user = UserFactory(username=pc_user_data.username, email=pc_user_data.email, kind=UserKind.JOB_SEEKER)
@@ -488,7 +481,6 @@ class TestProConnectCallbackView:
         assert user.kind == UserKind.JOB_SEEKER
         assert get_user(client).is_authenticated is False
 
-    @respx.mock
     def test_callback_redirect_prescriber_on_too_many_kind_exception(self, client, pro_connect):
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
 
@@ -510,7 +502,6 @@ class TestProConnectCallbackView:
             assertContains(response, "pour devenir prescripteur sur la plateforme")
             user.delete()
 
-    @respx.mock
     def test_callback_redirect_on_inactive_user_exception(self, client, pro_connect):
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
 
@@ -546,7 +537,6 @@ class TestProConnectCallbackView:
             ],
         )
 
-    @respx.mock
     def test_callback_redirect_employer_on_too_many_kind_exception(self, client, pro_connect):
         pc_user_data = ProConnectEmployerData.from_user_info(pro_connect.oidc_userinfo)
 
@@ -569,7 +559,6 @@ class TestProConnectCallbackView:
             assertContains(response, "pour devenir employeur sur la plateforme")
             user.delete()
 
-    @respx.mock
     def test_callback_update_sub_on_sub_conflict(self, client, pro_connect):
         oidc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         user = PrescriberFactory(
@@ -583,7 +572,6 @@ class TestProConnectCallbackView:
         user.refresh_from_db()
         assert user.username == pro_connect.oidc_userinfo["sub"]
 
-    @respx.mock
     def test_callback_updating_email_collision(self, client, pro_connect):
         PrescriberFactory(
             first_name="Bernard",
@@ -617,7 +605,6 @@ class TestProConnectCallbackView:
             ],
         )
 
-    @respx.mock
     def test_callback_update_FT_organization(self, client, pro_connect):
         user = PrescriberFactory(
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
@@ -632,7 +619,6 @@ class TestProConnectCallbackView:
         )
         assertQuerySetEqual(org.members.all(), [user])
 
-    @respx.mock
     def test_callback_update_FT_organization_as_employer_does_not_crash(self, client, pro_connect):
         org = PrescriberOrganizationFactory(france_travail=True, code_safir_pole_emploi="95021")
         pro_connect.mock_oauth_dance(
@@ -658,7 +644,6 @@ class TestProConnectCallbackView:
         assert user.is_authenticated
         assertQuerySetEqual(org.members.all(), [user])
 
-    @respx.mock
     def test_callback_ft_users_with_no_org(self, client, pro_connect):
         PrescriberFactory(**dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)))
 
@@ -677,7 +662,6 @@ class TestProConnectCallbackView:
         pro_connect.assert_and_mock_forced_logout(client, response)
         assert get_user(client).is_authenticated is False
 
-    @respx.mock
     def test_callback_ft_users_unknown_safir(self, client, pro_connect):
         PrescriberFactory(**dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)))
 
@@ -709,7 +693,6 @@ class TestProConnectCallbackView:
         pro_connect.assert_and_mock_forced_logout(client, response)
         assert get_user(client).is_authenticated is False
 
-    @respx.mock
     def test_callback_ft_users_unknown_safir_already_in_org(self, client, pro_connect):
         user = PrescriberFactory(
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
@@ -741,7 +724,6 @@ class TestProConnectCallbackView:
         )
 
     # FIXME (alaurent) Remove in a month (old states expiry)
-    @respx.mock
     def test_old_state_compat(self, client, pro_connect):
         # Create a prescriber
         user = PrescriberFactory(
@@ -807,7 +789,6 @@ class TestProConnectSession:
 
 
 class TestProConnectLogin:
-    @respx.mock
     def test_normal_signin(self, client, pro_connect):
         """
         A user has created an account with ProConnect.
@@ -836,7 +817,6 @@ class TestProConnectLogin:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.last_login > before_auth
 
-    @respx.mock
     def test_old_django_account(self, client, pro_connect, settings):
         """
         A user has a Django account.
@@ -880,7 +860,6 @@ class TestProConnectLogin:
 
 
 class TestProConnectLogout:
-    @respx.mock
     def test_simple_logout(self, client, pro_connect):
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
         logout_response = client.post(reverse("account_logout"))
@@ -904,7 +883,6 @@ class TestProConnectLogout:
         response = client.get(add_url_params(post_logout_redirect_uri, {"state": signed_state}))
         assertRedirects(response, reverse("search:employers_home"))
 
-    @respx.mock
     def test_logout_with_redirection(self, client, pro_connect):
         pro_connect.mock_oauth_dance(client, UserKind.PRESCRIBER)
         expected_redirection = reverse("search:prescribers_home")
@@ -930,7 +908,6 @@ class TestProConnectLogout:
         response = client.get(add_url_params(post_logout_redirect_uri, {"state": signed_state}))
         assertRedirects(response, expected_redirection)
 
-    @respx.mock
     def test_django_account_logout_from_pro(self, client, pro_connect):
         """
         When ac ProConnect user wants to log out from his local account,
@@ -959,7 +936,6 @@ class TestProConnectLogout:
         assertRedirects(response, reverse("search:employers_home"))
         assert not auth.get_user(client).is_authenticated
 
-    @respx.mock
     def test_logout_with_incomplete_state(self, client, pro_connect):
         # This happens while testing. It should never happen for real users, but it's still painful for us.
 
@@ -976,7 +952,6 @@ class TestProConnectLogout:
 
 
 class TestProConnectMapChannel:
-    @respx.mock
     def test_happy_path(self, client, pro_connect):
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
             sender_prescriber_organization__code_safir_pole_emploi="95021"
@@ -1008,7 +983,6 @@ class TestProConnectMapChannel:
         response = client.get(response.url)
         assert response.status_code == 200
 
-    @respx.mock
     def test_create_user(self, client, pro_connect):
         # Application sent by a colleague from the same agency but not by the prescriber himself.
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
@@ -1043,7 +1017,6 @@ class TestProConnectMapChannel:
         response = client.get(response.url)
         assert response.status_code == 200
 
-    @respx.mock
     def test_create_user_organization_not_found(self, client, pro_connect):
         # Application sent by a colleague from the same agency but not by the prescriber himself.
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
@@ -1096,7 +1069,6 @@ class TestProConnectMapChannel:
 
 
 class TestProConnectNexusChannel:
-    @respx.mock
     def test_callback_existing_user(self, client, pro_connect):
         PrescriberFactory(email=pro_connect.oidc_userinfo["email"])
 
@@ -1107,7 +1079,6 @@ class TestProConnectNexusChannel:
         )
         assert get_user(client).is_authenticated is True
 
-    @respx.mock
     def test_callback_new_user(self, client, pro_connect):
         pro_connect.mock_oauth_dance(
             client,
