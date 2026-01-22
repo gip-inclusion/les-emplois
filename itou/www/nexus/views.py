@@ -78,6 +78,9 @@ class NexusMixin:
         else:
             context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
 
+        if hasattr(self, "service"):
+            context["service"] = self.service
+
         return context
 
 
@@ -107,3 +110,8 @@ def activate_mon_recap(request):
     )
 
     return HttpResponseRedirect(next_url)
+
+
+class CommunauteView(NexusMixin, TemplateView):
+    template_name = "nexus/communaute.html"
+    service = Service.COMMUNAUTE

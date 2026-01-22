@@ -10,4 +10,5 @@ urlpatterns = [
     path("auto-login", auto_login, name="auto_login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
     path("activate_mon_recap", views.activate_mon_recap, name="activate_mon_recap"),
+    path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
 ]
