@@ -56,7 +56,6 @@ class TestPrescriberSignup:
         response = client.post(url, data={"kind": UserKind.PRESCRIBER})
         assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
 
-    @respx.mock
     def test_create_user_prescriber_member_of_france_travail(self, client, mailoutbox, pro_connect):
         organization = PrescriberOrganizationFactory(france_travail=True)
 
@@ -141,7 +140,6 @@ class TestPrescriberSignup:
         [email] = mailoutbox
         assert email.subject == "[TEST] Votre rôle d’administrateur"
 
-    @respx.mock
     def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(
         self, client, mocker, mailoutbox, pro_connect
     ):
@@ -220,7 +218,6 @@ class TestPrescriberSignup:
         assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
         assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
-    @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_known_kind(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
@@ -302,7 +299,6 @@ class TestPrescriberSignup:
         assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
         assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
-    @respx.mock
     def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
@@ -397,7 +393,6 @@ class TestPrescriberSignup:
         assert "Vérification de l'habilitation d'une nouvelle organisation" in authorization_email.subject
         assert administrator_email.subject == "[TEST] Votre rôle d’administrateur"
 
-    @respx.mock
     def test_create_user_prescriber_with_unauthorized_org(self, client, mocker, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber with an unauthorized organization.
@@ -561,7 +556,6 @@ class TestPrescriberSignup:
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         assertRedirects(response, url)
 
-    @respx.mock
     def test_create_user_prescriber_without_org(self, client, mailoutbox, pro_connect):
         """
         Test the creation of a user of type prescriber without organization.
@@ -609,7 +603,6 @@ class TestPrescriberSignup:
         # No email has been sent.
         assert len(mailoutbox) == 0
 
-    @respx.mock
     def test_create_user_prescriber_with_same_siret_and_different_kind(self, client, mocker, pro_connect):
         """
         A user can create a new prescriber organization with an existing SIRET number,
@@ -681,7 +674,6 @@ class TestPrescriberSignup:
         assert PrescriberOrganizationKind.ML.value == org1.kind
         assert PrescriberOrganizationKind.PLIE.value == org2.kind
 
-    @respx.mock
     def test_create_user_prescriber_with_same_siret_and_same_kind(self, client, mocker, pro_connect):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
@@ -763,7 +755,6 @@ class TestPrescriberSignup:
         invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
         assert invitation_url in mail_body
 
-    @respx.mock
     def test_prescriber_already_exists_simple_signup(self, client, pro_connect):
         """
         He does not want to join an organization, only create an account.
@@ -801,7 +792,6 @@ class TestPrescriberSignup:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.has_sso_provider
 
-    @respx.mock
     def test_prescriber_already_exists_create_organization(self, client, pro_connect):
         """
         User is already a prescriber.
@@ -917,7 +907,6 @@ class TestProConnectPrescribersViewsExceptions:
     Prescribers' signup and login exceptions: user already exists, ...
     """
 
-    @respx.mock
     def test_organization_creation_error(self, client, pro_connect):
         """
         The organization creation didn't work.
@@ -985,7 +974,6 @@ class TestProConnectPrescribersViewsExceptions:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert not user.prescriberorganization_set.exists()
 
-    @respx.mock
     def test_non_prescriber_cant_join_organisation(self, client, pro_connect):
         """
         The organization creation didn't work.
@@ -1063,7 +1051,6 @@ class TestProConnectPrescribersViewsExceptions:
             ],
         )
 
-    @respx.mock
     def test_employer_already_exists(self, client, pro_connect):
         """
         User is already a member of an SIAE.
@@ -1148,7 +1135,6 @@ class TestProConnectPrescribersViewsExceptions:
         assert not organization_exists
         assert not user.prescriberorganization_set.exists()
 
-    @respx.mock
     def test_prescriber_signup_ft_organization_wrong_email(self, client, pro_connect):
         """
         A user creates a prescriber account on Itou with ProConnect

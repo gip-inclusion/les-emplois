@@ -2,7 +2,6 @@ import random
 from functools import partial
 from urllib.parse import urlencode
 
-import respx
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
@@ -507,7 +506,6 @@ class DjangoSignupTestAcceptInvitation:
 
 
 class ProConnectSignupTestAcceptInvitation:
-    @respx.mock
     def test_new_user__ProConnect_signup(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link, follow=True)
@@ -540,7 +538,6 @@ class ProConnectSignupTestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @respx.mock
     def test_new_user__ProConnect_signup__returns_on_other_browser(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         response = client.get(invitation.acceptance_link)
@@ -575,7 +572,6 @@ class ProConnectSignupTestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @respx.mock
     def test_auto_accept_invitation__ProConnect_login(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
@@ -591,7 +587,6 @@ class ProConnectSignupTestAcceptInvitation:
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @respx.mock
     def test_existing_user__login_with_ProConnect(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
         user = self.user_factory(
@@ -627,7 +622,6 @@ class ProConnectSignupTestAcceptInvitation:
         assert response.context["user"].is_authenticated
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
 
-    @respx.mock
     def test_new_user__ProConnect_signup__wrong_email(self, client, pro_connect):
         invitation = self.invitation_factory()
         response = client.get(invitation.acceptance_link, follow=True)

@@ -39,7 +39,6 @@ class TestCompanySignup:
         assertRedirects(response, reverse("signup:company_select"))
 
     @freeze_time("2022-09-15 15:53:54")
-    @respx.mock
     def test_join_an_company_without_members(self, client, mailoutbox, pro_connect):
         """
         A user joins a company without members.
@@ -171,7 +170,6 @@ class TestCompanySignup:
         assert response.status_code == 200
 
     @freeze_time("2022-09-15 15:53:54")
-    @respx.mock
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
         """
         A user joins a company without members.
@@ -220,7 +218,6 @@ class TestCompanySignup:
         assert 2 == user.company_set.count()
 
     @freeze_time("2022-09-15 15:53:54")
-    @respx.mock
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
         self, client, pro_connect
     ):
@@ -302,7 +299,6 @@ class TestCompanySignup:
             ],
         )
 
-    @respx.mock
     def test_create_facilitator(self, client, mocker, mailoutbox, settings, pro_connect):
         settings.API_INSEE_AUTH_URL = "https://insee.fake"
         settings.API_INSEE_SIRENE_URL = "https://entreprise.fake"

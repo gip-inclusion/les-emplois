@@ -771,7 +771,7 @@ def api_particulier_settings(settings):
 
 
 @pytest.fixture(name="pro_connect")
-def setup_pro_connect():
+def setup_pro_connect(respx_mock):
     # this import requirest the settings to be loaded so we con't put it with the others
     from tests.openid_connect.pro_connect.testing import pro_connect_setup
 
