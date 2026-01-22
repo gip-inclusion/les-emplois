@@ -15,7 +15,7 @@ class UserSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     email = serializers.CharField()
     phone = serializers.CharField(allow_blank=True)
-    last_login = serializers.DateTimeField()
+    last_login = serializers.DateTimeField(required=False, allow_null=True)
     auth = serializers.ChoiceField(choices=Auth.choices)
 
     memberships = MembershipSerializer(many=True)
