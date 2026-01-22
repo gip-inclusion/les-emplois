@@ -628,6 +628,15 @@ class Company(AddressMixin, OrganizationAbstract):
         ).exists()
         return has_job_descriptions_considered_old
 
+    def get_documentation_link(self):
+        if self.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:
+            return "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409"
+        if self.kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
+            return "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16925381169681"
+        if self.kind == CompanyKind.GEIQ:
+            return "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/15209741332113"
+        return None  # This cannot happen since all the kinds are handled above
+
 
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""

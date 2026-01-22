@@ -359,6 +359,9 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
             and self.code_safir_pole_emploi in DTFT_SAFIR_CODE_TO_DEPARTMENTS
         )
 
+    def get_documentation_link(self):
+        return "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617"
+
 
 class PrescriberMembership(MembershipAbstract):
     """Intermediary model between `User` and `PrescriberOrganization`."""
