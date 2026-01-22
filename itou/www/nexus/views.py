@@ -117,6 +117,11 @@ class CommunauteView(NexusMixin, TemplateView):
     service = Service.COMMUNAUTE
 
 
+class DoraView(NexusMixin, TemplateView):
+    template_name = "nexus/dora.html"
+    service = Service.DORA
+
+
 class MarcheView(NexusMixin, TemplateView):
     template_name = "nexus/marche.html"
     service = Service.MARCHE
