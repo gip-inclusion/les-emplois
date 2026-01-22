@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import parse_response_to_soup, pretty_indented, remove_static_hash
 
 
 def test_navigation_not_authenticated(snapshot, client):
@@ -79,6 +79,6 @@ def test_navigation_authenticated(snapshot, client, user_factory):
     [offcanvasNav] = soup.select("#offcanvasNav")
     for a_tags in soup.find_all("a", attrs={"href": True}):
         if a_tags["href"].startswith("/static/pdf/syntheseSecurite"):
-            a_tags["href"] = "/static/pdf/syntheseSecurite.pdf"  # Normalize href for CI
+            a_tags["href"] = remove_static_hash(a_tags["href"])  # Normalize href for CI
     set_org_id_for_snapshot(offcanvasNav)
     assert pretty_indented(offcanvasNav) == snapshot(name="navigation")
