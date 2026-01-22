@@ -3,6 +3,7 @@ import functools
 from collections import defaultdict
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Exists, F, OuterRef, Value
 from django.db.models.functions import Concat, Lower
 from django.http import Http404, JsonResponse
@@ -560,6 +561,7 @@ def list_for_siae_actions(request):
     return response
 
 
+@transaction.non_atomic_requests
 @check_user(lambda u: u.is_prescriber or u.is_employer)
 def autocomplete(request, list_kind, field_name):
     if list_kind == JobApplicationsListKind.RECEIVED:

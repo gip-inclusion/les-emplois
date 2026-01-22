@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_not_required
+from django.db import transaction
 from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
@@ -41,6 +42,7 @@ def autocomplete_name(qs, term, extra_ordering_by):
 
 
 @login_not_required
+@transaction.non_atomic_requests
 def cities_autocomplete(request):
     """
     Returns JSON data compliant with Select2
@@ -65,6 +67,7 @@ def cities_autocomplete(request):
 
 
 @login_not_required
+@transaction.non_atomic_requests
 def jobs_autocomplete(request):
     """
     Returns JSON data compliant with Select2
@@ -86,6 +89,7 @@ def jobs_autocomplete(request):
 
 
 @login_not_required
+@transaction.non_atomic_requests
 def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)

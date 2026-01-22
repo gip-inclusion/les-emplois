@@ -1,14 +1,8 @@
 # serializer version: 1
 # name: TestCommunesAutocomplete.test_autocomplete
   dict({
-    'num_queries': 3,
+    'num_queries': 1,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
       dict({
         'origin': list([
           'communes_autocomplete[www/autocomplete/views.py]',
@@ -38,25 +32,13 @@
           LIMIT 50
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestJobsAutocomplete.test_search_multi_words
   dict({
-    'num_queries': 3,
+    'num_queries': 1,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
       dict({
         'origin': list([
           'jobs_autocomplete[www/autocomplete/views.py]',
@@ -77,25 +59,13 @@
           LIMIT 10
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestSelect2CitiesAutocomplete.test_autocomplete
   dict({
-    'num_queries': 3,
+    'num_queries': 1,
     'queries': list([
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
       dict({
         'origin': list([
           'cities_autocomplete[www/autocomplete/views.py]',
@@ -121,12 +91,6 @@
                    "cities_city"."department" ASC
           LIMIT 50
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

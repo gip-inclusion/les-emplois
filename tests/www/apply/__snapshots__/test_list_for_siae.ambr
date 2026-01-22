@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestAutocomplete.test_as_employer[SQL queries for job_seeker autocomplete]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -166,12 +166,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -266,18 +260,12 @@
           ORDER BY "job_applications_jobapplication"."job_seeker_id" ASC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender autocomplete]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -442,12 +430,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -542,18 +524,12 @@
           ORDER BY "job_applications_jobapplication"."sender_id" ASC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender_company autocomplete]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -718,12 +694,6 @@
                          LIMIT 1)))
           ORDER BY RANDOM() ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
@@ -820,18 +790,12 @@
           ORDER BY "job_applications_jobapplication"."sender_company_id" ASC
         ''',
       }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
     ]),
   })
 # ---
 # name: TestAutocomplete.test_as_employer[SQL queries for sender_prescriber_organization autocomplete]
   dict({
-    'num_queries': 7,
+    'num_queries': 5,
     'queries': list([
       dict({
         'origin': list([
@@ -999,12 +963,6 @@
       }),
       dict({
         'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
           'JobApplicationQuerySet.get_unique_fk_objects[job_applications/models.py]',
           'autocomplete[www/apply/views/list_views.py]',
           '_check_user_view_wrapper[utils/auth.py]',
@@ -1090,12 +1048,6 @@
           WHERE "job_applications_jobapplication"."to_company_id" = %s
           ORDER BY "job_applications_jobapplication"."sender_prescriber_organization_id" ASC
         ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })
