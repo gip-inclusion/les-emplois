@@ -1,0 +1,133 @@
+# serializer version: 1
+# name: TestCommunesAutocomplete.test_autocomplete
+  dict({
+    'num_queries': 3,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'communes_autocomplete[www/autocomplete/views.py]',
+        ]),
+        'sql': '''
+          SELECT "asp_commune"."id",
+                 "asp_commune"."start_date",
+                 "asp_commune"."end_date",
+                 "asp_commune"."code",
+                 "asp_commune"."name",
+                 "asp_commune"."normalized_name",
+                 "asp_commune"."created_at",
+                 "asp_commune"."city_id",
+                 "asp_commune"."ignore",
+                 NULLIF(STRPOS(LOWER(UNACCENT("asp_commune"."name")), %s), %s) AS "spaced_index",
+                 NULLIF(STRPOS(LOWER(UNACCENT("asp_commune"."name")), %s), %s) AS "hyphenated_index",
+                 LEAST(NULLIF(STRPOS(LOWER(UNACCENT("asp_commune"."name")), %s), %s), NULLIF(STRPOS(LOWER(UNACCENT("asp_commune"."name")), %s), %s)) AS "best_index"
+          FROM "asp_commune"
+          WHERE (NOT ("asp_commune"."ignore")
+                 AND "asp_commune"."start_date" <= %s
+                 AND ("asp_commune"."end_date" IS NULL
+                      OR "asp_commune"."end_date" > %s)
+                 AND "asp_commune"."normalized_name"::text LIKE %s)
+          ORDER BY 12 ASC NULLS LAST,
+                   "asp_commune"."name" ASC,
+                   "asp_commune"."code" ASC
+          LIMIT 50
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobsAutocomplete.test_search_multi_words
+  dict({
+    'num_queries': 3,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'jobs_autocomplete[www/autocomplete/views.py]',
+        ]),
+        'sql': '''
+          SELECT "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "jobs_rome"."updated_at",
+                 "jobs_rome"."code",
+                 "jobs_rome"."name"
+          FROM "jobs_appellation"
+          LEFT OUTER JOIN "jobs_rome" ON ("jobs_appellation"."rome_id" = "jobs_rome"."code")
+          WHERE "jobs_appellation"."full_text" @@ (to_tsquery(%s::regconfig, %s))
+          ORDER BY "jobs_appellation"."name" ASC
+          LIMIT 10
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestSelect2CitiesAutocomplete.test_autocomplete
+  dict({
+    'num_queries': 3,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'cities_autocomplete[www/autocomplete/views.py]',
+        ]),
+        'sql': '''
+          SELECT "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."normalized_name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode",
+                 "cities_city"."last_synced_at",
+                 NULLIF(STRPOS(LOWER(UNACCENT("cities_city"."name")), %s), %s) AS "spaced_index",
+                 NULLIF(STRPOS(LOWER(UNACCENT("cities_city"."name")), %s), %s) AS "hyphenated_index",
+                 LEAST(NULLIF(STRPOS(LOWER(UNACCENT("cities_city"."name")), %s), %s), NULLIF(STRPOS(LOWER(UNACCENT("cities_city"."name")), %s), %s)) AS "best_index"
+          FROM "cities_city"
+          WHERE "cities_city"."normalized_name"::text LIKE %s
+          ORDER BY 13 ASC NULLS LAST,
+                   "cities_city"."name" ASC,
+                   "cities_city"."department" ASC
+          LIMIT 50
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
