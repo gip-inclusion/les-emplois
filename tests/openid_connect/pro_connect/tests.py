@@ -120,6 +120,7 @@ class TestProConnectModel:
             expected, key=itemgetter("field_name")
         )
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_user_from_user_info_with_already_existing_id(self, pro_connect):
         """
         If there already is an existing user with this ProConnect id, we do not create it again,
@@ -152,6 +153,7 @@ class TestProConnectModel:
         with pytest.raises(ValidationError):
             pc_user_data.create_or_update_user()
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_create_user_from_user_info_with_already_existing_email_but_other_sub(self, pro_connect):
         """
         If there already is an existing user with this email but another ProConnect sub,
@@ -195,6 +197,7 @@ class TestProConnectModel:
         assert organization.active_members.count() == 1
         assert organization.has_admin(user)
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_get_existing_user_with_same_email_django(self, pro_connect):
         """
         If there already is an existing django user with email ProConnect sent us, we do not create it again,
@@ -209,6 +212,7 @@ class TestProConnectModel:
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_get_existing_user_with_same_email_IC(self, pro_connect):
         """
         If there already is an existing IC user with email ProConnect sent us, we do not create it again,
@@ -223,6 +227,7 @@ class TestProConnectModel:
         assert user.username == pro_connect.oidc_userinfo["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.PRO_CONNECT
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_update_user_from_user_info(self, pro_connect):
         user = PrescriberFactory(
             **dataclasses.asdict(ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo))
@@ -276,6 +281,7 @@ class TestProConnectModel:
 
             user.delete()
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_login_only(self, pro_connect):
         pc_user_data = ProConnectPrescriberData.from_user_info(pro_connect.oidc_userinfo)
         with pytest.raises(RegisterForbiddenException):
@@ -977,6 +983,7 @@ class TestProConnectLogout:
 
 class TestProConnectMapChannel:
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_happy_path(self, client, pro_connect):
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
             sender_prescriber_organization__code_safir_pole_emploi="95021"

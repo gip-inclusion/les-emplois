@@ -15,6 +15,7 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
+from itou.utils import triggers
 from itou.utils.mocks.address_format import (
     BAN_GEOCODING_API_RESULTS_MOCK,
     get_random_geocoding_api_result,
@@ -312,7 +313,8 @@ class JobSeekerFactory(UserFactory):
         self.insee_city = city
 
         if create:
-            self.save()
+            with triggers.update_context():
+                self.save()
 
     @factory.post_generation
     def with_mocked_address(self, create, extracted, **kwargs):
@@ -330,7 +332,8 @@ class JobSeekerFactory(UserFactory):
         self.geocoding_score = address.get("score")
         self.coords = f"POINT({address.get('longitude')} {address.get('latitude')})"
         if create:
-            self.save()
+            with triggers.update_context():
+                self.save()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):

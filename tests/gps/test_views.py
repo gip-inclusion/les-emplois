@@ -369,6 +369,7 @@ class TestGroupDetailsMembershipTab:
             assert response.status_code == 403
 
     @freezegun.freeze_time("2024-06-21")
+    @pytest.mark.usefixtures("trigger_context")
     def test_tab(self, client, snapshot, caplog):
         prescriber = PrescriberFactory(
             membership=True,

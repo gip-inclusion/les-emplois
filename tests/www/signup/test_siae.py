@@ -1,4 +1,5 @@
 import httpx
+import pytest
 import respx
 from django.contrib import messages
 from django.urls import reverse
@@ -172,6 +173,7 @@ class TestCompanySignup:
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
         """
         A user joins a company without members.
@@ -221,6 +223,7 @@ class TestCompanySignup:
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
+    @pytest.mark.usefixtures("trigger_context")
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
         self, client, pro_connect
     ):

@@ -5652,6 +5652,7 @@ class TestFillJobSeekerInfosForHire:
             )
         assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_no_birthdate(self, client, birth_country):
         self.job_seeker.jobseeker_profile.birthdate = None
@@ -5753,6 +5754,7 @@ class TestFillJobSeekerInfosForHire:
         if birth_country != "other":
             assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("in_france", [True, False])
     def test_no_birth_country(self, client, in_france):
         assert self.job_seeker.jobseeker_profile.birthdate
@@ -5836,6 +5838,7 @@ class TestFillJobSeekerInfosForHire:
         assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_no_address(self, client, address):
         address_kwargs = {
@@ -5955,6 +5958,7 @@ class TestFillJobSeekerInfosForHire:
         job_application = self.accept_contract(client, session_uuid)
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
     def test_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
@@ -6044,6 +6048,7 @@ class TestFillJobSeekerInfosForHire:
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
         assertRedirects(response, reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_no_country_disable_with_certification(self, client):
         IdentityCertification.objects.create(
             jobseeker_profile=self.job_seeker.jobseeker_profile,
@@ -6284,6 +6289,7 @@ class TestHireContract:
 
         assert apply_session.name not in client.session
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_redirect_fill_user_infos_when_needed(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_employer=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
@@ -6307,6 +6313,7 @@ class TestHireContract:
             response, reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         )
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_retrieval_of_session_data(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)

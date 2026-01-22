@@ -18,6 +18,7 @@ from tests.users.factories import (
 
 
 @respx.mock
+@pytest.mark.usefixtures("trigger_context")
 def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect):
     user = PrescriberFactory(identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"])
     client.force_login(user)
@@ -42,6 +43,7 @@ def test_prescriber_using_django_has_to_activate_sso_account(client, pro_connect
 
 
 @respx.mock
+@pytest.mark.usefixtures("trigger_context")
 def test_employer_using_django_has_to_activate_sso_account(client, pro_connect):
     user = EmployerFactory(
         membership=True, identity_provider=IdentityProvider.DJANGO, email=pro_connect.oidc_userinfo["email"]

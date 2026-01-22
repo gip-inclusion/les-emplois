@@ -20,7 +20,7 @@ from django.utils import timezone
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, RSAAllocation
+from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import (
@@ -918,6 +918,7 @@ class TestJobSeekerProfileModel:
             {"jobseeker_profile__birth_country": None, "with_birth_place": True},
         ],
     )
+    @pytest.mark.usefixtures("trigger_context")
     def test_valid_birth_place_and_country_constraint(self, factory_kwargs):
         profile = JobSeekerFactory().jobseeker_profile
         profile_values = JobSeekerFactory.build(**factory_kwargs).jobseeker_profile
@@ -1145,6 +1146,58 @@ def test_job_seeker_profile_asp_uid_field_history():
 
 
 @pytest.mark.parametrize(
+    "obj_attr,field,value",
+    [
+        pytest.param("jobseeker_profile", "asp_uid", "000000000000000000000000000002", id="asp_uid"),
+        pytest.param("jobseeker_profile", "birthdate", datetime.date(2000, 1, 1), id="birthdate"),
+        pytest.param("jobseeker_profile", "birth_country_id", "BAHAMAS", id="birth_country"),
+        pytest.param("jobseeker_profile", "birth_place_id", "STRASBOURG", id="birth_place"),
+        pytest.param("jobseeker_profile", "is_not_stalled_anymore", False, id="is_not_stalled_anymore"),
+        pytest.param("jobseeker_profile", "pole_emploi_id", "12345678944", id="pole_emploi_id"),
+        pytest.param(None, "first_name", "Dolorès", id="first_name"),
+        pytest.param(None, "last_name", "Madrigal", id="last_name"),
+        pytest.param(None, "title", "MME", id="title"),
+        pytest.param(None, "email", "hush@madrigal.com", id="email"),
+        pytest.param(None, "phone", "0612345678", id="phone"),
+        pytest.param(None, "address_line_1", "Calle del encanto", id="address_line_1"),
+        pytest.param(None, "address_line_2", "Finca Madrigal", id="address_line_2"),
+        pytest.param(None, "post_code", "34570", id="post_code"),
+        pytest.param(None, "city", "Montarnaud", id="city"),
+    ],
+)
+def test_user_and_job_seeker_profile_field_history(obj_attr, field, value):
+    """
+    Light version of `test_job_seeker_profile_asp_uid_field_history`
+    that only check if keys are present because the whole
+    system is already tested.
+    Also, types of monitored fields are different, making testing their value
+    not that obvious.
+    """
+    factory_kwargs = {}
+    match field:
+        case "birth_country_id":
+            value = Country.objects.get(name=value).pk
+        case "birth_place_id":
+            factory_kwargs["born_in_france"] = True
+            value = Commune.objects.current().get(name=value).pk
+        case "title":
+            # JobSeekerFactory.title being random, force its value
+            # to ensure a change is made.
+            factory_kwargs["title"] = "M"
+
+    obj = JobSeekerFactory(**factory_kwargs)
+    if obj_attr:
+        obj = getattr(obj, obj_attr)
+    assert obj.fields_history == []
+
+    setattr(obj, field, value)
+    with triggers.context():
+        obj.save(update_fields=[field])
+    obj.refresh_from_db()
+    assert field in obj.fields_history[0]["after"].keys()
+
+
+@pytest.mark.parametrize(
     "factory",
     [
         JobSeekerFactory,
@@ -1202,6 +1255,7 @@ def test_save_creates_a_job_seeker_profile(user_kind, profile_expected):
 
 
 @freezegun.freeze_time("2022-08-10")
+@pytest.mark.usefixtures("trigger_context")
 def test_save_erases_ft_fields_if_details_change():
     UserFactory(
         email="foobar@truc.com",

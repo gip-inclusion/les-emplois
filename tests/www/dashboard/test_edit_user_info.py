@@ -709,6 +709,7 @@ class TestEditUserInfoView:
         assert user.jobseeker_profile.birthdate != birthdate
         assert user.email != post_data["email"]
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_edit_without_title(self, client, snapshot):
         MISSING_INFOS_WARNING_ID = "missing-infos-warning"
         user = JobSeekerFactory(with_address=True, title="", phone="", address_line_1="")
