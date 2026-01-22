@@ -2428,6 +2428,12 @@ class TestAutocomplete:
             assert response.status_code == 200
             assert response.json() == {"results": []}
 
+            # A non empty term is needed to search
+            with assertSnapshotQueries(snapshot(name="SQL queries when no actual search is performed ")):
+                response = client.get(autocomplete_url, {"term": "  "})
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
             # No results for unrelated term
             response = client.get(autocomplete_url, {"term": "Nom sans aucun rapport"})
             assert response.status_code == 200
