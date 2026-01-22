@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur le candidat" %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur le candidat" %}
         {% fragment as c_title__main %}
             <h1>Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
             <p id="copy_public_id">
