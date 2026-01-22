@@ -1169,7 +1169,7 @@ class TestAutocomplete:
             "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
             "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
             "to_company": (
-                "société c",
+                "ciété c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
             ),
         }
@@ -1179,6 +1179,12 @@ class TestAutocomplete:
 
             # A term is needed to search
             response = client.get(autocomplete_url)
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            # A non empty term is needed to search
+            with assertSnapshotQueries(snapshot(name="SQL queries when no actual search is performed ")):
+                response = client.get(autocomplete_url, {"term": "  "})
             assert response.status_code == 200
             assert response.json() == {"results": []}
 
@@ -1303,7 +1309,7 @@ class TestAutocomplete:
             "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
             "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
             "to_company": (
-                "société c",
+                "ciété c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
             ),
         }
@@ -1313,6 +1319,12 @@ class TestAutocomplete:
 
             # A term is needed to search
             response = client.get(autocomplete_url)
+            assert response.status_code == 200
+            assert response.json() == {"results": []}
+
+            # A non empty term is needed to search
+            with assertSnapshotQueries(snapshot(name="SQL queries when no actual search is performed ")):
+                response = client.get(autocomplete_url, {"term": "  "})
             assert response.status_code == 200
             assert response.json() == {"results": []}
 
