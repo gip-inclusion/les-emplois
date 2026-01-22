@@ -338,7 +338,8 @@
                              WHERE (NOT (U0."siret" = %s)
                                     AND U0."convention_id" = ("companies_company"."convention_id")
                                     AND U0."source" = %s)
-                             ORDER BY RANDOM() ASC)))
+                             ORDER BY RANDOM() ASC
+                             LIMIT 1)))
           LIMIT 1
         ''',
       }),
@@ -462,7 +463,8 @@
              WHERE (NOT (U0."siret" = %s)
                     AND U0."convention_id" = ("companies_company"."convention_id")
                     AND U0."source" = %s)
-             ORDER BY RANDOM() ASC) AS "siret_from_asp_source",
+             ORDER BY RANDOM() ASC
+             LIMIT 1) AS "siret_from_asp_source",
                  "job_applications_jobapplication"."id",
                  "job_applications_jobapplication"."job_seeker_id",
                  "job_applications_jobapplication"."eligibility_diagnosis_id",
