@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from itoutils.django.testing import assertSnapshotQueries
 
 from itou.asp.models import Commune
 from tests.cities.factories import create_test_cities
@@ -17,13 +18,14 @@ class TestJobsAutocomplete:
         self.company = CompanyFactory()
         self.url = reverse("autocomplete:jobs")
 
-    def test_search_multi_words(self, client):
-        response = client.get(
-            self.url,
-            {
-                "term": "cariste ferroviaire",
-            },
-        )
+    def test_search_multi_words(self, client, snapshot):
+        with assertSnapshotQueries(snapshot):
+            response = client.get(
+                self.url,
+                {
+                    "term": "cariste ferroviaire",
+                },
+            )
         assert response.status_code == 200
         expected = {
             "results": [
@@ -101,13 +103,14 @@ class TestJobsAutocomplete:
 
 
 class TestSelect2CitiesAutocomplete:
-    def test_autocomplete(self, client):
+    def test_autocomplete(self, client, snapshot):
         cities = create_test_cities(["01", "75", "93"])
         city_slug_to_pk = {city.slug: city.pk for city in cities}
 
         url = reverse("autocomplete:cities")
 
-        response = client.get(url, {"term": "sai"})
+        with assertSnapshotQueries(snapshot):
+            response = client.get(url, {"term": "sai"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
@@ -260,10 +263,11 @@ class TestSelect2CitiesAutocomplete:
 
 
 class TestCommunesAutocomplete:
-    def test_autocomplete(self, client):
+    def test_autocomplete(self, client, snapshot):
         url = reverse("autocomplete:communes")
 
-        response = client.get(url, {"term": "sai"})
+        with assertSnapshotQueries(snapshot):
+            response = client.get(url, {"term": "sai"})
         assert response.status_code == 200
         assert response.json() == {
             "results": [
