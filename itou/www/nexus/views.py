@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from itoutils.urls import add_url_params
 
 from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
@@ -63,7 +64,7 @@ class NexusMixin:
         context = super().get_context_data(**kwargs)
         context["activated_services"] = self.activated_services
         context["user_kind"] = self.user_kind
-        context["logout_url"] = reverse("account_logout")  # FIXME: Redirect to nexus login page
+        context["logout_url"] = add_url_params(reverse("account_logout"), {"redirect_url": reverse("nexus:login")})
         context["user_name"] = f"{self.request.user.first_name} {self.request.user.last_name[0]}"
         context["emplois_badge_count"] = None
         if Service.EMPLOIS in self.activated_services and self.user_kind == NexusUserKind.FACILITY_MANAGER:

@@ -2353,7 +2353,7 @@
                               Besoin d'aide ?
                           </span>
                       </a>
-                      <form action="/accounts/logout/" method="post">
+                      <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-ico-only btn-nexus">
                               <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2485,7 +2485,7 @@
                           </a>
                       </li>
                       <li>
-                          <form action="/accounts/logout/" method="post">
+                          <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <button class="btn btn-lg btn-ico btn-nexus">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2545,7 +2545,7 @@
                               Besoin d'aide ?
                           </span>
                       </a>
-                      <form action="/accounts/logout/" method="post">
+                      <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-ico-only btn-nexus">
                               <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2677,7 +2677,7 @@
                           </a>
                       </li>
                       <li>
-                          <form action="/accounts/logout/" method="post">
+                          <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <button class="btn btn-lg btn-ico btn-nexus">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2737,7 +2737,7 @@
                               Besoin d'aide ?
                           </span>
                       </a>
-                      <form action="/accounts/logout/" method="post">
+                      <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-ico-only btn-nexus">
                               <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2869,7 +2869,7 @@
                           </a>
                       </li>
                       <li>
-                          <form action="/accounts/logout/" method="post">
+                          <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <button class="btn btn-lg btn-ico btn-nexus">
                                   <i aria-hidden="true" class="ri-logout-circle-line">
@@ -2929,7 +2929,7 @@
                               Besoin d'aide ?
                           </span>
                       </a>
-                      <form action="/accounts/logout/" method="post">
+                      <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                           <button class="btn btn-lg btn-ico-only btn-nexus">
                               <i aria-hidden="true" class="ri-logout-circle-line">
@@ -3050,7 +3050,7 @@
                           </a>
                       </li>
                       <li>
-                          <form action="/accounts/logout/" method="post">
+                          <form action="/accounts/logout/?redirect_url=%2Fportal%2Flogin" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <button class="btn btn-lg btn-ico btn-nexus">
                                   <i aria-hidden="true" class="ri-logout-circle-line">

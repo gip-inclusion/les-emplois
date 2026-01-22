@@ -114,6 +114,16 @@ class TestLayout:
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
 
+    def test_logout_redirect_url(self, client):
+        client.force_login(PrescriberFactory())
+
+        response = client.get(reverse("nexus:homepage"))
+        logout_url = add_url_params(reverse("account_logout"), {"redirect_url": reverse("nexus:login")})
+        assertContains(response, logout_url)
+
+        response = client.post(logout_url)
+        assertRedirects(response, reverse("nexus:login"))
+
 
 class TestHomePageView:
     url = reverse("nexus:homepage")
