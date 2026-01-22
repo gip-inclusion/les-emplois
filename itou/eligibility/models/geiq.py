@@ -173,7 +173,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         )
 
     @classmethod
-    def _expiration_date(cls, author=None):
+    def _expiration_date(cls, author_kind=None):
         return timezone.localdate() + relativedelta(months=cls.EXPIRATION_DELAY_MONTHS)
 
     @classmethod

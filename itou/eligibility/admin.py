@@ -172,7 +172,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
-            obj.expires_at = self.model._expiration_date(obj.author)
+            obj.expires_at = self.model._expiration_date(obj.author_kind)
         # We cannot make this message in the admin form
         if obj.author_prescriber_organization_id and not obj.author_prescriber_organization.is_authorized:
             messages.warning(request, "L'organisation prescriptrice n'est actuellement pas habilitée.")

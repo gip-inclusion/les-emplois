@@ -182,7 +182,7 @@ class TestAdministrativeCriteriaEvaluationForm:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=company,
+            author_siae=company,
             administrative_criteria=[
                 AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
             ]
