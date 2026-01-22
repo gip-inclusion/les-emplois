@@ -3637,7 +3637,7 @@ class TestInstitutionEvaluatedJobApplicationView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=siae,
+            author_siae=siae,
             administrative_criteria=[],
         )
         IAESelectedAdministrativeCriteriaFactory(
@@ -4054,7 +4054,7 @@ class TestInstitutionEvaluatedAdministrativeCriteriaView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=siae,
+            author_siae=siae,
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(

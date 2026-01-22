@@ -272,7 +272,7 @@ class TestEligibilityDiagnosisModel:
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, author=user, author_organization=company)
+        diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, author=user, author_siae=company)
 
         assert diagnosis.job_seeker == job_seeker
         assert diagnosis.author == user
@@ -299,7 +299,7 @@ class TestEligibilityDiagnosisModel:
         diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=prescriber,
-            author_organization=organization,
+            author_prescriber_organization=organization,
         )
 
         assert diagnosis.job_seeker == job_seeker
@@ -332,7 +332,7 @@ class TestEligibilityDiagnosisModel:
         diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=prescriber_organization,
+            author_prescriber_organization=prescriber_organization,
             administrative_criteria=[criteria1, criteria2, criteria3],
         )
 
@@ -350,23 +350,27 @@ class TestEligibilityDiagnosisModel:
 
     @freeze_time("2024-12-03")
     def test_update_diagnosis(self):
-        company = CompanyFactory(with_membership=True)
+        # Only prescribers can update a diagnosis
+        prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
 
         current_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         new_diagnosis = EligibilityDiagnosis.update_diagnosis(
-            current_diagnosis, author=company.members.first(), author_organization=company, administrative_criteria=[]
+            current_diagnosis,
+            author=prescriber_organization.members.first(),
+            author_prescriber_organization=prescriber_organization,
+            administrative_criteria=[],
         )
         current_diagnosis.refresh_from_db()
 
         # Some information should be copied...
         assert new_diagnosis.job_seeker == current_diagnosis.job_seeker
         # ... or updated.
-        assert new_diagnosis.author == company.members.first()
-        assert new_diagnosis.author_kind == AuthorKind.EMPLOYER
-        assert new_diagnosis.author_siae == company
-        assert new_diagnosis.author_prescriber_organization is None
+        assert new_diagnosis.author == prescriber_organization.members.first()
+        assert new_diagnosis.author_kind == AuthorKind.PRESCRIBER
+        assert new_diagnosis.author_siae is None
+        assert new_diagnosis.author_prescriber_organization == prescriber_organization
         assert new_diagnosis.administrative_criteria.count() == 0
-        assert new_diagnosis.expires_at == datetime.date(2025, 3, 5)
+        assert new_diagnosis.expires_at == datetime.date(2025, 6, 3)
 
         # And the old diagnosis should now be expired (thus considered invalid)
         assert current_diagnosis.expires_at == timezone.localdate(new_diagnosis.created_at)

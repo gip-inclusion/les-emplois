@@ -47,7 +47,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
             EligibilityDiagnosis.create_diagnosis(
                 self.job_seeker,
                 author=self.request.user,
-                author_organization=self.request.current_organization,
+                author_prescriber_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
             message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été validée."
@@ -55,7 +55,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
             EligibilityDiagnosis.update_diagnosis(
                 self.eligibility_diagnosis,
                 author=self.request.user,
-                author_organization=self.request.current_organization,
+                author_prescriber_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
             message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été mise à jour."
@@ -75,7 +75,8 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         context["job_seeker"] = self.job_seeker
         context["eligibility_diagnosis"] = self.eligibility_diagnosis
         if self.eligibility_diagnosis:
-            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(self.request.user)
+            # self.request.from_authorized_prescriber is True so the user is a prescriber
+            context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(UserKind.PRESCRIBER)
         return context
 
 
@@ -110,7 +111,7 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
         EligibilityDiagnosis.create_diagnosis(
             self.job_seeker,
             author=self.request.user,
-            author_organization=self.request.current_organization,
+            author_siae=self.request.current_organization,
             administrative_criteria=form.cleaned_data,
         )
         messages.success(self.request, "Éligibilité confirmée !", extra_tags="toast")

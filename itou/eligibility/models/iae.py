@@ -213,9 +213,9 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         return self.expires_at
 
     @classmethod
-    def _expiration_date(cls, author):
+    def _expiration_date(cls, author_kind):
         now = timezone.localdate()
-        if author.is_employer:
+        if author_kind == UserKind.EMPLOYER:
             # For siae_evaluations, employers must provide a proof for administrative criteria
             # supporting the hire. A proof is valid for 3 months, align employer diagnosis
             # duration with proof validity duration.
@@ -224,22 +224,28 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def create_diagnosis(cls, job_seeker, *, author, author_organization, administrative_criteria=None):
+    def create_diagnosis(
+        cls, job_seeker, *, author, author_siae=None, author_prescriber_organization=None, administrative_criteria=None
+    ):
         """
         Arguments:
             job_seeker: User() object
         Keyword arguments:
             author: User() object, future diagnosis author
-            author_organization: either Siae, PrescriberOrganization or None, future diagnosis author organization
+            author_siae: either Company or None, future diagnosis author organization
+            author_prescriber_organization: either PrescriberOrganization or None, future diagnosis author organization
             administrative_criteria: an optional list of AdministrativeCriteria() objects
         """
+        if author_siae is None and author_prescriber_organization is None:
+            raise ValueError("Missing author_siae or author_prescriber_organization")
+        author_kind = UserKind.EMPLOYER if author_siae else UserKind.PRESCRIBER
         diagnosis = cls.objects.create(
             job_seeker=job_seeker,
             author=author,
-            author_kind=author.kind,
-            author_siae=author_organization if author.is_employer else None,
-            author_prescriber_organization=author_organization if author.is_prescriber else None,
-            expires_at=cls._expiration_date(author),
+            author_kind=author_kind,
+            author_siae=author_siae,
+            author_prescriber_organization=author_prescriber_organization,
+            expires_at=cls._expiration_date(author_kind),
         )
         if administrative_criteria:
             diagnosis.administrative_criteria.add(*administrative_criteria)
@@ -252,12 +258,14 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
     @classmethod
     @transaction.atomic()
-    def update_diagnosis(cls, eligibility_diagnosis, *, author, author_organization, administrative_criteria):
+    def update_diagnosis(
+        cls, eligibility_diagnosis, *, author, author_prescriber_organization, administrative_criteria
+    ):
         # Create a new diagnostic to be aligned with the criteria certification period.
         new_eligibility_diagnosis = cls.create_diagnosis(
             eligibility_diagnosis.job_seeker,
             author=author,
-            author_organization=author_organization,
+            author_prescriber_organization=author_prescriber_organization,
             administrative_criteria=administrative_criteria,
         )
         # And mark the current one as expired.

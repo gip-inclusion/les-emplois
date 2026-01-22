@@ -562,7 +562,7 @@ class TestSiaeJobApplicationListView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=self.user,
-            author_organization=self.siae,
+            author_siae=self.siae,
             administrative_criteria=[],
         )
         IAESelectedAdministrativeCriteriaFactory(
@@ -649,7 +649,7 @@ class TestSiaeJobApplicationListView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=self.user,
-            author_organization=self.siae,
+            author_siae=self.siae,
             administrative_criteria=[rsa],
         )
         job_application = JobApplicationFactory(
@@ -932,7 +932,7 @@ class TestSiaeSelectCriteriaView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker=job_seeker,
             author=self.user,
-            author_organization=self.siae,
+            author_siae=self.siae,
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(
@@ -1147,7 +1147,7 @@ class TestSiaeUploadDocsView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker=job_seeker,
             author=self.user,
-            author_organization=self.siae,
+            author_siae=self.siae,
             administrative_criteria=[administrative_criteria],
         )
         job_application = JobApplicationFactory(
@@ -1430,7 +1430,7 @@ class TestSiaeEvaluatedSiaeDetailView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=siae,
+            author_siae=siae,
             administrative_criteria=[],
         )
         IAESelectedAdministrativeCriteriaFactory(
@@ -1538,7 +1538,7 @@ class TestSiaeEvaluatedJobApplicationView:
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
             job_seeker,
             author=user,
-            author_organization=siae,
+            author_siae=siae,
             administrative_criteria=[],
         )
         IAESelectedAdministrativeCriteriaFactory(
