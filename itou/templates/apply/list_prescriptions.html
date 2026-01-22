@@ -9,7 +9,7 @@
 {% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria-label="Actions sur les candidatures" %}
+    {% component_title c_title__main=c_title__main c_title__cta=c_title__cta role="group" aria_label="Actions sur les candidatures" %}
         {% fragment as c_title__main %}
             {% include "apply/includes/list_job_applications_title.html" %}
         {% endfragment %}
