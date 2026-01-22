@@ -36,7 +36,10 @@ class TestUserAPI(NexusApiTestMixin):
         assert user.source_kind == user_data["kind"]
         for field in ["first_name", "last_name", "email", "phone", "auth"]:
             assert getattr(user, field) == user_data[field]
-        assert user.last_login.isoformat() == user_data["last_login"]
+        if user.last_login is not None:
+            assert user.last_login.isoformat() == user_data["last_login"]
+        else:
+            assert user_data["last_login"] is None
 
     def test_unauthenticated(self, api_client):
         api_client = self.api_client()
@@ -73,7 +76,7 @@ class TestUserAPI(NexusApiTestMixin):
                 "last_name": "Bon",
                 "email": "jean.bon@boucherie.fr",
                 "phone": "",
-                "last_login": timezone.now().isoformat(),
+                "last_login": None,
                 "auth": "MAGIC_LINK",
                 "memberships": [
                     {"structure_id": structure.source_id, "role": "ADMINISTRATOR"},
