@@ -205,7 +205,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
             siret_from_asp_source=Subquery(
                 Company.objects.filter(
                     source=Company.SOURCE_ASP, convention=OuterRef("job_application__to_company__convention")
-                ).values("siret")
+                ).values("siret")[:1]
             )
         )
 
