@@ -47,6 +47,7 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
+from tests.files.factories import FileFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -2552,6 +2553,7 @@ class TestJobApplicationAdminForm:
 
     def test_applications_sent_by_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory()
+        job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
         sender_kind = job_application.sender_kind
         sender_company = job_application.sender_company
@@ -2590,6 +2592,7 @@ class TestJobApplicationAdminForm:
 
     def test_applications_sent_by_siae(self):
         job_application = JobApplicationSentByCompanyFactory()
+        job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender_company = job_application.sender_company
         sender = job_application.sender
 
@@ -2631,6 +2634,7 @@ class TestJobApplicationAdminForm:
 
     def test_applications_sent_by_prescriber_with_organization(self):
         job_application = JobApplicationSentByPrescriberOrganizationFactory()
+        job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
         sender_prescriber_organization = job_application.sender_prescriber_organization
 
@@ -2667,6 +2671,7 @@ class TestJobApplicationAdminForm:
 
     def test_applications_sent_by_prescriber_without_organization(self):
         job_application = JobApplicationSentByPrescriberFactory()
+        job_application.resume = FileFactory()  # Avoid unique resume conflict
         sender = job_application.sender
 
         job_application.sender = JobSeekerFactory()

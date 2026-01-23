@@ -474,6 +474,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             return hiring_start_at
 
     def clean(self):
+        super().clean()
         hiring_start_at = self.cleaned_data.get("hiring_start_at")
         hiring_end_at = self.cleaned_data.get("hiring_end_at")
 
