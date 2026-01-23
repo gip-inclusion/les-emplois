@@ -893,6 +893,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -1062,6 +1063,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -1195,7 +1197,8 @@
                                               %s))
              GROUP BY "users_user"."id",
                       1,
-                      2) subquery
+                      2,
+                      4) subquery
         ''',
       }),
       dict({
@@ -1325,6 +1328,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 36 ASC,
                    "users_user"."id" ASC
@@ -1930,6 +1934,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY "users_user"."first_name" ASC,
                    "users_user"."last_name" ASC
@@ -2097,6 +2102,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY RANDOM() ASC
         ''',
@@ -2230,7 +2236,8 @@
                                               %s))
              GROUP BY "users_user"."id",
                       1,
-                      2) subquery
+                      2,
+                      4) subquery
         ''',
       }),
       dict({
@@ -2359,6 +2366,7 @@
           GROUP BY "users_user"."id",
                    36,
                    37,
+                   39,
                    "users_jobseekerprofile"."user_id"
           ORDER BY 36 ASC,
                    "users_user"."id" ASC

@@ -1568,7 +1568,9 @@
              WHERE ("job_applications_jobapplication"."to_company_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
+                      6,
                       8,
                       9) subquery
         ''',
@@ -1956,7 +1958,9 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
+                   51,
                    53,
                    54,
                    "users_user"."id",
@@ -2543,6 +2547,7 @@
              WHERE ("job_applications_jobapplication"."to_company_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
                       5) subquery
         ''',
@@ -2895,6 +2900,7 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
                    50,
                    "users_user"."id",
@@ -3627,6 +3633,7 @@
                                  ORDER BY 1 ASC)
                               AND V0."id" IN (%s))))
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
                       7) subquery
         ''',
@@ -4055,6 +4062,7 @@
                               ORDER BY 1 ASC)
                            AND V0."id" IN (%s))))
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
                    52,
                    "users_user"."id",
@@ -4753,6 +4761,7 @@
              WHERE ("job_applications_jobapplication"."to_company_id" = %s
                     AND "job_applications_jobapplication"."job_seeker_id" = %s)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
                       5) subquery
         ''',
@@ -5105,6 +5114,7 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."job_seeker_id" = %s)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
                    50,
                    "users_user"."id",

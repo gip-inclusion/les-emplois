@@ -71,18 +71,24 @@ class DuetDatePickerWidget(forms.DateInput):
 
 
 class OSMWidget(gis_widgets.OSMWidget):
-    # https://docs.djangoproject.com/en/4.1/ref/contrib/gis/forms-api/#widget-classes
-    # We copied the html to include the nonce attribute
-    # We need to set the widget in the admin formfield_for_dbfield function
-    # because widget render does not access to the request context
-    # (see itou.utils.admin.ItouGISMixin)
-    template_name = "utils/widgets/csp_proof_openlayers-osm.html"
-
+    # Used vendored version of OpenLayers to avoid relying on external CDN
     class Media:
         css = {
-            "all": ["vendor/ol/ol.css"],
+            "all": [
+                "vendor/ol/ol.css",
+                "gis/css/ol3.css",
+            ],
         }
-        js = ["vendor/ol/ol.js"]
+        js = [
+            "vendor/ol/ol.js",
+            "gis/js/OLMapWidget.js",
+        ]
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        # Avoid "Undefined template variable 'disabled'" error in our tests
+        context.setdefault("disabled", False)
+        return context
 
 
 class RemoteAutocompleteSelect2WidgetMixin:

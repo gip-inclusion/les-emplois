@@ -2026,9 +2026,12 @@
              WHERE ("job_applications_jobapplication"."sender_id" = %s
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
+                      5,
                       6,
                       7,
+                      9,
                       10) subquery
         ''',
       }),
@@ -2427,9 +2430,12 @@
           WHERE ("job_applications_jobapplication"."sender_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
+                   50,
                    51,
                    52,
+                   54,
                    55,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
@@ -3094,6 +3100,7 @@
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE "job_applications_jobapplication"."sender_id" = %s
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
                    T5."id",
                    "users_jobseekerprofile"."user_id",
@@ -4209,9 +4216,12 @@
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
+                      5,
                       6,
                       7,
+                      9,
                       10) subquery
         ''',
       }),
@@ -4612,9 +4622,12 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
+                   50,
                    51,
                    52,
+                   54,
                    55,
                    T6."id",
                    "users_jobseekerprofile"."user_id",
@@ -5160,7 +5173,9 @@
                      OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                     AND "job_applications_jobapplication"."archived_at" IS NULL)
              GROUP BY "job_applications_jobapplication"."id",
+                      2,
                       3,
+                      5,
                       6,
                       7) subquery
         ''',
@@ -5534,7 +5549,9 @@
                   OR "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           GROUP BY "job_applications_jobapplication"."id",
+                   47,
                    48,
+                   50,
                    51,
                    52,
                    T6."id",
