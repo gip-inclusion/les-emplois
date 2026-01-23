@@ -88,7 +88,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
     def lookup_allowed(self, lookup, value, request):
         if lookup in ["follow_up_group__beneficiary"]:
             return True
-        return super().lookup_allowed(lookup, value)
+        return super().lookup_allowed(lookup, value, request)
 
     @admin.display(description="motif de suivi")
     def reason_truncated(self, obj):
@@ -119,7 +119,7 @@ class FollowUpGroupAdmin(ItouModelAdmin):
     def lookup_allowed(self, lookup, value, request):
         if lookup in ["memberships__member"]:
             return True
-        return super().lookup_allowed(lookup, value)
+        return super().lookup_allowed(lookup, value, request)
 
     @admin.display(description="Département")
     def beneficiary_department(self, obj):
