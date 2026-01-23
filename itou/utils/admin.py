@@ -62,7 +62,7 @@ class ItouGISMixin:
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         field = super().formfield_for_dbfield(db_field, request, **kwargs)
         if isinstance(field, gis_fields.PointField):
-            field.widget = OSMWidget(attrs={"map_width": 800, "map_height": 500, "CSP_NONCE": request.csp_nonce})
+            field.widget = OSMWidget(attrs={"map_width": 800, "map_height": 500})
         return field
 
 
