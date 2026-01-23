@@ -28,6 +28,7 @@ class UserAdminForm(UserChangeForm):
         exclude = ("public_id", "address_filled_at")
 
     def clean(self):
+        super().clean()
         self.cleaned_data["is_staff"] = self.instance.kind == UserKind.ITOU_STAFF
 
         # smart warning if email already exist

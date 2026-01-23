@@ -63,6 +63,7 @@ class CreateCompanyForm(forms.ModelForm):
         return self.current_company.kind
 
     def clean(self):
+        super().clean()
         siret = self.cleaned_data.get("siret")
         kind = self.cleaned_data.get("kind")
         existing_siae_query = Company.objects.filter(siret=siret, kind=kind)

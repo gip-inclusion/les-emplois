@@ -23,6 +23,7 @@ class JobApplicationAdminForm(forms.ModelForm):
         self._job_application_to_accept = False
 
     def clean(self):
+        super().clean()
         sender = self.cleaned_data["sender"]
 
         if "sender_kind" not in self.cleaned_data:
