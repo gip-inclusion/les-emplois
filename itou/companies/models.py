@@ -350,6 +350,13 @@ class Company(AddressMixin, OrganizationAbstract):
     class Meta:
         verbose_name = "entreprise"
         unique_together = ("siret", "kind")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["convention"],
+                name="unique_convention_per_company_from_asp",
+                condition=Q(source=CompanySource.ASP),
+            ),
+        ]
         triggers = [FieldsHistory(name="company_fields_history", fields=["siret"])]
         permissions = [
             ("import_aci_convergence_phc", "Import ACI Convergence / PHC SIRETs"),
