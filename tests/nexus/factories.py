@@ -56,6 +56,8 @@ class NexusStructureFactory(factory.django.DjangoModelFactory):
 
 
 class NexusMembershipFactory(factory.django.DjangoModelFactory):
+    id = factory.LazyAttribute(lambda o: service_id(o.source, o.source_id))
+    source_id = factory.LazyFunction(uuid.uuid4)
     source = factory.fuzzy.FuzzyChoice(Service)
     user = factory.SubFactory(NexusUserFactory, source=factory.SelfAttribute("..source"))
     structure = factory.SubFactory(NexusStructureFactory, source=factory.SelfAttribute("..source"))

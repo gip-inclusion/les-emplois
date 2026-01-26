@@ -106,6 +106,8 @@ class NexusStructure(NexusModelMixin, AddressMixin, models.Model):
 
 
 class NexusMembership(NexusModelMixin, models.Model):
+    id = models.CharField(verbose_name="ID unique", primary_key=True)
+    source_id = models.CharField(verbose_name="ID Source")
     user = models.ForeignKey(
         NexusUser,
         verbose_name="utilisateur",
