@@ -4,6 +4,7 @@ from django.db.models import Prefetch
 from django.utils import timezone
 
 from itou.asp.models import SiaeMeasure
+from itou.companies.enums import CompanySource
 from itou.companies.models import Company, Contract, SiaeConvention
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -94,7 +95,7 @@ class Command(BaseCommand):
         conventions = SiaeConvention.objects.prefetch_related(
             Prefetch(
                 "siaes",
-                queryset=(Company.objects.filter(source=Company.SOURCE_ASP)[:1]),
+                queryset=(Company.objects.filter(source=CompanySource.ASP)[:1]),
                 to_attr="siae",
             )
         )

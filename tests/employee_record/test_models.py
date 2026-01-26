@@ -15,7 +15,7 @@ from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.companies.models import Company
+from itou.companies.enums import CompanySource
 from itou.employee_record.enums import Status
 from itou.employee_record.models import (
     EmployeeRecord,
@@ -293,7 +293,7 @@ class TestEmployeeRecordModel:
     @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source(self):
         employee_record = EmployeeRecordFactory(
-            job_application__to_company__siret="10000000000001", job_application__to_company__source=Company.SOURCE_ASP
+            job_application__to_company__siret="10000000000001", job_application__to_company__source=CompanySource.ASP
         )
         employee_record._fill_denormalized_fields()  # to run siret_from_asp_source(main_company)
         company = employee_record.job_application.to_company
@@ -307,10 +307,10 @@ class TestEmployeeRecordModel:
 
     @pgtrigger.ignore("companies.Company:company_fields_history")
     def test_has_siret_different_form_asp_source_for_antenna(self):
-        main_company = CompanyFactory(subject_to_iae_rules=True, source=Company.SOURCE_ASP, siret="10000000000001")
+        main_company = CompanyFactory(subject_to_iae_rules=True, source=CompanySource.ASP, siret="10000000000001")
         employee_record = EmployeeRecordFactory(
             job_application__to_company__siret="10000000000002",
-            job_application__to_company__source=Company.SOURCE_USER_CREATED,
+            job_application__to_company__source=CompanySource.USER_CREATED,
             job_application__to_company__convention=main_company.convention,
         )
         employee_record._fill_denormalized_fields()  # to run siret_from_asp_source(main_company)
@@ -692,7 +692,7 @@ class TestEmployeeRecordQueryset:
         employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
         employee_record_in_antenna = EmployeeRecordFactory(
             job_application__to_company__convention=employee_record_1.job_application.to_company.convention,
-            job_application__to_company__source=Company.SOURCE_USER_CREATED,
+            job_application__to_company__source=CompanySource.USER_CREATED,
             job_application__approval=employee_record_1.job_application.approval,
         )
 
@@ -710,7 +710,7 @@ class TestEmployeeRecordQueryset:
         company = employee_record.job_application.to_company
         EmployeeRecordFactory(
             job_application__to_company__convention=company.convention,
-            job_application__to_company__source=Company.SOURCE_USER_CREATED,
+            job_application__to_company__source=CompanySource.USER_CREATED,
         )
 
         assert set(

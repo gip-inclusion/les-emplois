@@ -9,7 +9,7 @@ from django.utils import timezone
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, CompanySource, ContractType
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.enums import EvaluationSiaesKind
 from tests.cities.factories import create_city_vannes
@@ -161,7 +161,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.LazyFunction(create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
-    source = models.Company.SOURCE_ASP
+    source = CompanySource.ASP
     department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
     convention = factory.Maybe(
         "with_convention",

@@ -12,8 +12,7 @@ from rest_framework.test import APIClient
 from itou.api.geiq import serializers
 from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import CompanyToken
-from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.companies.factories import CompanyFactory
@@ -42,7 +41,7 @@ def test_candidatures_geiq_token_authentication():
     token.save()
 
     geiq = CompanyFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
-    antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
+    antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=CompanySource.USER_CREATED)
     token.companies.add(geiq)
 
     JobApplicationFactory(state="accepted", to_company=geiq)

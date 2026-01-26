@@ -19,7 +19,7 @@ from django.utils.http import urlencode
 from django.views.generic import FormView, TemplateView, View
 
 from itou.common_apps.address.models import lat_lon_to_coords
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company, CompanyMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -805,7 +805,7 @@ class FacilitatorBaseMixin:
         org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
         self.company_to_create = Company(
             kind=CompanyKind.OPCS,
-            source=Company.SOURCE_USER_CREATED,
+            source=CompanySource.USER_CREATED,
             siret=org_data["siret"],
             name=org_data["name"],
             address_line_1=org_data["address_line_1"] or "",

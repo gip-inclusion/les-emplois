@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from itou.companies.enums import CompanySource
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -36,7 +37,7 @@ TABLE.add_columns(
             "name": "source",
             "type": "varchar",
             "comment": "Source des données de la structure",
-            "fn": lambda o: get_choice(choices=Company.SOURCE_CHOICES, key=o.source),
+            "fn": lambda o: get_choice(choices=CompanySource.choices, key=o.source),
         },
         get_column_from_field(get_model_field(Company, "naf"), name="code_naf"),
         get_column_from_field(get_model_field(Company, "email"), name="email_public"),

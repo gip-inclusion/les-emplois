@@ -87,7 +87,7 @@ def get_params_aci_asp_ids_for_department(department):
                 # By only taking ASP-imported SIAE and because we are using the `asp_id`:
                 # - antennas in the department with a convention signed in another department are filter out
                 # - antennas not in the department with a convention signed in the department are included
-                source=companies_models.Company.SOURCE_ASP,
+                source=companies_models.CompanySource.ASP,
             )
             .select_related("convention")
             .values_list("convention__asp_id", flat=True)

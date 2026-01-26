@@ -9,7 +9,7 @@ import datetime
 from django.db import transaction
 from django.utils import timezone
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company, SiaeConvention
 
 
@@ -26,7 +26,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
     managed_siaes_with_conventions = Company.objects.filter(
-        source=Company.SOURCE_ASP, convention__isnull=False
+        source=CompanySource.ASP, convention__isnull=False
     ).select_related("convention")
     for siae in managed_siaes_with_conventions:
         convention = siae.convention
@@ -119,7 +119,7 @@ def get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key):
     """
     creatable_conventions = []
 
-    for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=True):
+    for siae in Company.objects.filter(source=CompanySource.ASP, convention__isnull=True):
         if siae.siret not in siret_to_siae_row:
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
@@ -155,7 +155,7 @@ def check_convention_data_consistency():
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
         # Check that each active convention has exactly one siae of ASP source.
         # Unfortunately some inactive conventions have lost their ASP siae.
-        asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Company.SOURCE_ASP]
+        asp_siaes = [siae for siae in convention.siaes.all() if siae.source == CompanySource.ASP]
         if convention.is_active:
             assert len(asp_siaes) == 1
         else:
@@ -169,13 +169,13 @@ def check_convention_data_consistency():
             assert siae.kind == convention.kind
 
     asp_siaes_without_convention = Company.objects.filter(
-        kind__in=CompanyKind.siae_kinds(), source=Company.SOURCE_ASP, convention__isnull=True
+        kind__in=CompanyKind.siae_kinds(), source=CompanySource.ASP, convention__isnull=True
     ).count()
     assert asp_siaes_without_convention == 0
 
     user_created_siaes_without_convention = Company.objects.filter(
         kind__in=CompanyKind.siae_kinds(),
-        source=Company.SOURCE_USER_CREATED,
+        source=CompanySource.USER_CREATED,
         convention__isnull=True,
     ).count()
     assert user_created_siaes_without_convention == 0
@@ -191,7 +191,7 @@ def create_conventions(siret_to_siae_row, conventions_by_siae_key):
         assert convention.siaes.count() == 0
         siae.convention = convention
         siae.save(update_fields={"convention", "updated_at"})
-        assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
+        assert convention.siaes.filter(source=CompanySource.ASP).count() == 1
 
 
 @transaction.atomic()

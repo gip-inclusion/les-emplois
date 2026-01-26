@@ -9,7 +9,7 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
@@ -28,7 +28,7 @@ def build_siae(row, kind, *, is_active):
     siae.siret = row.siret
     siae.kind = kind
     siae.naf = row.naf
-    siae.source = Company.SOURCE_ASP
+    siae.source = CompanySource.ASP
     siae.name = row["name"]  # row.name surprisingly returns the row index.
     assert not siae.name.isnumeric()
 
@@ -74,7 +74,7 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
 
     asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
     for siae in Company.objects.select_related("convention").filter(
-        source=Company.SOURCE_ASP, convention__isnull=False
+        source=CompanySource.ASP, convention__isnull=False
     ):
         assert siae.should_have_convention
 
@@ -134,7 +134,7 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
         for existing_siae in existing_siaes:
             assert existing_siae.should_have_convention
             # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
-            if existing_siae.source == Company.SOURCE_ASP and existing_siae.siret != row.siret:
+            if existing_siae.source == CompanySource.ASP and existing_siae.siret != row.siret:
                 raise AssertionError(f"SIRET mismatch: {existing_siae.siret=}, {row.siret=}")
         try:
             existing_siae = Company.objects.get(siret=row.siret, kind=kind)
@@ -158,17 +158,17 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
             # TODO: Delete “ or row.siret == "52172441900036"” when email with subject
             # “Demande de clarification ACI 521724419” sent on 17/04/2024 18:44 has been answered.
             # https://plateforme-inclusion.zendesk.com/agent/tickets/11571
-            if existing_siae.source == Company.SOURCE_ASP or row.siret == "52172441900036":
+            if existing_siae.source == CompanySource.ASP or row.siret == "52172441900036":
                 continue
             # Siae with this siret+kind already exists but with the wrong source.
-            assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
+            assert existing_siae.source in [CompanySource.USER_CREATED, CompanySource.STAFF_CREATED]
             assert existing_siae.should_have_convention
             print(
                 f"siae.id={existing_siae.id} already exists "
                 f"with wrong source={existing_siae.source} "
                 f"(source will be fixed to ASP)"
             )
-            existing_siae.source = Company.SOURCE_ASP
+            existing_siae.source = CompanySource.ASP
             existing_siae.convention = None
             existing_siae.save(update_fields={"source", "convention", "updated_at"})
 
@@ -217,7 +217,7 @@ def delete_user_created_siaes_without_members():
     """
     errors = 0
     for siae in Company.objects.prefetch_related("memberships").filter(
-        members__isnull=True, source=Company.SOURCE_USER_CREATED
+        members__isnull=True, source=CompanySource.USER_CREATED
     ):
         if not siae.has_members:
             if could_siae_be_deleted(siae):
@@ -247,13 +247,13 @@ def manage_staff_created_siaes():
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
     staff_created_siaes = Company.objects.filter(
         kind__in=CompanyKind.siae_kinds(),
-        source=Company.SOURCE_STAFF_CREATED,
+        source=CompanySource.STAFF_CREATED,
     )
     # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
     # case it should be converted to a regular user created siae so that the usual convention logic applies.
     for siae in staff_created_siaes.filter(convention__isnull=False):
         print(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
-        siae.source = Company.SOURCE_USER_CREATED
+        siae.source = CompanySource.USER_CREATED
         siae.save(update_fields={"source", "updated_at"})
 
     recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)

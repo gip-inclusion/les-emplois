@@ -21,6 +21,7 @@ from itou.companies.enums import (
     COMPANY_KIND_RESERVED,
     POLE_EMPLOI_SIRET,
     CompanyKind,
+    CompanySource,
     ContractType,
     JobDescriptionSource,
     JobSource,
@@ -50,7 +51,7 @@ class CompanyQuerySet(OrganizationQuerySet):
             # converted to ASP source companies by import_siae script.
             # Such companies are created by our staff when ASP data is lacking
             # the most recent data about them.
-            | Q(source=Company.SOURCE_STAFF_CREATED)
+            | Q(source=CompanySource.STAFF_CREATED)
             # ASP source companies and user created companies are active if and only
             # if they have an active convention.
             | has_active_convention
@@ -236,20 +237,6 @@ class Company(AddressMixin, OrganizationAbstract):
         self.job_description_through.all()     <QuerySet [<JobDescription>, ...]>
     """
 
-    SOURCE_ASP = "ASP"
-    SOURCE_GEIQ = "GEIQ"
-    SOURCE_EA_EATT = "EA_EATT"
-    SOURCE_USER_CREATED = "USER_CREATED"
-    SOURCE_STAFF_CREATED = "STAFF_CREATED"
-
-    SOURCE_CHOICES = (
-        (SOURCE_ASP, "Export ASP"),
-        (SOURCE_GEIQ, "Export GEIQ"),
-        (SOURCE_EA_EATT, "Export EA+EATT"),
-        (SOURCE_USER_CREATED, "Utilisateur (Antenne)"),
-        (SOURCE_STAFF_CREATED, "Staff Itou"),
-    )
-
     # These kinds of Companies can use employee record app to send data to ASP
     ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.EITI, CompanyKind.ETTI]
 
@@ -279,7 +266,7 @@ class Company(AddressMixin, OrganizationAbstract):
     provided_support = models.TextField(verbose_name="type d'accompagnement", blank=True)
 
     source = models.CharField(
-        verbose_name="source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
+        verbose_name="source de données", max_length=20, choices=CompanySource.choices, default=CompanySource.ASP
     )
 
     jobs = models.ManyToManyField("jobs.Appellation", verbose_name="métiers", through="JobDescription", blank=True)
@@ -392,7 +379,7 @@ class Company(AddressMixin, OrganizationAbstract):
         if not self.should_have_convention:
             # GEIQ, EA, EATT, OPCS, ... have no convention logic and thus are always active.
             return True
-        if self.source == Company.SOURCE_STAFF_CREATED:
+        if self.source == CompanySource.STAFF_CREATED:
             # Staff created companies are always active until eventually
             # converted to ASP source companies by import_siae script.
             # Such commanies are created by our staff when ASP data is lacking
@@ -496,7 +483,7 @@ class Company(AddressMixin, OrganizationAbstract):
             return timezone.now() + timezone.timedelta(days=365)
 
         # This should never happen but let's be defensive in this case.
-        if self.source == self.SOURCE_USER_CREATED and not self.convention:
+        if self.source == CompanySource.USER_CREATED and not self.convention:
             # A user created siae without convention should not exist, but if it does, it should be considered past
             # its grace period.
             return timezone.now() + timezone.timedelta(days=-1)
@@ -534,11 +521,11 @@ class Company(AddressMixin, OrganizationAbstract):
         If the current company has no parent, it is itself its canonical company.
         If the current company has a parent, that parent is the canonical company.
         """
-        if self.convention_id and self.source == self.SOURCE_USER_CREATED:
+        if self.convention_id and self.source == CompanySource.USER_CREATED:
             # Iterate on all() to take advantage of a potential prefetch_related upstream
             # e.g. by populate_metabase_emplois.
             for convention_siae in self.convention.siaes.all():
-                if convention_siae.source == self.SOURCE_ASP:
+                if convention_siae.source == CompanySource.ASP:
                     return convention_siae
         return self
 
@@ -561,7 +548,7 @@ class Company(AddressMixin, OrganizationAbstract):
         if not self.should_have_convention:
             # AF interfaces only makes sense for SIAE, not for GEIQ, EA, etc.
             return False
-        if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
+        if self.source not in [CompanySource.ASP, CompanySource.USER_CREATED]:
             # AF interfaces do not make sense for staff created siaes, which
             # have no convention yet, and will eventually be converted into
             # siaes of ASP source by `import_siae.py` script.
@@ -579,7 +566,7 @@ class Company(AddressMixin, OrganizationAbstract):
         # The link between an ASP source siae and its convention
         # is immutable. Only user created siaes can have their
         # convention changed by the user.
-        return self.source == self.SOURCE_USER_CREATED
+        return self.source == CompanySource.USER_CREATED
 
     def get_active_suspension_dates(self):
         active_suspension_dates = (
@@ -607,7 +594,7 @@ class Company(AddressMixin, OrganizationAbstract):
         """
         Fetch SIRET number of authoritative SIAE from ASP source
         """
-        if self.canonical_company.source == Company.SOURCE_ASP:
+        if self.canonical_company.source == CompanySource.ASP:
             return self.canonical_company.siret
         raise ValidationError("Could not find authoritative SIAE from ASP source")
 

@@ -5,8 +5,7 @@ from pytest_django.asserts import assertNumQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import ServiceToken
-from itou.companies.enums import COMPANY_KIND_RESERVED
-from itou.companies.models import Company
+from itou.companies.enums import COMPANY_KIND_RESERVED, CompanySource
 from itou.nexus.enums import Service
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.utils.testing import BASE_NUM_QUERIES
@@ -83,7 +82,7 @@ class TestMarcheCompanyAPI:
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
         company_3 = CompanyFactory(
-            siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000000003", source=CompanySource.USER_CREATED, convention=company_1.convention
         )
 
         with assertNumQueries(NUM_QUERIES):
@@ -107,9 +106,9 @@ class TestMarcheCompanyAPI:
     def test_list_companies_antenne_with_user_created_and_999(self, subtests):
         api_client = self.api_client()
         company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
+        company_2 = CompanyFactory(siret="10000000000002", source=CompanySource.ASP, convention=company_1.convention)
         company_3 = CompanyFactory(
-            siret="10000000099991", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
+            siret="10000000099991", source=CompanySource.USER_CREATED, convention=company_1.convention
         )
 
         num_queries = NUM_QUERIES
@@ -135,7 +134,7 @@ class TestMarcheCompanyAPI:
 
     def test_list_companies_siret_with_999_and_no_other_siret_available(self):
         api_client = self.api_client()
-        company = CompanyFactory(siret="10000000099991", source=Company.SOURCE_USER_CREATED)
+        company = CompanyFactory(siret="10000000099991", source=CompanySource.USER_CREATED)
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
