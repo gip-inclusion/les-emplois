@@ -10,7 +10,7 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Nom</th>
+                    <th scope="col">Nom Prénom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'ajout</th>
                     <th scope="col">Expiration du lien</th>
@@ -21,7 +21,7 @@
                 {% for invitation in pending_invitations %}
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
-                        <td>{{ invitation.first_name|title }} {{ invitation.last_name|upper }}</td>
+                        <td>{{ invitation.last_name|upper }} {{ invitation.first_name|title }}</td>
                         <td>
                             <a href="mailto:{{ invitation.email }}" class="btn-link">{{ invitation.email }}</a>
                         </td>

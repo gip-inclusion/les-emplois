@@ -4,11 +4,11 @@
     {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
         {% if action == "remove" %}
             <div class="alert alert-warning">
-                Vous allez retirer les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_full_name }}</b>
+                Vous allez retirer les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
             </div>
         {% else %}
             <div class="alert alert-warning">
-                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_full_name }}</b>
+                Vous allez ajouter les droits d'administrateur de votre {{ org_display }} <b>{{ structure.display_name }}</b> à <b>{{ target_member.get_inverted_full_name }}</b>
             </div>
         {% endif %}
 

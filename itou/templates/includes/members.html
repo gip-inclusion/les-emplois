@@ -17,7 +17,7 @@
             <caption class="visually-hidden">Liste des collaborateurs</caption>
             <thead>
                 <tr>
-                    <th scope="col">Nom</th>
+                    <th scope="col">Nom Prénom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'inscription</th>
                     {% if user in active_admin_members %}<th scope="col" class="text-end w-50px"></th>{% endif %}
@@ -27,7 +27,7 @@
                 {% for member in object_list %}
                     <tr>
                         <td>
-                            {{ member.user.get_full_name }}
+                            {{ member.user.get_inverted_full_name }}
                             {% if member.user in active_admin_members %}
                                 <button type="button" class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" data-bs-title="Administrateur de la structure">
                                     Admin<span class="visually-hidden">istrateur de la structure</span>
