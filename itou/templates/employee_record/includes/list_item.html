@@ -6,7 +6,7 @@
             <div class="c-box--results__summary flex-grow-1">
                 <i class="ri-user-line" aria-hidden="true"></i>
                 <div>
-                    <h3>{{ employee_record.job_application.job_seeker.get_full_name }}</h3>
+                    <h3>{{ employee_record.job_application.job_seeker.get_inverted_full_name }}</h3>
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                         <span>
                             <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>{% profile_city_display employee_record.job_application.job_seeker.jobseeker_profile %}
@@ -147,15 +147,15 @@
                 {% if employee_record.disable.is_available %}
                     <a href="{% url "employee_record_views:disable" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                       aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Désactiver</a>
+                       aria-label="Désactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Désactiver</a>
                 {% elif employee_record.status == "DISABLED" %}
                     <a href="{% url "employee_record_views:reactivate" employee_record.id %}"
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                       aria-label="Réactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Réactiver</a>
+                       aria-label="Réactiver la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Réactiver</a>
                 {% endif %}
                 <a href="{% url "employee_record_views:summary" employee_record.id %}?back_url={{ current_url|urlencode }}"
                    class="btn {% if employee_record.status == "NEW" or employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
-                   aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Voir la fiche salarié</a>
+                   aria-label="Voir la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Voir la fiche salarié</a>
                 {% if employee_record.status == "PROCESSED" %}
                     <div class="dropdown w-md-auto">
                         {% include "employee_record/includes/send_back_dropdown.html" with employee_record=employee_record csrf_token=csrf_token extra_classes="btn-primary w-100 w-md-auto dropdown-toggle" only %}
@@ -164,11 +164,11 @@
                 {% if employee_record.status == "NEW" %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
-                       aria-label="Compléter la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Compléter</a>
+                       aria-label="Compléter la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Compléter</a>
                 {% elif employee_record.status == "REJECTED" %}
                     <a href="{% url "employee_record_views:create" employee_record.job_application.id %}?from_status={{ employee_record.status }}"
                        class="btn btn-primary btn-block w-100 w-md-auto"
-                       aria-label="Modifier la fiche salarié de {{ employee_record.job_application.job_seeker.get_full_name }}">Modifier</a>
+                       aria-label="Modifier la fiche salarié de {{ employee_record.job_application.job_seeker.get_inverted_full_name }}">Modifier</a>
                 {% endif %}
             </div>
         {% endif %}

@@ -3,13 +3,13 @@
   '''
   <div class="c-box--results__footer">
       <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
+          <a aria-label="Désactiver la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
               Désactiver
           </a>
-          <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">
+          <a aria-label="Voir la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DNEW">
               Voir la fiche salarié
           </a>
-          <a aria-label="Compléter la fiche salarié de Jane DOE" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">
+          <a aria-label="Compléter la fiche salarié de DOE Jane" class="btn btn-primary btn-block w-100 w-md-auto" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">
               Compléter
           </a>
       </div>
@@ -751,10 +751,10 @@
   '''
   <div class="c-box--results__footer">
       <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-          <a aria-label="Désactiver la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
+          <a aria-label="Désactiver la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/disable/[PK of EmployeeRecord]">
               Désactiver
           </a>
-          <a aria-label="Voir la fiche salarié de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DPROCESSED">
+          <a aria-label="Voir la fiche salarié de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/employee_record/summary/[PK of EmployeeRecord]?back_url=/employee_record/list%3Fstatus%3DPROCESSED">
               Voir la fiche salarié
           </a>
           <div class="dropdown w-md-auto">

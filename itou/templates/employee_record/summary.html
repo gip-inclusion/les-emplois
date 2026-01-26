@@ -15,7 +15,7 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>
-                Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_full_name }}
+                Fiche salarié ASP : {{ employee_record.job_application.job_seeker.get_inverted_full_name }}
                 {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
             </h1>
         {% endfragment %}

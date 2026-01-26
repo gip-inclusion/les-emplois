@@ -90,7 +90,11 @@ class EmployeeRecordFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["job_seeker"].choices = sorted(
-            [(user.id, user.get_full_name().title()) for user in job_seekers if user.get_full_name()],
+            [
+                (user.id, user.get_inverted_full_name().title())
+                for user in job_seekers
+                if user.get_inverted_full_name()
+            ],
             key=lambda u: u[1],
         )
 
