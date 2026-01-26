@@ -10,8 +10,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
-from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import DGFT_SAFIR_CODE, PrescriberOrganizationKind
 from itou.utils.apis import metabase as mb
@@ -457,7 +456,7 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
         kind=CompanyKind.ACI,
         department=factory.fuzzy.FuzzyChoice([31, 84]),
         convention=company.convention,
-        source=Company.SOURCE_USER_CREATED,
+        source=CompanySource.USER_CREATED,
     )
     assert get_params_aci_asp_ids_for_department(antenna.department) == {"id_asp_de_la_siae": []}
     assert get_params_aci_asp_ids_for_department(company.department) == {

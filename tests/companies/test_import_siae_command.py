@@ -13,7 +13,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
@@ -73,7 +73,7 @@ class TestImportSiaeManagementCommands:
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
-        company = CompanyFactory(source=Company.SOURCE_ASP, subject_to_iae_rules=True)
+        company = CompanyFactory(source=CompanySource.ASP, subject_to_iae_rules=True)
         assert company.is_active
         assert not get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
 
@@ -86,7 +86,7 @@ class TestImportSiaeManagementCommands:
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
-        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
+        company = CompanyFactory(source=CompanySource.ASP, siret=SIRET, convention=None)
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
@@ -95,7 +95,7 @@ class TestImportSiaeManagementCommands:
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        CompanyFactory(source=CompanySource.ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
 
         with freeze_time("2022-10-10"):
             results = get_creatable_conventions(
@@ -112,13 +112,13 @@ class TestImportSiaeManagementCommands:
             convention.is_active,
             convention.deactivated_at,
         ) == (ASP_ID, company.kind, SIRET_SIGNATURE, True, None)
-        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
+        assert (company.source, company.siret, company.kind) == (CompanySource.ASP, SIRET, CompanyKind.ACI)
 
     def test_creatable_conventions_for_active_siae_where_siret_not_equals_siret_signature(self):
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
+        CompanyFactory(source=CompanySource.ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
 
         with freeze_time("2022-10-10"):
             results = get_creatable_conventions(
@@ -135,12 +135,12 @@ class TestImportSiaeManagementCommands:
             convention.is_active,
             convention.deactivated_at,
         ) == (ASP_ID, company.kind, SIRET_SIGNATURE, True, None)
-        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.AI)
+        assert (company.source, company.siret, company.kind) == (CompanySource.ASP, SIRET, CompanyKind.AI)
 
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
-        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
+        CompanyFactory(source=CompanySource.ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
 
         conventions = get_creatable_conventions(
             get_siret_to_siae_row(get_vue_structure_df()),
@@ -156,7 +156,7 @@ class TestImportSiaeManagementCommands:
             convention.is_active,
             convention.deactivated_at,
         ) == (ASP_ID, company.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 12, 31, tzinfo=datetime.UTC))
-        assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
+        assert (company.source, company.siret, company.kind) == (CompanySource.ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
         af_number_to_row = {row.number: row for _, row in get_vue_af_df().iterrows()}
@@ -273,7 +273,7 @@ class TestImportSiaeManagementCommands:
     def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self, monkeypatch):
         clever_user_id = f"user_{uuid.uuid4()}"
         company = CompanyFactory(
-            source=Company.SOURCE_ASP,
+            source=CompanySource.ASP,
             siret="21540323900000",
             kind=CompanyKind.ACI,
             convention=SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=112, siret_signature="21540323900000"),

@@ -14,6 +14,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
+from itou.companies.enums import CompanySource
 from itou.companies.models import Company
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -97,7 +98,7 @@ def could_siae_be_deleted(siae):
     if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():
         return False
     # An ASP siae can only be deleted when all its antennas have been deleted.
-    if siae.source == Company.SOURCE_ASP:
+    if siae.source == CompanySource.ASP:
         return siae.convention.siaes.count() == 1
     return True
 
@@ -134,7 +135,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     This logic is *not* for actual SIAE from the ASP.
 
     - df: dataframe of structures, one row per structure
-    - source: either Siae.SOURCE_GEIQ or Siae.SOURCE_EA_EATT
+    - source: either CompanySource.GEIQ or CompanySource.EA_EATT
     - kinds: possible kinds of the structures
     - build_structure: a method building a structure from a dataframe row
     """
@@ -189,12 +190,12 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
         # Allow longer periods before activity than SIAE imports, because changes to
         # EA/EATT and GEIQ will take longer to reflect in their respective data source.
         a_year_ago = timezone.now() - timezone.timedelta(days=365)
-        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= a_year_ago:
+        if siae.source == CompanySource.STAFF_CREATED and siae.created_at >= a_year_ago:
             # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
             deletable_skipped_count += 1
             continue
 
-        if siae.source == Company.SOURCE_USER_CREATED:
+        if siae.source == CompanySource.USER_CREATED:
             # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
             # Thus we never attempt to delete it.
             deletable_skipped_count += 1

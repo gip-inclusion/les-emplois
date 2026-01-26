@@ -28,6 +28,14 @@ class CompanyKind(models.TextChoices):
         ]
 
 
+class CompanySource(models.TextChoices):
+    ASP = "ASP", "Export ASP"
+    GEIQ = "GEIQ", "Export GEIQ"
+    EA_EATT = "EA_EATT", "Export EA+EATT"
+    USER_CREATED = "USER_CREATED", "Utilisateur (Antenne)"
+    STAFF_CREATED = "STAFF_CREATED", "Staff Itou"
+
+
 class ContractNature(models.TextChoices):
     PEC_OFFER = "PEC_OFFER", "Contrat PEC - Parcours Emploi Compétences"
 

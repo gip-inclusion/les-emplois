@@ -1,7 +1,6 @@
 from django.urls import reverse
 
-from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.enums import CompanyKind, CompanySource
 from tests.companies.factories import (
     CompanyFactory,
     SiaeConventionFactory,
@@ -15,7 +14,7 @@ class TestShowAndSelectFinancialAnnex:
         user = company.members.first()
         assert company.has_admin(user)
         assert company.should_have_convention
-        assert company.source == Company.SOURCE_ASP
+        assert company.source == CompanySource.ASP
 
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -30,7 +29,7 @@ class TestShowAndSelectFinancialAnnex:
 
     def test_user_created_siae_admin_can_see_and_select_af(self, client):
         company = CompanyFactory(
-            source=Company.SOURCE_USER_CREATED,
+            source=CompanySource.USER_CREATED,
             with_membership=True,
             subject_to_iae_rules=True,
         )
@@ -41,7 +40,7 @@ class TestShowAndSelectFinancialAnnex:
 
         assert company.has_admin(user)
         assert company.should_have_convention
-        assert company.source == Company.SOURCE_USER_CREATED
+        assert company.source == CompanySource.USER_CREATED
 
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -68,11 +67,11 @@ class TestShowAndSelectFinancialAnnex:
         assert company.convention == new_convention
 
     def test_staff_created_siae_admin_cannot_see_nor_select_af(self, client):
-        company = CompanyFactory(source=Company.SOURCE_STAFF_CREATED, with_membership=True, subject_to_iae_rules=True)
+        company = CompanyFactory(source=CompanySource.STAFF_CREATED, with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
         assert company.has_admin(user)
         assert company.should_have_convention
-        assert company.source == Company.SOURCE_STAFF_CREATED
+        assert company.source == CompanySource.STAFF_CREATED
 
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -91,7 +90,7 @@ class TestShowAndSelectFinancialAnnex:
         company.members.add(user)
         assert not company.has_admin(user)
         assert company.should_have_convention
-        assert company.source == Company.SOURCE_ASP
+        assert company.source == CompanySource.ASP
 
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -105,11 +104,11 @@ class TestShowAndSelectFinancialAnnex:
         assert response.status_code == 403
 
     def test_import_created_geiq_admin_cannot_see_nor_select_af(self, client):
-        company = CompanyFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_GEIQ, with_membership=True)
+        company = CompanyFactory(kind=CompanyKind.GEIQ, source=CompanySource.GEIQ, with_membership=True)
         user = company.members.first()
         assert company.has_admin(user)
         assert not company.should_have_convention
-        assert company.source == Company.SOURCE_GEIQ
+        assert company.source == CompanySource.GEIQ
 
         client.force_login(user)
         url = reverse("dashboard:index")
@@ -123,11 +122,11 @@ class TestShowAndSelectFinancialAnnex:
         assert response.status_code == 403
 
     def test_user_created_geiq_admin_cannot_see_nor_select_af(self, client):
-        company = CompanyFactory(kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED, with_membership=True)
+        company = CompanyFactory(kind=CompanyKind.GEIQ, source=CompanySource.USER_CREATED, with_membership=True)
         user = company.members.first()
         assert company.has_admin(user)
         assert not company.should_have_convention
-        assert company.source == Company.SOURCE_USER_CREATED
+        assert company.source == CompanySource.USER_CREATED
 
         client.force_login(user)
         url = reverse("dashboard:index")

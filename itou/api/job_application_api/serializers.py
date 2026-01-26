@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from itou.approvals.enums import ApprovalStatus
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import JobDescription
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
@@ -238,7 +238,7 @@ class JobApplicationSearchResponseSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_entreprise_siret(self, obj) -> str:
-        if obj.to_company.source == obj.to_company.SOURCE_USER_CREATED:
+        if obj.to_company.source == CompanySource.USER_CREATED:
             return obj.to_company.siret[:9]
         return obj.to_company.siret
 

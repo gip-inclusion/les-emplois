@@ -7,7 +7,7 @@ from rest_framework import authentication, exceptions, generics, permissions, st
 
 from itou.api.geiq.serializers import GeiqJobApplicationSerializer
 from itou.api.models import CompanyToken
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company
 from itou.job_applications.enums import JobApplicationState, Prequalification, ProfessionalSituationExperience
 from itou.job_applications.models import JobApplication, PriorAction
@@ -55,7 +55,7 @@ class GeiqJobApplicationListView(LoginNotRequiredMixin, generics.ListAPIView):
         if api_token:
             geiqs = api_token.companies.all()
             antennas = (
-                Company.objects.filter(source=Company.SOURCE_USER_CREATED, kind=CompanyKind.GEIQ)
+                Company.objects.filter(source=CompanySource.USER_CREATED, kind=CompanyKind.GEIQ)
                 .annotate(siren=Substr("siret", pos=1, length=9))
                 .filter(siren__in=[geiq.siret[:9] for geiq in geiqs])
             )

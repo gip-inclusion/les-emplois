@@ -2,7 +2,7 @@ import re
 
 from rest_framework import serializers
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company
 
 
@@ -27,7 +27,7 @@ class MarcheCompanySerializer(serializers.ModelSerializer):
     post_code = serializers.CharField()
     city = serializers.CharField()
     department = serializers.CharField()
-    source = serializers.ChoiceField(choices=Company.SOURCE_CHOICES)
+    source = serializers.ChoiceField(choices=CompanySource.choices)
     longitude = serializers.FloatField()
     latitude = serializers.FloatField()
     convention_is_active = serializers.BooleanField(source="convention.is_active", allow_null=True)
@@ -64,7 +64,7 @@ class MarcheCompanySerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_siret(self, obj) -> str:
-        if obj.source == Company.SOURCE_USER_CREATED:
+        if obj.source == CompanySource.USER_CREATED:
             if re.search(r"999\d\d$", obj.siret) is None:
                 # Though this siae may refer to another siae with its asp_id, it owns a proper siret,
                 # which makes it a structure in its own right according to data.inclusion
@@ -73,7 +73,7 @@ class MarcheCompanySerializer(serializers.ModelSerializer):
             # The `999\d\d` pattern should not be published. There might be a valid siret available
             # for this asp_id on another siae : use the oldest.
             a_parent_siae = (
-                Company.objects.exclude(source=Company.SOURCE_USER_CREATED)
+                Company.objects.exclude(source=CompanySource.USER_CREATED)
                 .filter(convention=obj.convention, siret__startswith=obj.siren)
                 .order_by("created_at", "pk")
                 .first()
@@ -84,7 +84,7 @@ class MarcheCompanySerializer(serializers.ModelSerializer):
             # default to siren
             return obj.siret[:9]
 
-        # If the siae source is other than SOURCE_USER_CREATED,
+        # If the siae source is other than CompanySource.USER_CREATED,
         # then its siret **should** be valid.
         return obj.siret
 

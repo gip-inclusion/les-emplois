@@ -16,6 +16,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
+from itou.companies.enums import CompanySource
 from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.utils import is_ntt_required
@@ -204,7 +205,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.annotate(
             siret_from_asp_source=Subquery(
                 Company.objects.filter(
-                    source=Company.SOURCE_ASP, convention=OuterRef("job_application__to_company__convention")
+                    source=CompanySource.ASP, convention=OuterRef("job_application__to_company__convention")
                 ).values("siret")[:1]
             )
         )
