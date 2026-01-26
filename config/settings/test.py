@@ -85,8 +85,8 @@ NEXUS_METABASE_DB_PORT = DATABASES["default"]["PORT"]  # noqa: F405
 NEXUS_METABASE_DB_DATABASE = DATABASES["default"]["NAME"]  # noqa: F405
 NEXUS_METABASE_DB_USER = DATABASES["default"]["USER"]  # noqa: F405
 NEXUS_METABASE_DB_PASSWORD = DATABASES["default"]["PASSWORD"]  # noqa: F405
-NEXUS_AUTO_LOGIN_KEY = {"k": "aTR4ZnR1WlpYYmphbFdtaXVlVjB3alljNjhrWXpfYSE", "kty": "oct"}
 NEXUS_ALLOWED_REDIRECT_HOSTS = ["emplois.fr", "emplois.com"]
+PDI_JWT_KEY = {"k": "aTR4ZnR1WlpYYmphbFdtaXVlVjB3alljNjhrWXpfYSE", "kty": "oct"}
 
 
 ASSERT_SNAPSHOT_QUERIES_EXTRA_PACKAGES_ALLOWLIST = [
