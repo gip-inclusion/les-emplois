@@ -36,7 +36,7 @@ class TestAutoLogin:
         response = client.get(url)
         assert response.status_code == 404
 
-    @override_settings(NEXUS_AUTO_LOGIN_KEY=None)
+    @override_settings(PDI_JWT_KEY=None)
     def test_no_settings(self, client):
         client.force_login(PrescriberFactory())
         next_url = f"https://{settings.NEXUS_ALLOWED_REDIRECT_HOSTS[0]}"
