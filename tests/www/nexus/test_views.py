@@ -2,7 +2,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from itoutils.urls import add_url_params
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
@@ -98,3 +98,35 @@ class TestLayout:
         NexusUserFactory(email=user.email, source=Service.DORA)
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="all_badges")
+
+
+class TestHomePageView:
+    url = reverse("nexus:homepage")
+    ACTIVATE_SERVICES_H2 = "Mes services actifs"
+    NEW_SERVICES_H2 = "Services à découvrir"
+
+    def test_one_activated_service(self, client, snapshot):
+        user = EmployerFactory(membership=True)
+        client.force_login(user)
+        response = client.get(self.url)
+
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="facility_manager")
+        assertContains(response, self.ACTIVATE_SERVICES_H2)
+        assertContains(response, self.NEW_SERVICES_H2)
+
+        user.kind = UserKind.PRESCRIBER
+        user.save()
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot(name="guide")
+
+    def test_all_activated_services(self, client, snapshot):
+        user = PrescriberFactory()
+        for service in Service.activable():
+            if service != Service.EMPLOIS:
+                NexusUserFactory(email=user.email, source=service, auth=Auth.PRO_CONNECT)
+        client.force_login(user)
+
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+        assertContains(response, self.ACTIVATE_SERVICES_H2)
+        assertNotContains(response, self.NEW_SERVICES_H2)

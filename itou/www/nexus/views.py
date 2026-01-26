@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import NexusUser
 from itou.nexus.utils import build_user, serialize_user
+from itou.utils.templatetags.url_add_query import autologin_proconnect
 
 
 logger = logging.getLogger(__name__)
@@ -49,9 +50,41 @@ class NexusMixin:
         if Service.EMPLOIS in self.activated_services:
             context["emplois_badge_count"] = 0  # FIXME Replace with active job desctiptions
 
+        # FIXME: Handle demo environments
+        # It's always activated
+        context["emplois_url"] = reverse("dashboard:index")
+
+        # It's the same in both cases
+        context["dora_url"] = autologin_proconnect("https://dora.inclusion.gouv.fr/", self.request.user)
+
+        if Service.MARCHE in self.activated_services:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/login/"
+        else:
+            context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/signup/"
+
+        if Service.MON_RECAP in self.activated_services:
+            context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+
+        if Service.PILOTAGE in self.activated_services:
+            context["pilotage_url"] = reverse("dashboard:index_stats")
+
+        if Service.COMMUNAUTE in self.activated_services:
+            context["communaute_url"] = autologin_proconnect(
+                "https://communaute.inclusion.gouv.fr/topics/", self.request.user
+            )
+        else:
+            context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
+
         return context
 
 
 class HomePageView(NexusMixin, TemplateView):
     template_name = "nexus/homepage.html"
-    # Empty for now : it's just to test the layout separately from all the views
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["all_services_activated"] = context["activated_services"] == set(Service.activable())
+        context["new_service_shown"] = next(
+            (service for service in Service.activable() if service not in context["activated_services"]), None
+        )
+        return context

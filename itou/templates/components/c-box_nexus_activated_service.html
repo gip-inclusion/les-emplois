@@ -1,0 +1,13 @@
+{% load matomo %}
+{% load theme_inclusion %}
+
+<div class="c-box h-100">
+    <div class="d-flex align-items-center gap-3">
+        <img src="{% static_theme_images logo %}" height="35" width="35" alt="{{ name }}">
+        <div>
+            <strong class="d-block fs-lg">{{ name }}</strong>
+            <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+        </div>
+    </div>
+    <a href="{{ url }}" class="btn btn-outline-primary btn-block has-external-link mt-3" aria-label="{{ aria_label }} (lien externe)" {% matomo_event "nexus" "acceder-service" service %} target="_blank">Accéder</a>
+</div>
