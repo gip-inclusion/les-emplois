@@ -417,7 +417,7 @@ class Client:
         if not any([fields, filters, group_by]):
             return self._client.post(f"/card/{card}/query/json").raise_for_status().json()
 
-        dataset_query = self._client.get(f"/card/{card}").raise_for_status().json()["dataset_query"]
+        dataset_query = json.loads(self._client.get(f"/card/{card}").raise_for_status().json()["legacy_query"])
         dataset_query["query"] = self.merge_query(
             dataset_query["query"],
             self.build_query(select=fields, where=filters, group_by=group_by),

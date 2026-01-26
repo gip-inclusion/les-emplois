@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from itou.utils.apis.metabase import Client
@@ -20,12 +22,14 @@ def data_results_fixture():
 @pytest.fixture(name="card_results")
 def card_results_fixture():
     return {
-        "dataset_query": {
-            "query": {
-                "filter": [],
-                "breakout": [],
+        "legacy_query": json.dumps(
+            {
+                "query": {
+                    "filter": [],
+                    "breakout": [],
+                }
             }
-        }
+        )
     }
 
 
@@ -56,7 +60,7 @@ def test_fetch_card_results_with_filters(snapshot, respx_mock, client, data_resu
     dataset_api_route = respx_mock.post("/dataset/json").respond(202, json=data_results)
 
     # Without pre-existing filters
-    card_api_route.respond(200, json={"dataset_query": {"query": {"foo": "bar"}}})
+    card_api_route.respond(200, json={"legacy_query": json.dumps({"query": {"foo": "bar"}})})
     client.fetch_card_results(42, filters={21: ["baz"]})
     assert dataset_api_route.calls.last.request.content == snapshot(name="without pre-existing")
 
@@ -64,11 +68,16 @@ def test_fetch_card_results_with_filters(snapshot, respx_mock, client, data_resu
     card_api_route.respond(
         200,
         json={
-            "dataset_query": {
-                "query": {
-                    "filter": ["and", ["=", Client._build_metabase_field(100), "filter value 1", "filter value 2"]],
+            "legacy_query": json.dumps(
+                {
+                    "query": {
+                        "filter": [
+                            "and",
+                            ["=", Client._build_metabase_field(100), "filter value 1", "filter value 2"],
+                        ],
+                    }
                 }
-            }
+            )
         },
     )
     client.fetch_card_results(42, filters={21: ["baz"]})
@@ -81,7 +90,7 @@ def test_fetch_card_results_with_group_by(snapshot, respx_mock, client, data_res
     dataset_api_route = respx_mock.post("/dataset/json").respond(202, json=data_results)
 
     # Without pre-existing breakout
-    card_api_route.respond(200, json={"dataset_query": {"query": {"foo": "bar"}}})
+    card_api_route.respond(200, json={"legacy_query": json.dumps({"query": {"foo": "bar"}})})
     client.fetch_card_results(42, group_by=[1])
     assert dataset_api_route.calls.last.request.content == snapshot(name="without pre-existing")
 
@@ -89,11 +98,13 @@ def test_fetch_card_results_with_group_by(snapshot, respx_mock, client, data_res
     card_api_route.respond(
         200,
         json={
-            "dataset_query": {
-                "query": {
-                    "breakout": [client._build_metabase_field(100)],
+            "legacy_query": json.dumps(
+                {
+                    "query": {
+                        "breakout": [client._build_metabase_field(100)],
+                    }
                 }
-            }
+            )
         },
     )
     client.fetch_card_results(42, group_by=[2])
