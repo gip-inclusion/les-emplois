@@ -107,7 +107,7 @@
     {{ block.super }}
 
     <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         iFrameResize({
             waitForLoad: true
         }, "#stats-iframe")
@@ -122,7 +122,7 @@
         {{ tally_hidden_fields|json_script:'tally-hidden-fields' }}
 
         {# `defer` ensures the script runs *after* embed.js above has been loaded. #}
-        <script defer nonce="{{ CSP_NONCE }}">
+        <script defer nonce="{{ csp_nonce }}">
             // Any given Tally popup will not be shown more than once every `minDaysBetweenDisplays` days.
             const minDaysBetweenDisplays = 14;
             const delayBeforeShowingPopupInSeconds = 45;

@@ -34,7 +34,7 @@
 {% block script %}
     {{ block.super }}
 
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         htmx.onLoad((target) => {
             const keepOriginalResume = target.querySelector("#id_keep_original_resume");
             if (keepOriginalResume) {

@@ -99,7 +99,7 @@
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         htmx.onLoad(function(target) {
             const orderFormGroup = target.querySelector("#order-form-group");
             if (orderFormGroup) {

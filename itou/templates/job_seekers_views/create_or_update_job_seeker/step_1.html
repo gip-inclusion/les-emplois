@@ -68,7 +68,7 @@
     {{ block.super }}
     {% if confirmation_needed %}
         {# Show the confirmation modal after submitting the form. #}
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             // Adding the "show" CSS class is not enough and not documented.
             // A JS initialization is recommended.
             const emailConfirmationModal = new bootstrap.Modal("#email-confirmation-modal");

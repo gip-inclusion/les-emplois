@@ -46,7 +46,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         function disable_other_contract_type() {
             var isDisabled = $("#id_contract_type").val() !== "OTHER"
             $("#id_other_contract_type").attr("disabled", isDisabled)

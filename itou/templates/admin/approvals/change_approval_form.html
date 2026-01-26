@@ -9,7 +9,7 @@
         </li>
     {% endif %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         (function() {
             Array.from(document.getElementsByClassName("js-with-confirm")).forEach((form) => {
                 form.addEventListener("submit", function(e) {

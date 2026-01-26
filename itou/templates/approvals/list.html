@@ -84,7 +84,7 @@
     <!-- Needed to use the Select2MultipleWidget JS widget. -->
     {{ filters_form.media.js }}
     {# djlint:off #}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         window.addEventListener("load", () => {
             const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
             const filterDropdown = document.getElementById('intro-js-contract-status-filter');

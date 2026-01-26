@@ -139,7 +139,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         // Inputs
         const advanceAmountInput = document.getElementById("id_advance_amount")
         const grantedAmountInput = document.getElementById("id_granted_amount")

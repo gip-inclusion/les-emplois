@@ -11,7 +11,7 @@
     {{ form_accept.media.js }}
 
     {# HTMX: dynamic contract type details field, must be reloaded at each DOM swap (otherwise invalidated) #}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         htmx.onLoad(function() {
             var contractType = $("#id_contract_type");
             var contractTypeDetails = $("#contractTypeDetails");

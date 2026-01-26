@@ -38,7 +38,7 @@
 {% block extrabody %}
     {{ block.super }}
 
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         Array.from(document.getElementsByClassName("with-confirm")).forEach((button) => {
             button.addEventListener("click", function(event) {
                 if (!confirm('Êtes vous certain ?')) {

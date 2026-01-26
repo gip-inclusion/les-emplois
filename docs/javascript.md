@@ -8,7 +8,7 @@ Le code JavaScript est ajouté dans ce dossier
 directement dans le template dans le `{% block script %}` à l’aide d'une
 [`nonce`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/nonce):
 
-``` {% block script %} {{ block.super }} <script nonce="{{ CSP_NONCE }}"> //
+``` {% block script %} {{ block.super }} <script nonce="{{ csp_nonce }}"> //
 Insert smart code here </script> {% endblock %} ```
 
 Les comportements largement réutilisables sont quant à eux ajoutés dans

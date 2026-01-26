@@ -14,7 +14,7 @@
             {% endif %}
         </div>
 
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             window.onload = function() {
                 new bootstrap.Modal(document.getElementById("message-modal-{{ forloop.counter }}")).show();
             };
