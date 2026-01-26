@@ -2,7 +2,7 @@
 
 <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
 
-<script nonce="{{ CSP_NONCE }}">
+<script nonce="{{ csp_nonce }}">
     // Tarteaucitron's language is set according to the browser configuration
     // but a lot of users don't know how to change it.
     // This can be forced only by using a global `var` statement.
@@ -152,7 +152,7 @@
 
 {% if MATOMO_BASE_URL and send_to_matomo %}
     {# Matomo/Piwik open source web analytics #}
-    <script id="matomo-custom-init" nonce="{{ CSP_NONCE }}">
+    <script id="matomo-custom-init" nonce="{{ csp_nonce }}">
         /* beautify ignore:start */
         window._paq = window._paq || [];
         /* tracker methods like "setCustomDimension" should be called before "trackPageView" */

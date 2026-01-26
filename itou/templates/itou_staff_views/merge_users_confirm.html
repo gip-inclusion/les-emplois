@@ -149,7 +149,7 @@
 {% block script %}
     {{ block.super }}
 
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         htmx.onLoad(function() {
             const left_user_box = $("#left_user_box");
             const right_user_box = $("#right_user_box");

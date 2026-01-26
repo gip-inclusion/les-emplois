@@ -28,7 +28,7 @@
             {% endif %}
         </div>
 
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             var buttons = document.getElementsByClassName("js-with-confirm");
             Array.prototype.forEach.call(buttons, function(button) {
                 button.addEventListener("click", function(event) {

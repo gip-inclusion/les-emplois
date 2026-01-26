@@ -67,7 +67,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         document.addEventListener('DOMContentLoaded', function() {
             const recommandationsModal = new bootstrap.Modal(document.getElementById('recommandations_modal'));
             recommandationsModal.show();

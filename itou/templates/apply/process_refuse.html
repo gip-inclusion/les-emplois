@@ -168,7 +168,7 @@
 {% block script %}
     {{ block.super }}
     {% if wizard_steps.current == RefuseViewStep.REASON %}
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             function manageWarningSection(value) {
                 if (value === 'no_position') {
                     $('.refusal-reason-no-position-info').removeClass('d-none');

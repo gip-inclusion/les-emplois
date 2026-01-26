@@ -184,7 +184,7 @@
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
     <script src='{% static "js/htmx_compat.js" %}'></script>
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         const commentsBtn = document.querySelector('#comments-btn');
         const commentsTab = document.querySelector('#comments-tab');
 

@@ -69,9 +69,9 @@ API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 API_INSEE_METADATA_URL = os.getenv("API_INSEE_METADATA_URL", "https://api.insee.fr/metadonnees/")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
 MATOMO_SITE_ID = 220
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"].append(MATOMO_BASE_URL)  # noqa: F405
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["connect-src"].append(MATOMO_BASE_URL)  # noqa: F405
+SECURE_CSP["img-src"].append(MATOMO_BASE_URL)  # noqa: F405
+SECURE_CSP["script-src"].append(MATOMO_BASE_URL)  # noqa: F405
+SECURE_CSP["connect-src"].append(MATOMO_BASE_URL)  # noqa: F405
 
 # use almost the same settings for metabase as base PG.
 PILOTAGE_DATASTORE_DB_HOST = os.getenv("PILOTAGE_DATASTORE_DB_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405
@@ -83,7 +83,7 @@ PILOTAGE_DATASTORE_DB_DATABASE = os.getenv("PILOTAGE_DATASTORE_DB_DATABASE", os.
 PILOTAGE_DATA_HASH_SALT = os.getenv("PILOTAGE_DATA_HASH_SALT")
 
 AWS_STORAGE_BUCKET_NAME = "dev"
-CONTENT_SECURITY_POLICY["DIRECTIVES"]["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
+SECURE_CSP["img-src"].append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
 PILOTAGE_DATASTORE_S3_BUCKET_NAME = AWS_STORAGE_BUCKET_NAME
 

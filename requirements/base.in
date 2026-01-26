@@ -115,9 +115,6 @@ pyzipper  # https://github.com/danifus/pyzipper
 # Stream XLSX files
 xlsx_streaming  # https://github.com/Polyconseil/xlsx_streaming
 
-# Add Content Security Policy headers
-django-csp
-
 # S3
 # ------------------------------------------------------------------------------
 

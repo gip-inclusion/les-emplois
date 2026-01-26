@@ -275,7 +275,7 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
 
         def is_variable_node(node):
             return (
-                isinstance(node, base.VariableNode) and "block.super" not in str(node) and "CSP_NONCE" not in str(node)
+                isinstance(node, base.VariableNode) and "block.super" not in str(node) and "csp_nonce" not in str(node)
             )
 
         title_node = _walk_template_nodes(self.template.nodelist, is_title_node)

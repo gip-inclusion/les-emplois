@@ -127,7 +127,7 @@
         <script src="{% static "admin/js/vendor/select2/i18n/fr.js" %}"></script>
         <script src="{% static "django_select2/django_select2.js" %}"></script>
 
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             // Gives focus and scroll to a specific element
             const thisElToFocus = document.querySelector("[data-emplois-give-focus-if-exist]");
             if (thisElToFocus) {
@@ -146,7 +146,7 @@
             <script src="{% static 'js/demo_accounts.js'%}"></script>
         {% endif %}
 
-        <script nonce="{{ CSP_NONCE }}">
+        <script nonce="{{ csp_nonce }}">
             // Show any toasts present in the loaded DOM
             htmx.onLoad((target) => {
                 $(".toast-container .toast", target).each(function() {

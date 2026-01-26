@@ -8,7 +8,7 @@
     {{ block.super }}
     <script src="{% url 'admin:jsi18n' %}"></script>
     {{ media }}
-    <script nonce="{{ CSP_NONCE }}">
+    <script nonce="{{ csp_nonce }}">
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.getElementsByClassName("with-confirm");
             Array.from(buttons).forEach(function(button) {

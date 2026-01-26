@@ -9,8 +9,8 @@ import os
 import re
 import warnings
 
-import csp.constants
 from botocore.config import Config
+from django.utils.csp import CSP
 from dotenv import load_dotenv
 
 from config.sentry import sentry_init
@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     # Third party apps.
     "anymail",
     "citext",
-    "csp",
     "django_bootstrap5",
     "django_select2",
     "formtools",
@@ -151,9 +150,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     # Third party
     "allauth.account.middleware.AccountMiddleware",
-    "csp.middleware.CSPMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
@@ -186,8 +185,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                # Django CSP
-                "csp.context_processors.nonce",
+                "django.template.context_processors.csp",
                 # Itou.
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.matomo",
@@ -680,7 +678,7 @@ MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
 # Content Security Policy
 # Beware, some browser extensions may prevent the reports to be sent to sentry with CORS errors.
 csp_img_src = [
-    csp.constants.SELF,
+    CSP.SELF,
     "data:",  # Because of tarteaucitron.js and bootstrap5
     # OpenStreetMap tiles for django admin maps: both tile. and *.tile are used
     "https://tile.openstreetmap.org",
@@ -690,14 +688,14 @@ csp_img_src = [
     f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/",
 ]
 csp_script_src = [
-    csp.constants.SELF,
-    csp.constants.NONCE,
+    CSP.SELF,
+    CSP.NONCE,
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
     "https://tally.so",
 ]
 csp_connect_src = [
-    csp.constants.SELF,
+    CSP.SELF,
     "*.sentry.io",  # Allow to send reports to sentry without CORS errors.
     "*.hotjar.com",
     "*.hotjar.io",
@@ -710,49 +708,47 @@ if MATOMO_BASE_URL:
     csp_script_src.append(MATOMO_BASE_URL)
     csp_connect_src.append(MATOMO_BASE_URL)
 
-CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        "base-uri": [csp.constants.NONE],  # We don't use any <base> element in our code, so let's forbid it
-        "connect-src": csp_connect_src,
-        "default-src": [csp.constants.SELF],
-        "font-src": [
-            csp.constants.SELF,
-            # '*' does not allows 'data:' fonts
-            "data:",  # Because of tarteaucitron.js
-        ],
-        "frame-ancestors": [
-            "https://pilotage.inclusion.beta.gouv.fr",
-        ],
-        "frame-src": [
-            "https://app.livestorm.co",  # Upcoming events from the homepage
-            "*.hotjar.com",
-            # For stats/pilotage views
-            "https://tally.so",
-            "https://stats.inclusion.beta.gouv.fr",
-            "https://pilotage.inclusion.beta.gouv.fr",
-            "https://communaute.inclusion.gouv.fr",
-            "https://inclusion.beta.gouv.fr",
-            "https://api.data.inclusion.gouv.fr",
-            "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
-            "data:",  # For downloading Metabase questions as PNG on Firefox etc
-        ],
-        "img-src": csp_img_src,
-        "object-src": [csp.constants.NONE],
-        "report-uri": os.getenv("CSP_REPORT_URI", None),
-        "script-src": csp_script_src,
-        # Some browsers don't seem to fallback on script-src if script-src-elem is not there
-        # But some other don't support script-src-elem... just copy one into the other
-        "script-src-elem": csp_script_src,
-        "style-src": [
-            csp.constants.SELF,
-            # It would be better to whilelist styles hashes but it's to much work for now.
-            csp.constants.UNSAFE_INLINE,
-        ],
-        "worker-src": [
-            csp.constants.SELF,
-            "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
-        ],
-    }
+SECURE_CSP = {
+    "base-uri": [CSP.NONE],  # We don't use any <base> element in our code, so let's forbid it
+    "connect-src": csp_connect_src,
+    "default-src": [CSP.SELF],
+    "font-src": [
+        CSP.SELF,
+        # '*' does not allows 'data:' fonts
+        "data:",  # Because of tarteaucitron.js
+    ],
+    "frame-ancestors": [
+        "https://pilotage.inclusion.beta.gouv.fr",
+    ],
+    "frame-src": [
+        "https://app.livestorm.co",  # Upcoming events from the homepage
+        "*.hotjar.com",
+        # For stats/pilotage views
+        "https://tally.so",
+        "https://stats.inclusion.beta.gouv.fr",
+        "https://pilotage.inclusion.beta.gouv.fr",
+        "https://communaute.inclusion.gouv.fr",
+        "https://inclusion.beta.gouv.fr",
+        "https://api.data.inclusion.gouv.fr",
+        "blob:",  # For downloading Metabase questions as CSV/XSLX/JSON on Firefox etc
+        "data:",  # For downloading Metabase questions as PNG on Firefox etc
+    ],
+    "img-src": csp_img_src,
+    "object-src": [CSP.NONE],
+    "report-uri": os.getenv("CSP_REPORT_URI", None),
+    "script-src": csp_script_src,
+    # Some browsers don't seem to fallback on script-src if script-src-elem is not there
+    # But some other don't support script-src-elem... just copy one into the other
+    "script-src-elem": csp_script_src,
+    "style-src": [
+        CSP.SELF,
+        # It would be better to whilelist styles hashes but it's to much work for now.
+        CSP.UNSAFE_INLINE,
+    ],
+    "worker-src": [
+        CSP.SELF,
+        "blob:",  # Redoc seems to use blob:https://emplois.inclusion.beta.gouv.fr/some-ran-dom-uu-id
+    ],
 }
 
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
