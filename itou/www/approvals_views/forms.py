@@ -99,9 +99,9 @@ class ApprovalForm(forms.Form):
         approvals_qs = Approval.objects.filter(self.get_approvals_qs_filter())
         users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
-            (user.pk, user.get_full_name())
-            for user in users_qs.order_by("first_name", "last_name")
-            if user.get_full_name()
+            (user.pk, user.get_inverted_full_name())
+            for user in users_qs.order_by("last_name", "first_name")
+            if user.get_inverted_full_name()
         ]
 
     def get_filters_counter(self):
@@ -424,7 +424,9 @@ class ProlongationRequestDenyInformationReasonForm(forms.ModelForm):
 
         self.fields[
             "reason"
-        ].label = f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_full_name()} ?"
+        ].label = (
+            f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_inverted_full_name()} ?"
+        )
 
 
 class ProlongationRequestDenyInformationReasonExplanationForm(forms.ModelForm):

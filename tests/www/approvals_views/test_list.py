@@ -46,8 +46,8 @@ class TestApprovalsListView:
         assert response.context["display_kind"] == ApprovalDisplayKind.TABLE  # Check default display kind
 
         assertContains(response, "1 résultat")
-        assertContains(response, approval.user.get_full_name())
-        assertNotContains(response, approval_for_other_company.user.get_full_name())
+        assertContains(response, approval.user.get_inverted_full_name())
+        assertNotContains(response, approval_for_other_company.user.get_inverted_full_name())
 
         employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assertContains(response, f"{employee_base_url}?approval={approval.pk}&back_url={urlencode(url)}")
@@ -70,7 +70,9 @@ class TestApprovalsListView:
         response = client.get(url)
 
         assertContains(response, "2 résultats")
-        assertContains(response, f'aria-label="Voir les informations de {approval.user.get_full_name()}"', count=1)
+        assertContains(
+            response, f'aria-label="Voir les informations de {approval.user.get_inverted_full_name()}"', count=1
+        )
         assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
         assertContains(response, reverse("employees:detail", kwargs={"public_id": another_approval.user.public_id}))
 
@@ -125,8 +127,8 @@ class TestApprovalsListView:
 
         form = response.context["filters_form"]
         assert form.fields["job_seeker"].choices == [
-            (approval.user_id, "Jean VIER"),
-            (approval_same_company.user_id, "Seb TAMBRE"),
+            (approval_same_company.user_id, "TAMBRE Seb"),
+            (approval.user_id, "VIER Jean"),
         ]
 
         url = f"{reverse('approvals:list')}?job_seeker={approval.user_id}&expiry="

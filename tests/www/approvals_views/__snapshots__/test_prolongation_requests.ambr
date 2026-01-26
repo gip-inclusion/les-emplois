@@ -26,7 +26,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -267,7 +267,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -431,7 +431,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
@@ -595,7 +595,7 @@
                           <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
                           <div class="form-group form-group-required">
                               <label class="form-label">
-                                  Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?
+                                  Pour quel motif refusez-vous la prolongation du parcours IAE de DOE Jane ?
                               </label>
                               <div class="" id="id_reason-reason" required="">
                                   <div class="form-check">
