@@ -483,6 +483,13 @@ class User(AbstractUser, AddressMixin):
         full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
         return full_name.strip()
 
+    def get_inverted_full_name(self):
+        """
+        Return the last_name plus the first_name, with a space in between.
+        """
+        full_name = f"{self.last_name.upper()} {self.first_name.strip().title()}"
+        return full_name.strip()
+
     def get_truncated_full_name(self):
         """
         Return first name but display only last name's first letter for privacy.
