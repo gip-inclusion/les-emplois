@@ -39,6 +39,7 @@ def get_permissions_dict():
     import itou.external_data.models as external_data_models
     import itou.files.models as files_models
     import itou.geiq_assessments.models as geiq_assessments_models
+    import itou.geo.models as geo_models
     import itou.gps.models as gps_models
     import itou.institutions.models as institution_models
     import itou.invitations.models as invitation_models
@@ -84,6 +85,8 @@ def get_permissions_dict():
         employee_record_models.EmployeeRecordTransitionLog: PERMS_READ,
         external_data_models.ExternalDataImport: PERMS_DELETE,
         files_models.File: PERMS_READ,
+        geo_models.QPV: PERMS_READ,
+        geo_models.ZRR: PERMS_READ,
         geiq_assessments_models.AssessmentCampaign: PERMS_ADD,
         geiq_assessments_models.Assessment: PERMS_READ,
         geiq_assessments_models.Employee: PERMS_READ,
@@ -133,6 +136,8 @@ def get_permissions_dict():
         companies_models.Company: PERMS_READ,
         companies_models.CompanyMembership: PERMS_READ,
         companies_models.SiaeACIConvergencePHC: PERMS_READ,
+        geo_models.QPV: PERMS_READ,
+        geo_models.ZRR: PERMS_READ,
         institution_models.Institution: PERMS_ADD,
         institution_models.InstitutionMembership: PERMS_ADD,
         job_applications_models.JobApplication: PERMS_READ,
