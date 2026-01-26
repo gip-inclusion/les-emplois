@@ -8,7 +8,7 @@
         <div class="c-box--results__summary">
             <i class="ri-user-line" aria-hidden="true"></i>
             <div>
-                <h3>{{ approval.user.get_full_name }}</h3>
+                <h3>{{ approval.user.get_inverted_full_name }}</h3>
                 <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                     {% approval_state_badge approval span_extra_classes="badge-sm text-wrap" icon_extra_classes="ri-xl" %}
                 </div>
@@ -43,7 +43,7 @@
             <a href="{% url 'employees:detail' public_id=approval.user.public_id %}?approval={{ approval.pk }}&back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary btn-block w-100 w-md-auto"
                {% matomo_event "salaries" "clic" "details-salarie" %}
-               aria-label="Voir les informations de {{ approval.user.get_full_name }}">Voir les informations</a>
+               aria-label="Voir les informations de {{ approval.user.get_inverted_full_name }}">Voir les informations</a>
         </div>
     </div>
 </div>

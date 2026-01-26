@@ -228,8 +228,8 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY "users_user"."last_name" ASC,
+                   "users_user"."first_name" ASC
         ''',
       }),
       dict({
@@ -731,8 +731,8 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY "users_user"."last_name" ASC,
+                   "users_user"."first_name" ASC
         ''',
       }),
       dict({
@@ -1237,8 +1237,8 @@
                                 AND U0."to_company_id" = %s)
                          LIMIT 1))
                  AND "users_user"."kind" = %s)
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY "users_user"."last_name" ASC,
+                   "users_user"."first_name" ASC
         ''',
       }),
       dict({
@@ -1493,7 +1493,7 @@
                   </i>
                   <div>
                       <h3>
-                          Jane DOE
+                          DOE Jane
                       </h3>
                       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                           <span class="badge badge-sm text-wrap rounded-pill bg-success-lighter text-success">
@@ -1545,7 +1545,7 @@
           </div>
           <div class="c-box--results__footer">
               <div class="d-flex justify-content-md-end">
-                  <a aria-label="Voir les informations de Jane DOE" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dlist">
+                  <a aria-label="Voir les informations de DOE Jane" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dlist">
                       Voir les informations
                   </a>
               </div>
@@ -1566,7 +1566,7 @@
               <thead>
                   <tr>
                       <th class="text-nowrap" scope="col">
-                          Prénom NOM
+                          NOM Prénom
                       </th>
                       <th scope="col">
                           Statut du PASS IAE
@@ -1587,7 +1587,7 @@
                   <tr>
                       <td>
                           <a class="btn-link" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dtable">
-                              Jane DOE
+                              DOE Jane
                           </a>
                       </td>
                       <td>
@@ -1619,8 +1619,8 @@
                           356112 jours (Environ 975 ans)
                       </td>
                       <td class="text-end w-50px align-middle">
-                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir les informations de Jane DOE" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dtable">
-                              <i aria-label="Voir les informations de Jane DOE" class="ri-arrow-drop-right-line fs-lg">
+                          <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Voir les informations de DOE Jane" data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="details-salarie-tableau" href="/employees/detail/7614fc4b-aef9-4694-ab17-12324300180a?approval=[PK of Approval]&back_url=/approvals/list%3Fdisplay%3Dtable">
+                              <i aria-label="Voir les informations de DOE Jane" class="ri-arrow-drop-right-line fs-lg">
                               </i>
                           </a>
                       </td>
