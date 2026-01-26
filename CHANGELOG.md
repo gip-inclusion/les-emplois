@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 2026-01-26
+
+### Ajouté
+
+- [Admin : Possibilité de chercher un candidat dans l'admin par son identifiant France Travail](https://github.com/gip-inclusion/les-emplois/pull/7412)
+- [Contrôle a posteriori : Ajout d'une modale informative des prérequis nécessaires à la conformité juridique de ma décision de sanction](https://github.com/gip-inclusion/les-emplois/pull/7355)
+
+### Modifié
+
+- [Candidature : Modification de filtres pour les rendre dynamiques](https://github.com/gip-inclusion/les-emplois/pull/6960)
+- [Page d’accueil : Ne pas afficher la modale de nouveautés si elle ne contient aucun élément](https://github.com/gip-inclusion/les-emplois/pull/7377)
+- [Recherche des services : Correction d'une erreur quand le mode d'accueil n'est pas renseigné](https://github.com/gip-inclusion/les-emplois/pull/7389)
+
 ## 2026-01-19
 
 ### Ajouté
