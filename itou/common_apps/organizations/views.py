@@ -29,7 +29,7 @@ class BaseMemberList(UserPassesTestMixin, ListView):
         return (
             self.organization.memberships.select_related("user")
             .all()
-            .order_by("user__first_name", "user__last_name", "pk")
+            .order_by("user__last_name", "user__first_name", "pk")
         )
 
     def get_invitation_url(self):
@@ -66,7 +66,8 @@ def deactivate_org_member(request, user_id, *, success_url, template_name):
     if request.method == "POST":
         request.current_organization.deactivate_membership(membership, updated_by=request.user)
         messages.success(
-            request, f"{membership.user.get_full_name()} a été retiré(e) des membres actifs de cette structure."
+            request,
+            f"{membership.user.get_inverted_full_name()} a été retiré(e) des membres actifs de cette structure.",
         )
         return HttpResponseRedirect(success_url)
 
@@ -100,7 +101,8 @@ def update_org_admin_role(request, action, user_id, *, success_url, template_nam
                 raise ValueError(f"Unknown {action=}")
         request.current_organization.set_admin_role(membership, admin, updated_by=request.user)
         messages.success(
-            request, f"{membership.user.get_full_name()} a été {action_label} administrateurs de cette structure."
+            request,
+            f"{membership.user.get_inverted_full_name()} a été {action_label} administrateurs de cette structure.",
         )
         return HttpResponseRedirect(success_url)
 

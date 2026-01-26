@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <p>
-                    Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
+                    Vous êtes connecté(e) en tant que <b>{{ user.get_inverted_full_name }}</b> ({{ user.email }})
                 </p>
 
                 {% if request.user.is_prescriber %}

@@ -57,7 +57,7 @@
                       <p>
                           Vous êtes connecté(e) en tant que
                           <b>
-                              John DOE
+                              DOE John
                           </b>
                           (john.doe@test.local)
                       </p>
@@ -72,7 +72,7 @@
                               <thead>
                                   <tr>
                                       <th scope="col">
-                                          Nom
+                                          Nom Prénom
                                       </th>
                                       <th scope="col">
                                           Email
@@ -87,7 +87,7 @@
                               <tbody>
                                   <tr>
                                       <td>
-                                          John DOE
+                                          DOE John
                                           <button class="badge badge-xs rounded-pill bg-info" data-bs-title="Administrateur de la structure" data-bs-toggle="tooltip" type="button">
                                               Admin
                                               <span class="visually-hidden">
