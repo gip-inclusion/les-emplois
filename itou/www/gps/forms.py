@@ -43,7 +43,7 @@ class MembershipsFiltersForm(forms.Form):
             (
                 beneficiary.id,
                 mask_unless(
-                    beneficiary.get_full_name(),
+                    beneficiary.get_inverted_full_name(),
                     predicate=(
                         beneficiaries_data[beneficiary.pk]
                         or is_gps_authorized(request)
@@ -51,8 +51,8 @@ class MembershipsFiltersForm(forms.Form):
                     ),
                 ),
             )
-            for beneficiary in beneficiaries.order_by("first_name", "last_name")
-            if beneficiary.get_full_name()
+            for beneficiary in beneficiaries.order_by("last_name", "first_name")
+            if beneficiary.get_inverted_full_name()
         ]
         return beneficiaries
 

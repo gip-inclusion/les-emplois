@@ -4,7 +4,7 @@
 {% load str_filters %}
 
 {% block title %}
-    Réseau d'intervenants - Profil de {{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+    Réseau d'intervenants - Profil de {{ group.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
 {% endblock %}
 
 {% block title_navinfo %}
@@ -14,7 +14,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__cta=c_title__cta %}
         {% fragment as c_title__main %}
-            <h1>{{ group.beneficiary.get_full_name|mask_unless:can_view_personal_information }}</h1>
+            <h1>{{ group.beneficiary.get_inverted_full_name|mask_unless:can_view_personal_information }}</h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if can_print_page %}
