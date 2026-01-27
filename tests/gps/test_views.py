@@ -29,19 +29,9 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
-from tests.users.factories import (
-    EmployerFactory,
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    PAGINATION_PAGE_ONE_MARKUP,
-    get_session_name,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, get_session_name, parse_response_to_soup, pretty_indented
 
 
 def gps_logs(caplog):
@@ -287,8 +277,8 @@ class TestGroupLists:
         prescriber = PrescriberFactory(membership__organization__authorized=False)
         job_seeker = JobSeekerFactory(for_snapshot=True)
         group = FollowUpGroupFactory(memberships=1, memberships__member=prescriber, beneficiary=job_seeker)
-        masked_name = "J… D…"
-        full_name = "Jane DOE"
+        masked_name = "D… J…"
+        full_name = "DOE Jane"
 
         client.force_login(prescriber)
         my_groups_url = reverse("gps:group_list")
@@ -1290,21 +1280,21 @@ class TestBeneficiariesAutocomplete:
             "birthdate": "01/01/1980",
             "id": first_beneficiary.pk,
             "title": "M.",
-            "name": first_beneficiary.get_full_name(),
+            "name": first_beneficiary.get_inverted_full_name(),
         }
         if can_view_personal_info:
             second_beneficiary_data = {
                 "birthdate": "01/01/1990",
                 "id": second_beneficiary.pk,
                 "title": "Mme",
-                "name": second_beneficiary.get_full_name(),
+                "name": second_beneficiary.get_inverted_full_name(),
             }
         else:
             second_beneficiary_data = {
                 "birthdate": "",
                 "id": second_beneficiary.pk,
                 "title": "",
-                "name": mask_unless(second_beneficiary.get_full_name(), False),
+                "name": mask_unless(second_beneficiary.get_inverted_full_name(), False),
             }
         assert data[second_beneficiary.pk] == second_beneficiary_data
         if can_view_personal_info in ["authorized", "gps_authorized"]:
@@ -1312,14 +1302,14 @@ class TestBeneficiariesAutocomplete:
                 "birthdate": "01/01/2000",
                 "id": third_beneficiary.pk,
                 "title": "Mme",
-                "name": third_beneficiary.get_full_name(),
+                "name": third_beneficiary.get_inverted_full_name(),
             }
         else:
             third_beneficiary_data = {
                 "birthdate": "",
                 "id": third_beneficiary.pk,
                 "title": "",
-                "name": mask_unless(third_beneficiary.get_full_name(), False),
+                "name": mask_unless(third_beneficiary.get_inverted_full_name(), False),
             }
         assert data[third_beneficiary.pk] == third_beneficiary_data
 

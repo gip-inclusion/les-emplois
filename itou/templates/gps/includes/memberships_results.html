@@ -12,7 +12,7 @@
                 <caption class="visually-hidden">Liste des bénéficiaires</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Prénom NOM</th>
+                        <th scope="col">Nom Prénom</th>
                         {% if active_memberships %}
                             <th scope="col">Accompagné depuis</th>
                         {% else %}
@@ -29,9 +29,9 @@
                             <td>
                                 <a href="{% url 'gps:group_memberships' group_id=membership.follow_up_group.pk %}?back_url={{ request.get_full_path|urlencode }}"
                                    class="btn-link"
-                                   aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name|mask_unless:membership.user_can_view_personal_information }}"
+                                   aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_inverted_full_name|mask_unless:membership.user_can_view_personal_information }}"
                                    {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>
-                                    {{ membership.follow_up_group.beneficiary.get_full_name|mask_unless:membership.user_can_view_personal_information }}
+                                    {{ membership.follow_up_group.beneficiary.get_inverted_full_name|mask_unless:membership.user_can_view_personal_information }}
                                 </a>
                             </td>
                             {% if active_memberships %}
@@ -46,7 +46,7 @@
                                 {% if membership.is_referent_certified %}
                                     <span class="badge badge-xs rounded-pill bg-accent-03-lighter text-primary">vous êtes référent</span>
                                 {% elif membership.follow_up_group.certified_referent %}
-                                    {{ membership.follow_up_group.certified_referent.0.member.get_full_name }}
+                                    {{ membership.follow_up_group.certified_referent.0.member.get_inverted_full_name }}
                                 {% endif %}
                             </td>
                             <td>{{ membership.nb_members }}</td>

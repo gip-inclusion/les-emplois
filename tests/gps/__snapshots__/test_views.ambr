@@ -21,7 +21,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  J… D…
+                                  D… J…
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -125,7 +125,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Jane DOE
+                                  DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -270,7 +270,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Jane DOE
+                                  DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -422,7 +422,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Jane DOE
+                                  DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -594,7 +594,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Jane DOE
+                                  DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -773,7 +773,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  J… D…
+                                  D… J…
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -899,7 +899,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  J… D…
+                                  D… J…
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -1025,7 +1025,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  J… D…
+                                  D… J…
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -1469,7 +1469,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Jane DOE
+                                  DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -1891,8 +1891,8 @@
           FROM "users_user"
           WHERE "users_user"."id" IN (%s,
                                       %s)
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY "users_user"."last_name" ASC,
+                   "users_user"."first_name" ASC
         ''',
       }),
       dict({
@@ -2253,10 +2253,10 @@
                                       <option selected="" value="">
                                       </option>
                                       <option value="[PK of JobSeeker]">
-                                          François LE FRANÇAIS
+                                          DOE Jane
                                       </option>
                                       <option value="[PK of JobSeeker]">
-                                          Jane DOE
+                                          LE FRANÇAIS François
                                       </option>
                                   </select>
                               </div>
@@ -2271,7 +2271,7 @@
                                   <thead>
                                       <tr>
                                           <th scope="col">
-                                              Prénom NOM
+                                              Nom Prénom
                                           </th>
                                           <th scope="col">
                                               Accompagné depuis
@@ -2287,8 +2287,8 @@
                                   <tbody>
                                       <tr>
                                           <td>
-                                              <a aria-label="Consulter la fiche de Jane DOE" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
-                                                  Jane DOE
+                                              <a aria-label="Consulter la fiche de DOE Jane" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
+                                                  DOE Jane
                                               </a>
                                           </td>
                                           <td>
@@ -2305,8 +2305,8 @@
                                       </tr>
                                       <tr>
                                           <td>
-                                              <a aria-label="Consulter la fiche de François LE FRANÇAIS" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
-                                                  François LE FRANÇAIS
+                                              <a aria-label="Consulter la fiche de LE FRANÇAIS François" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/list">
+                                                  LE FRANÇAIS François
                                               </a>
                                           </td>
                                           <td>
@@ -2523,8 +2523,8 @@
                  "users_user"."allow_next_sso_sub_update"
           FROM "users_user"
           WHERE "users_user"."id" IN (%s)
-          ORDER BY "users_user"."first_name" ASC,
-                   "users_user"."last_name" ASC
+          ORDER BY "users_user"."last_name" ASC,
+                   "users_user"."first_name" ASC
         ''',
       }),
       dict({
@@ -2829,7 +2829,7 @@
               <thead>
                   <tr>
                       <th scope="col">
-                          Prénom NOM
+                          Nom Prénom
                       </th>
                       <th scope="col">
                           Début d’accompagnement
@@ -2848,8 +2848,8 @@
               <tbody>
                   <tr>
                       <td>
-                          <a aria-label="Consulter la fiche de Jean BON" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/old/list">
-                              Jean BON
+                          <a aria-label="Consulter la fiche de BON Jean" class="btn-link" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/gps/groups/[PK of FollowUpGroup]/memberships?back_url=/gps/groups/old/list">
+                              BON Jean
                           </a>
                       </td>
                       <td>

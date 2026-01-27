@@ -558,7 +558,7 @@ def beneficiaries_autocomplete(request):
                 "id": user.pk,
                 "title": "",
                 "name": mask_unless(
-                    user.get_full_name(),
+                    user.get_inverted_full_name(),
                     predicate=(
                         user.membership_can_view_personal_information
                         or is_gps_authorized(request)
