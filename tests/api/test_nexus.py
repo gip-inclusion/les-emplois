@@ -7,7 +7,7 @@ from pytest_django.asserts import assertQuerySetEqual
 from rest_framework.test import APIClient
 
 from itou.api.models import ServiceToken
-from itou.nexus.enums import Role, Service
+from itou.nexus.enums import Service
 from itou.nexus.models import DEFAULT_VALID_SINCE, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
 from itou.nexus.utils import service_id
 from tests.nexus.factories import (
@@ -54,7 +54,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
-                "memberships": [],
             }
         ]
 
@@ -66,7 +65,6 @@ class TestUserAPI(NexusApiTestMixin):
 
     def test_create_user(self):
         api_client = self.api_client(service=Service.DORA)
-        structure = NexusStructureFactory(source=Service.DORA)
 
         data = [
             {
@@ -78,9 +76,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": None,
                 "auth": "MAGIC_LINK",
-                "memberships": [
-                    {"structure_id": structure.source_id, "role": "ADMINISTRATOR"},
-                ],
             }
         ]
 
@@ -89,13 +84,6 @@ class TestUserAPI(NexusApiTestMixin):
 
         user = NexusUser.objects.get()
         self.assert_user_equals(user, Service.DORA, data[0])
-
-        assertQuerySetEqual(
-            NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.ADMINISTRATOR)],
-            ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
-        )
 
     def test_update_user(self):
         api_client = self.api_client(service=Service.DORA)
@@ -121,7 +109,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
-                "memberships": [],
             }
         ]
 
@@ -130,155 +117,10 @@ class TestUserAPI(NexusApiTestMixin):
         updated_user = NexusUser.objects.get()
         assert updated_user.pk == user.pk
         self.assert_user_equals(updated_user, Service.DORA, data[0])
-        assert NexusMembership.objects.count() == 0
-
-    def test_update_user_add_membership(self):
-        api_client = self.api_client(service=Service.DORA)
-        structure = NexusStructureFactory(source=Service.DORA)
-
-        user = NexusUserFactory(
-            source=Service.DORA,
-            kind="offreur",
-            first_name="A",
-            last_name="B",
-            email="old@mailinator.com",
-            phone="0123456789",
-            last_login=timezone.now().isoformat(),
-            auth="PRO_CONNECT",
-        )
-        data = [
-            {
-                "id": user.source_id,
-                "kind": "accompagnateur",
-                "first_name": "Jean",
-                "last_name": "Bon",
-                "email": "jean.bon@boucherie.fr",
-                "phone": "",
-                "last_login": timezone.now().isoformat(),
-                "auth": "MAGIC_LINK",
-                "memberships": [
-                    {"structure_id": structure.source_id, "role": "ADMINISTRATOR"},
-                ],
-            }
-        ]
-
-        response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 200
-        updated_user = NexusUser.objects.get()
-        assert updated_user.pk == user.pk
-        self.assert_user_equals(updated_user, Service.DORA, data[0])
-
-        assertQuerySetEqual(
-            NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.ADMINISTRATOR)],
-            ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
-        )
-
-    def test_update_user_update_membership(self):
-        api_client = self.api_client(service=Service.DORA)
-
-        user = NexusUserFactory(
-            source=Service.DORA,
-            kind="offreur",
-            first_name="A",
-            last_name="B",
-            email="old@mailinator.com",
-            phone="0123456789",
-            last_login=timezone.now().isoformat(),
-            auth="PRO_CONNECT",
-        )
-        membership = NexusMembershipFactory(role=Role.ADMINISTRATOR, user=user, source=Service.DORA)
-        structure = membership.structure
-        data = [
-            {
-                "id": user.source_id,
-                "kind": "accompagnateur",
-                "first_name": "Jean",
-                "last_name": "Bon",
-                "email": "jean.bon@boucherie.fr",
-                "phone": "",
-                "last_login": timezone.now().isoformat(),
-                "auth": "MAGIC_LINK",
-                "memberships": [
-                    {"structure_id": structure.source_id, "role": "COLLABORATOR"},
-                ],
-            }
-        ]
-
-        response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 200
-        updated_user = NexusUser.objects.get()
-        assert updated_user.pk == user.pk
-        self.assert_user_equals(updated_user, Service.DORA, data[0])
-
-        assertQuerySetEqual(
-            NexusMembership.objects.all(),
-            [(Service.DORA, user.pk, structure.pk, Role.COLLABORATOR)],
-            ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
-        )
-
-    def test_ignore_memberships_from_missing_structure(self, caplog):
-        api_client = self.api_client(service=Service.DORA)
-
-        data = [
-            {
-                "id": "my-id",
-                "kind": "offreur",
-                "first_name": "Jean",
-                "last_name": "Bon",
-                "email": "jean.bon@boucherie.fr",
-                "phone": "",
-                "last_login": timezone.now().isoformat(),
-                "auth": "MAGIC_LINK",
-                "memberships": [
-                    {"structure_id": "3918bb96-9a69-428c-b01c-1cbea7141988", "role": "ADMINISTRATOR"},
-                ],
-            }
-        ]
-
-        # Silently ignore the membership if the structure does not exists
-        response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 200
-        user = NexusUser.objects.get()
-        self.assert_user_equals(user, Service.DORA, data[0])
-
-        assert NexusMembership.objects.count() == 0
-        assert (
-            caplog.messages[0]
-            == "NexusAPI: Ignoring memberships for structure=dora--3918bb96-9a69-428c-b01c-1cbea7141988"
-        )
-
-    def test_update_user_delete_old_memberships(self):
-        api_client = self.api_client(service=Service.DORA)
-        user = NexusUserFactory(source=Service.DORA, with_membership=True)
-
-        data = [
-            {
-                "id": user.source_id,
-                "kind": "accompagnateur",
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-                "phone": user.phone,
-                "last_login": user.last_login.isoformat(),
-                "auth": user.auth,
-                "memberships": [],
-            }
-        ]
-
-        response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 200
-        assert NexusUser.objects.count() == 1
-        assert NexusMembership.objects.count() == 0
-        assert NexusStructure.objects.count() == 1
 
     def test_create_and_update_multiple_users(self):
         api_client = self.api_client(service=Service.DORA)
         user = NexusUserFactory(source=Service.DORA)
-        structure_1 = NexusStructureFactory(source=Service.DORA)
-        structure_2 = NexusStructureFactory(source=Service.DORA)
 
         data = [
             {
@@ -290,10 +132,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": user.phone,
                 "last_login": user.last_login.isoformat(),
                 "auth": user.auth,
-                "memberships": [
-                    {"structure_id": structure_1.source_id, "role": "ADMINISTRATOR"},
-                    {"structure_id": structure_2.source_id, "role": "ADMINISTRATOR"},
-                ],
             },
             {
                 "id": "my-id",
@@ -304,9 +142,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC_LINK",
-                "memberships": [
-                    {"structure_id": structure_1.source_id, "role": "COLLABORATOR"},
-                ],
             },
         ]
 
@@ -321,31 +156,21 @@ class TestUserAPI(NexusApiTestMixin):
             ordered=False,
             transform=lambda user: (user.source, user.pk),
         )
-        assertQuerySetEqual(
-            NexusMembership.objects.all(),
-            [
-                (Service.DORA, user.pk, structure_1.pk, Role.ADMINISTRATOR),
-                (Service.DORA, user.pk, structure_2.pk, Role.ADMINISTRATOR),
-                (Service.DORA, "dora--my-id", structure_1.pk, Role.COLLABORATOR),
-            ],
-            ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
-        )
 
     def test_delete_user(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
-        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
-        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        user_1 = NexusUserFactory(source=Service.COMMUNAUTE)
+        user_2 = NexusMembershipFactory(source=Service.COMMUNAUTE).user
 
         response = api_client.delete(
             self.url,
-            data=[{"id": membership_1.user.source_id}, {"id": membership_2.user.source_id}],
+            data=[{"id": user_1.source_id}, {"id": user_2.source_id}],
             content_type="application/json",
         )
         assert response.status_code == 200
         assert NexusUser.objects.count() == 0
-        assert NexusMembership.objects.count() == 0  # Also removes the linked memberships
-        assert NexusStructure.objects.count() == 2
+        assert NexusMembership.objects.count() == 0  # Also removes the linked memberships (cascade)
+        assert NexusStructure.objects.count() == 1
 
     def test_delete_unknown_user(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
@@ -355,8 +180,6 @@ class TestUserAPI(NexusApiTestMixin):
     def test_ignore_other_sources(self):
         api_client = self.api_client(service=Service.DORA)
         emplois_user = NexusUserFactory(source=Service.EMPLOIS)
-        emplois_structure = NexusStructureFactory(source=Service.EMPLOIS)
-        dora_structure = NexusStructureFactory(source=Service.DORA, source_id=emplois_structure.source_id)
 
         data = [
             {
@@ -368,9 +191,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": emplois_user.phone,
                 "last_login": emplois_user.last_login.isoformat(),
                 "auth": emplois_user.auth,
-                "memberships": [
-                    {"structure_id": emplois_structure.source_id, "role": "ADMINISTRATOR"},
-                ],
             },
         ]
 
@@ -387,18 +207,9 @@ class TestUserAPI(NexusApiTestMixin):
             ordered=False,
             transform=lambda user: (user.source, user.pk),
         )
-        assertQuerySetEqual(
-            NexusMembership.objects.all(),
-            [
-                (Service.DORA, dora_user_id, dora_structure.pk, Role.ADMINISTRATOR),
-            ],
-            ordered=False,
-            transform=lambda m: (m.source, m.user_id, m.structure_id, m.role),
-        )
 
     def test_validate_payload(self):
         api_client = self.api_client(service=Service.DORA)
-        structure = NexusStructureFactory(source=Service.DORA)
 
         data = [
             {
@@ -410,12 +221,6 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC LINK",  # missing underscore
-                "memberships": [
-                    {
-                        "structure_id": structure.source_id,
-                        "role": "administrator",  # should be in upper case
-                    },
-                ],
             }
         ]
 
@@ -425,9 +230,6 @@ class TestUserAPI(NexusApiTestMixin):
             {
                 "auth": ["«\xa0MAGIC LINK\xa0» n'est pas un choix valide."],
                 "kind": ["«\xa0employeur\xa0» n'est pas un choix valide."],
-                "memberships": [
-                    {"role": ["«\xa0administrator\xa0» n'est pas un choix valide."]},
-                ],
             },
         ]
 
@@ -529,7 +331,7 @@ class TestStructureAPI(NexusApiTestMixin):
         )
         data = [
             {
-                "id": str(old_structure.source_id),
+                "id": old_structure.source_id,
                 "kind": "CCAS",
                 "siret": "01234567891011",
                 "name": "le CCAS du coin",
@@ -571,7 +373,7 @@ class TestStructureAPI(NexusApiTestMixin):
     def test_delete_unknown_structure(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
 
-        response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
+        response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
         assert response.status_code == 404
 
     def test_validate_payload(self):
@@ -606,6 +408,134 @@ class TestStructureAPI(NexusApiTestMixin):
                 "source_link": ["Saisissez une URL valide."],
                 "website": ["Saisissez une URL valide."],
             },
+        ]
+
+
+class TestMembershipsAPI(NexusApiTestMixin):
+    url = reverse("v1:nexus-memberships")
+
+    def assert_membership_equals(self, membership, source, membership_data):
+        assert membership.id == f"{source}--{membership_data['id']}"
+        assert membership.source == source
+        assert membership.user_id == f"{source}--{membership_data['user_id']}"
+        assert membership.structure_id == f"{source}--{membership_data['structure_id']}"
+        assert membership.role == membership_data["role"]
+
+    def test_unauthenticated(self, api_client):
+        api_client = self.api_client()
+        user = NexusUserFactory(source=Service.DORA)
+        structure = NexusStructureFactory(source=Service.DORA)
+
+        data = [
+            {
+                "id": "my-id",
+                "user_id": user.source_id,
+                "structure_id": structure.source_id,
+                "role": "ADMINISTRATOR",
+            }
+        ]
+
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 401
+
+        response = api_client.delete(self.url, data={"id": "my-id"}, content_type="application/json")
+        assert response.status_code == 401
+
+    def test_create_membership(self):
+        api_client = self.api_client(service=Service.DORA)
+        user = NexusUserFactory(source=Service.DORA)
+        structure = NexusStructureFactory(source=Service.DORA)
+
+        data = [
+            {
+                "id": "my-id",
+                "user_id": user.source_id,
+                "structure_id": structure.source_id,
+                "role": "ADMINISTRATOR",
+            }
+        ]
+
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 200
+
+        membership = NexusMembership.objects.get()
+        self.assert_membership_equals(membership, Service.DORA, data[0])
+
+    def test_update_membership(self):
+        api_client = self.api_client(service=Service.DORA)
+        membership = NexusMembershipFactory(source=Service.DORA)
+
+        data = [
+            {
+                "id": membership.source_id,
+                "user_id": membership.user.source_id,
+                "structure_id": membership.structure.source_id,
+                "role": "COLLABORATOR",
+            }
+        ]
+
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 200
+
+        membership = NexusMembership.objects.get()
+        self.assert_membership_equals(membership, Service.DORA, data[0])
+
+    def test_ignore_memberships_from_missing_structure_or_user(self):
+        api_client = self.api_client(service=Service.DORA)
+
+        data = [
+            {
+                "id": "my-id",
+                "user_id": "XXX",
+                "structure_id": "YYY",
+                "role": "ADMINISTRATOR",
+            }
+        ]
+
+        # Silently ignore the membership if the structure or user dosen't exist
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 200
+        assert NexusMembership.objects.count() == 0
+
+    def test_delete_memberships(self):
+        api_client = self.api_client(service=Service.COMMUNAUTE)
+        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+
+        response = api_client.delete(
+            self.url,
+            data=[{"id": membership_1.source_id}, {"id": membership_2.source_id}],
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        assert NexusUser.objects.count() == 2
+        assert NexusStructure.objects.count() == 2
+        assert NexusMembership.objects.count() == 0
+
+    def test_delete_unknown_structure(self):
+        api_client = self.api_client(service=Service.COMMUNAUTE)
+
+        response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
+        assert response.status_code == 404
+
+    def test_validate_payload(self):
+        api_client = self.api_client(service=Service.DORA)
+        user = NexusUserFactory(source=Service.DORA)
+        structure = NexusStructureFactory(source=Service.DORA)
+
+        data = [
+            {
+                "id": "my-id",
+                "user_id": user.source_id,
+                "structure_id": structure.source_id,
+                "role": "administrator",  # should be in upper case
+            }
+        ]
+
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 400
+        assert response.json() == [
+            {"role": ["«\xa0administrator\xa0» n'est pas un choix valide."]},
         ]
 
 
