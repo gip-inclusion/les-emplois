@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
     np.int64: "bigint",
     np.object_: "text",
+    str: "text",
     np.float64: "double precision",
     np.bool_: "boolean",
 }
