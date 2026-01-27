@@ -9,7 +9,6 @@
             <caption class="visually-hidden">Liste des ajouts en attente</caption>
             <thead>
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Nom Prénom</th>
                     <th scope="col">Email</th>
                     <th scope="col">Date d'ajout</th>
@@ -20,7 +19,6 @@
             <tbody>
                 {% for invitation in pending_invitations %}
                     <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ invitation.last_name|upper }} {{ invitation.first_name|title }}</td>
                         <td>
                             <a href="mailto:{{ invitation.email }}" class="btn-link">{{ invitation.email }}</a>
