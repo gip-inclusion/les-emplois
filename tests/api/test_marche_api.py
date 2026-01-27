@@ -80,7 +80,7 @@ class TestMarcheCompanyAPI:
     def test_list_companies_antenne_with_user_created_with_proper_siret(self, subtests):
         api_client = self.api_client()
         company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
+        company_2 = CompanyFactory(siret="10000000000002")
         company_3 = CompanyFactory(
             siret="10000000000003", source=CompanySource.USER_CREATED, convention=company_1.convention
         )
@@ -106,7 +106,7 @@ class TestMarcheCompanyAPI:
     def test_list_companies_antenne_with_user_created_and_999(self, subtests):
         api_client = self.api_client()
         company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=CompanySource.ASP, convention=company_1.convention)
+        company_2 = CompanyFactory(siret="10000000000002", source=CompanySource.ASP)
         company_3 = CompanyFactory(
             siret="10000000099991", source=CompanySource.USER_CREATED, convention=company_1.convention
         )
