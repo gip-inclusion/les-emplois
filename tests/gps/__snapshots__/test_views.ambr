@@ -1603,6 +1603,26 @@
                               </ul>
                           </div>
                       </div>
+                      <div class="c-box c-box--promo-partenaire">
+                          <div class="row g-0">
+                              <div class="col-12 col-md pe-3 pe-md-4 py-3 py-md-4">
+                                  <h3 class="text-tertiary">
+                                      Un même fil rouge entre intervenants
+                                  </h3>
+                                  <p>
+                                      Mon Récap facilite la coordination entre pros en rassemblant les infos essentielles du bénéficiaire dans un support papier. Équipez vos usagers dès aujourd’hui pour réduire les redites, fluidifier les relais et sécuriser l’accompagnement multi-acteurs.
+                                  </p>
+                                  <a class="btn btn-block w-100 w-md-auto btn-outline-primary has-external-link" href="https://mon-recap.inclusion.beta.gouv.fr/?mtm_campaign=Encart%20GPS">
+                                      👉 Découvrir Mon Récap
+                                  </a>
+                              </div>
+                              <div class="d-none d-md-inline-flex col-md-auto align-self-end">
+                                  <div>
+                                      <img alt="" class="img-fluid" src="/static/img/illustration-mon-recap.png"/>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div class="c-box c-box--results has-links-inside mb-3 my-md-4" id="card-[Public ID of prescriber]">
                           <div class="c-box--results__header">
                               <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
