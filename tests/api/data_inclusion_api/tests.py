@@ -79,7 +79,7 @@ class TestDataInclusionSiaeStructure:
 
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
-        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True, convention=company_1.convention)
+        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True)
         company_3 = CompanyFactory(
             siret="10000000000003",
             subject_to_iae_rules=True,
@@ -118,7 +118,6 @@ class TestDataInclusionSiaeStructure:
             siret="10000000000002",
             subject_to_iae_rules=True,
             source=CompanySource.ASP,
-            convention=company_1.convention,
         )
         company_3 = CompanyFactory(
             siret="10000000099991",

@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
+from itou.companies.enums import CompanySource
 from itou.job_applications.enums import JobApplicationState
 from itou.www.employee_record_views.enums import MissingEmployeeCase
 from tests.approvals.factories import ApprovalFactory
@@ -101,7 +102,7 @@ def test_missing_employee(client, snapshot):
         approval=approval,
         hiring_start_at=datetime.date(2025, 2, 14),
     )
-    other_siae = CompanyFactory(convention=siae.convention, for_snapshot=True)
+    other_siae = CompanyFactory(convention=siae.convention, source=CompanySource.USER_CREATED, for_snapshot=True)
     job_application = JobApplicationFactory(
         to_company=other_siae,
         job_seeker=job_seeker,
