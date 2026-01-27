@@ -12,6 +12,7 @@ urlpatterns = [
     path("activate_mon_recap", views.activate_mon_recap, name="activate_mon_recap"),
     path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
     path("service/dora", views.DoraView.as_view(), name="dora"),
+    path("service/emplois", views.EmploisView.as_view(), name="emplois"),
     path("service/marche", views.MarcheView.as_view(), name="marche"),
     path("service/mon-recap", views.MonRecapView.as_view(), name="mon_recap"),
     path("service/pilotage", views.PilotageView.as_view(), name="pilotage"),

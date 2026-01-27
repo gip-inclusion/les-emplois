@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
+from itou.companies.models import JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
 from itou.nexus.utils import build_user, serialize_user
@@ -120,6 +121,35 @@ class CommunauteView(NexusMixin, TemplateView):
 class DoraView(NexusMixin, TemplateView):
     template_name = "nexus/dora.html"
     service = Service.DORA
+
+
+class EmploisView(NexusMixin, TemplateView):
+    service = Service.EMPLOIS
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if self.user_kind != NexusUserKind.FACILITY_MANAGER:
+            # The user doesn't have access to this page
+            return Http404
+
+    def get_template_names(self):
+        return [
+            "nexus/emplois_structure.html"
+            if Service.EMPLOIS in self.activated_services
+            else "nexus/emplois_inactive.html"
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if Service.EMPLOIS in self.activated_services:
+            # TODO(alaurent) We can have facility managers that are prescribers on les emplois
+            # We should handle it correctly someday
+            context["job_descriptions"] = JobDescription.objects.filter(
+                is_active=True, company=self.request.current_organization
+            )
+            context["job_description_count"] = len(context["job_descriptions"])
+        return context
 
 
 class MarcheView(NexusMixin, TemplateView):

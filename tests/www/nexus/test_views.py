@@ -1,7 +1,10 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from itoutils.urls import add_url_params
 from pytest_django.asserts import (
     assertContains,
@@ -14,6 +17,8 @@ from pytest_django.asserts import (
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
 from itou.users.enums import UserKind
+from tests.companies.factories import CompanyMembershipFactory, JobDescriptionFactory
+from tests.jobs.factories import create_test_romes_and_appellations
 from tests.nexus.factories import NexusUserFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -208,6 +213,44 @@ class TestDoraView:
 
         response = client.get(self.url)
         assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
+
+class TestEmploisViews:
+    url = reverse("nexus:emplois")
+
+    def test_list(self, client, snapshot):
+        user = EmployerFactory()
+        company = CompanyMembershipFactory(user=user, company__for_snapshot=True).company
+        client.force_login(user)
+
+        other_company = CompanyMembershipFactory(
+            user=user, company__kind="EI", company__brand="Le petit mousqueton"
+        ).company
+
+        create_test_romes_and_appellations(["N1101"])
+        job = JobDescriptionFactory(
+            company=company,
+            for_snapshot=True,
+            last_employer_update_at=timezone.now() - datetime.timedelta(days=10),
+        )
+
+        response = client.get(self.url)
+        assert (
+            pretty_indented(
+                parse_response_to_soup(
+                    response,
+                    "#main",
+                    replace_in_attr=[
+                        ("href", f"job_description/{job.pk}", "job_description/[PK of JobDescription]"),
+                        ("href", str(company.uid), "[Source_ui of NexusStructure]"),
+                        ("href", str(other_company.uid), "[Source_ui of other NexusStructure]"),
+                        ("value", str(company.pk), "[PK of Company]"),
+                        ("value", str(other_company.pk), "[PK of other Company]"),
+                    ],
+                )
+            )
+            == snapshot
+        )
 
 
 class TestMarcheView:

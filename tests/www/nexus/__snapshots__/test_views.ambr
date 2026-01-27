@@ -271,6 +271,174 @@
   
   '''
 # ---
+# name: TestEmploisViews.test_list
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-title align-items-center">
+                          <div class="c-title__main">
+                              <h1>
+                                  <img alt="Les emplois de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion-mono.svg"/>
+                                  Fiches de poste
+                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                      <i aria-hidden="true" class="ri-check-line">
+                                      </i>
+                                      Activé
+                                  </span>
+                              </h1>
+                          </div>
+                          <div aria-label="Changement de structure active" class="c-title__cta" role="group">
+                              <div class="dropdown dropdown-structure">
+                                  <button aria-controls="switchStructureDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-primary btn-ico dropdown-toggle" data-bs-toggle="dropdown" type="button">
+                                      <i aria-hidden="true" class="ri-community-line">
+                                      </i>
+                                      <span>
+                                          EI - ACME Inc.
+                                      </span>
+                                  </button>
+                                  <div class="dropdown-menu w-100" id="switchStructureDropdown">
+                                      <form action="/dashboard/switch-organization?next_url=/portal/service/emplois" method="post">
+                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                          <ul class="list-unstyled">
+                                              <li>
+                                                  <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="[PK of Company]">
+                                                      <i aria-hidden="true" class="ri-community-line">
+                                                      </i>
+                                                      <span>
+                                                          EI
+                                                      </span>
+                                                      <strong>
+                                                          ACME Inc.
+                                                      </strong>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <button class="dropdown-item dropdown-item__summary" name="organization_id" value="[PK of other Company]">
+                                                      <i aria-hidden="true" class="ri-community-line">
+                                                      </i>
+                                                      <span>
+                                                          EI
+                                                      </span>
+                                                      <strong data-bs-title="Le petit mousqueton" data-bs-toggle="tooltip">
+                                                          Le petit mousqueton
+                                                      </strong>
+                                                  </button>
+                                              </li>
+                                          </ul>
+                                      </form>
+                                      <a class="dropdown-item dropdown-item__summary is-last-sticky" href="/company/create-company">
+                                          <i aria-hidden="true" class="ri-add-line">
+                                          </i>
+                                          <span>
+                                              Créer ou rejoindre
+                                          </span>
+                                          <strong>
+                                              une nouvelle structure
+                                          </strong>
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                          <p class="mb-0">
+                              1 fiche de poste
+                          </p>
+                          <div aria-label="Actions sur les candidatures" class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group">
+                              <a class="btn btn-outline-primary btn-ico" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="modifier-fiche-de-poste" href=" /company/job_description_list">
+                                  <i aria-hidden="true" class="ri-pencil-line ri-lg">
+                                  </i>
+                                  <span>
+                                      Modifier
+                                  </span>
+                              </a>
+                              <a class="btn btn-outline-primary btn-ico" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="creer-fiche-de-poste" href="/company/edit_job_description">
+                                  <i aria-hidden="true" class="ri-add-line ri-lg">
+                                  </i>
+                                  <span>
+                                      Créer une nouvelle fiche de poste
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <div class="table-responsive mt-3 mt-md-4">
+                          <table class="table table-hover">
+                              <caption class="visually-hidden">
+                                  Liste des collaborateurs
+                              </caption>
+                              <thead>
+                                  <tr>
+                                      <th scope="col">
+                                          Métiers
+                                      </th>
+                                      <th scope="col">
+                                          Statut
+                                      </th>
+                                      <th scope="col">
+                                          Localisation
+                                      </th>
+                                      <th scope="col">
+                                          Nbre de postes
+                                      </th>
+                                      <th scope="col">
+                                          Mise a jour
+                                      </th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <a aria-label="Lien vers fiche de poste : 'Agent / Agente cariste de livraison ferroviaire'" class="btn-link" data-matomo-action="emplois" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="clic-fiche-poste" href="http://localhost:8000/company/job_description/[PK of JobDescription]/card?back_url=/portal/service/emplois" title="Agent / Agente cariste de livraison ferroviaire">
+                                              Agent / Agente cariste de livraison ferroviaire
+                                          </a>
+                                      </td>
+                                      <td>
+                                          <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">
+                                              Ouvert
+                                          </span>
+                                      </td>
+                                      <td>
+                                          <span class="d-flex align-items-center">
+                                              <i aria-hidden="true" class="ri-map-pin-line me-1">
+                                              </i>
+                                              <span aria-label="Vannes - 56" title="Vannes - 56">
+                                                  Vannes - 56
+                                              </span>
+                                          </span>
+                                      </td>
+                                      <td>
+                                          1
+                                      </td>
+                                      <td>
+                                          <span>
+                                              Il y a 10 jours
+                                          </span>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
 # name: TestHomePageView.test_all_activated_services
   '''
   <main class="s-main" id="main" role="main">
@@ -2206,7 +2374,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
@@ -2385,7 +2553,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
@@ -2564,7 +2732,7 @@
                   </strong>
                   <ul>
                       <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="">
+                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Fiches de poste
