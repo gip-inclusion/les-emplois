@@ -1,0 +1,48 @@
+{% extends "nexus/layout/base.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Structures {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title align-items-center">
+                        <div class="c-title__main">
+                            <h1>Infos structure</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="text-center">
+                        <div class="mb-3 mb-md-4">
+                            <img src="{% static_theme_images 'nexus/nx-forme-commune-02.png' %}" alt="">
+                        </div>
+                        <p class="mb-md-4">
+                            Prochainement, vous pourrez gérer depuis cet espace toutes les informations de
+                            <br>
+                            votre structure, sur l’ensemble de vos services connectés.
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <img src="{% static 'img/nexus/presentation_infos_structure.png' %}" alt="" class="img-fluid" width="1200">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

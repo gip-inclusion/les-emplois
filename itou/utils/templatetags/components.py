@@ -45,3 +45,15 @@ def create_component_tag(template_path):
 
 register.tag("component_title", create_component_tag("components/c-title.html"))
 register.tag("component_navinfo", create_component_tag("components/c-navinfo.html"))
+register.tag(
+    "component_box_nexus_activated_service", create_component_tag("components/c-box_nexus_activated_service.html")
+)
+register.tag("component_nexus_new_service_v1", create_component_tag("components/nexus_new_service_v1.html"))
+register.tag("component_nexus_new_service_v2", create_component_tag("components/nexus_new_service_v2.html"))
+register.tag(
+    "component_nexus_new_service_v2_details", create_component_tag("components/nexus_new_service_v2_details.html")
+)
+register.tag(
+    "component_nexus_new_service_v2_responsive",
+    create_component_tag("components/nexus_new_service_v2_responsive.html"),
+)

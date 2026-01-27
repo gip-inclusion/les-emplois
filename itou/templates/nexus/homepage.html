@@ -1,0 +1,577 @@
+{% extends "nexus/layout/base.html" %}
+{% load components %}
+{% load enums %}
+{% load matomo %}
+{% load theme_inclusion %}
+
+{% block title %}Tableau de bord {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    {% enums "nexus" "NexusUserKind" as NexusUserKind %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title">
+                        <div class="c-title__main">
+                            <h1>Accueil</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if activated_services %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <h2>
+                            <i class="ri-function-line ri-xl fw-normal text-disabled"></i>
+                            Mes services actifs
+                        </h2>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                            {% if Service.EMPLOIS in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Les Emplois de l’inclusion" logo="logo-emploi-inclusion-mono.svg" url=emplois_url aria_label="Accéder aux Emplois de l’inclusion" service=Service.EMPLOIS %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.DORA in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="DORA" logo="logo-dora-mono.svg" url=dora_url aria_label="Accéder à DORA" service=Service.DORA %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.MARCHE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Le marché de l’inclusion" logo="logo-marche-inclusion-mono.svg" url=marche_url aria_label="Accéder au marché de l’inclusion" service=Service.MARCHE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.MON_RECAP in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Mon Récap" logo="logo-monrecap-mono.svg" url=monrecap_url aria_label="Accéder à Mon Récap" service=Service.MON_RECAP %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.PILOTAGE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Le pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" url=pilotage_url aria_label="Accéder au pilotage de l’inclusion" service=Service.PILOTAGE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.COMMUNAUTE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="La communauté de l’inclusion" logo="logo-communaute-inclusion-mono.svg" url=communaute_url aria_label="Accéder à la communauté de l’inclusion" service=Service.COMMUNAUTE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not all_services_activated %}
+        <section class="s-section" id="newServicesV1">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inclusion</a>
+                        </div>
+                        <div class="c-box">
+                            <ul class="list-group list-group-flush">
+                                {% if Service.EMPLOIS not in activated_services %}
+                                    {% component_nexus_new_service_v1 name="Les Emplois de l’inclusion" logo="logo-emploi-inclusion-mono.svg" description=description li_1="Publiez vos recrutements" li_2="Recevez des candidatures" li_3="Obtenez un PASS IAE" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                            <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.EMPLOIS %} type="button">
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </button>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            Le service de recrutement et de gestion des PASS IAE.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                                {% if Service.DORA not in activated_services %}
+                                    {% component_nexus_new_service_v1 name="DORA" logo="logo-dora-mono.svg" description=description li_1="Saisissez votre offre de service" li_2="Service identifié par les pro" li_3="Gérez les demandes dans votre espace" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                                {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                    {% component_nexus_new_service_v1 name="Le marché de l’inclusion" logo="logo-marche-inclusion-mono.svg" description=description li_1="Renseignez votre activité" li_2="Recevez des demandes de devis" li_3="Développez votre CA" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            Le service de mise en relation entre acheteurs et structures d’insertion.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                                {% if Service.MON_RECAP not in activated_services %}
+                                    {% component_nexus_new_service_v1 name="Mon Récap" logo="logo-monrecap-mono.svg" description=description li_1="Démarches et parcours centralisés" li_2="Support accessible" li_3="Commun à tous les pros" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            <form method="post" action="{{ monrecap_url }}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-ico btn-block btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            </form>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                                {% if Service.PILOTAGE not in activated_services %}
+                                    {% component_nexus_new_service_v1 name="Le Pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" description=description li_1="Statistiques nationales" li_2="Données sur votre organisation" li_3="Aide à la décision" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            Le service présentant les données sur les politiques publiques d’insertion.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                                {% if Service.COMMUNAUTE not in activated_services %}
+                                    {% component_nexus_new_service_v1 name="La Communauté de l’inclusion" logo="logo-communaute-inclusion-mono.svg" description=description li_1="Forum de discussion" li_2="14 000 utilisateurs actifs" li_3="Fiches métiers" activate_button=activate_button %}
+                                        {% fragment as activate_button %}
+                                            <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                <span>Activer ce service</span>
+                                            </a>
+                                        {% endfragment %}
+                                        {% fragment as description %}
+                                            L’espace d’entraide des professionnels de l’inclusion.
+                                        {% endfragment %}
+                                    {% endcomponent_nexus_new_service_v1 %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="s-section d-none" id="newServicesV2">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inclusion</a>
+                        </div>
+                        <div class="c-box">
+                            <div class="row d-none d-xxl-flex">
+                                <div class="col-5" id="nxAccordionListGroup">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            {% component_nexus_new_service_v2 name="Les Emplois de l’inclusion" logo="logo-emploi-inclusion-mono.svg" description=description target="emploisInfoMore" service=Service.EMPLOIS new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    Le service de recrutement et de gestion des PASS IAE.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            {% component_nexus_new_service_v2 name="DORA" logo="logo-dora-mono.svg" description=description target="doraInfoMore" service=Service.DORA new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            {% component_nexus_new_service_v2 name="Le marché de l’inclusion" logo="logo-marche-inclusion-mono.svg" description=description target="marcheInfoMore" service=Service.MARCHE new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    Le service de mise en relation entre acheteurs et structures d’insertion.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% component_nexus_new_service_v2 name="Mon Récap" logo="logo-monrecap-mono.svg" description=description target="monrecapInfoMore" service=Service.MON_RECAP new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            {% component_nexus_new_service_v2 name="Le Pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" description=description target="pilotageInfoMore" service=Service.PILOTAGE new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    Le service présentant les données sur les politiques publiques d’insertion.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            {% component_nexus_new_service_v2 name="La Communauté de l’inclusion" logo="logo-communaute-inclusion-mono.svg" description=description target="communauteInfoMore" service=Service.COMMUNAUTE new_service_shown=new_service_shown %}
+                                                {% fragment as description %}
+                                                    L’espace d’entraide des professionnels de l’inclusion.
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2 %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-7" id="nxAccordionInfoMore">
+                                    {% if Service.EMPLOIS not in activated_services %}
+                                        {% component_nexus_new_service_v2_details name="Les Emplois de l’inclusion" id="emploisInfoMore" logo="logo-emploi-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url=find_out_url service=Service.EMPLOIS new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                                <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.EMPLOIS %} type="button">
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </button>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                Le service de recrutement et de gestion des PASS IAE.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Publiez vos fiches de poste
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Recevez des candidatures de la part des accompagnateurs et des candidats
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Obtenez un
+                                                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">PASS IAE</a>
+                                                en ligne dès l’embauche d’un candidat
+                                            {% endfragment %}
+                                            {% fragment as find_out_url %}
+                                                {% url 'home:hp' %}
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                    {% if Service.DORA not in activated_services %}
+                                        {% component_nexus_new_service_v2_details name="DORA" id="doraInfoMore" logo="logo-dora-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://dora.inclusion.gouv.fr/" service=Service.DORA new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Saisissez ou importez votre offre de service
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Service identifié par les professionnels de l’insertion grâce au moteur de recherche
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Gérez vos demandes de mobilisation dans un espace dédié
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                    {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                        {% component_nexus_new_service_v2_details name="Le marché de l’inclusion" id="marcheInfoMore" logo="logo-marche-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://lemarche.inclusion.gouv.fr/" service=Service.MARCHE new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                Le service de mise en relation entre acheteurs et structures d’insertion.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Renseignez votre activité commerciale
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Recevez des demandes de clients publics et privés
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Développez votre activité commerciale
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                    {% if Service.MON_RECAP not in activated_services %}
+                                        {% component_nexus_new_service_v2_details name="Mon Récap" id="monrecapInfoMore" logo="logo-monrecap-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://mon-recap.inclusion.beta.gouv.fr/" service=Service.MON_RECAP new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                <form method="post" action="{{ monrecap_url }}">
+                                                    {% csrf_token %}
+                                                    <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                </form>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Choisissez un outil accessible non numérique
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                    {% if Service.PILOTAGE not in activated_services %}
+                                        {% component_nexus_new_service_v2_details name="Le Pilotage de l’inclusion" id="pilotageInfoMore" logo="logo-pilotage-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://pilotage.inclusion.beta.gouv.fr/" service=Service.PILOTAGE new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                Le service présentant les données sur les politiques publiques d’insertion.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Suivez et analysez les données spécifiques à votre organisation
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Prenez des décisions et argumentez grâce aux données
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                    {% if Service.COMMUNAUTE not in activated_services %}
+                                        {% component_nexus_new_service_v2_details name="La Communauté de l’inclusion" id="communauteInfoMore" logo="logo-communaute-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url="https://communaute.inclusion.gouv.fr/" service=Service.COMMUNAUTE new_service_shown=new_service_shown activate_button=activate_button %}
+                                            {% fragment as activate_button %}
+                                                <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                    <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                    <span>Activer ce service</span>
+                                                </a>
+                                            {% endfragment %}
+                                            {% fragment as description %}
+                                                L’espace d’entraide des professionnels de l’inclusion.
+                                            {% endfragment %}
+                                            {% fragment as li_1 %}
+                                                Posez directement votre question aux 14 000 utilisateurs actifs
+                                            {% endfragment %}
+                                            {% fragment as li_2 %}
+                                                Trouvez une information parmi les 8000 échanges entre pairs
+                                            {% endfragment %}
+                                            {% fragment as li_3 %}
+                                                Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
+                                            {% endfragment %}
+                                        {% endcomponent_nexus_new_service_v2_details %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row d-xxl-none">
+                                <div class="col-12" id="nxAccordionListGroupCollapse">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            {% component_nexus_new_service_v2_responsive name="Les Emplois de l’inclusion" id="emploisInfoCollapse" logo="logo-emploi-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 find_out_url=find_out_url service=Service.EMPLOIS new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <a href="{% url 'home:hp' %}" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.EMPLOIS %} target="_blank">En savoir plus</a>
+                                                    {# TODO : when it's possible to access this page without a EMPLOIS account #}
+                                                    <button class="btn btn-ico btn-primary" type="button">
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </button>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    Le service de recrutement et de gestion des PASS IAE.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Publiez vos fiches de poste
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Recevez des candidatures de la part des accompagnateurs et des candidats
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Obtenez un
+                                                    <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="btn-link has-external-link" target="_blank">PASS IAE</a>
+                                                    en ligne dès l’embauche d’un candidat
+                                                {% endfragment %}
+                                                {% fragment as find_out_url %}
+                                                    {% url 'home:hp' %}
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            {% component_nexus_new_service_v2_responsive name="DORA" id="doraInfoCollapse" logo="logo-dora-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.DORA new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <a href="https://dora.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.DORA %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ dora_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Saisissez ou importez votre offre de service
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Service identifié par les professionnels de l’insertion grâce au moteur de recherche
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Gérez vos demandes de mobilisation dans un espace dédié
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            {% component_nexus_new_service_v2_responsive name="Le marché de l’inclusion" id="marcheInfoCollapse" logo="logo-marche-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.MARCHE new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <a href="https://lemarche.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MARCHE %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ marche_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    Le service de mise en relation entre acheteurs et structures d’insertion.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Renseignez votre activité commerciale
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Recevez des demandes de clients publics et privés
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Développez votre activité commerciale
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% component_nexus_new_service_v2_responsive name="Mon Récap" id="monrecapInfoCollapse" logo="logo-monrecap-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.MON_RECAP new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <form method="post" action="{{ monrecap_url }}">
+                                                        <a href="https://mon-recap.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %} target="_blank">En savoir plus</a>
+                                                        {% csrf_token %}
+                                                        <button class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                                                            <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                            <span>Activer ce service</span>
+                                                        </button>
+                                                    </form>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Choisissez un outil accessible non numérique
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            {% component_nexus_new_service_v2_responsive name="Le Pilotage de l’inclusion" id="pilotageInfoCollapse" logo="logo-pilotage-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.PILOTAGE new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <a href="https://pilotage.inclusion.beta.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.PILOTAGE %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ pilotage_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.PILOTAGE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    Le service présentant les données sur les politiques publiques d’insertion.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Suivez et analysez les données spécifiques à votre organisation
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Prenez des décisions et argumentez grâce aux données
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            {% component_nexus_new_service_v2_responsive name="La Communauté de l’inclusion" id="communauteInfoCollapse" logo="logo-communaute-inclusion-mono.svg" description=description li_1=li_1 li_2=li_2 li_3=li_3 service=Service.COMMUNAUTE new_service_shown=new_service_shown buttons=buttons %}
+                                                {% fragment as buttons %}
+                                                    <a href="https://communaute.inclusion.gouv.fr/" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" Service.COMMUNAUTE %} target="_blank">En savoir plus</a>
+                                                    <a href="{{ communaute_url }}" class="btn btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.COMMUNAUTE %}>
+                                                        <i class="ri-toggle-line" aria-hidden="true"></i>
+                                                        <span>Activer ce service</span>
+                                                    </a>
+                                                {% endfragment %}
+                                                {% fragment as description %}
+                                                    L’espace d’entraide des professionnels de l’inclusion.
+                                                {% endfragment %}
+                                                {% fragment as li_1 %}
+                                                    Posez directement votre question aux 14 000 utilisateurs actifs
+                                                {% endfragment %}
+                                                {% fragment as li_2 %}
+                                                    Trouvez une information parmi les 8000 échanges entre pairs
+                                                {% endfragment %}
+                                                {% fragment as li_3 %}
+                                                    Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
+                                                {% endfragment %}
+                                            {% endcomponent_nexus_new_service_v2_responsive %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+
+{% block script %}
+    <!-- Matomo A/B test -->
+    <script nonce="{{ csp_nonce }}">
+        var _paq = _paq || [];
+        _paq.push(['AbTesting::create', {
+            name: 'NexusServicesADecouvrir', // the name is the same in both environment
+            percentage: 100,
+            includedTargets: [{
+                "attribute": "url",
+                "inverted": "0",
+                "type": "equals_simple",
+                "value": "{{ a_b_test_url }}"
+            }],
+            excludedTargets: [],
+            variations: [{
+                name: 'original',
+                activate: function(event) {}
+            }, {
+                name: 'VariationB',
+                activate: function(event) {
+                    $('#newServicesV1').addClass('d-none');
+                    $('#newServicesV2').removeClass('d-none');
+                }
+            }],
+            trigger: function() {
+                return true;
+            }
+        }]);
+    </script>
+{% endblock %}

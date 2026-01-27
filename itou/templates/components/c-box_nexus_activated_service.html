@@ -1,0 +1,27 @@
+{% load matomo %}
+{% load theme_inclusion %}
+
+<div class="c-box h-100">
+    <div class="d-flex align-items-center gap-3">
+        <img src="{% static_theme_images logo %}" height="35" width="35" alt="{{ name }}">
+        <div>
+            <strong class="d-block fs-lg">{{ name }}</strong>
+            <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+        </div>
+        {% if url is None %}
+            <div class="ms-auto align-self-start">
+                <span class="badge badge-xs rounded-circle bg-warning-lighter text-warning" data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                    <span class="visually-hidden">Démo inexistante</span>
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </span>
+            </div>
+        {% endif %}
+    </div>
+    {% if url %}
+        <a href="{{ url }}" class="btn btn-outline-primary btn-block has-external-link mt-3" aria-label="{{ aria_label }} (lien externe)" {% matomo_event "nexus" "acceder-service" service %} target="_blank">Accéder</a>
+    {% else %}
+        <button class="btn btn-outline-primary btn-block has-external-link mt-3" disabled aria-label="{{ aria_label }} (lien externe)">
+            Accéder
+        </button>
+    {% endif %}
+</div>

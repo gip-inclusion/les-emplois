@@ -1,0 +1,50 @@
+{% extends "nexus/base_service.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Prestations commerciales {{ block.super }}{% endblock %}
+
+{% block service_title %}
+    <img src="{% static_theme_images 'logo-marche-inclusion-mono.svg' %}" height="35" width="35" alt="Le marché de l'inclusion">
+    Prestations commerciales
+{% endblock %}
+
+{% block service_logo %}
+    <img src="{% static_theme_images 'logo-marche-inclusion.svg' %}" height="50" alt="Le marché de l’inclusion">
+{% endblock %}
+
+{% block description %}
+    <div class="mb-3 mb-md-4">
+        <img src="{% static_theme_images 'nexus/nx-illustration-marche.png' %}" height="152" width="216" alt="">
+    </div>
+    <h2 class="h3">Le service de mise en relation entre acheteurs et structures d’insertion</h2>
+    <p class="mb-md-4">
+        Renseignez votre activité commerciale.
+        <br>
+        Recevez des demandes de clients publics et privés.
+        <br>
+        Développez votre activité commerciale.
+    </p>
+    {% if Service.MARCHE in activated_services %}
+        <a href="{{ marche_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.MARCHE %} target="_blank">
+            <span>Accéder à mon tableau de bord</span>
+        </a>
+    {% else %}
+        <a href="{{ marche_url }}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MARCHE %}>
+            <i class="ri-toggle-line" aria-hidden="true"></i>
+            <span>Activer ce service</span>
+        </a>
+    {% endif %}
+    <br>
+    <a href="https://lemarche.inclusion.gouv.fr/"
+       class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+       aria-label="Découvrir Le Marché  de l’inclusion (lien externe)"
+       {% matomo_event "nexus" "decouvrir-service" Service.MARCHE %}
+       target="_blank">Découvrir Le Marché de l’inclusion</a>
+    <div class="text-center">
+        <img src="{% static 'img/nexus/presentation_marche.png' %}" alt="" class="img-fluid" width="1200">
+    </div>
+{% endblock %}
