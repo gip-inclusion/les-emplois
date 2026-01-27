@@ -83,17 +83,17 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     context_object_name = "job_seeker"
 
     def test_func(self):
-        return self.request.user.is_prescriber or self.request.user.is_employer
+        return self.request.from_prescriber or self.request.from_employer
 
     def get_context_data(self, **kwargs):
         geiq_eligibility_diagnosis = None
-        if self.request.user.is_prescriber or (
-            self.request.user.is_employer and self.request.current_organization.kind == CompanyKind.GEIQ
+        if self.request.from_prescriber or (
+            self.request.from_employer and self.request.current_organization.kind == CompanyKind.GEIQ
         ):
             geiq_eligibility_diagnosis = (
                 GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                     self.object,
-                    for_geiq=self.request.current_organization if self.request.user.is_employer else None,
+                    for_geiq=self.request.current_organization if self.request.from_employer else None,
                 )
                 .prefetch_related("selected_administrative_criteria__administrative_criteria")
                 .first()
@@ -102,20 +102,20 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         approval = None
         iae_eligibility_diagnosis = None
         can_edit_iae_eligibility = False
-        if self.request.user.is_prescriber or (
-            self.request.user.is_employer and self.request.current_organization.is_subject_to_iae_rules
+        if self.request.from_prescriber or (
+            self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
         ):
             approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
             iae_eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.object,
-                for_siae=self.request.current_organization if self.request.user.is_employer else None,
+                for_siae=self.request.current_organization if self.request.from_employer else None,
                 prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
         fallback_back_url = (
-            reverse("apply:list_prescriptions") if self.request.user.is_employer else reverse("job_seekers_views:list")
+            reverse("apply:list_prescriptions") if self.request.from_employer else reverse("job_seekers_views:list")
         )
 
         group = FollowUpGroup.objects.filter(beneficiary=self.object).first()
@@ -167,7 +167,7 @@ def switch_stalled_status(request, public_id):
 
 
 @require_safe
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if list_organization:
         if not request.current_organization:
@@ -282,7 +282,7 @@ class GetOrCreateJobSeekerStartView(View):
         self.job_seeker_session = SessionNamespace.create(request.session, JobSeekerSessionKinds.GET_OR_CREATE, data)
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if request.user.kind not in UserKind.actors():
             raise PermissionDenied("Vous n'êtes pas autorisé à rechercher ou créer un compte candidat.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -344,16 +344,13 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             not self.hire_process
             and not self.is_gps
             and not self.standalone_creation
-            and (
-                request.user.is_prescriber
-                or (request.user.is_employer and self.company != request.current_organization)
-            )
+            and (request.from_prescriber or (request.from_employer and self.company != request.current_organization))
         )
         self.auto_prescription_process = (
             not self.hire_process
             and not self.is_gps
             and not self.standalone_creation
-            and request.user.is_employer
+            and request.from_employer
             and self.company == request.current_organization
         )
 
@@ -404,7 +401,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         }
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
-        if not self.request.user.is_prescriber:
+        if not self.request.from_prescriber:
             return False
 
         return job_seeker.pk in User.objects.linked_job_seeker_ids(
@@ -422,7 +419,7 @@ class JobSeekerForSenderBaseView(JobSeekerBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.sender.kind not in UserKind.actors():
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
@@ -552,7 +549,7 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         )
 
     def _can_add_nir(self, job_seeker):
-        return (self.request.from_authorized_prescriber or self.request.user.is_employer) and (
+        return (self.request.from_authorized_prescriber or self.request.from_employer) and (
             job_seeker and not job_seeker.jobseeker_profile.nir
         )
 
@@ -868,7 +865,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
-                if request.user.is_prescriber:
+                if request.from_prescriber:
                     self.profile.created_by_prescriber_organization = request.current_organization
                 if self.standalone_creation:
                     messages.success(
@@ -1305,7 +1302,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         }
 
 
-@check_user(lambda user: user.is_job_seeker or user.is_employer or user.is_prescriber)
+@check_user(lambda user: user.is_job_seeker or user.is_actor)
 def nir_modification_request(request, public_id, template_name="job_seekers_views/nir_modification_request.html"):
     job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
     if not can_view_personal_information(request, job_seeker):

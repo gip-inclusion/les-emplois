@@ -17,7 +17,7 @@ def can_create_antenna(request):
     a given territory and thus would not need to join others.
     """
     return bool(
-        request.user.is_employer
+        request.from_employer
         and request.is_current_organization_admin
         and request.current_organization.kind in [CompanyKind.GEIQ, *CompanyKind.siae_kinds()]
         and request.current_organization.is_active

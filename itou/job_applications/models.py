@@ -43,7 +43,7 @@ from itou.job_applications.enums import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
-from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.enums import KIND_EMPLOYER, LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
@@ -510,13 +510,16 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def prescriptions_of(self, user, organization=None):
         if organization is None and user.is_prescriber:
+            # FIXME replace with user.is_actor --^
             return self.filter(sender=user)
         if organization and isinstance(organization, PrescriberOrganization) and user.is_prescriber:
+            # FIXME replace with user.is_actor -----------------------------------------^
             return self.filter(
                 (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
                 | Q(sender_prescriber_organization=organization)
             )
         if organization and isinstance(organization, Company) and user.is_employer:
+            # FIXME replace with user.is_actor ---------------------^
             return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
 
@@ -1042,7 +1045,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Can't transfer to same structure
         if target_company == self.to_company:
             return False
-        if not user.is_employer:
+        if not user.is_employer:  # FIXME the user is member of both, we don't really need to check his kind, right ?
             return False
         return self.transfer.is_available()
 
@@ -1477,6 +1480,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 viewer=self.sender,
                 user=self.job_seeker,
                 viewer_is_prescriber_from_authorized_org=self.sender.is_prescriber_with_authorized_org_memberships,
+                viewer_is_employer=self.sender_kind == KIND_EMPLOYER,
             ),
         }
         return get_email_message(to, context, subject, body)

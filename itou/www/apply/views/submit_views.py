@@ -43,7 +43,7 @@ APPLY_SESSION_KIND = "apply_session"
 
 def _check_job_seeker_approval(request, job_seeker, siae):
     if job_seeker.new_approval_blocked_by_waiting_period(
-        siae=siae, sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None
+        siae=siae, sender_prescriber_organization=request.current_organization if request.from_prescriber else None
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
         # by reusing the 403 template and its logic. I'm not 100% sure that this is a good idea but,
@@ -149,7 +149,7 @@ class StartView(ApplicationPermissionMixin, View):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         self.hire_process = hire_process
         self.auto_prescription_process = (
-            not self.hire_process and request.user.is_employer and self.company == request.current_organization
+            not self.hire_process and request.from_employer and self.company == request.current_organization
         )
         self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
 
@@ -209,7 +209,7 @@ class StartView(ApplicationPermissionMixin, View):
 
         # Warn message if prescriber's authorization is pending
         if (
-            request.user.is_prescriber
+            request.from_prescriber
             and request.current_organization
             and request.current_organization.has_pending_authorization()
         ):
@@ -272,10 +272,10 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         )
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = not self.hire_process and (
-            request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
+            request.from_prescriber or (request.from_employer and self.company != request.current_organization)
         )
         self.auto_prescription_process = (
-            not self.hire_process and request.user.is_employer and self.company == request.current_organization
+            not self.hire_process and request.from_employer and self.company == request.current_organization
         )
 
     def get_back_url(self):
@@ -313,7 +313,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         # Prescribers do not see employer diagnosis.
-        for_company = self.company if self.request.user.is_employer else None
+        for_company = self.company if self.request.from_employer else None
         if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, for_company
@@ -383,7 +383,7 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
         self.sender = request.user
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.sender.kind not in UserKind.actors():
             logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
@@ -604,7 +604,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
                     request.user,
-                    request.current_organization if request.user.is_prescriber else None,
+                    request.current_organization if request.from_prescriber else None,
                     self.form.cleaned_data,
                 )
             else:
@@ -653,9 +653,9 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             sender_kind=self.request.user.kind,
             message=self.form.cleaned_data["message"],
         )
-        if self.request.user.is_prescriber:
+        if self.request.from_prescriber:
             job_application.sender_prescriber_organization = self.request.current_organization
-        if self.request.user.is_employer:
+        if self.request.from_employer:
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
@@ -672,7 +672,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
 
-        if self.request.user.is_employer or self.request.user.is_prescriber:
+        if self.request.from_employer or self.request.from_prescriber:
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
@@ -681,7 +681,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         for employer in company_recipients:
             job_application.notifications_new_for_employer(employer).send()
         job_application.notifications_new_for_job_seeker.send()
-        if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.request.user.kind in UserKind.actors():
             job_application.notifications_new_for_proxy.send()
         return job_application
 
@@ -730,7 +730,7 @@ class ApplicationEndView(TemplateView):
         self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
-        self.auto_prescription_process = request.user.is_employer and self.company == request.current_organization
+        self.auto_prescription_process = request.from_employer and self.company == request.current_organization
 
     def post(self, request, *args, **kwargs):
         if not can_edit_personal_information(self.request, self.job_application.job_seeker):
@@ -933,9 +933,9 @@ class ApplyForJobSeekerMixin:
             UserKind.PRESCRIBER,
             UserKind.EMPLOYER,
         ):
-            if request.user.is_prescriber:
+            if request.from_prescriber:
                 self.exit_url = reverse("job_seekers_views:list")
-            elif request.user.is_employer:
+            elif request.from_employer:
                 self.exit_url = reverse("apply:list_prescriptions")
 
             self.job_seeker = _get_job_seeker_to_apply_for(request)

@@ -7,7 +7,7 @@ from itou.users.models import User
 
 class AutoLoginMiddleware(BaseAutoLoginMiddleware):
     def get_queryset(self):
-        return User.objects.filter(kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
+        return User.objects.filter(kind__in=UserKind.actors())
 
     def get_proconnect_authorize_url(self, user, next_url):
         return reverse(

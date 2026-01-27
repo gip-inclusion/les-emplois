@@ -29,7 +29,7 @@ def can_view_stats_dashboard_widget(request):
     It should be displayed to all professional users, even when no specific can_view_stats_* condition
     is available to them.
     """
-    return request.user.is_employer or request.user.is_prescriber or request.user.is_labor_inspector
+    return request.user.kind in UserKind.professionals()
 
 
 def can_view_stats_siae(request):
@@ -38,7 +38,7 @@ def can_view_stats_siae(request):
     Users of a SIAE can view their SIAE data and only theirs.
     """
     return (
-        request.user.is_employer
+        request.from_employer
         and isinstance(request.current_organization, Company)
         # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
         # we require a convention object to exist here.

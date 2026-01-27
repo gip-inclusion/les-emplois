@@ -119,7 +119,7 @@
                                                 </button>
                                                 <div class="c-info__detail collapse" id="collapseCertifiedApplication-{{ evaluated_job_application.pk }}">
                                                     <p>
-                                                        {% if request.user.is_employer %}
+                                                        {% if request.from_employer %}
                                                             Attention, votre structure doit toutefois, conserver une pièce justifiant du critère pendant une période de deux ans (Article R5132-1-7 du code du travail).
                                                             <br>
                                                             Nous vous invitons par conséquent à garder en votre possession

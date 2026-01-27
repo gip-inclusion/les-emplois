@@ -23,7 +23,7 @@ class BulkCreatedAtQuerysetProxy:
 class FollowUpGroupManager(models.Manager):
     def follow_beneficiary(self, beneficiary, user, is_active=True):
         assert beneficiary.is_job_seeker
-        if user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if user.kind not in UserKind.actors():
             # This should not happen but we don't want to block everything
             logger.warning("We should not try to add a FollowUpGroupMembership on user=%s", user)
             return

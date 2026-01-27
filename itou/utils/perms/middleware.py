@@ -55,8 +55,10 @@ class ItouCurrentOrganizationMiddleware:
         user = request.user
 
         logout_warning = None
+        request.from_employer = False
+        request.from_prescriber = False
         if user.is_authenticated:
-            if user.is_employer:
+            if user.is_employer:  # FIXME: Will be refactored to remove is_employer
                 # Do not use the default manager to avoid double checking whether the user is_active.
                 # The AuthenticationMiddleware already checked that the user is_active.
                 active_memberships = list(CompanyMembership.include_inactive.filter(user=user, is_active=True))
@@ -96,7 +98,7 @@ class ItouCurrentOrganizationMiddleware:
                     else:
                         logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
 
-            elif user.is_prescriber:
+            elif user.is_prescriber:  # FIXME: Will be refactored to remove is_employer
                 active_memberships = list(
                     # Do not use the default manager to avoid double checking whether the user is_active.
                     # The AuthenticationMiddleware already checked that the user is_active.
@@ -137,7 +139,24 @@ class ItouCurrentOrganizationMiddleware:
 
             request.from_authorized_prescriber = bool(
                 user.is_prescriber and request.current_organization and request.current_organization.is_authorized
-            )
+            )  # FIXME: Replace with the following line when merging kinds
+            # request.from_authorized_prescriber = bool(
+            #     user.is_prescriber
+            #     and request.current_organization
+            #     and isinstance(request.current_organization, PrescriberOrganization)
+            #     and request.current_organization.is_authorized
+            # )
+            request.from_prescriber = user.is_prescriber  # FIXME: Replace with the following line when merging kinds
+            # request.from_emplouer = bool(
+            #     user.is_actor and (
+            #         request.current_organization is None
+            #         or isinstance(request.current_organization, PrescriberOrganization)
+            #     )
+            # )
+            request.from_employer = user.is_employer  # FIXME: Replace with the following line when merging kinds
+            # request.from_emplouer = bool(
+            #     user.is_actor and request.current_organization and isinstance(request.current_organization, Company)
+            # )
 
         # Accepting an invitation to join a group is a two-step process.
         # - View one: account creation or login.
@@ -162,7 +181,7 @@ class ItouCurrentOrganizationMiddleware:
         if (
             user.is_authenticated
             and user.identity_provider != IdentityProvider.PRO_CONNECT
-            and user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+            and user.kind in UserKind.actors()
             and not request.path.startswith(
                 "/dashboard/activate-pro-connect-account"
             )  # Allow to access ic activation view
