@@ -130,6 +130,12 @@ class TestHomePageView:
     ACTIVATE_SERVICES_H2 = "Mes services actifs"
     NEW_SERVICES_H2 = "Services à découvrir"
 
+    def test_redirect(self, client):
+        user = EmployerFactory(membership=True)
+        client.force_login(user)
+        response = client.get(reverse("nexus:index"))
+        assertRedirects(response, self.url, status_code=301)
+
     def test_one_activated_service(self, client, snapshot):
         user = EmployerFactory(membership=True)
         client.force_login(user)

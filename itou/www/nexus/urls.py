@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.views.generic import RedirectView
 from itoutils.django.nexus.views import auto_login
 
 from itou.www.nexus import views
@@ -7,6 +8,7 @@ from itou.www.nexus import views
 app_name = "nexus"
 
 urlpatterns = [
+    path("", RedirectView.as_view(url=reverse_lazy("nexus:homepage"), permanent=True), name="index"),
     path("auto-login", auto_login, name="auto_login"),
     path("login", views.login, name="login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
