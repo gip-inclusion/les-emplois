@@ -237,9 +237,9 @@ def anonymize_fluxiae_df(df):
         df["salarie_annee_naissance"] = df.salarie_date_naissance.str[-4:].astype(int)
 
     if "salarie_agrement" in df.columns.tolist():
-        df["hash_numéro_pass_iae"] = df["salarie_agrement"].apply(hash_content)
+        df["hash_numéro_pass_iae"] = df["salarie_agrement"].apply(lambda v: hash_content(None if pd.isna(v) else v))
     if "salarie_nir" in df.columns.tolist():
-        df["hash_nir"] = df["salarie_nir"].apply(hash_content)
+        df["hash_nir"] = df["salarie_nir"].apply(lambda v: hash_content(None if pd.isna(v) else v))
 
     # Any column having any of these keywords inside its name will be dropped.
     # E.g. if `courriel` is a deletable keyword, then columns named `referent_courriel`,
