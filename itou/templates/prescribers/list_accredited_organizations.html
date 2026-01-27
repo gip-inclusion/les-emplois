@@ -58,7 +58,6 @@
                                                 <caption>Liste des organisations conventionnées</caption>
                                                 <thead>
                                                     <tr>
-                                                        <th scope="col">#</th>
                                                         <th scope="col">Nom</th>
                                                         <th scope="col">Prénom</th>
                                                         <th scope="col">Email</th>
@@ -68,7 +67,6 @@
                                                 <tbody>
                                                     {% for membership in org.memberships.all %}
                                                         <tr>
-                                                            <th scope="row">{{ forloop.counter }}</th>
                                                             <td>{{ membership.user.last_name|upper }}</td>
                                                             <td>{{ membership.user.first_name|title }}</td>
                                                             <td>
