@@ -277,7 +277,7 @@ class EvaluationCampaign(models.Model):
                 ).prefetch_related(
                     Prefetch(
                         "eligibility_diagnosis__selected_administrative_criteria",
-                        queryset=SelectedAdministrativeCriteria.objects.filter(certified=True),
+                        queryset=SelectedAdministrativeCriteria.objects.filter(certification_period__isempty=False),
                         to_attr="certified_administrative_criteria",
                     )
                 ):
@@ -287,16 +287,17 @@ class EvaluationCampaign(models.Model):
                     )
                     criteria = []
                     for selected_criterion in job_application.eligibility_diagnosis.certified_administrative_criteria:
-                        criteria.append(
-                            EvaluatedAdministrativeCriteria(
-                                evaluated_job_application=evaluated_job_app,
-                                administrative_criteria=selected_criterion.administrative_criteria,
-                                uploaded_at=set_at,
-                                submitted_at=set_at,
-                                review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-                                criteria_certified=True,
+                        if job_application.hiring_start_at in selected_criterion.certification_period:
+                            criteria.append(
+                                EvaluatedAdministrativeCriteria(
+                                    evaluated_job_application=evaluated_job_app,
+                                    administrative_criteria=selected_criterion.administrative_criteria,
+                                    uploaded_at=set_at,
+                                    submitted_at=set_at,
+                                    review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
+                                    criteria_certified=True,
+                                )
                             )
-                        )
                         # TODO: For the 2026 campaign on auto-prescriptions
                         # hires in 2025, this should be updated to handle
                         # LEVEL_2.
