@@ -4,6 +4,8 @@ from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Ro
 
 
 class MembershipSerializer(serializers.Serializer):
+    id = serializers.CharField(source="source_id")
+    user_id = serializers.CharField()
     structure_id = serializers.CharField()
     role = serializers.ChoiceField(choices=Role.choices)
 
@@ -17,8 +19,6 @@ class UserSerializer(serializers.Serializer):
     phone = serializers.CharField(allow_blank=True)
     last_login = serializers.DateTimeField(required=False, allow_null=True)
     auth = serializers.ChoiceField(choices=Auth.choices)
-
-    memberships = MembershipSerializer(many=True)
 
     def validate_kind(self, value):
         if value not in USER_KIND_MAPPING[self.context["source"]]:
