@@ -17,7 +17,7 @@ from itou.eligibility.models.common import (
     CommonEligibilityDiagnosisQuerySet,
 )
 from itou.gps.models import FollowUpGroup
-from itou.users.enums import UserKind
+from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment
 
 
@@ -256,7 +256,9 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
         if author.is_prescriber:
             # Sync job seeker assignment to a prescriber
-            JobSeekerAssignment.objects.upsert_assignment(job_seeker, author, author_organization)
+            JobSeekerAssignment.objects.upsert_assignment(
+                job_seeker, author, author_prescriber_organization, ActionKind.IAE_ELIGIBILITY
+            )
 
         return diagnosis
 

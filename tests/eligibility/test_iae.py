@@ -18,7 +18,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
-from itou.users.enums import IdentityCertificationAuthorities
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
     RESPONSES,
@@ -324,6 +324,7 @@ class TestEligibilityDiagnosisModel:
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
         assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 
     def test_create_diagnosis_with_administrative_criteria(self):
         job_seeker = JobSeekerFactory()

@@ -11,6 +11,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import GEIQAdministrativeCriteria, GEIQEligibilityDiagnosis
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
@@ -67,6 +68,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     assert assignment.job_seeker == diagnosis.job_seeker
     assert assignment.prescriber == diagnosis.author
     assert assignment.prescriber_organization == prescriber_org
+    assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
     diagnosis = GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
         job_seeker=JobSeekerFactory(),
@@ -130,6 +132,7 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     assert assignment.job_seeker == diagnosis.job_seeker
     assert assignment.prescriber == diagnosis.author
     assert assignment.prescriber_organization == diagnosis.author_prescriber_organization
+    assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
 
