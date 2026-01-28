@@ -3,9 +3,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.views.generic import FormView
 
-from itou.eligibility.models.iae import EligibilityDiagnosis
+from itou.eligibility.models.iae import EligibilityDiagnosis, get_criteria_from_job_seeker
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.urls import get_safe_url
@@ -19,6 +20,10 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
     # "eligibility/includes/iae_form_content_for_prescriber.html"
     form_class = AdministrativeCriteriaForm
     display_success_messages = False
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.criteria_filled_from_job_seeker = None
 
     def test_func(self):
         return self.request.from_authorized_prescriber
@@ -39,6 +44,9 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         initial = super().get_initial()
         if self.eligibility_diagnosis:
             initial["administrative_criteria"] = self.eligibility_diagnosis.administrative_criteria.all()
+        elif self.job_seeker.last_checked_at > timezone.now() - timezone.timedelta(hours=24):
+            self.criteria_filled_from_job_seeker = get_criteria_from_job_seeker(self.job_seeker)
+            initial["administrative_criteria"] = self.criteria_filled_from_job_seeker
         return initial
 
     def form_valid(self, form):
@@ -74,6 +82,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
         context["back_url"] = self.get_back_url()
         context["job_seeker"] = self.job_seeker
         context["eligibility_diagnosis"] = self.eligibility_diagnosis
+        context["criteria_filled_from_job_seeker"] = self.criteria_filled_from_job_seeker
         if self.eligibility_diagnosis:
             # self.request.from_authorized_prescriber is True so the user is a prescriber
             context["new_expires_at_if_updated"] = self.eligibility_diagnosis._expiration_date(UserKind.PRESCRIBER)
@@ -83,6 +92,10 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
 class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
     template_name = None
     form_class = AdministrativeCriteriaForm
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.criteria_filled_from_job_seeker = None
 
     def test_func(self):
         return self.request.user.is_employer
@@ -107,6 +120,13 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
     def get_cancel_url(self):
         raise NotImplementedError
 
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.job_seeker.last_checked_at > timezone.now() - timezone.timedelta(hours=24):
+            self.criteria_filled_from_job_seeker = get_criteria_from_job_seeker(self.job_seeker)
+            initial["administrative_criteria"] = self.criteria_filled_from_job_seeker
+        return initial
+
     def form_valid(self, form):
         EligibilityDiagnosis.create_diagnosis(
             self.job_seeker,
@@ -123,6 +143,7 @@ class BaseIAEEligibilityViewForEmployer(UserPassesTestMixin, FormView):
         context["job_seeker"] = self.job_seeker
         context["cancel_url"] = self.get_cancel_url()
         context["matomo_custom_title"] = "Evaluation de la candidature"
+        context["criteria_filled_from_job_seeker"] = self.criteria_filled_from_job_seeker
         return context
 
 

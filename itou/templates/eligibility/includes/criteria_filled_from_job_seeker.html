@@ -1,0 +1,29 @@
+{% load i18n %}
+<div class="alert alert-info mb-5" role="status">
+    <div class="row">
+        <div class="col-auto pe-0">
+            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+        </div>
+        <div class="col">
+            <p>
+                Attention :
+                {% blocktranslate count critetia_count=criteria_filled_from_job_seeker|length %}
+                    le critère ci-dessous a été précoché par défaut, car il a été renseigné récemment dans le profil administratif du candidat.
+                {% plural %}
+                    les critères ci-dessous ont été précochés par défaut, car ils ont été renseignés récemment dans le profil administratif du candidat.
+                {% endblocktranslate %}
+                <strong>Merci d’en vérifier l’exactitude.</strong>
+                <br>
+                {% blocktranslate count critetia_count=criteria_filled_from_job_seeker|length %}
+                    Vous pouvez le décocher si vous ne souhaitez pas l’intégrer au diagnostic socio-professionnel du candidat.
+                {% plural %}
+                    Vous pouvez les décocher si vous ne souhaitez pas les intégrer au diagnostic socio-professionnel du candidat.
+                {% endblocktranslate %}
+                Vous avez également la possibilité d’ajouter d’autres critères.
+            </p>
+            <ul>
+                {% for criterion in criteria_filled_from_job_seeker %}<li>{{ criterion }}</li>{% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
