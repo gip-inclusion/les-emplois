@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-import pytz
 from django.db import models
 from django.db.models.functions import Coalesce
 from django.utils import timezone
@@ -74,7 +73,7 @@ class TestCountRelatedSubquery:
     "date_input, expected_output",
     [
         (timezone.make_aware(datetime.datetime(2023, 10, 15)), datetime.date(2023, 10, 1)),
-        (timezone.make_aware(datetime.datetime(2024, 8, 31, 23, 0, 0), pytz.utc), datetime.date(2024, 9, 1)),
+        (timezone.make_aware(datetime.datetime(2024, 8, 31, 23, 0, 0), datetime.UTC), datetime.date(2024, 9, 1)),
         (datetime.date(2023, 10, 15), datetime.date(2023, 10, 1)),
         (None, None),
     ],
