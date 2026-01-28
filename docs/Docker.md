@@ -87,8 +87,4 @@ DJANGO_PORT_ON_DOCKER_HOST=8000
 POSTGRES_PORT_ON_DOCKER_HOST=5432
 MINIO_PORT_ON_DOCKER_HOST=9000
 MINIO_ADMIN_PORT_ON_DOCKER_HOST=9001
-
-# Needed for the ./scripts/restore_latest_backup.sh script.
-# Path to your local itou-backups repository.
-PATH_TO_ITOU_BACKUPS=set_me
 ```
