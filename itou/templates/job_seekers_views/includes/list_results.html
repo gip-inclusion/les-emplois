@@ -49,7 +49,7 @@
                                     {% url_add_query search_url job_seeker_public_id=job_seeker.public_id as url_query %}
                                 {% endif %}
                                 <a class="btn btn-sm btn-link btn-ico-only" href="{{ url_query }}" data-bs-toggle="tooltip" data-bs-title="Postuler pour ce candidat" {% matomo_event "candidature" "clic" "postuler-pour-ce-candidat" %}>
-                                    <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
+                                    <i class="ri-draft-line" aria-label="Postuler pour {{ job_seeker.get_inverted_full_name|mask_unless:job_seeker.user_can_view_personal_information }}"></i>
                                 </a>
                                 {% if request.current_organization.is_authorized %}
                                     <button id="dropdown_{{ forloop.counter }}_action_menu"
