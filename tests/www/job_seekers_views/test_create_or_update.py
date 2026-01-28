@@ -13,7 +13,7 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.gps.models import FollowUpGroupMembership
-from itou.users.enums import LackOfPoleEmploiId, Title
+from itou.users.enums import ActionKind, LackOfPoleEmploiId, Title
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.session import SessionNamespace
@@ -877,7 +877,10 @@ class TestStandaloneCreateAsPrescriber:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
         ).exists()
         for field in boolean_fields:
             assert getattr(new_job_seeker.jobseeker_profile, field) == (field in true_fields)

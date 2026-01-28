@@ -24,7 +24,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
-from itou.users.enums import UserKind
+from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request, check_user
@@ -906,7 +906,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
             if request.user.is_prescriber:
                 # Sync job seeker assignment to a prescriber
-                JobSeekerAssignment.objects.upsert_assignment(user, request.user, request.current_organization)
+                JobSeekerAssignment.objects.upsert_assignment(
+                    user, request.user, request.current_organization, ActionKind.CREATE
+                )
 
         return HttpResponseRedirect(url)
 
