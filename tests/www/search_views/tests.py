@@ -523,7 +523,9 @@ class TestSearchCompany:
             self.URL,
             {"city": guerande.slug, "distance": 100, "job_seeker_public_id": job_application.job_seeker.public_id},
         )
-        assertContains(response, f"Vous postulez actuellement pour {job_application.job_seeker.get_full_name()}")
+        assertContains(
+            response, f"Vous postulez actuellement pour {job_application.job_seeker.get_inverted_full_name()}"
+        )
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
@@ -1483,7 +1485,9 @@ class TestJobDescriptionSearchView:
             self.URL,
             {"city": guerande.slug, "distance": 100, "job_seeker_public_id": job_application.job_seeker.public_id},
         )
-        assertContains(response, f"Vous postulez actuellement pour {job_application.job_seeker.get_full_name()}")
+        assertContains(
+            response, f"Vous postulez actuellement pour {job_application.job_seeker.get_inverted_full_name()}"
+        )
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
