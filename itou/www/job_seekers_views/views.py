@@ -202,7 +202,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         .select_related("jobseeker_profile")
         .prefetch_related("approvals")
         .annotate(
-            full_name=Concat(Lower("first_name"), Value(" "), Lower("last_name")),
+            full_name=Concat(Lower("last_name"), Value(" "), Lower("first_name")),
             job_applications_nb=Coalesce(subquery_count, 0),
             last_updated_at=subquery_last_update,
             valid_eligibility_diagnosis=subquery_diagnosis,
@@ -873,7 +873,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 if self.standalone_creation:
                     messages.success(
                         request,
-                        f"Le compte du candidat {self.profile.user.get_full_name()} a "
+                        f"Le compte du candidat {self.profile.user.get_inverted_full_name()} a "
                         "bien été créé et ajouté à votre liste de candidats.",
                         extra_tags="toast",
                     )

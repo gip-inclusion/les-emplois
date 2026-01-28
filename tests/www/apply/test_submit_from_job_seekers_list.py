@@ -91,7 +91,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
+        assertContains(response, "Vous postulez actuellement pour ZORRO Alain")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
@@ -217,7 +217,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(reverse("job_seekers_views:list"))
         next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
-        assertContains(response, "A… Z…")
+        assertContains(response, "Z… A…")
         assertContains(
             response,
             f"""
@@ -238,7 +238,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        assertContains(response, "A… Z…")
+        assertContains(response, "Z… A…")
         assertContains(
             response,
             (
@@ -259,7 +259,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour A… Z…")
+        assertContains(response, "Vous postulez actuellement pour Z… A…")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
@@ -418,7 +418,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
+        assertContains(response, "Vous postulez actuellement pour ZORRO Alain")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (

@@ -56,10 +56,12 @@ class FilterForm(forms.Form):
         return [
             (
                 job_seeker.pk,
-                mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_information(request, job_seeker)),
+                mask_unless(
+                    job_seeker.get_inverted_full_name(), predicate=can_view_personal_information(request, job_seeker)
+                ),
             )
-            for job_seeker in job_seeker_qs.order_by("first_name", "last_name")
-            if job_seeker.get_full_name()
+            for job_seeker in job_seeker_qs.order_by("last_name", "first_name")
+            if job_seeker.get_inverted_full_name()
         ]
 
     def _get_choices_for_organization_members(self, job_seeker_qs, request_organization):
