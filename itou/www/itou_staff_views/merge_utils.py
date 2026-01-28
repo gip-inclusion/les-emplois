@@ -135,9 +135,13 @@ def handle_job_seeker_assignment(model, from_user, to_user):
         )
         if to_user_assignment := to_user_assignments.get(key):
             updated_pks.append(from_user_assignment.pk)
+            last_assignment = sorted(
+                [to_user_assignment, from_user_assignment], key=lambda a: a.updated_at, reverse=True
+            )[0]
             JobSeekerAssignment.objects.filter(pk=to_user_assignment.pk).update(
                 created_at=min(to_user_assignment.created_at, from_user_assignment.created_at),
-                updated_at=max(to_user_assignment.updated_at, from_user_assignment.updated_at),
+                updated_at=last_assignment.updated_at,
+                last_action_kind=last_assignment.last_action_kind,
             )
             from_user_assignment.delete()
         else:
