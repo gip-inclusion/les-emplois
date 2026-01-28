@@ -38,7 +38,7 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
@@ -1190,7 +1190,10 @@ class TestApplyAsAuthorizedPrescriber:
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
         ).get()
         assignment.delete()  # delete it to check it is created again when applying
 
@@ -1261,7 +1264,10 @@ class TestApplyAsAuthorizedPrescriber:
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.APPLY,
         ).exists()
 
     @freeze_time()
@@ -1515,7 +1521,10 @@ class TestApplyAsAuthorizedPrescriber:
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
         ).get()
         assignment.delete()  # delete it to check it is created again when applying
 
@@ -1623,7 +1632,10 @@ class TestApplyAsAuthorizedPrescriber:
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=prescriber_organization
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.APPLY,
         ).exists()
 
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
@@ -2041,7 +2053,10 @@ class TestApplyAsPrescriber:
         # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.CREATE,
         ).get()
         assignment.delete()  # delete it to check it is created again when applying
 
@@ -2112,7 +2127,7 @@ class TestApplyAsPrescriber:
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
         ).exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
