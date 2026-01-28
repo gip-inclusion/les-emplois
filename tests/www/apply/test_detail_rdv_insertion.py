@@ -433,3 +433,16 @@ class TestRdvInsertionInvitationRequestsList:
         )
         assert response.status_code == 403
         assert InvitationRequest.objects.count() == 1
+
+    def test_invite_fails_for_invalid_job_application(self, client, snapshot):
+        client.force_login(self.job_application.to_company.members.get())
+        other_job_application = JobApplicationFactory()
+
+        response = client.post(
+            reverse("apply:rdv_insertion_invite_for_detail", kwargs={"job_application_id": other_job_application.pk}),
+            follow=True,
+        )
+        assert not respx.routes["rdv_solidarites_create_and_invite"].called
+
+        error_button = parse_response_to_soup(response, selector=".text-danger")
+        assert pretty_indented(error_button) == snapshot()
