@@ -59,7 +59,7 @@ class TestApplyAsPrescriber:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
+                <i class="ri-draft-line" aria-label="Postuler pour ZORRO Alain">
                 </i>
             </a>
             """,
@@ -227,8 +227,7 @@ class TestApplyAsPrescriber:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
-                </i>
+                <i class="ri-draft-line" aria-label="Postuler pour Z… A…"></i>
             </a>
             """,
             html=True,

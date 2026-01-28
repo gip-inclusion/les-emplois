@@ -30,8 +30,13 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 from tests.www.apply.test_submit import fake_session_initialization
 
 
-def assert_contains_button_apply_for(response, job_seeker, with_city=True):
+def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_personal_information=True):
     city = f"&city={job_seeker.city_slug}" if with_city else ""
+    # If personal information is not visible, the name should be masked in aria-label
+    if with_personal_information:
+        aria_label = job_seeker.get_inverted_full_name()
+    else:
+        aria_label = mask_unless(job_seeker.get_inverted_full_name(), False)
     assertContains(
         response,
         f"""
@@ -42,7 +47,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True):
                 data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{reverse("search:employers_results")}?job_seeker_public_id={job_seeker.public_id}{city}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
+                <i class="ri-draft-line" aria-label="Postuler pour {aria_label}"></i>
             </a>
         """,
         count=1,
@@ -248,7 +253,7 @@ def test_multiple(client, snapshot):
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
-    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False)
+    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_personal_information=False)
 
 
 @override_settings(PAGE_SIZE_SMALL=1)
@@ -494,7 +499,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     assert_contains_button_apply_for(response, alain, with_city=True)
     # A job seeker created by a member of the unauthorized organization is shown *without* personal information
     assert_contains_job_seeker(response, bernard, back_url=url_organization, with_personal_information=False)
-    assert_contains_button_apply_for(response, bernard, with_city=False)
+    assert_contains_button_apply_for(response, bernard, with_city=False, with_personal_information=False)
 
     # There's no link to the eligibility update view
     assert_update_eligibility(response, can_update=False)
