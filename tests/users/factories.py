@@ -14,7 +14,7 @@ from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
-from itou.users.enums import IdentityProvider, Title, UserKind
+from itou.users.enums import ActionKind, IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import (
     BAN_GEOCODING_API_RESULTS_MOCK,
     get_random_geocoding_api_result,
@@ -424,3 +424,4 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
         "tests.prescribers.factories.PrescriberOrganizationFactory", with_membership=True
     )
     prescriber = factory.SubFactory(PrescriberFactory)
+    last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)

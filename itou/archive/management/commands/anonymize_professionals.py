@@ -143,7 +143,7 @@ class Command(BaseCommand):
 
     def anonymize_and_delete_professionals(self, users):
         AnonymizedProfessional.objects.bulk_create([self.make_anonymized_professional(user) for user in users])
-        # TODO(ewen): delete prescriber here too?
+        # FIXME(ewen): delete prescriber here too?
         User.objects.filter(id__in=[user.id for user in users]).delete()
 
     def anonymize_professionals_without_deletion(self, users):

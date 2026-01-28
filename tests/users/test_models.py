@@ -25,6 +25,7 @@ from itou.asp.models import AllocationDuration, Commune, EducationLevel, RSAAllo
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import (
+    ActionKind,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -1327,21 +1328,25 @@ class TestJobSeekerAssignment:
         prescriber = PrescriberFactory()
 
         with pytest.raises(AssertionError):
-            JobSeekerAssignment.objects.upsert_assignment(not_a_job_seeker, prescriber, None)
+            JobSeekerAssignment.objects.upsert_assignment(
+                not_a_job_seeker, prescriber, None, random.choice(ActionKind.values)
+            )
 
     @pytest.mark.parametrize("factory", [JobSeekerFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
     def test_is_prescriber(self, factory, caplog):
         not_a_prescriber = factory()
         job_seeker = JobSeekerFactory()
 
-        JobSeekerAssignment.objects.upsert_assignment(job_seeker, not_a_prescriber, None)
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker, not_a_prescriber, None, random.choice(ActionKind.values)
+        )
         assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
 
     def test_prescriber_and_or_organization(self):
         job_seeker = JobSeekerFactory()
 
         with pytest.raises(IntegrityError):
-            JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None)
+            JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None, random.choice(ActionKind.values))
 
     @pytest.mark.parametrize(
         "with_prescriber,with_organization",
@@ -1357,7 +1362,9 @@ class TestJobSeekerAssignment:
         assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
 
         # upsert_assignment updates the existing assignment
-        JobSeekerAssignment.objects.upsert_assignment(assignment.job_seeker, prescriber, organization)
+        JobSeekerAssignment.objects.upsert_assignment(
+            assignment.job_seeker, prescriber, organization, random.choice(ActionKind.values)
+        )
 
         with pytest.raises(IntegrityError):
             JobSeekerAssignmentFactory(
@@ -1380,21 +1387,23 @@ class TestJobSeekerAssignment:
         # Creation
         with freezegun.freeze_time("2025-11-14 12:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment creation sql queries")):
-                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.CREATE)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
         assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.CREATE
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
 
         # Update
         with freezegun.freeze_time("2025-11-15 18:00:01"):
             with assertSnapshotQueries(snapshot(name="assignment update sql queries")):
-                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization)
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.APPLY)
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
         assert assignment.prescriber == prescriber
         assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.APPLY
         assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
         assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)

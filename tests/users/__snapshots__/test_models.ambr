@@ -12,10 +12,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -34,10 +36,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -56,10 +60,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -78,10 +84,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -100,10 +108,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),
@@ -122,10 +132,12 @@
                                                    "updated_at",
                                                    "job_seeker_id",
                                                    "prescriber_id",
-                                                   "prescriber_organization_id")
-          VALUES (%s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
           UPDATE
-          SET "updated_at" = EXCLUDED."updated_at" RETURNING "users_jobseekerassignment"."id"
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
         ''',
       }),
     ]),

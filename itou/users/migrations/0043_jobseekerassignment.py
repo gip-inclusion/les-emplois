@@ -63,6 +63,20 @@ class Migration(migrations.Migration):
                         verbose_name="organisation prescriptrice",
                     ),
                 ),
+                (
+                    "last_action_kind",
+                    models.CharField(
+                        choices=[
+                            ("CREATE", "création du compte candidat"),
+                            ("APPLY", "envoi de candidature"),
+                            ("IAE_ELIGIBILITY", "validation de l'éligibilité IAE"),
+                            ("GEIQ_ELIGIBILITY", "validation de l'éligibilité GEIQ"),
+                        ],
+                        default="CREATE",
+                        max_length=20,
+                        verbose_name="dernière action effectuée",
+                    ),
+                ),
             ],
             options={
                 "ordering": ["-updated_at"],

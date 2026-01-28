@@ -40,6 +40,7 @@ from itou.common_apps.address.models import AddressMixin
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
+    ActionKind,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -1580,7 +1581,7 @@ class IdentityCertification(models.Model):
 
 
 class JobSeekerAssignmentManager(models.Manager):
-    def upsert_assignment(self, job_seeker, prescriber, prescriber_organization):
+    def upsert_assignment(self, job_seeker, prescriber, prescriber_organization, last_action_kind):
         assert job_seeker.is_job_seeker
         if prescriber:
             if prescriber.kind != UserKind.PRESCRIBER:
@@ -1589,12 +1590,15 @@ class JobSeekerAssignmentManager(models.Manager):
                 return
 
         assignment = JobSeekerAssignment(
-            job_seeker=job_seeker, prescriber=prescriber, prescriber_organization=prescriber_organization
+            job_seeker=job_seeker,
+            prescriber=prescriber,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=last_action_kind,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
-            update_fields=["updated_at"],
+            update_fields=["updated_at", "last_action_kind"],
             unique_fields=["job_seeker", "prescriber", "prescriber_organization"],
         )
 
@@ -1627,6 +1631,12 @@ class JobSeekerAssignment(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name="organization_assignments",
+    )
+    last_action_kind = models.CharField(
+        max_length=20,
+        verbose_name="dernière action effectuée",
+        choices=ActionKind.choices,
+        default=ActionKind.CREATE,
     )
 
     objects = JobSeekerAssignmentManager()
