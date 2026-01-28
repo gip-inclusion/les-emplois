@@ -113,7 +113,7 @@ shell_on_postgres_container:
 # Database.
 # =============================================================================
 
-.PHONY: dumpcreate dumprestore resetdb restore_latest_backup
+.PHONY: dumpcreate dumprestore resetdb
 
 dumpcreate: $(VIRTUAL_ENV)
 	dropdb --if-exists $(PGDATABASE)
@@ -138,6 +138,3 @@ $(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/*/fixtures.py itou/
 # Recreate the database when fixtures change.
 resetdb: $(DBDUMP)
 	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore; fi
-
-restore_latest_backup:
-	./scripts/restore_latest_backup.sh $(PGDATABASE)
