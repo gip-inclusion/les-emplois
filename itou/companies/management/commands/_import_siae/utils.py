@@ -154,7 +154,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     not_created_because_of_missing_email = 0
     structures_created = 0
     # Create structures which do not exist in database yet.
-    for _, row in df[df.siret.isin(creatable_sirets)].iterrows():
+    for row in df[df.siret.isin(creatable_sirets)].itertuples():
         if not row.auth_email:
             print(f"{source} siret={row.siret} will not been created as it has no email.")
             not_created_because_of_missing_email += 1

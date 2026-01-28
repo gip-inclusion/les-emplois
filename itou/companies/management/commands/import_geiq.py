@@ -81,7 +81,7 @@ def build_geiq(row):
     company.siret = row.siret
     company.kind = CompanyKind.GEIQ
     company.source = CompanySource.GEIQ
-    company.name = row["name"]  # row.name returns row index.
+    company.name = row.name
     assert not company.name.isnumeric()
     company.email = ""  # Do not make the authentification email public!
     company.auth_email = row.auth_email

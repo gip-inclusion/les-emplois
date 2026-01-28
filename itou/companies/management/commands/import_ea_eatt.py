@@ -33,7 +33,7 @@ def build_ea_eatt(row):
     assert company.kind in [CompanyKind.EA, CompanyKind.EATT]
     company.source = CompanySource.EA_EATT
 
-    company.name = row["name"]  # row.name returns row index.
+    company.name = row.name
     assert not company.name.isnumeric()
 
     company.email = ""  # Do not make the authentification email public!
