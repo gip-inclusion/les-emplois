@@ -12,6 +12,8 @@ class JobSeekerSessionKinds(enum.StrEnum):
 class JobSeekerOrder(OrderEnum):
     FULL_NAME_ASC = "full_name"
     FULL_NAME_DESC = "-full_name"
+    LAST_NAME_ASC = "last_name"
+    LAST_NAME_DESC = "-last_name"
     LAST_UPDATED_AT_ASC = "last_updated_at"
     LAST_UPDATED_AT_DESC = "-last_updated_at"
     JOB_APPLICATIONS_NB_ASC = "job_applications_nb"

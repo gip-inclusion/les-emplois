@@ -69,7 +69,7 @@ def assert_contains_job_seeker(
         f"""
             <a href="{reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})}?back_url={
             back_url
-        }" class="btn-link">{mask_unless(job_seeker.get_full_name(), with_personal_information)}
+        }" class="btn-link">{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}
             </a>
         """,
         count=1,
@@ -627,9 +627,9 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     assert len(job_seekers) == 3
     filters_form = response.context["filters_form"]
     assert filters_form.fields["job_seeker"].choices == [
-        (a_b_job_seeker.pk, "A… B…"),
-        (c_d_job_seeker.pk, "C… D…"),
-        (created_job_seeker.pk, "Zorro MARTIN"),
+        (a_b_job_seeker.pk, "B… A…"),
+        (c_d_job_seeker.pk, "D… C…"),
+        (created_job_seeker.pk, "MARTIN Zorro"),
     ]
 
 
@@ -681,26 +681,26 @@ def test_filtered_by_eligibility_state(client, url):
     ).job_seeker
 
     response = client.get(url, {"eligibility_validated": "on"})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
         job_seeker_valid_eligibility_valid_approval,
-    ]
+    }
 
     response = client.get(url, {"eligibility_pending": "on"})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_expired_eligibility_no_approval,
         job_seeker_valid_geiq_eligibility_no_approval,
-    ]
+    }
 
     response = client.get(url, {"eligibility_validated": "on", "eligibility_pending": "on"})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_expired_eligibility_no_approval,
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
         job_seeker_valid_eligibility_valid_approval,
         job_seeker_valid_geiq_eligibility_no_approval,
-    ]
+    }
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])
@@ -735,26 +735,26 @@ def test_filtered_by_approval_state(client, url):
     ).job_seeker
 
     response = client.get(url, {"pass_iae_active": "on"})
-    assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_valid_approval]
+    assert set(response.context["page_obj"].object_list) == {job_seeker_expired_eligibility_valid_approval}
 
     response = client.get(url, {"pass_iae_expired": "on"})
-    assert response.context["page_obj"].object_list == [job_seeker_expired_eligibility_expired_approval]
+    assert set(response.context["page_obj"].object_list) == {job_seeker_expired_eligibility_expired_approval}
 
     response = client.get(url, {"no_pass_iae": "on"})
-    assert response.context["page_obj"].object_list == [job_seeker_valid_eligibility_no_approval]
+    assert set(response.context["page_obj"].object_list) == {job_seeker_valid_eligibility_no_approval}
 
     response = client.get(url, {"pass_iae_expired": "on", "no_pass_iae": "on"})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_valid_eligibility_no_approval,
-    ]
+    }
 
     response = client.get(url, {"pass_iae_active": "on", "pass_iae_expired": "on", "no_pass_iae": "on"})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_expired_eligibility_expired_approval,
         job_seeker_expired_eligibility_valid_approval,
         job_seeker_valid_eligibility_no_approval,
-    ]
+    }
 
 
 def test_filtered_by_is_stalled(client):
@@ -841,7 +841,7 @@ def test_filtered_by_organization_members(client):
     url = reverse("job_seekers_views:list_organization")
 
     response = client.get(url)
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_applied_by_member,
         job_seeker_applied_by_old_member,
         job_seeker_applied_by_user_created_by_user_not_in_orga,
@@ -849,20 +849,23 @@ def test_filtered_by_organization_members(client):
         job_seeker_created_by_member,
         job_seeker_created_by_old_member,
         job_seeker_created_by_user,
-    ]
+    }
 
     for organization_member in [prescriber, member, old_member]:
         assertContains(response, organization_member.get_full_name())
     assertNotContains(response, other_prescriber_not_in_orga.get_full_name())
 
     response = client.get(url, {"organization_members": member.pk})
-    assert response.context["page_obj"].object_list == [job_seeker_applied_by_member, job_seeker_created_by_member]
+    assert set(response.context["page_obj"].object_list) == {
+        job_seeker_applied_by_member,
+        job_seeker_created_by_member,
+    }
 
     response = client.get(url, {"organization_members": old_member.pk})
-    assert response.context["page_obj"].object_list == [
+    assert set(response.context["page_obj"].object_list) == {
         job_seeker_applied_by_old_member,
         job_seeker_created_by_old_member,
-    ]
+    }
 
 
 @pytest.mark.parametrize("url", [reverse("job_seekers_views:list"), reverse("job_seekers_views:list_organization")])

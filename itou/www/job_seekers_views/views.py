@@ -226,7 +226,7 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
     try:
         order = JobSeekerOrder(request.GET.get("order"))
     except ValueError:
-        order = JobSeekerOrder.FULL_NAME_ASC
+        order = JobSeekerOrder.LAST_NAME_ASC
     queryset = queryset.order_by(*order.order_by)
 
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
@@ -873,7 +873,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 if self.standalone_creation:
                     messages.success(
                         request,
-                        f"Le compte du candidat {self.profile.user.get_full_name()} a "
+                        f"Le compte du candidat {self.profile.user.get_inverted_full_name()} a "
                         "bien été créé et ajouté à votre liste de candidats.",
                         extra_tags="toast",
                     )
@@ -897,7 +897,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
             if self.is_gps:
                 notify_duplicate = (
-                    User.objects.filter(kind=UserKind.JOB_SEEKER, first_name=user.first_name, last_name=user.last_name)
+                    User.objects.filter(kind=UserKind.JOB_SEEKER, last_name=user.last_name, first_name=user.first_name)
                     .exclude(pk=user.pk)
                     .exists()
                 )

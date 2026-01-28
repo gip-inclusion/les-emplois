@@ -861,7 +861,7 @@ class TestStandaloneCreateAsPrescriber:
             [
                 messages.Message(
                     messages.SUCCESS,
-                    f"Le compte du candidat {new_job_seeker.get_full_name()} a "
+                    f"Le compte du candidat {new_job_seeker.get_inverted_full_name()} a "
                     "bien été créé et ajouté à votre liste de candidats.",
                 )
             ],
