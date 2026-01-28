@@ -802,9 +802,9 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django,django-testing]==26.1.26.1 \
-    --hash=sha256:9255e86e7872495290533c906add6f938e13257a74cab63486258d754b6ddcf5 \
-    --hash=sha256:a1c3422075d2342227cd0bb4824611f5675d5f524f206b6b5ca4c970c746b4b5
+itoutils[django,django-testing]==26.1.28.0 \
+    --hash=sha256:35096692175965ca0d20ab271a3ad1d81733121ec5a7a869c6b91f53ba23ae7f \
+    --hash=sha256:9e983ab097edd9f39428cd26fc15ee3d36e23b36092e8a7cce8ae0cb95504048
     # via -r requirements/test.txt
 jedi==0.19.2 \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
