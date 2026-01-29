@@ -321,7 +321,7 @@ class EmployeeRecordSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
     siret = serializers.CharField()  # Required
-    mesure = serializers.CharField(source="asp_siae_type")  # Required
+    mesure = serializers.CharField(source="asp_measure")  # Required
 
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
     personnePhysique = _PersonSerializer(source="*")  # Required
@@ -333,16 +333,14 @@ class EmployeeRecordSerializer(serializers.Serializer):
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
 
     def get_situationSalarie(self, obj: EmployeeRecord):
-        serializer_class = (
-            _SituationForEITISerializer if obj.asp_siae_type is SiaeMeasure.EITI else _SituationSerializer
-        )
+        serializer_class = _SituationForEITISerializer if obj.asp_measure == SiaeMeasure.EITI else _SituationSerializer
         return serializer_class(obj).data
 
 
 class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
-    mesure = serializers.CharField(source="employee_record.asp_siae_type")  # Required
+    mesure = serializers.CharField(source="employee_record.asp_measure")  # Required
     siret = serializers.CharField(source="employee_record.siret")  # Required
 
     personnePhysique = serializers.SerializerMethodField()  # Required
@@ -376,7 +374,7 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
 
     def get_situationSalarie(self, obj: EmployeeRecordUpdateNotification):
-        is_eiti = obj.employee_record.asp_siae_type is SiaeMeasure.EITI
+        is_eiti = obj.employee_record.asp_measure == SiaeMeasure.EITI
 
         required_fields = {"education_level"}
         if obj.employee_record.job_application.job_seeker.jobseeker_profile.pole_emploi_id:
