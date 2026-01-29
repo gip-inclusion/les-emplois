@@ -45,3 +45,4 @@ def create_component_tag(template_path):
 
 register.tag("component_title", create_component_tag("components/c-title.html"))
 register.tag("component_navinfo", create_component_tag("components/c-navinfo.html"))
+register.tag("component_alert_global__acting_for", create_component_tag("components/alerts/global--acting-for.html"))
