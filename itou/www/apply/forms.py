@@ -718,7 +718,7 @@ def get_field_label_from_instance_funcs(field_name, request):
     # Keep both dictionaries in sync:
     # the fields_display function must match the qs_annotation one (insensitive case)
     fields_display = {
-        "job_seeker": lambda job_seeker: job_seeker.get_full_name(),
+        "job_seeker": lambda job_seeker: job_seeker.get_inverted_full_name(),
         "sender": lambda sender: sender.get_full_name(),
         "sender_company": lambda company: company.display_name,
         "sender_prescriber_organization": lambda org: org.display_name,
@@ -759,7 +759,7 @@ def get_field_label_from_instance_funcs(field_name, request):
 
             def field_display(job_seeker):
                 return mask_unless(
-                    job_seeker.get_full_name(), predicate=can_view_personal_information(request, job_seeker)
+                    job_seeker.get_inverted_full_name(), predicate=can_view_personal_information(request, job_seeker)
                 )
 
             return field_display, qs_infos[field_name]

@@ -13,7 +13,7 @@
             <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
                 <a href="{% url "job_seekers_views:update_job_seeker_start" %}{% querystring job_seeker_public_id=job_seeker.public_id from_url=request.get_full_path %}"
                    class="btn btn-ico btn-outline-primary"
-                   aria-label="Modifier les informations personnelles de {{ profile.user.get_full_name }}">
+                   aria-label="Modifier les informations personnelles de {{ profile.user.get_inverted_full_name }}">
                     <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>
                     <span>Modifier</span>
                 </a>

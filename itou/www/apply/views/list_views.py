@@ -200,7 +200,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         order = JobApplicationOrder.CREATED_AT_DESC
 
     job_applications = job_applications.annotate(
-        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+        job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
     ).order_by(*order.order_by)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)
@@ -273,7 +273,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         order = JobApplicationOrder.CREATED_AT_DESC
 
     job_applications = job_applications.annotate(
-        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+        job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
     ).order_by(*order.order_by)
 
     if display_kind == JobApplicationsDisplayKind.LIST:
@@ -405,7 +405,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         order = JobApplicationOrder.CREATED_AT_DESC
 
     job_applications = job_applications.annotate(
-        job_seeker_full_name=Concat(Lower("job_seeker__first_name"), Value(" "), Lower("job_seeker__last_name"))
+        job_seeker_full_name=Concat(Lower("job_seeker__last_name"), Value(" "), Lower("job_seeker__first_name"))
     ).order_by(*order.order_by)
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_DEFAULT)

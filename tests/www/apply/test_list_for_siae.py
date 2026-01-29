@@ -11,11 +11,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import (
-    AdministrativeCriteriaKind,
-    AdministrativeCriteriaLevel,
-    AuthorKind,
-)
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
@@ -126,7 +122,7 @@ class TestProcessListSiae:
             html=True,
             count=1,
         )
-        assertContains(response, job_app.job_seeker.get_full_name())
+        assertContains(response, job_app.job_seeker.get_inverted_full_name())
         assertNotContains(
             response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id})
         )
@@ -2145,7 +2141,7 @@ def test_order(client, subtests):
 
     expected_order = {
         "created_at": [zorro_application, alice_first_application, alice_second_application],
-        "job_seeker_full_name": [alice_first_application, alice_second_application, zorro_application],
+        "job_seeker_full_name": [zorro_application, alice_first_application, alice_second_application],
     }
 
     with subtests.test(order="<missing_value>"):
@@ -2405,7 +2401,7 @@ class TestAutocomplete:
             assert response.status_code == 404
 
         matching_terms_and_results = {
-            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "COOLIDGE Calvin"}),
             "sender": ("alIce lew", {"id": job_application.sender.pk, "text": "Alice LEWIS"}),
             "sender_company": (
                 "envoy",

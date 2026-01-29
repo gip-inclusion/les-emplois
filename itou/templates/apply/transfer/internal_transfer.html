@@ -31,7 +31,7 @@
                                 <p>Impossible de transférer la candidature car elle appartient déjà à cette structure.</p>
                             {% else %}
                                 <p>
-                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_app_to_transfer.job_seeker.get_full_name }}</b> dans la structure suivante ?
+                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_app_to_transfer.job_seeker.get_inverted_full_name }}</b> dans la structure suivante ?
                                 </p>
                             {% endif %}
                             {% include "includes/structures/_structure_info.html" with structure=company company_show_cta=True extra_box_class="mb-3 mb-md-4" open_in_tab=True only %}

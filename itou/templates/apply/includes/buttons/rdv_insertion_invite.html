@@ -10,7 +10,7 @@
                 <button class="btn btn-danger btn-ico w-100 w-md-auto"
                         data-bs-toggle="tooltip"
                         data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti."
-                        aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}"
+                        aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_inverted_full_name }}"
                         {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                     <div class="stable-text">
                         <i class="ri-alert-line fw-medium" aria-hidden="true"></i>
@@ -46,7 +46,7 @@
               hx-swap="outerHTML"
               class="d-inline-flex">
             {% csrf_token %}
-            <button class="btn btn-secondary btn-ico w-100 w-md-auto" aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}" {% matomo_event "candidature" "clic" "proposer-rdv" %}>
+            <button class="btn btn-secondary btn-ico w-100 w-md-auto" aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_inverted_full_name }}" {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                 <div class="stable-text">
                     <i class="ri-mail-send-line fw-medium" aria-hidden="true"></i>
                     <span>Proposer un rendez-vous</span>
