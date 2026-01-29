@@ -1166,7 +1166,7 @@
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de DOE Jane au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   Commentaire de l’employeur :
   
@@ -1174,7 +1174,7 @@
   
   -----
   
-  Suivez toutes les candidatures de Jane DOE en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de DOE Jane en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -1183,7 +1183,7 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_employer_orienter[add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI ACME Inc.'
+  '[TEST] Candidature de DOE Jane ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_job_seeker[add_to_pool_email_to_job_seeker_body]
   '''
@@ -1223,11 +1223,11 @@
   '''
   Bonjour,
   
-  La candidature de J… D… au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de D… J… au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   -----
   
-  Suivez toutes les candidatures de J… D… en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de D… J… en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -1236,7 +1236,7 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[False][add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de J… D… ajoutée au vivier par EI ACME Inc.'
+  '[TEST] Candidature de D… J… ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_job_seeker_body]
   '''
@@ -1257,11 +1257,11 @@
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+  La candidature de DOE Jane au sein de la structure EI ACME Inc. a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
   
   -----
   
-  Suivez toutes les candidatures de Jane DOE en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de DOE Jane en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -1270,7 +1270,7 @@
   '''
 # ---
 # name: TestProcessViews.test_add_to_pool_from_prescriber[True][add_to_pool_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE ajoutée au vivier par EI ACME Inc.'
+  '[TEST] Candidature de DOE Jane ajoutée au vivier par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_details_for_company_from_approval[copy_public_id]
   '''
@@ -5260,7 +5260,7 @@
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
+  La candidature de DOE Jane au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   Commentaire de l’employeur:
   
@@ -5268,7 +5268,7 @@
   
   -----
   
-  Suivez toutes les candidatures de Jane DOE en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de DOE Jane en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -5277,7 +5277,7 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_employer_orienter[postpone_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE mise en attente par EI ACME Inc.'
+  '[TEST] Candidature de DOE Jane mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_job_seeker[postpone_email_to_job_seeker_body]
   '''
@@ -5317,11 +5317,11 @@
   '''
   Bonjour,
   
-  La candidature de J… D… au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
+  La candidature de D… J… au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   -----
   
-  Suivez toutes les candidatures de J… D… en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de D… J… en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -5330,7 +5330,7 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[False][postpone_email_to_proxy_subject]
-  '[TEST] Candidature de J… D… mise en attente par EI ACME Inc.'
+  '[TEST] Candidature de D… J… mise en attente par EI ACME Inc.'
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_job_seeker_body]
   '''
@@ -5351,11 +5351,11 @@
   '''
   Bonjour,
   
-  La candidature de Jane DOE au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
+  La candidature de DOE Jane au sein de la structure EI ACME Inc. a été mise en attente par l’employeur.
   
   -----
   
-  Suivez toutes les candidatures de Jane DOE en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
+  Suivez toutes les candidatures de DOE Jane en un seul endroit : http://localhost:8000/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a
   
   ---
   [TEST] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [TEST]
@@ -5364,7 +5364,7 @@
   '''
 # ---
 # name: TestProcessViews.test_postpone_from_prescriber[True][postpone_email_to_proxy_subject]
-  '[TEST] Candidature de Jane DOE mise en attente par EI ACME Inc.'
+  '[TEST] Candidature de DOE Jane mise en attente par EI ACME Inc.'
 # ---
 # name: test_add_prior_action
   '''
