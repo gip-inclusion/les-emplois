@@ -89,7 +89,7 @@ class TestUpdateEligibilityView:
 
         client.force_login(prescriber)
 
-        # Without a eligibility diagnosis
+        # Without an eligibility diagnosis
         url = reverse(
             "eligibility_views:update_iae",
             kwargs={"job_seeker_public_id": job_seeker.public_id},
