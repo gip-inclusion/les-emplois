@@ -1,14 +1,8 @@
+{% load components %}
 {% load str_filters %}
 
-<div class="alert alert-primary fade show" role="status">
-    <div class="d-flex flex-row justify-content-between align-items-center">
-        <p class="mb-0 text-start">
-            <i class="ri-arrow-right-line fw-medium pe-2" aria-hidden="true"></i>
-            <strong>Vous postulez actuellement pour {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</strong>
-        </p>
-        <a href="{{ exit_url }}" class="btn-link-white btn-ico align-items-center" aria-label="Quitter la procédure">
-            <i class="ri-close-line ri-xl fw-medium me-1" aria-hidden="true"></i>
-            <span class="fs-sm fw-medium">Quitter</span>
-        </a>
-    </div>
-</div>
+{% component_alert_global__acting_for content=content exit_url=exit_url %}
+    {% fragment as content %}
+        <strong>Vous postulez actuellement pour {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</strong>
+    {% endfragment %}
+{% endcomponent_alert_global__acting_for %}
