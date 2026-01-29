@@ -212,7 +212,7 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
     siret = serializers.CharField()
-    mesure = serializers.CharField(source="asp_siae_type")
+    mesure = serializers.CharField(source="asp_measure")
 
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
     personnePhysique = _API_PersonSerializer(source="*")
@@ -230,7 +230,7 @@ class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
     siret = serializers.CharField(source="employee_record.siret")
-    mesure = serializers.CharField(source="employee_record.asp_siae_type")
+    mesure = serializers.CharField(source="employee_record.asp_measure")
 
     personnePhysique = _API_PersonSerializer(source="employee_record")
     adresse = _API_AddressSerializer(source="employee_record.job_application.job_seeker")
