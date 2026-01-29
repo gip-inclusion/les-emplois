@@ -5,14 +5,14 @@
 {% load str_filters %}
 
 {% block title %}
-    Ajouter la candidature de {{ job_application.job_seeker.get_full_name }} au vivier
+    Ajouter la candidature de {{ job_application.job_seeker.get_inverted_full_name }} au vivier
     {{ block.super }}
 {% endblock %}
 
 {% block title_content %}
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
-            <h1>Ajouter la candidature de {{ job_application.job_seeker.get_full_name }} au vivier</h1>
+            <h1>Ajouter la candidature de {{ job_application.job_seeker.get_inverted_full_name }} au vivier</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}

@@ -60,7 +60,7 @@
                             <li class="d-flex justify-content-start align-items-center">
                                 <a href="{% url 'companies_views:card' company_pk=job_application.to_company.pk %}" class="btn-link btn-ico">
                                     <i class="ri-user-line ri-lg fw-normal" aria-hidden="true"></i>
-                                    <span>{{ refused_by.get_full_name }}</span>
+                                    <span>{{ refused_by.get_inverted_full_name }}</span>
                                 </a>
                             </li>
                         {% endif %}

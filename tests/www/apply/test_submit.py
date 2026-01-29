@@ -71,12 +71,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.testing import (
-    default_storage_ls_files,
-    get_session_name,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import default_storage_ls_files, get_session_name, parse_response_to_soup, pretty_indented
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -3269,7 +3264,7 @@ class TestDirectHireFullProcess:
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertContains(response, CONFIRM_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % new_job_seeker.get_inverted_full_name(), html=True)
         assertContains(response, contract_url)  # Back button URL
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
@@ -3469,7 +3464,7 @@ class TestDirectHireFullProcess:
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertContains(response, CONFIRM_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % job_seeker.get_inverted_full_name(), html=True)
         assertContains(response, contract_url)  # Back button URL
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         response = client.post(confirmation_url)
@@ -5520,7 +5515,7 @@ class TestCheckJobSeekerInformationsForHire:
                 f'<a href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}"\n'
                 '                   class="btn btn-ico btn-outline-primary"\n'
                 '                   aria-label="Modifier les informations personnelles de '
-                f'{job_seeker.get_full_name()}">\n'
+                f'{job_seeker.get_inverted_full_name()}">\n'
                 '                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>\n'
                 "                    <span>Modifier</span>\n                </a>"
             ),
@@ -5683,7 +5678,7 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Valider l'éligibilité IAE")
         assertContains(
             response,
@@ -5698,7 +5693,7 @@ class TestEligibilityForHire:
         self.job_seeker.last_checked_at = timezone.now()
         self.job_seeker.save(update_fields=["last_checked_at"])
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Valider l'éligibilité IAE")
         assertContains(
             response,
@@ -5759,7 +5754,7 @@ class TestGEIQEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Eligibilité GEIQ")
         assertContains(
             response,
@@ -5903,7 +5898,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -5993,7 +5988,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6082,7 +6077,7 @@ class TestFillJobSeekerInfosForHire:
         apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6145,7 +6140,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6208,7 +6203,7 @@ class TestFillJobSeekerInfosForHire:
             assertRedirects(response, accept_contract_infos_url)
             assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
-            assertContains(response, "Déclarer l’embauche de Clara SION")
+            assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
             assertContains(response, NEXT_BUTTON_MARKUP, html=True)
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
@@ -6290,7 +6285,7 @@ class TestFillJobSeekerInfosForHire:
             "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}
         )
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6346,7 +6341,7 @@ class TestHireContract:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
 
         hiring_start_at = timezone.localdate()
@@ -6419,7 +6414,7 @@ class TestHireContract:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "PASS IAE valide")
 
         hiring_start_at = timezone.localdate()
@@ -6464,7 +6459,7 @@ class TestHireContract:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligibilité GEIQ confirmée")
 
         hiring_start_at = timezone.localdate()
@@ -6554,7 +6549,7 @@ class TestHireContract:
         )
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
 
         hiring_start_at = timezone.localdate()
@@ -6631,7 +6626,7 @@ class TestHireConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         assertContains(
@@ -6715,7 +6710,7 @@ class TestHireConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         assertContains(response, hiring_end_at.strftime("%d/%m/%Y"))
 

@@ -24,10 +24,7 @@ from pytest_django.asserts import (
 from itou.asp.models import AllocationDuration
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
-from itou.eligibility.models import (
-    AdministrativeCriteria,
-    EligibilityDiagnosis,
-)
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
@@ -64,12 +61,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    assert_previous_step,
-    get_session_name,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import assert_previous_step, get_session_name, parse_response_to_soup, pretty_indented
 from tests.www.eligibility_views.utils import (
     CERTIFICATION_ERROR_BADGE_HTML,
     CERTIFIED_BADGE_HTML,
@@ -419,7 +411,7 @@ class TestProcessViews:
             response,
             """
             <p>
-                Cette candidature a été archivée par Gilles PARDOUX le 2 septembre 2024 à 11:11.
+                Cette candidature a été archivée par PARDOUX Gilles le 2 septembre 2024 à 11:11.
                 Elle n’est plus visible par défaut dans votre liste de candidatures.
             </p>
             """,
@@ -439,7 +431,7 @@ class TestProcessViews:
             response,
             """
             <p>
-                Cette candidature a été archivée par Gilles PARDOUX le 2 septembre 2024 à 11:11.
+                Cette candidature a été archivée par PARDOUX Gilles le 2 septembre 2024 à 11:11.
                 Elle n’est plus visible par défaut dans votre liste de candidatures.
             </p>
             """,
@@ -1353,7 +1345,7 @@ class TestProcessViews:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de Jean BOND ne peut pas être refusée car elle est au statut "
+                        "La candidature de BOND Jean ne peut pas être refusée car elle est au statut "
                         "«\u202fCandidature acceptée\u202f»."
                     ),
                 )
@@ -1383,7 +1375,7 @@ class TestProcessViews:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de Jean BOND ne peut pas être refusée car elle est au statut "
+                        "La candidature de BOND Jean ne peut pas être refusée car elle est au statut "
                         "«\u202fCandidature déclinée\u202f»."
                     ),
                 )

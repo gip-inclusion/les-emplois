@@ -1838,7 +1838,7 @@ class TestFillJobSeekerInfosForAccept:
         )
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Accepter la candidature de SION Clara")
 
         post_data = {
             "address_line_1": "128 Rue de Grenelle",
@@ -1924,7 +1924,7 @@ class TestFillJobSeekerInfosForAccept:
         )
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Accepter la candidature de SION Clara")
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         COUNTRY_FIELD_ID = 'id="id_birth_country"'
@@ -2032,7 +2032,7 @@ class TestFillJobSeekerInfosForAccept:
         )
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Accepter la candidature de SION Clara")
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         if in_france:
@@ -2137,7 +2137,7 @@ class TestFillJobSeekerInfosForAccept:
         )
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Accepter la candidature de Clara SION")
+        assertContains(response, "Accepter la candidature de SION Clara")
         assertContains(response, NEXT_BUTTON_MARKUP, html=True)
 
         # Trying to skip to contract step must redirect back to job seeker info step if a reason is missing
@@ -2227,7 +2227,7 @@ class TestFillJobSeekerInfosForAccept:
             assertRedirects(response, accept_contract_infos_url)
             assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
-            assertContains(response, "Accepter la candidature de Clara SION")
+            assertContains(response, "Accepter la candidature de SION Clara")
             assertContains(response, NEXT_BUTTON_MARKUP, html=True)
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
@@ -2316,7 +2316,7 @@ class TestAcceptConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Confirmer l’embauche de Clara SION")
+        assertContains(response, "Confirmer l’embauche de SION Clara")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
         response = client.post(confirmation_url)
@@ -2397,7 +2397,7 @@ class TestAcceptConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Confirmer l’embauche de Clara SION")
+        assertContains(response, "Confirmer l’embauche de SION Clara")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         assertContains(response, hiring_end_at.strftime("%d/%m/%Y"))
 

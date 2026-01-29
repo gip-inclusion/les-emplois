@@ -77,7 +77,7 @@ def test_get(client):
         # Count job applications used by the template
         assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
-        assertContains(response, job_application.job_seeker.get_full_name())
+        assertContains(response, job_application.job_seeker.get_inverted_full_name())
 
 
 @override_settings(PAGE_SIZE_DEFAULT=1)
@@ -135,14 +135,14 @@ def test_as_unauthorized_prescriber(client, snapshot):
     with assertSnapshotQueries(snapshot(name="SQL queries for prescriptions list")):
         response = client.get(list_url, data={"display": JobApplicationsDisplayKind.LIST})
 
-    assertContains(response, "<h3>S… U…</h3>")
+    assertContains(response, "<h3>U… S…</h3>", html=True)
     assertNotContains(response, "Supersecretname")
-    assertContains(response, "<h3>Liz IBLE</h3>")
+    assertContains(response, "<h3>IBLE Liz</h3>", html=True)
 
     response = client.get(list_url, data={"display": JobApplicationsDisplayKind.TABLE})
-    assertContains(response, "S… U…")
+    assertContains(response, "U… S…")
     assertNotContains(response, "Supersecretname")
-    assertContains(response, "Liz IBLE")
+    assertContains(response, "IBLE Liz")
 
 
 def test_filtered_by_state(client):
@@ -195,7 +195,7 @@ def test_filtered_by_job_seeker(client):
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
     assert applications[0].job_seeker.pk == job_seeker.pk
-    assertContains(response, job_seeker.get_full_name())
+    assertContains(response, job_seeker.get_inverted_full_name())
     assertNotContains(response, INVALID_VALUE_MESSAGE)
 
     response = client.get(reverse("apply:list_prescriptions"))
@@ -226,7 +226,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     )
     created_job_seeker = application.job_seeker
     client.force_login(prescriber)
-    full_name = "Zorro MARTIN"
+    full_name = "MARTIN Zorro"
     url = reverse("apply:list_prescriptions")
     response = client.get(url, {"job_seeker": created_job_seeker.pk})
     applications = response.context["job_applications_page"].object_list
@@ -242,7 +242,7 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     assert len(applications) == 1
     assert applications[0].pk == application.pk
     assertNotContains(response, full_name)
-    assertContains(response, "Z… M…")
+    assertContains(response, "M… Z…")
 
 
 def test_filtered_by_company(client):
@@ -579,7 +579,7 @@ def test_order(client, subtests):
 
     expected_order = {
         "created_at": [zorro_application, alice_first_application, alice_second_application],
-        "job_seeker_full_name": [alice_first_application, alice_second_application, zorro_application],
+        "job_seeker_full_name": [zorro_application, alice_first_application, alice_second_application],
     }
 
     with subtests.test(order="<missing_value>"):
@@ -1166,8 +1166,8 @@ class TestAutocomplete:
             assert response.status_code == 404
 
         matching_terms_and_results = {
-            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
-            "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "COOLIDGE Calvin"}),
+            "sender": ("john", {"id": job_application.sender.pk, "text": "DOE John"}),
             "to_company": (
                 "ciété c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
@@ -1205,8 +1205,8 @@ class TestAutocomplete:
         )
         assert response.status_code == 200
         assert len(response.json()["results"]) == 2
-        assert {"id": job_application.sender.pk, "text": "John DOE"} in response.json()["results"]
-        assert {"id": other_job_application.sender.pk, "text": "Jane DOE"} in response.json()["results"]
+        assert {"id": job_application.sender.pk, "text": "DOE John"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "DOE Jane"} in response.json()["results"]
 
     def test_as_unauthorized_prescriber(self, client):
         org = PrescriberOrganizationFactory()
@@ -1244,7 +1244,7 @@ class TestAutocomplete:
         response = client.get(autocomplete_url, {"term": "e"})
         assert response.json() == {
             "results": [
-                {"id": third_application.job_seeker.pk, "text": "Ethan COOPER"},
+                {"id": third_application.job_seeker.pk, "text": "COOPER Ethan"},
             ]
         }
         # User takes control of its account and prescriber cannot know anymore if it contains an 'r'
@@ -1260,14 +1260,14 @@ class TestAutocomplete:
         response = client.get(autocomplete_url, {"term": "doe"})
         assert response.json() == {
             "results": [
-                {"id": other_job_application.sender.pk, "text": "Jane DOE"},
-                {"id": job_application.sender.pk, "text": "John DOE"},
+                {"id": other_job_application.sender.pk, "text": "DOE Jane"},
+                {"id": job_application.sender.pk, "text": "DOE John"},
             ]
         }
         response = client.get(autocomplete_url, {"term": "jo bl"})
         assert response.json() == {
             "results": [
-                {"id": third_application.sender.pk, "text": "John BLACK"},
+                {"id": third_application.sender.pk, "text": "BLACK John"},
             ]
         }
 
@@ -1306,8 +1306,8 @@ class TestAutocomplete:
             assert response.status_code == 404
 
         matching_terms_and_results = {
-            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "Calvin COOLIDGE"}),
-            "sender": ("john", {"id": job_application.sender.pk, "text": "John DOE"}),
+            "job_seeker": ("Calvin", {"id": job_application.job_seeker.pk, "text": "COOLIDGE Calvin"}),
+            "sender": ("john", {"id": job_application.sender.pk, "text": "DOE John"}),
             "to_company": (
                 "ciété c",
                 {"id": third_application.to_company.pk, "text": "Société C"},
@@ -1345,5 +1345,5 @@ class TestAutocomplete:
         )
         assert response.status_code == 200
         assert len(response.json()["results"]) == 2
-        assert {"id": job_application.sender.pk, "text": "John DOE"} in response.json()["results"]
-        assert {"id": other_job_application.sender.pk, "text": "Jane DOE"} in response.json()["results"]
+        assert {"id": job_application.sender.pk, "text": "DOE John"} in response.json()["results"]
+        assert {"id": other_job_application.sender.pk, "text": "DOE Jane"} in response.json()["results"]

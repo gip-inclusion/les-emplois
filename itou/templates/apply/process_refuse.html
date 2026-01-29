@@ -8,7 +8,7 @@
 
 {% block title %}
     {% if job_applications|length == 1 %}
-        Décliner la candidature de {{ job_applications.0.job_seeker.get_full_name }}
+        Décliner la candidature de {{ job_applications.0.job_seeker.get_inverted_full_name }}
     {% else %}
         Décliner {{ job_applications|length }} candidature{{ job_applications|pluralizefr }}
     {% endif %}
@@ -20,7 +20,7 @@
         {% fragment as c_title__main %}
             <h1>
                 {% if job_applications|length == 1 %}
-                    Décliner la candidature de {{ job_applications.0.job_seeker.get_full_name }}
+                    Décliner la candidature de {{ job_applications.0.job_seeker.get_inverted_full_name }}
                 {% else %}
                     Décliner {{ job_applications|length }} candidature{{ job_applications|pluralizefr }}
                 {% endif %}

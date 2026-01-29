@@ -5,7 +5,7 @@
         <p class="text-success mb-1">
             {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validée" }}
             le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
-            <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
+            <strong>{{ eligibility_diagnosis.author.get_inverted_full_name }}</strong>
             {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
             {% if eligibility_diagnosis.author_prescriber_organization %}
                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).

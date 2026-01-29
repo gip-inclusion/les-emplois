@@ -31,7 +31,7 @@
     {% else %}
         <td>
             <a class="btn-link" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}">
-                {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
+                {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}
             </a>
             <span class="d-block">
                 {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
@@ -71,7 +71,7 @@
             {% if job_application.sender_prescriber_organization %}
                 {{ job_application.sender_prescriber_organization.display_name }}
             {% else %}
-                {{ job_application.sender.get_full_name }}
+                {{ job_application.sender.get_inverted_full_name }}
             {% endif %}
         {% endif %}
     </td>
@@ -147,7 +147,7 @@
                data-bs-toggle="tooltip"
                data-bs-title="Voir sa candidature"
                {% matomo_event "candidature" "clic" "voir_candidature_prescripteur" %}>
-                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
             </a>
         {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
             <a class="btn btn-sm btn-link btn-ico-only"
@@ -155,7 +155,7 @@
                data-bs-toggle="tooltip"
                data-bs-title="Voir sa candidature"
                {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
-                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
+                <i class="ri-arrow-drop-right-line fs-lg" aria-label="Gérer la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:job_application.user_can_view_personal_information }}"></i>
             </a>
         {% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
             <a class="btn btn-sm btn-link btn-ico-only" href="{{ details_url }}?back_url={{ request.get_full_path|urlencode }}" data-bs-toggle="tooltip" data-bs-title="Voir ma candidature">

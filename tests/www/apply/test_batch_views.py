@@ -10,13 +10,8 @@ from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.www.apply.views.batch_views import RefuseWizardView
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.job_applications.factories import (
-    JobApplicationFactory,
-)
-from tests.users.factories import (
-    JobSeekerFactory,
-    LaborInspectorFactory,
-)
+from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory
 from tests.utils.testing import get_session_name
 
 
@@ -152,8 +147,8 @@ class TestBatchArchive:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être archivée car elle est au statut "
-                        "« Nouvelle candidature »."
+                        "La candidature de RAMBO John n’a pas pu être "
+                        "archivée car elle est au statut « Nouvelle candidature »."
                     ),
                     extra_tags="toast",
                 ),
@@ -187,7 +182,7 @@ class TestBatchArchive:
             [
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà archivée.",
+                    "La candidature de BOND Jean est déjà archivée.",
                     extra_tags="toast",
                 ),
             ],
@@ -239,13 +234,13 @@ class TestBatchArchive:
                 ),
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà archivée.",
+                    "La candidature de BOND Jean est déjà archivée.",
                     extra_tags="toast",
                 ),
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être archivée car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être archivée car elle est au statut "
                         "« Nouvelle candidature »."
                     ),
                     extra_tags="toast",
@@ -428,7 +423,7 @@ class TestBatchAddToPool:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être ajoutée dans le vivier car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être ajoutée dans le vivier car elle est au statut "
                         "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
@@ -464,7 +459,7 @@ class TestBatchAddToPool:
             [
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà dans le vivier.",
+                    "La candidature de BOND Jean est déjà dans le vivier.",
                     extra_tags="toast",
                 ),
             ],
@@ -521,13 +516,13 @@ class TestBatchAddToPool:
                 ),
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà dans le vivier.",
+                    "La candidature de BOND Jean est déjà dans le vivier.",
                     extra_tags="toast",
                 ),
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être ajoutée dans le vivier car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être ajoutée dans le vivier car elle est au statut "
                         "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
@@ -710,7 +705,7 @@ class TestBatchPostpone:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être mise en attente car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être mise en attente car elle est au statut "
                         "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
@@ -746,7 +741,7 @@ class TestBatchPostpone:
             [
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà mise en attente.",
+                    "La candidature de BOND Jean est déjà mise en attente.",
                     extra_tags="toast",
                 ),
             ],
@@ -803,13 +798,13 @@ class TestBatchPostpone:
                 ),
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà mise en attente.",
+                    "La candidature de BOND Jean est déjà mise en attente.",
                     extra_tags="toast",
                 ),
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être mise en attente car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être mise en attente car elle est au statut "
                         "« Candidature déclinée »."
                     ),
                     extra_tags="toast",
@@ -954,7 +949,7 @@ class TestBatchProcess:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être mise à l'étude car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être mise à l'étude car elle est au statut "
                         "« Candidature en attente »."
                     ),
                     extra_tags="toast",
@@ -988,7 +983,7 @@ class TestBatchProcess:
             [
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà à l'étude.",
+                    "La candidature de BOND Jean est déjà à l'étude.",
                     extra_tags="toast",
                 ),
             ],
@@ -1042,13 +1037,13 @@ class TestBatchProcess:
                 ),
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND est déjà à l'étude.",
+                    "La candidature de BOND Jean est déjà à l'étude.",
                     extra_tags="toast",
                 ),
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être mise à l'étude car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être mise à l'étude car elle est au statut "
                         "« Candidature en attente »."
                     ),
                     extra_tags="toast",
@@ -1148,7 +1143,7 @@ class TestBatchRefuse:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de Jean BOND ne peut pas être refusée car elle est au statut "
+                        "La candidature de BOND Jean ne peut pas être refusée car elle est au statut "
                         "« Candidature acceptée »."
                     ),
                     extra_tags="toast",
@@ -1242,7 +1237,7 @@ class TestBatchRefuse:
             response,
             [
                 messages.Message(
-                    messages.SUCCESS, "La candidature de Jean BOND a bien été refusée.", extra_tags="toast"
+                    messages.SUCCESS, "La candidature de BOND Jean a bien été refusée.", extra_tags="toast"
                 )
             ],
         )
@@ -1641,7 +1636,7 @@ class TestBatchRefuse:
             response,
             [
                 messages.Message(
-                    messages.SUCCESS, "La candidature de Jean BOND a bien été refusée.", extra_tags="toast"
+                    messages.SUCCESS, "La candidature de BOND Jean a bien été refusée.", extra_tags="toast"
                 )
             ],
         )
@@ -1802,7 +1797,7 @@ class TestBatchTransfer:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être transférée car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être transférée car elle est au statut "
                         "« Candidature acceptée »."
                     ),
                     extra_tags="toast",
@@ -1903,7 +1898,7 @@ class TestBatchTransfer:
                 messages.Message(
                     messages.ERROR,
                     (
-                        "La candidature de John RAMBO n’a pas pu être transférée car elle est au statut "
+                        "La candidature de RAMBO John n’a pas pu être transférée car elle est au statut "
                         "« Candidature acceptée »."
                     ),
                     extra_tags="toast",
@@ -2047,7 +2042,7 @@ class TestBatchUnarchive:
             [
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND n’est pas archivée.",
+                    "La candidature de BOND Jean n’est pas archivée.",
                     extra_tags="toast",
                 ),
             ],
@@ -2091,7 +2086,7 @@ class TestBatchUnarchive:
                 ),
                 messages.Message(
                     messages.WARNING,
-                    "La candidature de Jean BOND n’est pas archivée.",
+                    "La candidature de BOND Jean n’est pas archivée.",
                     extra_tags="toast",
                 ),
                 messages.Message(messages.SUCCESS, "2 candidatures ont bien été désarchivées.", extra_tags="toast"),

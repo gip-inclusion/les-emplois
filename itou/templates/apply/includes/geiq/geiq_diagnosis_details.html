@@ -9,11 +9,11 @@
 
     {% if diagnosis.allowance_amount %}
         <p>
-            Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+            Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
         </p>
     {% else %}
         <p>
-            Renseignée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+            Renseignée par <b>{{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
         </p>
     {% endif %}
 
