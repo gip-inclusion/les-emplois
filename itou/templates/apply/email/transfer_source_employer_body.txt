@@ -3,7 +3,7 @@
 
 Candidature transférée
 
-{{ transferred_by.get_full_name }} a transféré la candidature de : {{ job_application.job_seeker.get_full_name }}
+{{ transferred_by.get_inverted_full_name }} a transféré la candidature de : {{ job_application.job_seeker.get_inverted_full_name }}
 de la structure {{ origin_company.display_name }}
 vers la structure {{ target_company.display_name }}.
 

@@ -4,7 +4,7 @@
 
 Bonjour,
 
-La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} au sein de la structure {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }} a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
+La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} au sein de la structure {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }} a été ajoutée dans le vivier de candidatures en vue de prochaines opportunités.
 
 {% if job_application.answer %}
 Commentaire de l’employeur :
@@ -14,5 +14,5 @@ Commentaire de l’employeur :
 
 -----
 
-Suivez toutes les candidatures de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
+Suivez toutes les candidatures de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} en un seul endroit : {{ job_seekers_job_applications_link }}
 {% endblock body %}

@@ -2084,7 +2084,7 @@ class TestProcessViews:
             assert (
                 self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                     company_name=job_application.to_company.display_name,
-                    job_seeker_name=job_application.job_seeker.get_full_name(),
+                    job_seeker_name=job_application.job_seeker.get_inverted_full_name(),
                 )
                 in mailoutbox[0].body
             )
@@ -2141,7 +2141,7 @@ class TestProcessViews:
         assert (
             self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
                 company_name=job_application.to_company.display_name,
-                job_seeker_name=mask_unless(job_application.job_seeker.get_full_name(), predicate=False),
+                job_seeker_name=mask_unless(job_application.job_seeker.get_inverted_full_name(), predicate=False),
             )
             in mailoutbox[0].body
         )
