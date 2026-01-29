@@ -10,14 +10,10 @@ from django.views.generic.base import TemplateView
 
 from itou.companies.models import Company
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import (
-    JobApplication,
-)
+from itou.job_applications.models import JobApplication
 from itou.utils.auth import check_user
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import (
-    TransferJobApplicationForm,
-)
+from itou.www.apply.forms import TransferJobApplicationForm
 from itou.www.apply.views.process_views import JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY
 from itou.www.apply.views.submit_views import (
     ApplicationEndView,
@@ -47,7 +43,7 @@ def transfer(request, job_application_id):
         messages.success(
             request,
             (
-                f"La candidature de {job_application.job_seeker.get_full_name()} "
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} "
                 f"a bien été transférée à {target_company.display_name}||"
                 "Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure"
             ),
@@ -216,7 +212,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
     form_class = TransferJobApplicationForm
 
     def get_initial(self):
-        sender_display = self.job_application.sender.get_full_name()
+        sender_display = self.job_application.sender.get_inverted_full_name()
         if self.job_application.sender_company:
             sender_display += f" {self.job_application.sender_company.name}"
         elif self.job_application.sender_prescriber_organization:

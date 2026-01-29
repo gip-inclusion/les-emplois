@@ -67,15 +67,15 @@ def archive(request):
         elif job_application.archived_at:
             messages.warning(
                 request,
-                f"La candidature de {job_application.job_seeker.get_full_name()} est déjà archivée.",
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} est déjà archivée.",
                 extra_tags="toast",
             )
         else:
             messages.error(
                 request,
                 (
-                    f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être archivée "
-                    f"car elle est au statut « {job_application.get_state_display()} »."
+                    f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être "
+                    f"archivée car elle est au statut « {job_application.get_state_display()} »."
                 ),
                 extra_tags="toast",
             )
@@ -116,7 +116,7 @@ def unarchive(request):
         else:
             messages.warning(
                 request,
-                f"La candidature de {job_application.job_seeker.get_full_name()} n’est pas archivée.",
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’est pas archivée.",
                 extra_tags="toast",
             )
 
@@ -164,7 +164,8 @@ def postpone(request):
             if job_application.state == JobApplicationState.POSTPONED:
                 messages.warning(
                     request,
-                    f"La candidature de {job_application.job_seeker.get_full_name()} est déjà mise en attente.",
+                    f"La candidature de {job_application.job_seeker.get_inverted_full_name()} "
+                    "est déjà mise en attente.",
                     extra_tags="toast",
                 )
                 continue
@@ -176,7 +177,8 @@ def postpone(request):
                 messages.error(
                     request,
                     (
-                        f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être mise en "
+                        f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a "
+                        "pas pu être mise en "
                         f"attente car elle est au statut « {job_application.get_state_display()} »."
                     ),
                     extra_tags="toast",
@@ -229,7 +231,8 @@ def add_to_pool(request):
             if job_application.state == JobApplicationState.POOL:
                 messages.warning(
                     request,
-                    f"La candidature de {job_application.job_seeker.get_full_name()} est déjà dans le vivier.",
+                    f"La candidature de {job_application.job_seeker.get_inverted_full_name()} est "
+                    "déjà dans le vivier.",
                     extra_tags="toast",
                 )
                 continue
@@ -241,8 +244,8 @@ def add_to_pool(request):
                 messages.error(
                     request,
                     (
-                        f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être ajoutée dans "
-                        f"le vivier car elle est au statut « {job_application.get_state_display()} »."
+                        f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être "
+                        f"ajoutée dans le vivier car elle est au statut « {job_application.get_state_display()} »."
                     ),
                     extra_tags="toast",
                 )
@@ -284,7 +287,7 @@ def process(request):
         if job_application.state == JobApplicationState.PROCESSING:
             messages.warning(
                 request,
-                f"La candidature de {job_application.job_seeker.get_full_name()} est déjà à l'étude.",
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} est déjà à l'étude.",
                 extra_tags="toast",
             )
             continue
@@ -294,8 +297,8 @@ def process(request):
             messages.error(
                 request,
                 (
-                    f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être mise à l'étude "
-                    f"car elle est au statut « {job_application.get_state_display()} »."
+                    f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être mise "
+                    f"à l'étude car elle est au statut « {job_application.get_state_display()} »."
                 ),
                 extra_tags="toast",
             )
@@ -348,8 +351,8 @@ def _start_refuse_wizard(request, *, application_ids, next_url, from_detail_view
             messages.error(
                 request,
                 (
-                    f"La candidature de {job_application.job_seeker.get_full_name()} ne peut pas être refusée "
-                    f"car elle est au statut « {job_application.get_state_display()} »."
+                    f"La candidature de {job_application.job_seeker.get_inverted_full_name()} ne peut pas être "
+                    f"refusée car elle est au statut « {job_application.get_state_display()} »."
                 ),
                 extra_tags="toast",
             )
@@ -502,8 +505,8 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
                 messages.error(
                     self.request,
                     (
-                        f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être refusée "
-                        f"car elle est au statut « {job_application.get_state_display()} »."
+                        f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être "
+                        f"refusée car elle est au statut « {job_application.get_state_display()} »."
                     ),
                     extra_tags="toast",
                 )
@@ -516,7 +519,8 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
                 (
                     f"{refused_nb} candidatures ont bien été refusées."
                     if refused_nb > 1
-                    else f"La candidature de {self.applications[0].job_seeker.get_full_name()} a bien été refusée."
+                    else f"La candidature de {self.applications[0].job_seeker.get_inverted_full_name()} "
+                    "a bien été refusée."
                 ),
                 extra_tags="toast",
             )
@@ -551,7 +555,9 @@ def transfer(request):
             job_application.transfer(user=request.user, target_company=target_company)
             transferred_ids.append(job_application.pk)
         except (ValidationError, xwf_models.InvalidTransitionError):
-            error_msg = f"La candidature de {job_application.job_seeker.get_full_name()} n’a pas pu être transférée"
+            error_msg = (
+                f"La candidature de {job_application.job_seeker.get_inverted_full_name()} n’a pas pu être transférée"
+            )
             if not job_application.transfer.is_available():
                 error_msg += f" car elle est au statut « {job_application.get_state_display()} »."
             else:

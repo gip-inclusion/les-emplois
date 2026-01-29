@@ -1,7 +1,7 @@
 <div class="c-stepper mb-3 mb-md-4">
     <div class="d-flex">
         <div class="flex-fill">
-            <h2>Transférer la candidature de {{ job_app_to_transfer.job_seeker.get_full_name }}</h2>
+            <h2>Transférer la candidature de {{ job_app_to_transfer.job_seeker.get_inverted_full_name }}</h2>
             <div class="progress">
                 {% if step == 1 %}
                     <div class="progress-bar progress-bar-25" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">

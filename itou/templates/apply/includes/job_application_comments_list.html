@@ -18,7 +18,7 @@
                         <div>
                             <time datetime="{{ comment.created_at.isoformat }}">Le {{ comment.created_at|date }} à {{ comment.created_at|time }}</time>
                             <strong>
-                                {{ comment.created_by.get_full_name }}
+                                {{ comment.created_by.get_inverted_full_name }}
                                 {% if comment.created_by == request.user %}(vous){% endif %}
                             </strong>
                         </div>

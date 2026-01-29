@@ -600,7 +600,7 @@ def test_step_3(client, snapshot, pdf_file):
 
     assert pretty_indented(parse_response_to_soup(response, ".c-stepper")) == snapshot(name="progress")
     expected_message = (
-        f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, Pierre DUPONT a écrit :\n\n{job_application.message}"
+        f"Le {timezone.now().strftime('%d/%m/%Y à %Hh%M')}, DUPONT Pierre a écrit :\n\n{job_application.message}"
     )
     assert response.context["form"].initial["message"] == expected_message
 

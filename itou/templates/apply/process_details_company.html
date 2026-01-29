@@ -9,7 +9,7 @@
 {% block title %}
     Candidature
     -
-    {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+    {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
     {{ block.super }}
 {% endblock %}
 
@@ -248,7 +248,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title" id="cancel_hire_modal_title">
-                            Annuler l’embauche de {{ job_application.job_seeker.get_full_name }}
+                            Annuler l’embauche de {{ job_application.job_seeker.get_inverted_full_name }}
                         </h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                     </div>
@@ -259,7 +259,7 @@
                                 Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE.
                             </p>
                             <p>
-                                {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                                {{ job_application.job_seeker.get_inverted_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
                             </p>
                         {% else %}
                             <p>En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.</p>

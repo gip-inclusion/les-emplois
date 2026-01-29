@@ -4,7 +4,7 @@
 {% load str_filters %}
 
 {% block title %}
-    Accepter la candidature de {{ job_application.job_seeker.get_full_name }}
+    Accepter la candidature de {{ job_application.job_seeker.get_inverted_full_name }}
     {{ block.super }}
 {% endblock %}
 
@@ -12,7 +12,7 @@
     {% component_title c_title__main=c_title__main %}
         {% fragment as c_title__main %}
             <h1>
-                Accepter la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                Accepter la candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
                 {% job_application_state_badge job_application extra_classes="badge-base" %}
             </h1>
         {% endfragment %}
