@@ -687,7 +687,7 @@ def test_get_criteria_from_job_seeker():
     profile.pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
     criteria = get_criteria_from_job_seeker(job_seeker)
     assert kind_to_criterion[AdministrativeCriteriaKind.DETLD] in criteria
-    assert kind_to_criterion[AdministrativeCriteriaKind.DELD] not in criteria  # If DETLD is present, not need for DELD
+    assert kind_to_criterion[AdministrativeCriteriaKind.DELD] not in criteria  # If DETLD is present, no need for DELD
     profile.pole_emploi_since = AllocationDuration.FROM_12_TO_23_MONTHS
     criteria = get_criteria_from_job_seeker(job_seeker)
     assert kind_to_criterion[AdministrativeCriteriaKind.DETLD] not in criteria

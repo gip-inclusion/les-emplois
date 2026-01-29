@@ -1517,7 +1517,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
 
         # Simulate address in qpv. If the address is in qpv, the criteria_filled_from_job_seeker template
-        # should be used: QPV will be automatically filled.
+        # should be used: QPV will be automatically checked.
         with mock.patch(
             "itou.common_apps.address.models.QPV.in_qpv",
             return_value=True,
