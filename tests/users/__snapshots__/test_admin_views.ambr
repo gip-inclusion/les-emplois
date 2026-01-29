@@ -558,7 +558,9 @@
         'sql': '''
           SELECT COUNT(*) AS "__count"
           FROM "gps_followupgroupmembership"
-          WHERE "gps_followupgroupmembership"."member_id" = %s
+          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroupmembership"."member_id" = %s)
         ''',
       }),
       dict({

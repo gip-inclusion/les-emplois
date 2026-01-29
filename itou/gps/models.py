@@ -20,9 +20,25 @@ class BulkCreatedAtQuerysetProxy:
         return self.exclude(created_in_bulk=True)
 
 
-class FollowUpGroupManager(models.Manager):
+class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
+    def active(self):
+        return self.filter(beneficiary__is_active=True)
+
+
+class ActiveFollowUpGroupManager(models.Manager.from_queryset(FollowUpGroupQueryset)):
+    def get_queryset(self):
+        return super().get_queryset().active()
+
     def follow_beneficiary(self, beneficiary, user, is_active=True):
-        assert beneficiary.is_job_seeker
+        if not beneficiary.is_job_seeker:
+            logger.warning("We should not try to add a FollowUpGroup on beneficiary=%s", beneficiary)
+            return
+        if not beneficiary.is_active:
+            logger.warning("Cannot follow inactive beneficiary=%s", beneficiary)
+            return
+        if not user.is_active:
+            logger.warning("Cannot follow beneficiary with inactive user=%s", user)
+            return
         if user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
             # This should not happen but we don't want to block everything
             logger.warning("We should not try to add a FollowUpGroupMembership on user=%s", user)
@@ -53,10 +69,6 @@ class FollowUpGroupManager(models.Manager):
             return membership, created
 
 
-class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
-    pass
-
-
 class FollowUpGroup(models.Model):
     """
     A group of stakeholders supporting the beneficiary
@@ -65,7 +77,8 @@ class FollowUpGroup(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
-    objects = FollowUpGroupManager.from_queryset(FollowUpGroupQueryset)()
+    objects = ActiveFollowUpGroupManager()
+    include_inactive = FollowUpGroupQueryset.as_manager()
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
@@ -100,7 +113,13 @@ class FollowUpGroup(models.Model):
 
 
 class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
-    pass
+    def active(self):
+        return self.filter(member__is_active=True)
+
+
+class ActiveFollowUpGroupMembershipManager(models.Manager.from_queryset(FollowUpGroupMembershipQueryset)):
+    def get_queryset(self):
+        return super().get_queryset().active()
 
 
 class FollowUpGroupMembership(models.Model):
@@ -170,7 +189,8 @@ class FollowUpGroupMembership(models.Model):
         choices=EndReason.choices,
     )
 
-    objects = FollowUpGroupMembershipQueryset.as_manager()
+    objects = ActiveFollowUpGroupMembershipManager()
+    include_inactive = FollowUpGroupMembershipQueryset.as_manager()
 
     def __str__(self):
         return self.follow_up_group.beneficiary.get_full_name() + " => " + self.member.get_full_name()

@@ -2986,6 +2986,7 @@
           SELECT COUNT(*) AS "__count"
           FROM "gps_followupgroup"
           INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE "users_user"."is_active"
         ''',
       }),
       dict({
@@ -3091,6 +3092,7 @@
                  "users_user"."department" AS "beneficiary_department"
           FROM "gps_followupgroup"
           INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE "users_user"."is_active"
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3187,6 +3189,7 @@
              LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
              LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
              LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+             WHERE "users_user"."is_active"
              GROUP BY 1) subquery
         ''',
       }),
@@ -3330,6 +3333,7 @@
           LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE "users_user"."is_active"
           GROUP BY "gps_followupgroupmembership"."id"
           ORDER BY RANDOM() ASC
         ''',
