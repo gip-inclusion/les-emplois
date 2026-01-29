@@ -1,0 +1,21 @@
+{% comment %}
+Banner when performing action for a job seeker.
+
+Only used in the {% global_messages %} block.
+
+See examples -> https://zeroheight.com/85c89893b/p/0775de-alerts/b/995f63/t/page-0775de-91507343-995f63-25
+{% endcomment %}
+<div class="alert alert-primary fade show" role="status">
+    <div class="d-flex flex-row justify-content-between align-items-center">
+        <p class="mb-0 text-start">
+            <i class="ri-arrow-right-line fw-medium pe-2" aria-hidden="true"></i>
+            {{ content }}
+        </p>
+        {% if exit_url %}
+            <a href="{{ exit_url }}" class="btn-link-white btn-ico align-items-center" aria-label="Quitter la procédure">
+                <i class="ri-close-line ri-xl fw-medium me-1" aria-hidden="true"></i>
+                <span class="fs-sm fw-medium">Quitter</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
