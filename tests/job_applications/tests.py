@@ -1121,7 +1121,7 @@ class TestJobApplicationNotifications:
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
 
         # Subject
-        assertion(job_application.job_seeker.get_full_name(), email.subject)
+        assertion(job_application.job_seeker.get_inverted_full_name(), email.subject)
 
         # Body.
         assertion(job_application.job_seeker.first_name.title(), email.body)
@@ -1208,7 +1208,7 @@ class TestJobApplicationNotifications:
         assert "Candidature acceptée et votre avis sur les emplois de l'inclusion" in email.subject
         # Body.
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
-        assertion(job_application.job_seeker.get_full_name(), email.body)
+        assertion(job_application.job_seeker.get_inverted_full_name(), email.body)
         assert job_application.sender.get_full_name() in email.body
         assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
@@ -1497,7 +1497,7 @@ class TestJobApplicationNotifications:
         # Body.
         assert "annulée" in employer_email.body
         assert job_application.sender.get_full_name() in employer_email.body
-        assert job_application.job_seeker.get_full_name() in employer_email.body
+        assert job_application.job_seeker.get_inverted_full_name() in employer_email.body
 
         assert "annulée" in prescriber_email.body
         if is_authorized_prescriber:
@@ -1505,7 +1505,7 @@ class TestJobApplicationNotifications:
         else:
             assert mailoutbox[1].body != employer_email.body
         assertion = assertIn if is_authorized_prescriber else assertNotInCaseFolded
-        assertion(job_application.job_seeker.get_full_name(), prescriber_email.body)
+        assertion(job_application.job_seeker.get_inverted_full_name(), prescriber_email.body)
         assertion(job_application.job_seeker.first_name.title(), prescriber_email.body)
         assertion(job_application.job_seeker.last_name.upper(), prescriber_email.body)
         assertion(job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"), prescriber_email.body)
@@ -1540,8 +1540,8 @@ class TestJobApplicationNotifications:
 
         # Body.
         assert "annulée" in mailoutbox[0].body
-        assert job_application.sender.get_full_name() in mailoutbox[0].body
-        assert job_application.job_seeker.get_full_name() in mailoutbox[0].body
+        assert job_application.sender.get_inverted_full_name() in mailoutbox[0].body
+        assert job_application.job_seeker.get_inverted_full_name() in mailoutbox[0].body
 
     def test_cancel_without_sender(self, django_capture_on_commit_callbacks, mailoutbox):
         job_application = JobApplicationFactory(
