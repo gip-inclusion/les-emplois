@@ -19,6 +19,8 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from itou.approvals.models import Approval
 from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
@@ -30,6 +32,7 @@ from itou.www.itou_staff_views import merge_utils
 from itou.www.itou_staff_views.export_utils import (
     cta_export_spec,
     export_row,
+    fs_3437_export_spec,
     get_export_ts,
     job_app_export_spec,
 )
@@ -204,6 +207,36 @@ def export_cta(request):
             "Content-Disposition": content_disposition_header(
                 as_attachment=True,
                 filename=f"export_cta_{get_export_ts()}.csv",
+            ),
+        },
+        streaming_content=(writer.writerow(row) for row in content()),
+    )
+
+
+@check_user(lambda user: user.is_staff)
+@permission_required("employee_record.view_employeerecord")
+def export_fs_3437(request):
+    employee_record_qs = (
+        EmployeeRecord.objects.filter(
+            status=Status.REJECTED,
+            asp_processing_code=EmployeeRecord.ASP_UNIQUE_ID_MISMATCH_CODE,
+        )
+        .select_related("job_application__job_seeker__jobseeker_profile")
+        .order_by("-updated_at")
+    )
+
+    def content():
+        yield fs_3437_export_spec.keys()
+        for obj in employee_record_qs.iterator():
+            yield export_row(fs_3437_export_spec, obj)
+
+    writer = csv.writer(Echo())
+    return StreamingHttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": content_disposition_header(
+                as_attachment=True,
+                filename=f"export_fs_3437_{get_export_ts()}.csv",
             ),
         },
         streaming_content=(writer.writerow(row) for row in content()),
