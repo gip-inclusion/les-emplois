@@ -40,9 +40,8 @@ class NexusApiMixin:
     def delete(self, request, *args, **kwargs):
         serializer = DeleteObjectSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        if self.perform_delete(serializer):
-            return Response({}, status=status.HTTP_200_OK)
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
+        self.perform_delete(serializer)
+        return Response({}, status=status.HTTP_200_OK)
 
     def perform_delete(self, serializer):
         source_ids = [data["source_id"] for data in serializer.validated_data]

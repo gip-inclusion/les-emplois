@@ -175,7 +175,7 @@ class TestUserAPI(NexusApiTestMixin):
     def test_delete_unknown_user(self):
         api_client = self.api_client(service=Service.COMMUNAUTE)
         response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
-        assert response.status_code == 404
+        assert response.status_code == 200
 
     def test_ignore_other_sources(self):
         api_client = self.api_client(service=Service.DORA)
@@ -374,7 +374,7 @@ class TestStructureAPI(NexusApiTestMixin):
         api_client = self.api_client(service=Service.COMMUNAUTE)
 
         response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
-        assert response.status_code == 404
+        assert response.status_code == 200
 
     def test_validate_payload(self):
         api_client = self.api_client(service=Service.DORA)
@@ -516,7 +516,7 @@ class TestMembershipsAPI(NexusApiTestMixin):
         api_client = self.api_client(service=Service.COMMUNAUTE)
 
         response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
-        assert response.status_code == 404
+        assert response.status_code == 200
 
     def test_validate_payload(self):
         api_client = self.api_client(service=Service.DORA)
