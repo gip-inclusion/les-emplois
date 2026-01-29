@@ -1834,9 +1834,11 @@
           SELECT "gps_followupgroup"."beneficiary_id" AS "follow_up_group__beneficiary_id",
                  "gps_followupgroupmembership"."can_view_personal_information" AS "can_view_personal_information"
           FROM "gps_followupgroupmembership"
+          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-          WHERE ("gps_followupgroupmembership"."is_active"
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroupmembership"."is_active"
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND "gps_followupgroupmembership"."ended_at" IS NULL)
           GROUP BY "gps_followupgroupmembership"."id",
@@ -1907,9 +1909,11 @@
           FROM
             (SELECT "gps_followupgroupmembership"."id" AS "col1"
              FROM "gps_followupgroupmembership"
+             INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
              INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
              LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-             WHERE ("gps_followupgroupmembership"."is_active"
+             WHERE ("users_user"."is_active"
+                    AND "gps_followupgroupmembership"."is_active"
                     AND "gps_followupgroupmembership"."member_id" = %s
                     AND "gps_followupgroupmembership"."ended_at" IS NULL)
              GROUP BY 1) subquery
@@ -2017,7 +2021,8 @@
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
           INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
-          WHERE ("gps_followupgroupmembership"."is_active"
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroupmembership"."is_active"
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND "gps_followupgroupmembership"."ended_at" IS NULL)
           GROUP BY "gps_followupgroupmembership"."id",
@@ -2143,7 +2148,8 @@
                        "users_user"."allow_next_sso_sub_update" AS "col50"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
-                WHERE ("gps_followupgroupmembership"."is_referent_certified"
+                WHERE ("users_user"."is_active"
+                       AND "gps_followupgroupmembership"."is_referent_certified"
                        AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s,
                                                                                   %s))
                 ORDER BY RANDOM() ASC) "qualify"
@@ -2467,9 +2473,11 @@
           SELECT "gps_followupgroup"."beneficiary_id" AS "follow_up_group__beneficiary_id",
                  "gps_followupgroupmembership"."can_view_personal_information" AS "can_view_personal_information"
           FROM "gps_followupgroupmembership"
+          INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-          WHERE ("gps_followupgroupmembership"."is_active"
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroupmembership"."is_active"
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
           GROUP BY "gps_followupgroupmembership"."id",
@@ -2539,9 +2547,11 @@
           FROM
             (SELECT "gps_followupgroupmembership"."id" AS "col1"
              FROM "gps_followupgroupmembership"
+             INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
              INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
              LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
-             WHERE ("gps_followupgroupmembership"."is_active"
+             WHERE ("users_user"."is_active"
+                    AND "gps_followupgroupmembership"."is_active"
                     AND "gps_followupgroupmembership"."member_id" = %s
                     AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
              GROUP BY 1) subquery
@@ -2649,7 +2659,8 @@
           INNER JOIN "gps_followupgroup" ON ("gps_followupgroupmembership"."follow_up_group_id" = "gps_followupgroup"."id")
           LEFT OUTER JOIN "gps_followupgroupmembership" T4 ON ("gps_followupgroup"."id" = T4."follow_up_group_id")
           INNER JOIN "users_user" T6 ON ("gps_followupgroup"."beneficiary_id" = T6."id")
-          WHERE ("gps_followupgroupmembership"."is_active"
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroupmembership"."is_active"
                  AND "gps_followupgroupmembership"."member_id" = %s
                  AND NOT ("gps_followupgroupmembership"."ended_at" IS NULL))
           GROUP BY "gps_followupgroupmembership"."id",
@@ -2775,7 +2786,8 @@
                        "users_user"."allow_next_sso_sub_update" AS "col50"
                 FROM "gps_followupgroupmembership"
                 INNER JOIN "users_user" ON ("gps_followupgroupmembership"."member_id" = "users_user"."id")
-                WHERE ("gps_followupgroupmembership"."is_referent_certified"
+                WHERE ("users_user"."is_active"
+                       AND "gps_followupgroupmembership"."is_referent_certified"
                        AND "gps_followupgroupmembership"."follow_up_group_id" IN (%s))
                 ORDER BY RANDOM() ASC) "qualify"
              WHERE ("qual0" > %s

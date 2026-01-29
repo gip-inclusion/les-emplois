@@ -2225,7 +2225,9 @@
                  "gps_followupgroup"."updated_at",
                  "gps_followupgroup"."beneficiary_id"
           FROM "gps_followupgroup"
-          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',
@@ -4987,7 +4989,9 @@
                  "gps_followupgroup"."updated_at",
                  "gps_followupgroup"."beneficiary_id"
           FROM "gps_followupgroup"
-          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',
