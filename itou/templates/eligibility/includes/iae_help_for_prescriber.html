@@ -22,9 +22,3 @@
         </div>
     </div>
 {% endif %}
-
-{% if criteria_filled_from_job_seeker %}
-    {% include "eligibility/includes/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
-{% elif job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
-    {% include "apply/includes/known_criteria.html" %}
-{% endif %}
