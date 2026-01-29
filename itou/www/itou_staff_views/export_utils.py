@@ -207,3 +207,17 @@ cta_export_spec = {
     "Administrateur ?": lambda membership: "Oui" if membership.is_admin else "Non",
     "Utilisateur - date d'inscription": lambda membership: membership.user.date_joined.strftime("%d-%m-%Y"),
 }
+
+fs_3437_export_spec = {
+    "idItou": lambda er: er.job_application.job_seeker.jobseeker_profile.asp_uid,
+    "nomUsage": lambda er: er.job_application.job_seeker.last_name,
+    "prenom": lambda er: er.job_application.job_seeker.first_name,
+    "dateNaissance": lambda er: er.job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+    "numeroIDE": lambda er: er.job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+    "NIR": lambda er: er.job_application.job_seeker.jobseeker_profile.nir,
+    "NTT": lambda er: er.ntt,
+    "passIae": lambda er: er.approval_number,
+    "siret": lambda er: er.siret,
+    "mesure": lambda er: er.asp_measure,
+    "horodatage": lambda er: er.asp_batch_file,
+}

@@ -23,6 +23,8 @@ from pytest_django.asserts import (
 from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
@@ -40,7 +42,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.employee_record.factories import EmployeeRecordTransitionLogFactory
+from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordTransitionLogFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -1088,3 +1090,61 @@ class TestOTP:
             assertContains(response, device_1.name)
             assertNotContains(response, device_2.name)
             assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+
+
+class TestExportFS3437:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            pytest.param(JobSeekerFactory, {}, 403, id="job_seeker"),
+            pytest.param(EmployerFactory, {"membership": True}, 403, id="employer"),
+            pytest.param(PrescriberFactory, {}, 403, id="prescriber"),
+            pytest.param(LaborInspectorFactory, {"membership": True}, 403, id="labor_inspector"),
+            pytest.param(ItouStaffFactory, {}, 302, id="staff"),
+            pytest.param(ItouStaffFactory, {"is_superuser": True}, 200, id="superuser"),
+        ],
+    )
+    def test_requires_superuser(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:export_fs_3437"))
+        assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:export_fs_3437")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="view_employeerecord"))
+        response = client.get(url)
+        assert response.status_code == 200
+
+    @freeze_time("2024-05-17T11:11:11+02:00")
+    def test_export(self, admin_client, snapshot):
+        EmployeeRecordFactory(
+            status=Status.REJECTED,
+            asp_processing_code="3437",
+            job_application__approval__for_snapshot=True,
+            job_application__to_company__for_snapshot=True,
+            job_application__job_seeker__for_snapshot=True,
+        )
+        EmployeeRecordFactory(
+            status=Status.READY,
+            asp_processing_code="3437",
+        )
+        EmployeeRecordFactory(
+            status=Status.REJECTED,
+            asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
+        )
+        EmployeeRecordFactory(asp_processing_code=EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE)
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = admin_client.get(
+                reverse("itou_staff_views:export_fs_3437"),
+            )
+            assert response.status_code == 200
+            assert response["Content-Disposition"] == ('attachment; filename="export_fs_3437_2024-05-17_11-11-11.csv"')
+            assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")

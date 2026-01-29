@@ -42,6 +42,7 @@ def validate_asp_batch_filename(value):
 class ASPExchangeInformation(models.Model):
     ASP_PROCESSING_SUCCESS_CODE = "0000"
     ASP_DUPLICATE_ERROR_CODE = "3436"
+    ASP_UNIQUE_ID_MISMATCH_CODE = "3437"
 
     ASP_MOVEMENT_TYPE = None  # Must be specified in descendant classes
 
