@@ -278,6 +278,16 @@ class EducationLevel(models.TextChoices):
     TRAINING_1_YEAR = "60", "Formation courte d'une durée d'un an"
     NO_SCHOOLING_BEYOND_MANDATORY = "70", "Pas de formation au-delà de la scolarité obligatoire"
 
+    @classmethod
+    def eligible_for_cap_bep_criterion(cls):
+        return [
+            cls.BEP_OR_CAP_DIPLOMA,
+            cls.BEP_OR_CAP_LEVEL,
+            cls.NON_CERTIFYING_QUALICATIONS,
+            cls.NO_SCHOOLING,
+            cls.NO_SCHOOLING_BEYOND_MANDATORY,
+        ]
+
 
 class EmployerType(models.TextChoices):
     """
