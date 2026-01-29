@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
+from django.core.exceptions import PermissionDenied
 
 from itou.geo.models import QPV, ZRR
-from itou.utils.admin import ItouModelAdmin, ItouModelMixin
+from itou.utils.admin import ItouGISMixin, ItouModelAdmin, ItouModelMixin
 
 
 @admin.register(QPV)
-class QPVAdmin(ItouModelMixin, GISModelAdmin):
+class QPVAdmin(ItouModelMixin, ItouGISMixin, GISModelAdmin):
     list_display = (
         "pk",
         "code",
@@ -20,17 +21,28 @@ class QPVAdmin(ItouModelMixin, GISModelAdmin):
         "code",
         "name",
         "communes_info",
+        "geometry",
     )
+    readonly_fields = ("code", "name", "communes_info")
 
-    # GIS reference models are read-only
-    # TODO: find a way to display map of a geometry in "read-only" mode
-    actions = None
+    def has_add_permission(self, request, obj=None):
+        return False
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return True  # True to allow geometry display and really, this admin is read-only
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        if request.method not in ("GET", "HEAD", "OPTIONS", "TRACE"):
+            raise PermissionDenied
+        if extra_context is None:
+            # Hide save buttons to prevent users from trying to save changes
+            extra_context = {}
+            extra_context["show_save"] = False
+            extra_context["show_save_and_continue"] = False
+        return super().change_view(request, object_id, form_url=form_url, extra_context=extra_context)
 
 
 @admin.register(ZRR)
