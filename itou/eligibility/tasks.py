@@ -44,6 +44,9 @@ def certify_criterion_with_api_particulier(criterion):
                     if "errors" not in criterion.data_returned_by_api:
                         raise
                     criterion.certified_at = timezone.now()
+                case 409:
+                    # A request using the same token with same parameters is in progress.
+                    raise RetryTask(delay=60) from exc
                 case 429:
                     # https://particulier.api.gouv.fr/developpeurs#respecter-la-volumétrie
                     raise RetryTask(delay=int(exc.response.headers["Retry-After"])) from exc
