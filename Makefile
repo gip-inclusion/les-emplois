@@ -82,6 +82,7 @@ populate_db_with_reference_data: $(VIRTUAL_ENV)
 		itou/fixtures/postgres/jobs_rome.sql \
 		itou/fixtures/postgres/jobs_appellation.sql \
 	| python manage.py dbshell
+	python manage.py loaddata_bulk itou/geo/fixtures/QPV_2024.json
 
 populate_db: populate_db_with_reference_data
 	python manage.py loaddata_bulk itou/fixtures/django/*.json
