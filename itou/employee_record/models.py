@@ -492,13 +492,6 @@ class EmployeeRecord(ASPExchangeInformation, xwf_models.WorkflowEnabled):
 
         return PrescriberType.OTHER_AUTHORIZED_PRESCRIBERS
 
-    @property
-    def asp_siae_type(self):
-        """
-        Mapping between ASP and itou models for SIAE kind ("Mesure")
-        """
-        return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
-
     def has_siret_different_from_asp_source(self):
         siret_from_asp_source = (
             self.siret_from_asp_source
