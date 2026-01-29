@@ -130,6 +130,7 @@ USER_KIND_MAPPING = {
         "offreur": NexusUserKind.FACILITY_MANAGER,
         "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
         "autre": "",
+        "": "",
     },
     Service.COMMUNAUTE: {
         "": "",  # this service does not have a user kind
