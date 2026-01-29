@@ -46,8 +46,7 @@ class Migration(migrations.Migration):
                     "prescriber",
                     models.ForeignKey(
                         limit_choices_to={"kind": "prescriber"},
-                        null=True,
-                        on_delete=django.db.models.deletion.SET_NULL,
+                        on_delete=django.db.models.deletion.CASCADE,
                         related_name="prescriber_assignments",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="prescripteur",
@@ -88,19 +87,8 @@ class Migration(migrations.Migration):
                         name="unique_jobseekerassignment_assignment_per_jobseeker",
                         nulls_distinct=False,
                         violation_error_message=(
-                            "Une affectation existe déjà entre le candidat et le "
-                            "prescripteur et/ou l'organisation prescriptrice."
-                        ),
-                    ),
-                    models.CheckConstraint(
-                        condition=models.Q(
-                            ("prescriber__isnull", False),
-                            ("prescriber_organization__isnull", False),
-                            _connector="OR",
-                        ),
-                        name="prescriber_and_or_organization_jobseekerassignment",
-                        violation_error_message=(
-                            "Un candidat doit être associé à un prescripteur et/ou à une organisation prescriptrice."
+                            "Une affectation existe déjà entre le candidat, le prescripteur et l'organisation "
+                            "prescriptrice."
                         ),
                     ),
                 ],

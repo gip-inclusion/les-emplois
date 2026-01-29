@@ -1342,23 +1342,23 @@ class TestJobSeekerAssignment:
         )
         assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
 
-    def test_prescriber_and_or_organization(self):
+    def test_prescriber_and_organization(self):
         job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+        prescriber_organization = PrescriberOrganizationFactory()
 
+        # prescriber_organization is not mandatory
+        JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, None, random.choice(ActionKind.values))
+
+        # prescriber is mandatory
         with pytest.raises(IntegrityError):
-            JobSeekerAssignment.objects.upsert_assignment(job_seeker, None, None, random.choice(ActionKind.values))
+            JobSeekerAssignment.objects.upsert_assignment(
+                job_seeker, None, prescriber_organization, random.choice(ActionKind.values)
+            )
 
-    @pytest.mark.parametrize(
-        "with_prescriber,with_organization",
-        [
-            (True, True),
-            (True, False),
-            (False, True),
-        ],
-    )
-    def test_unique_constraint(self, with_prescriber, with_organization):
-        prescriber = PrescriberFactory() if with_prescriber else None
-        organization = PrescriberOrganizationFactory() if with_organization else None
+    def test_unique_constraint(self):
+        prescriber = PrescriberFactory()
+        organization = PrescriberOrganizationFactory()
         assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
 
         # upsert_assignment updates the existing assignment
@@ -1366,22 +1366,20 @@ class TestJobSeekerAssignment:
             assignment.job_seeker, prescriber, organization, random.choice(ActionKind.values)
         )
 
+        # no error with another value for prescriber_organization
+        JobSeekerAssignmentFactory(
+            job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=None
+        )
+
         with pytest.raises(IntegrityError):
             JobSeekerAssignmentFactory(
                 job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=organization
             )
 
-    @pytest.mark.parametrize(
-        "with_prescriber,with_organization",
-        [
-            (True, True),
-            (True, False),
-            (False, True),
-        ],
-    )
-    def test_assign_job_seeker(self, with_prescriber, with_organization, snapshot):
+    @pytest.mark.parametrize("with_organization", [True, False])
+    def test_assign_job_seeker(self, with_organization, snapshot):
         job_seeker = JobSeekerFactory()
-        prescriber = PrescriberFactory() if with_prescriber else None
+        prescriber = PrescriberFactory()
         organization = PrescriberOrganizationFactory() if with_organization else None
 
         # Creation

@@ -66,7 +66,7 @@ from tests.files.factories import FileFactory
 from tests.gps.factories import FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedJobApplicationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -1543,25 +1543,19 @@ class TestAnonymizeProfessionalManagementCommand:
     def test_anonymize_professional_with_job_seeker_assignment(
         self, django_capture_on_commit_callbacks, caplog, respx_mock
     ):
-        # Assignment with a prescriber only, will be deleted
+        organization = random.choice([PrescriberOrganizationFactory(), None])
         JobSeekerAssignmentFactory(
             prescriber__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
             prescriber__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
-            prescriber_organization=None,
-        )
-        # Assignment with a prescriber and an organization, will be updated (prescriber=None)
-        assignment = JobSeekerAssignmentFactory(
-            prescriber__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
-            prescriber__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+            prescriber_organization=organization,
         )
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("anonymize_professionals", wet_run=True)
 
-        assert "Anonymized professionals after grace period, count: 2" in caplog.messages
-        assert JobSeekerAssignment.objects.count() == 1
-        assignment.refresh_from_db()
-        # assert assignment.prescriber is None  # FIXME(ewen)
+        assert "Anonymized professionals after grace period, count: 1" in caplog.messages
+
+        assert not JobSeekerAssignment.objects.exists()
 
     @pytest.mark.parametrize("is_active", [True, False])
     def test_anonymize_professionals_notification(

@@ -1620,8 +1620,7 @@ class JobSeekerAssignment(models.Model):
     prescriber = models.ForeignKey(
         User,
         verbose_name="prescripteur",
-        null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="prescriber_assignments",
         limit_choices_to={"kind": UserKind.PRESCRIBER},
     )
@@ -1651,15 +1650,7 @@ class JobSeekerAssignment(models.Model):
                 fields=["job_seeker", "prescriber", "prescriber_organization"],
                 nulls_distinct=False,
                 violation_error_message=(
-                    "Une affectation existe déjà entre le candidat et le prescripteur et/ou l'organisation "
-                    "prescriptrice."
-                ),
-            ),
-            models.CheckConstraint(
-                name="prescriber_and_or_organization_%(class)s",
-                condition=(Q(prescriber__isnull=False) | Q(prescriber_organization__isnull=False)),
-                violation_error_message=(
-                    "Un candidat doit être associé à un prescripteur et/ou à une organisation prescriptrice."
+                    "Une affectation existe déjà entre le candidat, le prescripteur et l'organisation prescriptrice."
                 ),
             ),
         ]
