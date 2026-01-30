@@ -84,7 +84,7 @@ populate_db_with_reference_data: $(VIRTUAL_ENV)
 	| python manage.py dbshell
 
 populate_db: populate_db_with_reference_data
-	python manage.py loaddata_bulk itou/fixtures/django/*.json
+	python manage.py loaddata_bulk itou/fixtures/django/*.json itou/geo/fixtures/QPV_2024.json
 	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
 # Tests.
