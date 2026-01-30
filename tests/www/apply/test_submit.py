@@ -61,7 +61,7 @@ from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberOrganizationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -577,7 +577,7 @@ class TestApplyAsJobSeeker:
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
-        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="", phone="")
         client.force_login(user)
 
         # Entry point.
@@ -2067,9 +2067,10 @@ class TestApplyAsPrescriber:
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
-    def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
+    @pytest.mark.parametrize("is_authorized", [True, False])
+    def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client, is_authorized):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
-        user = PrescriberFactory()
+        user = PrescriberMembershipFactory(organization__authorized=is_authorized).user
         client.force_login(user)
         dummy_job_seeker = JobSeekerFactory(
             jobseeker_profile__with_hexa_address=True,
@@ -2094,8 +2095,112 @@ class TestApplyAsPrescriber:
             (
                 "Une erreur a été détectée. "
                 "La date de naissance renseignée ne correspond pas au numéro de sécurité "
-                "sociale 178122978200508 enregistré."
+                f"sociale {'178122978200508 ' if is_authorized else ''}enregistré."
             ),
+        )
+
+    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_birthdate(self, client):
+        company = CompanyFactory(with_membership=True)
+        client.force_login(PrescriberFactory())
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
+            jobseeker_profile__pole_emploi_id="",  # Make sure the view is accessible
+        )
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+
+        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session.name})
+        response = client.get(next_url)
+        assertNotContains(response, job_seeker.jobseeker_profile.birthdate.isoformat())
+        assert "birthdate" not in response.context["form"].fields
+
+        post_data = {
+            "phone": "",
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate with nir
+            "pole_emploi_id": "3454471C",
+        }
+        response = client.post(next_url, data=post_data)
+        job_seeker.jobseeker_profile.refresh_from_db()
+        # birthdate is unchanged but pole_emploi_id is updated
+        assert job_seeker.jobseeker_profile.birthdate == datetime.date(1990, 12, 1)
+        assert job_seeker.jobseeker_profile.pole_emploi_id == "3454471C"
+        assertRedirects(
+            response,
+            reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
+            fetch_redirect_response=False,
+        )
+
+    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_pole_emploi_id(self, client):
+        company = CompanyFactory(with_membership=True)
+        client.force_login(PrescriberFactory())
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__birthdate=None,  # Make sure the view is accessible
+            jobseeker_profile__pole_emploi_id="1234567C",
+        )
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+
+        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session.name})
+        response = client.get(next_url)
+        assertNotContains(response, job_seeker.jobseeker_profile.pole_emploi_id)
+        assert "pole_emploi_id" not in response.context["form"].fields
+
+        post_data = {
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "pole_emploi_id": "3454471C",
+        }
+        response = client.post(next_url, data=post_data)
+        job_seeker.jobseeker_profile.refresh_from_db()
+        # birthdate is updated but pole_emploi_id is unchanged
+        assert job_seeker.jobseeker_profile.birthdate == datetime.date(1978, 11, 20)
+        assert job_seeker.jobseeker_profile.pole_emploi_id == "1234567C"
+        assertRedirects(
+            response,
+            reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
+            fetch_redirect_response=False,
+        )
+
+    @pytest.mark.parametrize("is_authorized", [True, False])
+    @pytest.mark.parametrize("with_phone", [True, False])
+    def test_check_info_as_unauthorized_prescriber_for_job_seeker_with_phone(self, client, is_authorized, with_phone):
+        company = CompanyFactory(with_membership=True)
+        prescriber = PrescriberMembershipFactory(organization__authorized=is_authorized).user
+        client.force_login(prescriber)
+        job_seeker = JobSeekerFactory(
+            phone="0987654321" if with_phone else "",
+            jobseeker_profile__birthdate=datetime.date(1990, 12, 1),
+            jobseeker_profile__pole_emploi_id="",  # Make sure the view is accessible
+        )
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+
+        next_url = reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": apply_session.name})
+        response = client.get(next_url)
+        if with_phone:
+            if is_authorized:
+                assertContains(response, job_seeker.phone)
+            else:
+                assertNotContains(response, job_seeker.phone)
+
+        post_data = {
+            "phone": "0123456789",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
+        }
+        response = client.post(next_url, data=post_data)
+        job_seeker.jobseeker_profile.refresh_from_db()
+        assert (
+            job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
+            == LackOfPoleEmploiId.REASON_NOT_REGISTERED.value
+        )
+        job_seeker.refresh_from_db()
+        # Unauthorized prescribers can provide a phone only if the job seeker has none
+        if is_authorized or not with_phone:
+            # phone is updated
+            assert job_seeker.phone == "0123456789"
+        else:
+            # phone is unchanged
+            assert job_seeker.phone == "0987654321"
+        assertRedirects(
+            response,
+            reverse("apply:step_check_prev_applications", kwargs={"session_uuid": apply_session.name}),
+            fetch_redirect_response=False,
         )
 
 

@@ -373,22 +373,36 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         }
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, editor_request, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
+        self.editor_request = editor_request
+        # Don't display birthdate field if already set
+        if self.instance.jobseeker_profile.birthdate:
+            del self.fields["birthdate"]
+        else:
+            self.fields["birthdate"].required = True
+            self.fields["birthdate"].widget = DuetDatePickerWidget(
+                {
+                    "min": DuetDatePickerWidget.min_birthdate(),
+                    "max": DuetDatePickerWidget.max_birthdate(),
+                }
+            )
+        if self.instance.jobseeker_profile.pole_emploi_id:
+            del self.fields["pole_emploi_id"]
+            del self.fields["lack_of_pole_emploi_id_reason"]
+
+        if self.instance.phone:
+            del self.fields["phone"]
 
     def clean(self):
         super().clean()
-        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
-        JobSeekerProfile.clean_nir_title_birthdate_fields(
-            self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
-        )
+        if "pole_emploi_id" in self.cleaned_data:
+            JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+        if "birthdate" in self.cleaned_data:
+            JobSeekerProfile.clean_nir_title_birthdate_fields(
+                self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir},
+                remind_nir_in_error=can_view_personal_information(self.editor_request, self.instance),
+            )
 
 
 class SwitchStalledStatusForm(forms.ModelForm):
