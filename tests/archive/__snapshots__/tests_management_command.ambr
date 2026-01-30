@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 86,
+    'num_queries': 87,
     'queries': list([
       dict({
         'origin': list([
@@ -2837,6 +2837,36 @@
                                                             %s,
                                                             %s,
                                                             %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Command.anonymize_and_delete_professionals[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'Command.execute[utils/command.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "users_jobseekerassignment"
+          WHERE ("users_jobseekerassignment"."job_seeker_id" IN (%s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s,
+                                                                 %s)
+                 OR "users_jobseekerassignment"."prescriber_id" IN (%s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s,
+                                                                    %s))
         ''',
       }),
       dict({

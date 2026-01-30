@@ -60,6 +60,12 @@
       'jobseeker_profile': <class 'itou.users.models.JobSeekerProfile'>,
     }),
     dict({
+      'job_seeker_assignments': <class 'itou.users.models.JobSeekerAssignment'>,
+    }),
+    dict({
+      'prescriber_assignments': <class 'itou.users.models.JobSeekerAssignment'>,
+    }),
+    dict({
       'prescribermembership': <class 'itou.prescribers.models.PrescriberMembership'>,
     }),
     dict({

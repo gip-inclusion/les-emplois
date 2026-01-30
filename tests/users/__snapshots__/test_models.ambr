@@ -1,4 +1,100 @@
 # serializer version: 1
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False][assignment creation sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "prescriber_id",
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False][assignment update sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "prescriber_id",
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobSeekerAssignment.test_assign_job_seeker[True][assignment creation sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "prescriber_id",
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobSeekerAssignment.test_assign_job_seeker[True][assignment update sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "prescriber_id",
+                                                   "prescriber_organization_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "prescriber_id", "prescriber_organization_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
 # name: TestModel.test_create_job_seeker_by_proxy[email jobseeker created by proxy]
   '''
   Bonjour Monsieur John DOE,
