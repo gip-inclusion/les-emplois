@@ -5,6 +5,7 @@ from unidecode import unidecode
 
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.typing import CodeComInsee
+from itou.employee_record.utils import is_ntt_required
 from itou.users.enums import Title
 from itou.users.models import User
 from itou.utils.serializers import NullField, NullIfEmptyCharField
@@ -64,8 +65,9 @@ class _API_AddressSerializer(serializers.Serializer):
 
 
 class _API_PersonSerializer(serializers.Serializer):
-    # Specific field added to the API (not used in ASP transfers)
-    NIR = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.nir")
+    # Specific field added only to the API.
+    # Synchronized with salarieNIR to play nice (hopefully) with software already using it.
+    NIR = serializers.SerializerMethodField(method_name="get_salarieNIR")
 
     passIae = serializers.CharField(source="approval_number")
     sufPassIae = NullField()
@@ -92,6 +94,7 @@ class _API_PersonSerializer(serializers.Serializer):
 
     passDateDeb = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.start_at")
     passDateFin = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.end_at")
+    salarieNIR = serializers.SerializerMethodField()  # Duplicate of `NIR`, added to match the ASP case.
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.last_name).upper()
@@ -114,6 +117,12 @@ class _API_PersonSerializer(serializers.Serializer):
             "codeComInsee": None,
             "codeDpt": "099",
         }
+
+    def get_salarieNIR(self, obj: EmployeeRecord) -> str:
+        nir = obj.job_application.job_seeker.jobseeker_profile.nir
+        if is_ntt_required(nir):
+            return obj.ntt or ""
+        return nir
 
 
 class _API_SituationSerializer(serializers.Serializer):
@@ -164,6 +173,22 @@ class _API_SituationSerializer(serializers.Serializer):
     # Without any satisfactory answer, it has been decided to obfuscate / mock these fields.
     salarieTypeEmployeur = serializers.CharField(source="asp_employer_type", required=False)
     orienteur = serializers.CharField(source="asp_prescriber_type", required=False)
+
+    salarieSortantASE = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.ase_exit")
+    salarieParentIsole = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.isolated_parent"
+    )
+    salarieHebergement = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.housing_issue")
+    salarieRefugie = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.refugee")
+    salarieSortantDetention = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.detention_exit_or_ppsmj"
+    )
+    salarieLangueFrancaise = serializers.SerializerMethodField()
+    salarieMobilite = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.mobility_issue")
+
+    def get_salarieLangueFrancaise(self, obj: EmployeeRecord) -> bool:
+        # In ASP, True means that the job seeker can speak French
+        return not obj.job_application.job_seeker.jobseeker_profile.low_level_in_french
 
 
 class EmployeeRecordAPISerializer(serializers.Serializer):
