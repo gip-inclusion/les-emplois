@@ -378,7 +378,6 @@ class PendingAuthorizationForSender(ApplyStepBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.sender = request.user
         params = {
             "tunnel": "sender",
             "company": self.company.pk,
@@ -388,8 +387,8 @@ class PendingAuthorizationForSender(ApplyStepBaseView):
         self.next_url = reverse("job_seekers_views:get_or_create_start", query=params)
 
     def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-            logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
+        if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+            logger.info(f"dispatch ({request.path}) : {request.user.kind} in sender tunnel")
             return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
