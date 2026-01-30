@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import storages
 from django.forms import ValidationError
@@ -373,8 +374,11 @@ class ApplicationBaseView(ApplyStepBaseView):
         }
 
 
-class PendingAuthorizationForSender(ApplyStepBaseView):
+class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
+
+    def test_func(self):
+        return self.request.user.is_prescriber
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -385,12 +389,6 @@ class PendingAuthorizationForSender(ApplyStepBaseView):
             "apply_session_uuid": self.apply_session.name,
         }
         self.next_url = reverse("job_seekers_views:get_or_create_start", query=params)
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-            logger.info(f"dispatch ({request.path}) : {request.user.kind} in sender tunnel")
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
