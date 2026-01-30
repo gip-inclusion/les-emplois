@@ -529,8 +529,8 @@ class TestApplyAsJobSeeker:
 
         client.force_login(job_seeker)
 
-        def _check_info_url(session_uuid):
-            return reverse("job_seekers_views:check_job_seeker_info", kwargs={"session_uuid": session_uuid})
+        def _jobs_url(session_uuid):
+            return reverse("apply:application_jobs", kwargs={"session_uuid": session_uuid})
 
         # Step apply to company
         # ----------------------------------------------------------------------
@@ -541,7 +541,7 @@ class TestApplyAsJobSeeker:
         )
         response = client.get(apply_company_url_other_uuid, follow=True)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
-        assert response.request["PATH_INFO"] == _check_info_url(apply_session_name)
+        assert response.request["PATH_INFO"] == _jobs_url(apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker
 
@@ -555,6 +555,6 @@ class TestApplyAsJobSeeker:
 
         response = client.get(apply_job_description_url_other_uuid, follow=True)
         other_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[apply_session_name])
-        assert response.request["PATH_INFO"] == _check_info_url(other_apply_session_name)
+        assert response.request["PATH_INFO"] == _jobs_url(other_apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker

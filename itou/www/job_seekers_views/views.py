@@ -1252,7 +1252,18 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.form = CheckJobSeekerInfoForm(instance=self.job_seeker, data=request.POST or None)
+        self.form = (
+            CheckJobSeekerInfoForm(
+                instance=self.job_seeker,
+                data=request.POST or None,
+            )
+            if (
+                request.user.is_employer
+                or request.from_authorized_prescriber
+                or can_edit_personal_information(request, self.job_seeker)
+            )
+            else None
+        )
 
     def get_redirect_url(self):
         return reverse("apply:step_check_prev_applications", kwargs={"session_uuid": self.apply_session.name})
@@ -1263,21 +1274,41 @@ class CheckJobSeekerInformations(ApplicationBaseView):
             self.job_seeker.jobseeker_profile.pole_emploi_id
             or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
         )
-        if has_required_info:
+        if has_required_info or self.form is None:
             return HttpResponseRedirect(self.get_redirect_url())
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if self.form is None:
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
         if self.form.is_valid():
             self.form.save()
             return HttpResponseRedirect(self.get_redirect_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
+    def get_missing_fields_text(self):
+        missing_fields = []
+        plural = False
+        if "birthdate" in self.form.fields:
+            missing_fields.append("la date de naissance")
+        if "pole_emploi_id" in self.form.fields:
+            missing_fields.append("les informations France Travail")
+            plural = True
+        plural |= len(missing_fields) > 1
+        missing_fields_text = " et ".join(missing_fields)
+        missing_fields_text = missing_fields_text[0].upper() + missing_fields_text[1:]
+        if plural:
+            missing_fields_text += " sont obligatoires pour continuer."
+        else:
+            missing_fields_text += " est obligatoire pour continuer."
+        return missing_fields_text
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "missing_fields_text": self.get_missing_fields_text(),
         }
 
 
