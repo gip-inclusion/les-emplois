@@ -656,7 +656,6 @@ class TestApplyAsJobSeeker:
             "selected_jobs": [selected_job.pk],
             "reset_url": reset_url_company,
             "company_pk": company.pk,
-            "job_seeker_public_id": str(user.public_id),
         }
 
         next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
