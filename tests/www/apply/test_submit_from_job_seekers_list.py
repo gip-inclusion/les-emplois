@@ -537,6 +537,7 @@ class TestApplyAsJobSeeker:
         )
         response = client.get(apply_company_url_other_uuid, follow=True)
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
+        assert "job_seeker_public_id" not in client.session[apply_session_name]
         assert response.request["PATH_INFO"] == _check_info_url(apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker
@@ -551,6 +552,7 @@ class TestApplyAsJobSeeker:
 
         response = client.get(apply_job_description_url_other_uuid, follow=True)
         other_apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND, ignore=[apply_session_name])
+        assert "job_seeker_public_id" not in client.session[apply_session_name]
         assert response.request["PATH_INFO"] == _check_info_url(other_apply_session_name)
         assert response.status_code == 200
         assert response.context["user"] == job_seeker
