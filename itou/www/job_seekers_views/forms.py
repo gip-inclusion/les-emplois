@@ -373,9 +373,8 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         }
         widgets = {"phone": forms.TextInput(attrs={"type": "tel"})}
 
-    def __init__(self, *args, editor_request, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.editor_request = editor_request
         # Don't display birthdate field if already set
         if self.instance.jobseeker_profile.birthdate:
             del self.fields["birthdate"]
@@ -400,8 +399,7 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
             JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
         if "birthdate" in self.cleaned_data:
             JobSeekerProfile.clean_nir_title_birthdate_fields(
-                self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir},
-                remind_nir_in_error=can_view_personal_information(self.editor_request, self.instance),
+                self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
             )
 
 

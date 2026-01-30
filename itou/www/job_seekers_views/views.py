@@ -1253,10 +1253,17 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        self.form = CheckJobSeekerInfoForm(
-            instance=self.job_seeker,
-            data=request.POST or None,
-            editor_request=request,
+        self.form = (
+            CheckJobSeekerInfoForm(
+                instance=self.job_seeker,
+                data=request.POST or None,
+            )
+            if (
+                request.user.is_employer
+                or request.from_authorized_prescriber
+                or (request.user.is_prescriber and can_edit_personal_information(request, self.job_seeker))
+            )
+            else None
         )
 
     def get_redirect_url(self):
@@ -1268,12 +1275,14 @@ class CheckJobSeekerInformations(ApplicationBaseView):
             self.job_seeker.jobseeker_profile.pole_emploi_id
             or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
         )
-        if has_required_info:
+        if has_required_info or self.form is None:
             return HttpResponseRedirect(self.get_redirect_url())
 
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if self.form is None:
+            raise PermissionDenied("Votre utilisateur n'est pas autorisé à modifier les informations de ce candidat")
         if self.form.is_valid():
             self.form.save()
             return HttpResponseRedirect(self.get_redirect_url())
