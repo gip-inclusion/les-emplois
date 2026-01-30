@@ -38,5 +38,8 @@ MembershipsTable.add_columns(
             "fn": lambda o: o.companies_departments or o.prescriber_departments,
         },
         get_column_from_field(get_model_field(FollowUpGroupMembership, "created_in_bulk"), "created_in_bulk"),
+        get_column_from_field(
+            get_model_field(FollowUpGroupMembership, "is_referent_certified"), "is_referent_certified"
+        ),
     ]
 )
