@@ -79,7 +79,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -386,7 +386,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -677,7 +677,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -920,7 +920,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -1263,7 +1263,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -1591,7 +1591,7 @@
                                   </div>
                                   <div class="c-box--results__footer">
                                       <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                                               Voir sa candidature
                                           </a>
                                       </div>
@@ -1633,7 +1633,7 @@
                                   </div>
                                   <div class="c-box--results__footer">
                                       <div class="d-flex justify-content-end">
-                                          <a aria-label="Voir la candidature de Pierre DUPONT" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
+                                          <a aria-label="Voir la candidature de DUPONT Pierre" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="detail-candidature" href="/apply/11111111-1111-1111-1111-222222222222/prescriber/details?back_url=/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a">
                                               Voir sa candidature
                                           </a>
                                       </div>
@@ -2523,7 +2523,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -2845,7 +2845,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -3136,7 +3136,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -3372,7 +3372,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -3670,7 +3670,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -3961,7 +3961,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>
@@ -4197,7 +4197,7 @@
                                                   </h3>
                                               </div>
                                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                                  <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                                       <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                                       </i>
                                                       <span>

@@ -1,5 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load str_filters %}
 {% block subject %}
-Candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }} mise en attente par {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }}
+Candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} mise en attente par {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }}
 {% endblock %}
