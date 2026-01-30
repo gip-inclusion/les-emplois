@@ -20,15 +20,15 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider
-from itou.users.management.commands import send_check_authorized_members_email
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities, IdentityProvider
+from itou.users.management.commands import send_check_authorized_members_email, sync_job_seeker_assignments
 from itou.users.models import NirModificationRequest, User
 from itou.utils.apis.enums import PEApiRechercheIndividuExitCode
 from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse
 from itou.utils.brevo import BrevoListID
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
@@ -1438,6 +1438,76 @@ class TestSendCheckAuthorizedMembersEmailManagementCommand:
                 f"vérifiez la liste des membres de l’organisation {expected_membership.institution.name}"
             )
             assert mailoutbox[idx].to == [expected_membership.user.email]
+
+
+class TestSyncJobSeekerAssignmentManagementCommand:
+    def test_get_users_contacts(self):
+        # A prescriber in two organizations
+        organization_1 = PrescriberOrganizationFactory(with_membership=True)
+        prescriber = organization_1.members.first()
+        organization_2 = PrescriberOrganizationFactory(membership__user=prescriber)
+
+        # Prescriber alone
+        job_seeker_1 = JobSeekerFactory(
+            created_by=prescriber, jobseeker_profile__created_by_prescriber_organization=None
+        )
+        job_app_no_orga = JobApplicationFactory(
+            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=None
+        )
+
+        # Prescriber and orga 1
+        job_app_orga_1 = JobApplicationFactory(
+            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_1
+        )
+        geiq_diag_orga_1 = GEIQEligibilityDiagnosisFactory(
+            job_seeker=job_seeker_1,
+            author=prescriber,
+            author_prescriber_organization=organization_1,
+            expires_at=datetime.date.today() - datetime.timedelta(days=1),
+        )
+
+        # Prescriber and orga 2
+        job_seeker_2 = JobSeekerFactory(
+            created_by=prescriber, jobseeker_profile__created_by_prescriber_organization=organization_2
+        )
+        iae_diag_orga_2 = IAEEligibilityDiagnosisFactory(
+            job_seeker=job_seeker_1,
+            author=prescriber,
+            author_prescriber_organization=organization_2,
+            expires_at=datetime.date.today() - datetime.timedelta(days=1),
+        )
+        job_app_orga_2 = JobApplicationFactory(
+            job_seeker=job_seeker_1, sender=prescriber, sender_prescriber_organization=organization_2
+        )
+
+        # Ignore employers and job seekers
+        JobApplicationFactory(job_seeker=job_seeker_1, sent_by_company=True)
+        JobApplicationFactory(job_seeker=job_seeker_1, sent_by_job_seeker=True)
+        GEIQEligibilityDiagnosisFactory(job_seeker=job_seeker_1, from_employer=True)
+        IAEEligibilityDiagnosisFactory(job_seeker=job_seeker_1, from_employer=True)
+
+        print(sync_job_seeker_assignments.get_users_contacts([job_seeker_1.pk, job_seeker_2.pk]))
+        assert sync_job_seeker_assignments.get_users_contacts([job_seeker_1.pk, job_seeker_2.pk]) == {
+            job_seeker_1.pk: {
+                (prescriber.pk, None): [
+                    {"timestamp": job_seeker_1.date_joined, "action_kind": ActionKind.CREATE},
+                    {"timestamp": job_app_no_orga.created_at, "action_kind": ActionKind.APPLY},
+                ],
+                (prescriber.pk, organization_1.pk): [
+                    {"timestamp": job_app_orga_1.created_at, "action_kind": ActionKind.APPLY},
+                    {"timestamp": geiq_diag_orga_1.created_at, "action_kind": ActionKind.GEIQ_ELIGIBILITY},
+                ],
+                (prescriber.pk, organization_2.pk): [
+                    {"timestamp": job_app_orga_2.created_at, "action_kind": ActionKind.APPLY},
+                    {"timestamp": iae_diag_orga_2.created_at, "action_kind": ActionKind.IAE_ELIGIBILITY},
+                ],
+            },
+            job_seeker_2.pk: {
+                (prescriber.pk, organization_2.pk): [
+                    {"timestamp": job_seeker_2.date_joined, "action_kind": ActionKind.CREATE},
+                ]
+            },
+        }
 
 
 @pytest.mark.parametrize("is_after_cutoff", [True, False])
