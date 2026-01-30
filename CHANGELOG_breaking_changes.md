@@ -1,5 +1,9 @@
 # Journal des changements techniques majeurs
 
+## 2026-01-30
+
+- La branche master est renommée en main
+
 ## 2025-10-23
 
 - L'API data⋅inclusion est totalement changée sans rétrocompatibilité.
