@@ -97,6 +97,27 @@ def test_person_serializer_with_empty_birth_country():
     assert serializer.data["codeGroupePays"] is None
 
 
+@pytest.mark.parametrize(
+    "nir,ntt,expected",
+    [
+        pytest.param("", None, "", id="empty"),
+        pytest.param("123456789012345", "12345678901", "123456789012345", id="nir_and_ntt"),
+        pytest.param("", "12345678901", "12345678901", id="ntt_only"),
+        pytest.param("723456789012345", "12345678901", "12345678901", id="ntt_required_by_nia"),
+    ],
+)
+def test_person_serializer_nir_and_ntt_related_fields(nir, ntt, expected):
+    employee_record = EmployeeRecordFactory(
+        ntt=ntt,
+        job_application__job_seeker__jobseeker_profile__nir=nir,
+    )
+
+    serializer = _API_PersonSerializer(employee_record)
+    assert serializer.data["NIR"] == nir
+    assert serializer.data["NTT"] == ntt
+    assert serializer.data["salarieNIR"] == expected
+
+
 @pytest.mark.parametrize("kind", Company.ASP_EMPLOYEE_RECORD_KINDS)
 def test_oeth_employee(kind):
     employee_record = EmployeeRecordWithProfileFactory(
