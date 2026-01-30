@@ -185,18 +185,18 @@ class StartView(ApplicationPermissionMixin, View):
             else:
                 session_data["selected_jobs"] = [job_description.pk]
 
-        job_seeker = _get_job_seeker_to_apply_for(self.request)
-        if job_seeker:
-            session_data["job_seeker_public_id"] = str(job_seeker.public_id)
-
-        self.apply_session = initialize_apply_session(request, session_data)
-
         if request.user.is_job_seeker:
             tunnel = "job_seeker"
         elif self.hire_process:
             tunnel = "hire"
         else:
             tunnel = "sender"
+            job_seeker = _get_job_seeker_to_apply_for(self.request)
+
+            if job_seeker:
+                session_data["job_seeker_public_id"] = str(job_seeker.public_id)
+
+        self.apply_session = initialize_apply_session(request, session_data)
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
         if tunnel == "sender" and job_seeker:
@@ -304,14 +304,17 @@ class ApplicationBaseView(ApplyStepBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        job_seeker_public_id = self.apply_session.get("job_seeker_public_id") or request.GET.get(
-            "job_seeker_public_id"
-        )
-        self.job_seeker = get_object_or_404(
-            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
-        )
-        if "job_seeker_public_id" not in self.apply_session:
-            self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
+        if request.user.is_job_seeker:
+            self.job_seeker = request.user
+        else:  # prescriber or employer
+            job_seeker_public_id = self.apply_session.get("job_seeker_public_id") or request.GET.get(
+                "job_seeker_public_id"
+            )
+            self.job_seeker = get_object_or_404(
+                User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+            )
+            if "job_seeker_public_id" not in self.apply_session:
+                self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         # Prescribers do not see employer diagnosis.
         for_company = self.company if self.request.user.is_employer else None
