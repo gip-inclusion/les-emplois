@@ -4,7 +4,7 @@
 
 {% block content_extend %}
     <div class="alert alert-warning" role="status">
-        <p class="mb-0">La date de naissance et les informations France Travail sont obligatoires pour continuer.</p>
+        <p class="mb-0">{{ missing_fields_text }}</p>
     </div>
 
     <form method="post" class="js-prevent-multiple-submit">

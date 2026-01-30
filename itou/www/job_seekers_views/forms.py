@@ -375,20 +375,33 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DuetDatePickerWidget(
-            {
-                "min": DuetDatePickerWidget.min_birthdate(),
-                "max": DuetDatePickerWidget.max_birthdate(),
-            }
-        )
+
+        # Don't display fields if already set
+        if self.instance.jobseeker_profile.birthdate:
+            del self.fields["birthdate"]
+        else:
+            self.fields["birthdate"].required = True
+            self.fields["birthdate"].widget = DuetDatePickerWidget(
+                {
+                    "min": DuetDatePickerWidget.min_birthdate(),
+                    "max": DuetDatePickerWidget.max_birthdate(),
+                }
+            )
+        if self.instance.jobseeker_profile.pole_emploi_id:
+            del self.fields["pole_emploi_id"]
+            del self.fields["lack_of_pole_emploi_id_reason"]
+
+        if self.instance.phone:
+            del self.fields["phone"]
 
     def clean(self):
         super().clean()
-        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
-        JobSeekerProfile.clean_nir_title_birthdate_fields(
-            self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
-        )
+        if "pole_emploi_id" in self.cleaned_data:
+            JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+        if "birthdate" in self.cleaned_data:
+            JobSeekerProfile.clean_nir_title_birthdate_fields(
+                self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
+            )
 
 
 class SwitchStalledStatusForm(forms.ModelForm):
