@@ -1109,6 +1109,7 @@ def test_populate_gps_memberships(snapshot):
                 membership.member.pk,
                 ["13", "63", "75"],
                 int(membership.created_in_bulk),
+                int(membership.is_referent_certified),
                 datetime.date(2023, 2, 1),
             ),
         ]
