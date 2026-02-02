@@ -634,7 +634,6 @@ class SearchByEmailForSenderView(JobSeekerForSenderBaseView):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "nir": self.job_seeker_session.get("profile", {}).get("nir"),
-            "siae": self.company,
             "preview_mode": False,
         }
 
