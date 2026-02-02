@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 
+
 logger = logging.getLogger(__name__)
 
 ADDED = "ajouté"
@@ -30,6 +31,7 @@ LABEL_TITLES = {
     TECH: "Tech",
 }
 
+
 def capfirst(x):
     """Imported from django/utils/text.py"""
     if not x:
@@ -38,16 +40,17 @@ def capfirst(x):
         x = str(x)
     return x[0].upper() + x[1:]
 
+
 def prepare_branch(branch):
     # The remote branch may not exist, ignore errors.
-    subprocess.run(["git", "fetch", "origin", "master", branch])
+    subprocess.run(["git", "fetch", "origin", "main", branch])
     try:
         subprocess.run(["git", "switch", branch], check=True)
         created = False
     except subprocess.CalledProcessError:
         subprocess.run(["git", "switch", "--create", branch], check=True)
         created = True
-    subprocess.run(["git", "reset", "--hard", "origin/master"], check=True)
+    subprocess.run(["git", "reset", "--hard", "origin/main"], check=True)
     return created
 
 
