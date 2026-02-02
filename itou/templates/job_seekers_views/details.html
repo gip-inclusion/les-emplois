@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block title_content %}
-    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=can_edit_iae_eligibility iae_eligibility_diagnosis=iae_eligibility_diagnosis only %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=can_edit_iae_eligibility iae_eligibility_diagnosis=iae_eligibility_diagnosis services_search_url=services_search_url service_search_event_option="services-search-from-details-general" only %}
 {% endblock %}
 
 {% block title_extra %}
