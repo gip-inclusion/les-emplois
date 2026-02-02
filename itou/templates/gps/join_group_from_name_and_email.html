@@ -42,7 +42,7 @@
                                             <div class="modal-body">
                                                 {% if email_only_match and can_use_gps_advanced_features %}
                                                     <p>
-                                                        Cette adresse e-mail est associée à <strong>{{ job_seeker.get_full_name }}</strong>, dont la date de naissance est le <strong>{{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>.
+                                                        Cette adresse e-mail est associée à <strong>{{ job_seeker.get_inverted_full_name }}</strong>, dont la date de naissance est le <strong>{{ job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}</strong>.
                                                     </p>
                                                 {% else %}
                                                     <p>

@@ -7,7 +7,7 @@
 {% load siae_evaluations_tags %}
 {% load static %}
 
-{% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
+{% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_inverted_full_name }}{% endblock %}
 
 {% block title_navinfo %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
@@ -20,7 +20,9 @@
                 Ajouter un justificatif
                 {% evaluated_job_application_state_display evaluated_administrative_criteria.evaluated_job_application %}
             </h1>
-            <p>{{ evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker.get_full_name }}</p>
+            <p>
+                {{ evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}
+            </p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}

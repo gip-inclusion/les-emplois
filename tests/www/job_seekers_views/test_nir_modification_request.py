@@ -72,7 +72,7 @@ def test_nir_modification_request_title_blocks_reflects_actor(client, is_proxy):
     url = reverse("job_seekers_views:nir_modification_request", kwargs={"public_id": job_seeker.public_id})
     response = client.get(url)
     assert response.status_code == 200
-    expected_name = job_seeker.get_full_name() if is_proxy else ""
+    expected_name = job_seeker.get_inverted_full_name() if is_proxy else ""
     name_fragment = f" pour {expected_name}" if expected_name else ""
     soup = parse_response_to_soup(response)
     title = f"Demande de régularisation NIR{name_fragment}"

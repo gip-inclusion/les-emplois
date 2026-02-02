@@ -253,8 +253,8 @@ class TestSiaeJobApplicationListView:
                         <div class="c-box--results__summary flex-grow-1">
                             <i class="ri-pass-valid-line" aria-hidden="true"></i>
                             <div>
-                                <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
-                                <span>Manny CALAVERA</span>
+                                <h3>PASS&nbsp;IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                                <span>CALAVERA Manny</span>
                             </div>
                         </div>
                         <div>
@@ -339,8 +339,8 @@ class TestSiaeJobApplicationListView:
                 <div class="c-box--results__summary flex-grow-1">
                     <i class="ri-pass-valid-line" aria-hidden="true"></i>
                     <div>
-                        <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
-                        <span>Manny CALAVERA</span>
+                        <h3>PASS&nbsp;IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                        <span>CALAVERA Manny</span>
                     </div>
                 </div>
                 <div>
@@ -377,8 +377,8 @@ class TestSiaeJobApplicationListView:
                 <div class="c-box--results__summary flex-grow-1">
                     <i class="ri-pass-valid-line" aria-hidden="true"></i>
                     <div>
-                        <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
-                        <span>Manny CALAVERA</span>
+                        <h3>PASS&nbsp;IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                        <span>CALAVERA Manny</span>
                     </div>
                 </div>
                 <div>

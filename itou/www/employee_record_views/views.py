@@ -153,7 +153,7 @@ def missing_employee(request, template_name="employee_record/missing_employee.ht
 
     all_job_seekers = sorted(
         JobApplication.objects.filter(to_company=siae).get_unique_fk_objects("job_seeker"),
-        key=lambda u: u.get_full_name(),
+        key=lambda u: u.get_inverted_full_name(),
     )
     form = FindEmployeeOrJobSeekerForm(employees=all_job_seekers, data=request.POST or None)
 

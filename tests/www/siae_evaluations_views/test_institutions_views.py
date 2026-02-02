@@ -1045,7 +1045,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         assertContains(response, formatted_number, html=True, count=1)
-        assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
+        assertContains(response, evaluated_job_application.job_application.job_seeker.get_inverted_full_name())
         assertContains(response, format_phone(evaluated_siae.siae.phone))
 
         assert response.context["back_url"] == back_url
@@ -1359,7 +1359,7 @@ class TestInstitutionEvaluatedSiaeDetailView:
         assertContains(response, escape(f"({evaluated_siae.siae.kind} - {evaluated_siae.siae.get_kind_display()})"))
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         assertContains(response, formatted_number, html=True, count=1)
-        assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
+        assertContains(response, evaluated_job_application.job_application.job_seeker.get_inverted_full_name())
         assert response.context["back_url"] == back_url
         assertNotContains(response, evaluated_job_application_url)
         assertContains(response, back_url)

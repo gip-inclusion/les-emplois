@@ -649,7 +649,7 @@ class TestProcessViews:
         assertNotContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
         assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
-        assertContains(response, "S… U…")
+        assertContains(response, "U… S…")
         assertNotContains(response, job_application.job_seeker.email)
         assertNotContains(response, job_application.job_seeker.phone)
         assertNotContains(response, job_application.job_seeker.post_code)
@@ -2213,7 +2213,7 @@ class TestProcessViews:
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
 
-        no_referent_str = f"L’accompagnateur de {job_seeker.get_full_name()} n’est pas connu de nos services"
+        no_referent_str = f"L’accompagnateur de {job_seeker.get_inverted_full_name()} n’est pas connu de nos services"
 
         # No referent found
         assertContains(response, no_referent_str)
@@ -2321,12 +2321,12 @@ class TestProcessViews:
 
         # text displayed if 2 prescribers are following this job seeker
         TWO_PRESCRIBERS_TEXT = (
-            f"Découvrez l'autre intervenant qui a accompagné {job_seeker.first_name} {job_seeker.last_name.upper()}"
+            f"Découvrez l'autre intervenant qui a accompagné {job_seeker.last_name.upper()} {job_seeker.first_name}"
         )
         # text displayed if more than 2 prescribers are following this job seeker
         MORE_THAN_2_PRESCRIBERS_TEXT = (
             "Découvrez les 2 autres intervenants qui ont accompagné "
-            f"{job_seeker.first_name} {job_seeker.last_name.upper()}"
+            f"{job_seeker.last_name.upper()} {job_seeker.first_name}"
         )
 
         prescriber = PrescriberFactory(

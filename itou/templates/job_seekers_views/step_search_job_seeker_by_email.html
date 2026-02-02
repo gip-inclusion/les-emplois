@@ -53,18 +53,18 @@
                         <div class="modal-body">
                             {# djlint:off #}
                             <p>
-                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>{% if standalone_creation and is_job_seeker_in_list %} figurant dans votre liste de candidats{% endif %}.
+                                L'adresse {{ form.email.value }} est associée au compte de <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>{% if standalone_creation and is_job_seeker_in_list %} figurant dans votre liste de candidats{% endif %}.
                             </p>
                             {# djlint:on #}
                             <p>
                                 {% if is_gps|default:False %}
                                     L'identité du candidat est une information clé pour la structure.
-                                    Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                                    Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
                                 {% elif standalone_creation and not is_job_seeker_in_list %}
                                     Le compte de ce candidat sera ajouté à votre liste une fois que vous aurez postulé pour lui.
                                 {% elif not standalone_creation %}
                                     L'identité du candidat est une information clé pour la structure.
-                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
                                     « Ce n'est pas mon candidat » afin d'enregistrer ses informations
                                     personnelles.
                                 {% endif %}

@@ -119,9 +119,9 @@
                 <div class="c-info mt-3 mt-md-4">
                     <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoExample" aria-expanded="false" aria-controls="collapseInfoExample">
                         {% if prescribers_count == 1 %}
-                            <span>Découvrez l'autre intervenant qui a accompagné {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
+                            <span>Découvrez l'autre intervenant qui a accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</span>
                         {% else %}
-                            <span>Découvrez les {{ prescribers_count }} autres intervenants qui ont accompagné {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
+                            <span>Découvrez les {{ prescribers_count }} autres intervenants qui ont accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</span>
                         {% endif %}
                     </button>
                     <div class="c-info__detail collapse" id="collapseInfoExample">
@@ -133,7 +133,7 @@
     {% else %}
         <div id="card-no-referent" class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3">
             <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
-                <i>L’accompagnateur de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} n’est pas connu de nos services</i>
+                <i>L’accompagnateur de {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }} n’est pas connu de nos services</i>
             </div>
             {% if not request.user.is_job_seeker %}
                 <div>

@@ -110,11 +110,11 @@ def assert_contains_apply_nir_modal(response, job_seeker, with_personal_informat
         <div class="modal-body">
             <p>
                 Le numéro {format_nir(job_seeker.jobseeker_profile.nir)} est associé au compte de
-                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>.
+                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>.
             </p>
             <p>
                 Si cette candidature n'est pas pour
-                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>,
+                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
                 cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
             </p>
         </div>
@@ -145,12 +145,12 @@ def assert_contains_apply_email_modal(response, job_seeker, with_personal_inform
         <div class="modal-body">
             <p>
                 L'adresse {job_seeker.email} est associée au compte de
-                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>.
+                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>.
             </p>
             <p>
                 L'identité du candidat est une information clé pour la structure.
                 Si cette candidature n'est pas pour
-                <b>{mask_unless(job_seeker.get_full_name(), with_personal_information)}</b>,
+                <b>{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}</b>,
                 cliquez sur « Ce n'est pas mon candidat » afin d'enregistrer ses informations personnelles.
             </p>
             {add_nir_text}
@@ -5380,7 +5380,7 @@ class TestFindJobSeekerForHireView:
         assertContains(response, "Déclarer une embauche")
 
         response = client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
-        assertContains(response, "Sylvie MARTIN")
+        assertContains(response, "MARTIN Sylvie")
         # Confirmation modal is shown
         assert response.context["preview_mode"] is True
 
@@ -5434,7 +5434,7 @@ class TestFindJobSeekerForHireView:
         assertNotContains(response, INVALID_NIR)
 
         response = client.post(search_by_email_url, data={"email": job_seeker.email, "preview": 1})
-        assertContains(response, "Sylvie MARTIN")
+        assertContains(response, "MARTIN Sylvie")
         # Confirmation modal is shown
         assert response.context["preview_mode"] is True
 

@@ -58,7 +58,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
                 author_prescriber_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été validée."
+            message = f"L’éligibilité du candidat {self.job_seeker.get_inverted_full_name()} a bien été validée."
         elif self.eligibility_diagnosis and not form.data.get("shrouded"):
             EligibilityDiagnosis.update_diagnosis(
                 self.eligibility_diagnosis,
@@ -66,7 +66,7 @@ class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
                 author_prescriber_organization=self.request.current_organization,
                 administrative_criteria=form.cleaned_data,
             )
-            message = f"L’éligibilité du candidat {self.job_seeker.get_full_name()} a bien été mise à jour."
+            message = f"L’éligibilité du candidat {self.job_seeker.get_inverted_full_name()} a bien été mise à jour."
         if message and self.display_success_messages:
             messages.success(self.request, message, extra_tags="toast")
         return HttpResponseRedirect(self.get_success_url())

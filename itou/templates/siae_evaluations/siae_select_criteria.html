@@ -7,7 +7,7 @@
 {% load static %}
 
 {% block title %}
-    Auto-prescriptions à justifier pour {{ evaluated_job_application.job_application.job_seeker.get_full_name }}
+    Auto-prescriptions à justifier pour {{ evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}
 {% endblock %}
 
 {% block title_navinfo %}
@@ -21,7 +21,7 @@
                 Modifier les critères administratifs
                 {% evaluated_job_application_state_display evaluated_job_application %}
             </h1>
-            <p>{{ evaluated_job_application.job_application.job_seeker.get_full_name }}</p>
+            <p>{{ evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}</p>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
