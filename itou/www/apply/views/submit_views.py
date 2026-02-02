@@ -201,11 +201,11 @@ class StartView(ApplicationPermissionMixin, View):
                 session_data["selected_jobs"] = [job_description.pk]
 
         if request.user.is_job_seeker:
-            tunnel = "job_seeker"
+            job_seeker_tunnel = "job_seeker"
         elif self.hire_process:
-            tunnel = "hire"
+            job_seeker_tunnel = "hire"
         else:
-            tunnel = "sender"
+            job_seeker_tunnel = "sender"
             job_seeker = _get_job_seeker_to_apply_for(self.request)
 
             if job_seeker:
@@ -214,7 +214,7 @@ class StartView(ApplicationPermissionMixin, View):
         self.apply_session = initialize_apply_session(request, session_data)
 
         # Go directly to step ApplicationJobsView if we're carrying the job seeker public id with us.
-        if tunnel == "sender" and job_seeker:
+        if job_seeker_tunnel == "sender" and job_seeker:
             return HttpResponseRedirect(
                 reverse(
                     "apply:application_jobs",
@@ -233,7 +233,7 @@ class StartView(ApplicationPermissionMixin, View):
                 reverse("apply:pending_authorization_for_sender", kwargs={"session_uuid": self.apply_session.name})
             )
 
-        if tunnel == "job_seeker":
+        if job_seeker_tunnel == "job_seeker":
             # Init a job_seeker_session needed for job_seekers_views
             job_seeker_session = self.init_job_seeker_session(request)
 
@@ -242,7 +242,7 @@ class StartView(ApplicationPermissionMixin, View):
             )
 
         params = {
-            "tunnel": tunnel,
+            "tunnel": job_seeker_tunnel,
             "apply_session_uuid": self.apply_session.name,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
