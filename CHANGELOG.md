@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-02-02
+
+### Ajouté
+
+- [Tableau de bord : Ajout de la recherche des services d'insertion](https://github.com/gip-inclusion/les-emplois/pull/7354)
+
+### Modifié
+
+- [Admin : Ajout de l'accès en lecture seule des modèles QPV et ZRR](https://github.com/gip-inclusion/les-emplois/pull/7435)
+- [Candidature : Nouvelle page récapitulative avant confirmation d'embauche](https://github.com/gip-inclusion/les-emplois/pull/7370)
+- [GPS : Gestion des utilisateurs désactivés](https://github.com/gip-inclusion/les-emplois/pull/7449)
+- [Interface : Afficher les bénéficiaires accompagnés GPS par NOM Prénom](https://github.com/gip-inclusion/les-emplois/pull/7441)
+- [Interface : Afficher les collaborateurs par NOM Prénom](https://github.com/gip-inclusion/les-emplois/pull/7437)
+- [Interface : Afficher les salariés et Pass IAE par NOM Prénom](https://github.com/gip-inclusion/les-emplois/pull/7434)
+- [Interface : Afficher Mes candidats par NOM Prénom](https://github.com/gip-inclusion/les-emplois/pull/7443)
+- [Pilotage : Exporter l'information sur le certification du référent (réseau d'intervenants)](https://github.com/gip-inclusion/les-emplois/pull/7457)
+- [Recherches : Rediriger vers la page attendue pour les utilisateurs connectés](https://github.com/gip-inclusion/les-emplois/pull/7340)
+
 ## 2026-01-26
 
 ### Ajouté
