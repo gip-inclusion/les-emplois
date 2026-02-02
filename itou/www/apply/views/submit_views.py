@@ -97,18 +97,18 @@ class ApplicationPermissionMixin:
     This mixin requires the following arguments that must be setup by the child view
 
     company: Company
-    hire_process: bool
-    auto_prescription_process: bool
+    tunnel: ApplyTunnel
     """
 
     def get_reset_url(self):
         raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
-        if self.hire_process and request.user.kind != UserKind.EMPLOYER:
-            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-        if self.hire_process and not self.company.has_member(request.user):
-            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+        if self.tunnel == ApplyTunnel.HIRE:
+            if request.user.kind != UserKind.EMPLOYER:
+                raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+            if not self.company.has_member(request.user):
+                raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
         if request.user.kind not in [
             UserKind.JOB_SEEKER,
             UserKind.PRESCRIBER,
@@ -119,7 +119,7 @@ class ApplicationPermissionMixin:
             raise PermissionDenied(
                 "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
             )
-        if self.auto_prescription_process or self.hire_process:
+        if self.tunnel in (ApplyTunnel.AUTO_PRESCRIPTION, ApplyTunnel.HIRE):
             if suspension_explanation := self.company.get_active_suspension_text_with_dates():
                 raise PermissionDenied(
                     "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
@@ -135,7 +135,7 @@ class ApplicationPermissionMixin:
                 self, "SKIP_PREV_APPLICATIONS_CHECK", False
             )  # Don't enforce this rule until after CheckPreviousApplications
             and hasattr(self, "job_seeker")
-            and not (self.auto_prescription_process or self.hire_process)
+            and self.tunnel not in (ApplyTunnel.AUTO_PRESCRIPTION, ApplyTunnel.HIRE)
             and self.get_previous_applications_queryset().created_in_past(hours=24).exists()
         ):
             if request.user == self.job_seeker:
