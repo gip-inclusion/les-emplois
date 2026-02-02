@@ -703,6 +703,10 @@ def test_get_criteria_from_job_seeker():
     criteria = get_criteria_from_job_seeker(job_seeker)
     assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] in criteria
     assert kind_to_criterion[AdministrativeCriteriaKind.JEUNE] not in criteria
+    profile.birthdate = datetime.date.today() - relativedelta(years=50) + datetime.timedelta(days=1)
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] not in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.JEUNE] not in criteria
     profile.birthdate = datetime.date.today() - relativedelta(years=26)
     criteria = get_criteria_from_job_seeker(job_seeker)
     assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] not in criteria
