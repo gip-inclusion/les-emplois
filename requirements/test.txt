@@ -781,9 +781,9 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-itoutils[django,django-testing]==26.1.28.0 \
-    --hash=sha256:35096692175965ca0d20ab271a3ad1d81733121ec5a7a869c6b91f53ba23ae7f \
-    --hash=sha256:9e983ab097edd9f39428cd26fc15ee3d36e23b36092e8a7cce8ae0cb95504048
+itoutils[django, django-testing]==26.1.28.1 \
+    --hash=sha256:86b63873ee8c69bc534295f65e0cca60659036168d7f7b6059eab475911dc983 \
+    --hash=sha256:917106653b92c21017882f3ab323c8706201ff46b893f05af52ddb4aae5a9a3a
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
