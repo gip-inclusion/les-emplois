@@ -1196,9 +1196,9 @@ patchy==2.10.0 \
     --hash=sha256:e7dc3610d20b8ce30af2ddbfa4a1ed67f066269fa6b10094f16dc798b80119da \
     --hash=sha256:f5c13adee5db3eea36a702ae3ab95f24d2c62d28d3a2246cc2f329e2e3e0cd74
     # via -r requirements/test.in
-pathspec==1.0.3 \
-    --hash=sha256:bac5cf97ae2c2876e2d25ebb15078eb04d76e4b98921ee31c6f85ade8b59444d \
-    --hash=sha256:e80767021c1cc524aa3fb14bedda9c34406591343cc42797b386ce7b9354fb6c
+pathspec==1.0.4 \
+    --hash=sha256:0210e2ae8a21a9137c0d470578cb0e595af87edaa6ebf12ff176f14a02e0e645 \
+    --hash=sha256:fb6ae2fd4e7c921a165808a552060e722767cfa526f99ca5156ed2ce45a5c723
     # via djlint
 pendulum==3.1.0 \
     --hash=sha256:006758e2125da2e624493324dfd5d7d1b02b0c44bc39358e18bf0f66d0767f5f \
