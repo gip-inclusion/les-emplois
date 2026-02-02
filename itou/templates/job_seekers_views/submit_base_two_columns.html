@@ -17,8 +17,8 @@
         <div class="s-section_container container">
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    {% if siae %}
-                        {% include "includes/structures/_structure_info.html" with structure=siae company_show_cta=True extra_box_class="mb-3 mb-md-4" only %}
+                    {% if company %}
+                        {% include "includes/structures/_structure_info.html" with structure=company company_show_cta=True extra_box_class="mb-3 mb-md-4" only %}
                     {% endif %}
                     {% block left_column %}{% endblock %}
                 </div>
