@@ -1,14 +1,19 @@
 import random
 from functools import partial
+from urllib.parse import urlsplit
 
 import pytest
 from data_inclusion.schema import v1 as data_inclusion_v1
+from django.http import QueryDict
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from itoutils.django.nexus.token import decode_token
+from jwcrypto import jwt
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from tests.cities.factories import create_city_vannes
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -18,6 +23,9 @@ from tests.users.factories import (
 )
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
+
+
+first_service_hyperlink_selector = "#services-search-results > .c-box--results:first-child a"
 
 
 @pytest.fixture(name="search_services_route")
@@ -119,24 +127,27 @@ def test_results_html(snapshot, client, search_services_route):
         pytest.param(None, id="anonymous"),
         pytest.param(JobSeekerFactory, id="jobseeker"),
         pytest.param(partial(EmployerFactory, membership=True), id="employer"),
-        pytest.param(partial(PrescriberFactory, membership=True), id="prescriber"),
+        pytest.param(
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=True),
+            id="prescriber_authorized",
+        ),
+        pytest.param(
+            partial(PrescriberFactory, membership=True, membership__organization__authorized=False),
+            id="prescriber_not_authorized",
+        ),
         pytest.param(partial(LaborInspectorFactory, membership=True), id="labor_inspector"),
         pytest.param(ItouStaffFactory, id="itou_staff"),
     ],
 )
-def test_results_html_link(snapshot, client, search_services_route, user_factory):
+def test_results_html_link(snapshot, client, mocker, search_services_route, user_factory):
+    mocker.patch("itou.www.search_views.views.generate_token", autospec=dict, return_value="op_jwt_token")
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     if user_factory:
         client.force_login(user_factory())
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assert (
-        pretty_indented(
-            parse_response_to_soup(response, selector="#services-search-results > .c-box--results:first-child a")
-        )
-        == snapshot()
-    )
+    assert pretty_indented(parse_response_to_soup(response, selector=first_service_hyperlink_selector)) == snapshot()
 
 
 def test_results_ordering(client, search_services_route):
@@ -160,6 +171,84 @@ def test_results_are_cached(client, search_services_route):
         reverse("search:services_results"), {"city": city.slug, "category": data_inclusion_v1.Categorie.MOBILITE}
     )
     assert search_services_route.call_count == 2
+
+
+@pytest.mark.usefixtures("search_services_route")
+@pytest.mark.parametrize(
+    "JobSeekerFactory",
+    (
+        None,
+        pytest.param(lambda: JobSeekerFactory(for_snapshot=True), id="with_job_seeker"),
+    ),
+)
+def test_results_with_orientation_jwt(client, JobSeekerFactory):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+    job_seeker = None
+    if JobSeekerFactory:
+        job_seeker = JobSeekerFactory()
+
+    organization = PrescriberOrganizationFactory(authorized=True)
+    prescriber = PrescriberFactory(membership=True, membership__organization=organization)
+    client.force_login(prescriber)
+
+    query = {"city": city.slug, "category": category}
+    if job_seeker:
+        query["job_seeker_public_id"] = job_seeker.public_id
+    response = client.get(reverse("search:services_results"), query)
+
+    result_a_tag = parse_response_to_soup(response, selector=first_service_hyperlink_selector)
+    href_url = urlsplit(result_a_tag["href"])
+    assert href_url.path == reverse("nexus:auto_login")
+
+    href_query = QueryDict(href_url.query)
+    next_url = urlsplit(href_query["next_url"])
+    next_url_query = QueryDict(next_url.query)
+    op = next_url_query["op"]
+    with pytest.raises(KeyError):
+        jwt.JWT(jwt=op).claims
+    expected = {
+        "prescriber": {
+            "email": prescriber.email,
+            "organization": {
+                "siret": organization.siret,
+                "uid": str(organization.uid),
+            },
+        },
+    }
+    if job_seeker:
+        expected["beneficiary"] = {
+            "uid": str(job_seeker.public_id),
+            "first_name": job_seeker.first_name,
+            "last_name": job_seeker.last_name,
+            "email": job_seeker.email,
+            "phone": job_seeker.phone,
+            "france_travail_id": job_seeker.jobseeker_profile.pole_emploi_id,
+        }
+    assert decode_token(op) == expected
+
+
+def test_category_error_suppression(client, search_services_route, snapshot):
+    city = create_city_vannes()
+    error_markup = """\
+        <div class="alert alert-danger" role="alert" tabindex="0" data-emplois-give-focus-if-exist>
+            <p><strong>Votre formulaire contient une erreur</strong></p>
+            <ul class="mb-0">
+                <li>Sélectionnez un choix valide. invalid n’en fait pas partie.</li>
+            </ul>
+        </div>"""
+
+    response = client.get(reverse("search:services_results"), {"city": city.slug})
+    assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot(
+        name="suppressed_error"
+    )
+    assertNotContains(response, error_markup, html=True)
+
+    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": "invalid"})
+    assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot(
+        name="other_error_not_suppressed"
+    )
+    assertContains(response, error_markup, html=True, count=1)
 
 
 def test_api_error(snapshot, client, search_services_route):
