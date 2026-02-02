@@ -10,7 +10,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, CompanySource, ContractType
 from itou.companies.models import Company, JobDescription, SiaeACIConvergencePHC
 from itou.invitations.models import EmployerInvitation
 from itou.job_applications.models import JobApplication
@@ -339,12 +339,12 @@ class TestCompanyModel:
             company.add_or_activate_membership(non_employer)
 
     def test_siret_from_asp_source(self):
-        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, source=Company.SOURCE_ASP)
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True, source=CompanySource.ASP)
         antenna = CompanyFactory(
             subject_to_iae_rules=True,
             with_membership=True,
             convention=company.convention,
-            source=Company.SOURCE_USER_CREATED,
+            source=CompanySource.USER_CREATED,
         )
 
         assert company.siret != antenna.siret

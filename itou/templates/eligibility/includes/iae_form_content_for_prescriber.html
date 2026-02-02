@@ -21,6 +21,12 @@
     </div>
 </div>
 
+{% if criteria_filled_from_job_seeker %}
+    {% include "eligibility/includes/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
+{% elif job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
+    {% include "apply/includes/known_criteria.html" %}
+{% endif %}
+
 <div class="{% if eligibility_diagnosis and not form.is_bound %}js-shroud{% endif %}">
     <fieldset>
         <legend class="h3">Critères administratifs de niveau 1</legend>

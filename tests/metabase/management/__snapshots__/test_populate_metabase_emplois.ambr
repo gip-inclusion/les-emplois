@@ -2986,6 +2986,7 @@
           SELECT COUNT(*) AS "__count"
           FROM "gps_followupgroup"
           INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE "users_user"."is_active"
         ''',
       }),
       dict({
@@ -3091,6 +3092,7 @@
                  "users_user"."department" AS "beneficiary_department"
           FROM "gps_followupgroup"
           INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE "users_user"."is_active"
           ORDER BY RANDOM() ASC
         ''',
       }),
@@ -3158,7 +3160,7 @@
 # ---
 # name: test_populate_gps_memberships
   dict({
-    'num_queries': 19,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -3187,6 +3189,7 @@
              LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
              LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
              LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+             WHERE "users_user"."is_active"
              GROUP BY 1) subquery
         ''',
       }),
@@ -3211,7 +3214,7 @@
         'sql': '''
           CREATE TABLE IF NOT EXISTS "z_new_gps_membres_v1" ("id" integer,"group_id" integer,"created_at" timestamp WITH TIME ZONE,
                                                                                                                               "updated_at" timestamp WITH TIME ZONE,
-                                                                                                                                                               "ended_at" date,"member_id" integer,"org_departments" text[],"created_in_bulk" integer,"date_mise_à_jour_metabase" date)
+                                                                                                                                                               "ended_at" date,"member_id" integer,"org_departments" text[],"created_in_bulk" integer,"is_referent_certified" integer,"date_mise_à_jour_metabase" date)
         ''',
       }),
       dict({
@@ -3293,6 +3296,15 @@
           'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
           'Command.execute[utils/command.py]',
         ]),
+        'sql': 'COMMENT ON COLUMN "z_new_gps_membres_v1"."is_referent_certified" IS \'référent certifié\'',
+      }),
+      dict({
+        'origin': list([
+          'populate_table[metabase/db.py]',
+          'Command.populate_gps_memberships[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.handle[metabase/management/commands/populate_metabase_emplois.py]',
+          'Command.execute[utils/command.py]',
+        ]),
         'sql': 'COMMENT ON COLUMN "z_new_gps_membres_v1"."date_mise_à_jour_metabase" IS \'Date de dernière mise à jour de Metabase\'',
       }),
       dict({
@@ -3330,6 +3342,7 @@
           LEFT OUTER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
           LEFT OUTER JOIN "prescribers_prescribermembership" ON ("users_user"."id" = "prescribers_prescribermembership"."user_id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE "users_user"."is_active"
           GROUP BY "gps_followupgroupmembership"."id"
           ORDER BY RANDOM() ASC
         ''',
@@ -3351,6 +3364,7 @@
                                        "member_id",
                                        "org_departments",
                                        "created_in_bulk",
+                                       "is_referent_certified",
                                        "date_mise_à_jour_metabase")
           FROM STDIN WITH (FORMAT BINARY)
         ''',

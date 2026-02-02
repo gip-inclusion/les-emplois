@@ -17,8 +17,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.models import Approval, CancelledApproval
-from itou.companies.enums import CompanyKind, ContractType
-from itou.companies.models import Company
+from itou.companies.enums import CompanyKind, CompanySource, ContractType
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -937,7 +936,7 @@ class TestJobApplicationQuerySet:
         job_app_on_same_convention = JobApplicationFactory(
             state=JobApplicationState.ACCEPTED,
             to_company__convention=job_app_with_employee_record.to_company.convention,
-            to_company__source=Company.SOURCE_USER_CREATED,
+            to_company__source=CompanySource.USER_CREATED,
             approval=job_app_with_employee_record.approval,
         )
         assert_job_app_not_in_queryset(job_app_on_same_convention)

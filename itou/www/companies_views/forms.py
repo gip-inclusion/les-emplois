@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind, CompanySource, ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.jobs.models import Appellation
 from itou.utils.urls import get_external_link_markup
@@ -90,7 +90,7 @@ class CreateCompanyForm(forms.ModelForm):
         company = super().save(commit=False)
         company.geocode_address()
         company.created_by = self.current_user
-        company.source = Company.SOURCE_USER_CREATED
+        company.source = CompanySource.USER_CREATED
         company.convention = self.current_company.convention
         company.save()
 

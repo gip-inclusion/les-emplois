@@ -27,7 +27,7 @@ from pytest_django.asserts import (
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind, ContractType
-from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AuthorKind
+from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
@@ -49,7 +49,7 @@ from itou.www.apply.views import constants as apply_view_constants
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, initialize_apply_session
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
 from tests.approvals.factories import ApprovalFactory
-from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
+from tests.cities.factories import create_city_geispolsheim, create_city_partially_in_zrr, create_test_cities
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -1253,7 +1253,7 @@ class TestApplyAsAuthorizedPrescriber:
         reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
 
         # test ZRR / QPV template loading
-        city = create_city_in_zrr()
+        city = create_city_partially_in_zrr()  # Avoid auto-filled criteria
         ZRRFactory(insee_code=city.code_insee)
 
         prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
@@ -1262,7 +1262,8 @@ class TestApplyAsAuthorizedPrescriber:
 
         dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
+            jobseeker_profile__with_education_level_above_cap_bep=True,  # Avoid auto-filled criteria
+            jobseeker_profile__birthdate=timezone.localdate() - relativedelta(years=30),  # Avoid auto-filled criteria
             with_ban_geoloc_address=True,
             first_name="John",
             last_name="DOE",
@@ -1515,8 +1516,8 @@ class TestApplyAsAuthorizedPrescriber:
         # Step application's eligibility.
         # ----------------------------------------------------------------------
 
-        # Simulate address in qpv. If the address is in qpv, the known_criteria template
-        # should be used
+        # Simulate address in qpv. If the address is in qpv, the criteria_filled_from_job_seeker template
+        # should be used: QPV will be automatically checked.
         with mock.patch(
             "itou.common_apps.address.models.QPV.in_qpv",
             return_value=True,
@@ -1524,7 +1525,7 @@ class TestApplyAsAuthorizedPrescriber:
             response = client.get(next_url)
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
-            assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+            assertTemplateUsed(response, "eligibility/includes/criteria_filled_from_job_seeker.html", count=1)
 
         expected_snapshot = pretty_indented(
             parse_response_to_soup(
@@ -3571,6 +3572,36 @@ class TestApplicationView:
         assert new_eligibility_diagnosis != eligibility_diagnosis
         assert new_eligibility_diagnosis.author == prescriber
 
+    def test_application_iae_eligibility_prefilled(self, client):
+        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+        company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        job_seeker = JobSeekerFactory(last_checked_at=timezone.now() - datetime.timedelta(hours=25))
+        prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
+
+        client.force_login(prescriber)
+        apply_session = fake_session_initialization(client, company, job_seeker, {})
+
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
+        assertTemplateNotUsed(response, PREFILLED_TEMPLATE)
+
+        job_seeker.jobseeker_profile.low_level_in_french = True
+        job_seeker.jobseeker_profile.ass_allocation_since = AllocationDuration.FROM_12_TO_23_MONTHS
+        job_seeker.jobseeker_profile.save(update_fields=["low_level_in_french", "ass_allocation_since"])
+        job_seeker.last_checked_at = timezone.now()
+        job_seeker.save(update_fields=["last_checked_at"])
+
+        response = client.get(
+            reverse("apply:application_iae_eligibility", kwargs={"session_uuid": apply_session.name})
+        )
+        assertTemplateUsed(response, PREFILLED_TEMPLATE)
+        prefilled_criteria = [c.kind for c in response.context["form"].initial["administrative_criteria"]]
+        assert AdministrativeCriteriaKind.ASS in prefilled_criteria
+        assert AdministrativeCriteriaKind.FLE in prefilled_criteria
+        assert response.context["form"].initial["level_1_2"] is True  # ASS criterion
+        assert response.context["form"].initial["level_2_17"] is True  # FLE / low_level_in_french criterion
+
 
 class TestApplicationEndView:
     def test_update_job_seeker(self, client):
@@ -5469,6 +5500,10 @@ class TestEligibilityForHire:
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
+        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+        # Profile last checked a long time ago to prevent pre-filled criteria
+        self.job_seeker.last_checked_at = timezone.now() - datetime.timedelta(days=10)
+        self.job_seeker.save(update_fields=["last_checked_at"])
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         assert not self.job_seeker.has_valid_diagnosis(for_siae=company)
         client.force_login(company.members.first())
@@ -5480,6 +5515,27 @@ class TestEligibilityForHire:
             response,
             reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}),
         )  # cancel button
+        assertTemplateNotUsed(response, PREFILLED_TEMPLATE)
+
+        # Update profile to now have some pre-filled criteria
+        self.job_seeker.jobseeker_profile.ase_exit = True
+        self.job_seeker.jobseeker_profile.housing_issue = True
+        self.job_seeker.jobseeker_profile.save(update_fields=["ase_exit", "housing_issue"])
+        self.job_seeker.last_checked_at = timezone.now()
+        self.job_seeker.save(update_fields=["last_checked_at"])
+        response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
+        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, "Valider l'éligibilité IAE")
+        assertContains(
+            response,
+            reverse("job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session.name}),
+        )  # cancel button
+        assertTemplateUsed(response, PREFILLED_TEMPLATE)
+        prefilled_criteria = [c.kind for c in response.context["form"].initial["administrative_criteria"]]
+        assert AdministrativeCriteriaKind.ASE in prefilled_criteria
+        assert AdministrativeCriteriaKind.PSH_PR in prefilled_criteria
+        assert response.context["form"].initial["level_2_8"] is True  # ASE criterion
+        assert response.context["form"].initial["level_2_12"] is True  # PSH_PR / housing_issue criterion
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)

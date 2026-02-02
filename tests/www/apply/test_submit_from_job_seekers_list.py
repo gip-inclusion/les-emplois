@@ -1,6 +1,8 @@
 from urllib.parse import quote
 
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertRedirects
@@ -39,6 +41,8 @@ class TestApplyAsPrescriber:
             first_name="Alain",
             last_name="Zorro",
             public_id="11111111-2222-3333-4444-555566667777",
+            jobseeker_profile__with_education_level_above_cap_bep=True,  # Avoid auto-filled criteria
+            jobseeker_profile__birthdate=timezone.localdate() - relativedelta(years=30),  # Avoid auto-filled criteria
         )
         # This is to have a job seeker in "Mes candidats" (job_seekers_views:list)
         JobApplicationFactory(job_seeker=job_seeker, sender=prescriber)
@@ -59,7 +63,7 @@ class TestApplyAsPrescriber:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
+                <i class="ri-draft-line" aria-label="Postuler pour ZORRO Alain">
                 </i>
             </a>
             """,
@@ -91,7 +95,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
+        assertContains(response, "Vous postulez actuellement pour ZORRO Alain")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
@@ -217,7 +221,7 @@ class TestApplyAsPrescriber:
 
         response = client.get(reverse("job_seekers_views:list"))
         next_url = f"{reverse('search:employers_results')}?job_seeker_public_id={job_seeker.public_id}"
-        assertContains(response, "A… Z…")
+        assertContains(response, "Z… A…")
         assertContains(
             response,
             f"""
@@ -227,8 +231,7 @@ class TestApplyAsPrescriber:
                 data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{next_url}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat">
-                </i>
+                <i class="ri-draft-line" aria-label="Postuler pour Z… A…"></i>
             </a>
             """,
             html=True,
@@ -238,7 +241,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id}))
-        assertContains(response, "A… Z…")
+        assertContains(response, "Z… A…")
         assertContains(
             response,
             (
@@ -259,7 +262,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour A… Z…")
+        assertContains(response, "Vous postulez actuellement pour Z… A…")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (
@@ -418,7 +421,7 @@ class TestApplyAsCompany:
         # ----------------------------------------------------------------------
 
         response = client.get(add_url_params(next_url, {"city": guerande.slug}))
-        assertContains(response, "Vous postulez actuellement pour Alain ZORRO")
+        assertContains(response, "Vous postulez actuellement pour ZORRO Alain")
 
         # Has link to company card with job_seeker public_id
         company_url_with_job_seeker_id = (

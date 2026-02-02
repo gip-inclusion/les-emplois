@@ -13,7 +13,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -706,7 +706,7 @@ class TestListEmployeeRecords:
 def test_an_active_siae_without_convention_can_not_access_the_view(client):
     siae = CompanyFactory(
         use_employee_record=True,
-        source=Company.SOURCE_STAFF_CREATED,
+        source=CompanySource.STAFF_CREATED,
         convention=None,
         with_membership=True,
     )

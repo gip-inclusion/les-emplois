@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 case _:  # 21 of the 3462 rows.
                     # If accepted job applications are:
                     # - In the same SIAE → get first hiring
-                    # - In multiple SIAE → get first hiring in the matching Siret, the "mother" (SOURCE_ASP)
+                    # - In multiple SIAE → get first hiring in the matching Siret, the "mother" (CompanySource.ASP)
                     if len(siaes) > 1:
                         job_applications_qs = job_applications_qs.filter(to_company__siret=siret)
                     job_application = job_applications_qs.with_accepted_at().earliest("accepted_at")

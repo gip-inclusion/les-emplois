@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import storages
 from django.forms import ValidationError
@@ -373,24 +374,11 @@ class ApplicationBaseView(ApplyStepBaseView):
         }
 
 
-class ApplyStepForSenderBaseView(ApplyStepBaseView):
-    def __init__(self):
-        super().__init__()
-        self.sender = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.sender = request.user
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-            logger.info(f"dispatch ({request.path}) : {self.sender.kind} in sender tunnel")
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
-        return super().dispatch(request, *args, **kwargs)
-
-
-class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
+class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
+
+    def test_func(self):
+        return self.request.user.is_prescriber
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

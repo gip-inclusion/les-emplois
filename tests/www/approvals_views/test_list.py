@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.companies.models import Company
+from itou.companies.enums import CompanySource
 from itou.job_applications.enums import JobApplicationState
 from itou.www.approvals_views.views import ApprovalDisplayKind, ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
@@ -676,7 +676,7 @@ class TestApprovalsListView:
             convention=None,
             use_employee_record=True,
             with_membership=True,
-            source=Company.SOURCE_STAFF_CREATED,
+            source=CompanySource.STAFF_CREATED,
             subject_to_iae_rules=True,
         )
         ApprovalFactory(

@@ -9,7 +9,7 @@ from sentry_sdk.crons import monitor
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.utils import (
     geocode_siae,
     remap_columns,
@@ -31,7 +31,7 @@ def build_ea_eatt(row):
     company.siret = row.siret
     company.kind = row.kind
     assert company.kind in [CompanyKind.EA, CompanyKind.EATT]
-    company.source = Company.SOURCE_EA_EATT
+    company.source = CompanySource.EA_EATT
 
     company.name = row["name"]  # row.name returns row index.
     assert not company.name.isnumeric()
@@ -200,7 +200,7 @@ class Command(BaseCommand):
 
         info_stats |= sync_structures(
             df=ea_eatt_df,
-            source=Company.SOURCE_EA_EATT,
+            source=CompanySource.EA_EATT,
             kinds=[CompanyKind.EA, CompanyKind.EATT],
             build_structure=build_ea_eatt,
             wet_run=wet_run,

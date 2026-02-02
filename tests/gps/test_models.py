@@ -3,6 +3,7 @@ import datetime
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.www.gps.enums import EndReason
@@ -122,12 +123,30 @@ class TestFollowBeneficiary:
         assert membership.is_active is False
 
     @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
-    def test_is_job_seeker(self, factory):
+    def test_is_job_seeker(self, factory, caplog):
         not_a_beneficiary = factory()
         prescriber = PrescriberFactory()
+        FollowUpGroup.objects.follow_beneficiary(not_a_beneficiary, prescriber)
 
-        with pytest.raises(AssertionError):
-            FollowUpGroup.objects.follow_beneficiary(not_a_beneficiary, prescriber)
+        assert not FollowUpGroup.objects.exists()
+        assert f"We should not try to add a FollowUpGroup on beneficiary={not_a_beneficiary}" in caplog.messages
+
+    def test_inactive_beneficiary(self, caplog):
+        beneficiary = JobSeekerFactory(is_active=False)
+        prescriber = PrescriberFactory()
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, prescriber)
+
+        assert not FollowUpGroup.objects.exists()
+        assert f"Cannot follow inactive beneficiary={beneficiary}" in caplog.messages
+
+    @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory])
+    def test_inactive_prescriber_or_employer(self, factory, caplog):
+        beneficiary = JobSeekerFactory()
+        user = factory(is_active=False)
+        FollowUpGroup.objects.follow_beneficiary(beneficiary, user)
+
+        assert not FollowUpGroup.objects.exists()
+        assert f"Cannot follow beneficiary with inactive user={user}" in caplog.messages
 
 
 @freeze_time("2025-02-13T16:44:42")
@@ -151,3 +170,20 @@ def test_human_readable_followed_for():
 
     membership.started_at = datetime.date(2024, 1, 13)
     assert membership.human_readable_followed_for == "1 an, 1 mois"
+
+
+def test_follow_up_group_active_memberships():
+    follow_up_group = FollowUpGroupFactory()
+    membership_1 = FollowUpGroupMembershipFactory(follow_up_group=follow_up_group)
+    membership_2 = FollowUpGroupMembershipFactory(follow_up_group=follow_up_group)
+
+    assertQuerySetEqual(
+        follow_up_group.memberships.all(),
+        [membership_1, membership_2],
+        ordered=False,
+    )
+
+    membership_2.member.is_active = False
+    membership_2.member.save()
+
+    assertQuerySetEqual(follow_up_group.memberships.all(), [membership_1])

@@ -14,6 +14,7 @@ from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
 from itou.companies import enums, models, transfer
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
+from itou.companies.enums import CompanySource
 from itou.siae_evaluations.models import EvaluatedSiae
 from itou.utils.admin import (
     CreatedOrUpdatedByMixin,
@@ -208,13 +209,13 @@ class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
         ]
         if obj:
             readonly_fields.append("kind")
-            if obj.source == models.Company.SOURCE_ASP:
+            if obj.source == CompanySource.ASP:
                 readonly_fields.extend(["siret", "convention", "auth_email"])
         return readonly_fields
 
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.source = models.Company.SOURCE_STAFF_CREATED
+            obj.source = enums.CompanySource.STAFF_CREATED
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.

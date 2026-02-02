@@ -6,6 +6,7 @@ from psycopg.errors import UniqueViolation
 
 from itou.approvals import models as approvals_models
 from itou.companies import enums, models
+from itou.companies.enums import CompanySource
 from itou.eligibility import models as eligibility_models
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
@@ -152,7 +153,7 @@ def transfer_company_data(
             f"Impossible de transférer les objets de l'entreprise ID={from_company.pk}: il y a un contrôle "
             "a posteriori lié. Vérifiez avec l'équipe support."
         )
-    if from_company.source == to_company.SOURCE_ASP and to_company.source == to_company.SOURCE_USER_CREATED:
+    if from_company.source == CompanySource.ASP and to_company.source == CompanySource.USER_CREATED:
         raise TransferError("Impossible de transférer d'une entreprise provenant de l'ASP vers une antenne")
     fields_to_transfer = [TransferField(field_to_transfer) for field_to_transfer in fields_to_transfer]
 

@@ -155,37 +155,6 @@
                                   </a>
                               </div>
                           </div>
-                          <div class="alert alert-info mb-5" role="status">
-                              <div class="row">
-                                  <div class="col-auto pe-0">
-                                      <i aria-hidden="true" class="ri-information-line ri-xl text-info">
-                                      </i>
-                                  </div>
-                                  <div class="col">
-                                      <p class="mb-2">
-                                          <strong>
-                                              Critère(s) détecté(s)
-                                          </strong>
-                                          :
-                                      </p>
-                                      <ul>
-                                          <li>
-                                              <strong>
-                                                  Résident QPV
-                                              </strong>
-                                              : l'adresse
-                          
-                              du
-                          
-                          candidat "37 B Rue du Général De Gaulle, 67500 Haguenau" est en QPV.
-                                          </li>
-                                      </ul>
-                                      <p class="mb-0">
-                                          Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.
-                                      </p>
-                                  </div>
-                              </div>
-                          </div>
                           <h2>
                               Préciser la situation administrative du candidat (facultatif)
                           </h2>
@@ -214,6 +183,33 @@
                                               Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.
                                           </li>
                                       </ul>
+                                  </div>
+                              </div>
+                              <div class="alert alert-info mb-5" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                                          </i>
+                                      </div>
+                                      <div class="col">
+                                          <p>
+                                              Attention :
+                  
+                      le critère ci-dessous a été précoché par défaut, car il a été renseigné récemment dans le profil administratif du candidat.
+                                              <strong>
+                                                  Merci d’en vérifier l’exactitude.
+                                              </strong>
+                                              <br/>
+                                              Vous pouvez le décocher si vous ne souhaitez pas l’intégrer au diagnostic socio-professionnel du candidat.
+                  
+                  Vous avez également la possibilité d’ajouter d’autres critères.
+                                          </p>
+                                          <ul>
+                                              <li>
+                                                  Résident QPV - Niveau 2
+                                              </li>
+                                          </ul>
+                                      </div>
                                   </div>
                               </div>
                               <div class="">
@@ -361,7 +357,7 @@
                                       </div>
                                       <div class="form-group">
                                           <div class="form-check">
-                                              <input aria-describedby="id_level_2_15_helptext" class="form-check-input" id="id_level_2_15" name="level_2_15" type="checkbox"/>
+                                              <input aria-describedby="id_level_2_15_helptext" checked="" class="form-check-input" id="id_level_2_15" name="level_2_15" type="checkbox"/>
                                               <label class="form-check-label" for="id_level_2_15">
                                                   Résident QPV
                                               </label>

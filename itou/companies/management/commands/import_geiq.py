@@ -3,7 +3,7 @@ import pandas as pd
 from django.core.management.base import CommandError
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
@@ -80,7 +80,7 @@ def build_geiq(row):
     company = Company()
     company.siret = row.siret
     company.kind = CompanyKind.GEIQ
-    company.source = Company.SOURCE_GEIQ
+    company.source = CompanySource.GEIQ
     company.name = row["name"]  # row.name returns row index.
     assert not company.name.isnumeric()
     company.email = ""  # Do not make the authentification email public!
@@ -123,7 +123,7 @@ class Command(BaseCommand):
         geiq_df, info_stats = get_geiq_df(filename)
         info_stats |= sync_structures(
             df=geiq_df,
-            source=Company.SOURCE_GEIQ,
+            source=CompanySource.GEIQ,
             kinds=[CompanyKind.GEIQ],
             build_structure=build_geiq,
             wet_run=wet_run,

@@ -3,8 +3,7 @@ from pytest_django.asserts import assertNumQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import ServiceToken
-from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.nexus.enums import Service
 from tests.api.utils import _str_with_tz
 from tests.companies.factories import CompanyFactory
@@ -80,11 +79,11 @@ class TestDataInclusionSiaeStructure:
 
     def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
-        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True, convention=company_1.convention)
+        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True)
         company_3 = CompanyFactory(
             siret="10000000000003",
             subject_to_iae_rules=True,
-            source=Company.SOURCE_USER_CREATED,
+            source=CompanySource.USER_CREATED,
             convention=company_1.convention,
         )
 
@@ -118,13 +117,12 @@ class TestDataInclusionSiaeStructure:
         company_2 = CompanyFactory(
             siret="10000000000002",
             subject_to_iae_rules=True,
-            source=Company.SOURCE_ASP,
-            convention=company_1.convention,
+            source=CompanySource.ASP,
         )
         company_3 = CompanyFactory(
             siret="10000000099991",
             subject_to_iae_rules=True,
-            source=Company.SOURCE_USER_CREATED,
+            source=CompanySource.USER_CREATED,
             convention=company_1.convention,
         )
 
@@ -155,7 +153,7 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data["siret"] == siret
 
     def test_list_structures_siret_with_999_and_no_other_siret_available(self):
-        CompanyFactory(siret="10000000099991", source=Company.SOURCE_USER_CREATED)
+        CompanyFactory(siret="10000000099991", source=CompanySource.USER_CREATED)
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae

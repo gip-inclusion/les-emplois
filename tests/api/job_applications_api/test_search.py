@@ -9,7 +9,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from itou.api.auth import ServiceAccount
 from itou.api.job_application_api.serializers import JobApplicationSearchResponseSerializer
 from itou.api.models import DepartmentToken
-from itou.companies.models import Company
+from itou.companies.enums import CompanySource
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from tests.api.utils import _str_with_tz
@@ -203,11 +203,11 @@ class TestJobApplicationSearchApi:
     @pytest.mark.parametrize(
         "company_source,expected_len",
         [
-            (Company.SOURCE_ASP, 14),
-            (Company.SOURCE_GEIQ, 14),
-            (Company.SOURCE_EA_EATT, 14),
-            (Company.SOURCE_USER_CREATED, 9),
-            (Company.SOURCE_STAFF_CREATED, 14),
+            (CompanySource.ASP, 14),
+            (CompanySource.GEIQ, 14),
+            (CompanySource.EA_EATT, 14),
+            (CompanySource.USER_CREATED, 9),
+            (CompanySource.STAFF_CREATED, 14),
         ],
     )
     def test_siret_siren(self, company_source, expected_len):

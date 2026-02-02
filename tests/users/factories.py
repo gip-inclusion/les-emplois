@@ -338,6 +338,15 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Params:
         with_classic_nir = False
         with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
+        with_education_level_above_cap_bep = factory.Trait(
+            education_level=factory.fuzzy.FuzzyChoice(
+                [
+                    level
+                    for level in EducationLevel.values
+                    if level not in EducationLevel.eligible_for_cap_bep_criterion()
+                ]
+            )
+        )
         with_hexa_address = factory.Trait(
             hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
             hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),

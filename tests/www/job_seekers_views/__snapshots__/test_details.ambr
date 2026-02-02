@@ -21,7 +21,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -328,7 +328,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -612,7 +612,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -855,7 +855,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -1198,7 +1198,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -1516,7 +1516,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                           </div>
                           <div class="c-title__cta">
@@ -2225,7 +2225,9 @@
                  "gps_followupgroup"."updated_at",
                  "gps_followupgroup"."beneficiary_id"
           FROM "gps_followupgroup"
-          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',
@@ -2463,7 +2465,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -2778,7 +2780,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -3076,7 +3078,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -3312,7 +3314,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -3603,7 +3605,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -3901,7 +3903,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -4137,7 +4139,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Candidat : Jane DOE
+                                  Candidat : DOE Jane
                               </h1>
                               <p id="copy_public_id">
                                   Copier l'ID du candidat
@@ -4987,7 +4989,9 @@
                  "gps_followupgroup"."updated_at",
                  "gps_followupgroup"."beneficiary_id"
           FROM "gps_followupgroup"
-          WHERE "gps_followupgroup"."beneficiary_id" = %s
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
           ORDER BY "gps_followupgroup"."id" ASC
           LIMIT 1
         ''',

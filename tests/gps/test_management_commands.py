@@ -37,7 +37,7 @@ class TestSyncGroupsManagementCommand:
         settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
         ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
-    def test_get_users_contacts(ids):
+    def test_get_users_contacts(self):
         beneficiary = JobSeekerFactory()
         staff = ItouStaffFactory()
 

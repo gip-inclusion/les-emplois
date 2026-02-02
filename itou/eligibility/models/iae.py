@@ -8,8 +8,9 @@ from django.db.models import Case, Exists, OuterRef, Q, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models.common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
@@ -319,3 +320,46 @@ class SelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
 
     def __str__(self):
         return f"{self.pk}"
+
+
+_CRITERIA_KIND_TO_PROFILE_FUNC = {
+    AdministrativeCriteriaKind.AAH: lambda profile: profile.aah_allocation_since,
+    AdministrativeCriteriaKind.ASS: lambda profile: profile.ass_allocation_since,
+    AdministrativeCriteriaKind.RSA: lambda profile: profile.rsa_allocation_since,
+    AdministrativeCriteriaKind.DELD: lambda profile: (
+        profile.pole_emploi_since == AllocationDuration.FROM_12_TO_23_MONTHS
+    ),
+    AdministrativeCriteriaKind.DETLD: lambda profile: (
+        profile.pole_emploi_since == AllocationDuration.MORE_THAN_24_MONTHS
+    ),
+    AdministrativeCriteriaKind.CAP_BEP: lambda profile: (
+        profile.education_level in EducationLevel.eligible_for_cap_bep_criterion()
+    ),
+    AdministrativeCriteriaKind.SENIOR: lambda profile: (
+        profile.birthdate and profile.birthdate + relativedelta(years=50) <= timezone.localdate()
+    ),
+    AdministrativeCriteriaKind.JEUNE: lambda profile: (
+        profile.birthdate and profile.birthdate + relativedelta(years=26) > timezone.localdate()
+    ),
+    AdministrativeCriteriaKind.ASE: lambda profile: profile.ase_exit,
+    AdministrativeCriteriaKind.DETENTION_MJ: lambda profile: profile.detention_exit_or_ppsmj,
+    AdministrativeCriteriaKind.FLE: lambda profile: profile.low_level_in_french,
+    AdministrativeCriteriaKind.PI: lambda profile: profile.isolated_parent,
+    AdministrativeCriteriaKind.PM: lambda profile: profile.mobility_issue,
+    AdministrativeCriteriaKind.PSH_PR: lambda profile: profile.housing_issue,
+    AdministrativeCriteriaKind.REF_DA: lambda profile: profile.refugee,
+    AdministrativeCriteriaKind.TH: lambda profile: profile.rqth_employee,
+    # zrr_city_name is a tuple (city_name, partially_in_zrr boolean)
+    # Do not consider partially in ZRR as eligible automatically
+    AdministrativeCriteriaKind.ZRR: lambda profile: profile.user.zrr_city_name and not profile.user.zrr_city_name[1],
+    AdministrativeCriteriaKind.QPV: lambda profile: profile.user.address_in_qpv,
+}
+
+
+def get_criteria_from_job_seeker(job_seeker):
+    criteria = []
+    for criterion in AdministrativeCriteria.objects.all():
+        if (func := _CRITERIA_KIND_TO_PROFILE_FUNC.get(criterion.kind)) is not None:
+            if func(job_seeker.jobseeker_profile):
+                criteria.append(criterion)
+    return criteria

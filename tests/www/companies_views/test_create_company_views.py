@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.utils.html import escape
 from pytest_django.asserts import assertContains, assertNotContains
 
-from itou.companies.enums import CompanyKind
+from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.models import Company
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -39,7 +39,7 @@ class TestCreateCompanyView:
             "siret": new_siret,
             "kind": company.kind,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -75,7 +75,7 @@ class TestCreateCompanyView:
             "siret": new_siret,
             "kind": preexisting_company.kind,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -106,7 +106,7 @@ class TestCreateCompanyView:
             "siret": company.siret,
             "kind": company.kind,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -142,7 +142,7 @@ class TestCreateCompanyView:
             "siret": company.siret,
             "kind": CompanyKind.ACI,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -178,7 +178,7 @@ class TestCreateCompanyView:
             "siret": new_siret,
             "kind": CompanyKind.ACI,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -215,7 +215,7 @@ class TestCreateCompanyView:
             "siret": new_siret,
             "kind": company.kind,
             "name": "FAMOUS COMPANY SUB STRUCTURE",
-            "source": Company.SOURCE_USER_CREATED,
+            "source": CompanySource.USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
             "post_code": "67660",
@@ -232,8 +232,8 @@ class TestCreateCompanyView:
 
         new_company = Company.objects.get(siret=new_siret)
         assert new_company.has_admin(user)
-        assert company.source == Company.SOURCE_ASP
-        assert new_company.source == Company.SOURCE_USER_CREATED
+        assert company.source == CompanySource.ASP
+        assert new_company.source == CompanySource.USER_CREATED
         assert new_company.siret == post_data["siret"]
         assert new_company.kind == post_data["kind"]
         assert new_company.name == post_data["name"]
@@ -246,7 +246,7 @@ class TestCreateCompanyView:
         assert new_company.website == post_data["website"]
         assert new_company.description == post_data["description"]
         assert new_company.created_by == user
-        assert new_company.source == Company.SOURCE_USER_CREATED
+        assert new_company.source == CompanySource.USER_CREATED
         assert new_company.is_active
         assert new_company.convention is not None
         assert company.convention == new_company.convention

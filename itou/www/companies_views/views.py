@@ -14,6 +14,7 @@ from itoutils.urls import add_url_params
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
+from itou.companies.enums import CompanySource
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.companies.perms import can_create_antenna
 from itou.jobs.models import Appellation
@@ -427,8 +428,8 @@ def show_financial_annexes(request, template_name="companies/show_financial_anne
         "convention": current_siae.convention,
         "financial_annexes": financial_annexes,
         "can_select_af": current_siae.convention_can_be_changed_by(request.user),
-        "siae_is_asp": current_siae.source == Company.SOURCE_ASP,
-        "siae_is_user_created": current_siae.source == Company.SOURCE_USER_CREATED,
+        "siae_is_asp": current_siae.source == CompanySource.ASP,
+        "siae_is_user_created": current_siae.source == CompanySource.USER_CREATED,
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)

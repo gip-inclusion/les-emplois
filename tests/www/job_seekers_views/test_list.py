@@ -17,32 +17,26 @@ from itou.users.models import User, UserKind
 from itou.utils.templatetags.str_filters import mask_unless
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import (
-    GEIQEligibilityDiagnosisFactory,
-    IAEEligibilityDiagnosisFactory,
-)
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
 )
-from tests.users.factories import (
-    JobSeekerFactory,
-    LaborInspectorFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import (
-    PAGINATION_PAGE_ONE_MARKUP,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_soup, pretty_indented
 from tests.www.apply.test_submit import fake_session_initialization
 
 
-def assert_contains_button_apply_for(response, job_seeker, with_city=True):
+def assert_contains_button_apply_for(response, job_seeker, with_city=True, with_personal_information=True):
     city = f"&city={job_seeker.city_slug}" if with_city else ""
+    # If personal information is not visible, the name should be masked in aria-label
+    if with_personal_information:
+        aria_label = job_seeker.get_inverted_full_name()
+    else:
+        aria_label = mask_unless(job_seeker.get_inverted_full_name(), False)
     assertContains(
         response,
         f"""
@@ -53,7 +47,7 @@ def assert_contains_button_apply_for(response, job_seeker, with_city=True):
                 data-matomo-category="candidature" data-matomo-action="clic"
                 data-matomo-option="postuler-pour-ce-candidat"
                 href="{reverse("search:employers_results")}?job_seeker_public_id={job_seeker.public_id}{city}">
-                <i class="ri-draft-line" aria-label="Postuler pour ce candidat"></i>
+                <i class="ri-draft-line" aria-label="Postuler pour {aria_label}"></i>
             </a>
         """,
         count=1,
@@ -69,7 +63,7 @@ def assert_contains_job_seeker(
         f"""
             <a href="{reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})}?back_url={
             back_url
-        }" class="btn-link">{mask_unless(job_seeker.get_full_name(), with_personal_information)}
+        }" class="btn-link">{mask_unless(job_seeker.get_inverted_full_name(), with_personal_information)}
             </a>
         """,
         count=1,
@@ -259,7 +253,7 @@ def test_multiple(client, snapshot):
     # Current user cannot view personal information, so the city is not in the URL
     client.force_login(unauthorized_prescriber)
     response = client.get(url)
-    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False)
+    assert_contains_button_apply_for(response, job_app5.job_seeker, with_city=False, with_personal_information=False)
 
 
 @override_settings(PAGE_SIZE_SMALL=1)
@@ -505,7 +499,7 @@ def test_multiple_with_job_seekers_created_by_unauthorized_organization(client):
     assert_contains_button_apply_for(response, alain, with_city=True)
     # A job seeker created by a member of the unauthorized organization is shown *without* personal information
     assert_contains_job_seeker(response, bernard, back_url=url_organization, with_personal_information=False)
-    assert_contains_button_apply_for(response, bernard, with_city=False)
+    assert_contains_button_apply_for(response, bernard, with_city=False, with_personal_information=False)
 
     # There's no link to the eligibility update view
     assert_update_eligibility(response, can_update=False)
@@ -627,9 +621,9 @@ def test_filtered_by_job_seeker_for_unauthorized_prescriber(client):
     assert len(job_seekers) == 3
     filters_form = response.context["filters_form"]
     assert filters_form.fields["job_seeker"].choices == [
-        (a_b_job_seeker.pk, "A… B…"),
-        (c_d_job_seeker.pk, "C… D…"),
-        (created_job_seeker.pk, "Zorro MARTIN"),
+        (a_b_job_seeker.pk, "B… A…"),
+        (c_d_job_seeker.pk, "D… C…"),
+        (created_job_seeker.pk, "MARTIN Zorro"),
     ]
 
 
@@ -648,12 +642,14 @@ def test_filtered_by_eligibility_state(client, url):
         job_seeker__created_by=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     job_seeker_valid_geiq_eligibility_no_approval = GEIQEligibilityDiagnosisFactory(
         from_prescriber=True,
         job_seeker__created_by=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid geiq eligibility, no approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     job_seeker_expired_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
         from_prescriber=True,
@@ -661,6 +657,7 @@ def test_filtered_by_eligibility_state(client, url):
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
     job_seeker_valid_eligibility_valid_approval = IAEEligibilityDiagnosisFactory(
@@ -668,6 +665,7 @@ def test_filtered_by_eligibility_state(client, url):
         job_seeker__created_by=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, valid approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     ApprovalFactory(user=job_seeker_valid_eligibility_valid_approval)
 
@@ -678,6 +676,7 @@ def test_filtered_by_eligibility_state(client, url):
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, no approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
 
     response = client.get(url, {"eligibility_validated": "on"})
@@ -715,6 +714,7 @@ def test_filtered_by_approval_state(client, url):
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, valid approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_valid_approval)
 
@@ -724,6 +724,7 @@ def test_filtered_by_approval_state(client, url):
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         expired=True,
         job_seeker__first_name="expired eligibility, expired approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
     ApprovalFactory(user=job_seeker_expired_eligibility_expired_approval, expired=True)
 
@@ -732,6 +733,7 @@ def test_filtered_by_approval_state(client, url):
         job_seeker__created_by=prescriber,
         job_seeker__jobseeker_profile__created_by_prescriber_organization=organization,
         job_seeker__first_name="valid eligibility, no approval",
+        job_seeker__last_name="Zorro",
     ).job_seeker
 
     response = client.get(url, {"pass_iae_active": "on"})
@@ -844,8 +846,8 @@ def test_filtered_by_organization_members(client):
     assert response.context["page_obj"].object_list == [
         job_seeker_applied_by_member,
         job_seeker_applied_by_old_member,
-        job_seeker_applied_by_user_created_by_user_not_in_orga,
         job_seeker_applied_by_user,
+        job_seeker_applied_by_user_created_by_user_not_in_orga,
         job_seeker_created_by_member,
         job_seeker_created_by_old_member,
         job_seeker_created_by_user,
@@ -856,7 +858,10 @@ def test_filtered_by_organization_members(client):
     assertNotContains(response, other_prescriber_not_in_orga.get_full_name())
 
     response = client.get(url, {"organization_members": member.pk})
-    assert response.context["page_obj"].object_list == [job_seeker_applied_by_member, job_seeker_created_by_member]
+    assert response.context["page_obj"].object_list == [
+        job_seeker_applied_by_member,
+        job_seeker_created_by_member,
+    ]
 
     response = client.get(url, {"organization_members": old_member.pk})
     assert response.context["page_obj"].object_list == [

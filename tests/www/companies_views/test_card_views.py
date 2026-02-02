@@ -295,8 +295,8 @@ class TestCardView:
         )
         job_seeker_public_id = job_application.job_seeker.public_id
         BANNER_TXT = "Vous postulez actuellement pour"
-        BANNER_TXT_NAME = f"{BANNER_TXT} {job_application.job_seeker.get_full_name()}"
-        BANNER_TXT_MASK = f"{BANNER_TXT} A… Z…"
+        BANNER_TXT_NAME = f"{BANNER_TXT} {job_application.job_seeker.get_inverted_full_name()}"
+        BANNER_TXT_MASK = f"{BANNER_TXT} Z… A…"
         EXIT_URL_EMPLOYER = reverse("apply:list_prescriptions")
         EXIT_URL_PRESCRIBER = reverse("job_seekers_views:list")
 
@@ -502,8 +502,8 @@ class TestJobDescriptionCardView:
         )
         job_seeker_public_id = job_application.job_seeker.public_id
         BANNER_TXT = "Vous postulez actuellement pour"
-        BANNER_TXT_NAME = f"{BANNER_TXT} {job_application.job_seeker.get_full_name()}"
-        BANNER_TXT_MASK = f"{BANNER_TXT} A… Z…"
+        BANNER_TXT_NAME = f"{BANNER_TXT} {job_application.job_seeker.get_inverted_full_name()}"
+        BANNER_TXT_MASK = f"{BANNER_TXT} Z… A…"
         EXIT_URL_EMPLOYER = reverse("apply:list_prescriptions")
         EXIT_URL_PRESCRIBER = reverse("job_seekers_views:list")
 

@@ -1,4 +1,5 @@
 import datetime
+import random
 from functools import partial
 
 import pytest
@@ -7,6 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.eligibility.enums import (
     CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS,
     AdministrativeCriteriaKind,
@@ -15,6 +17,7 @@ from itou.eligibility.enums import (
 )
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.eligibility.models.iae import get_criteria_from_job_seeker
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
@@ -646,3 +649,113 @@ def test_is_from_employer():
 
     diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
     assert not diagnosis.is_from_employer
+
+
+def test_get_criteria_from_job_seeker():
+    kind_to_criterion = {c.kind: c for c in AdministrativeCriteria.objects.all()}
+    job_seeker = JobSeekerFactory.build()
+    profile = job_seeker.jobseeker_profile
+
+    profile.rsa_allocation_since = random.choice(AllocationDuration.values)
+    assert kind_to_criterion[AdministrativeCriteriaKind.RSA] in get_criteria_from_job_seeker(job_seeker)
+    profile.rsa_allocation_since = None
+    assert kind_to_criterion[AdministrativeCriteriaKind.RSA] not in get_criteria_from_job_seeker(job_seeker)
+
+    profile.ass_allocation_since = random.choice(AllocationDuration.values)
+    assert kind_to_criterion[AdministrativeCriteriaKind.ASS] in get_criteria_from_job_seeker(job_seeker)
+    profile.ass_allocation_since = None
+    assert kind_to_criterion[AdministrativeCriteriaKind.ASS] not in get_criteria_from_job_seeker(job_seeker)
+
+    profile.aah_allocation_since = random.choice(AllocationDuration.values)
+    assert kind_to_criterion[AdministrativeCriteriaKind.AAH] in get_criteria_from_job_seeker(job_seeker)
+    profile.aah_allocation_since = None
+    assert kind_to_criterion[AdministrativeCriteriaKind.AAH] not in get_criteria_from_job_seeker(job_seeker)
+
+    expected_cap_bep_levels = {
+        EducationLevel.NON_CERTIFYING_QUALICATIONS,
+        EducationLevel.NO_SCHOOLING,
+        EducationLevel.BEP_OR_CAP_LEVEL,
+        EducationLevel.BEP_OR_CAP_DIPLOMA,
+        EducationLevel.NO_SCHOOLING_BEYOND_MANDATORY,
+    }
+
+    profile.education_level = random.choice(list(expected_cap_bep_levels))
+    assert kind_to_criterion[AdministrativeCriteriaKind.CAP_BEP] in get_criteria_from_job_seeker(job_seeker)
+    profile.education_level = random.choice(list(set(EducationLevel.values) - expected_cap_bep_levels | {None}))
+    assert kind_to_criterion[AdministrativeCriteriaKind.CAP_BEP] not in get_criteria_from_job_seeker(job_seeker)
+
+    profile.pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.DETLD] in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.DELD] not in criteria  # If DETLD is present, no need for DELD
+    profile.pole_emploi_since = AllocationDuration.FROM_12_TO_23_MONTHS
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.DETLD] not in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.DELD] in criteria
+    profile.pole_emploi_since = random.choice(
+        [AllocationDuration.FROM_6_TO_11_MONTHS, AllocationDuration.LESS_THAN_6_MONTHS, None]
+    )
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.DETLD] not in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.DELD] not in criteria
+
+    profile.birthdate = datetime.date.today() - relativedelta(years=50)
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.JEUNE] not in criteria
+    profile.birthdate = datetime.date.today() - relativedelta(years=26)
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] not in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.JEUNE] not in criteria
+    profile.birthdate = datetime.date.today() - relativedelta(years=26) + datetime.timedelta(days=1)
+    criteria = get_criteria_from_job_seeker(job_seeker)
+    assert kind_to_criterion[AdministrativeCriteriaKind.SENIOR] not in criteria
+    assert kind_to_criterion[AdministrativeCriteriaKind.JEUNE] in criteria
+
+    for criterion_kind, boolean_field in [
+        (AdministrativeCriteriaKind.ASE, "ase_exit"),
+        (
+            AdministrativeCriteriaKind.DETENTION_MJ,
+            "detention_exit_or_ppsmj",
+        ),
+        (
+            AdministrativeCriteriaKind.FLE,
+            "low_level_in_french",
+        ),
+        (
+            AdministrativeCriteriaKind.PI,
+            "isolated_parent",
+        ),
+        (
+            AdministrativeCriteriaKind.PM,
+            "mobility_issue",
+        ),
+        (
+            AdministrativeCriteriaKind.PSH_PR,
+            "housing_issue",
+        ),
+        (
+            AdministrativeCriteriaKind.REF_DA,
+            "refugee",
+        ),
+        (
+            AdministrativeCriteriaKind.TH,
+            "rqth_employee",
+        ),
+    ]:
+        setattr(profile, boolean_field, True)
+        assert kind_to_criterion[criterion_kind] in get_criteria_from_job_seeker(job_seeker)
+        setattr(profile, boolean_field, False)
+        assert kind_to_criterion[criterion_kind] not in get_criteria_from_job_seeker(job_seeker)
+
+    assert not job_seeker.zrr_city_name
+    assert kind_to_criterion[AdministrativeCriteriaKind.ZRR] not in get_criteria_from_job_seeker(job_seeker)
+    job_seeker = JobSeekerFactory(with_city_in_zrr=True)
+    assert kind_to_criterion[AdministrativeCriteriaKind.ZRR] in get_criteria_from_job_seeker(job_seeker)
+    job_seeker = JobSeekerFactory(with_city_partially_in_zrr=True)
+    assert kind_to_criterion[AdministrativeCriteriaKind.ZRR] not in get_criteria_from_job_seeker(job_seeker)
+
+    assert not job_seeker.address_in_qpv
+    assert kind_to_criterion[AdministrativeCriteriaKind.QPV] not in get_criteria_from_job_seeker(job_seeker)
+    job_seeker = JobSeekerFactory(with_address_in_qpv=True)
+    assert kind_to_criterion[AdministrativeCriteriaKind.QPV] in get_criteria_from_job_seeker(job_seeker)
