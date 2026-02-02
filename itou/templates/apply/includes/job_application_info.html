@@ -16,7 +16,7 @@
     <ul class="list-data mb-3">
         <li>
             <small>Employeur destinataire</small>
-            <a class="btn btn-link" href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}"><strong>{{ job_application.to_company.display_name }}</strong></a>
+            <a class="btn btn-link" href="{% url 'companies_views:card' company_pk=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}"><strong>{{ job_application.to_company.display_name }}</strong></a>
         </li>
     </ul>
 {% endif %}

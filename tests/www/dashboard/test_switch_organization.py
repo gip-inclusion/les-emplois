@@ -22,7 +22,7 @@ class TestSwitchCompany:
         assert response.status_code == 200
         assert response.context["request"].current_organization == company
 
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == company
@@ -37,7 +37,7 @@ class TestSwitchCompany:
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-        url = reverse("companies_views:card", kwargs={"siae_id": related_company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": related_company.pk})
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company

@@ -31,7 +31,7 @@ class TestCardView:
 
     def test_card(self, client):
         company = CompanyFactory(with_membership=True)
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         assert response.context["siae"] == company
         assertContains(response, escape(company.display_name))
@@ -42,20 +42,20 @@ class TestCardView:
 
     def test_card_no_active_members(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         soup = parse_response_to_soup(response, selector="#main")
         assert pretty_indented(soup) == snapshot()
 
     def test_card_is_searchable_false(self, client):
         company = CompanyFactory(with_membership=True, is_searchable=False)
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         assert response.status_code == 404
 
     def test_card_tally_url_with_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         user = JobSeekerFactory(pk=10)
         client.force_login(user)
         response = client.get(url)
@@ -64,7 +64,7 @@ class TestCardView:
 
     def test_card_tally_url_no_user(self, client, snapshot):
         company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
         assert pretty_indented(soup) == snapshot()
@@ -78,7 +78,7 @@ class TestCardView:
             contract_type=ContractType.PERMANENT,
             is_active=False,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
@@ -115,7 +115,7 @@ class TestCardView:
             contract_type=ContractType.PERMANENT,
             is_active=False,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
         assertNotContains(response, self.APPLY)
         assertNotContains(response, self.SPONTANEOUS_APPLICATIONS_OPEN)
@@ -129,7 +129,7 @@ class TestCardView:
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
@@ -171,7 +171,7 @@ class TestCardView:
             appellation=app2,
             is_active=False,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
@@ -207,7 +207,7 @@ class TestCardView:
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
         )
-        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(url)
 
         nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
@@ -233,7 +233,7 @@ class TestCardView:
     def test_card_flow(self, client, snapshot):
         company = CompanyFactory(with_jobs=True)
         list_url = reverse("search:employers_results")
-        company_card_base_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        company_card_base_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         company_card_initial_url = add_url_params(
             company_card_base_url,
             {"back_url": list_url},
@@ -261,7 +261,7 @@ class TestCardView:
             description="*Lorem ipsum*, **bold** and [link](https://beta.gouv.fr).",
             provided_support="* list 1\n* list 2\n\n1. list 1\n2. list 2",
         )
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(company_card_url)
         attrs = 'target="_blank" rel="noopener" aria-label="Ouverture dans un nouvel onglet"'
         assertContains(
@@ -276,7 +276,7 @@ class TestCardView:
         company = CompanyFactory(
             description='# Gros titre\n<script></script>\n<span class="font-size:200px;">Gros texte</span>',
         )
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         response = client.get(company_card_url)
         assertContains(response, "Gros titre\n\n<p>Gros texte</p>")
 
@@ -301,7 +301,7 @@ class TestCardView:
         EXIT_URL_PRESCRIBER = reverse("job_seekers_views:list")
 
         url = (
-            reverse("companies_views:card", kwargs={"siae_id": company.pk})
+            reverse("companies_views:card", kwargs={"company_pk": company.pk})
             + f"?job_seeker_public_id={job_seeker_public_id}"
         )
 
@@ -350,13 +350,13 @@ class TestCardView:
         assertContains(response, apply_url_with_job_seeker_id, count=1)
 
         # When UUID is broken in GET parameters
-        broken_url = reverse("companies_views:card", kwargs={"siae_id": company.pk}) + "?job_seeker_public_id=123"
+        broken_url = reverse("companies_views:card", kwargs={"company_pk": company.pk}) + "?job_seeker_public_id=123"
         response = client.get(broken_url)
         assert response.status_code == 404
 
         # When uuid is not a job_seeker one
         not_job_seeker_url = (
-            reverse("companies_views:card", kwargs={"siae_id": company.pk})
+            reverse("companies_views:card", kwargs={"company_pk": company.pk})
             + f"?job_seeker_public_id={prescriber.public_id}"
         )
         response = client.get(not_job_seeker_url)

@@ -447,7 +447,7 @@ class Company(AddressMixin, OrganizationAbstract):
         return self.kind in CompanyKind.siae_kinds()
 
     def get_card_url(self):
-        return reverse("companies_views:card", kwargs={"siae_id": self.pk})
+        return reverse("companies_views:card", kwargs={"company_pk": self.pk})
 
     @property
     def signup_magic_link(self):

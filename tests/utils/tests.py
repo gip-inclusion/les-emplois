@@ -1467,11 +1467,11 @@ def test_matomo_context_processor(client, settings, snapshot):
     assertNotContains(response, matomo_tarteaucitron_integration, status_code=404)
 
     # canonical case
-    url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
     response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule")
     assert response.status_code == 200
     assert response.context["siae"] == company
-    assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?mtm_bar=bidule&mtm_foo=truc"
+    assert response.context["matomo_custom_url"] == "company/<int:company_pk>/card?mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector=f"#{matomo_script_id}")

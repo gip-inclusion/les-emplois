@@ -575,7 +575,7 @@ class TestApplyAsJobSeeker:
         """Apply as jobseeker."""
 
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
 
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         client.force_login(user)
@@ -948,7 +948,7 @@ class TestApplyAsAuthorizedPrescriber:
         """Apply as prescriber that has pending authorization."""
 
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
-        from_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        from_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
 
         prescriber_organization = PrescriberOrganizationFactory(with_pending_authorization=True, with_membership=True)
         user = prescriber_organization.members.first()
@@ -1250,7 +1250,7 @@ class TestApplyAsAuthorizedPrescriber:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_authorized_prescriber(self, client, pdf_file, snapshot):
         company = CompanyFactory(romes=("N1101", "N1105"), for_snapshot=True, with_membership=True, with_jobs=True)
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
 
         # test ZRR / QPV template loading
         city = create_city_partially_in_zrr()  # Avoid auto-filled criteria
@@ -1647,7 +1647,7 @@ class TestApplyAsAuthorizedPrescriber:
         company = CompanyFactory(romes=["N1101"], with_membership=True, with_jobs=True)
         prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
         user = prescriber_organization.members.get()
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         client.force_login(user)
 
         response = client.get(
@@ -1659,7 +1659,7 @@ class TestApplyAsAuthorizedPrescriber:
             "tunnel": "sender",
             "apply_session_uuid": apply_session_name,
             "company": company.pk,
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
         }
         next_url = reverse("job_seekers_views:get_or_create_start", query=params)
         assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
@@ -1727,7 +1727,7 @@ class TestApplyAsPrescriber:
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_prescriber(self, client, pdf_file):
         company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         with_nia = random.choice([True, False])  # NIA = numéro d'immatriculation d'attente
 
         user = PrescriberFactory()
@@ -2131,7 +2131,7 @@ class TestApplyAsPrescriberNirExceptions:
         # Create an approval to bypass the eligibility diagnosis step.
         ApprovalFactory(user=job_seeker)
         company, user = self.create_test_data()
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         client.force_login(user)
 
         # Follow all redirections…
@@ -2160,7 +2160,7 @@ class TestApplyAsPrescriberNirExceptions:
         expected_job_seeker_session = {
             "config": {
                 "tunnel": "sender",
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             },
             "apply": {
                 "company_pk": company.pk,
@@ -2222,7 +2222,7 @@ class TestApplyAsPrescriberNirExceptions:
         # Create an approval to bypass the eligibility diagnosis step.
         ApprovalFactory(user=job_seeker)
         siae, user = self.create_test_data()
-        reset_url_company = reverse("companies_views:card", kwargs={"siae_id": siae.pk})
+        reset_url_company = reverse("companies_views:card", kwargs={"company_pk": siae.pk})
         client.force_login(user)
 
         # Follow all redirections…
@@ -2251,7 +2251,7 @@ class TestApplyAsPrescriberNirExceptions:
         expected_job_seeker_session = {
             "config": {
                 "tunnel": "sender",
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": siae.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": siae.pk}),
             },
             "apply": {
                 "company_pk": siae.pk,
@@ -2340,7 +2340,7 @@ class TestApplyAsCompany:
         reset_url = (
             reverse("dashboard:index")
             if company in user.company_set.all()
-            else reverse("companies_views:card", kwargs={"siae_id": company.pk})
+            else reverse("companies_views:card", kwargs={"company_pk": company.pk})
         )
 
         existing_job_seeker = JobSeekerFactory()
@@ -4366,7 +4366,7 @@ class TestUpdateJobSeekerStep3View:
 
 def test_detect_existing_job_seeker(client):
     company = CompanyFactory(romes=("N1101", "N1105"), with_membership=True, with_jobs=True)
-    reset_url_company = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    reset_url_company = reverse("companies_views:card", kwargs={"company_pk": company.pk})
 
     prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
     user = prescriber_organization.members.first()
@@ -4390,7 +4390,7 @@ def test_detect_existing_job_seeker(client):
         "tunnel": "sender",
         "apply_session_uuid": apply_session_name,
         "company": company.pk,
-        "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+        "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
     }
     next_url = reverse("job_seekers_views:get_or_create_start", query=params)
     assertRedirects(response, next_url, target_status_code=302, fetch_redirect_response=False)
@@ -4414,7 +4414,7 @@ def test_detect_existing_job_seeker(client):
     expected_job_seeker_session = {
         "config": {
             "tunnel": "sender",
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
         },
         "apply": {
             "company_pk": company.pk,
@@ -4797,7 +4797,10 @@ class TestCheckPreviousApplicationsView:
             client,
             self.company,
             self.job_seeker,
-            {"selected_jobs": [], "reset_url": reverse("companies_views:card", kwargs={"siae_id": self.company.pk})},
+            {
+                "selected_jobs": [],
+                "reset_url": reverse("companies_views:card", kwargs={"company_pk": self.company.pk}),
+            },
         )
 
     @property
@@ -4818,7 +4821,7 @@ class TestCheckPreviousApplicationsView:
         assertRedirects(response, self.application_jobs_url)
 
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
 
         # Reset URL is correct
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
@@ -4867,7 +4870,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_no_previous_as_authorized_prescriber(self, client):
@@ -4878,7 +4881,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     @freeze_time("2025-09-08 11:39")
@@ -4926,7 +4929,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     @freeze_time("2025-09-08 11:39")
@@ -5013,7 +5016,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     def test_no_previous_as_employer(self, client):
@@ -5046,7 +5049,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
     @freeze_time("2025-09-08 11:39")
@@ -5099,7 +5102,7 @@ class TestCheckPreviousApplicationsView:
 
         # Reset URL is correct
         response = client.get(self.application_jobs_url)
-        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        company_card_url = reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
         assertContains(response, LINK_RESET_MARKUP % company_card_url, count=1)
 
 

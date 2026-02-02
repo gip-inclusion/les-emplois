@@ -50,7 +50,7 @@ class TestGetOrCreateAsOther:
                 "tunnel": tunnel,
                 "company": company.pk,
                 "apply_session_uuid": apply_session.name,
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
@@ -68,7 +68,7 @@ class TestGetOrCreateAsOther:
                 "tunnel": tunnel,
                 "company": company.pk,
                 "apply_session_uuid": apply_session.name,
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
@@ -81,7 +81,7 @@ class TestGetOrCreateAsOther:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
@@ -102,7 +102,7 @@ class TestGetOrCreateForJobSeeker:
                 "tunnel": tunnel,
                 "company": company.pk,
                 "apply_session_uuid": apply_session.name,
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
@@ -122,7 +122,7 @@ class TestGetOrCreateForJobSeeker:
             session[session_name] = {
                 "config": {
                     "tunnel": tunnel,
-                    "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                    "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
                 },
                 "apply": {"company_pk": company.pk},
             }
@@ -141,7 +141,7 @@ class TestGetOrCreateForJobSeeker:
     def test_check_nir_with_session(self, client):
         company = CompanyFactory(with_membership=True)
         user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
-        reset_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        reset_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
         client.force_login(user)
 
         # Init session
@@ -303,7 +303,7 @@ class TestGetOrCreateForSender:
         session_name = str(uuid.uuid4())
         session[session_name] = {
             "config": {
-                "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+                "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             },
             "apply": {"company_pk": company.pk},
         }

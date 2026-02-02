@@ -73,7 +73,9 @@ class TestDataInclusionSiaeStructure:
                 "longitude": company.longitude,
                 "latitude": company.latitude,
                 "date_maj": _str_with_tz(company.updated_at),
-                "lien_source": f"http://testserver{reverse('companies_views:card', kwargs={'siae_id': company.pk})}",
+                "lien_source": (
+                    f"http://testserver{reverse('companies_views:card', kwargs={'company_pk': company.pk})}"
+                ),
             }
         ]
 

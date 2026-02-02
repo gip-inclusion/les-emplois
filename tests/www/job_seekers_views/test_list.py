@@ -381,7 +381,7 @@ def test_multiple_with_job_seekers_created_by_organization(client, snapshot):
 def test_job_seeker_created_for_prescription_is_shown(client):
     company = CompanyFactory(with_membership=True, with_jobs=True)
     organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
-    company_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    company_url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
     prescriber = organization.members.first()
     client.force_login(prescriber)
     client.get(company_url)
@@ -393,7 +393,7 @@ def test_job_seeker_created_for_prescription_is_shown(client):
     session[session_name] = {
         "config": {
             "tunnel": "sender",
-            "from_url": reverse("companies_views:card", kwargs={"siae_id": company.pk}),
+            "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
         },
         "apply": {
             "company_pk": company.pk,
