@@ -107,7 +107,7 @@ def assert_and_mock_forced_logout(client, response, expected_redirect_url=revers
 TEST_SETTINGS = {
     "PRO_CONNECT_BASE_URL": "https://pro.connect.fake",
     "PRO_CONNECT_CLIENT_ID": "PC_CLIENT_ID_123",
-    "PRO_CONNECT_CLIENT_SECRET": "PC_CLIENT_SECRET_123",
+    "PRO_CONNECT_CLIENT_SECRET": "PC_CLIENT_SECRET_QUUUUUUUUUUUUUX",
     "PRO_CONNECT_FT_IDP_HINT": "xxxxxx",
 }
 

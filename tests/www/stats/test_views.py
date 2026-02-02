@@ -24,7 +24,9 @@ from tests.users.factories import ItouStaffFactory, PrescriberFactory
 
 
 class TestStatsView:
-    @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+    @override_settings(
+        METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux"
+    )
     def test_stats_public(self, client):
         url = reverse("stats:stats_public")
         response = client.get(url)
@@ -59,7 +61,7 @@ def assert_stats_dashboard_equal(values):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ft_")],
@@ -93,7 +95,7 @@ def test_stats_ft_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_cd_")],
@@ -126,7 +128,7 @@ def test_stats_cd_log_visit(client, settings, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_siae_")],
@@ -161,7 +163,7 @@ def test_stats_siae_log_visit(client, settings, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_iae_")],
@@ -195,7 +197,7 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_log_")],
@@ -228,7 +230,7 @@ def test_stats_ddets_log_log_visit(client, settings, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dreets_iae_")],
@@ -261,7 +263,7 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [
@@ -297,7 +299,7 @@ def test_stats_dgefp_iae_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dihal_")],
@@ -329,7 +331,7 @@ def test_stats_dihal_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_drihl_")],
@@ -361,7 +363,7 @@ def test_stats_drihl_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize(
     "view_name",
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_iae_network_")],
@@ -393,7 +395,7 @@ def test_stats_iae_network_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 def test_stats_staff(client):
     # Login required
     view_name = "stats_staff_service_indicators"
@@ -423,7 +425,9 @@ def test_stats_staff(client):
 
 
 @override_settings(
-    METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar", TALLY_URL="http://tally.fake"
+    METABASE_SITE_URL="http://metabase.fake",
+    METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux",
+    TALLY_URL="http://tally.fake",
 )
 def test_suspended_stats_page_banner(client, snapshot):
     """Test a banner appears for the user when a dashboard is marked as suspended"""
@@ -468,7 +472,7 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
 @pytest.mark.parametrize(
     "institution_kind", [InstitutionKind.DGEFP_IAE, InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]
 )
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 def test_stats_redirect_for_institution(client, institution_kind, dashboard_name):
     institution = InstitutionFactory(kind=institution_kind, with_membership=True)
     client.force_login(institution.members.get())
@@ -485,7 +489,7 @@ def test_stats_ph_state_main_for_prescriber_without_organization(client):
 
 
 @freeze_time("2023-03-10")
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 @pytest.mark.parametrize("organization_kind", stats_utils.STATS_PH_ORGANISATION_KIND_WHITELIST)
 def test_stats_ph_state_main_tally_form_overrides(client, organization_kind):
     organization = PrescriberOrganizationFactory(
@@ -516,7 +520,7 @@ def ft_agencies_for_stats_ph_raw(db):
         pytest.param(PrescriberOrganizationKind.ML, "75", None, 1, id="non_ft"),  # Only self
     ],
 )
-@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="quuuuuuuuuuuuuuuuuuuuuuuuuuuuuux")
 def test_stats_ph_raw_prescriber_org_pks(
     client,
     mocker,
