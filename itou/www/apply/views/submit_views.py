@@ -284,7 +284,7 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "siae": self.company,
+            "company": self.company,
             "back_url": self.get_back_url(),
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
