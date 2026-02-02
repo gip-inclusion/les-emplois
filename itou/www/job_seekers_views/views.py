@@ -33,7 +33,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
-from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
+from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView, ApplyTunnel
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
 from itou.www.job_seekers_views.forms import (
@@ -1327,7 +1327,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        assert self.hire_process
+        assert self.tunnel == ApplyTunnel.HIRE
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

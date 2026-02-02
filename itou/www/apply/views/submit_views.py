@@ -165,8 +165,6 @@ class StartView(ApplicationPermissionMixin, View):
         else:
             tunnel = ApplyTunnel.PRESCRIPTION
         self.tunnel = tunnel
-        self.hire_process = tunnel == ApplyTunnel.HIRE
-        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
         self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
 
     def get_reset_url(self):
@@ -202,7 +200,7 @@ class StartView(ApplicationPermissionMixin, View):
 
         if request.user.is_job_seeker:
             job_seeker_tunnel = "job_seeker"
-        elif self.hire_process:
+        elif self.tunnel == ApplyTunnel.HIRE:
             job_seeker_tunnel = "hire"
         else:
             job_seeker_tunnel = "sender"
@@ -277,9 +275,6 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         super().__init__()
         self.company = None
         self.tunnel = None
-        self.hire_process = None
-        self.prescription_process = None
-        self.auto_prescription_process = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -296,10 +291,6 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         else:
             tunnel = ApplyTunnel.PRESCRIPTION
         self.tunnel = tunnel
-        self.hire_process = tunnel == ApplyTunnel.HIRE
-        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
-        self.prescription_process = tunnel == ApplyTunnel.PRESCRIPTION
-        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
 
     def get_back_url(self):
         return None
@@ -308,9 +299,9 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         return super().get_context_data(**kwargs) | {
             "company": self.company,
             "back_url": self.get_back_url(),
-            "hire_process": self.hire_process,
-            "prescription_process": self.prescription_process,
-            "auto_prescription_process": self.auto_prescription_process,
+            "hire_process": self.tunnel == ApplyTunnel.HIRE,
+            "prescription_process": self.tunnel == ApplyTunnel.PRESCRIPTION,
+            "auto_prescription_process": self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION,
             "page_title": "Postuler",
         }
 
@@ -432,7 +423,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         self.prev_application = self.get_previous_applications_queryset().order_by("created_at").last()
 
     def get_next_url(self):
-        if self.hire_process:
+        if self.tunnel == ApplyTunnel.HIRE:
             return self.get_eligibility_for_hire_step_url() or reverse(
                 "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name}
             )
@@ -645,7 +636,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         return {
             "company": self.company,
             "user": self.request.user,
-            "auto_prescription_process": self.auto_prescription_process,
+            "auto_prescription_process": self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION,
             "data": self.request.POST or None,
             "files": self.request.FILES or None,
         }
