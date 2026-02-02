@@ -484,9 +484,9 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateView):
     template_name = "companies/card.html"
 
-    def setup(self, request, siae_id, *args, **kwargs):
+    def setup(self, request, company_pk, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id, is_searchable=True)
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk, is_searchable=True)
 
     def get_context_data(self, **kwargs):
         back_url = get_safe_url(self.request, "back_url")
@@ -513,7 +513,7 @@ class CompanyCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, TemplateVie
             "di_widget_token": settings.API_DATA_INCLUSION_WIDGET_TOKEN,
             "di_base_url": global_constants.API_DATA_INCLUSION_BASE_URL,
             "siae_card_absolute_url": get_absolute_url(
-                reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+                reverse("companies_views:card", kwargs={"company_pk": self.company.pk})
             ),
             "report_tally_url": report_tally_url(self.request.user, self.company),
             "back_url": back_url,

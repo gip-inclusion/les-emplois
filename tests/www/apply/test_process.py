@@ -557,7 +557,7 @@ class TestProcessViews:
         assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
-        assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+        assertContains(response, reverse("companies_views:card", kwargs={"company_pk": job_application.to_company.pk}))
 
         # Has a button to copy-paste job_seeker public_id
         content = parse_response_to_soup(
@@ -727,7 +727,7 @@ class TestProcessViews:
         assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
-        assertContains(response, reverse("companies_views:card", kwargs={"siae_id": job_application.to_company.pk}))
+        assertContains(response, reverse("companies_views:card", kwargs={"company_pk": job_application.to_company.pk}))
 
         assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)

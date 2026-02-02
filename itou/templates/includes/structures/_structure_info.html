@@ -28,7 +28,7 @@
                 <a href="{% url 'apply:job_application_external_transfer_step_1_company_card' job_application_id=job_app_to_transfer company_pk=structure.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}"
                    class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
             {% else %}
-                {% url 'companies_views:card' siae_id=structure.pk as company_url %}
+                {% url 'companies_views:card' company_pk=structure.pk as company_url %}
                 {% if back_url|default:'' and not open_in_tab|default:False %}
                     {% url_add_query company_url job_seeker_public_id=job_seeker.public_id|default:'' back_url=back_url as company_url_params %}
                 {% else %}

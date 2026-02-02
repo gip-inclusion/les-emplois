@@ -25,7 +25,7 @@ def test_dora_iframe_displayed_when_token_and_code_insee_available(client, di_se
     )
     company = CompanyFactory(with_membership=True, insee_city=city)
 
-    url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
     response = client.get(url)
 
     assertContains(response, "Découvrez l'offre d'insertion disponible sur votre territoire")
@@ -47,7 +47,7 @@ def test_dora_iframe_not_displayed_without_token(client, di_settings):
     )
     company = CompanyFactory(with_membership=True, insee_city=city)
 
-    url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
     response = client.get(url)
 
     assertNotContains(response, "api.data.inclusion.gouv.fr/widget")
@@ -56,7 +56,7 @@ def test_dora_iframe_not_displayed_without_token(client, di_settings):
 def test_dora_iframe_not_displayed_without_code_insee(client, di_settings):
     company = CompanyFactory(with_membership=True, insee_city=None)
 
-    url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+    url = reverse("companies_views:card", kwargs={"company_pk": company.pk})
     response = client.get(url)
 
     assertNotContains(response, "api.data.inclusion.gouv.fr/widget")

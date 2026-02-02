@@ -8,7 +8,7 @@ app_name = "companies_views"
 
 urlpatterns = [
     path("overview", views.overview, name="overview"),
-    path("<int:siae_id>/card", views.CompanyCardView.as_view(), name="card"),
+    path("<int:company_pk>/card", views.CompanyCardView.as_view(), name="card"),
     path(
         "job_description/<int:job_description_id>/card",
         views.JobDescriptionCardView.as_view(),
