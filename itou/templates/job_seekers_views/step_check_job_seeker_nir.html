@@ -16,23 +16,23 @@
         {% endfragment %}
         {% fragment as c_title__secondary %}
             {% if auto_prescription_process or hire_process %}
-                {% if siae.is_subject_to_iae_rules or siae.kind == CompanyKind.GEIQ %}
+                {% if company.is_subject_to_iae_rules or company.kind == CompanyKind.GEIQ %}
                     <p>
                         {% if hire_process %}
                             Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.
-                            {% if siae.kind == CompanyKind.GEIQ %}
+                            {% if company.kind == CompanyKind.GEIQ %}
                                 Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
-                                sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
+                                sur <a href="{% url 'apply:start' company_pk=company.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                             {% else %}
-                                Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
+                                Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=company.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                             {% endif %}
                         {% else %}
-                            {% if siae.kind == CompanyKind.GEIQ %}
+                            {% if company.kind == CompanyKind.GEIQ %}
                                 Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
                             {% else %}
                                 Cet espace vous permet d’enregistrer une nouvelle candidature.
                             {% endif %}
-                            Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+                            Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:start_hire' company_pk=company.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
                         {% endif %}
                     </p>
                 {% endif %}

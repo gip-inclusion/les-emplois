@@ -395,7 +395,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "siae": self.company,
+            "company": self.company,
             "hire_process": self.hire_process,
             "prescription_process": self.prescription_process,
             "auto_prescription_process": self.auto_prescription_process,
