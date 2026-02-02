@@ -24,6 +24,12 @@
             </p>
         {% endfragment %}
         {% fragment as c_title__cta %}
+            {% if services_search_url %}
+                <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" "services-search-from-details-general" %}>
+                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
+                    Orienter vers un service d’insertion
+                </a>
+            {% endif %}
             {% url 'search:employers_results' as search_url %}
             {% if can_view_personal_information %}
                 {% url_add_query search_url job_seeker_public_id=job_seeker.public_id city=job_seeker.city_slug as url_query %}

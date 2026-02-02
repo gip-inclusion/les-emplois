@@ -626,6 +626,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
                                   </i>
@@ -869,6 +874,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
                                   </i>
@@ -1212,6 +1222,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
                                   </i>
@@ -1520,6 +1535,11 @@
                               </h1>
                           </div>
                           <div class="c-title__cta">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-job-applications" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fjob_applications%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>
@@ -2794,6 +2814,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
                                   </i>
@@ -3619,6 +3644,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-ico btn-secondary" href="/eligibility/update/iae/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-checkbox-circle-line fw-medium">
                                   </i>
@@ -4153,6 +4183,11 @@
                               </p>
                           </div>
                           <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg bin-ico btn-secondary" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-details-general" href="/search/services/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&back_url=%2Fjob-seekers%2Fdetails%2F7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-user-location-line fw-medium">
+                                  </i>
+                                  Orienter vers un service d’insertion
+                              </a>
                               <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
                                   <i aria-hidden="true" class="ri-draft-line fw-medium">
                                   </i>

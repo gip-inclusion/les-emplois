@@ -26,6 +26,7 @@ from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
+from itou.users.perms import can_prefill_orientation_on_dora
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request, check_user
 from itou.utils.constants import ITOU_CONTACT_FORM_URL
@@ -115,6 +116,17 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
+        services_search_url = None
+        # Authorized prescribers can_view_personal_information, it is not checked here.
+        if can_prefill_orientation_on_dora(self.request):
+            query = {
+                "job_seeker_public_id": self.object.public_id,
+                "back_url": self.request.get_full_path(),
+            }
+            if self.object.city_slug:
+                query["city"] = self.object.city_slug
+            services_search_url = reverse("search:services_results", query=query)
+
         fallback_back_url = (
             reverse("apply:list_prescriptions") if self.request.user.is_employer else reverse("job_seekers_views:list")
         )
@@ -143,6 +155,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
             # already checked in test_func because the user name is displayed in the title
             "can_view_personal_information": can_view_personal_information(self.request, self.object),
             "can_edit_personal_information": can_edit_personal_information(self.request, self.object),
+            "services_search_url": services_search_url,
             "group": group,
             "user_in_group": user_in_group,
         }
@@ -230,10 +243,27 @@ def list_job_seekers(request, template_name="job_seekers_views/list.html", list_
         order = JobSeekerOrder.FULL_NAME_ASC
     queryset = queryset.order_by(*order.order_by)
 
+    prefill_orientation_on_dora = can_prefill_orientation_on_dora(request)
+
+    def services_search_url(job_seeker):
+        if prefill_orientation_on_dora:
+            query = {
+                "job_seeker_public_id": job_seeker.public_id,
+                "back_url": request.get_full_path(),
+            }
+            # Authorized prescribers can_view_personal_information, it is not checked here.
+            if job_seeker.city_slug:
+                query["city"] = job_seeker.city_slug
+            return reverse("search:services_results", query=query)
+        return None
+
     page_obj = pager(queryset, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL)
     for job_seeker in page_obj:
         job_seeker.user_can_view_personal_information = can_view_personal_information(request, job_seeker)
-        job_seeker.show_more_actions = not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled
+        job_seeker.show_more_actions = (
+            not job_seeker.has_valid_approval or job_seeker.jobseeker_profile.is_stalled or prefill_orientation_on_dora
+        )
+        job_seeker.services_search_url = services_search_url(job_seeker)
 
     context = {
         "back_url": get_safe_url(request, "back_url"),

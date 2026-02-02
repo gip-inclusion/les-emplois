@@ -1,8 +1,11 @@
+import contextlib
 import hashlib
 import json
 import logging
+import time
 import warnings
 from collections import defaultdict, namedtuple
+from math import ceil
 from urllib.parse import urlencode
 
 from data_inclusion.schema import v1 as data_inclusion_v1
@@ -10,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.db.models import Case, F, Prefetch, Q, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -17,6 +21,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import FormView
+from itoutils.django.nexus.token import generate_token
 from itoutils.urls import add_url_params
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
@@ -26,11 +31,15 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.search.models import MAX_SAVED_SEARCHES_COUNT, SavedSearch
+from itou.users.enums import UserKind
+from itou.users.models import User
+from itou.users.perms import can_prefill_orientation_on_dora
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException, DataInclusionApiV1Client
 from itou.utils.auth import LoginNotRequiredMixin
 from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.pagination import pager
+from itou.utils.urls import get_safe_url
 from itou.www.apply.views.submit_views import ApplyForJobSeekerMixin
 from itou.www.search_views.forms import (
     JobDescriptionSearchForm,
@@ -383,6 +392,7 @@ def search_services_results(request, template_name="search/services/results.html
     city, category = None, None
     form = ServiceSearchForm(data=request.GET or None)
 
+    suppress_category_error = False
     if form.is_valid():
         city = form.cleaned_data["city"]
         category = form.cleaned_data["category"]
@@ -435,13 +445,63 @@ def search_services_results(request, template_name="search/services/results.html
             api_error, results = cached_data
     else:
         api_error, results = None, []
+        if len(form.errors) == 1:
+            try:
+                # When searching for a job seeker (param job_seeker_public_id), the
+                # location is pre-filled with their city_slug. A category is
+                # also required, so the initial page load displays an error.
+                [category_error] = form.errors["category"]
+            except (KeyError, ValueError):
+                pass
+            else:
+                # Category not provided or empty.
+                suppress_category_error = not request.GET.get("category")
+                if suppress_category_error:
+                    del form.errors["category"]
+
+    job_seeker = None
+    orientation_jwt = None
+    if not api_error and can_prefill_orientation_on_dora(request):
+        if job_seeker_uid := request.GET.get("job_seeker_public_id"):
+            with contextlib.suppress(User.DoesNotExist, ValidationError):
+                job_seeker = User.objects.select_related("jobseeker_profile").get(
+                    kind=UserKind.JOB_SEEKER, public_id=job_seeker_uid
+                )
+                # Authorized prescribers can_view_personal_information, not
+                # checked here.
+        jwt_claims = {
+            "exp": ceil(time.time()) + 3600,
+            "prescriber": {
+                "email": request.user.email,
+                "organization": {
+                    "siret": request.current_organization.siret,
+                    "uid": str(request.current_organization.uid),
+                },
+            },
+        }
+        if job_seeker:
+            jwt_claims["beneficiary"] = {
+                "uid": str(job_seeker.public_id),
+                "first_name": job_seeker.first_name,
+                "last_name": job_seeker.last_name,
+                "email": job_seeker.email,
+                "phone": job_seeker.phone,
+                "france_travail_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            }
+        orientation_jwt = generate_token(jwt_claims)
 
     context = {
         "form": form,
         "city": city,
         "category": category,
         "api_error": api_error,
+        "suppress_category_error": suppress_category_error,
         "results": pager(results, request.GET.get("page"), items_per_page=settings.PAGE_SIZE_SMALL),
+        "orientation": {
+            "exit_url": get_safe_url(request, "back_url", reverse("job_seekers_views:list")),
+            "job_seeker": job_seeker,
+            "jwt": orientation_jwt,
+        },
         "matomo_custom_title": "Recherche de services d'insertion",
         "back_url": reverse("search:services_home"),
     }
