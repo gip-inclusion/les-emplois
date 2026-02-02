@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block title_content %}
-    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False only %}
+    {% include "job_seekers_views/includes/detail_title_content.html" with request=request job_seeker=job_seeker can_view_personal_information=can_view_personal_information can_edit_iae_eligibility=False services_search_url=services_search_url service_search_event_option="services-search-from-details-job-applications" only %}
 {% endblock %}
 
 {% block title_extra %}
