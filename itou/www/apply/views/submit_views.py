@@ -1,3 +1,4 @@
+import enum
 import logging
 from datetime import timedelta
 
@@ -40,6 +41,13 @@ logger = logging.getLogger(__name__)
 JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
 
 APPLY_SESSION_KIND = "apply_session"
+
+
+class ApplyTunnel(enum.StrEnum):
+    HIRE = "hire"
+    PRESCRIPTION = "prescription"
+    AUTO_PRESCRIPTION = "auto_prescription"
+    JOB_SEEKER = "job_seeker"
 
 
 def _check_job_seeker_approval(request, job_seeker, siae):
@@ -148,10 +156,17 @@ class StartView(ApplicationPermissionMixin, View):
         super().setup(request, *args, **kwargs)
 
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.hire_process = hire_process
-        self.auto_prescription_process = (
-            not self.hire_process and request.user.is_employer and self.company == request.current_organization
-        )
+        if hire_process:
+            tunnel = ApplyTunnel.HIRE
+        elif request.user.is_employer and self.company == request.current_organization:
+            tunnel = ApplyTunnel.AUTO_PRESCRIPTION
+        elif request.user.is_job_seeker:
+            tunnel = ApplyTunnel.JOB_SEEKER
+        else:
+            tunnel = ApplyTunnel.PRESCRIPTION
+        self.tunnel = tunnel
+        self.hire_process = tunnel == ApplyTunnel.HIRE
+        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
         self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
 
     def get_reset_url(self):
@@ -261,6 +276,7 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
     def __init__(self):
         super().__init__()
         self.company = None
+        self.tunnel = None
         self.hire_process = None
         self.prescription_process = None
         self.auto_prescription_process = None
@@ -271,13 +287,19 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
         )
-        self.hire_process = kwargs.pop("hire_process", False)
-        self.prescription_process = not self.hire_process and (
-            request.user.is_prescriber or (request.user.is_employer and self.company != request.current_organization)
-        )
-        self.auto_prescription_process = (
-            not self.hire_process and request.user.is_employer and self.company == request.current_organization
-        )
+        if kwargs.pop("hire_process", False):
+            tunnel = ApplyTunnel.HIRE
+        elif request.user.is_employer and self.company == request.current_organization:
+            tunnel = ApplyTunnel.AUTO_PRESCRIPTION
+        elif request.user.is_job_seeker:
+            tunnel = ApplyTunnel.JOB_SEEKER
+        else:
+            tunnel = ApplyTunnel.PRESCRIPTION
+        self.tunnel = tunnel
+        self.hire_process = tunnel == ApplyTunnel.HIRE
+        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
+        self.prescription_process = tunnel == ApplyTunnel.PRESCRIPTION
+        self.auto_prescription_process = tunnel == ApplyTunnel.AUTO_PRESCRIPTION
 
     def get_back_url(self):
         return None
