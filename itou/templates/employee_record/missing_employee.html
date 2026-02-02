@@ -28,7 +28,7 @@
                 <div class="col-12 col-md-9">
                     <div class="c-form mb-3 mb-md-4">
                         {% if employee_or_job_seeker %}
-                            <h2>{{ employee_or_job_seeker.get_full_name }}</h2>
+                            <h2>{{ employee_or_job_seeker.get_inverted_full_name }}</h2>
 
                             {% if case == MissingEmployeeCase.NO_HIRING %}
                                 <p>

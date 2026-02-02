@@ -553,7 +553,7 @@
                           </p>
                           <div class="form-group form-group-required">
                               <label class="form-label" for="id_approval">
-                                  PASS IAE de Jane DOE
+                                  PASS IAE de DOE Jane
                               </label>
                               <select aria-describedby="id_approval_helptext" class="form-select" id="id_approval" name="approval">
                                   <option value="[PK of Approval]">
@@ -1018,7 +1018,7 @@
                                       Sélectionnez le salarié
                                   </option>
                                   <option value="[PK of job seeker]">
-                                      Jane DOE
+                                      DOE Jane
                                   </option>
                               </select>
                               <div class="form-text" id="id_employee_helptext">

@@ -126,7 +126,7 @@ class TestEvaluatedSiaeSanctionView:
             f"""
             <p>
              <strong>PASS IAE <span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span>,
-             Jane DOE</strong>
+             DOE Jane</strong>
              <br> Motif de l'irrégularité : Les documents fournis se sont révélés incomplets ou non conformes
              aux exigences réglementaires.
              {subsidy_cut_str}

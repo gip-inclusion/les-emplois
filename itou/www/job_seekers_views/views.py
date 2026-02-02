@@ -1360,7 +1360,7 @@ def nir_modification_request(request, public_id, *, template_name="job_seekers_v
     is_proxy = request.user != job_seeker
     context = {
         "job_seeker_public_id": job_seeker.public_id,
-        "job_seeker_name": f" pour {job_seeker.get_full_name()}" if is_proxy else "",
+        "job_seeker_name": f" pour {job_seeker.get_inverted_full_name()}" if is_proxy else "",
         "back_url": back_url,
         "matomo_custom_title": "Demande de régularisation NIR",
         "form": form,

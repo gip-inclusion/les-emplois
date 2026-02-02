@@ -8,7 +8,7 @@
             <h3>
                 PASS IAE {{ evaluated_job_application.job_application.approval.number|format_approval_number }} délivré le {{ evaluated_job_application.job_application.approval.start_at|date:"d E Y" }}
             </h3>
-            <span>{{ evaluated_job_application.job_application.job_seeker.get_full_name }}</span>
+            <span>{{ evaluated_job_application.job_application.job_seeker.get_inverted_full_name }}</span>
         </div>
     </div>
     <div>{% evaluated_job_application_state_display evaluated_job_application %}</div>

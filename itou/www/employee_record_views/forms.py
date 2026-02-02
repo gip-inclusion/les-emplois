@@ -30,7 +30,7 @@ class AddEmployeeRecordChooseEmployeeForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields["employee"].choices = [(None, "Sélectionnez le salarié")] + [
-            (user.id, user.get_full_name()) for user in employees if user.get_full_name()
+            (user.id, user.get_inverted_full_name()) for user in employees if user.get_inverted_full_name()
         ]
 
 
@@ -55,7 +55,7 @@ class AddEmployeeRecordChooseApprovalForm(forms.Form):
             (approval.pk, f"{approval.number} — Du {approval.start_at:%d/%m/%Y} au {approval.end_at:%d/%m/%Y}")
             for approval in approvals
         ]
-        self.fields["approval"].label = f"PASS IAE de {employee.get_full_name()}"
+        self.fields["approval"].label = f"PASS IAE de {employee.get_inverted_full_name()}"
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):

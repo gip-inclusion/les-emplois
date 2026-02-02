@@ -149,8 +149,8 @@ def test_employee_list(client):
     response = client.get(choose_employee_url)
     assert response.context["form"].fields["employee"].choices == [
         (None, "Sélectionnez le salarié"),
-        (job_application_1.job_seeker.pk, job_application_1.job_seeker.get_full_name()),
-        (job_application_2.job_seeker.pk, job_application_2.job_seeker.get_full_name()),
+        (job_application_1.job_seeker.pk, job_application_1.job_seeker.get_inverted_full_name()),
+        (job_application_2.job_seeker.pk, job_application_2.job_seeker.get_inverted_full_name()),
     ]
 
 

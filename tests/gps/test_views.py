@@ -45,7 +45,7 @@ def gps_logs(caplog):
 
 
 def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
-    name = mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_info)
+    name = mask_unless(job_seeker.get_inverted_full_name(), predicate=can_view_personal_info)
     assertMessages(
         response,
         [
@@ -59,7 +59,7 @@ def assert_new_beneficiary_toast(response, job_seeker, can_view_personal_info=Tr
 
 
 def assert_already_followed_beneficiary_toast(response, job_seeker, can_view_personal_info=True):
-    name = mask_unless(job_seeker.get_full_name(), predicate=can_view_personal_info)
+    name = mask_unless(job_seeker.get_inverted_full_name(), predicate=can_view_personal_info)
     assertMessages(
         response,
         [
@@ -73,7 +73,7 @@ def assert_already_followed_beneficiary_toast(response, job_seeker, can_view_per
 
 
 def assert_ask_to_follow_beneficiary_toast(response, job_seeker):
-    name = mask_unless(job_seeker.get_full_name(), False)
+    name = mask_unless(job_seeker.get_inverted_full_name(), False)
     assertMessages(
         response,
         [
@@ -2015,7 +2015,7 @@ class TestJoinGroupFromNameAndEmail:
                 (
                     (
                         ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
-                        f"<{new_job_seeker_admin_url}|{mask_unless(new_job_seeker.get_full_name(), False)}>.",
+                        f"<{new_job_seeker_admin_url}|{mask_unless(new_job_seeker.get_inverted_full_name(), False)}>.",
                     ),
                 )
             ]

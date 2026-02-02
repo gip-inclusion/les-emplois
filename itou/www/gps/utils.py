@@ -23,7 +23,7 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
         beneficiary=beneficiary, user=request.user, is_active=is_active
     )
     name = mask_unless(
-        beneficiary.get_full_name(),
+        beneficiary.get_inverted_full_name(),
         predicate=membership.can_view_personal_information or can_view_personal_information(request, beneficiary),
     )
     if is_active is False:
@@ -53,7 +53,7 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
         job_seeker_admin_url = get_absolute_url(reverse("admin:users_user_change", args=(beneficiary.pk,)))
         send_slack_message_for_gps(
             ":black_square_for_stop: Création d’un nouveau bénéficiaire : "
-            f"<{job_seeker_admin_url}|{mask_unless(beneficiary.get_full_name(), False)}>."
+            f"<{job_seeker_admin_url}|{mask_unless(beneficiary.get_inverted_full_name(), False)}>."
         )
     return membership
 
