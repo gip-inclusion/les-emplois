@@ -473,9 +473,9 @@ distlib==0.4.0 \
     --hash=sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16 \
     --hash=sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d
     # via virtualenv
-django==6.0.1 \
-    --hash=sha256:a92a4ff14f664a896f9849009cb8afaca7abe0d6fc53325f3d1895a15253433d \
-    --hash=sha256:ed76a7af4da21551573b3d9dfc1f53e20dd2e6c7d70a3adc93eedb6338130a5f
+django==6.0.2 \
+    --hash=sha256:3046a53b0e40d4b676c3b774c73411d7184ae2745fe8ce5e45c0f33d3ddb71a7 \
+    --hash=sha256:610dd3b13d15ec3f1e1d257caedd751db8033c5ad8ea0e2d1219a8acf446ecc6
     # via
     #   -r requirements/test.txt
     #   django-allauth
@@ -841,7 +841,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django,django-testing]==26.1.28.1 \
+itoutils[django, django-testing]==26.1.28.1 \
     --hash=sha256:86b63873ee8c69bc534295f65e0cca60659036168d7f7b6059eab475911dc983 \
     --hash=sha256:917106653b92c21017882f3ab323c8706201ff46b893f05af52ddb4aae5a9a3a
     # via -r requirements/test.txt
