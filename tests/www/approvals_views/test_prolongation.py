@@ -575,7 +575,7 @@ def test_prolongation_report_file(client, mocker, faker, xlsx_file, mailoutbox):
 
     [email] = mailoutbox
     assert email.to == [post_data["email"]]
-    assert email.subject == f"[TEST] Demande de prolongation du PASS IAE de {approval.user.get_full_name()}"
+    assert email.subject == f"[TEST] Demande de prolongation du PASS IAE de {approval.user.get_inverted_full_name()}"
     assert (
         reverse(
             "approvals:prolongation_request_report_file",

@@ -170,7 +170,7 @@ def test_grant_view(client):
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
         response,
-        [messages.Message(messages.SUCCESS, "La prolongation de Jane DOE a bien été acceptée.")],
+        [messages.Message(messages.SUCCESS, "La prolongation de DOE Jane a bien été acceptée.")],
     )
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.GRANTED
@@ -190,7 +190,7 @@ def test_grant_view_already_granted(client):
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
         response,
-        [messages.Message(messages.SUCCESS, "La prolongation de Jane DOE a déjà été acceptée.")],
+        [messages.Message(messages.SUCCESS, "La prolongation de DOE Jane a déjà été acceptée.")],
     )
 
 
@@ -297,7 +297,7 @@ def test_deny_view_for_reasons(snapshot, client, reason):
         )
 
     assertRedirects(response, end_url)
-    assertMessages(response, [messages.Message(messages.SUCCESS, "La prolongation de Jane DOE a bien été refusée.")])
+    assertMessages(response, [messages.Message(messages.SUCCESS, "La prolongation de DOE Jane a bien été refusée.")])
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
     assert prolongation_request.deny_information.reason == reason

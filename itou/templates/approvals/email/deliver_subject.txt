@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
 {% if job_application.to_company.is_subject_to_iae_rules %}
-PASS IAE pour {{ job_application.job_seeker.get_full_name }} et avis sur les emplois de l'inclusion
+PASS IAE pour {{ job_application.job_seeker.get_inverted_full_name }} et avis sur les emplois de l'inclusion
 {% else %}
 Confirmation de l'embauche
 {% endif %}

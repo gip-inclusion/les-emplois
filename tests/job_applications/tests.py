@@ -1364,7 +1364,7 @@ class TestJobApplicationNotifications:
         assert accepted_by.email in email.to
         assert len(email.to) == 1
         # Body.
-        assert approval.user.get_full_name() in email.subject
+        assert approval.user.get_inverted_full_name() in email.subject
         assert approval.number_with_spaces in email.body
         assert approval.start_at.strftime("%d/%m/%Y") in email.body
         assert approval.get_remainder_display() in email.body
@@ -1403,8 +1403,8 @@ class TestJobApplicationNotifications:
         email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert (
-            f"[TEST] PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
-            == email.subject
+            f"[TEST] PASS IAE pour {job_application.job_seeker.get_inverted_full_name()} et avis sur les emplois "
+            "de l'inclusion" == email.subject
         )
         assert "PASS IAE" in email.body
 

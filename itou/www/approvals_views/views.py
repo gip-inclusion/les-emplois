@@ -270,7 +270,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
         def _format_for_template(user, org):
             parts = []
             if user:
-                parts.append(user.get_full_name())
+                parts.append(user.get_inverted_full_name())
             if org:
                 parts.append(org.display_name)
             return " - ".join(parts)
@@ -609,7 +609,8 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
         if self.prolongation_request.status == approvals_enums.ProlongationRequestStatus.GRANTED:
             messages.success(
                 request,
-                f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a déjà été acceptée.",
+                f"La prolongation de {self.prolongation_request.approval.user.get_inverted_full_name()} "
+                "a déjà été acceptée.",
                 extra_tags="toast",
             )
             return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
@@ -631,7 +632,8 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
 
         messages.success(
             request,
-            f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été acceptée.",
+            f"La prolongation de {self.prolongation_request.approval.user.get_inverted_full_name()} "
+            "a bien été acceptée.",
             extra_tags="toast",
         )
         return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
@@ -665,7 +667,8 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
         )
         messages.success(
             self.request,
-            f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été refusée.",
+            f"La prolongation de {self.prolongation_request.approval.user.get_inverted_full_name()} "
+            "a bien été refusée.",
             extra_tags="toast",
         )
         return HttpResponseRedirect(reverse("approvals:prolongation_requests_list"))
@@ -891,7 +894,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
         )
         messages.success(
             request,
-            f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
+            f"La suspension de {suspension.approval.user.get_inverted_full_name()} a bien été supprimée.",
             extra_tags="toast",
         )
         return HttpResponseRedirect(reverse("approvals:details", kwargs={"public_id": suspension.approval.public_id}))

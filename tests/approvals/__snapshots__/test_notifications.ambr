@@ -50,7 +50,7 @@
   '''
 # ---
 # name: test_prolongation_request_created[subject]
-  '[TEST] Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Demande de prolongation du PASS IAE de DOE Jane'
 # ---
 # name: test_prolongation_request_created_reminder[body]
   '''
@@ -109,7 +109,7 @@
   '''
 # ---
 # name: test_prolongation_request_created_reminder[subject]
-  '[TEST] Relance - Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Relance - Demande de prolongation du PASS IAE de DOE Jane'
 # ---
 # name: test_prolongation_request_denied_employer[body]
   '''
@@ -119,7 +119,7 @@
   
   Références :
   Numéro : 99999 99 99999
-  Bénéficiaire : Jane DOE
+  Bénéficiaire : DOE Jane
   
   Motif de refus :
   - L’IAE ne correspond plus aux besoins / à la situation de la personne.
@@ -144,7 +144,7 @@
   '''
 # ---
 # name: test_prolongation_request_denied_employer[subject]
-  '[TEST] Prolongation du PASS IAE de Jane DOE refusée'
+  '[TEST] Prolongation du PASS IAE de DOE Jane refusée'
 # ---
 # name: test_prolongation_request_denied_jobseeker[body with Afpa]
   '''
@@ -220,7 +220,7 @@
   
   Références :
   Numéro : 99999 99 99999
-  Bénéficiaire : Jane DOE
+  Bénéficiaire : DOE Jane
   
   Vous pouvez consulter la nouvelle date de fin prévisionnelle du PASS IAE dans votre espace employeur sur les emplois de l’inclusion.
   
@@ -231,7 +231,7 @@
   '''
 # ---
 # name: test_prolongation_request_granted_employer[subject]
-  '[TEST] Prolongation du PASS IAE de Jane DOE acceptée'
+  '[TEST] Prolongation du PASS IAE de DOE Jane acceptée'
 # ---
 # name: test_prolongation_request_granted_jobseeker[body]
   '''

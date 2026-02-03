@@ -24,7 +24,7 @@
                                     {% if can_be_suspended_by_current_user %}
                                         <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"
-                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}">
                                             <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
                                             <span>Suspendre</span>
                                         </a>
@@ -129,7 +129,7 @@
                                     {% if can_be_prolonged_by_current_user %}
                                         <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            class="btn btn-block btn-outline-primary btn-ico mt-3"
-                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_inverted_full_name|mask_unless:can_view_personal_information }}">
                                             <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
                                             <span>Prolonger</span>
                                         </a>
