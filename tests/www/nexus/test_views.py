@@ -258,6 +258,13 @@ class TestEmploisViews:
         response = client.get(self.url)
         assert response.status_code == 403
 
+    def test_no_company(self, client, snapshot):
+        user = PrescriberFactory()
+        NexusUserFactory(kind=NexusUserKind.FACILITY_MANAGER, email=user.email)
+        client.force_login(user)
+        response = client.get(self.url)
+        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
+
     def test_list(self, client, snapshot):
         user = EmployerFactory()
         company = CompanyMembershipFactory(user=user, company__for_snapshot=True).company
