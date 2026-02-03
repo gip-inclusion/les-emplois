@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from itoutils.urls import add_url_params
 
-from itou.companies.models import JobDescription
+from itou.companies.models import Company, JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
 from itou.nexus.models import ActivatedService, NexusUser
 from itou.nexus.utils import build_user, serialize_user
@@ -157,18 +157,19 @@ class EmploisView(NexusMixin, TemplateView):
         super().setup(request, *args, **kwargs)
         if self.user_kind != NexusUserKind.FACILITY_MANAGER:
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
+        self.has_company_memberships = any(isinstance(org, Company) for org in self.request.organizations)
 
     def get_template_names(self):
-        return [
-            "nexus/emplois_job_descriptions.html"
-            if Service.EMPLOIS in self.activated_services
-            else "nexus/emplois_inactive.html"
-        ]
+        if Service.EMPLOIS not in self.activated_services:
+            return ["nexus/emplois_inactive.html"]
+        if self.has_company_memberships:
+            return ["nexus/emplois_job_descriptions.html"]
+        return ["nexus/emplois_no_companies.html"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if Service.EMPLOIS in self.activated_services:
+        if Service.EMPLOIS in self.activated_services and self.has_company_memberships:
             # TODO(alaurent) We can have facility managers that are prescribers on les emplois
             # We should handle it correctly someday
             context["job_descriptions"] = JobDescription.objects.filter(

@@ -1,0 +1,34 @@
+{% extends "nexus/base_service.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Fiches de poste {{ block.super }}{% endblock %}
+
+{% block service_title %}
+    <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" width="35" alt="Les emplois de l’inclusion">
+    Fiches de poste
+{% endblock %}
+
+{% block service_logo %}
+    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="50" alt="Les emplois de l’inclusion">
+{% endblock %}
+
+{% block description %}
+    <div class="mb-3 mb-md-4">
+        <img src="{% static 'img/illustration-error.png' %}" height="152" width="216" alt="">
+    </div>
+    <h2 class="h3">Vous n’appartenez à aucune structure</h2>
+    <p class="mb-md-4">
+        Pour pouvoir activer ce service et gérer vos fiches de poste, vous devez être rattaché à une structure.
+    </p>
+    <a href="{% url 'signup:company_select' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-lg btn-ico btn-primary">Se rattacher à une structure</a>
+    <br>
+    <a href="{% url "dashboard:index" %}"
+       class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+       aria-label="Découvrir Les emplois de l’inclusion (lien externe)"
+       target="_blank"
+       {% matomo_event "nexus" "decouvrir-service" Service.EMPLOIS %}>Découvrir Les emplois de l’inclusion</a>
+{% endblock %}
