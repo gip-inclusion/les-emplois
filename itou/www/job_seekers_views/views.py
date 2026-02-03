@@ -439,7 +439,11 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.job_seeker = request.user
-        self.form = CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
+        self.form = (
+            CheckJobSeekerNirForm(job_seeker=self.job_seeker, data=request.POST or None)
+            if self.job_seeker.is_job_seeker and not self.job_seeker.jobseeker_profile.nir
+            else None
+        )
 
     def dispatch(self, request, *args, **kwargs):
         if not self.job_seeker.is_job_seeker:
@@ -448,7 +452,7 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
 
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
-        if self.job_seeker.jobseeker_profile.nir:
+        if self.form is None:
             # get_apply_kwargs requires the job_seeker_session
             next_url = self.get_apply_url("job_seekers_views:check_job_seeker_info", self.job_seeker)
             # TODO(ewen): check_job_seeker_info doesn't use the session yet,
@@ -459,6 +463,8 @@ class CheckNIRForJobSeekerView(JobSeekerBaseView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if self.form is None:
+            raise PermissionDenied()
         next_url = self.get_apply_url("job_seekers_views:check_job_seeker_info", self.job_seeker)
         if self.form.is_valid():
             self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
