@@ -734,7 +734,6 @@ class ApplicationEndView(TemplateView):
         self.form = CreateOrUpdateJobSeekerStep2Form(
             instance=self.job_application.job_seeker, data=request.POST or None
         )
-        self.auto_prescription_process = request.user.is_employer and self.company == request.current_organization
 
     def post(self, request, *args, **kwargs):
         if not can_edit_personal_information(self.request, self.job_application.job_seeker):
@@ -746,6 +745,12 @@ class ApplicationEndView(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
+        if self.request.user.is_employer and self.company == self.request.current_organization:
+            page_title = "Auto-prescription enregistrée"
+            matomo_custom_title = "Auto-prescription enregistrée"
+        else:
+            page_title = "Candidature envoyée"
+            matomo_custom_title = "Candidature soumise"
         return super().get_context_data(**kwargs) | {
             "job_application": self.job_application,
             "form": self.form,
@@ -756,10 +761,8 @@ class ApplicationEndView(TemplateView):
                 self.request, self.job_application.job_seeker
             ),
             "reset_url": reverse("apply:application_end", kwargs={"application_pk": self.job_application.pk}),
-            "page_title": "Auto-prescription enregistrée" if self.auto_prescription_process else "Candidature envoyée",
-            "matomo_custom_title": "Auto-prescription enregistrée"
-            if self.auto_prescription_process
-            else "Candidature soumise",
+            "page_title": page_title,
+            "matomo_custom_title": matomo_custom_title,
         }
 
 
