@@ -70,5 +70,5 @@
   '''
 # ---
 # name: test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit[subject]
-  '[TEST] Relance - Demande de prolongation du PASS IAE de Jane DOE'
+  '[TEST] Relance - Demande de prolongation du PASS IAE de DOE Jane'
 # ---

@@ -2335,7 +2335,7 @@
                           CDI conclu avec une personne de plus de 57 ans
                       </td>
                       <td>
-                          John DOE
+                          DOE John
                       </td>
                       <td>
                           <i class="text-disabled">
@@ -2359,10 +2359,10 @@
                           Fin d'une formation
                       </td>
                       <td>
-                          John DOE - ACME Inc.
+                          DOE John - ACME Inc.
                       </td>
                       <td>
-                          Ack CEPTÉ
+                          CEPTÉ Ack
                       </td>
                   </tr>
                   <tr>
@@ -2381,10 +2381,10 @@
                           RQTH - Reconnaissance de la qualité de travailleur handicapé
                       </td>
                       <td>
-                          John DOE - ACME Inc.
+                          DOE John - ACME Inc.
                       </td>
                       <td>
-                          Apou VÉPAR - Une orga
+                          VÉPAR Apou - Une orga
                       </td>
                   </tr>
               </tbody>
@@ -2484,7 +2484,7 @@
                           CDI conclu avec une personne de plus de 57 ans
                       </td>
                       <td>
-                          John DOE
+                          DOE John
                       </td>
                       <td>
                           <i class="text-disabled">
@@ -2508,10 +2508,10 @@
                           Fin d'une formation
                       </td>
                       <td>
-                          John DOE - ACME Inc.
+                          DOE John - ACME Inc.
                       </td>
                       <td>
-                          Ack CEPTÉ
+                          CEPTÉ Ack
                       </td>
                   </tr>
                   <tr>
@@ -2530,10 +2530,10 @@
                           RQTH - Reconnaissance de la qualité de travailleur handicapé
                       </td>
                       <td>
-                          John DOE - ACME Inc.
+                          DOE John - ACME Inc.
                       </td>
                       <td>
-                          Apou VÉPAR - Une orga
+                          VÉPAR Apou - Une orga
                       </td>
                   </tr>
               </tbody>
@@ -4889,7 +4889,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  PASS IAE de Jane DOE
+                                  PASS IAE de DOE Jane
                               </h1>
                           </div>
                           <div aria-label="sur le PASS IAE" class="c-title__cta" role="group">
@@ -5041,7 +5041,7 @@
 # ---
 # name: test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=ACI+de+la+Rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+  <a aria-label="Mettre fin au PASS IAE de JOHN Doe" class="btn btn-lg btn-danger btn-ico" href="https://tally.so/r/3je84Q?siaeID=999999&nomSIAE=ACI+de+la+Rochelle&prenomemployeur=Milady&nomemployeur=de+Winter&emailemployeur=oph%40dewinter.com&userID=123456&numPASS=XXXXX+12+34568&prenomsalarie=Doe&nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
       <i aria-hidden="true" class="ri-pass-expired-line fw-medium">
       </i>
       <span>

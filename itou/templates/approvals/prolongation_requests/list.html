@@ -62,7 +62,7 @@
                                 <tbody>
                                     {% for prolongation_request in pager %}
                                         <tr>
-                                            <td class="fw-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
+                                            <td class="fw-bold">{{ prolongation_request.approval.user.get_inverted_full_name }}</td>
                                             <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
                                             <td>{{ prolongation_request.declared_by_siae|default:"-" }}</td>
                                             <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
@@ -74,9 +74,9 @@
                                                    data-bs-toggle="tooltip"
                                                    {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}data-bs-title="Traiter"{% else %}data-bs-title="Ouvrir"{% endif %}>
                                                     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-                                                        <i class="ri-pencil-line" aria-label="Traiter la prolongation de {{ prolongation_request.approval.user.get_full_name }}"></i>
+                                                        <i class="ri-pencil-line" aria-label="Traiter la prolongation de {{ prolongation_request.approval.user.get_inverted_full_name }}"></i>
                                                     {% else %}
-                                                        <i class="ri-eye-line" aria-label="Ouvrir la prolongation de {{ prolongation_request.approval.user.get_full_name }}"></i>
+                                                        <i class="ri-eye-line" aria-label="Ouvrir la prolongation de {{ prolongation_request.approval.user.get_inverted_full_name }}"></i>
                                                     {% endif %}
                                                 </a>
                                             </td>

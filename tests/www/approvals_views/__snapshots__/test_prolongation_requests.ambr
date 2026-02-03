@@ -152,7 +152,7 @@
                   <div class="c-title">
                       <div class="c-title__main">
                           <h1>
-                              Refuser la demande de prolongation pour Jane DOE
+                              Refuser la demande de prolongation pour DOE Jane
                           </h1>
                       </div>
                   </div>
@@ -393,7 +393,7 @@
                   <div class="c-title">
                       <div class="c-title__main">
                           <h1>
-                              Refuser la demande de prolongation pour Jane DOE
+                              Refuser la demande de prolongation pour DOE Jane
                           </h1>
                       </div>
                   </div>
@@ -557,7 +557,7 @@
                   <div class="c-title">
                       <div class="c-title__main">
                           <h1>
-                              Refuser la demande de prolongation pour Jane DOE
+                              Refuser la demande de prolongation pour DOE Jane
                           </h1>
                       </div>
                   </div>
@@ -721,7 +721,7 @@
                   <div class="c-title">
                       <div class="c-title__main">
                           <h1>
-                              Refuser la demande de prolongation pour Jane DOE
+                              Refuser la demande de prolongation pour DOE Jane
                           </h1>
                       </div>
                   </div>
@@ -1012,7 +1012,7 @@
                           <tbody>
                               <tr>
                                   <td class="fw-bold">
-                                      Jane DOE
+                                      DOE Jane
                                   </td>
                                   <td>
                                       <span>
@@ -1041,7 +1041,7 @@
                                   </td>
                                   <td class="text-end w-50px">
                                       <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
-                                          <i aria-label="Traiter la prolongation de Jane DOE" class="ri-pencil-line">
+                                          <i aria-label="Traiter la prolongation de DOE Jane" class="ri-pencil-line">
                                           </i>
                                       </a>
                                   </td>
@@ -1452,7 +1452,7 @@
                           <tbody>
                               <tr>
                                   <td class="fw-bold">
-                                      Jane DOE
+                                      DOE Jane
                                   </td>
                                   <td>
                                       <span>
@@ -1481,7 +1481,7 @@
                                   </td>
                                   <td class="text-end w-50px">
                                       <a class="btn btn-sm btn-link btn-ico-only" data-bs-title="Traiter" data-bs-toggle="tooltip" href="/approvals/prolongation/request/666">
-                                          <i aria-label="Traiter la prolongation de Jane DOE" class="ri-pencil-line">
+                                          <i aria-label="Traiter la prolongation de DOE Jane" class="ri-pencil-line">
                                           </i>
                                       </a>
                                   </td>
@@ -1506,7 +1506,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+              <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx" href="/approvals/prolongation/request/666/report-file/">
                   <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
                   </i>
                   <span>
@@ -1553,7 +1553,7 @@
                   Bilan des actions réalisées
               </small>
               <p>
-                  <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                  <a download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
                       Bilan des actions réalisées et actions prévues avec le salarié
                   </a>
               </p>
@@ -1622,7 +1622,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Demande de prolongation pour Jane DOE
+                                  Demande de prolongation pour DOE Jane
                                   <span class="badge rounded-pill badge-base bg-danger">
                                       Refusée
                                   </span>
@@ -1648,7 +1648,7 @@
                                   </span>
                               </div>
                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx" href="/approvals/prolongation/request/666/report-file/">
                                       <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
                                       </i>
                                       <span>
@@ -1695,7 +1695,7 @@
                                       Bilan des actions réalisées
                                   </small>
                                   <p>
-                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                      <a download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
                                           Bilan des actions réalisées et actions prévues avec le salarié
                                       </a>
                                   </p>
@@ -1892,7 +1892,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Demande de prolongation pour Jane DOE
+                                  Demande de prolongation pour DOE Jane
                                   <span class="badge rounded-pill badge-base bg-success">
                                       Acceptée
                                   </span>
@@ -1918,7 +1918,7 @@
                                   </span>
                               </div>
                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx" href="/approvals/prolongation/request/666/report-file/">
                                       <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
                                       </i>
                                       <span>
@@ -1965,7 +1965,7 @@
                                       Bilan des actions réalisées
                                   </small>
                                   <p>
-                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                      <a download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
                                           Bilan des actions réalisées et actions prévues avec le salarié
                                       </a>
                                   </p>
@@ -2162,7 +2162,7 @@
                       <div class="c-title">
                           <div class="c-title__main">
                               <h1>
-                                  Demande de prolongation pour Jane DOE
+                                  Demande de prolongation pour DOE Jane
                                   <span class="badge rounded-pill badge-base bg-accent-03 text-primary">
                                       À traiter
                                   </span>
@@ -2213,7 +2213,7 @@
                                   </h3>
                               </div>
                               <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <a class="btn btn-ico btn-outline-primary" download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx" href="/approvals/prolongation/request/666/report-file/">
                                       <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
                                       </i>
                                       <span>
@@ -2260,7 +2260,7 @@
                                       Bilan des actions réalisées
                                   </small>
                                   <p>
-                                      <a download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
+                                      <a download="Bilan prolongation PASS IAE 999999999999 DOE Jane.xlsx (fichier excel)" href="/approvals/prolongation/request/666/report-file/">
                                           Bilan des actions réalisées et actions prévues avec le salarié
                                       </a>
                                   </p>
