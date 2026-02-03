@@ -184,6 +184,12 @@ class TestGetOrCreateForJobSeeker:
         )
         assertRedirects(response, next_url, fetch_redirect_response=False)
 
+        # Job seeker cannot modify the NIR if already set
+        response = client.post(next_url, data={"nir": "194023456789032"})
+        assert response.status_code == 403
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.nir == "194022734304328"
+
         apply_session_name = get_session_name(client.session, APPLY_SESSION_KIND)
         response = client.get(next_url)
         assertRedirects(
