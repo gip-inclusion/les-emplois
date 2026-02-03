@@ -378,10 +378,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
 
         if created and self.hire_process:
             # The job seeker was just created, we don't need to check info if we are hiring
-            if self.company.kind == CompanyKind.GEIQ:
-                view_name = "apply:geiq_eligibility_for_hire"
-            else:
-                view_name = "apply:iae_eligibility_for_hire"
+            view_name = "apply:hire_fill_job_seeker_infos"
         elif self.hire_process:
             # Hiring a job seeker that was found but not created: we check info
             view_name = "job_seekers_views:check_job_seeker_info_for_hire"

@@ -424,9 +424,7 @@ class CheckPreviousApplications(ApplicationBaseView):
 
     def get_next_url(self):
         if self.tunnel == ApplyTunnel.HIRE:
-            return self.get_eligibility_for_hire_step_url() or reverse(
-                "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name}
-            )
+            view_name = "apply:hire_fill_job_seeker_infos"
         else:
             view_name = "apply:application_jobs"
         return reverse(view_name, kwargs={"session_uuid": self.apply_session.name})
@@ -775,7 +773,11 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        # Check if contract step is already filled
+        if not self.apply_session.get("contract_form_data"):
+            # TODO: remove this case in a week
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
 
     def get_cancel_url(self):
         return reverse(
@@ -804,7 +806,11 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return super().dispatch(request, *args, **kwargs)
 
     def get_next_url(self):
-        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        # Check if contract step is already filled
+        if not self.apply_session.get("contract_form_data"):
+            # TODO: remove this case in a week
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
 
     def get_back_url(self):
         return reverse(
@@ -833,7 +839,7 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
         return self.apply_session
 
     def get_back_url(self):
-        return self.get_eligibility_for_hire_step_url() or reverse(
+        return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
 
@@ -868,12 +874,14 @@ class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInf
         other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
         if other_forms:
             return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
-        return self.get_eligibility_for_hire_step_url() or reverse(
+        return reverse(
             "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
         )
 
     def get_success_url(self):
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+        return self.get_eligibility_for_hire_step_url() or reverse(
+            "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

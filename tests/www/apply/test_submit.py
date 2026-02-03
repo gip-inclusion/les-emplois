@@ -3199,10 +3199,42 @@ class TestDirectHireFullProcess:
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nir
 
+        fill_job_seeker_infos_url = reverse(
+            "apply:hire_fill_job_seeker_infos",
+            kwargs={"session_uuid": apply_session_name},
+            query={"job_seeker_public_id": new_job_seeker.public_id},
+        )
+        assertRedirects(response, fill_job_seeker_infos_url, fetch_redirect_response=False)
+
+        # Fill job seeker infos
+        # ----------------------------------------------------------------------
+        response = client.get(fill_job_seeker_infos_url)
+        # No missing data to fill - skip to contract
+        contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, contract_url)
+
+        check_infos_url = reverse(
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
+        )
+
+        # Contract infos
+        # ----------------------------------------------------------------------
+        response = client.get(contract_url)
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
+        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
+        assertContains(response, check_infos_url)  # Back button URL
+
+        hiring_start_at = timezone.localdate()
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": "",
+            "answer": "",
+        }
+        response = client.post(contract_url, data=post_data)
         next_url = reverse(
             "apply:iae_eligibility_for_hire",
             kwargs={"session_uuid": apply_session_name},
-            query={"job_seeker_public_id": new_job_seeker.public_id},
         )
         assertRedirects(response, next_url)
 
@@ -3229,39 +3261,11 @@ class TestDirectHireFullProcess:
             },
         )
 
-        next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, next_url, fetch_redirect_response=False)
+        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
 
-        # Fill job seeker infos
-        # ----------------------------------------------------------------------
-        response = client.get(next_url)
-        # No missing data to fill - skip to contract
-        contract_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, contract_url)
-
-        check_infos_url = reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": apply_session_name}
-        )
-
-        # Contract infos
-        # ----------------------------------------------------------------------
-        response = client.get(contract_url)
-        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
-        assertContains(response, CONFIRM_RESET_MARKUP % reset_url_dashboard)
-        assertContains(response, check_infos_url)  # Back button URL
-
-        hiring_start_at = timezone.localdate()
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": "",
-            "answer": "",
-        }
-        response = client.post(contract_url, data=post_data)
-        confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, confirmation_url, fetch_redirect_response=False)
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
@@ -3354,44 +3358,10 @@ class TestDirectHireFullProcess:
 
         response = client.get(prev_applicaitons_url)
         assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        geiq_eligibility_url = reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session_name})
-        assertRedirects(response, geiq_eligibility_url, fetch_redirect_response=False)
-
-        # Step GEIQ eligibility
-        # ----------------------------------------------------------------------
-        geiq_criteria_url = reverse(
-            "apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": apply_session_name}
-        )
         fill_job_seeker_infos_url = reverse(
             "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session_name}
         )
-
-        response = client.get(geiq_eligibility_url)
-        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
-        response = client.post(
-            geiq_eligibility_url,
-            data={"choice": "True"},
-            headers={"hx-request": "true"},
-        )
-        assertRedirects(
-            response,
-            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": fill_job_seeker_infos_url}),
-            fetch_redirect_response=False,
-        )
-        htmx_response = client.get(geiq_criteria_url, headers={"hx-request": "true"})
-        assert htmx_response.status_code == 200
-
-        response = client.post(
-            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": fill_job_seeker_infos_url}),
-            data={
-                "jeune_26_ans": "on",
-                "jeune_de_moins_de_26_ans_sans_qualification": "on",
-                "proof_of_eligibility": "on",
-            },
-        )
-        assertRedirects(response, fill_job_seeker_infos_url)
-        diag = GEIQEligibilityDiagnosis.objects.get(job_seeker=job_seeker)
-        assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
+        assertRedirects(response, fill_job_seeker_infos_url, fetch_redirect_response=False)
 
         # Fill job seeker infos
         # ----------------------------------------------------------------------
@@ -3457,8 +3427,45 @@ class TestDirectHireFullProcess:
             "hired_job": company.job_description_through.first().pk,
         }
         response = client.post(contract_url, data=post_data)
+        geiq_eligibility_url = reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session_name})
+        assertRedirects(response, geiq_eligibility_url, fetch_redirect_response=False)
+
+        # Step GEIQ eligibility
+        # ----------------------------------------------------------------------
+        geiq_criteria_url = reverse(
+            "apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": apply_session_name}
+        )
+
+        response = client.get(geiq_eligibility_url)
+        assertTemplateNotUsed(response, "utils/templatetags/approval_box.html")
+
         confirmation_url = reverse("apply:hire_confirmation", kwargs={"session_uuid": apply_session_name})
+        response = client.post(
+            geiq_eligibility_url,
+            data={"choice": "True"},
+            headers={"hx-request": "true"},
+        )
+        assertRedirects(
+            response,
+            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": confirmation_url}),
+            fetch_redirect_response=False,
+        )
+        htmx_response = client.get(geiq_criteria_url, headers={"hx-request": "true"})
+        assert htmx_response.status_code == 200
+
+        response = client.post(
+            add_url_params(geiq_criteria_url, {"back_url": check_infos_url, "next_url": confirmation_url}),
+            data={
+                "jeune_26_ans": "on",
+                "jeune_de_moins_de_26_ans_sans_qualification": "on",
+                "proof_of_eligibility": "on",
+            },
+        )
         assertRedirects(response, confirmation_url, fetch_redirect_response=False)
+
+        diag = GEIQEligibilityDiagnosis.objects.get(job_seeker=job_seeker)
+        assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
+
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
@@ -5583,7 +5590,7 @@ class TestCheckPreviousApplicationsForHireView:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {})
 
         url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
-        next_url = reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name})
+        next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
         assertRedirects(response, next_url)
 
@@ -5604,7 +5611,7 @@ class TestCheckPreviousApplicationsForHireView:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {})
 
         url = reverse("apply:check_prev_applications_for_hire", kwargs={"session_uuid": apply_session.name})
-        next_url = reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name})
+        next_url = reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name})
         response = client.get(url)
         assertRedirects(response, next_url)
 
