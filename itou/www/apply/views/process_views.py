@@ -453,7 +453,6 @@ def start_refuse_wizard(request, job_application_id):
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
 
     form = AnswerForm(data=request.POST or None)
 
@@ -531,7 +530,6 @@ def cancel(request, job_application_id):
     """
     queryset = JobApplication.objects.is_active_company_member(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
     next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
     session_key = JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY % job_application.pk
