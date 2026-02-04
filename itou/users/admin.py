@@ -14,7 +14,7 @@ from django.db.models import Exists, OuterRef
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -715,9 +715,12 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         def _get_transfer_data_from_user(user, field):
             data = []
             for item in getattr(user, field.name).all():
-                item.admin_link = reverse(
-                    f"admin:{item._meta.app_label}_{item._meta.model_name}_change", args=[item.pk]
-                )
+                try:
+                    item.admin_link = reverse(
+                        f"admin:{item._meta.app_label}_{item._meta.model_name}_change", args=[item.pk]
+                    )
+                except NoReverseMatch:
+                    item.admin_link = None
                 data.append(item)
             return data
 
