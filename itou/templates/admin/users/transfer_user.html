@@ -54,7 +54,12 @@
                 <ul>
                     {% for item in data.from %}
                         <li>
-                            <a href="{{ item.admin_link }}">{{ item }}</a>
+                            {% if item.admin_link %}
+                                <a href="{{ item.admin_link }}">{{ item }}</a>
+                            {% else %}
+                                {{ item }}
+                            {% endif %}
+
                         </li>
                     {% empty %}
                         <li>- Rien à transférer</li>
@@ -67,7 +72,11 @@
                     <ul>
                         {% for item in data.to %}
                             <li>
-                                <a href="{{ item.admin_link }}">{{ item }}</a>
+                                {% if item.admin_link %}
+                                    <a href="{{ item.admin_link }}">{{ item }}</a>
+                                {% else %}
+                                    {{ item }}
+                                {% endif %}
                             </li>
                         {% empty %}
                             <li>- Pas de données</li>
