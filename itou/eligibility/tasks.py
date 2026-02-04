@@ -27,6 +27,9 @@ def certify_criterion_with_api_particulier(criterion):
     if not api_particulier.has_required_info(job_seeker):
         logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
         return
+
+    criterion.last_certification_attempt_at = timezone.now()
+    criterion.save(update_fields={"last_certification_attempt_at"})
     with api_particulier.client() as client:
         try:
             data = api_particulier.certify_criteria(criterion.administrative_criteria.kind, client, job_seeker)
