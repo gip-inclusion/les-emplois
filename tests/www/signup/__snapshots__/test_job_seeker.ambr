@@ -57,7 +57,7 @@
           <label class="form-label" for="id_birth_country">
               Pays de naissance
           </label>
-          <select class="form-select" id="id_birth_country" name="birth_country">
+          <select class="form-select" data-required-indicator="#id_birth_country" data-required-target="#id_birth_place" data-required-value="91" id="id_birth_country" name="birth_country">
               <option selected="" value="">
                   ---------
               </option>

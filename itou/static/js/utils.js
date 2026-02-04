@@ -48,9 +48,18 @@ htmx.onLoad((target) => {
   /**
     * JS to disable/enable targeted field
     **/
-  $('input[type="checkbox"][data-disable-target]', target).change(function (e) {
-    const target = this.getAttribute("data-disable-target")
-    $(target).attr("disabled", this.checked)
+  function toggleDisableTarget() {
+    const disabledOnCheck = this.getAttribute("data-disable-target")
+    $(target).find(disabledOnCheck).attr("disabled", this.checked)
+    $(target).find(disabledOnCheck).closest(".form-group").toggleClass("form-group-required", !this.checked)
+    const requiredOnCheck = this.getAttribute("data-required-on-check")
+    if (requiredOnCheck) {
+       $(target).find(requiredOnCheck).closest(".form-group").toggleClass("form-group-required", this.checked)
+    }
+  }
+  $('input[type="checkbox"][data-disable-target]', target).each(function () {
+    toggleDisableTarget.call(this);
+    $(this).change(toggleDisableTarget);
   })
 
   /**
@@ -84,6 +93,33 @@ htmx.onLoad((target) => {
     toggleDisableAndSetValue.call(selectFieldWithDisable);
     $(selectFieldWithDisable).change(toggleDisableAndSetValue);
   });
+
+  /**
+   * JS to conditionally mark a field as required based on another select field's value.
+   * Uses data-required-target (CSS selector) and data-required-value attributes.
+   **/
+  function toggleConditionalRequired() {
+    const targetSelector = this.getAttribute("data-required-target");
+    const requiredValue = this.getAttribute("data-required-value");
+    const targetEl = document.querySelector(targetSelector);
+    if (targetEl) {
+      const formGroup = targetEl.closest(".form-group");
+      if (formGroup) {
+        formGroup.classList.toggle("form-group-required", $(this).val() === requiredValue);
+      }
+    }
+  }
+  querySelectorAllIncludingTarget(target, 'select[data-required-target]').forEach(function (selectField) {
+    toggleConditionalRequired.call(selectField);
+    $(selectField).change(toggleConditionalRequired);
+  });
+
+  $('[data-required-indicator]', target).each(function () {
+    const selector = this.getAttribute("data-required-indicator")
+    const targetEl = document.querySelector(selector);
+    const formGroup = targetEl.closest(".form-group");
+    formGroup.classList.toggle("form-group-required", true);
+  })
 
   /**
     * JS to allow to disable buttons (elements with "btn" class)
