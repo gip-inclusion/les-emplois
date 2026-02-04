@@ -55,12 +55,12 @@ from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.urls import get_zendesk_form_url
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
-from itou.www.apply.views.batch_views import RefuseWizardView
-from itou.www.apply.views.process_views import (
+from itou.www.apply.views.accept_views import (
     ACCEPT_SESSION_KIND,
     initialize_accept_session,
-    job_application_sender_left_org,
 )
+from itou.www.apply.views.batch_views import RefuseWizardView
+from itou.www.apply.views.process_views import job_application_sender_left_org
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory, SiaeConventionFactory

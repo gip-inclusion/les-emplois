@@ -175,7 +175,7 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -368,7 +368,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -403,7 +403,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -537,7 +537,7 @@
       dict({
         'origin': list([
           'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -666,7 +666,7 @@
       dict({
         'origin': list([
           'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_geiqselectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -1121,7 +1121,7 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1314,7 +1314,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1349,7 +1349,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1484,7 +1484,7 @@
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'ConfirmationForAcceptView.setup[www/apply/views/process_views.py]',
+          'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -1991,7 +1991,7 @@
       }),
       dict({
         'origin': list([
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2184,7 +2184,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2219,7 +2219,7 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -2354,7 +2354,7 @@
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -2686,8 +2686,8 @@
       }),
       dict({
         'origin': list([
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2880,8 +2880,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2916,8 +2916,8 @@
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           'check_waiting_period[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -3052,8 +3052,8 @@
         'origin': list([
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
-          'ContractInfosForAcceptView.setup[www/apply/views/process_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
+          'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
