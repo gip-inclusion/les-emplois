@@ -1,10 +1,10 @@
 """
 WSGI config for itou project.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
+It exposes the WSGI callable and is transmitted to Clever Cloud for deployment
+via the environment variable `CC_PYTHON_MODULE=config.wsgi:application`.
 
-For more information on this file, see
-https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
+Cf https://www.clever.cloud/developers/doc/reference/reference-environment-variables/#python
 """
 
 import os
@@ -12,6 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.prod")
+if not os.environ.get("DJANGO_SETTINGS_MODULE"):
+    raise RuntimeError("DJANGO_SETTINGS_MODULE environment variable is not set.")
 
 application = get_wsgi_application()
