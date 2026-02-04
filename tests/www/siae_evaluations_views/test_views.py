@@ -211,6 +211,12 @@ class TestEvaluatedSiaeSanctionView:
         assertContains(response, "<h2>Structure concernée</h2>")
         assertContains(response, f"<h2>Détail{'s' if suspension_dates else ''} de la décision</h2>")
         assertContains(response, "<h2>Irrégularités constatées</h2>")
+        assertContains(
+            response,
+            '<span class="c-info__summary">Aide à la rédaction de l’Annexe 1 du courrier de sanction</span>',
+            html=True,
+            count=int(has_significant_sanction),
+        )
 
     def test_view_as_other_institution(self, client):
         other = InstitutionMembershipFactory()
