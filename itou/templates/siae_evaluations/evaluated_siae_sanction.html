@@ -74,11 +74,17 @@
                                 {% endif %}
                             </p>
                             <p class="mb-1">
-                                <b>Commentaire de votre DDETS</b>
+                                <b>Commentaire de {{ is_siae|yesno:"votre,la" }} DDETS</b>
                             </p>
                             <blockquote class="blockquote mb-0">
                                 {{ evaluated_siae.notification_text|linebreaks }}
                             </blockquote>
+                            {% if not is_siae %}
+                                <p class="fs-xs">
+                                    Ce commentaire est transmis à la structure par e-mail uniquement lorsque le mode de notification sélectionné ci-dessus est « Transmis par e-mail ».
+                                    Lorsque la notification de la sanction requiert l’envoi d’une lettre recommandée, ce commentaire n’est pas adressé par e-mail ; il peut toutefois servir de base à la rédaction du courrier.
+                                </p>
+                            {% endif %}
                         </div>
                         {% if not is_siae %}
                             <div class="card-body">

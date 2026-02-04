@@ -104,9 +104,9 @@ class TestEvaluatedSiaeSanctionView:
 
         assertContains(
             response,
-            """
+            f"""
             <p class="mb-1">
-                <b>Commentaire de votre DDETS</b>
+                <b>Commentaire de {"votre" if is_siae else "la"} DDETS</b>
             </p>
             <blockquote class="blockquote mb-0">
                 <p>A envoyé une photo de son chat. Séparé de son chat pendant une journée.</p>
