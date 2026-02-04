@@ -149,6 +149,14 @@
                             </div>
                             <div class="card-body">
                                 <h2>Irrégularités constatées</h2>
+                                {% if sanctions.has_significant_sanction %}
+                                    <div class="c-info mb-4">
+                                        <span class="c-info__summary">Aide à la rédaction de l’Annexe 1 du courrier de sanction</span>
+                                        <div class="c-info__detail">
+                                            Appuyez-vous sur ces éléments pour compléter l’Annexe 1 du courrier de sanction. Lorsque, lors du contrôle, un justificatif a été jugé irrecevable, le courrier doit préciser de manière détaillée et circonstanciée les motifs de cette irrecevabilité.
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <p class="mb-1">
                                     <b>Nombre de PASS IAE contrôlés :</b> {{ evaluated_job_application_count }}
                                 </p>
