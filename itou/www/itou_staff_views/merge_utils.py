@@ -19,6 +19,7 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
+from itou.users.utils import merge_job_seeker_assignments
 from itou.utils.admin import add_support_remark_to_obj
 
 
@@ -135,13 +136,9 @@ def handle_job_seeker_assignment(model, from_user, to_user):
         )
         if to_user_assignment := to_user_assignments.get(key):
             updated_pks.append(to_user_assignment.pk)
-            last_assignment = max([to_user_assignment, from_user_assignment], key=lambda a: a.updated_at)
-            JobSeekerAssignment.objects.filter(pk=to_user_assignment.pk).update(
-                created_at=min(to_user_assignment.created_at, from_user_assignment.created_at),
-                updated_at=last_assignment.updated_at,
-                last_action_kind=last_assignment.last_action_kind,
+            merge_job_seeker_assignments(
+                assignment_to_delete=from_user_assignment, assignment_to_keep=to_user_assignment
             )
-            from_user_assignment.delete()
         else:
             moved_pks.append(from_user_assignment.pk)
             from_user_assignment.prescriber = to_user

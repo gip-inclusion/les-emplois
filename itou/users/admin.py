@@ -37,7 +37,7 @@ from itou.users.admin_forms import (
     UserAdminForm,
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
-from itou.users.utils import NIR_RE
+from itou.users.utils import NIR_RE, merge_job_seeker_assignments
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -264,7 +264,6 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "eligibility_diagnoses",  # EligibilityDiagnosis.job_seeker
     "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
     "job_applications",  # JobApplication.job_seeker
-    # FIXME(ewen): handle assignment merge
     "job_seeker_assignments",  # JobSeekerAssignment.job_seeker
 }
 
@@ -766,7 +765,22 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         if field.name == "job_applications" and item.sender_kind == UserKind.JOB_SEEKER:
                             # Keep sender & job_seeker consistent to comply with job_seeker_sender_coherence constraint
                             item.sender = to_user
-                        item.save()
+                        if field.name == "job_seeker_assignments":
+                            # Check and merge if to_user has an assignment with same prescriber and organization
+                            to_user_assignment = models.JobSeekerAssignment.objects.filter(
+                                job_seeker=to_user,
+                                prescriber=item.prescriber,
+                                prescriber_organization=item.prescriber_organization,
+                            ).first()
+                            if to_user_assignment:
+                                merge_job_seeker_assignments(
+                                    assignment_to_delete=item, assignment_to_keep=to_user_assignment
+                                )
+                            else:
+                                models.JobSeekerAssignment.objects.filter(pk=item.pk).update(job_seeker=to_user)
+                        else:
+                            # Don't change assignment's updated_at field
+                            item.save()
                         transferred_items.append((transfer_data[field_name]["title"], item))
                 if transferred_items:
                     summary_text = "\n".join(
