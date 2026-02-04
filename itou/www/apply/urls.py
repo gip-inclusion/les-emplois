@@ -302,13 +302,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:job_application_id>/rdv-insertion-invite",
-        process_views.rdv_insertion_invite,
+        process_views.RdvInsertionInviteView.as_view(),
         name="rdv_insertion_invite",
     ),
     path(
         "<uuid:job_application_id>/rdv_insertion_invite_for_detail",
-        process_views.rdv_insertion_invite,
-        {"for_detail": True},
+        process_views.RdvInsertionInviteView.as_view(for_detail=True),
         name="rdv_insertion_invite_for_detail",
     ),
 ]
