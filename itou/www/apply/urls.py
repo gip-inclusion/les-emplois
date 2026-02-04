@@ -1,6 +1,14 @@
 from django.urls import path
 
-from itou.www.apply.views import batch_views, edit_views, list_views, process_views, submit_views, transfer_views
+from itou.www.apply.views import (
+    accept_views,
+    batch_views,
+    edit_views,
+    list_views,
+    process_views,
+    submit_views,
+    transfer_views,
+)
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -187,20 +195,20 @@ urlpatterns = [
         name="refuse",
     ),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
-    path("<uuid:job_application_id>/siae/start-accept", process_views.start_accept_wizard, name="start-accept"),
+    path("<uuid:job_application_id>/siae/start-accept", accept_views.start_accept_wizard, name="start-accept"),
     path(
         "<uuid:session_uuid>/accept/job-seeker-infos",
-        process_views.FillJobSeekerInfosForAcceptView.as_view(),
+        accept_views.FillJobSeekerInfosForAcceptView.as_view(),
         name="accept_fill_job_seeker_infos",
     ),
     path(
         "<uuid:session_uuid>/accept/contract",
-        process_views.ContractInfosForAcceptView.as_view(),
+        accept_views.ContractInfosForAcceptView.as_view(),
         name="accept_contract_infos",
     ),
     path(
         "<uuid:session_uuid>/accept/confirm",
-        process_views.ConfirmationForAcceptView.as_view(),
+        accept_views.ConfirmationForAcceptView.as_view(),
         name="accept_confirmation",
     ),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
@@ -287,17 +295,17 @@ urlpatterns = [
     # HTMX fragments loading
     path(
         "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_qualification_fields",
-        process_views.ReloadQualificationFields.as_view(),
+        accept_views.ReloadQualificationFields.as_view(),
         name="reload_qualification_fields",
     ),
     path(
         "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_contract_type_and_options",
-        process_views.ReloadContractTypeAndOptions.as_view(),
+        accept_views.ReloadContractTypeAndOptions.as_view(),
         name="reload_contract_type_and_options",
     ),
     path(
         "<int:company_pk>/accept/<uuid:job_seeker_public_id>/reload_job_description_fields",
-        process_views.ReloadJobDescriptionFields.as_view(),
+        accept_views.ReloadJobDescriptionFields.as_view(),
         name="reload_job_description_fields",
     ),
     path(

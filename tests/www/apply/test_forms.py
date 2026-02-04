@@ -8,7 +8,7 @@ from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
 from itou.www.apply import forms as apply_forms
-from itou.www.apply.views.process_views import initialize_accept_session
+from itou.www.apply.views.accept_views import initialize_accept_session
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
