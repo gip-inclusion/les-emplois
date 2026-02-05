@@ -27,7 +27,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         Éligibilité GEIQ non confirmée
       </span>"""
     EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic du candidat a expiré"
-    CONFIRMATION_MODAL = "Êtes-vous sûr de vouloir continuer sans bénéficier d’une aide financière de l’État ?"
 
     def get_response(self, client, job_application, user):
         client.force_login(user)
@@ -52,14 +51,12 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
         # as job seeker, I see the prescriber diagnosis
         response = self.get_response(client, job_application, job_application.job_seeker)
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
         # as a prescriber, I see my diagnosis
         assert diagnosis.author.is_prescriber
@@ -67,7 +64,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.NO_ALLOWANCE)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
     def test_with_expired_diagnosis(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
@@ -82,14 +78,12 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.NO_ALLOWANCE)
         assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-        assertContains(response, self.CONFIRMATION_MODAL)
 
         # as job seeker, I see the prescriber diagnosis isn't valid anymore without further details
         response = self.get_response(client, job_application, job_application.job_seeker)
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
         # as a prescriber, I see the prescriber diagnosis isn't valid anymore
         assert diagnosis.author.is_prescriber
@@ -97,7 +91,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
         assertNotContains(response, self.NO_ALLOWANCE)
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
     def test_without_diagnosis(self, client):
         # No GEIQ diagnosis for this job seeker / job application
@@ -106,18 +99,15 @@ class TestJobApplicationGEIQEligibilityDetails:
         # as employer, I see there's no diagnosis
         response = self.get_response(client, job_application, job_application.to_company.members.first())
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertContains(response, self.CONFIRMATION_MODAL)
 
         # as job seeker, I see there's no diagnosis
         response = self.get_response(client, job_application, job_application.job_seeker)
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
         # as a prescriber, I see there's no diagnosis
         assert job_application.sender.is_prescriber
         response = self.get_response(client, job_application, job_application.sender)
         assertContains(response, self.NO_VALID_DIAGNOSIS_BADGE, html=True)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
     def test_accepted_job_app_with_valid_diagnosis(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
@@ -217,7 +207,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.NO_ALLOWANCE)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-        assertContains(response, self.CONFIRMATION_MODAL)
 
         # as job seeker, I see the prescriber diagnosis
         response = self.get_response(client, job_application, job_application.job_seeker)
@@ -225,7 +214,6 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertNotContains(response, self.NO_ALLOWANCE)
         assertNotContains(response, self.ALLOWANCE_AND_COMPANY)
         assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
-        assertNotContains(response, self.CONFIRMATION_MODAL)
 
     def test_accepted_without_diagnosis(self, client):
         job_application = JobApplicationFactory(

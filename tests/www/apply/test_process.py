@@ -1716,8 +1716,9 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        next_url = reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk})
-        assertRedirects(response, next_url, target_status_code=302)
+        assertRedirects(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_company
@@ -1763,13 +1764,14 @@ class TestProcessViews:
             kwargs={"job_application_id": job_application.pk},
             query={"next_url": next_url},
         )
+        details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
         assert response.status_code == 200
         assertTemplateUsed(response, "eligibility/includes/iae/criteria_filled_from_job_seeker.html", count=1)
         assertContains(
             response,
             f"""
-            <a href="{next_url}"
+            <a href="{details_url}"
                class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
                aria-label="Annuler la saisie de ce formulaire">
                 <i class="ri-close-line ri-lg" aria-hidden="true"></i>
@@ -1787,10 +1789,7 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        url = reverse(
-            "apply:start-accept", kwargs={"job_application_id": job_application.pk}, query={"next_url": next_url}
-        )
-        assertRedirects(response, url, target_status_code=302)
+        assertRedirects(response, next_url)
 
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
@@ -2697,30 +2696,20 @@ def test_details_sender_email_display_for_job_seeker(client):
 def test_accept_button(client):
     job_application = JobApplicationFactory(
         state=job_applications_enums.JobApplicationState.PROCESSING,
-        to_company__kind=CompanyKind.GEIQ,
     )
     accept_url = reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk})
-    DIRECT_ACCEPT_BUTTON = (
+    client.force_login(job_application.to_company.members.first())
+    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+    assertContains(
+        response,
         f'<a href="{accept_url}" class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" '
         'data-matomo-event="true" data-matomo-category="candidature" '
         'data-matomo-action="clic" data-matomo-option="accept_application">'
         '\n            <i class="ri-check-line fw-medium" aria-hidden="true"></i>'
         "\n            <span>Accepter</span>"
-        "\n        </a>"
+        "\n        </a>",
+        html=True,
     )
-    client.force_login(job_application.to_company.members.first())
-    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-    # GEIQ without GEIQ diagnosis: we get the modals
-    assertNotContains(response, DIRECT_ACCEPT_BUTTON, html=True)
-
-    job_application.to_company = CompanyFactory(kind=CompanyKind.AI, with_membership=True)
-    client.force_login(job_application.to_company.members.first())
-    job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
-        from_prescriber=True, job_seeker=job_application.job_seeker
-    )
-    job_application.save()
-    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-    assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
 
 @freeze_time("2023-12-12 13:37:00", tz_offset=-1)
