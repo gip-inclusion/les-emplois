@@ -25,9 +25,7 @@ from itou.asp.models import Commune, Country
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS, AdministrativeCriteriaKind
-from itou.eligibility.models import (
-    EligibilityDiagnosis,
-)
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
@@ -250,9 +248,9 @@ class TestProcessAcceptViewsInWizard:
         _nominal_cases,
         ids=[state + ("_no_end_date" if not end_at else "") for end_at, state in _nominal_cases],
     )
-    def test_nominal_case(self, client, hiring_end_at, state):
+    def test_nominal_iae_case(self, client, hiring_end_at, state):
         today = timezone.localdate()
-        job_application = self.create_job_application(state=state, with_iae_eligibility_diagnosis=True)
+        job_application = self.create_job_application(state=state)
         previous_last_checked_at = self.job_seeker.last_checked_at
 
         employer = self.company.members.first()
@@ -271,7 +269,44 @@ class TestProcessAcceptViewsInWizard:
         response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
         assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
 
-        self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data)
+        response = self.fill_contract_info_step(
+            client, job_application, session_uuid, post_data=post_data, assert_successful=False
+        )
+
+        eligibility_url = reverse(
+            "apply:eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={
+                "back_url": self.get_contract_info_step_url(session_uuid),
+                "next_url": self.get_confirm_step_url(session_uuid),
+            },
+        )
+        assertRedirects(response, eligibility_url, fetch_redirect_response=False)
+
+        response = client.get(eligibility_url)
+        assertContains(
+            response, CONFIRM_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk])
+        )
+        assertContains(
+            response,
+            (
+                '<button type="submit" class="btn btn-block btn-primary" aria-label="Passer à l’étape suivante">'
+                "<span>Valider l’éligibilité du candidat</span>"
+                "</button>"
+            ),
+            html=True,
+        )
+        assertContains(response, BACK_BUTTON_ARIA_LABEL)
+        assertContains(response, self.get_contract_info_step_url(session_uuid))
+        criterion1 = AdministrativeCriteria.objects.level1().order_by("?").first()
+        assert not EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_company
+        )
+        response = client.post(eligibility_url, data={f"{criterion1.key}": "true"})
+        assertRedirects(response, self.get_confirm_step_url(session_uuid), fetch_redirect_response=False)
+        assert EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_company
+        )
 
         # If you go back to contract infos, data is pre-filled
         response = client.get(self.get_contract_info_step_url(session_uuid))
@@ -303,6 +338,35 @@ class TestProcessAcceptViewsInWizard:
             assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_accept_with_iae_eligibility(self, client):
+        today = timezone.localdate()
+        job_application = self.create_job_application(
+            state=JobApplicationState.PROCESSING, with_iae_eligibility_diagnosis=True
+        )
+        details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        employer = self.company.members.first()
+        client.force_login(employer)
+        # Good duration.
+        hiring_start_at = today
+        post_data = {"hiring_end_at": ""}
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
+        assertContains(response, LINK_RESET_MARKUP % details_url)
+        assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
+        assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
+
+        self.fill_contract_info_step(client, job_application, session_uuid, post_data=post_data, reset_url=details_url)
+        self.confirm_step(client, session_uuid, reset_url=details_url)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at is None
+        assert job_application.state.is_accepted
 
     def test_accept_with_next_url(self, client):
         today = timezone.localdate()
@@ -336,6 +400,64 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.hiring_start_at == hiring_start_at
         assert job_application.hiring_end_at is None
         assert job_application.state.is_accepted
+
+    def test_nominal_geiq_case(self, client):
+        today = timezone.localdate()
+        job_application = self.create_job_application()
+        self.company.kind = CompanyKind.GEIQ
+        self.company.convention = None
+        self.company.save(update_fields=["convention", "kind", "updated_at"])
+        previous_last_checked_at = self.job_seeker.last_checked_at
+
+        employer = self.company.members.first()
+        client.force_login(employer)
+        # Good duration.
+        hiring_start_at = today
+
+        session_uuid = self.start_accept_job_application(client, job_application)
+        response = client.get(self.get_job_seeker_info_step_url(session_uuid))
+        assertContains(response, NEXT_BUTTON_MARKUP, html=True)
+        assertContains(response, LINK_RESET_MARKUP % reverse("apply:details_for_company", args=[job_application.pk]))
+        assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
+        response = self.fill_job_seeker_info_step(client, job_application, session_uuid)
+        assertRedirects(response, self.get_contract_info_step_url(session_uuid), fetch_redirect_response=False)
+
+        response = self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=False)
+
+        eligibility_url = reverse(
+            "apply:geiq_eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={
+                "back_url": self.get_contract_info_step_url(session_uuid),
+                "next_url": self.get_confirm_step_url(session_uuid),
+            },
+        )
+        assertRedirects(response, eligibility_url, fetch_redirect_response=False)
+
+        response = client.get(eligibility_url)
+        assertContains(response, self.get_contract_info_step_url(session_uuid))  # cancel button
+        response = client.post(eligibility_url, data={"choice": "False"})  # Skip GEIQ eligibility step
+        assertContains(response, self.get_confirm_step_url(session_uuid))  # htmx response contains confirm step link
+        # If you go back to contract infos, data is pre-filled
+        response = client.get(self.get_contract_info_step_url(session_uuid))
+        assertContains(response, f'value="{hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)}"')
+
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        self.confirm_step(client, session_uuid, reset_url=next_url)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.state.is_accepted
+
+        # test how hiring_end_date is displayed
+        response = client.get(next_url)
+        assertNotContains(
+            response,
+            users_test_constants.CERTIFIED_FORM_READONLY_HTML.format(url=get_zendesk_form_url(response.wsgi_request)),
+            html=True,
+        )
+        # last_checked_at has been updated
+        assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
     @freeze_time("2024-09-11")
@@ -614,23 +736,6 @@ class TestProcessAcceptViewsInWizard:
         self.fill_contract_info_step(client, job_application, session_uuid, assert_successful=True, post_data={})
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.confirm_step(client, session_uuid, reset_url=next_url)
-
-    def test_no_diagnosis(self, client):
-        # if no, should not see the confirm button, nor accept posted data
-        job_application = self.create_job_application(with_iae_eligibility_diagnosis=False)
-        assert job_application.eligibility_diagnosis is None
-        job_application.job_seeker.eligibility_diagnoses.all().delete()
-
-        employer = self.company.members.first()
-        client.force_login(employer)
-        url_accept = reverse("apply:start-accept", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url_accept, follow=True)
-        assertRedirects(
-            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
-            list(response.context["messages"])[-1]
-        )
 
     def test_with_active_suspension(self, client):
         """Test the `accept` transition with active suspension for active user"""
