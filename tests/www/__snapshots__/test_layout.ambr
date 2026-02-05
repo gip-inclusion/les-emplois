@@ -152,6 +152,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
@@ -480,6 +483,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
@@ -780,6 +786,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
@@ -1117,6 +1126,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
@@ -1448,6 +1460,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
@@ -1746,6 +1761,9 @@
                           </i>
                           <span>
                               Rechercher
+                              <span class="badge rounded-pill bg-important text-white badge-sm ms-2">
+                                  Nouveau
+                              </span>
                           </span>
                       </button>
                       <div class="collapse" id="collapse-nav-rechercher">
