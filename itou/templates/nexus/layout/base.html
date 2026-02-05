@@ -1,0 +1,87 @@
+{% load static %}
+{% load theme_inclusion %}
+
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <title>
+            {% block title %}- Plateforme de l'inclusion{% endblock %}
+        </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="title" content="Plateforme de l'inclusion">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
+        <meta property="og:title" content="Plateforme de l'inclusion">
+        <meta property="og:description" content="La Plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion.">
+        <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
+
+        <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
+        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
+        <link rel="stylesheet" href="{% static "css/itou.css" %}">
+    </head>
+
+    <body class="l-nexus">
+        <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="c-skiplinks">
+            <ul>
+                <li>
+                    <a href="#nav-primary">Aller au menu principal</a>
+                </li>
+                <li>
+                    <a href="#main">Aller au contenu principal</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="global-messages-container">
+            {% block global_messages %}
+                {% include "includes/demo_accounts.html" %}
+            {% endblock %}
+        </div>
+
+        {% if user.is_authenticated %}
+            {% include "nexus/layout/header.html" %}
+        {% endif %}
+
+        <main class="s-main" id="main" role="main">
+            <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
+            {% block content %}{% endblock %}
+        </main>
+
+        {% if user.is_authenticated %}
+            <footer role="contentinfo" id="footer">
+                <section class="s-footer-legal">
+                    <div class="s-footer-legal__container container">{% include "layout/_footer_legal_content.html" %}</div>
+                </section>
+            </footer>
+        {% endif %}
+
+        <script src="{% static "vendor/jquery/jquery.min.js" %}"></script>
+        <script src="{% static "vendor/bootstrap/popper.min.js" %}"></script>
+        <script src="{% static "vendor/bootstrap/bootstrap.min.js" %}"></script>
+        <script src="{% static "vendor/intro-js/intro.min.js" %}"></script>
+        <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
+        <script src="{% static "django_htmx/htmx.min.js" %}"></script>
+        <script src="{% static "js/htmx_handlers.js" %}"></script>
+
+        {% include "includes/tarteaucitron_matomo.html" %}
+
+        {% if SHOW_DEMO_ACCOUNTS_BANNER %}
+            <script src="{% static 'js/demo_accounts.js'%}"></script>
+        {% endif %}
+
+        <script nonce="{{ csp_nonce }}">
+            // Show any toasts present in the loaded DOM
+            htmx.onLoad((target) => {
+                $(".toast-container .toast", target).each(function() {
+                    $(this).toast("show");
+                });
+            });
+        </script>
+
+        {% block script %}
+        {% endblock %}
+
+    </body>
+</html>

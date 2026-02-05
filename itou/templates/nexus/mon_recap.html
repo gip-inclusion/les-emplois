@@ -1,0 +1,60 @@
+{% extends "nexus/base_service.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Commande de carnet {{ block.super }}{% endblock %}
+
+{% block service_title %}
+    <img src="{% static_theme_images 'logo-monrecap-mono.svg' %}" height="35" width="35" alt="Mon Récap">
+    Commande de carnet
+{% endblock %}
+
+{% block service_logo %}
+    <img src="{% static_theme_images 'logo-monrecap.svg' %}" height="50" alt="Mon Récap">
+{% endblock %}
+
+{% block description %}
+    <div class="mb-3 mb-md-4">
+        <img src="{% static_theme_images 'nexus/nx-illustration-monrecap.png' %}" height="152" width="216" alt="">
+    </div>
+    {% if Service.MON_RECAP in activated_services %}
+        <h2 class="h3 mb-md-4">Commandez en quelques clics vos premiers carnets !</h2>
+        {% if monrecap_url %}
+            <a href="{{ monrecap_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.MON_RECAP %} target="_blank">
+                <span>Commander des carnets</span>
+            </a>
+        {% else %}
+            <button class="btn btn-lg btn-primary has-external-link" disabled data-bs-toggle="tooltip" data-bs-title="Démo inexistante">
+                <span>Commander des carnets</span>
+            </button>
+        {% endif %}
+        <br>
+    {% else %}
+        <h2 class="h3">Le carnet papier retraçant le parcours d’insertion d’une personne</h2>
+        <p class="mb-md-4">
+            Outillez vos usagers avec un support concret pour suivre leurs démarches et parcours.
+            <br>
+            Facilitez votre accompagnement et communiquez entre professionnels grâce à un carnet commun.
+            <br>
+            Choisissez un outil accessible non numérique.
+        </p>
+        <form method="post" action="{{ monrecap_url }}">
+            {% csrf_token %}
+            <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.MON_RECAP %}>
+                <i class="ri-toggle-line" aria-hidden="true"></i>
+                <span>Activer ce service</span>
+            </button>
+        </form>
+    {% endif %}
+    <a href="https://mon-recap.inclusion.beta.gouv.fr/"
+       class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+       aria-label="Découvrir Mon Récap (lien externe)"
+       {% matomo_event "nexus" "decouvrir-service" Service.MON_RECAP %}
+       target="_blank">Découvrir Mon Récap</a>
+    <div class="text-center">
+        <img src="{% static 'img/nexus/presentation_monrecap.png' %}" alt="" class="img-fluid" width="1200">
+    </div>
+{% endblock %}

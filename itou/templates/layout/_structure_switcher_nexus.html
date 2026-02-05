@@ -1,0 +1,9 @@
+<div class="dropdown dropdown-structure">
+    <button type="button" class="btn btn-primary btn-ico dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchStructureDropdown" aria-expanded="false">
+        <i class="{{ icon }}" aria-hidden="true"></i>
+        <span>{{ current_organization.kind }} - {{ current_organization.display_name }}</span>
+    </button>
+    <div class="dropdown-menu w-100" id="switchStructureDropdown">
+        {% include "layout/_structure_switcher_dropdown_menu.html" %}
+    </div>
+</div>

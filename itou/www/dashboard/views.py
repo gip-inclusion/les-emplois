@@ -27,6 +27,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.metabase.models import DatumKey
+from itou.nexus.utils import activate_pilotage
 from itou.search.models import SavedSearch
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
@@ -196,6 +197,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     if not stats_utils.can_view_stats_dashboard_widget(request):
         return HttpResponseForbidden()
+
+    if request.user.is_authenticated and (request.user.is_employer or request.user.is_prescriber):
+        activate_pilotage(request.user)
 
     context = {
         "layout_kind": DashboardStatsLayoutKind.LEGACY,

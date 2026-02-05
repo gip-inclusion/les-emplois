@@ -1,0 +1,238 @@
+{% extends "nexus/layout/base.html" %}
+{% load components %}
+{% load enums %}
+{% load matomo %}
+{% load nexus %}
+{% load theme_inclusion %}
+
+{% block title %}Tableau de bord {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    {% enums "nexus" "NexusUserKind" as NexusUserKind %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title">
+                        <div class="c-title__main">
+                            <h1>Accueil</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if activated_services %}
+        <section class="s-section">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <h2>
+                            <i class="ri-function-line ri-xl fw-normal text-disabled"></i>
+                            Mes services actifs
+                        </h2>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xxl-3 row-cols-xxxl-4 mt-3 mt-md-4">
+                            {% if Service.EMPLOIS in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Les Emplois de l’inclusion" logo="logo-emploi-inclusion-mono.svg" url=emplois_url aria_label="Accéder aux Emplois de l’inclusion" service=Service.EMPLOIS %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.DORA in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="DORA" logo="logo-dora-mono.svg" url=dora_url aria_label="Accéder à DORA" service=Service.DORA %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.MARCHE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Le marché de l’inclusion" logo="logo-marche-inclusion-mono.svg" url=marche_url aria_label="Accéder au marché de l’inclusion" service=Service.MARCHE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.MON_RECAP in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Mon Récap" logo="logo-monrecap-mono.svg" url=monrecap_url aria_label="Accéder à Mon Récap" service=Service.MON_RECAP %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.PILOTAGE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Le pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" url=pilotage_url aria_label="Accéder au pilotage de l’inclusion" service=Service.PILOTAGE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.COMMUNAUTE in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="La communauté de l’inclusion" logo="logo-communaute-inclusion-mono.svg" url=communaute_url aria_label="Accéder à la communauté de l’inclusion" service=Service.COMMUNAUTE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    {% if not all_services_activated %}
+        <section class="s-section" id="newServicesV1">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inclusion</a>
+                        </div>
+                        <div class="c-box">
+                            <ul class="list-group list-group-flush">
+                                {% if Service.EMPLOIS not in activated_services %}
+                                    {% new_service_v1 service=Service.EMPLOIS %}
+                                {% endif %}
+                                {% if Service.DORA not in activated_services %}
+                                    {% new_service_v1 service=Service.DORA %}
+                                {% endif %}
+                                {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                    {% new_service_v1 service=Service.MARCHE %}
+                                {% endif %}
+                                {% if Service.MON_RECAP not in activated_services %}
+                                    {% new_service_v1 service=Service.MON_RECAP %}
+                                {% endif %}
+                                {% if Service.PILOTAGE not in activated_services %}
+                                    {% new_service_v1 service=Service.PILOTAGE %}
+                                {% endif %}
+                                {% if Service.COMMUNAUTE not in activated_services %}
+                                    {% new_service_v1 service=Service.COMMUNAUTE %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="s-section d-none" id="newServicesV2">
+            <div class="s-section__container container">
+                <div class="s-section__row row">
+                    <div class="s-section__col col-12">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3">
+                            <h2 class="mb-0">
+                                <i class="ri-star-smile-line ri-xl fw-normal text-disabled"></i>
+                                Services à découvrir
+                            </h2>
+                            <a href="https://inclusion.gouv.fr/à-propos/presentation/" class="btn btn-link has-external-link justify-content-start justify-content-md-center" target="_blank">Qu’est-ce que la Plateforme de l’inclusion</a>
+                        </div>
+                        <div class="c-box">
+                            <div class="row d-none d-xxl-flex">
+                                <div class="col-5" id="nxAccordionListGroup">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            {% new_service_v2 service=Service.EMPLOIS %}
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            {% new_service_v2 service=Service.DORA %}
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            {% new_service_v2 service=Service.MARCHE %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% new_service_v2 service=Service.MON_RECAP %}
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            {% new_service_v2 service=Service.PILOTAGE %}
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            {% new_service_v2 service=Service.COMMUNAUTE %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                                <div class="col-7" id="nxAccordionInfoMore">
+                                    {% if Service.EMPLOIS not in activated_services %}
+                                        {% new_service_v2_details service=Service.EMPLOIS %}
+                                    {% endif %}
+                                    {% if Service.DORA not in activated_services %}
+                                        {% new_service_v2_details service=Service.DORA %}
+                                    {% endif %}
+                                    {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                        {% new_service_v2_details service=Service.MARCHE %}
+                                    {% endif %}
+                                    {% if Service.MON_RECAP not in activated_services %}
+                                        {% new_service_v2_details service=Service.MON_RECAP %}
+                                    {% endif %}
+                                    {% if Service.PILOTAGE not in activated_services %}
+                                        {% new_service_v2_details service=Service.PILOTAGE %}
+                                    {% endif %}
+                                    {% if Service.COMMUNAUTE not in activated_services %}
+                                        {% new_service_v2_details service=Service.COMMUNAUTE %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row d-xxl-none">
+                                <div class="col-12" id="nxAccordionListGroupCollapse">
+                                    <ul class="list-group list-group-flush">
+                                        {% if Service.EMPLOIS not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.EMPLOIS %}
+                                        {% endif %}
+                                        {% if Service.DORA not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.DORA %}
+                                        {% endif %}
+                                        {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
+                                            {% new_service_v2_responsive service=Service.MARCHE %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.MON_RECAP %}
+                                        {% endif %}
+                                        {% if Service.PILOTAGE not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.PILOTAGE %}
+                                        {% endif %}
+                                        {% if Service.COMMUNAUTE not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.COMMUNAUTE %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+
+{% block script %}
+    <!-- Matomo A/B test -->
+    <script nonce="{{ csp_nonce }}">
+        var _paq = _paq || [];
+        _paq.push(['AbTesting::create', {
+            name: 'NexusServicesADecouvrir', // the name is the same in both environment
+            percentage: 100,
+            includedTargets: [{
+                "attribute": "url",
+                "inverted": "0",
+                "type": "equals_simple",
+                "value": "{{ a_b_test_url }}"
+            }],
+            excludedTargets: [],
+            variations: [{
+                name: 'original',
+                activate: function(event) {}
+            }, {
+                name: 'VariationB',
+                activate: function(event) {
+                    $('#newServicesV1').addClass('d-none');
+                    $('#newServicesV2').removeClass('d-none');
+                }
+            }],
+            trigger: function() {
+                return true;
+            }
+        }]);
+    </script>
+{% endblock %}

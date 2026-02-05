@@ -1,0 +1,41 @@
+{% extends "nexus/base_service.html" %}
+{% load enums %}
+{% load matomo %}
+{% load theme_inclusion %}
+
+
+{% block title %}Fiches de poste {{ block.super }}{% endblock %}
+
+{% block service_title %}
+    <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" width="35" alt="Les emplois de l’inclusion">
+    Fiches de poste
+{% endblock %}
+
+{% block service_logo %}
+    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="50" alt="Les emplois de l’inclusion">
+{% endblock %}
+
+{% block description %}
+    <div class="mb-3 mb-md-4">
+        <img src="{% static_theme_images 'nexus/nx-illustration-emplois.png' %}" height="152" width="216" alt="">
+    </div>
+    <h2 class="h3">Le service de recrutement et de gestion des PASS IAE</h2>
+    <p class="mb-md-4">
+        Publiez vos fiches de poste.
+        <br>
+        Recevez des candidatures de la part des accompagnateurs et des candidats.
+        <br>
+        Obtenez un <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" class="has-external-link" target="_blank" rel="noopener">PASS IAE</a> en ligne dès l’embauche d’un candidat.
+    </p>
+    {# TODO : when it's possible to access this page without a EMPLOIS account #}
+    <button class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.EMPLOIS %} type="button">
+        <i class="ri-toggle-line" aria-hidden="true"></i>
+        <span>Activer ce service</span>
+    </button>
+    <br>
+    <a href="{% url "dashboard:index" %}"
+       class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+       aria-label="Découvrir Les emplois de l’inclusion (lien externe)"
+       target="_blank"
+       {% matomo_event "nexus" "decouvrir-service" Service.EMPLOIS %}>Découvrir Les emplois de l’inclusion</a>
+{% endblock %}

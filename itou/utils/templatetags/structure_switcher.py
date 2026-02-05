@@ -25,7 +25,7 @@ def structure_switcher(context, mode):
             "organizations": organizations,
             "show_company_switcher_menu": len(organizations) >= 2 or create_antenna_perm,
             "user": request.user,
-            "next_url": reverse("dashboard:index"),
+            "next_url": reverse("nexus:emplois") if mode == "nexus" else reverse("dashboard:index"),
         }
         userkind_context = {
             UserKind.JOB_SEEKER: {
@@ -66,6 +66,7 @@ def structure_switcher(context, mode):
         template_name = {
             "mobile": "layout/_structure_switcher_offcanvas.html",
             "nav": "layout/_structure_switcher_nav.html",
+            "nexus": "layout/_structure_switcher_nexus.html",
         }[mode]
         template = get_template(template_name)
         return template.render(template_context)
