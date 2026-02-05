@@ -1,0 +1,26 @@
+name: 🧹 Clean CleverCloud test buckets
+# When CI gets interrupted (eg. concurrent build), the buckets from the test
+# suite aren’t deleted. There’s a maximum of 1_000 buckets per Cellar instance.
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  delete-buckets:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      CELLAR_ADDON_HOST: ${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}
+      CELLAR_ADDON_KEY_ID: ${{ secrets.CLEVER_CELLAR_ADDON_KEY_ID_FOR_TESTS }}
+      CELLAR_ADDON_KEY_SECRET: ${{ secrets.CLEVER_CELLAR_ADDON_SECRET_KEY_FOR_TESTS }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: ⏬ Install uv
+        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+        with:
+          enable-cache: true
+      - name: Remove leftover buckets from interrupted test suites
+        run: uv run --script scripts/delete-buckets --use-case=ci_buckets
