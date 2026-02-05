@@ -2,6 +2,8 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
+from itou.utils.constants import ITOU_CONTACT_FORM_URL
+
 
 @pytest.mark.parametrize(
     "view_name,expected_title",
@@ -15,3 +17,5 @@ from pytest_django.asserts import assertContains
 def test_navigation_not_authenticated(client, view_name, expected_title):
     response = client.get(reverse(view_name))
     assertContains(response, expected_title)
+    if view_name == "accessibility":
+        assertContains(response, f'href="{ITOU_CONTACT_FORM_URL}"')
