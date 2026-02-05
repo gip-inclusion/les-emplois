@@ -582,12 +582,20 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
             query={"next_url": self.next_url} if self.next_url else None,
         )
 
+    def get_back_url(self):
+        return get_safe_url(
+            self.request,
+            "back_url",
+            fallback_url=None,
+        )
+
     def get_cancel_url(self):
         return self.next_url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["job_application"] = self.job_application
+        context["back_url"] = self.get_back_url()
         return context
 
 

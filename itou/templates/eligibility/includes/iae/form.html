@@ -48,9 +48,9 @@
     </div>
 
     {% if cancel_url %}
-        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" reset_url=cancel_url show_mandatory_fields_mention=False %}
+        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" secondary_url=back_url reset_url=cancel_url show_mandatory_fields_mention=False %}
     {% else %}
-        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" show_mandatory_fields_mention=False %}
+        {% itou_buttons_form primary_label="Valider l’éligibilité du candidat" secondary_url=back_url show_mandatory_fields_mention=False %}
     {% endif %}
 
 </form>
