@@ -55,8 +55,10 @@ class AbstractEligibilityDiagnosisModelFactory(AutoNowOverrideMixin, factory.dja
 
     created_at = factory.LazyFunction(timezone.now)
     expires_at = factory.LazyAttribute(
-        lambda obj: timezone.localdate(obj.created_at)
-        + relativedelta(months=AbstractEligibilityDiagnosisModel.EXPIRATION_DELAY_MONTHS)
+        lambda obj: (
+            timezone.localdate(obj.created_at)
+            + relativedelta(months=AbstractEligibilityDiagnosisModel.EXPIRATION_DELAY_MONTHS)
+        )
     )
     job_seeker = factory.SubFactory(JobSeekerFactory)
 

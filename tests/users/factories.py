@@ -191,12 +191,14 @@ class JobSeekerFactory(UserFactory):
         )
         with_birth_place = factory.Trait(
             jobseeker_profile__birth_place=factory.LazyAttribute(
-                lambda instance: Commune.objects.order_by("?")
-                .filter(
-                    start_date__lte=instance.birthdate,
-                    end_date__gte=instance.birthdate,
-                )
-                .first(),
+                lambda instance: (
+                    Commune.objects.order_by("?")
+                    .filter(
+                        start_date__lte=instance.birthdate,
+                        end_date__gte=instance.birthdate,
+                    )
+                    .first()
+                ),
             )
         )
         with_ban_geoloc_address = factory.Trait(

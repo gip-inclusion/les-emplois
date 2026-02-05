@@ -1,6 +1,6 @@
 import enum
 
 
-class StructureTypeStr(str, enum.Enum):
+class StructureTypeStr(enum.StrEnum):
     ORGA = "orga"
     SIAE = "siae"
