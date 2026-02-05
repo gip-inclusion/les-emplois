@@ -409,7 +409,7 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
         context["progress"] = 33
         context["can_view_personal_information"] = True
         context["job_seeker"] = self.job_seeker
-        context["siae"] = self.company
+        context["company"] = self.company
         context["back_url"] = self.get_back_url()
         context["next_url"] = self.get_next_url()
         context["geiq_criteria_form_url"] = self.get_success_url()

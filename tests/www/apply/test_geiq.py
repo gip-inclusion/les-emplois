@@ -326,3 +326,13 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis:
         )
         assert not job_application.job_seeker.geiq_eligibility_diagnoses.exists()
         assert response.status_code == 404
+
+
+def test_geiq_eligibility(client):
+    job_application = JobApplicationFactory(
+        to_company__kind=CompanyKind.GEIQ,
+    )
+    client.force_login(job_application.to_company.members.first())
+    response = client.get(reverse("apply:geiq_eligibility", kwargs={"job_application_id": job_application.pk}))
+    assertContains(response, "Souhaitez-vous préciser la situation administrative du candidat ?")
+    assertContains(response, reverse("companies_views:card", kwargs={"company_pk": job_application.to_company.pk}))
