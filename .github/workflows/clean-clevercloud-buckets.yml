@@ -1,0 +1,60 @@
+name: 🧹 Clean leftover buckets
+# When CI gets interrupted (eg. concurrent build), the buckets from the test
+# suite aren’t deleted. There’s a maximum of 1_000 buckets per Cellar instance.
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * 1"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    permissions: {}
+    env:
+      CELLAR_ADDON_HOST_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_HOST_FOR_TESTS }}
+      CELLAR_ADDON_KEY_ID_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_KEY_ID_FOR_TESTS }}
+      CELLAR_ADDON_SECRET_KEY_TEST: ${{ secrets.CLEVER_CELLAR_ADDON_SECRET_KEY_FOR_TESTS }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: ⏬ Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: "requirements/base.txt"
+      - name: 📥 Install dependencies
+        run: |
+          make venv
+          echo ".venv/bin" >> $GITHUB_PATH
+        shell: bash
+      - name: Remove leftover buckets from interrupted test suite
+        shell: python
+        run: |
+          import os
+          from datetime import date, timedelta
+
+          import boto3
+
+          s3 = boto3.client(
+              "s3",
+              endpoint_url=os.environ["CELLAR_ADDON_HOST_TEST"],
+              aws_access_key_id=os.environ["CELLAR_ADDON_KEY_ID_TEST"],
+              aws_secret_access_key=os.environ["CELLAR_ADDON_SECRET_KEY_TEST"],
+          )
+          for bucket in s3.list_buckets()["Buckets"]:
+              if bucket["CreationDate"].date() < date.today() - datetime.timedelta(days=1):
+                  bucket_name = bucket["Name"]
+                  paginator = s3.get_paginator("list_object_versions")
+                  for page in paginator.paginate(Bucket=bucket_name):
+                      for entity_name in ["DeleteMarkers", "Versions"]:
+                          # Some pages may not have 'DeleteMarkers' nor 'Versions' keys.
+                          if entity_name in page:
+                              s3.delete_objects(
+                                  Bucket=bucket_name,
+                                  Delete={
+                                      "Objects": [
+                                          {"Key": obj["Key"], "VersionId": obj["VersionId"]} for obj in page[entity_name]
+                                      ]
+                                  },
+                              )
+                  s3.delete_bucket(Bucket=bucket["Name"])
