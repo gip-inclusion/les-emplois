@@ -25,7 +25,7 @@
 {% block title_extra %}
     <div class="c-search mt-3 mt-md-4">
         <div class="c-search__bar">
-            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results">
+            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results" id="top_search_form">
                 {% include "search/services/includes/form.html" with form=form is_home=False only %}
             </form>
         </div>
@@ -41,7 +41,7 @@
                     <div class="d-block w-100">
                         <form hx-get="{% url 'search:services_results' %}"
                               hx-trigger="change delay:.5s"
-                              hx-include="#id_city, #id_category"
+                              hx-include="#top_search_form"
                               hx-indicator="#services-search-results"
                               hx-target="#services-search-results"
                               hx-swap="outerHTML"
