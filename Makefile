@@ -67,6 +67,9 @@ fast_fix: $(VIRTUAL_ENV)
 fix: fast_fix
 	djlint --reformat itou
 
+apt_install:
+	sudo apt-get install gdal-bin -y
+
 # Django.
 # =============================================================================
 
