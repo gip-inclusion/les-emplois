@@ -1,0 +1,50 @@
+{% extends "nexus/base_service.html" %}
+{% load enums %}
+{% load matomo %}
+{% load static %}
+{% load theme_inclusion %}
+
+
+{% block title %}Services d’insertion {{ block.super }}{% endblock %}
+
+{% block service_title %}
+    <img src="{% static_theme_images 'logo-dora-mono.svg' %}" height="35" width="35" alt="DORA">
+    Services d’insertion
+{% endblock %}
+
+{% block service_logo %}
+    <img src="{% static_theme_images 'logo-dora.svg' %}" height="50" alt="DORA">
+{% endblock %}
+
+{% block description %}
+    <div class="mb-3 mb-md-4">
+        <img src="{% static_theme_images 'nexus/nx-illustration-dora.png' %}" height="152" width="216" alt="">
+    </div>
+    <h2 class="h3">Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi</h2>
+    <p class="mb-md-4">
+        Saisissez ou importez votre offre de service.
+        <br>
+        Service identifié par les professionnels de l’insertion grâce au moteur de recherche.
+        <br>
+        Gérez vos demandes de mobilisation dans un espace dédié.
+    </p>
+    {% if Service.DORA in activated_services %}
+        <a href="{{ dora_url }}" class="btn btn-lg btn-primary has-external-link" {% matomo_event "nexus" "acceder-service" Service.DORA %} target="_blank">
+            <span>Accéder à mes services d’insertion</span>
+        </a>
+    {% else %}
+        <a href="{{ dora_url }}" class="btn btn-lg btn-ico btn-primary" {% matomo_event "nexus" "activer-service" Service.DORA %}>
+            <i class="ri-toggle-line" aria-hidden="true"></i>
+            <span>Activer ce service</span>
+        </a>
+    {% endif %}
+    <br>
+    <a href="https://dora.inclusion.gouv.fr/"
+       class="btn btn-sm btn-link has-external-link d-inline-block mt-3"
+       aria-label="Découvrir DORA (lien externe)"
+       target="_blank"
+       {% matomo_event "nexus" "decouvrir-service" Service.DORA %}>Découvrir DORA</a>
+    <div class="text-center">
+        <img src="{% static 'img/nexus/presentation_dora.png' %}" alt="" class="img-fluid" width="1200">
+    </div>
+{% endblock %}

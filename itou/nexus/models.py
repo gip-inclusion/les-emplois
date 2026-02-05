@@ -159,6 +159,11 @@ class NexusRessourceSyncStatus(models.Model):
         return f"{self.service} - {self.valid_since}"
 
 
+class ActivatedServiceManager(models.Manager):
+    def activate(self, user, service):
+        ActivatedService.objects.bulk_create([ActivatedService(user=user, service=service)], ignore_conflicts=True)
+
+
 class ActivatedService(models.Model):
     user = models.ForeignKey(
         User,
@@ -169,6 +174,11 @@ class ActivatedService(models.Model):
     service = models.CharField(verbose_name="service", choices=Service.choices)
     created_at = models.DateTimeField(verbose_name="date d'activation", default=timezone.now)
 
+    objects = ActivatedServiceManager()
+
     class Meta:
         verbose_name = "service activé"
         verbose_name_plural = "services activés"
+        constraints = [
+            models.UniqueConstraint(fields=["user", "service"], name="user_service_unique"),
+        ]
