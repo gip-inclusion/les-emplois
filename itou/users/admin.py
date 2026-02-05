@@ -1052,8 +1052,16 @@ class EmailAddressWithRemarkAdmin(ItouModelMixin, EmailAddressAdmin):
 
 @admin.register(models.NirModificationRequest)
 class NirModificationRequestAdmin(ItouModelAdmin):
-    fields = ("jobseeker_profile", "requested_by", "requested_by_type", "nir", "created_at", "processed_at")
-    readonly_fields = ("jobseeker_profile", "requested_by", "requested_by_type", "nir", "created_at")
+    fields = (
+        "jobseeker_profile",
+        "requested_by",
+        "requested_by_type",
+        "nir",
+        "rationale",
+        "created_at",
+        "processed_at",
+    )
+    readonly_fields = ("jobseeker_profile", "requested_by", "requested_by_type", "nir", "rationale", "created_at")
     list_display = ("pk", "jobseeker_profile", "requested_by", "created_at", "processed_at")
     list_display_links = ("pk", "jobseeker_profile")
     list_filter = ("created_at", "processed_at")

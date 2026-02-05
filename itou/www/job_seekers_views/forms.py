@@ -422,9 +422,22 @@ class NirModificationRequestForm(forms.ModelForm):
         help_text="Par exemple: 2 69 05 49 588 157 80",
     )
 
+    rationale = forms.CharField(
+        label="Donnez-nous quelques explications sur la demande de modification",
+        required=True,
+        min_length=NirModificationRequest.MIN_RATIONALE_LENGTH,
+        strip=True,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        error_messages={
+            "min_length": (
+                f"Veuillez fournir des détails (au moins {NirModificationRequest.MIN_RATIONALE_LENGTH} caractères)."
+            ),
+        },
+    )
+
     class Meta:
         model = NirModificationRequest
-        fields = ["nir"]
+        fields = ["nir", "rationale"]
 
     def __init__(self, *args, job_seeker, requested_by, **kwargs):
         self.job_seeker = job_seeker

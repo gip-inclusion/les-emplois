@@ -28,6 +28,7 @@ from itou.users.enums import ActionKind, UserKind
 from itou.users.models import JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.auth import check_request, check_user
+from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.emails import redact_email_address
 from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
@@ -1344,25 +1345,26 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
 
 
 @check_user(lambda user: user.is_job_seeker or user.is_employer or user.is_prescriber)
-def nir_modification_request(request, public_id, template_name="job_seekers_views/nir_modification_request.html"):
+def nir_modification_request(request, public_id, *, template_name="job_seekers_views/nir_modification_request.html"):
     job_seeker = get_object_or_404(User, public_id=public_id, kind=UserKind.JOB_SEEKER)
     if not can_view_personal_information(request, job_seeker):
         raise Http404
-
-    back_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+    dashboard_url = reverse("dashboard:index")
+    back_url = get_safe_url(request, "back_url", dashboard_url)
     form = NirModificationRequestForm(job_seeker=job_seeker, requested_by=request.user, data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and form.is_valid():  # POST requests should be htmx, except in the tests
         nir_modification_request = form.save()
         nir_modification_request.email_nir_modification_request_notification().send()
-        messages.success(request, "Demande de régularisation du NIR envoyée.", extra_tags="toast")
-        return HttpResponseRedirect(back_url)
-
+        context = {"contact_form_url": ITOU_CONTACT_FORM_URL}
+        return render(request, "job_seekers_views/nir_modification_success.html", context)
+    is_proxy = request.user != job_seeker
     context = {
-        "form": form,
-        "job_seeker": job_seeker,
-        "is_request_from_proxy": request.user != job_seeker,
+        "job_seeker_public_id": job_seeker.public_id,
+        "job_seeker_name": f" pour {job_seeker.get_full_name()}" if is_proxy else "",
         "back_url": back_url,
         "matomo_custom_title": "Demande de régularisation NIR",
+        "form": form,
     }
+    if request.htmx:
+        template_name += "#nir-modification-request"
     return render(request, template_name, context)
