@@ -12,9 +12,9 @@ anyio==4.12.1 \
     # via
     #   -r requirements/test.txt
     #   httpx
-asgiref==3.11.0 \
-    --hash=sha256:13acff32519542a1736223fb79a715acdebe24286d98e8b164a73085f40da2c4 \
-    --hash=sha256:1db9021efadb0d9512ce8ffaf72fcef601c7b73a8807a1bb2ef143dc6b14846d
+asgiref==3.11.1 \
+    --hash=sha256:5f184dc43b7e763efe848065441eac62229c9f7b0475f41f80e207a114eda4ce \
+    --hash=sha256:e8667a091e69529631969fd45dc268fa79b99c92c5fcdda727757e52146ec133
     # via
     #   -r requirements/test.txt
     #   django
@@ -841,7 +841,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django, django-testing]==26.1.28.1 \
+itoutils[django,django-testing]==26.1.28.1 \
     --hash=sha256:86b63873ee8c69bc534295f65e0cca60659036168d7f7b6059eab475911dc983 \
     --hash=sha256:917106653b92c21017882f3ab323c8706201ff46b893f05af52ddb4aae5a9a3a
     # via -r requirements/test.txt
