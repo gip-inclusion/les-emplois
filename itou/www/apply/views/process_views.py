@@ -6,7 +6,6 @@ import httpx
 import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Exists, F, OuterRef
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
@@ -39,7 +38,7 @@ from itou.www.apply.forms import (
     JobApplicationInternalTransferForm,
     PriorActionForm,
 )
-from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.apply.views import common as common_views
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
@@ -48,22 +47,6 @@ logger = logging.getLogger(__name__)
 
 JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY = "JOB_APP_DETAILS_FOR_COMPANY-BACK_URL-%d"
 LAST_COMMENTS_COUNT = 3
-
-
-def check_waiting_period(job_application):
-    """
-    This should be an edge case.
-    An approval may expire between the time an application is sent and
-    the time it is accepted.
-    """
-    # NOTE(vperron): We need to check both PASS and PE Approvals for ongoing eligibility issues.
-    # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
-    # that have been delivered in December 2021 (and that may have 2 years waiting periods)
-    if job_application.job_seeker.new_approval_blocked_by_waiting_period(
-        siae=job_application.to_company,
-        sender_prescriber_organization=job_application.sender_prescriber_organization,
-    ):
-        raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
 def job_application_sender_left_org(job_app):
