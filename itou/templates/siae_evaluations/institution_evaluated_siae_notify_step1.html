@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
 {% load components %}
 {% load django_bootstrap5 %}
 
@@ -30,25 +31,23 @@
             </div>
             <div class="s-section__row row">
                 <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
-                    <div class="card c-card">
-                        <div class="card-body">
-                            <h2 class="mt-2">Quelle raison justifie ce résultat ?</h2>
-                            <hr class="my-4">
+                    <div class="c-box mb-3 mb-md-4">
+                        <fieldset>
+                            <legend class="h3">Quelle raison justifie ce résultat ?</legend>
                             <p>
-                                <b>
+                                <strong>
                                     Résultat de cette campagne de contrôle : <span class="text-danger">Négatif</span>
-                                </b>
+                                </strong>
                             </p>
                             {% bootstrap_form_errors form type="all" %}
                             <form method="post">
                                 {% csrf_token %}
                                 {% bootstrap_form form %}
-                                <div class="float-end">
-                                    <a class="btn btn-link" href="{% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id %}">Revenir à la liste</a>
-                                    <button class="btn btn-primary">Passer au choix de sanction</button>
-                                </div>
+
+                                {% url "siae_evaluations_views:institution_evaluated_siae_list" evaluated_siae.evaluation_campaign_id as reset_url %}
+                                {% itou_buttons_form primary_label="Passer au choix de sanction" reset_url=reset_url %}
                             </form>
-                        </div>
+                        </fieldset>
                     </div>
                 </div>
                 <div class="s-section__col col-12 col-xxl-4 col-xxxl-3">
