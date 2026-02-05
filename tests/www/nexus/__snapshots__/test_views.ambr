@@ -539,6 +539,26 @@
       </section>
       <section class="s-section">
           <div class="s-section__container container">
+              <div class="alert alert-info alert-dismissible fade show" role="status">
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+                  </button>
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-0">
+                              Cet espace est en phase d’expérimentation dans les départements 34, 44, 29, 31, 67, 88, 33, 76.
+                              Nous prévoyons de l’étendre progressivement à d’autres territoires.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
               <div class="s-section__row row">
                   <div class="s-section__col col-12">
                       <h2>
@@ -679,6 +699,26 @@
                                   Accueil
                               </h1>
                           </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="alert alert-info alert-dismissible fade show" role="status">
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+                  </button>
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-0">
+                              Cet espace est en phase d’expérimentation dans les départements 34, 44, 29, 31, 67, 88, 33, 76.
+                              Nous prévoyons de l’étendre progressivement à d’autres territoires.
+                          </p>
                       </div>
                   </div>
               </div>
@@ -1586,6 +1626,26 @@
                                   Accueil
                               </h1>
                           </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="alert alert-info alert-dismissible fade show" role="status">
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+                  </button>
+                  <div class="row">
+                      <div class="col-auto pe-0">
+                          <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                          </i>
+                      </div>
+                      <div class="col">
+                          <p class="mb-0">
+                              Cet espace est en phase d’expérimentation dans les départements 34, 44, 29, 31, 67, 88, 33, 76.
+                              Nous prévoyons de l’étendre progressivement à d’autres territoires.
+                          </p>
                       </div>
                   </div>
               </div>
