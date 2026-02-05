@@ -5,8 +5,7 @@
 {% load matomo %}
 
 {% block title %}
-    Demande de régularisation NIR
-    {% if is_request_from_proxy %}de {{ job_seeker.get_full_name }}{% endif %}
+    Demande de régularisation NIR{{ job_seeker_name }}
     {{ block.super }}
 {% endblock %}
 
@@ -17,10 +16,7 @@
 {% block title_content %}
     {% component_title c_title__main=c_title__main role="group" aria_label="Actions sur le candidat" %}
         {% fragment as c_title__main %}
-            <h1>
-                Demande de régularisation NIR
-                {% if is_request_from_proxy %}de {{ job_seeker.get_full_name }}{% endif %}
-            </h1>
+            <h1>Demande de régularisation NIR{{ job_seeker_name }}</h1>
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -29,15 +25,35 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="s-section__col col-12 col-xxl-8 col-xxxl-12">
-                    <div class="c-box mb-3 mb-md-4">
-                        <form method="post" class="js-prevent-multiple-submit js-format-nir">
-                            {% csrf_token %}
-                            {% bootstrap_form_errors form type="non_fields" %}
-                            {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
-                            {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=back_url %}
-                        </form>
-                    </div>
+                <div class="s-section__col col-12 col-xxl-8 col-xxxl-9">
+                    {% partialdef nir-modification-request inline %}
+                        <div id="nir-modification-request" class="c-box mb-3 mb-md-4">
+                            <form class="js-prevent-multiple-submit js-format-nir"
+                                  hx-post="{% url "job_seekers_views:nir_modification_request" public_id=job_seeker_public_id %}"
+                                  hx-swap="outerHTML"
+                                  hx-disabled-elt="find button[type='submit']"
+                                  hx-target="#nir-modification-request">
+                                {% csrf_token %}
+                                <input type="hidden" name="back_url" value="{{ back_url }}">
+                                {% bootstrap_form_errors form type="non_fields" %}
+                                {% bootstrap_field form.nir wrapper_class="form-group form-group-input-w-lg-66" %}
+                                {% bootstrap_field form.rationale wrapper_class="form-group" %}
+                                <div class="alert alert-info" role="status">
+                                    <div class="row">
+                                        <div class="col-auto pe-0">
+                                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-0">
+                                                Ce changement n'est <strong>pas automatique</strong>. Votre demande sera <strong>transmise au support</strong> pour être traitée dans les meilleurs délais.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% itou_buttons_form primary_label="Enregistrer" reset_url=back_url %}
+                            </form>
+                        </div>
+                    {% endpartialdef %}
                 </div>
             </div>
         </div>
