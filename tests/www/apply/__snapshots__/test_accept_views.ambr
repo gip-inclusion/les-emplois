@@ -367,7 +367,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -402,7 +402,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -1313,7 +1313,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -1348,7 +1348,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ConfirmationForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -2183,7 +2183,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -2218,7 +2218,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'FillJobSeekerInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
         'sql': '''
@@ -2879,7 +2879,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
           'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),
@@ -2915,7 +2915,7 @@
           'RelatedManager.has_considered_valid[eligibility/models/iae.py]',
           'User.has_valid_diagnosis[users/models.py]',
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
-          'check_waiting_period[www/apply/views/process_views.py]',
+          'check_waiting_period[www/apply/views/accept_views.py]',
           'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
           'ContractInfosForAcceptView.setup[www/apply/views/accept_views.py]',
         ]),

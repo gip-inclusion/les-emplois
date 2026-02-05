@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import Http404, get_object_or_404
 from django.urls import reverse
@@ -23,13 +24,28 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
 )
-from itou.www.apply.views import common as common_views
-from itou.www.apply.views.process_views import check_waiting_period
+from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
 
 logger = logging.getLogger(__name__)
 
 ACCEPT_SESSION_KIND = "accept_session"
+
+
+def check_waiting_period(job_application):
+    """
+    This should be an edge case.
+    An approval may expire between the time an application is sent and
+    the time it is accepted.
+    """
+    # NOTE(vperron): We need to check both PASS and PE Approvals for ongoing eligibility issues.
+    # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
+    # that have been delivered in December 2021 (and that may have 2 years waiting periods)
+    if job_application.job_seeker.new_approval_blocked_by_waiting_period(
+        siae=job_application.to_company,
+        sender_prescriber_organization=job_application.sender_prescriber_organization,
+    ):
+        raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
 def initialize_accept_session(request, data):
