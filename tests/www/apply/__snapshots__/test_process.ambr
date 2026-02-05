@@ -17,7 +17,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -185,7 +185,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -266,7 +266,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -434,7 +434,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -515,7 +515,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -671,7 +671,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -749,7 +749,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -905,7 +905,7 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" href="/apply/[PK of JobApplication]/siae/eligibility">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
@@ -1073,13 +1073,13 @@
       </h2>
       <div class="form-row align-items-center gx-3">
           <div class="form-group col-12 col-lg-auto">
-              <button class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-bs-target="#confirm_no_allowance_modal" data-bs-toggle="modal">
+              <a class="btn btn-lg btn-link-white btn-block btn-ico justify-content-center" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="accept_application" href="/apply/[PK of JobApplication]/siae/start-accept">
                   <i aria-hidden="true" class="ri-check-line fw-medium">
                   </i>
                   <span>
                       Accepter
                   </span>
-              </button>
+              </a>
           </div>
           <div class="form-group col-12 col-lg-auto">
               <a class="btn btn-lg btn-link-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="refuse_application" href="/apply/[PK of JobApplication]/siae/refuse">
