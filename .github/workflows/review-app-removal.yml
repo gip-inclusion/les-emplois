@@ -47,9 +47,7 @@ jobs:
         enable-cache: true
 
     - name: 🗑 Delete S3 bucket
-      run: |
-        uv pip install boto3
-        scripts/delete-bucket
+      run: uv run --script scripts/delete-bucket
 
     - name: 🗑 Delete the review app
       run: |
