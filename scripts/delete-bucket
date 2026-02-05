@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# /// script
+# dependencies = [
+#     "boto3",
+# ]
+# ///
 
 import os
 import shlex
