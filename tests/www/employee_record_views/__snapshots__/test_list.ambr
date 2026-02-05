@@ -21,7 +21,7 @@
   '''
   <div class="c-box--results__footer">
       <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
-          <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="/job-seekers/nir-modification/[Public ID of JobSeeker]?back_url=/employee_record/list%3Fstatus%3DNEW">
+          <a aria-label="Régulariser le n° de sécurité sociale de Jane DOE (ouverture dans un nouvel onglet)" class="btn btn-primary btn-block w-100 w-md-auto has-external-link" href="/job-seekers/nir-modification/[Public ID of JobSeeker]?back_url=/employee_record/list%3Fstatus%3DNEW" rel="noopener noreferrer" target="_blank">
               Régulariser le n° de sécurité sociale
           </a>
       </div>
