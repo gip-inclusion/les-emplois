@@ -47,9 +47,11 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     ),
     "Nom de la structure": with_format(
         Format.TEXT,
-        lambda contract: "Siège"
-        if contract.other_data.get("antenne", {}).get("id") == 0
-        else contract.other_data.get("antenne", {}).get("nom"),
+        lambda contract: (
+            "Siège"
+            if contract.other_data.get("antenne", {}).get("id") == 0
+            else contract.other_data.get("antenne", {}).get("nom")
+        ),
     ),
     "Département de la structure": with_format(Format.TEXT, lambda contract: contract.antenna_department()),
     "Type de contrat": with_format(

@@ -133,9 +133,11 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
     processed_at = factory.LazyAttribute(
-        lambda o: datetime.now(UTC)
-        if str(o.state) in models.JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES
-        else None
+        lambda o: (
+            datetime.now(UTC)
+            if str(o.state) in models.JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES
+            else None
+        )
     )
 
     @factory.post_generation

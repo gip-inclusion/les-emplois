@@ -109,8 +109,9 @@ def sync_memberships(nexus_memberships):
     existing_user_pks = set(NexusUser.objects.filter(pk__in=user_pks).values_list("pk", flat=True))
     existing_structure_pks = set(NexusStructure.objects.filter(pk__in=structure_pks).values_list("pk", flat=True))
     filtered_memberships = filter(
-        lambda membership: membership.user_id in existing_user_pks
-        and membership.structure_id in existing_structure_pks,
+        lambda membership: (
+            membership.user_id in existing_user_pks and membership.structure_id in existing_structure_pks
+        ),
         nexus_memberships,
     )
     return len(

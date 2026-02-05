@@ -1127,9 +1127,11 @@ class TestProlongationModel:
         prolongation = ProlongationFactory(
             reason=reason,
             end_at=factory.LazyAttribute(
-                lambda obj: obj.start_at
-                + (info["max_cumulative_duration"] or info["max_duration"])
-                + datetime.timedelta(days=1)
+                lambda obj: (
+                    obj.start_at
+                    + (info["max_cumulative_duration"] or info["max_duration"])
+                    + datetime.timedelta(days=1)
+                )
             ),
             declared_by_siae__kind=CompanyKind.AI,
         )
