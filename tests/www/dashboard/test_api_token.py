@@ -51,3 +51,31 @@ def test_api_token_view_for_non_company_admin(client):
 
     response = client.get(API_TOKEN_URL)
     assert response.status_code == 403
+
+
+def test_api_token_view_for_mixed_admin_nonadmin_company(client):
+    admin_company = CompanyFactory(with_membership=True)
+    employer = CompanyMembershipFactory(is_admin=True, company=admin_company).user
+    non_admin_company = CompanyMembershipFactory(user=employer, is_admin=False).company
+    client.force_login(employer)
+
+    response = client.post(API_TOKEN_URL)
+
+    assertContains(
+        response,
+        f"""<tr>
+              <th scope="row">{admin_company.name}</th>
+              <td>{admin_company.uid}</td>
+              <td>oui</td>
+            </tr>""",
+        html=True,
+    )
+    assertContains(
+        response,
+        f"""<tr>
+              <th scope="row">{non_admin_company.name}</th>
+              <td>{non_admin_company.uid}</td>
+              <td>non</td>
+            </tr>""",
+        html=True,
+    )
