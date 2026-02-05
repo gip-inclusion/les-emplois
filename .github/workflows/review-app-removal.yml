@@ -42,14 +42,12 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $CLEVER_ORG_ID
 
     - name: 💂 Install Python
-      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v5
+      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
       with:
-        python-version: "3.13"
+        enable-cache: true
 
     - name: 🗑 Delete S3 bucket
-      run: |
-        pip install boto3
-        scripts/delete-bucket
+      run: uv run scripts/delete-bucket
 
     - name: 🗑 Delete the review app
       run: |
