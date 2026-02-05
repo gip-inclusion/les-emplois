@@ -48,6 +48,10 @@ class NavGroup:
     def active(self):
         return any(item.active for item in self.items)
 
+    @property
+    def is_new(self):
+        return any(item.is_new for item in self.items)
+
     def __repr__(self):
         return f"NavGroup(label={self.label})"
 
