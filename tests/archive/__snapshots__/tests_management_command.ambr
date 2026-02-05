@@ -1694,6 +1694,7 @@
                  "users_nirmodificationrequest"."jobseeker_profile_id",
                  "users_nirmodificationrequest"."nir",
                  "users_nirmodificationrequest"."requested_by_id",
+                 "users_nirmodificationrequest"."rationale",
                  "users_nirmodificationrequest"."created_at",
                  "users_nirmodificationrequest"."processed_at"
           FROM "users_nirmodificationrequest"

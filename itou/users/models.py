@@ -1505,6 +1505,9 @@ class JobSeekerProfile(models.Model):
 
 
 class NirModificationRequest(models.Model):
+    MIN_RATIONALE_LENGTH = 10
+    MAX_RATIONALE_LENGTH = 2_000
+
     jobseeker_profile = models.ForeignKey(
         JobSeekerProfile,
         verbose_name="profil demandeur d'emploi",
@@ -1522,6 +1525,12 @@ class NirModificationRequest(models.Model):
         verbose_name="auteur de la demande",
         related_name="+",
         on_delete=models.RESTRICT,
+    )
+    rationale = models.TextField(
+        verbose_name="contexte de la demande",
+        default="",
+        blank=True,
+        validators=[MaxLengthValidator(MAX_RATIONALE_LENGTH)],
     )
     created_at = models.DateTimeField("créée le", auto_now_add=True)
     processed_at = models.DateTimeField(verbose_name="traitée le", null=True)
