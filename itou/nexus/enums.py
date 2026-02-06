@@ -298,5 +298,6 @@ STRUCTURE_KIND_MAPPING = {
         "EATT": NexusStructureKind.EATT,
         "ESAT": NexusStructureKind.ESAT,
         "SEP": NexusStructureKind.SPIP,
+        "OPCS": NexusStructureKind.OPCS,
     },
 }
