@@ -35,9 +35,9 @@ class StructureSerializer(serializers.Serializer):
     email = serializers.CharField(allow_blank=True)
     address_line_1 = serializers.CharField(allow_blank=True)
     address_line_2 = serializers.CharField(allow_blank=True)
-    post_code = serializers.CharField()
-    city = serializers.CharField()
-    department = serializers.CharField()
+    post_code = serializers.CharField(allow_blank=True)
+    city = serializers.CharField(allow_blank=True)
+    department = serializers.CharField(allow_blank=True)
 
     website = serializers.URLField(allow_blank=True)
     opening_hours = serializers.CharField(allow_blank=True)
