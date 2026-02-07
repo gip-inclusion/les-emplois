@@ -286,6 +286,7 @@ STRUCTURE_KIND_MAPPING = {
         "SPIP": NexusStructureKind.SPIP,
         "TIERS_LIEUX": NexusStructureKind.ASSO,
         "UDAF": NexusStructureKind.DEPT,
+        "": "",
     },
     Service.MARCHE: {
         "EI": NexusStructureKind.EI,
