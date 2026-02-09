@@ -6,6 +6,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.companies.enums import CompanyKind
@@ -420,6 +421,18 @@ class TestCompanySignup:
         membership = CompanyMembershipFactory.create(company=company, is_active=False)
         response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
         assertNotContains(response, self.to_join_msg(membership.user))
+
+    def test_with_next_param(self, client):
+        next_url = reverse("dashboard:index")
+        url = add_url_params(reverse("signup:company_select"), {"next": next_url})
+        response = client.get(url)
+        assertNotContains(response, "Votre formulaire contient une erreur")
+
+        company = CompanyFactory(kind=CompanyKind.ETTI)
+        post_data = {"siaes": company.pk}
+        url = add_url_params(url, {"siren": company.siret[:9]})
+        response = client.post(url, data=post_data)
+        assertRedirects(response, next_url, fetch_redirect_response=False)
 
 
 def test_non_staff_cant_join_a_company(client):
