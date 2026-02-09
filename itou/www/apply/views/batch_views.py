@@ -15,7 +15,7 @@ from itou.companies.models import Company
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.urls import get_safe_url
@@ -50,7 +50,7 @@ def _get_and_lock_received_applications(request, application_ids, lock=True):
     return applications
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def archive(request):
     next_url = get_safe_url(request, "next_url")
@@ -99,7 +99,7 @@ def archive(request):
     return HttpResponseRedirect(next_url)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def unarchive(request):
     next_url = get_safe_url(request, "next_url")
@@ -139,7 +139,7 @@ def unarchive(request):
     return HttpResponseRedirect(next_url)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def postpone(request):
     next_url = get_safe_url(request, "next_url")
@@ -206,7 +206,7 @@ def postpone(request):
     return HttpResponseRedirect(next_url)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def add_to_pool(request):
     next_url = get_safe_url(request, "next_url")
@@ -272,7 +272,7 @@ def add_to_pool(request):
     return HttpResponseRedirect(next_url)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def process(request):
     next_url = get_safe_url(request, "next_url")
@@ -372,7 +372,7 @@ def _start_refuse_wizard(request, *, application_ids, next_url, from_detail_view
     )
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def refuse(request):
     return _start_refuse_wizard(
@@ -393,7 +393,7 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
     template_name = "apply/process_refuse.html"
 
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.is_employer
+        return self.request.user.is_authenticated and self.request.from_employer
 
     def load_session(self, session_uuid):
         super().load_session(session_uuid)
@@ -534,7 +534,7 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
         return self.reset_url
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 @require_POST
 def transfer(request):
     form = JobApplicationInternalTransferForm(request, data=request.POST)

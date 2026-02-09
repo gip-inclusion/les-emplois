@@ -176,7 +176,7 @@
       dict({
         'origin': list([
           'assessment_contracts_export[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -642,7 +642,7 @@
       dict({
         'origin': list([
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -692,7 +692,7 @@
         'origin': list([
           'get_allowance_stats_for_geiq[www/geiq_assessments_views/views.py]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT("geiq_assessments_employeecontract"."id") FILTER (
@@ -719,7 +719,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -735,7 +735,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -756,7 +756,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -781,7 +781,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",
@@ -1481,7 +1481,7 @@
       dict({
         'origin': list([
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -1532,7 +1532,7 @@
         'origin': list([
           'get_allowance_stats_for_institution[www/geiq_assessments_views/views.py]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT("geiq_assessments_employeecontract"."id") AS "contracts_nb",
@@ -1566,7 +1566,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1582,7 +1582,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_employeecontract"."id",

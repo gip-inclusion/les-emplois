@@ -39,11 +39,11 @@ from itou.www.job_seekers_views.forms import CheckJobSeekerNirForm
 
 
 def is_allowed_to_use_gps(request):
-    return request.user.is_employer or request.user.is_prescriber
+    return request.from_employer or request.from_prescriber
 
 
 def is_allowed_to_use_gps_advanced_features(request):
-    return request.user.is_employer or request.from_authorized_prescriber or is_gps_authorized(request)
+    return request.from_employer or request.from_authorized_prescriber or is_gps_authorized(request)
 
 
 @check_request(is_allowed_to_use_gps)
@@ -285,9 +285,9 @@ def display_contact_info(request, group_id, target_participant_public_id, mode):
         )
         if request.organizations and request.user.kind == target_participant.kind:
             org_ids = [org.pk for org in request.organizations]
-            if request.user.is_employer:
+            if request.from_employer:
                 are_colleagues = target_participant.companymembership_set.filter(company__in=org_ids).exists()
-            if request.user.is_prescriber:
+            if request.from_prescriber:
                 are_colleagues = target_participant.prescribermembership_set.filter(organization__in=org_ids).exists()
 
     logger.info(

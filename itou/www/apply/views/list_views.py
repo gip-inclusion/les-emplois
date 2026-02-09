@@ -19,7 +19,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis, GEIQSelectedA
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -238,7 +238,7 @@ def annotate_title(base_title, archived_choice):
             raise ValueError(archived_choice)
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for prescribers and employers.
@@ -315,7 +315,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     )
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
@@ -335,7 +335,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     return render(request, template_name, context)
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_actor)
 def list_prescriptions_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),
@@ -479,7 +479,7 @@ def list_for_siae_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename, request=request)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def list_for_siae_actions(request):
     company = get_current_company_or_404(request)
     selected_job_applications = list(

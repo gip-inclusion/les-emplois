@@ -4,7 +4,7 @@
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <div class="d-flex flex-column">
             <strong>{{ stats.contracts_selected_nb }} / {{ stats.contracts_nb }}</strong>
-            {% if request.user.is_employer %}
+            {% if request.from_employer %}
                 Contrats présentés
             {% elif request.user.is_labor_inspector %}
                 Contrats acceptés
