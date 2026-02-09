@@ -21,14 +21,17 @@ logger = logging.getLogger(__name__)
 
 class NexusApiMixin:
     authentication_classes = [ServiceTokenAuthentication]
-    serializer = None
-    model_class = None
-    build_obj = None
-    sync_objs = None
 
     @property
     def source(self):
         return self.request.auth.service
+
+
+class NexusApiObjectsMixin(NexusApiMixin):
+    serializer = None
+    model_class = None
+    build_obj = None
+    sync_objs = None
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer(data=request.data, many=True, context={"source": self.source})
@@ -50,7 +53,7 @@ class NexusApiMixin:
 
 
 @extend_schema(exclude=True)
-class UsersView(NexusApiMixin, generics.GenericAPIView):
+class UsersView(NexusApiObjectsMixin, generics.GenericAPIView):
     serializer = UserSerializer
     model_class = NexusUser
     build_obj = staticmethod(nexus_utils.build_user)
@@ -58,7 +61,7 @@ class UsersView(NexusApiMixin, generics.GenericAPIView):
 
 
 @extend_schema(exclude=True)
-class MembershipsView(NexusApiMixin, generics.GenericAPIView):
+class MembershipsView(NexusApiObjectsMixin, generics.GenericAPIView):
     serializer = MembershipSerializer
     model_class = NexusMembership
     build_obj = staticmethod(nexus_utils.build_membership)
@@ -66,7 +69,7 @@ class MembershipsView(NexusApiMixin, generics.GenericAPIView):
 
 
 @extend_schema(exclude=True)
-class StructuresView(NexusApiMixin, generics.GenericAPIView):
+class StructuresView(NexusApiObjectsMixin, generics.GenericAPIView):
     serializer = StructureSerializer
     model_class = NexusStructure
     build_obj = staticmethod(nexus_utils.build_structure)
@@ -81,9 +84,6 @@ class SyncStartView(NexusApiMixin, generics.GenericAPIView):
             status=status.HTTP_200_OK,
         )
 
-    def delete(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 @extend_schema(exclude=True)
 class SyncCompletedView(NexusApiMixin, generics.GenericAPIView):
@@ -97,6 +97,3 @@ class SyncCompletedView(NexusApiMixin, generics.GenericAPIView):
 
         logger.warning("Got invalid start_at for source=%s", self.source, exc_info=True)
         return Response({}, status=status.HTTP_403_FORBIDDEN)
-
-    def delete(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
