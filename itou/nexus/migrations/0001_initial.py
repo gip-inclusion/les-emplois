@@ -325,7 +325,7 @@ class Migration(migrations.Migration):
                         verbose_name="type",
                     ),
                 ),
-                ("email", citext.fields.CIEmailField(max_length=254, verbose_name="adresse e-mail")),
+                ("email", citext.fields.CIEmailField(max_length=254, verbose_name="adresse e-mail", blank=True)),
                 ("phone", models.CharField(blank=True, max_length=20, verbose_name="téléphone")),
                 ("website", models.URLField(blank=True, verbose_name="site web")),
                 ("opening_hours", models.CharField(blank=True, verbose_name="horaires d'accueil")),
