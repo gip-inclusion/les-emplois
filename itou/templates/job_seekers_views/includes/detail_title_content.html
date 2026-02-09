@@ -13,7 +13,7 @@
 
     {% fragment as c_title__cta %}
         {% if services_search_url %}
-            <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" service_search_event_option %}>
+            <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" service_search_event_option %} id="introjs-orienter-vers-service-insertion">
                 <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
                 Orienter vers un service d’insertion
             </a>
