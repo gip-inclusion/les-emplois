@@ -7,7 +7,6 @@ import datetime
 import json
 import os
 import re
-import warnings
 
 from botocore.config import Config
 from django.utils.csp import CSP
@@ -129,10 +128,6 @@ INSTALLED_APPS = [
     "itou.archive",
     "itou.nexus",
 ]
-
-# TODO: Remove with Django 6.0
-warnings.filterwarnings("ignore", "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated.")
-FORMS_URLFIELD_ASSUME_HTTPS = True
 
 MIDDLEWARE = [
     # Generate request Id
