@@ -183,9 +183,12 @@ def company_select(request, template_name="signup/company_select.html"):
     companies_with_members = None
 
     next_url = get_safe_url(request, "next")
+    data = request.GET.copy()
+    if next_url:
+        data.pop("next")
 
     # Form with required field is validated on GET, so instanciate the form with None when there's no querystring
-    siren_form = forms.CompanySearchBySirenForm(data=request.GET or None)
+    siren_form = forms.CompanySearchBySirenForm(data=data or None)
     company_select_form = None
 
     # The SIREN, when available, is always passed in the querystring.
