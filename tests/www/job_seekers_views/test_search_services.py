@@ -15,7 +15,8 @@ def details_markup(expected_url):
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
-                  data-matomo-option="services-search-from-details-general">
+                  data-matomo-option="services-search-from-details-general"
+                  id="introjs-orienter-vers-service-insertion">
                    <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
                    Orienter vers un service d’insertion
                </a>"""
@@ -47,7 +48,8 @@ def list_markup(expected_url):
                   data-matomo-event="true"
                   data-matomo-category="candidat"
                   data-matomo-action="clic"
-                  data-matomo-option="services-search-from-list">
+                  data-matomo-option="services-search-from-list"
+                  id="introjs-orienter-vers-service-insertion">
                 Orienter vers un service d’insertion
             </a>"""
 

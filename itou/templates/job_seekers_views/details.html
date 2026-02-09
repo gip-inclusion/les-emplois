@@ -25,7 +25,7 @@
         {% endfragment %}
         {% fragment as c_title__cta %}
             {% if services_search_url %}
-                <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" "services-search-from-details-general" %}>
+                <a href="{{ services_search_url }}" class="btn btn-lg bin-ico btn-secondary" {% matomo_event "candidat" "clic" "services-search-from-details-general" %} id="introjs-orienter-vers-service-insertion">
                     <i class="ri-user-location-line fw-medium" aria-hidden="true"></i>
                     Orienter vers un service d’insertion
                 </a>
@@ -101,4 +101,33 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script nonce="{{ csp_nonce }}">
+        window.addEventListener("load", () => {
+            const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
+            const orientationLink = document.getElementById("introjs-orienter-vers-service-insertion");
+
+            if (orientationLink && window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
+                introJs.tour().setOptions({
+                        disableInteraction: true,
+                        dontShowAgain: true,
+                        dontShowAgainCookie: "introjsOrientationLinkDetailDontShowAgain",
+                        dontShowAgainCookieDays: 90,
+                        dontShowAgainLabel: "Ne plus afficher",
+                        showProgress: false,
+                        showBullets: false,
+                        skipLabel: '',
+                        doneLabel: 'J’ai compris',
+                        steps: [{
+                            element: orientationLink,
+                            title: 'Orienter vers un service d’insertion',
+                            intro: '<p>Trouvez des structures qui accompagnent les personnes dans leur parcours ' +
+                                '(remobilisation, formation, accès à l’emploi, accompagnement social…).</p>' +
+                                '<p>Utile pour identifier des partenaires ou orienter un candidat ' +
+                                'vers le bon acteur, au bon moment.</p>',
+                        }]
+                    })
+                    .start();
+            }
+        });
+    </script>
 {% endblock %}

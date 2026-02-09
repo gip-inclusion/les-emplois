@@ -1509,7 +1509,7 @@
                       <a class="dropdown-item" href="/eligibility/update/iae/44444444-4444-4444-4444-444444444444?back_url=/job-seekers/list">
                           Mettre à jour son éligibilité IAE
                       </a>
-                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist">
+                      <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=44444444-4444-4444-4444-444444444444&back_url=%2Fjob-seekers%2Flist" id="introjs-orienter-vers-service-insertion">
                           Orienter vers un service d’insertion
                       </a>
                   </div>
@@ -2502,7 +2502,7 @@
                   <a class="dropdown-item" href="/eligibility/update/iae/33333333-3333-3333-3333-333333333333?back_url=/job-seekers/list-organization">
                       Valider son éligibilité IAE
                   </a>
-                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29">
+                  <a class="dropdown-item" data-matomo-action="clic" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="services-search-from-list" href="/search/services/results?job_seeker_public_id=33333333-3333-3333-3333-333333333333&back_url=%2Fjob-seekers%2Flist-organization&city=brest-29" id="introjs-orienter-vers-service-insertion">
                       Orienter vers un service d’insertion
                   </a>
               </div>
