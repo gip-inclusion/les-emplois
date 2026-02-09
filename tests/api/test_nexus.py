@@ -208,12 +208,22 @@ class TestUserAPI(NexusApiTestMixin):
             transform=lambda user: (user.source, user.pk),
         )
 
-    def test_validate_payload(self):
+    def test_partial_upsert(self):
         api_client = self.api_client(service=Service.DORA)
 
         data = [
             {
-                "id": "my-id",
+                "id": "ok",
+                "kind": "accompagnateur_offreur",
+                "first_name": "Jean",
+                "last_name": "Bon",
+                "email": "jean.bon@boucherie.fr",
+                "phone": "",
+                "last_login": timezone.now().isoformat(),
+                "auth": "MAGIC_LINK",
+            },
+            {
+                "id": "nok",
                 "kind": "employeur",  # Not in dora kind mapping
                 "first_name": "Jean",
                 "last_name": "Bon",
@@ -221,17 +231,28 @@ class TestUserAPI(NexusApiTestMixin):
                 "phone": "",
                 "last_login": timezone.now().isoformat(),
                 "auth": "MAGIC LINK",  # missing underscore
-            }
+            },
         ]
 
         response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 400
-        assert response.json() == [
-            {
-                "auth": ["«\xa0MAGIC LINK\xa0» n'est pas un choix valide."],
-                "kind": ["«\xa0employeur\xa0» n'est pas un choix valide."],
-            },
-        ]
+        assert response.status_code == 200
+        assert response.json() == {
+            "errors": {
+                "nok": {
+                    "auth": ["«\xa0MAGIC LINK\xa0» n'est pas un choix valide."],
+                    "kind": ["«\xa0employeur\xa0» n'est pas un choix valide."],
+                },
+            }
+        }
+
+        assertQuerySetEqual(
+            NexusUser.objects.all(),
+            [
+                (Service.DORA, "dora--ok"),
+            ],
+            ordered=False,
+            transform=lambda user: (user.source, user.pk),
+        )
 
 
 class TestStructureAPI(NexusApiTestMixin):
@@ -376,12 +397,30 @@ class TestStructureAPI(NexusApiTestMixin):
         response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
         assert response.status_code == 200
 
-    def test_validate_payload(self):
+    def test_partial_upsert(self):
         api_client = self.api_client(service=Service.DORA)
 
         data = [
             {
-                "id": "my-id",
+                "id": "ok",
+                "kind": "CCAS",
+                "siret": "01234567891011",
+                "name": "le CCAS du coin",
+                "phone": "0123456789",
+                "email": "ccas@malinator.com",
+                "address_line_1": "26 rue de Berri",
+                "address_line_2": "3e etage",
+                "post_code": "75008",
+                "city": "Paris",
+                "department": "75",
+                "accessibility": "",
+                "description": "",
+                "opening_hours": "",
+                "source_link": "",
+                "website": "",
+            },
+            {
+                "id": "nok",
                 "kind": "bad_kind",
                 "siret": "01234567891011",
                 "name": "le CCAS du coin",
@@ -397,18 +436,23 @@ class TestStructureAPI(NexusApiTestMixin):
                 "opening_hours": "",
                 "source_link": "not an url",
                 "website": "not an url",
-            }
-        ]
-        response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 400
-        assert response.json() == [
-            {
-                "kind": ["«\xa0bad_kind\xa0» n'est pas un choix valide."],
-                "accessibility": ["Saisissez une URL valide."],
-                "source_link": ["Saisissez une URL valide."],
-                "website": ["Saisissez une URL valide."],
             },
         ]
+        response = api_client.post(self.url, data=data, content_type="application/json")
+        assert response.status_code == 200
+        assert response.json() == {
+            "errors": {
+                "nok": {
+                    "kind": ["«\xa0bad_kind\xa0» n'est pas un choix valide."],
+                    "accessibility": ["Saisissez une URL valide."],
+                    "source_link": ["Saisissez une URL valide."],
+                    "website": ["Saisissez une URL valide."],
+                },
+            }
+        }
+
+        strucure = NexusStructure.objects.get()
+        self.assert_structure_equals(strucure, Service.DORA, data[0])
 
 
 class TestMembershipsAPI(NexusApiTestMixin):
@@ -518,25 +562,33 @@ class TestMembershipsAPI(NexusApiTestMixin):
         response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
         assert response.status_code == 200
 
-    def test_validate_payload(self):
+    def test_partial_upsert(self):
         api_client = self.api_client(service=Service.DORA)
-        user = NexusUserFactory(source=Service.DORA)
+        user_1 = NexusUserFactory(source=Service.DORA)
+        user_2 = NexusUserFactory(source=Service.DORA)
         structure = NexusStructureFactory(source=Service.DORA)
 
         data = [
             {
-                "id": "my-id",
-                "user_id": user.source_id,
+                "id": "ok",
+                "user_id": user_1.source_id,
+                "structure_id": structure.source_id,
+                "role": "ADMINISTRATOR",
+            },
+            {
+                "id": "nok",
+                "user_id": user_2.source_id,
                 "structure_id": structure.source_id,
                 "role": "administrator",  # should be in upper case
-            }
+            },
         ]
 
         response = api_client.post(self.url, data=data, content_type="application/json")
-        assert response.status_code == 400
-        assert response.json() == [
-            {"role": ["«\xa0administrator\xa0» n'est pas un choix valide."]},
-        ]
+        assert response.status_code == 200
+        assert response.json() == {"errors": {"nok": {"role": ["«\xa0administrator\xa0» n'est pas un choix valide."]}}}
+
+        membership = NexusMembership.objects.get()
+        self.assert_membership_equals(membership, Service.DORA, data[0])
 
 
 class TestSyncStartAPI(NexusApiTestMixin):

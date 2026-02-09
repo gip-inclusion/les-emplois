@@ -34,11 +34,25 @@ class NexusApiObjectsMixin(NexusApiMixin):
     sync_objs = None
 
     def post(self, request, *args, **kwargs):
+        assert "id" in self.serializer().get_fields()  # Required in our custom validation error handling
         serializer = self.serializer(data=request.data, many=True, context={"source": self.source})
-        serializer.is_valid(raise_exception=True)
+        response_payload = {}
+        if not serializer.is_valid():
+            valid_data = []
+            error_summary = {}
+            for data, errors in zip(request.data, serializer.errors):
+                if errors:
+                    error_summary[data["id"]] = errors
+                else:
+                    valid_data.append(data)
+            serializer = self.serializer(data=valid_data, many=True, context={"source": self.source})
+            # It should not raise when validating again since we only kept the valid data
+            # It can still raise in self.sync_objs or self.build_obj though (in which case, fix the damn method)
+            serializer.is_valid(raise_exception=True)
+            response_payload = {"errors": error_summary}
         objs = [self.build_obj(data, self.source) for data in serializer.validated_data]
         self.sync_objs(objs)
-        return Response({}, status=status.HTTP_200_OK)
+        return Response(response_payload, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         serializer = DeleteObjectSerializer(data=request.data, many=True)
