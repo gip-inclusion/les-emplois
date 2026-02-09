@@ -178,6 +178,16 @@ class ItouCurrentOrganizationMiddleware:
                 reverse("login:itou_staff", query={REDIRECT_FIELD_NAME: request.get_full_path()})
             )
 
+        # Nexus : Whitelist for Nexus views
+        # FIXME: Remove once we merge prescribers and employers
+        if user.is_authenticated and any(
+            [
+                request.path.startswith("/portal"),
+                user.is_employer and request.path.startswith("/signup/siae/select"),
+            ]
+        ):
+            return self.get_response(request)
+
         # Force OTP for staff users
         if (
             settings.REQUIRE_OTP_FOR_STAFF

@@ -424,3 +424,25 @@ class TestLoginView:
             if a_tags["href"].startswith("/static/pdf/syntheseSecurite"):
                 a_tags["href"] = "/static/pdf/syntheseSecurite.pdf"  # Normalize href for CI
         assert pretty_indented(soup) == snapshot
+
+
+def test_employer_without_company(client):
+    # Assert an employer without active companies can access nexus pages.
+    # FIXME: Remove once we merge prescribers and employers
+
+    user = EmployerFactory()
+    client.force_login(user)
+
+    assert client.get(reverse("nexus:homepage")).status_code == 200
+    assert client.get(reverse("nexus:structures")).status_code == 200
+    assert client.get(reverse("nexus:communaute")).status_code == 200
+    assert client.get(reverse("nexus:dora")).status_code == 200
+    assert client.get(reverse("nexus:emplois")).status_code == 200
+    assert client.get(reverse("nexus:marche")).status_code == 200
+    assert client.get(reverse("nexus:mon_recap")).status_code == 200
+    assert client.get(reverse("nexus:pilotage")).status_code == 200
+    assert client.get(reverse("nexus:contact")).status_code == 200
+    assertRedirects(client.get(reverse("nexus:login")), reverse("nexus:homepage"))
+
+    # Not really nexus, but required for a link in a nexus page
+    assert client.get(reverse("signup:company_select")).status_code == 200
