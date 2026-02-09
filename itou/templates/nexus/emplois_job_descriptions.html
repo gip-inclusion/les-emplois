@@ -1,0 +1,105 @@
+{% extends "nexus/layout/base.html" %}
+{% load datetime_filters %}
+{% load enums %}
+{% load matomo %}
+{% load str_filters %}
+{% load structure_switcher %}
+{% load theme_inclusion %}
+
+
+{% block title %}Fiches de poste {{ block.super }}{% endblock %}
+
+{% block content %}
+    {% enums "nexus" "Service" as Service %}
+    <section class="s-title-02">
+        <div class="s-title-02__container container">
+            <div class="s-title-02__row row">
+                <div class="s-title-02__col col-12">
+                    <div class="c-title align-items-center">
+                        <div class="c-title__main">
+                            <h1>
+                                <img src="{% static_theme_images 'logo-emploi-inclusion-mono.svg' %}" height="35" width="35" alt="Les emplois de l’inclusion">
+                                Fiches de poste
+                                <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
+                                    <i class="ri-check-line" aria-hidden="true"></i>
+                                    Activé
+                                </span>
+                            </h1>
+                        </div>
+                        <div class="c-title__cta" role="group" aria-label="Changement de structure active">
+                            {% structure_switcher mode="nexus" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                        <p class="mb-0">{{ job_description_count }} fiche{{ job_description_count|pluralizefr }} de poste</p>
+                        <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les candidatures">
+                            <a class="btn btn-outline-primary btn-ico" href=" {% url 'companies_views:job_description_list' %}" {% matomo_event "nexus" "emplois" "modifier-fiche-de-poste" %}>
+                                <i class="ri-pencil-line ri-lg" aria-hidden="true"></i>
+                                <span>Modifier</span>
+                            </a>
+                            <a class="btn btn-outline-primary btn-ico" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "nexus" "emplois" "creer-fiche-de-poste" %}>
+                                <i class="ri-add-line ri-lg" aria-hidden="true"></i>
+                                <span>Créer une nouvelle fiche de poste</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt-3 mt-md-4">
+                        <table class="table table-hover">
+                            <caption class="visually-hidden">Liste des collaborateurs</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Métiers</th>
+                                    <th scope="col">Statut</th>
+                                    <th scope="col">Localisation</th>
+                                    <th scope="col">Nbre de postes</th>
+                                    <th scope="col">Mise à jour</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job_description in job_descriptions %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="btn-link"
+                                               {% matomo_event "nexus" "emplois" "clic-fiche-poste" %}
+                                               aria-label="Lien vers la fiche de poste : {{ job_description.display_name }}"
+                                               title="{{ job_description.display_name }}">
+                                                {{ job_description.display_name|truncatechars:50 }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if job_description.is_active %}
+                                                <span class="badge rounded-pill text-nowrap badge-sm bg-success-lighter text-success">Ouvert</span>
+                                            {% else %}
+                                                <span class="badge rounded-pill text-nowrap badge-sm bg-warning-lighter text-warning">Fermé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="d-flex align-items-center">
+                                                <i class="ri-map-pin-line me-1" aria-hidden="true"></i>
+                                                <span aria-label="{{ job_description.display_location }}" title="{{ job_description.display_location }}">{{ job_description.display_location|truncatechars:20 }}</span>
+                                            </span>
+                                        </td>
+                                        <td>{{ job_description.open_positions }}</td>
+                                        <td>
+                                            <span>{{ job_description.last_employer_update_at|default_if_none:"-"|naturaldate|capfirst }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

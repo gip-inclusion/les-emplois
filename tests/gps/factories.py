@@ -24,11 +24,13 @@ class FollowUpGroupFactory(AutoNowOverrideMixin, factory.django.DjangoModelFacto
 
     beneficiary = factory.SubFactory(JobSeekerFactory)
     created_at = factory.LazyAttribute(
-        lambda o: datetime.datetime.combine(
-            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
+        lambda o: (
+            datetime.datetime.combine(
+                settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
+            )
+            if o.created_in_bulk
+            else timezone.now()
         )
-        if o.created_in_bulk
-        else timezone.now()
     )
     created_in_bulk = False
 
@@ -55,11 +57,13 @@ class FollowUpGroupMembershipFactory(factory.django.DjangoModelFactory):
         model = FollowUpGroupMembership
 
     created_at = factory.LazyAttribute(
-        lambda o: datetime.datetime.combine(
-            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
+        lambda o: (
+            datetime.datetime.combine(
+                settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
+            )
+            if o.created_in_bulk
+            else timezone.now()
         )
-        if o.created_in_bulk
-        else timezone.now()
     )
     last_contact_at = factory.SelfAttribute("created_at")
 

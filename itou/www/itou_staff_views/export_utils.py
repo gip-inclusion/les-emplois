@@ -52,9 +52,9 @@ job_app_export_spec = {
     "job_seeker_address1_post_code": lambda job_app: job_app.job_seeker.post_code,
     "job_seeker_address1_city": lambda job_app: job_app.job_seeker.city,
     "job_seeker_address1_city_code_insee": lambda job_app: _getattrs(job_app.job_seeker, "insee_city", "code_insee"),
-    "job_seeker_address1_coords": lambda job_app: f"{job_app.job_seeker.coords.x}; {job_app.job_seeker.coords.y}"
-    if job_app.job_seeker.coords
-    else "",
+    "job_seeker_address1_coords": lambda job_app: (
+        f"{job_app.job_seeker.coords.x}; {job_app.job_seeker.coords.y}" if job_app.job_seeker.coords else ""
+    ),
     "job_seeker_address1_geocoding_score": lambda job_app: job_app.job_seeker.geocoding_score,
     "job_seeker_address1_BAN_API_address": lambda job_app: job_app.job_seeker.ban_api_resolved_address,
     "job_seeker_address2_lane_number": lambda job_app: job_app.job_seeker.jobseeker_profile.hexa_lane_number,
@@ -142,8 +142,9 @@ job_app_export_spec = {
     "sender_prescriber_organization_code_safir": lambda job_app: _getattrs(
         job_app, "sender_prescriber_organization", "code_safir_pole_emploi"
     ),
-    "selected_jobs": lambda job_app: " | ".join(job.display_name for job in job_app.selected_jobs.all())
-    or "Candidature spontanée",
+    "selected_jobs": lambda job_app: (
+        " | ".join(job.display_name for job in job_app.selected_jobs.all()) or "Candidature spontanée"
+    ),
     "hired_for_job_name": lambda job_app: _getattrs(job_app, "hired_job", "display_name"),
     "hired_for_job_appellation_code": lambda job_app: _getattrs(job_app, "hired_job", "appellation", "code"),
     "hired_for_job_appellation_name": lambda job_app: _getattrs(job_app, "hired_job", "appellation", "name"),
@@ -188,9 +189,11 @@ def get_org(membership):
 
 cta_export_spec = {
     "Utilisateur - type": (
-        lambda membership: "Employeur"
-        if hasattr(membership, "company")
-        else ("Prescripteur habitité" if membership.organization.is_authorized else "Orienteur")
+        lambda membership: (
+            "Employeur"
+            if hasattr(membership, "company")
+            else ("Prescripteur habitité" if membership.organization.is_authorized else "Orienteur")
+        )
     ),
     "Structure - type": lambda membership: get_org(membership).kind,
     "Structure - nom": lambda membership: get_org(membership).name,
@@ -206,4 +209,18 @@ cta_export_spec = {
     "Utilisateur - e-mail": lambda membership: membership.user.email,
     "Administrateur ?": lambda membership: "Oui" if membership.is_admin else "Non",
     "Utilisateur - date d'inscription": lambda membership: membership.user.date_joined.strftime("%d-%m-%Y"),
+}
+
+fs_3437_export_spec = {
+    "idItou": lambda er: er.job_application.job_seeker.jobseeker_profile.asp_uid,
+    "nomUsage": lambda er: er.job_application.job_seeker.last_name,
+    "prenom": lambda er: er.job_application.job_seeker.first_name,
+    "dateNaissance": lambda er: er.job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
+    "numeroIDE": lambda er: er.job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+    "NIR": lambda er: er.job_application.job_seeker.jobseeker_profile.nir,
+    "NTT": lambda er: er.ntt,
+    "passIae": lambda er: er.approval_number,
+    "siret": lambda er: er.siret,
+    "mesure": lambda er: er.asp_measure,
+    "horodatage": lambda er: er.asp_batch_file,
 }

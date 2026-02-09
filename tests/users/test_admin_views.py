@@ -15,7 +15,7 @@ from pytest_django.asserts import assertContains, assertHTMLEqual, assertMessage
 
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
-from itou.users.models import IdentityProvider, User
+from itou.users.models import IdentityProvider, JobSeekerAssignment, User
 from itou.utils.models import PkSupportRemark
 from tests.companies.factories import CompanyMembershipFactory
 from tests.institutions.factories import InstitutionMembershipFactory
@@ -29,6 +29,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     LaborInspectorFactory,
@@ -251,6 +252,42 @@ class TestTransferUserData:
         job_application.refresh_from_db()
         assert job_application.job_seeker == to_user
         assert job_application.sender == sender
+
+    def test_transfer_assignments(self, admin_client):
+        from_user = JobSeekerFactory()
+        to_user = JobSeekerFactory()
+
+        # assignment without collision risk
+        assignment_1 = JobSeekerAssignmentFactory(job_seeker=from_user)
+
+        # assignment with the same prescriber and organization: assignment_2 will be deleted and assignmmment_3 updated
+        assignment_2 = JobSeekerAssignmentFactory(job_seeker=from_user)
+        assignment_3 = JobSeekerAssignmentFactory(
+            job_seeker=to_user,
+            prescriber=assignment_2.prescriber,
+            prescriber_organization=assignment_2.prescriber_organization,
+        )
+
+        transfer_url = reverse(
+            "admin:transfer_user_data", kwargs={"from_user_pk": from_user.pk, "to_user_pk": to_user.pk}
+        )
+        admin_client.post(transfer_url, data={"fields_to_transfer": ["job_seeker_assignments"]})
+
+        assignment_1.refresh_from_db()
+        assert assignment_1.job_seeker == to_user
+
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+
+        updated_assignment_3 = JobSeekerAssignment.objects.get(pk=assignment_3.pk)
+        assert updated_assignment_3.job_seeker == to_user
+        assert updated_assignment_3.created_at == assignment_2.created_at  # oldest
+        assert updated_assignment_3.updated_at == assignment_3.updated_at  # newest
+        assert updated_assignment_3.last_action_kind == assignment_3.last_action_kind  # newest
+
+        user_content_type = ContentType.objects.get_for_model(User)
+        to_user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=to_user.pk).first()
+        remark = to_user_remark.remark
+        assert "- AFFECTATIONS CANDIDATS" in remark
 
 
 def test_app_model_change_url(admin_client):

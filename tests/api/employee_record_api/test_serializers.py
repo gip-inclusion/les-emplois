@@ -146,7 +146,7 @@ def test_notification_serializer():
     ).data
     assert data is not None
     assert data.get("siret") == employee_record.siret
-    assert data.get("mesure") == employee_record.asp_siae_type
+    assert data.get("mesure") == employee_record.asp_measure
     assert data.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
 
     personal_data = data.get("personnePhysique")

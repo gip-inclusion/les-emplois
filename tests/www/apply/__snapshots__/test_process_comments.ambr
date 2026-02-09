@@ -23,14 +23,14 @@
                               <h1>
                                   Candidature de
                   
-                      Jane DOE
+                      DOE Jane
                                   <span class="badge rounded-pill text-nowrap badge-base bg-info" id="state_11111111-1111-1111-1111-111111111111">
                                       Nouvelle candidature
                                   </span>
                               </h1>
                           </div>
                           <div class="c-title__cta">
-                              <button aria-label="Imprimer la candidature de Jane DOE" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
+                              <button aria-label="Imprimer la candidature de DOE Jane" class="btn btn-lg btn-ico-only btn-link" data-it-action="print" data-matomo-action="click" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="impression-fiche-candidature" type="button">
                                   <i aria-hidden="true" class="ri-printer-line fw-normal">
                                   </i>
                               </button>
@@ -168,7 +168,7 @@
                                           </h3>
                                       </div>
                                       <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-                                          <a aria-label="Modifier les informations personnelles de Jane DOE" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                          <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
                                               <i aria-hidden="true" class="ri-pencil-line fw-medium">
                                               </i>
                                               <span>
@@ -492,7 +492,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -513,7 +513,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -534,7 +534,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -618,7 +618,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -641,7 +641,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -664,7 +664,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -687,7 +687,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Alice ABOLIVIER
+                                                          ABOLIVIER Alice
                                                       </strong>
                                                   </div>
                                               </div>
@@ -710,7 +710,7 @@
                                                           Le 26 septembre 2025 à 14:12
                                                       </time>
                                                       <strong>
-                                                          Bob BANANA
+                                                          BANANA Bob
                                   (vous)
                                                       </strong>
                                                   </div>

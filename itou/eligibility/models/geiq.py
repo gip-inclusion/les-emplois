@@ -17,8 +17,8 @@ from itou.eligibility.models.common import (
 from itou.eligibility.utils import geiq_allowance_amount
 from itou.gps.models import FollowUpGroup
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, User
 
 
 # GEIQ Eligibility model:
@@ -216,12 +216,17 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
+        if author_kind == UserKind.PRESCRIBER:
+            # Sync job seeker assignment to a prescriber
+            JobSeekerAssignment.objects.upsert_assignment(job_seeker, author, author_org, ActionKind.GEIQ_ELIGIBILITY)
 
         return result
 
     @classmethod
     @transaction.atomic()
-    def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
+    def update_eligibility_diagnosis(
+        cls, diagnosis, author: User, author_organization: PrescriberOrganization, administrative_criteria
+    ):
         if not issubclass(diagnosis.__class__, cls):
             raise ValueError("Le diagnostic fourni n'est pas un diagnostic GEIQ")
 
@@ -237,6 +242,12 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # - only administrative criteria are updatable
         diagnosis.administrative_criteria.set(administrative_criteria)
         diagnosis.schedule_certification()
+
+        if author.is_prescriber:
+            # Sync job seeker assignment to a prescriber
+            JobSeekerAssignment.objects.upsert_assignment(
+                diagnosis.job_seeker, author, author_organization, ActionKind.GEIQ_ELIGIBILITY
+            )
 
         return diagnosis
 

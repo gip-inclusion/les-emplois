@@ -9,7 +9,7 @@
 {% block title %}
     Candidature
     -
-    {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+    {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
     {{ block.super }}
 {% endblock %}
 

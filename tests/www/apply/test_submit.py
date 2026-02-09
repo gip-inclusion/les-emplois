@@ -38,8 +38,8 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir
@@ -71,12 +71,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.testing import (
-    default_storage_ls_files,
-    get_session_name,
-    parse_response_to_soup,
-    pretty_indented,
-)
+from tests.utils.testing import default_storage_ls_files, get_session_name, parse_response_to_soup, pretty_indented
 
 
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
@@ -704,7 +699,12 @@ class TestApplyAsJobSeeker:
         assertContains(response, reverse("dashboard:edit_user_info"), count=3)
 
         # GPS : a job seeker must not follow himself
+        # ----------------------------------------------------------------------
         assert not FollowUpGroup.objects.exists()
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker applies
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
     def test_apply_as_job_seeker_invalid_nir(self, client):
         """
@@ -1181,6 +1181,16 @@ class TestApplyAsAuthorizedPrescriber:
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.created_by_prescriber_organization == prescriber_organization
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
+
         next_url = reverse(
             "apply:application_jobs",
             kwargs={"session_uuid": apply_session_name},
@@ -1244,6 +1254,15 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         response = client.get(next_url)
         assert response.status_code == 200
+
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.APPLY,
+        ).exists()
 
     @freeze_time()
     @pytest.mark.usefixtures("temporary_bucket")
@@ -1488,10 +1507,21 @@ class TestApplyAsAuthorizedPrescriber:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -1589,8 +1619,18 @@ class TestApplyAsAuthorizedPrescriber:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
+        ).exists()
+
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.APPLY,
         ).exists()
 
     def test_cannot_create_job_seeker_with_pole_emploi_email(self, client):
@@ -1999,10 +2039,21 @@ class TestApplyAsPrescriber:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            prescriber=user,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2063,11 +2114,18 @@ class TestApplyAsPrescriber:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
 
-    def test_check_info_as_authorized_prescriber_for_job_seeker_with_incomplete_info(self, client):
+        # Check JobSeekerAssignment again
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
+        ).exists()
+
+    def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):
         company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
         user = PrescriberMembershipFactory(organization__authorized=True).user
         client.force_login(user)
@@ -2741,10 +2799,15 @@ class TestApplyAsCompany:
         assertRedirects(response, next_url)
 
         # Check GPS group
+        # ----------------------------------------------------------------------
         membership = FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).get()
         membership.delete()  # delete it to check it is created again when applying
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is created by an employer
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
         # Step application's jobs.
         # ----------------------------------------------------------------------
@@ -2805,9 +2868,14 @@ class TestApplyAsCompany:
         assert response.status_code == 200
 
         # Check GPS group again
+        # ----------------------------------------------------------------------
         assert FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=new_job_seeker, member=user
         ).exists()
+
+        # Check JobSeekerAssignment: no assignment is created when an application is created by an employer
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
     @pytest.mark.usefixtures("temporary_bucket")
     def test_apply_as_employer(self, client, pdf_file):
@@ -3269,7 +3337,7 @@ class TestDirectHireFullProcess:
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertContains(response, CONFIRM_BUTTON_MARKUP % new_job_seeker.get_full_name(), html=True)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % new_job_seeker.get_inverted_full_name(), html=True)
         assertContains(response, contract_url)  # Back button URL
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
 
@@ -3295,6 +3363,10 @@ class TestDirectHireFullProcess:
         response = client.get(next_url)
         assertTemplateUsed(response, "utils/templatetags/approval_box.html")
         assert response.status_code == 200
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is hired
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
     @freeze_time()
     def test_hire_as_geiq(self, client, mocker, settings):
@@ -3469,7 +3541,7 @@ class TestDirectHireFullProcess:
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
-        assertContains(response, CONFIRM_BUTTON_MARKUP % job_seeker.get_full_name(), html=True)
+        assertContains(response, CONFIRM_BUTTON_MARKUP % job_seeker.get_inverted_full_name(), html=True)
         assertContains(response, contract_url)  # Back button URL
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         response = client.post(confirmation_url)
@@ -4133,6 +4205,10 @@ class UpdateJobSeekerTestMixin:
 
         assert self.job_seeker.last_checked_at != previous_last_checked_at
 
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is updated
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
+
     def _check_only_administrative_allowed(self, client, user):
         client.force_login(user)
 
@@ -4225,6 +4301,10 @@ class UpdateJobSeekerTestMixin:
         assert self.job_seeker.has_jobseeker_profile is True
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
         assert self.job_seeker.last_checked_at != previous_last_checked_at
+
+        # Check JobSeekerAssignment: no assignment is created when a job seeker is updated
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
 
 class TestUpdateJobSeeker(UpdateJobSeekerTestMixin):
@@ -5520,7 +5600,7 @@ class TestCheckJobSeekerInformationsForHire:
                 f'<a href="{reverse("job_seekers_views:update_job_seeker_start", query=params)}"\n'
                 '                   class="btn btn-ico btn-outline-primary"\n'
                 '                   aria-label="Modifier les informations personnelles de '
-                f'{job_seeker.get_full_name()}">\n'
+                f'{job_seeker.get_inverted_full_name()}">\n'
                 '                    <i class="ri-pencil-line fw-medium" aria-hidden="true"></i>\n'
                 "                    <span>Modifier</span>\n                </a>"
             ),
@@ -5683,7 +5763,7 @@ class TestEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Valider l'éligibilité IAE")
         assertContains(
             response,
@@ -5698,7 +5778,7 @@ class TestEligibilityForHire:
         self.job_seeker.last_checked_at = timezone.now()
         self.job_seeker.save(update_fields=["last_checked_at"])
         response = client.get(reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Valider l'éligibilité IAE")
         assertContains(
             response,
@@ -5759,7 +5839,7 @@ class TestGEIQEligibilityForHire:
         client.force_login(company.members.first())
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
         response = client.get(reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Eligibilité GEIQ")
         assertContains(
             response,
@@ -5903,7 +5983,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -5993,7 +6073,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6082,7 +6162,7 @@ class TestFillJobSeekerInfosForHire:
         apply_session = fake_session_initialization(client, self.company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6145,7 +6225,7 @@ class TestFillJobSeekerInfosForHire:
         accept_contract_infos_url = reverse("apply:hire_contract_infos", kwargs={"session_uuid": session_uuid})
 
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6208,7 +6288,7 @@ class TestFillJobSeekerInfosForHire:
             assertRedirects(response, accept_contract_infos_url)
             assert PERSONAL_DATA_SESSION_KEY not in client.session[session_uuid]
         else:
-            assertContains(response, "Déclarer l’embauche de Clara SION")
+            assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
             assertContains(response, NEXT_BUTTON_MARKUP, html=True)
             # If no reason is present, the pole_emploi_id field is shown
             assertContains(response, POLE_EMPLOI_FIELD_MARKER)
@@ -6290,7 +6370,7 @@ class TestFillJobSeekerInfosForHire:
             "apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": apply_session.name}
         )
         response = client.get(fill_job_seeker_infos_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         if self.company.is_subject_to_iae_rules:
             assertContains(response, "Éligible à l’IAE")
 
@@ -6346,7 +6426,7 @@ class TestHireContract:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
 
         hiring_start_at = timezone.localdate()
@@ -6419,7 +6499,7 @@ class TestHireContract:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "PASS IAE valide")
 
         hiring_start_at = timezone.localdate()
@@ -6464,7 +6544,7 @@ class TestHireContract:
         apply_session = fake_session_initialization(client, company, self.job_seeker, {"selected_jobs": []})
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligibilité GEIQ confirmée")
 
         hiring_start_at = timezone.localdate()
@@ -6554,7 +6634,7 @@ class TestHireContract:
         )
 
         response = client.get(reverse("apply:hire_contract_infos", kwargs={"session_uuid": apply_session.name}))
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
 
         hiring_start_at = timezone.localdate()
@@ -6631,7 +6711,7 @@ class TestHireConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, "Éligible à l’IAE")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         assertContains(
@@ -6715,7 +6795,7 @@ class TestHireConfirmation:
 
         with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(confirmation_url)
-        assertContains(response, "Déclarer l’embauche de Clara SION")
+        assertContains(response, f"Déclarer l’embauche de {self.job_seeker.get_inverted_full_name()}")
         assertContains(response, hiring_start_at.strftime("%d/%m/%Y"))
         assertContains(response, hiring_end_at.strftime("%d/%m/%Y"))
 

@@ -30,6 +30,14 @@
                             </a>
                         </li>
                     {% endif %}
+                    {% if perms.employee_record.view_employeerecord %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'itou_staff_views:export_fs_3437' %}" class="btn-link btn-ico">
+                                <i class="ri-download-line ri-lg fw-normal" aria-hidden="true"></i>
+                                <span>Fiches salarié avec une erreur 3437 (IdItou)</span>
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels"
                            target="_blank"

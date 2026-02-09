@@ -18,7 +18,7 @@
                 {% if request.user.is_job_seeker %}
                     Votre candidature
                 {% else %}
-                    La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+                    La candidature de {{ job_application.job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
                 {% endif %}
                 <b>a bien été envoyée chez {{ job_application.to_company.display_name }}</b>.
             </p>
@@ -44,7 +44,7 @@
                         <div id="informations" {% if form.is_bound %}class="d-none"{% endif %} data-swap-element-with=".c-form">
                             <div class="card c-card c-card--noshadow border-bottom p-3">
                                 <div class="card-header d-flex flex-row align-items-center">
-                                    <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
+                                    <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
                                     {% if request.user.is_job_seeker %}
                                         <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
                                             <i class="ri-pencil-line" aria-hidden="true"></i>
@@ -91,7 +91,7 @@
                         </div>
                         {% if not request.user.is_job_seeker %}
                             <div class="c-form c-card--noshadow border-bottom {% if not form.is_bound %}d-none{% endif %}" data-swap-element-with="#informations">
-                                <h2 class="mb-5">{{ job_application.job_seeker.get_full_name }}</h2>
+                                <h2 class="mb-5">{{ job_application.job_seeker.get_inverted_full_name }}</h2>
 
                                 <form method="post">
                                     {% csrf_token %}

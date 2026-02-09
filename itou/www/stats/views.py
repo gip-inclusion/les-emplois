@@ -30,6 +30,7 @@ from itou.companies import models as companies_models
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
+from itou.nexus.utils import activate_pilotage
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
@@ -151,6 +152,9 @@ def render_stats(
             user_id=request.user.pk,
             **extra_data,
         )
+
+    if request.user.is_authenticated and (request.user.is_employer or request.user.is_prescriber):
+        activate_pilotage(request.user)
 
     return render(request, template_name, base_context)
 

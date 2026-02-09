@@ -22,8 +22,8 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import save_file
 from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
-from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, User
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
@@ -613,7 +613,10 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 # Check if update is really needed: may change diagnosis expiration date
                 if self.form.has_changed():
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-                        self.geiq_eligibility_diagnosis, request.user, self.form.cleaned_data
+                        self.geiq_eligibility_diagnosis,
+                        request.user,
+                        request.current_organization if request.user.is_prescriber else None,
+                        self.form.cleaned_data,
                     )
 
             return HttpResponseRedirect(self.get_next_url())
@@ -677,6 +680,12 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         if self.request.user.is_employer or self.request.user.is_prescriber:
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
+
+            if self.request.user.is_prescriber:
+                # Sync job seeker assignment to a prescriber
+                JobSeekerAssignment.objects.upsert_assignment(
+                    self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
+                )
 
         # Send notifications
         company_recipients = job_application.to_company.active_members.all()

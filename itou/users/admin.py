@@ -14,7 +14,7 @@ from django.db.models import Exists, OuterRef
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import NoReverseMatch, path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -37,7 +37,7 @@ from itou.users.admin_forms import (
     UserAdminForm,
 )
 from itou.users.enums import IdentityCertificationAuthorities, IdentityProvider, UserKind
-from itou.users.utils import NIR_RE
+from itou.users.utils import NIR_RE, merge_job_seeker_assignments
 from itou.utils.admin import (
     ChooseFieldsToTransfer,
     CreatedOrUpdatedByMixin,
@@ -264,6 +264,7 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
     "eligibility_diagnoses",  # EligibilityDiagnosis.job_seeker
     "geiq_eligibility_diagnoses",  # GEIQEligibilityDiagnosis.job_seeker
     "job_applications",  # JobApplication.job_seeker
+    "job_seeker_assignments",  # JobSeekerAssignment.job_seeker
 }
 
 
@@ -713,9 +714,12 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
         def _get_transfer_data_from_user(user, field):
             data = []
             for item in getattr(user, field.name).all():
-                item.admin_link = reverse(
-                    f"admin:{item._meta.app_label}_{item._meta.model_name}_change", args=[item.pk]
-                )
+                try:
+                    item.admin_link = reverse(
+                        f"admin:{item._meta.app_label}_{item._meta.model_name}_change", args=[item.pk]
+                    )
+                except NoReverseMatch:
+                    item.admin_link = None
                 data.append(item)
             return data
 
@@ -761,7 +765,22 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                         if field.name == "job_applications" and item.sender_kind == UserKind.JOB_SEEKER:
                             # Keep sender & job_seeker consistent to comply with job_seeker_sender_coherence constraint
                             item.sender = to_user
-                        item.save()
+                        if field.name == "job_seeker_assignments":
+                            # Check and merge if to_user has an assignment with same prescriber and organization
+                            to_user_assignment = models.JobSeekerAssignment.objects.filter(
+                                job_seeker=to_user,
+                                prescriber=item.prescriber,
+                                prescriber_organization=item.prescriber_organization,
+                            ).first()
+                            if to_user_assignment:
+                                merge_job_seeker_assignments(
+                                    assignment_to_delete=item, assignment_to_keep=to_user_assignment
+                                )
+                            else:
+                                models.JobSeekerAssignment.objects.filter(pk=item.pk).update(job_seeker=to_user)
+                        else:
+                            # Don't change assignment's updated_at field
+                            item.save()
                         transferred_items.append((transfer_data[field_name]["title"], item))
                 if transferred_items:
                     summary_text = "\n".join(

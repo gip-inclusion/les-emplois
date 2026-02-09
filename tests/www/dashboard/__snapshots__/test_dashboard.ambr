@@ -1369,6 +1369,15 @@
                                                   </a>
                                               </li>
                                               <li class="d-flex justify-content-between align-items-center mb-3">
+                                                  <a class="btn-link btn-ico" href="/staff/export-fs-3437">
+                                                      <i aria-hidden="true" class="ri-download-line ri-lg fw-normal">
+                                                      </i>
+                                                      <span>
+                                                          Fiches salarié avec une erreur 3437 (IdItou)
+                                                      </span>
+                                                  </a>
+                                              </li>
+                                              <li class="d-flex justify-content-between align-items-center mb-3">
                                                   <a aria-label="Liste des utilisateurs institutionnels (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://stats.inclusion.beta.gouv.fr/question/7519-utilisateurs-institutionnels" rel="noopener" target="_blank">
                                                       <i aria-hidden="true" class="ri-list-check-3 ri-lg fw-normal">
                                                       </i>

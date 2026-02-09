@@ -1,5 +1,30 @@
 # Journal des modifications
 
+## 2026-02-09
+
+### Ajouté
+
+- [API : Ajout des derniers champs envoyés à l'ASP](https://github.com/gip-inclusion/les-emplois/pull/7456)
+- [Tableau de bord : Ajout de l'export des fiches salariés en erreur à cause de l'`idItou`](https://github.com/gip-inclusion/les-emplois/pull/7451)
+
+### Modifié
+
+- [Candidature : Auto-remplissage de certains critères des diagnostics IAE en se basant sur le profil administratif du candidat s'il a été mis à jour récemment](https://github.com/gip-inclusion/les-emplois/pull/7396)
+- [Candidature : Limiter les informations accessibles et modifiables dans l'étape des informations manquantes d'un candidat (date de naissance et identifiant FT)](https://github.com/gip-inclusion/les-emplois/pull/7474)
+- [Candidature : Suppression de la vérification du délai de carence pour la mise en attente et l'annulation de candidature](https://github.com/gip-inclusion/les-emplois/pull/7487)
+- [Candidat : Empêcher un candidat de modifier son propre NIR](https://github.com/gip-inclusion/les-emplois/pull/7478)
+- [Contrôle a posteriori : Ajout de mentions pour les DDETS dans la page de détail de la sanction](https://github.com/gip-inclusion/les-emplois/pull/7489)
+- [Déclaration d'embauche : Vérification de l'éligibilité après renseignement des informations de contrat](https://github.com/gip-inclusion/les-emplois/pull/7481)
+- [Interface : Afficher les Candidatures par NOM Prénom](https://github.com/gip-inclusion/les-emplois/pull/7453)
+- [Nexus : Ajouter un type de structure dans la correspondance depuis le marché](https://github.com/gip-inclusion/les-emplois/pull/7512)
+- [Nexus : Autoriser plus de champs vides dans l'API](https://github.com/gip-inclusion/les-emplois/pull/7511)
+- [Nexus : Mise en place de la page d'accueil](https://github.com/gip-inclusion/les-emplois/pull/7273)
+- [Tableau de bord : Mieux expliquer le besoin d'être admin de toutes les structures pour utiliser l'API Candidats](https://github.com/gip-inclusion/les-emplois/pull/7492)
+
+### Tech
+
+- [Tech : Mise à jour des zones QPV](https://github.com/gip-inclusion/les-emplois/pull/7447)
+
 ## 2026-02-02
 
 ### Ajouté

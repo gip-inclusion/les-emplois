@@ -18,7 +18,8 @@ from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerAssignment, User
+from itou.users.utils import merge_job_seeker_assignments
 from itou.utils.admin import add_support_remark_to_obj
 
 
@@ -120,6 +121,37 @@ def handle_follow_up_group_membership(model, from_user, to_user):
     return len(from_user_memberships)
 
 
+def handle_job_seeker_assignment(model, from_user, to_user):
+    from_user_assignments = model.objects.filter(prescriber=from_user)
+    to_user_assignments = {
+        (assignment.job_seeker_id, assignment.prescriber_organization_id): assignment
+        for assignment in model.objects.filter(prescriber=to_user)
+    }
+    updated_pks = []
+    moved_pks = []
+    for from_user_assignment in from_user_assignments:
+        key = (
+            from_user_assignment.job_seeker.pk,
+            from_user_assignment.prescriber_organization.pk if from_user_assignment.prescriber_organization else None,
+        )
+        if to_user_assignment := to_user_assignments.get(key):
+            updated_pks.append(to_user_assignment.pk)
+            merge_job_seeker_assignments(
+                assignment_to_delete=from_user_assignment, assignment_to_keep=to_user_assignment
+            )
+        else:
+            moved_pks.append(from_user_assignment.pk)
+            from_user_assignment.prescriber = to_user
+
+    JobSeekerAssignment.objects.filter(pk__in=moved_pks).update(prescriber=to_user)
+    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.prescriber"
+    if updated_pks:
+        logger.info(f"{base_log} updated : {updated_pks}")
+    if moved_pks:
+        logger.info(f"{base_log} moved : {moved_pks}")
+    return len(from_user_assignments)
+
+
 def handle_token(model, from_user, to_user):
     if Token.objects.filter(user=to_user).exists():
         # We can't have more than one token per user so there's nothing to do
@@ -139,6 +171,7 @@ MODEL_MAPPING = {
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
     (FollowUpGroupMembership, "member"): handle_follow_up_group_membership,
+    (JobSeekerAssignment, "prescriber"): handle_job_seeker_assignment,
     (User._meta.get_field("groups").remote_field.through, "user"): noop,
     (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,
 }

@@ -1,7 +1,8 @@
 from django.utils import timezone
 
-from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Service
-from itou.nexus.models import NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
+from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
+from itou.users.enums import IdentityProvider
 
 
 SERVICE_MAPPING = {
@@ -39,6 +40,24 @@ def complete_full_sync(service, started_at):
             in_progress_since=None, valid_since=started_at
         )
     )
+
+
+def serialize_user(user):
+    # Serialize the user to reproduce the data received in the API
+    return {
+        "source_id": user.pk,
+        "source_kind": user.kind,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "phone": user.phone,
+        "last_login": user.last_login,
+        "auth": {
+            IdentityProvider.DJANGO: Auth.DJANGO,
+            IdentityProvider.INCLUSION_CONNECT: Auth.INCLUSION_CONNECT,
+            IdentityProvider.PRO_CONNECT: Auth.PRO_CONNECT,
+        }[user.identity_provider],
+    }
 
 
 def build_user(user_data, service):
@@ -90,8 +109,9 @@ def sync_memberships(nexus_memberships):
     existing_user_pks = set(NexusUser.objects.filter(pk__in=user_pks).values_list("pk", flat=True))
     existing_structure_pks = set(NexusStructure.objects.filter(pk__in=structure_pks).values_list("pk", flat=True))
     filtered_memberships = filter(
-        lambda membership: membership.user_id in existing_user_pks
-        and membership.structure_id in existing_structure_pks,
+        lambda membership: (
+            membership.user_id in existing_user_pks and membership.structure_id in existing_structure_pks
+        ),
         nexus_memberships,
     )
     return len(
@@ -141,3 +161,8 @@ def sync_structures(nexus_structures):
             unique_fields=["id"],
         )
     )
+
+
+# Activate pilotage
+def activate_pilotage(user):
+    ActivatedService.objects.activate(user=user, service=Service.PILOTAGE)

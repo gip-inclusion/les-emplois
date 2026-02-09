@@ -21,8 +21,8 @@ from itou.eligibility.models.iae import get_criteria_from_job_seeker
 from itou.eligibility.tasks import certify_criterion_with_api_particulier
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.models import JobApplication
-from itou.users.enums import IdentityCertificationAuthorities
-from itou.users.models import IdentityCertification, JobSeekerProfile
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities
+from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile
 from itou.utils.mocks.api_particulier import (
     RESPONSES,
     ResponseKind,
@@ -321,6 +321,14 @@ class TestEligibilityDiagnosisModel:
         assert membership.member == prescriber
         assert membership.creator == prescriber
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.job_seeker == job_seeker
+        assert assignment.prescriber == prescriber
+        assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
+
     def test_create_diagnosis_with_administrative_criteria(self):
         job_seeker = JobSeekerFactory()
         prescriber_organization = PrescriberOrganizationFactory(authorized=True, with_membership=True)
@@ -355,6 +363,7 @@ class TestEligibilityDiagnosisModel:
     def test_update_diagnosis(self):
         # Only prescribers can update a diagnosis
         prescriber_organization = PrescriberOrganizationFactory(with_membership=True)
+        assert not JobSeekerAssignment.objects.exists()
 
         current_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         new_diagnosis = EligibilityDiagnosis.update_diagnosis(
@@ -379,6 +388,14 @@ class TestEligibilityDiagnosisModel:
         assert current_diagnosis.expires_at == timezone.localdate(new_diagnosis.created_at)
         assert not current_diagnosis.is_valid
         assert new_diagnosis.is_valid
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.job_seeker == new_diagnosis.job_seeker
+        assert assignment.prescriber == new_diagnosis.author
+        assert assignment.prescriber_organization == prescriber_organization
+        assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 
     def test_is_valid(self):
         # Valid diagnosis.

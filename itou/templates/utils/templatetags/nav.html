@@ -12,7 +12,12 @@
                         aria-expanded="{{ menu_group_or_item.active|yesno:"true,false" }}"
                         aria-controls="collapse-nav-{{ menu_group_or_item.slug }}">
                     <i class="{{ menu_group_or_item.icon }} fw-medium" aria-hidden="true"></i>
-                    <span>{{ menu_group_or_item.label }}</span>
+                    <span>
+                        {{ menu_group_or_item.label }}
+                        {% if menu_group_or_item.is_new %}
+                            {% new_badge %}
+                        {% endif %}
+                    </span>
                 </button>
                 <div class="collapse{% if menu_group_or_item.active %} show{% endif %}" id="collapse-nav-{{ menu_group_or_item.slug }}">
                     <ul>

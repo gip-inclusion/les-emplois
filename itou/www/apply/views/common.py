@@ -409,7 +409,7 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
         context["progress"] = 33
         context["can_view_personal_information"] = True
         context["job_seeker"] = self.job_seeker
-        context["siae"] = self.company
+        context["company"] = self.company
         context["back_url"] = self.get_back_url()
         context["next_url"] = self.get_next_url()
         context["geiq_criteria_form_url"] = self.get_success_url()
@@ -452,7 +452,7 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
             return self.render_to_response(self.get_context_data(form=form))
 
         if self.diagnosis:
-            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, criteria)
+            GEIQEligibilityDiagnosis.update_eligibility_diagnosis(self.diagnosis, self.request.user, None, criteria)
         else:
             GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                 self.job_seeker, self.request.user, self.company, criteria

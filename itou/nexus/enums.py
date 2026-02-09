@@ -14,6 +14,18 @@ class Service(models.TextChoices):
     MON_RECAP = "mon-recap", "Mon Récap"
     PILOTAGE = "pilotage", "Le pilotage de l’inclusion"
 
+    @classmethod
+    def activable(cls):
+        """Returns the ordered services as displayed in the dashboard"""
+        return [
+            cls.EMPLOIS,
+            cls.DORA,
+            cls.MARCHE,
+            cls.MON_RECAP,
+            cls.PILOTAGE,
+            cls.COMMUNAUTE,
+        ]
+
 
 class Auth(models.TextChoices):
     DJANGO = "DJANGO", "Django"
@@ -118,6 +130,7 @@ USER_KIND_MAPPING = {
         "offreur": NexusUserKind.FACILITY_MANAGER,
         "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
         "autre": "",
+        "": "",
     },
     Service.COMMUNAUTE: {
         "": "",  # this service does not have a user kind
@@ -285,5 +298,6 @@ STRUCTURE_KIND_MAPPING = {
         "EATT": NexusStructureKind.EATT,
         "ESAT": NexusStructureKind.ESAT,
         "SEP": NexusStructureKind.SPIP,
+        "OPCS": NexusStructureKind.OPCS,
     },
 }

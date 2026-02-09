@@ -1,0 +1,34 @@
+{% load theme_inclusion %}
+
+
+<li class="list-group-item list-group-item-action">
+    <div class="d-flex align-items-center gap-3 position-relative">
+        <div class="flex-grow-1 d-flex align-items-center gap-3">
+            <img src="{% static_theme_images logo %}" height="35" width="35" alt="{{ name }}">
+            <div>
+                <strong class="d-block">{{ name }}</strong>
+                <p class="mb-0">{{ description }}</p>
+            </div>
+        </div>
+        <button class="btn btn-lg btn-ico-only btn-link stretched-link"
+                type="button"
+                aria-label="En savoir plus sur {{ name }}"
+                data-bs-toggle="collapse"
+                data-bs-target="#{{ id }}InfoCollapse"
+                aria-expanded="{% if service == new_service_shown %}true{% else %}false{% endif %}"
+                aria-controls="{{ id }}InfoCollapse">
+            <i class="ri-arrow-drop-down-line" aria-hidden="true"></i>
+        </button>
+    </div>
+    <div class="collapse{% if service == new_service_shown %} show{% endif %}" id="{{ id }}InfoCollapse" data-bs-parent="#nxAccordionListGroupCollapse">
+        <ul class="list-unstyled my-3">
+            {% for item in items_long %}
+                <li class="my-md-1">
+                    <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                    <span>{{ item }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        {{ responsive_buttons }}
+    </div>
+</li>

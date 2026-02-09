@@ -1,7 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directories:
+      - "/"
+      # https://github.com/dependabot/dependabot-core/issues/6345
+      - "/.github/actions/*"
+      - "/.github/actions/setup/*"
     schedule:
       interval: "weekly"
 

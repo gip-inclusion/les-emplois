@@ -1,0 +1,21 @@
+{% extends "nexus/layout/base.html" %}
+
+
+{% block title %}Contact {{ block.super }}{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col">
+                    <iframe data-tally-src="{{ tally_url }}" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" title="Formulaire de contact"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="https://tally.so/widgets/embed.js"></script>
+{% endblock %}

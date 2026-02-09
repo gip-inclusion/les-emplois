@@ -17,6 +17,7 @@ from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 from itou.approvals.models import Approval
@@ -24,6 +25,7 @@ from itou.asp.models import AllocationDuration, Commune, EducationLevel, RSAAllo
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.users.enums import (
+    ActionKind,
     IdentityCertificationAuthorities,
     IdentityProvider,
     LackOfNIRReason,
@@ -31,7 +33,7 @@ from itou.users.enums import (
     Title,
     UserKind,
 )
-from itou.users.models import IdentityCertification, JobSeekerProfile, User
+from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils import triggers
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.urls import get_absolute_url
@@ -47,6 +49,7 @@ from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
     LaborInspectorFactory,
@@ -1316,3 +1319,89 @@ def test_user_first_login(client):
     user.refresh_from_db()
     assert user.last_login != initial_first_login
     assert user.first_login == initial_first_login
+
+
+class TestJobSeekerAssignment:
+    @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_job_seeker(self, factory):
+        not_a_job_seeker = factory()
+        prescriber = PrescriberFactory()
+
+        with pytest.raises(AssertionError):
+            JobSeekerAssignment.objects.upsert_assignment(
+                not_a_job_seeker, prescriber, None, random.choice(ActionKind.values)
+            )
+
+    @pytest.mark.parametrize("factory", [JobSeekerFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
+    def test_is_prescriber(self, factory, caplog):
+        not_a_prescriber = factory()
+        job_seeker = JobSeekerFactory()
+
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker, not_a_prescriber, None, random.choice(ActionKind.values)
+        )
+        assert caplog.messages[0] == f"We should not try to add a JobSeekerAssignment on user={not_a_prescriber}"
+
+    def test_prescriber_and_organization(self):
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+        prescriber_organization = PrescriberOrganizationFactory()
+
+        # prescriber_organization is not mandatory
+        JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, None, random.choice(ActionKind.values))
+
+        # prescriber is mandatory
+        with pytest.raises(AttributeError):
+            JobSeekerAssignment.objects.upsert_assignment(
+                job_seeker, None, prescriber_organization, random.choice(ActionKind.values)
+            )
+
+    def test_unique_constraint(self):
+        prescriber = PrescriberFactory()
+        organization = PrescriberOrganizationFactory()
+        assignment = JobSeekerAssignmentFactory(prescriber=prescriber, prescriber_organization=organization)
+
+        # upsert_assignment updates the existing assignment
+        JobSeekerAssignment.objects.upsert_assignment(
+            assignment.job_seeker, prescriber, organization, random.choice(ActionKind.values)
+        )
+
+        # no error with another value for prescriber_organization
+        JobSeekerAssignmentFactory(
+            job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=None
+        )
+
+        with pytest.raises(IntegrityError):
+            JobSeekerAssignmentFactory(
+                job_seeker=assignment.job_seeker, prescriber=prescriber, prescriber_organization=organization
+            )
+
+    @pytest.mark.parametrize("with_organization", [True, False])
+    def test_assign_job_seeker(self, with_organization, snapshot):
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+        organization = PrescriberOrganizationFactory() if with_organization else None
+
+        # Creation
+        with freezegun.freeze_time("2025-11-14 12:00:01"):
+            with assertSnapshotQueries(snapshot(name="assignment creation sql queries")):
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.CREATE)
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.job_seeker == job_seeker
+        assert assignment.prescriber == prescriber
+        assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.CREATE
+        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.updated_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+
+        # Update
+        with freezegun.freeze_time("2025-11-15 18:00:01"):
+            with assertSnapshotQueries(snapshot(name="assignment update sql queries")):
+                JobSeekerAssignment.objects.upsert_assignment(job_seeker, prescriber, organization, ActionKind.APPLY)
+        assignment = JobSeekerAssignment.objects.get()
+        assert assignment.job_seeker == job_seeker
+        assert assignment.prescriber == prescriber
+        assert assignment.prescriber_organization == organization
+        assert assignment.last_action_kind == ActionKind.APPLY
+        assert assignment.created_at == datetime.datetime(2025, 11, 14, 12, 0, 1, tzinfo=datetime.UTC)
+        assert assignment.updated_at == datetime.datetime(2025, 11, 15, 18, 0, 1, tzinfo=datetime.UTC)

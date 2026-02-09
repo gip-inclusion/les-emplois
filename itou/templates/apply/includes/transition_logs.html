@@ -11,7 +11,7 @@
                     {% else %}
                         Passé en "{{ log.pretty_to_state }}"
                     {% endif %}
-                    {% if log.user and log.to_state != JobApplicationState.OBSOLETE %}par {{ log.user.get_full_name }}{% endif %}
+                    {% if log.user and log.to_state != JobApplicationState.OBSOLETE %}par {{ log.user.get_inverted_full_name }}{% endif %}
                 </span>
             </li>
         {% endfor %}

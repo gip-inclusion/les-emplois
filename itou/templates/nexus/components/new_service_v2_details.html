@@ -1,0 +1,25 @@
+{% load matomo %}
+{% load theme_inclusion %}
+
+<div class="h-100 border-start ps-4 collapse{% if service == new_service_shown %} show{% endif %}" id="{{ id }}InfoMore" data-bs-parent="#nxAccordionInfoMore">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+        <div class="flex-grow-1 d-flex align-items-center gap-3">
+            <img src="{% static_theme_images logo %}" height="60" width="60" alt="{{ name }}">
+            <div>
+                <strong class="d-block fs-lg">{{ name }}</strong>
+                <p class="mb-0 fs-sm">Plateforme de l’inclusion</p>
+            </div>
+        </div>
+        {{ activate_button }}
+    </div>
+    <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">{{ description }}</p>
+    <ul class="list-unstyled mb-3 mb-md-4">
+        {% for item in items_long %}
+            <li class="my-md-2">
+                <img src="{% static_theme_images 'nexus/nx-forme-commune-01.png' %}" alt="">
+                <span>{{ item }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ find_out_url }}" class="btn btn-link has-external-link ps-0" {% matomo_event "nexus" "decouvrir-service" service %} target="_blank">En savoir plus</a>
+</div>

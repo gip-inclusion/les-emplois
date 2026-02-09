@@ -15,7 +15,7 @@ from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberMembership
-from itou.users.models import User, UserKind
+from itou.users.models import JobSeekerAssignment, User, UserKind
 from itou.users.notifications import ArchiveUser
 from itou.utils.admin import add_support_remark_to_obj
 from itou.utils.command import BaseCommand
@@ -151,6 +151,12 @@ class Command(BaseCommand):
             model.objects.filter(user_id__in=user_ids).update(is_active=False)
 
         EmailAddress.objects.filter(user_id__in=user_ids).delete()
+
+        # No need to keep assignments from prescribers "solo" (without organization). If a prescriber was anonymized
+        # without deletion just because of an assignment like these, he will be deleted on the next command run.
+        JobSeekerAssignment.objects.filter(
+            prescriber_id__in=[user.id for user in users], prescriber_organization_id__isnull=True
+        ).delete()
 
         User.objects.filter(id__in=user_ids).update(
             is_active=False,

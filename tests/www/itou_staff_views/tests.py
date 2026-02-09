@@ -23,12 +23,14 @@ from pytest_django.asserts import (
 from rest_framework.authtoken.models import Token
 
 from itou.companies.models import CompanyMembership, SiaeACIConvergencePHC
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.gps.models import FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationTransitionLog
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
-from itou.users.models import NirModificationRequest, User
+from itou.users.enums import ActionKind, UserKind
+from itou.users.models import JobSeekerAssignment, NirModificationRequest, User
 from itou.utils.models import PkSupportRemark
 from itou.www.gps.enums import EndReason
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
@@ -40,7 +42,7 @@ from tests.approvals.factories import (
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
-from tests.employee_record.factories import EmployeeRecordTransitionLogFactory
+from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordTransitionLogFactory
 from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -48,6 +50,7 @@ from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberO
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
+    JobSeekerAssignmentFactory,
     JobSeekerFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -864,6 +867,115 @@ class TestMergeUsers:
             "HTTP 302 Found",
         ]
 
+    def test_merge_assignments(self, client, caplog):
+        org = PrescriberOrganizationFactory()
+        prescriber_1 = PrescriberFactory(membership__organization=org)
+        prescriber_2 = PrescriberFactory(membership=None)
+
+        # JSA(job_seeker, from_user, None)
+        # will get: JSA(job_seeker, to_user, None)
+        assignment_1 = JobSeekerAssignmentFactory(prescriber=prescriber_2, prescriber_organization=None)
+
+        # JSA(job_seeker, from_user, None) ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, None)
+        assignment_2 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_2, prescriber_organization=None, last_action_kind=ActionKind.IAE_ELIGIBILITY
+        )
+        assignment_2_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            job_seeker=assignment_2.job_seeker,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
+        )
+
+        # JSA(job_seeker, from_user, None), most recent ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, None) with updated_at and last_action_kind of from_user's assignment
+        assignment_3_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1, prescriber_organization=None, last_action_kind=ActionKind.GEIQ_ELIGIBILITY
+        )
+        assignment_3 = JobSeekerAssignmentFactory(
+            prescriber=prescriber_2,
+            job_seeker=assignment_3_to_user.job_seeker,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        )
+
+        # JSA(job_seeker, from_user, orgaA)
+        # will get: JSA(job_seeker, to_user, orgaA)
+        assignment_4 = JobSeekerAssignmentFactory(prescriber=prescriber_2, prescriber_organization=org)
+
+        # JSA(job_seeker, from_user, orgaA) ; JSA(job_seeker, to_user, None)
+        # will get: JSA(job_seeker, to_user, orgaA) ; JSA(job_seeker, to_user, None)
+        assignment_5_to_user = JobSeekerAssignmentFactory(
+            prescriber=prescriber_1,
+            prescriber_organization=None,
+            last_action_kind=ActionKind.CREATE,
+        )
+        assignment_5 = JobSeekerAssignmentFactory(
+            job_seeker=assignment_5_to_user.job_seeker,
+            prescriber=prescriber_2,
+            prescriber_organization=org,
+            last_action_kind=ActionKind.APPLY,
+        )
+
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))
+        client.post(url, data={"user_to_keep": "to_user"})
+
+        updated_assignment_1 = JobSeekerAssignment.objects.get(pk=assignment_1.pk)
+        assert updated_assignment_1.prescriber == prescriber_1
+        assert updated_assignment_1.prescriber_organization is None
+        assert updated_assignment_1.last_action_kind == assignment_1.last_action_kind
+        assert updated_assignment_1.created_at == assignment_1.created_at
+        assert updated_assignment_1.updated_at == assignment_1.updated_at
+
+        updated_assignment_2_to_user = JobSeekerAssignment.objects.get(pk=assignment_2_to_user.pk)
+        assert not JobSeekerAssignment.objects.filter(pk=assignment_2.pk).exists()
+        assert updated_assignment_2_to_user.prescriber == prescriber_1
+        assert updated_assignment_2_to_user.prescriber_organization == assignment_2.prescriber_organization
+        assert (
+            updated_assignment_2_to_user.last_action_kind == assignment_2_to_user.last_action_kind
+        )  # assignment_2_to_user was last updated, take its last_action_kind
+        assert updated_assignment_2_to_user.created_at == min(assignment_2.created_at, assignment_2_to_user.created_at)
+        assert updated_assignment_2_to_user.updated_at == max(assignment_2.updated_at, assignment_2_to_user.updated_at)
+
+        updated_assignment_3_to_user = JobSeekerAssignment.objects.get(pk=assignment_3_to_user.pk)
+        assert updated_assignment_3_to_user.prescriber == prescriber_1
+        assert updated_assignment_3_to_user.last_action_kind == assignment_3.last_action_kind
+        assert updated_assignment_3_to_user.created_at == assignment_3_to_user.created_at
+        assert updated_assignment_3_to_user.updated_at == assignment_3.updated_at
+
+        updated_assignment_4 = JobSeekerAssignment.objects.get(pk=assignment_4.pk)
+        assert updated_assignment_4.prescriber == prescriber_1
+        assert updated_assignment_4.prescriber_organization == org
+        assert updated_assignment_4.last_action_kind == assignment_4.last_action_kind
+        assert updated_assignment_4.created_at == assignment_4.created_at
+        assert updated_assignment_4.updated_at == assignment_4.updated_at
+
+        updated_assignment_5 = JobSeekerAssignment.objects.get(pk=assignment_5.pk)
+        updated_assignment_5_to_user = JobSeekerAssignment.objects.get(pk=assignment_5_to_user.pk)
+        assert updated_assignment_5.prescriber == prescriber_1
+        assert updated_assignment_5.prescriber_organization == org
+        assert updated_assignment_5.last_action_kind == assignment_5.last_action_kind
+        assert updated_assignment_5.created_at == assignment_5.created_at
+        assert updated_assignment_5.updated_at == assignment_5.updated_at
+        assert updated_assignment_5_to_user.prescriber == prescriber_1
+        assert updated_assignment_5_to_user.prescriber_organization is None
+        assert updated_assignment_5_to_user.last_action_kind == assignment_5_to_user.last_action_kind
+        assert updated_assignment_5_to_user.created_at == assignment_5_to_user.created_at
+        assert updated_assignment_5_to_user.updated_at == assignment_5_to_user.updated_at
+
+        assert caplog.messages == [
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+            "itou.users.models.JobSeekerAssignment.prescriber updated : "
+            f"[{assignment_3_to_user.pk}, {assignment_2_to_user.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — "
+            "itou.users.models.JobSeekerAssignment.prescriber moved : "
+            f"[{assignment_5.pk}, {assignment_4.pk}, {assignment_1.pk}]",
+            f"Fusion utilisateurs {prescriber_1.pk} ← {prescriber_2.pk} — Done !",
+            "HTTP 302 Found",
+        ]
+
     def test_merge_last_login(self, client, caplog, subtests):
         client.force_login(ItouStaffFactory(is_superuser=True))
 
@@ -1088,3 +1200,61 @@ class TestOTP:
             assertContains(response, device_1.name)
             assertNotContains(response, device_2.name)
             assertMessages(response, [messages.Message(messages.SUCCESS, "L’appareil a été supprimé.")])
+
+
+class TestExportFS3437:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            pytest.param(JobSeekerFactory, {}, 403, id="job_seeker"),
+            pytest.param(EmployerFactory, {"membership": True}, 403, id="employer"),
+            pytest.param(PrescriberFactory, {}, 403, id="prescriber"),
+            pytest.param(LaborInspectorFactory, {"membership": True}, 403, id="labor_inspector"),
+            pytest.param(ItouStaffFactory, {}, 302, id="staff"),
+            pytest.param(ItouStaffFactory, {"is_superuser": True}, 200, id="superuser"),
+        ],
+    )
+    def test_requires_superuser(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:export_fs_3437"))
+        assert response.status_code == expected_status
+
+    def test_requires_permission(self, settings, client):
+        user = ItouStaffFactory()
+        client.force_login(user)
+
+        url = reverse("itou_staff_views:export_fs_3437")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="view_employeerecord"))
+        response = client.get(url)
+        assert response.status_code == 200
+
+    @freeze_time("2024-05-17T11:11:11+02:00")
+    def test_export(self, admin_client, snapshot):
+        EmployeeRecordFactory(
+            status=Status.REJECTED,
+            asp_processing_code="3437",
+            job_application__approval__for_snapshot=True,
+            job_application__to_company__for_snapshot=True,
+            job_application__job_seeker__for_snapshot=True,
+        )
+        EmployeeRecordFactory(
+            status=Status.READY,
+            asp_processing_code="3437",
+        )
+        EmployeeRecordFactory(
+            status=Status.REJECTED,
+            asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
+        )
+        EmployeeRecordFactory(asp_processing_code=EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE)
+
+        with assertSnapshotQueries(snapshot(name="SQL queries")):
+            response = admin_client.get(
+                reverse("itou_staff_views:export_fs_3437"),
+            )
+            assert response.status_code == 200
+            assert response["Content-Disposition"] == ('attachment; filename="export_fs_3437_2024-05-17_11-11-11.csv"')
+            assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")

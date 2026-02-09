@@ -112,6 +112,6 @@
     </div>
     <form method="post" class="js-prevent-multiple-submit">
         {% csrf_token %}
-        {% itou_buttons_form primary_label="Confirmer l’embauche" primary_aria_label="Confirmer l’embauche de "|add:job_seeker.get_full_name reset_url=reset_url secondary_url=back_url show_mandatory_fields_mention=False %}
+        {% itou_buttons_form primary_label="Confirmer l’embauche" primary_aria_label="Confirmer l’embauche de "|add:job_seeker.get_inverted_full_name reset_url=reset_url secondary_url=back_url show_mandatory_fields_mention=False %}
     </form>
 </div>
