@@ -87,7 +87,7 @@ class NexusStructure(NexusModelMixin, AddressMixin, models.Model):
     )
     name = models.CharField(verbose_name="nom")
     kind = models.CharField(verbose_name="type", choices=NexusStructureKind.choices, blank=True)
-    email = CIEmailField("adresse e-mail")
+    email = CIEmailField("adresse e-mail", blank=True)
     phone = models.CharField(verbose_name="téléphone", max_length=20, blank=True)
     website = models.URLField(verbose_name="site web", blank=True)
     opening_hours = models.CharField(verbose_name="horaires d'accueil", blank=True)  # TODO: validate OSM format
