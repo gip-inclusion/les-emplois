@@ -1,24 +1,40 @@
 from rest_framework import serializers
 
-from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Role
+from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING
+from itou.nexus.models import NexusMembership, NexusStructure, NexusUser
 
 
-class MembershipSerializer(serializers.Serializer):
+class MembershipSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="source_id")
     user_id = serializers.CharField()
     structure_id = serializers.CharField()
-    role = serializers.ChoiceField(choices=Role.choices)
+
+    class Meta:
+        model = NexusMembership
+        fields = (
+            "id",
+            "user_id",
+            "structure_id",
+            "role",
+        )
 
 
-class UserSerializer(serializers.Serializer):
+class UserSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="source_id")
     kind = serializers.CharField(source="source_kind", allow_blank=True)
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    email = serializers.CharField()
-    phone = serializers.CharField(allow_blank=True)
-    last_login = serializers.DateTimeField(required=False, allow_null=True)
-    auth = serializers.ChoiceField(choices=Auth.choices)
+
+    class Meta:
+        model = NexusUser
+        fields = (
+            "id",
+            "kind",
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "last_login",
+            "auth",
+        )
 
     def validate_kind(self, value):
         if value not in USER_KIND_MAPPING[self.context["source"]]:
@@ -26,24 +42,31 @@ class UserSerializer(serializers.Serializer):
         return value
 
 
-class StructureSerializer(serializers.Serializer):
+class StructureSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="source_id")
     kind = serializers.CharField(source="source_kind", allow_blank=True)
-    siret = serializers.CharField()
-    name = serializers.CharField()
-    phone = serializers.CharField(allow_blank=True)
-    email = serializers.CharField(allow_blank=True)
-    address_line_1 = serializers.CharField(allow_blank=True)
-    address_line_2 = serializers.CharField(allow_blank=True)
-    post_code = serializers.CharField(allow_blank=True)
-    city = serializers.CharField(allow_blank=True)
-    department = serializers.CharField(allow_blank=True)
 
-    website = serializers.URLField(allow_blank=True)
-    opening_hours = serializers.CharField(allow_blank=True)
-    accessibility = serializers.URLField(allow_blank=True)
-    description = serializers.CharField(allow_blank=True)
-    source_link = serializers.URLField(allow_blank=True)
+    class Meta:
+        model = NexusStructure
+
+        fields = (
+            "id",
+            "kind",
+            "siret",
+            "name",
+            "phone",
+            "email",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "department",
+            "website",
+            "opening_hours",
+            "accessibility",
+            "description",
+            "source_link",
+        )
 
     def validate_kind(self, value):
         if value not in STRUCTURE_KIND_MAPPING[self.context["source"]]:
