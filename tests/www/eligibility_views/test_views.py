@@ -19,7 +19,7 @@ from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 class TestUpdateEligibilityView:
-    PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+    PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
 
     @pytest.mark.parametrize(
         "factory,status_code",
