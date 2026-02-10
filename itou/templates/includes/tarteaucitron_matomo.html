@@ -84,7 +84,7 @@
             var id = 'livestorm';
             tarteaucitron.fallback(['js-tac-livestorm'], function(elem) {
                 elem.style.width = elem.getAttribute('width');
-                elem.style.height = "365px";
+                elem.style.height = "265px";
                 return tarteaucitron.engage(id);
             });
         }
@@ -97,7 +97,8 @@
         "type": "other",
         "name": "Metabase",
         "uri": "https://www.metabase.com/privacy-policies",
-        "needConsent": true,
+        "needConsent": false,
+        "mandatory": true,
         "cookies": [],
         "js": function() {
             "use strict";
@@ -105,7 +106,7 @@
                 var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'metabase iframe'),
                     height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
                     url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
-                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
+                return '<iframe id="stats-iframe" title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
             });
         },
         "fallback": function() {
@@ -113,7 +114,7 @@
             var id = 'metabase';
             tarteaucitron.fallback(['js-tac-metabase'], function(elem) {
                 elem.style.width = elem.getAttribute('width');
-                elem.style.height = "365px";
+                elem.style.height = "265px";
                 return tarteaucitron.engage(id);
             });
         }
@@ -134,7 +135,7 @@
                 var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'tally iframe'),
                     height = tarteaucitron.fixSelfXSS(x.getAttribute("height") || '365'),
                     url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
-                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
+                return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" loading="lazy" width="100%" height="189" frameborder="0" marginheight="0" marginwidth="0"></iframe>';
             });
         },
         "fallback": function() {
@@ -142,7 +143,7 @@
             var id = 'tally';
             tarteaucitron.fallback(['js-tac-tally'], function(elem) {
                 elem.style.width = elem.getAttribute('width');
-                elem.style.height = "365px";
+                elem.style.height = "265px";
                 return tarteaucitron.engage(id);
             });
         }

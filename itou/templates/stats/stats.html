@@ -18,9 +18,7 @@
             {% if is_stats_public %}
                 <p>
                     Cette page a pour objectif de présenter l'impact des emplois de l'inclusion. Pour retrouver les indicateurs qui étaient présentés ici, merci de vous rendre sur le
-                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" class="has-external-link" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">
-                        pilotage de l'inclusion
-                    </a>
+                    <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" class="has-external-link" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">pilotage de l'inclusion</a>
                 </p>
             {% endif %}
         {% endfragment %}
@@ -73,8 +71,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <iframe id="stats-iframe" src="{{ iframeurl }}">
-                    </iframe>
+                    <div class="js-tac-metabase" data-url="{{ iframeurl }}" title="{{ page_title }} - Tableau de bord Metabase"></div>
 
                     {% if back_url %}
                         <p class="mt-4">
@@ -89,15 +86,13 @@
     {% if tally_embed_form_id %}
         <section class="s-section mt-0 pt-0">
             <div class="s-section__container container">
-                <iframe data-tally-src="{{ TALLY_URL }}/embed/{{ tally_embed_form_id }}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1{% for key, value in tally_hidden_fields.items %}&{{ key|urlencode }}={{ value|urlencode }}{% endfor %}"
-                        loading="lazy"
-                        width="100%"
-                        height="189"
-                        frameborder="0"
-                        marginheight="0"
-                        marginwidth="0"
-                        title="Aidez-nous à améliorer votre outil !">
-                </iframe>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="js-tac-tally"
+                             data-url="{{ TALLY_URL }}/embed/{{ tally_embed_form_id }}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1{% for key, value in tally_hidden_fields.items %}&{{ key|urlencode }}={{ value|urlencode }}{% endfor %}"
+                             title="Aidez-nous à améliorer votre outil !"></div>
+                    </div>
+                </div>
             </div>
         </section>
     {% endif %}
