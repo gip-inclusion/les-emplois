@@ -220,7 +220,7 @@
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
-              <h4>Votre dossier n’est pas encore complet</h4>
+              <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
               <ul>
                   
@@ -276,9 +276,9 @@
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: contracts, summary document & structure financial assessment missing]
   '''
   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
-      <h4>
+      <h3>
           Votre dossier n’est pas encore complet
-      </h4>
+      </h3>
       <p class="mb-0">
           Actions restantes :
       </p>
@@ -316,9 +316,9 @@
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: ready for submission]
   '''
   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
-      <h4>
+      <h3>
           Votre dossier est en attente d’envoi
-      </h4>
+      </h3>
       <form method="post">
           <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
           <button class="btn btn-primary btn-block" type="submit">
@@ -334,9 +334,9 @@
 # name: TestAssessmentDetailsForGEIQView.test_assessment_status_content[assessment status: summary document & structure financial assessment missing]
   '''
   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
-      <h4>
+      <h3>
           Votre dossier n’est pas encore complet
-      </h4>
+      </h3>
       <p class="mb-0">
           Actions restantes :
       </p>
@@ -985,7 +985,7 @@
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
-              <h4>Votre dossier n’est pas encore complet</h4>
+              <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
               <ul>
                   
@@ -1300,9 +1300,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
-                      <h4>
+                      <h3>
                           Votre dossier a été transmis le 27/05/2025
-                      </h4>
+                      </h3>
                       <p class="mb-0">
                           Il n’est plus possible de le modifier, en cas de besoin vous pouvez contacter la DDETS 29.
                           <br/>
@@ -2008,7 +2008,7 @@
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
-              <h4>Votre dossier n’est pas encore complet</h4>
+              <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
               <ul>
                   
@@ -2237,7 +2237,7 @@
                       
       <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info" id="assessment-status-box">
           
-              <h4>Votre dossier n’est pas encore complet</h4>
+              <h3>Votre dossier n’est pas encore complet</h3>
               <p class="mb-0">Actions restantes :</p>
               <ul>
                   
@@ -2444,14 +2444,14 @@
                                   <fieldset>
                                       <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
-                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
-                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
     <option selected="" value="">---------</option>
   
     <option value="2">DREETS BRET</option>
@@ -2555,14 +2555,14 @@
                                   <fieldset>
                                       <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
-                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
-                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
     <option selected="" value="">---------</option>
   
     <option value="2">DREETS BRET</option>
@@ -2672,14 +2672,14 @@
                                   <fieldset>
                                       <legend class="h4">Par quel type d’institution êtes-vous conventionné ?</legend>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_ddets" aria-expanded="false" class="form-check-input" data-bs-target=".ddets_group" data-bs-toggle="collapse" id="id_convention_with_ddets" name="convention_with_ddets" type="checkbox"/><label class="form-check-label" for="id_convention_with_ddets">DDETS (Département)</label></div></div>
-                                      <div class="form-group ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"><label class="form-label" for="id_ddets">Sélectionnez la DDETS</label><select class="form-select" id="id_ddets" name="ddets">
     <option selected="" value="">---------</option>
   
     <option value="1">DDETS 29</option>
   
   </select></div>
                                       <div class="form-group"><div class="form-check"><input aria-controls="id_dreets" aria-expanded="false" class="form-check-input" data-bs-target=".dreets_group" data-bs-toggle="collapse" id="id_convention_with_dreets" name="convention_with_dreets" type="checkbox"/><label class="form-check-label" for="id_convention_with_dreets">DREETS (Région)</label></div></div>
-                                      <div class="form-group ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
+                                      <div class="form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"><label class="form-label" for="id_dreets">Sélectionnez la DREETS</label><select class="form-select" id="id_dreets" name="dreets">
     <option selected="" value="">---------</option>
   
     <option value="2">DREETS BRET</option>
