@@ -25,10 +25,10 @@
                             </span>
                         {% endif %}
                         {% if job_application.to_company.is_subject_to_iae_rules %}
-                            {% include "eligibility/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_iae_rules=True is_subject_to_geiq_rules=False eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
+                            {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_application.job_seeker eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-xs" only %}
                         {% elif job_applications_list_kind is JobApplicationsListKind.SENT and job_application.to_company.kind == "GEIQ" %}
                             {# show GEIQ eligibility badge in prescriptions only #}
-                            {% include "eligibility/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_iae_rules=False is_subject_to_geiq_rules=True geiq_eligibility_diagnosis=job_application.jobseeker_geiq_eligibility_diagnosis badge_size="badge-xs" only %}
+                            {% include "eligibility/includes/geiq/eligibility_badge.html" with job_seeker=job_application.job_seeker geiq_eligibility_diagnosis=job_application.jobseeker_geiq_eligibility_diagnosis badge_size="badge-xs" only %}
 
                         {% endif %}
                         {% include "apply/includes/next_appointment.html" with job_application=job_application only %}

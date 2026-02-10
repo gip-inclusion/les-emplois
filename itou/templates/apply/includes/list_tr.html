@@ -102,7 +102,7 @@
             </td>
             <td>
                 {% if job_application.to_company.is_subject_to_iae_rules %}
-                    {% include "eligibility/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_iae_rules=True eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                    {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_application.job_seeker eligibility_diagnosis=job_application.jobseeker_valid_eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
                     {% if job_application.job_seeker.has_valid_approval %}
                         {% if job_application.job_seeker.latest_approval.eligibility_diagnosis %}
                             {% if job_application.job_seeker.latest_approval.eligibility_diagnosis.is_from_employer %}
@@ -128,7 +128,7 @@
                     {% endif %}
                 {% else %}
                     {# GEIQ prescriptions #}
-                    {% include "eligibility/includes/eligibility_badge.html" with job_seeker=job_application.job_seeker is_subject_to_iae_rules=False is_subject_to_geiq_rules=True geiq_eligibility_diagnosis=job_application.jobseeker_geiq_eligibility_diagnosis badge_size="badge-sm" only %}
+                    {% include "eligibility/includes/geiq/eligibility_badge.html" with job_seeker=job_application.job_seeker geiq_eligibility_diagnosis=job_application.jobseeker_geiq_eligibility_diagnosis badge_size="badge-sm" only %}
                     {% if job_application.jobseeker_geiq_eligibility_diagnosis %}
                         {# A prescription with an eligibility diagnosis for a GEIQ is necessarily done by an authorized prescriber #}
                         <span class="d-block">Diagnostic public prioritaire GEIQ validé par un prescripteur habilité</span>

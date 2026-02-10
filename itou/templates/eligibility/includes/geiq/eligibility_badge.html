@@ -1,0 +1,8 @@
+{% load badges %}
+{% with badge_size|default:"badge-base" as badge_class %}
+    {% if geiq_eligibility_diagnosis.is_valid and geiq_eligibility_diagnosis.allowance_amount %}
+        {% geiq_eligibility_badge is_eligible=True extra_classes=badge_class %}
+    {% else %}
+        {% geiq_eligibility_badge is_eligible=False extra_classes=badge_class %}
+    {% endif %}
+{% endwith %}
