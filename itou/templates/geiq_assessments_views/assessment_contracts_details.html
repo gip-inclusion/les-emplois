@@ -205,14 +205,6 @@
                         <div class="c-box mb-3 mb-md-4">
                             <ul class="list-data">
                                 <li>
-                                    <small>Accompagnement avant contrat</small>
-                                    <strong>{{ contract.other_data.accompagnement_avant_contrat|default:0 }} {{ contract.other_data.accompagnement_avant_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
-                                </li>
-                                <li>
-                                    <small>Accompagnement après contrat</small>
-                                    <strong>{{ contract.other_data.accompagnement_apres_contrat|default:0 }} {{ contract.other_data.accompagnement_apres_contrat|default:0|pluralizefr:"jour,jours" }}</strong>
-                                </li>
-                                <li>
                                     <small>Heures de suivi de l’évaluation des compétences prévues</small>
                                     <strong>{{ contract.other_data.heures_suivi_evaluation_competences_geiq_prevues|formatfloat_with_unit:"h"|default:"-" }}</strong>
                                 </li>
