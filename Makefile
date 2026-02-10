@@ -86,7 +86,7 @@ populate_db_with_reference_data: $(VIRTUAL_ENV)
 
 populate_db: populate_db_with_reference_data
 	python manage.py loaddata_bulk itou/fixtures/django/*.json
-	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
+	python manage.py shell -c 'from itou.fixtures.django.dynamic import load_dynamic; load_dynamic()'
 
 # Tests.
 # =============================================================================
@@ -131,7 +131,7 @@ dumprestore: $(VIRTUAL_ENV)
 	python manage.py migrate
 
 DBREADY := 0
-$(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/siae_evaluations/fixtures.py
+$(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/*/fixtures.py
 	$(MAKE) dumpcreate
 	$(eval DBREADY := 1)
 
