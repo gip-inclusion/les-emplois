@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from itoutils.django.commands import dry_runnable
@@ -20,7 +22,8 @@ class Command(BaseCommand):
 
     @dry_runnable
     def handle(self, **options):
-        today = timezone.localdate()
+        now = timezone.now()
+        today = timezone.localdate(now)
         profile_required_fields = api_particulier.JOBSEEKER_PROFILE_REQUIRED_FIELDS.copy()
         # birth_country and birthdate are sufficient to tell if the job seeker
         # can be certified. birth_place is only specified when birth_country is
@@ -35,7 +38,7 @@ class Command(BaseCommand):
                     administrative_criteria__kind__in=AdministrativeCriteriaKind.certifiable_by_api_particulier(),
                     certification_period=None,
                     eligibility_diagnosis__expires_at__gte=today,
-                    created_at__lte=timezone.now() - API_PARTICULIER_RETRY_DURATION,
+                    created_at__lte=now - API_PARTICULIER_RETRY_DURATION,
                 )
                 .exclude(
                     or_queries(
@@ -55,6 +58,7 @@ class Command(BaseCommand):
                                 Q(**{f"eligibility_diagnosis__job_seeker__jobseeker_profile__{field}": None})
                                 for field in profile_required_fields
                             ],
+                            Q(last_certification_attempt_at__gte=now - timedelta(days=7)),
                         ],
                     )
                 )
