@@ -27,10 +27,11 @@
     <h2 class="h1">Critères d'éligibilité</h2>
 
     {% if criteria_filled_from_job_seeker %}
-        {% include "eligibility/includes/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
+        {% include "eligibility/includes/iae/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
     {% elif job_seeker.address_in_qpv or job_seeker.zrr_city_name %}
         {% include "apply/includes/known_criteria.html" %}
     {% endif %}
 
-    {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
+    {% include "eligibility/includes/iae/form.html" with cancel_url=cancel_url %}
+
 </div>

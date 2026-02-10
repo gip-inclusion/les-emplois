@@ -1,11 +1,11 @@
 {% comment %}
 
     Usage:
-        {% include "eligibility/includes/form.html" %}
+        {% include "eligibility/includes/iae/form.html" %}
 
     Or with a `cancel_url` param:
         {% url 'apply:details_for_company' job_application_id=job_application.id as cancel_url %}
-        {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
+        {% include "eligibility/includes/iae/form.html" with cancel_url=cancel_url %}
 
 {% endcomment %}
 {% load buttons_form %}
@@ -21,7 +21,7 @@
 
     {% for field in form %}
         {% if form.LEVEL_1_PREFIX in field.name %}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
         {% endif %}
     {% endfor %}
 
@@ -29,7 +29,7 @@
 
     {% for field in form %}
         {% if form.LEVEL_2_PREFIX in field.name %}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form.OBJECTS %}
         {% endif %}
     {% endfor %}
 

@@ -1614,7 +1614,7 @@ class TestProcessViews:
         assert mail_to_other_employer.body == snapshot(name="postpone_email_to_proxy_body")
 
     def test_eligibility(self, client):
-        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+        PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -1725,7 +1725,7 @@ class TestProcessViews:
         )
         response = client.get(url)
         assert response.status_code == 200
-        assertTemplateUsed(response, "eligibility/includes/criteria_filled_from_job_seeker.html", count=1)
+        assertTemplateUsed(response, "eligibility/includes/iae/criteria_filled_from_job_seeker.html", count=1)
         assertContains(
             response,
             f"""
