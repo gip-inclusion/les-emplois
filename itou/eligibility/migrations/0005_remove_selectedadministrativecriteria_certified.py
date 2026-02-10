@@ -7,22 +7,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            database_operations=[],
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="SelectedAdministrativeCriteria",
-                    name="certified",
-                ),
-            ],
-        ),
-        migrations.SeparateDatabaseAndState(
-            database_operations=[],
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="GEIQSelectedAdministrativeCriteria",
-                    name="certified",
-                ),
-            ],
-        ),
+        migrations.RemoveField(model_name="SelectedAdministrativeCriteria", name="certified"),
+        migrations.RemoveField(model_name="GEIQSelectedAdministrativeCriteria", name="certified"),
     ]
