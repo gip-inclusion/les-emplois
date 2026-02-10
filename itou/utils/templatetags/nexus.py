@@ -231,46 +231,6 @@ def get_template_context(context, service):
             "find_out_url": "https://pilotage.inclusion.beta.gouv.fr/",
             "id": "pilotage",
         },
-        Service.COMMUNAUTE: {
-            "name": "La Communauté de l’inclusion",
-            "description": "L’espace d’entraide des professionnels de l’inclusion.",
-            "logo": "logo-communaute-inclusion-mono.svg",
-            "items_short": [
-                "Forum de discussion",
-                "14 000 utilisateurs actifs",
-                "Fiches métiers",
-            ],
-            "items_long": [
-                "Posez directement votre question aux 14 000 utilisateurs actifs",
-                "Trouvez une information parmi les 8 000 échanges entre pairs",
-                "Améliorez vos pratiques professionnelles en lisant nos fiches pratiques",
-            ],
-            "activate_button": format_html(
-                """
-                <a href="{}" class="btn btn-ico btn-primary" {}>
-                    <i class="ri-toggle-line" aria-hidden="true"></i>
-                    <span>Activer ce service</span>
-                </a>
-                """,
-                context["communaute_url"],
-                matomo_event("nexus", "activer-service", Service.COMMUNAUTE),
-            ),
-            "responsive_buttons": format_html(
-                """
-                <a href="{}" class="btn btn-link has-external-link ps-0" {} target="_blank">En savoir plus</a>
-                <a href="{}" class="btn btn-ico btn-primary" {}>
-                    <i class="ri-toggle-line" aria-hidden="true"></i>
-                    <span>Activer ce service</span>
-                </a>
-                """,
-                "https://communaute.inclusion.gouv.fr/",
-                matomo_event("nexus", "decouvrir-service", Service.COMMUNAUTE),
-                context["communaute_url"],
-                matomo_event("nexus", "activer-service", Service.COMMUNAUTE),
-            ),
-            "find_out_url": "https://communaute.inclusion.gouv.fr/",
-            "id": "communaute",
-        },
     }
     template_context.update(services_context[service])
     return template_context

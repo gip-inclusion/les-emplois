@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
                     "service",
                     models.CharField(
                         choices=[
-                            ("la-communaute", "La communauté de l’inclusion"),
                             ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois de l’inclusion"),
@@ -216,7 +215,6 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("la-communaute", "La communauté de l’inclusion"),
                             ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois de l’inclusion"),
@@ -355,7 +353,6 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("la-communaute", "La communauté de l’inclusion"),
                             ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois de l’inclusion"),
@@ -412,7 +409,6 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("la-communaute", "La communauté de l’inclusion"),
                             ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
                             ("les-emplois", "les emplois de l’inclusion"),

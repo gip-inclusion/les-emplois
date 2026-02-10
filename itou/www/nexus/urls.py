@@ -13,7 +13,6 @@ urlpatterns = [
     path("login", views.login, name="login"),
     path("homepage", views.HomePageView.as_view(), name="homepage"),
     path("structures", views.StructuresView.as_view(), name="structures"),
-    path("service/communaute", views.CommunauteView.as_view(), name="communaute"),
     path("service/dora", views.DoraView.as_view(), name="dora"),
     path("service/emplois", views.EmploisView.as_view(), name="emplois"),
     path("service/marche", views.MarcheView.as_view(), name="marche"),

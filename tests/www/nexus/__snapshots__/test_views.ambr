@@ -1,143 +1,4 @@
 # serializer version: 1
-# name: TestCommunauteView.test_activated
-  '''
-  <main class="s-main" id="main" role="main">
-      <div aria-atomic="true" aria-live="polite" class="toast-container">
-      </div>
-      <section class="s-title-02">
-          <div class="s-title-02__container container">
-              <div class="s-title-02__row row">
-                  <div class="s-title-02__col col-12">
-                      <div class="c-title align-items-center">
-                          <div class="c-title__main">
-                              <h1>
-                                  <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                  Aide de la communauté
-                                  <span class="badge badge-sm rounded-pill bg-info-lighter text-info">
-                                      <i aria-hidden="true" class="ri-check-line">
-                                      </i>
-                                      Activé
-                                  </span>
-                              </h1>
-                          </div>
-                          <div class="c-title__service d-none d-lg-block">
-                              <img alt="La communauté de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion.svg"/>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="s-section__col col-12">
-                      <div class="text-center">
-                          <div class="mb-3 mb-md-4">
-                              <img alt="" height="152" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-communaute.png" width="216"/>
-                          </div>
-                          <h2 class="h3">
-                              L’espace d’entraide des professionnels de l’inclusion
-                          </h2>
-                          <p class="mb-md-4">
-                              Posez directement votre question aux 14 000 utilisateurs actifs.
-                              <br/>
-                              Trouvez une information parmi les 8 000 échanges entre pairs.
-                              <br/>
-                              Améliorez vos pratiques professionnelles en lisant nos fiches pratiques.
-                          </p>
-                          <div class="d-flex justify-content-center gap-2 flex-column flex-sm-row">
-                              <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/search" target="_blank">
-                                  <span>
-                                      Lancer une recherche
-                                  </span>
-                              </a>
-                              <a class="btn btn-lg btn-outline-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/forum/espace-d%C3%A9changes-113/topic/create/" target="_blank">
-                                  <span>
-                                      Poser une question
-                                  </span>
-                              </a>
-                          </div>
-                          <a aria-label="Découvrir La Communauté de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
-                              Découvrir La Communauté de l’inclusion
-                          </a>
-                          <div class="text-center">
-                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_communaute.png" width="1200"/>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-  </main>
-  
-  '''
-# ---
-# name: TestCommunauteView.test_not_activated
-  '''
-  <main class="s-main" id="main" role="main">
-      <div aria-atomic="true" aria-live="polite" class="toast-container">
-      </div>
-      <section class="s-title-02">
-          <div class="s-title-02__container container">
-              <div class="s-title-02__row row">
-                  <div class="s-title-02__col col-12">
-                      <div class="c-title align-items-center">
-                          <div class="c-title__main">
-                              <h1>
-                                  <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                  Aide de la communauté
-                              </h1>
-                          </div>
-                          <div class="c-title__service d-none d-lg-block">
-                              <img alt="La communauté de l’inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion.svg"/>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-      <section class="s-section">
-          <div class="s-section__container container">
-              <div class="s-section__row row">
-                  <div class="s-section__col col-12">
-                      <div class="text-center">
-                          <div class="mb-3 mb-md-4">
-                              <img alt="" height="152" src="/static/vendor/theme-inclusion/images/nexus/nx-illustration-communaute.png" width="216"/>
-                          </div>
-                          <h2 class="h3">
-                              L’espace d’entraide des professionnels de l’inclusion
-                          </h2>
-                          <p class="mb-md-4">
-                              Posez directement votre question aux 14 000 utilisateurs actifs.
-                              <br/>
-                              Trouvez une information parmi les 8 000 échanges entre pairs.
-                              <br/>
-                              Améliorez vos pratiques professionnelles en lisant nos fiches pratiques.
-                          </p>
-                          <a class="btn btn-lg btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
-                              <i aria-hidden="true" class="ri-toggle-line">
-                              </i>
-                              <span>
-                                  Activer ce service
-                              </span>
-                          </a>
-                          <br/>
-                          <a aria-label="Découvrir La Communauté de l’inclusion (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
-                              Découvrir La Communauté de l’inclusion
-                          </a>
-                          <div class="text-center">
-                              <img alt="" class="img-fluid" src="/static/img/nexus/presentation_communaute.png" width="1200"/>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
-  </main>
-  
-  '''
-# ---
 # name: TestContactView.test_display
   '''
   <main class="s-main" id="main" role="main">
@@ -657,24 +518,6 @@
                                   </a>
                               </div>
                           </div>
-                          <div class="col mb-3 mb-md-4">
-                              <div class="c-box h-100">
-                                  <div class="d-flex align-items-center gap-3">
-                                      <img alt="La communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                      <div>
-                                          <strong class="d-block fs-lg">
-                                              La communauté de l’inclusion
-                                          </strong>
-                                          <p class="mb-0 fs-sm">
-                                              Plateforme de l’inclusion
-                                          </p>
-                                      </div>
-                                  </div>
-                                  <a aria-label="Accéder à la communauté de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr%2Ftopics%2F" target="_blank">
-                                      Accéder
-                                  </a>
-                              </div>
-                          </div>
                       </div>
                   </div>
               </div>
@@ -932,45 +775,6 @@
                                       </a>
                                   </div>
                               </li>
-                              <li class="list-group-item list-group-item-action">
-                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                          <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                          <div>
-                                              <strong class="d-block fs-lg">
-                                                  La Communauté de l’inclusion
-                                              </strong>
-                                              <p class="mb-0 fs-sm">
-                                                  L’espace d’entraide des professionnels de l’inclusion.
-                                              </p>
-                                              <ul class="list-inline fs-xs">
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Forum de discussion
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      14 000 utilisateurs actifs
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Fiches métiers
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </a>
-                                  </div>
-                              </li>
                           </ul>
                       </div>
                   </div>
@@ -1066,25 +870,6 @@
                                                   </div>
                                               </div>
                                               <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block fs-sm">
-                                                          La Communauté de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0 fs-sm">
-                                                          L’espace d’entraide des professionnels de l’inclusion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="communauteInfoMore" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoMore" data-bs-toggle="collapse" type="button">
                                                   <i aria-hidden="true" class="ri-arrow-drop-right-line">
                                                   </i>
                                               </button>
@@ -1285,54 +1070,6 @@
                                           </li>
                                       </ul>
                                       <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
-                                          En savoir plus
-                                      </a>
-                                  </div>
-                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="communauteInfoMore">
-                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                              <img alt="La Communauté de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="60"/>
-                                              <div>
-                                                  <strong class="d-block fs-lg">
-                                                      La Communauté de l’inclusion
-                                                  </strong>
-                                                  <p class="mb-0 fs-sm">
-                                                      Plateforme de l’inclusion
-                                                  </p>
-                                              </div>
-                                          </div>
-                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </a>
-                                      </div>
-                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
-                                          L’espace d’entraide des professionnels de l’inclusion.
-                                      </p>
-                                      <ul class="list-unstyled mb-3 mb-md-4">
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Posez directement votre question aux 14 000 utilisateurs actifs
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Trouvez une information parmi les 8 000 échanges entre pairs
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
-                                              </span>
-                                          </li>
-                                      </ul>
-                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
                                           En savoir plus
                                       </a>
                                   </div>
@@ -1540,57 +1277,6 @@
                                                   En savoir plus
                                               </a>
                                               <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </a>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3 position-relative">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block">
-                                                          La Communauté de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0">
-                                                          L’espace d’entraide des professionnels de l’inclusion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="communauteInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoCollapse" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="communauteInfoCollapse">
-                                              <ul class="list-unstyled my-3">
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Posez directement votre question aux 14 000 utilisateurs actifs
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Trouvez une information parmi les 8 000 échanges entre pairs
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
-                                                      </span>
-                                                  </li>
-                                              </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
                                                   <i aria-hidden="true" class="ri-toggle-line">
                                                   </i>
                                                   <span>
@@ -1820,45 +1506,6 @@
                                       </a>
                                   </div>
                               </li>
-                              <li class="list-group-item list-group-item-action">
-                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                          <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                          <div>
-                                              <strong class="d-block fs-lg">
-                                                  La Communauté de l’inclusion
-                                              </strong>
-                                              <p class="mb-0 fs-sm">
-                                                  L’espace d’entraide des professionnels de l’inclusion.
-                                              </p>
-                                              <ul class="list-inline fs-xs">
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Forum de discussion
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      14 000 utilisateurs actifs
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Fiches métiers
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </a>
-                                  </div>
-                              </li>
                           </ul>
                       </div>
                   </div>
@@ -1935,25 +1582,6 @@
                                                   </div>
                                               </div>
                                               <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block fs-sm">
-                                                          La Communauté de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0 fs-sm">
-                                                          L’espace d’entraide des professionnels de l’inclusion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="communauteInfoMore" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoMore" data-bs-toggle="collapse" type="button">
                                                   <i aria-hidden="true" class="ri-arrow-drop-right-line">
                                                   </i>
                                               </button>
@@ -2106,54 +1734,6 @@
                                           </li>
                                       </ul>
                                       <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
-                                          En savoir plus
-                                      </a>
-                                  </div>
-                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="communauteInfoMore">
-                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                              <img alt="La Communauté de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="60"/>
-                                              <div>
-                                                  <strong class="d-block fs-lg">
-                                                      La Communauté de l’inclusion
-                                                  </strong>
-                                                  <p class="mb-0 fs-sm">
-                                                      Plateforme de l’inclusion
-                                                  </p>
-                                              </div>
-                                          </div>
-                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </a>
-                                      </div>
-                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
-                                          L’espace d’entraide des professionnels de l’inclusion.
-                                      </p>
-                                      <ul class="list-unstyled mb-3 mb-md-4">
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Posez directement votre question aux 14 000 utilisateurs actifs
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Trouvez une information parmi les 8 000 échanges entre pairs
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
-                                              </span>
-                                          </li>
-                                      </ul>
-                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
                                           En savoir plus
                                       </a>
                                   </div>
@@ -2310,57 +1890,6 @@
                                                   En savoir plus
                                               </a>
                                               <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </a>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3 position-relative">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="La Communauté de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-communaute-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block">
-                                                          La Communauté de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0">
-                                                          L’espace d’entraide des professionnels de l’inclusion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="communauteInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur La Communauté de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#communauteInfoCollapse" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="communauteInfoCollapse">
-                                              <ul class="list-unstyled my-3">
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Posez directement votre question aux 14 000 utilisateurs actifs
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Trouvez une information parmi les 8 000 échanges entre pairs
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Améliorez vos pratiques professionnelles en lisant nos fiches pratiques
-                                                      </span>
-                                                  </li>
-                                              </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="https://communaute.inclusion.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="la-communaute" href="/portal/auto-login?next_url=https%3A%2F%2Fcommunaute.inclusion.gouv.fr">
                                                   <i aria-hidden="true" class="ri-toggle-line">
                                                   </i>
                                                   <span>
@@ -2572,14 +2101,6 @@
                               </span>
                           </a>
                       </li>
-                      <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Aide de la communauté
-                              </span>
-                          </a>
-                      </li>
                   </ul>
               </nav>
               <div class="mt-3">
@@ -2761,14 +2282,6 @@
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Aide de la communauté
                               </span>
                           </a>
                       </li>
@@ -2956,14 +2469,6 @@
                               </span>
                           </a>
                       </li>
-                      <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Aide de la communauté
-                              </span>
-                          </a>
-                      </li>
                   </ul>
               </nav>
               <div class="mt-3">
@@ -3134,14 +2639,6 @@
                               <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
                               <span class="d-md-none d-xl-inline-flex flex-grow-1">
                                   Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Aide de la communauté" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/communaute">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-communaute.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Aide de la communauté
                               </span>
                           </a>
                       </li>
