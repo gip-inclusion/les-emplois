@@ -45,15 +45,15 @@ class NexusMixin:
         if not (request.user.is_employer or request.user.is_prescriber):
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
 
-        self.service_users = get_service_users(user=request.user)
+        service_users = get_service_users(user=request.user)
 
         # Retrieve user data from nexus ressources
-        self.activated_services = {user.source for user in self.service_users}
+        self.activated_services = {user.source for user in service_users}
 
-        if Auth.PRO_CONNECT not in {user.auth for user in self.service_users}:
+        if Auth.PRO_CONNECT not in {user.auth for user in service_users}:
             raise PermissionDenied("Seul un utilisateur ayant un compte ProConnect peut accéder à cette page.")
 
-        if {user.kind for user in self.service_users if user.kind} == {NexusUserKind.GUIDE}:
+        if {user.kind for user in service_users if user.kind} == {NexusUserKind.GUIDE}:
             self.user_kind = NexusUserKind.GUIDE
         else:
             self.user_kind = NexusUserKind.FACILITY_MANAGER
