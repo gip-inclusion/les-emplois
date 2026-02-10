@@ -8,7 +8,8 @@
                       <div class="c-form">
                           <form class="js-prevent-multiple-submit" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <div class="form-group form-group-required"><label class="form-label" for="id_geiq_comment">Renseignez un commentaire</label><textarea class="form-control" cols="40" id="id_geiq_comment" name="geiq_comment" required="" rows="10"></textarea></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_geiq_comment">Renseignez un commentaire</label><textarea aria-describedby="id_geiq_comment_helptext" class="form-control" cols="40" id="id_geiq_comment" name="geiq_comment" required="" rows="10"></textarea><div class="form-text" id="id_geiq_comment_helptext">Ce commentaire est destiné à la DDETS/DREETS. Il vous permet de fournir toutes les informations que vous jugez utiles pour compléter votre dossier.</div>
+  </div>
                               
                                   
   
