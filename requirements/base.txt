@@ -660,7 +660,9 @@ httpcore==1.0.9 \
 httpx==0.28.1 \
     --hash=sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   itoutils
 huey==2.6.0 \
     --hash=sha256:1b9df9d370b49c6d5721ba8a01ac9a787cf86b3bdc584e4679de27b920395c3f \
     --hash=sha256:8d11f8688999d65266af1425b831f6e3773e99415027177b8734b0ffd5e251f6
@@ -682,9 +684,9 @@ invoke==2.2.1 \
     --hash=sha256:2413bc441b376e5cd3f55bb5d364f973ad8bdd7bf87e53c79de3c11bf3feecc8 \
     --hash=sha256:515bf49b4a48932b79b024590348da22f39c4942dff991ad1fb8b8baea1be707
     # via paramiko
-itoutils[django]==26.1.28.1 \
-    --hash=sha256:86b63873ee8c69bc534295f65e0cca60659036168d7f7b6059eab475911dc983 \
-    --hash=sha256:917106653b92c21017882f3ab323c8706201ff46b893f05af52ddb4aae5a9a3a
+itoutils[django]==26.2.9.0 \
+    --hash=sha256:66da5ef675755389085e3d307d69a85bf2970a5fa02d316b8dc98879c6cd44cc \
+    --hash=sha256:e7f2208b0e818f0018469f566053f4a57e54b203fa10d95c439e76e17de6bfdd
     # via -r requirements/base.in
 jmespath==1.1.0 \
     --hash=sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d \
