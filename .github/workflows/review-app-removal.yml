@@ -18,7 +18,9 @@ env:
 jobs:
   delete:
     runs-on: ubuntu-latest
-    if: github.event.label.name == '1-recette-jetable' || contains( github.event.pull_request.labels.*.name, '1-recette-jetable')
+    if: >
+      (github.event.action == 'unlabeled' && github.event.label.name == '1-recette-jetable')
+      || (github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, '1-recette-jetable'))
     permissions: {}
 
     steps:
