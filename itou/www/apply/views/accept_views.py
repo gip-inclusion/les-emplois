@@ -1,6 +1,5 @@
 import logging
 
-from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -67,14 +66,6 @@ def start_accept_wizard(request, job_application_id):
         reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id}),
     )
 
-    if job_application.eligibility_diagnosis_by_siae_required():
-        messages.error(
-            request,
-            "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.",
-            extra_tags="toast",
-        )
-        return HttpResponseRedirect(next_url)
-
     data = {
         "reset_url": next_url,
         "job_application_id": job_application_id,
@@ -122,6 +113,13 @@ class AcceptWizardMixin:
             "reset_url": self.get_reset_url(),
         }
 
+    def get_eligibility_view_name(self):
+        if self.job_application.eligibility_diagnosis_by_siae_required():
+            return "apply:eligibility"
+        elif self.company.kind == CompanyKind.GEIQ and self.geiq_eligibility_diagnosis is None:
+            return "apply:geiq_eligibility"
+        return None
+
 
 class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJobSeekerInfosView):
     template_name = "apply/process_accept_fill_job_seeker_infos_step.html"
@@ -163,7 +161,14 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
         return None
 
     def get_success_url(self):
-        return reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
+        next_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
+        if eligibility_view_name := self.get_eligibility_view_name():
+            return reverse(
+                eligibility_view_name,
+                kwargs={"job_application_id": self.job_application.pk},
+                query={"back_url": self.get_back_url(), "next_url": next_url},
+            )
+        return next_url
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -234,7 +239,15 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
         return self.request.get_full_path()
 
     def get_back_url(self):
-        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+        back_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+        if eligibility_view_name := self.get_eligibility_view_name():
+            # Typically if GEIQ diagnosis wasn't created
+            return reverse(
+                eligibility_view_name,
+                kwargs={"job_application_id": self.job_application.pk},
+                query={"back_url": back_url, "next_url": self.request.get_full_path()},
+            )
+        return back_url
 
     def get_success_url(self):
         return self.reset_url

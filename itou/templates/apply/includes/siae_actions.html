@@ -10,7 +10,7 @@
     <h2 class="visually-hidden">Actions rapides</h2>
     {% if not job_application.state.is_accepted %}
         <div class="form-row align-items-center gx-3">
-            <div class="form-group col-12 col-lg-auto">{% accept_button job_application geiq_eligibility_diagnosis %}</div>
+            <div class="form-group col-12 col-lg-auto">{% accept_button job_application %}</div>
             <div class="form-group col-12 col-lg-auto">
                 {% if can_archive %}
                     <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
