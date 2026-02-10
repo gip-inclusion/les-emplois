@@ -136,6 +136,10 @@ class GeiqCommentForm(forms.ModelForm):
         labels = {
             "geiq_comment": "Renseignez un commentaire",
         }
+        help_texts = {
+            "geiq_comment": "Ce commentaire est destiné à la DDETS/DREETS. Il vous permet de fournir toutes "
+            "les informations que vous jugez utiles pour compléter votre dossier.",
+        }
 
     def __init__(self, *args, instance, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
