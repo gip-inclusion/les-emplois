@@ -28,7 +28,8 @@ class TestRetryCertifyCriteria:
         # Just created, ignored.
         factory(criteria_certification_error=True)
         to_retry = []
-        with freeze_time(timezone.now() - timedelta(days=2)):
+        real_now = timezone.now()
+        with freeze_time(real_now - timedelta(days=2)):
             # Ignored criteria:
             factory(criteria_certified=True)
             factory(criteria_not_certified=True)
@@ -41,6 +42,10 @@ class TestRetryCertifyCriteria:
                 eligibility_diagnosis=crit_with_accepted_job_app.eligibility_diagnosis,
                 hiring_start_at=timezone.localdate(),
                 state=JobApplicationState.ACCEPTED,
+            )
+            factory(
+                criteria_certification_error=True,
+                last_certification_attempt_at=real_now - timedelta(days=6, hours=23, minutes=59),
             )
 
             # Criteria to retry:
