@@ -204,7 +204,7 @@ class TestIAEEligibilityDetail:
 
     @property
     def template(self):
-        return load_template("apply/includes/eligibility_diagnosis.html")
+        return load_template("eligibility/includes/iae/eligibility_diagnosis.html")
 
     def default_params(self, diagnosis):
         job_application = JobApplicationFactory(
@@ -341,7 +341,7 @@ class TestGEIQEligibilityDetail:
 
     @property
     def template(self):
-        return load_template("apply/includes/geiq/geiq_diagnosis_details.html")
+        return load_template("eligibility/includes/geiq/diagnosis_details.html")
 
     def default_params_geiq(self, diagnosis, job_application):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
@@ -460,7 +460,9 @@ class TestGEIQEligibilityDetail:
 class TestCertifiedBadge:
     def _render(self, **kwargs):
         kwargs.setdefault("request", {"from_authorized_prescriber": True})
-        return load_template("apply/includes/selected_administrative_criteria_display.html").render(Context(kwargs))
+        return load_template("eligibility/includes/selected_administrative_criteria_display.html").render(
+            Context(kwargs)
+        )
 
     def test_certifiable_job_seeker_without_certifiable_criteria(self, factory):
         # No certifiable criteria

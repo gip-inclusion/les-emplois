@@ -57,7 +57,7 @@
                             {% endif %}
                         </p>
                         {# Job seekers don’t see certified criteria, don’t bother with job_application. #}
-                        {% include "includes/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True job_application=None itou_help_center_url=itou_help_center_url request=request only %}
+                        {% include "eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html" with eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False flat_criteria_list=True job_application=None itou_help_center_url=itou_help_center_url request=request only %}
                     </div>
                 {% endif %}
             {% elif kind == "GEIQ" %}
@@ -74,7 +74,7 @@
                                 {% for criterion in eligibility_diagnosis.selected_administrative_criteria_for_display|dictsort:"administrative_criteria.ui_rank" %}
                                     <li>
                                         {# Job seekers don’t see certified criteria, don’t bother with job_application. #}
-                                        {% include "apply/includes/selected_administrative_criteria_display.html" with criterion=criterion job_application=None request=request only %}
+                                        {% include "eligibility/includes/selected_administrative_criteria_display.html" with criterion=criterion job_application=None request=request only %}
                                     </li>
                                 {% endfor %}
                             </ul>

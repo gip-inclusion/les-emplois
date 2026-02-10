@@ -16,7 +16,7 @@
         <h3>Niveau 1</h3>
 
         {% for field in level_1_fields %}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endfor %}
     {% endif %}
 
@@ -24,9 +24,9 @@
         <h3>Niveau 2</h3>
 
         {% for field in level_2_fields %}
-            {# notice that eligibility/includes/criteria_input.html requires form_administrative_criteria.OBJECTS #}
+            {# notice that eligibility/includes/iae/criteria_input.html requires form_administrative_criteria.OBJECTS #}
             {# altough field is already sent ~ vincentporte's note - april 2022#}
-            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+            {% include "eligibility/includes/iae/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endfor %}
     {% endif %}
 

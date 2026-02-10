@@ -1554,7 +1554,7 @@ class TestApplyAsAuthorizedPrescriber:
             response = client.get(next_url)
             assertContains(response, CONFIRM_RESET_MARKUP % reset_url_company)
             assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
-            assertTemplateUsed(response, "eligibility/includes/criteria_filled_from_job_seeker.html", count=1)
+            assertTemplateUsed(response, "eligibility/includes/iae/criteria_filled_from_job_seeker.html", count=1)
 
         expected_snapshot = pretty_indented(
             parse_response_to_soup(
@@ -3816,7 +3816,7 @@ class TestApplicationView:
         assert new_eligibility_diagnosis.author == prescriber
 
     def test_application_iae_eligibility_prefilled(self, client):
-        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+        PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
         job_seeker = JobSeekerFactory(last_checked_at=timezone.now() - datetime.timedelta(hours=25))
         prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
@@ -5754,7 +5754,7 @@ class TestEligibilityForHire:
         )
 
     def test_job_seeker_without_valid_diagnosis(self, client):
-        PREFILLED_TEMPLATE = "eligibility/includes/criteria_filled_from_job_seeker.html"
+        PREFILLED_TEMPLATE = "eligibility/includes/iae/criteria_filled_from_job_seeker.html"
         # Profile last checked a long time ago to prevent pre-filled criteria
         self.job_seeker.last_checked_at = timezone.now() - datetime.timedelta(days=10)
         self.job_seeker.save(update_fields=["last_checked_at"])
