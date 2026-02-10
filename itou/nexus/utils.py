@@ -6,7 +6,6 @@ from itou.users.enums import IdentityProvider
 
 
 SERVICE_MAPPING = {
-    Service.COMMUNAUTE: "la-communauté",
     Service.DORA: "dora",
     Service.EMPLOIS: "emplois-de-linclusion",
     Service.MARCHE: "le-marché",

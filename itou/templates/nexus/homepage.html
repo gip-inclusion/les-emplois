@@ -85,12 +85,6 @@
                                     {% endcomponent_box_nexus_activated_service %}
                                 </div>
                             {% endif %}
-                            {% if Service.COMMUNAUTE in activated_services %}
-                                <div class="col mb-3 mb-md-4">
-                                    {% component_box_nexus_activated_service name="La communauté de l’inclusion" logo="logo-communaute-inclusion-mono.svg" url=communaute_url aria_label="Accéder à la communauté de l’inclusion" service=Service.COMMUNAUTE %}
-                                    {% endcomponent_box_nexus_activated_service %}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -126,9 +120,6 @@
                                 {% endif %}
                                 {% if Service.PILOTAGE not in activated_services %}
                                     {% new_service_v1 service=Service.PILOTAGE %}
-                                {% endif %}
-                                {% if Service.COMMUNAUTE not in activated_services %}
-                                    {% new_service_v1 service=Service.COMMUNAUTE %}
                                 {% endif %}
                             </ul>
                         </div>
@@ -167,9 +158,6 @@
                                         {% if Service.PILOTAGE not in activated_services %}
                                             {% new_service_v2 service=Service.PILOTAGE %}
                                         {% endif %}
-                                        {% if Service.COMMUNAUTE not in activated_services %}
-                                            {% new_service_v2 service=Service.COMMUNAUTE %}
-                                        {% endif %}
                                     </ul>
                                 </div>
                                 <div class="col-7" id="nxAccordionInfoMore">
@@ -187,9 +175,6 @@
                                     {% endif %}
                                     {% if Service.PILOTAGE not in activated_services %}
                                         {% new_service_v2_details service=Service.PILOTAGE %}
-                                    {% endif %}
-                                    {% if Service.COMMUNAUTE not in activated_services %}
-                                        {% new_service_v2_details service=Service.COMMUNAUTE %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -211,9 +196,6 @@
                                         {% endif %}
                                         {% if Service.PILOTAGE not in activated_services %}
                                             {% new_service_v2_responsive service=Service.PILOTAGE %}
-                                        {% endif %}
-                                        {% if Service.COMMUNAUTE not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.COMMUNAUTE %}
                                         {% endif %}
                                     </ul>
                                 </div>

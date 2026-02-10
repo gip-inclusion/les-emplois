@@ -94,20 +94,12 @@ class NexusMixin:
 
         context["pilotage_url"] = reverse("dashboard:index_stats")
 
-        if Service.COMMUNAUTE in self.activated_services:
-            context["communaute_url"] = autologin_proconnect(
-                "https://communaute.inclusion.gouv.fr/topics/", self.request.user
-            )
-        else:
-            context["communaute_url"] = autologin_proconnect("https://communaute.inclusion.gouv.fr", self.request.user)
-
         if settings.ITOU_ENVIRONMENT not in [ItouEnvironment.PROD, ItouEnvironment.TEST]:
             # mask outgoing prod links on non prod live instances
             context["dora_url"] = "https://staging.dora.inclusion.gouv.fr/"
             context["marche_url"] = "https://staging.lemarche.inclusion.beta.gouv.fr/"
             if Service.MON_RECAP in self.activated_services:
                 context["monrecap_url"] = None  # Only keep the activation link
-            context["communaute_url"] = None  # No demo available
 
         context["menu"] = self.menu
         if self.menu in Service:
@@ -138,11 +130,6 @@ def activate_mon_recap(request):
         request, f"Service activé||Vous avez bien activé le service {Service.MON_RECAP.label}", extra_tags="toast"
     )
     return HttpResponseRedirect(next_url)
-
-
-class CommunauteView(NexusMixin, TemplateView):
-    template_name = "nexus/communaute.html"
-    menu = Service.COMMUNAUTE
 
 
 class DoraView(NexusMixin, TemplateView):

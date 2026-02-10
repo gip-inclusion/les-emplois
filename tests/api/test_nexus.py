@@ -158,9 +158,9 @@ class TestUserAPI(NexusApiTestMixin):
         )
 
     def test_delete_user(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
-        user_1 = NexusUserFactory(source=Service.COMMUNAUTE)
-        user_2 = NexusMembershipFactory(source=Service.COMMUNAUTE).user
+        api_client = self.api_client(service=Service.MARCHE)
+        user_1 = NexusUserFactory(source=Service.MARCHE)
+        user_2 = NexusMembershipFactory(source=Service.MARCHE).user
 
         response = api_client.delete(
             self.url,
@@ -173,7 +173,7 @@ class TestUserAPI(NexusApiTestMixin):
         assert NexusStructure.objects.count() == 1
 
     def test_delete_unknown_user(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
+        api_client = self.api_client(service=Service.MARCHE)
         response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
         assert response.status_code == 200
 
@@ -377,9 +377,9 @@ class TestStructureAPI(NexusApiTestMixin):
         self.assert_structure_equals(strucure, Service.DORA, data[0])
 
     def test_delete_structure(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
-        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
-        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        api_client = self.api_client(service=Service.MARCHE)
+        membership_1 = NexusMembershipFactory(source=Service.MARCHE)
+        membership_2 = NexusMembershipFactory(source=Service.MARCHE)
 
         response = api_client.delete(
             self.url,
@@ -392,7 +392,7 @@ class TestStructureAPI(NexusApiTestMixin):
         assert NexusStructure.objects.count() == 0
 
     def test_delete_unknown_structure(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
+        api_client = self.api_client(service=Service.MARCHE)
 
         response = api_client.delete(self.url, data=[{"id": "my-id"}], content_type="application/json")
         assert response.status_code == 200
@@ -542,9 +542,9 @@ class TestMembershipsAPI(NexusApiTestMixin):
         assert NexusMembership.objects.count() == 0
 
     def test_delete_memberships(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
-        membership_1 = NexusMembershipFactory(source=Service.COMMUNAUTE)
-        membership_2 = NexusMembershipFactory(source=Service.COMMUNAUTE)
+        api_client = self.api_client(service=Service.MARCHE)
+        membership_1 = NexusMembershipFactory(source=Service.MARCHE)
+        membership_2 = NexusMembershipFactory(source=Service.MARCHE)
 
         response = api_client.delete(
             self.url,
@@ -557,7 +557,7 @@ class TestMembershipsAPI(NexusApiTestMixin):
         assert NexusMembership.objects.count() == 0
 
     def test_delete_unknown_structure(self):
-        api_client = self.api_client(service=Service.COMMUNAUTE)
+        api_client = self.api_client(service=Service.MARCHE)
 
         response = api_client.delete(self.url, data=[{"id": "my-di"}], content_type="application/json")
         assert response.status_code == 200

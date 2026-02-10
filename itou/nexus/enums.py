@@ -6,7 +6,6 @@ from itou.users.enums import UserKind
 
 
 class Service(models.TextChoices):
-    COMMUNAUTE = "la-communaute", "La communauté de l’inclusion"
     DATA_INCLUSION = "data-inclusion", "Data inclusion"
     DORA = "dora", "Dora"
     EMPLOIS = "les-emplois", "les emplois de l’inclusion"
@@ -23,7 +22,6 @@ class Service(models.TextChoices):
             cls.MARCHE,
             cls.MON_RECAP,
             cls.PILOTAGE,
-            cls.COMMUNAUTE,
         ]
 
 
@@ -131,9 +129,6 @@ USER_KIND_MAPPING = {
         "accompagnateur_offreur": NexusUserKind.FACILITY_MANAGER,
         "autre": "",
         "": "",
-    },
-    Service.COMMUNAUTE: {
-        "": "",  # this service does not have a user kind
     },
     Service.PILOTAGE: emplois_kind_mapping,
     Service.MON_RECAP: {

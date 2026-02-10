@@ -94,7 +94,7 @@ class TestLayout:
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
 
         # Ignore NexusUser with empty kind
-        NexusUserFactory(email=user.email, kind="", source=Service.COMMUNAUTE, auth=Auth.PRO_CONNECT)
+        NexusUserFactory(email=user.email, kind="", source=Service.MARCHE, auth=Auth.PRO_CONNECT)
         response = client.get(reverse("nexus:homepage"))
         assert pretty_indented(parse_response_to_soup(response, "#header")) == snapshot(name="guide")
 
@@ -199,30 +199,6 @@ class TestActivateMonRecapView:
 
         response = client.get(self.url)
         assert response.status_code == 405
-
-
-class TestCommunauteView:
-    url = reverse("nexus:communaute")
-
-    def test_activated(self, client, snapshot):
-        user = PrescriberFactory()
-        NexusUserFactory(email=user.email, source=Service.COMMUNAUTE, auth=Auth.PRO_CONNECT)
-        client.force_login(user)
-
-        response = client.get(self.url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
-
-    def test_not_activated(self, client, snapshot):
-        user = PrescriberFactory()
-        client.force_login(user)
-
-        response = client.get(self.url)
-        assert pretty_indented(parse_response_to_soup(response, "#main")) == snapshot
-
-    def test_anonymous(self, client):
-        # Don't redirect to les emplois default login page
-        response = client.get(self.url)
-        assertRedirects(response, add_url_params(reverse("nexus:login"), {"next": self.url}))
 
 
 class TestDoraView:
@@ -435,7 +411,6 @@ def test_employer_without_company(client):
 
     assert client.get(reverse("nexus:homepage")).status_code == 200
     assert client.get(reverse("nexus:structures")).status_code == 200
-    assert client.get(reverse("nexus:communaute")).status_code == 200
     assert client.get(reverse("nexus:dora")).status_code == 200
     assert client.get(reverse("nexus:emplois")).status_code == 200
     assert client.get(reverse("nexus:marche")).status_code == 200
