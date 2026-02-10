@@ -94,12 +94,6 @@ EMPLOYEE_CONTRACT_XLSX_FORMAT = {
     "Nombre d’entreprises": with_format(
         Format.INTEGER, lambda contract: contract.other_data.get("mad_nb_entreprises", 0)
     ),
-    "Accompagnement avant contrat (en jours)": with_format(
-        Format.FLOAT, lambda contract: contract.other_data.get("accompagnement_avant_contrat", "")
-    ),
-    "Accompagnement après contrat (en jours)": with_format(
-        Format.FLOAT, lambda contract: contract.other_data.get("accompagnement_apres_contrat", "")
-    ),
     "Heures de suivi de l’évaluation des compétences prévues": with_format(
         Format.FLOAT, lambda contract: contract.other_data.get("heures_suivi_evaluation_competences_geiq_prevues", "")
     ),
