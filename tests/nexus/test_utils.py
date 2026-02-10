@@ -1,10 +1,14 @@
+import random
+
+import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
 from itou.nexus.enums import Service
-from itou.nexus.models import DEFAULT_VALID_SINCE, NexusRessourceSyncStatus
-from itou.nexus.utils import complete_full_sync, init_full_sync
-from tests.nexus.factories import NexusRessourceSyncStatusFactory
+from itou.nexus.models import DEFAULT_VALID_SINCE, ActivatedService, NexusRessourceSyncStatus
+from itou.nexus.utils import build_user, complete_full_sync, get_service_users, init_full_sync, serialize_user
+from tests.nexus.factories import NexusRessourceSyncStatusFactory, NexusUserFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 
 
 def test_init_full_sync():
@@ -46,3 +50,43 @@ def test_complete_full_sync():
     assert api_synced.service == Service.DORA
     assert api_synced.valid_since == start_at
     assert api_synced.in_progress_since is None
+
+
+class TestGetServiceUsers:
+    def test_only_one_kwarg(self):
+        with pytest.raises(AssertionError):
+            get_service_users()
+
+        user = PrescriberFactory()
+
+        with pytest.raises(AssertionError):
+            get_service_users(email=user.email, user=user)
+
+    def test_emplois_user(self):
+        user = PrescriberFactory()
+        expected = [build_user(serialize_user(user), Service.EMPLOIS)]
+        assert get_service_users(user=user) == expected
+        assert get_service_users(email=user.email) == expected
+
+    def test_activated_services(self):
+        user = PrescriberFactory()
+        activated_service = ActivatedService.objects.create(
+            user=user, service=random.choice([Service.PILOTAGE, Service.MON_RECAP])
+        )
+
+        expected = [
+            build_user(serialize_user(user), Service.EMPLOIS),
+            build_user(serialize_user(user), activated_service.service),
+        ]
+        assert get_service_users(user=user) == expected
+        assert get_service_users(email=user.email) == expected
+
+    def test_nexus_user(self):
+        nexus_user = NexusUserFactory()
+
+        assert get_service_users(email=nexus_user.email) == [nexus_user]
+
+    def test_wrong_emplois_user(self):
+        for factory in [JobSeekerFactory, ItouStaffFactory, LaborInspectorFactory]:
+            user = factory()
+            assert get_service_users(email=user.email) == []

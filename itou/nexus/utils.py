@@ -2,7 +2,8 @@ from django.utils import timezone
 
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
 from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.models import User
 
 
 SERVICE_MAPPING = {
@@ -17,6 +18,32 @@ SERVICE_MAPPING = {
 
 def service_id(service, id):
     return f"{SERVICE_MAPPING[service]}--{id}"
+
+
+# ------------------------------------------------
+# Check user
+
+
+def get_service_users(*, email=None, user=None):
+    assert bool(email) ^ bool(user), "One and only one of email and user is required"
+    if email:
+        user = User.objects.filter(
+            email=email,
+            is_active=True,
+            kind__in=[UserKind.PRESCRIBER, UserKind.EMPLOYER],
+        ).first()
+    else:
+        email = email or user.email
+
+    service_users = list(NexusUser.objects.filter(email=email))
+
+    if user:
+        user_data = serialize_user(user)
+        service_users.append(build_user(user_data, Service.EMPLOIS))
+        for activated_service in user.activated_services.all():
+            service_users.append(build_user(user_data, activated_service.service))
+
+    return service_users
 
 
 # ------------------------------------------------
