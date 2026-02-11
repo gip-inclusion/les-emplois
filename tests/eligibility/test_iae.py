@@ -573,15 +573,28 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             id="not-certified",
         ),
         pytest.param(
-            [],
+            [IdentityCertificationAuthorities.API_PARTICULIER],
             {
-                "certification_period": None,
+                "certification_period": InclusiveDateRange(empty=True),
                 "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
                 "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
             },
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["status_code"],
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
             id="not-found",
+        ),
+        pytest.param(
+            [],
+            {
+                "certification_period": None,
+                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
+                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT][
+                    "json"
+                ],
+            },
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["status_code"],
+            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.UNPROCESSABLE_CONTENT]["json"],
+            id="unprocessable-content",
         ),
     ],
 )
