@@ -37,16 +37,15 @@ def certify_criterion_with_api_particulier(criterion):
             user_found = False
             criterion.data_returned_by_api = exc.response.json()
             match exc.response.status_code:
-                case (
-                    # Identity found, but not attached to a data provider
-                    # (no “caisse de rattachement”, or no entry for that
-                    # person in the “caisse de rattachement”).
-                    404
-                    # Identity not found, change the query parameters.
-                    | 422
-                ):
+                case 404:
+                    # No "caisse de rattachement" ⇒ no subsidiary.
                     if "errors" not in criterion.data_returned_by_api:
                         raise
+                    user_found = True  # Found in the SNGI.
+                    criterion.certification_period = InclusiveDateRange(empty=True)
+                    criterion.certified_at = timezone.now()
+                case 422:
+                    # Identity not found, change the query parameters.
                     criterion.certified_at = timezone.now()
                 case 409:
                     # A request using the same token with same parameters is in progress.

@@ -11,6 +11,7 @@ from itou.utils.mocks.api_particulier import (
     RESPONSES,
     ResponseKind,
 )
+from itou.utils.types import InclusiveDateRange
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -89,6 +90,6 @@ def test_not_found(respx_mock, caplog):
     certify_criterion_with_api_particulier(criterion)
     crit = diag.selected_administrative_criteria.get()
     assert crit.data_returned_by_api == response["json"]
-    assert crit.certification_period is None
+    assert crit.certification_period == InclusiveDateRange(empty=True)
     assert "https://fake-api-particulier.com/v3/dss/revenu_solidarite_active/identite" in caplog.text
     assert "nomNaissance=_REDACTED_&prenoms%5B%5D=_REDACTED_" in caplog.text
