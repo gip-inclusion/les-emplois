@@ -541,10 +541,16 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
 @freeze_time("2024-09-12T00:00:00Z")
 @pytest.mark.usefixtures("api_particulier_settings")
 @pytest.mark.parametrize(
-    "EligibilityDiagnosisFactory,identity_certifiers,expected,response_status,response",
+    "EligibilityDiagnosisFactory",
+    [
+        pytest.param(partial(IAEEligibilityDiagnosisFactory, from_employer=True), id="iae"),
+        pytest.param(partial(GEIQEligibilityDiagnosisFactory, from_employer=True), id="geiq"),
+    ],
+)
+@pytest.mark.parametrize(
+    "identity_certifiers,expected,response_status,response",
     [
         pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
@@ -553,22 +559,9 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             },
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["status_code"],
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
-            id="iae-certified",
+            id="certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
-            [IdentityCertificationAuthorities.API_PARTICULIER],
-            {
-                "certification_period": InclusiveDateRange(datetime.date(2024, 8, 1)),
-                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
-            },
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["status_code"],
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.CERTIFIED]["json"],
-            id="geiq-certified",
-        ),
-        pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             [IdentityCertificationAuthorities.API_PARTICULIER],
             {
                 "certification_period": InclusiveDateRange(empty=True),
@@ -577,22 +570,9 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             },
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["status_code"],
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
-            id="iae-not-certified",
+            id="not-certified",
         ),
         pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
-            [IdentityCertificationAuthorities.API_PARTICULIER],
-            {
-                "certification_period": InclusiveDateRange(empty=True),
-                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
-            },
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["status_code"],
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_CERTIFIED]["json"],
-            id="geiq-not-certified",
-        ),
-        pytest.param(
-            partial(IAEEligibilityDiagnosisFactory, from_employer=True),
             [],
             {
                 "certification_period": None,
@@ -601,19 +581,7 @@ def test_certify_criterion_missing_info(respx_mock, EligibilityDiagnosisFactory)
             },
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["status_code"],
             RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
-            id="iae-not-found",
-        ),
-        pytest.param(
-            partial(GEIQEligibilityDiagnosisFactory, from_employer=True),
-            [],
-            {
-                "certification_period": None,
-                "certified_at": datetime.datetime(2024, 9, 12, tzinfo=datetime.UTC),
-                "data_returned_by_api": RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
-            },
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["status_code"],
-            RESPONSES[AdministrativeCriteriaKind.RSA][ResponseKind.NOT_FOUND]["json"],
-            id="geiq-not-found",
+            id="not-found",
         ),
     ],
 )
