@@ -47,3 +47,22 @@ def test_prescriber_see_history_box(client, factory, assertion):
     url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
     response = client.get(url)
     assertion(response, "<h3>Suivi du candidat</h3>", html=True)
+
+
+def test_job_seeker_referent_heading(client):
+    DEFAULT_HEADING = "<h3>Qui accompagne ce candidat ?</h3>"
+    JOB_SEEKER_HEADING = "<h3>Qui m'accompagne ?</h3>"
+    job_application = JobApplicationFactory()
+    client.force_login(job_application.sender)
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertContains(response, DEFAULT_HEADING, html=True)
+    assertNotContains(response, JOB_SEEKER_HEADING, html=True)
+
+    client.force_login(job_application.job_seeker)
+    url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertNotContains(response, DEFAULT_HEADING, html=True)
+    assertContains(response, JOB_SEEKER_HEADING, html=True)
