@@ -1,0 +1,22 @@
+{% load enums %}
+{% load theme_inclusion %}
+
+
+
+<div class="dropdown dropdown-nexus">
+    <button class="btn btn-outline-primary btn-block dropdown-toggle" type="button" id="dropdownNexusMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span>Mon portail</span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownNexusMenuButton">
+        <div class="dropdown-item">
+            <img src="{% static_theme_images 'logo-nexus-dropdown.svg' %}" alt="Nexus - La plateforme de l'inclusion" height="50" width="133">
+        </div>
+        <div class="dropdown-item">
+            <h1 class="h2 mb-lg-4">Découvrez votre nouveau portail unifié !</h1>
+            <p>Accédez bientôt à l’ensemble de votre offre et de vos informations.</p>
+            <hr>
+            <p>Pour accéder à votre portail, vous devez avoir un compte ProConnect.</p>
+            {% include "pro_connect/includes/button.html" with login=True %}
+        </div>
+    </div>
+</div>

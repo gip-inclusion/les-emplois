@@ -1,10 +1,12 @@
 from django import template
+from django.conf import settings
 from django.template.defaulttags import CsrfTokenNode
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.html import format_html
 
 from itou.nexus.enums import Service
+from itou.users.enums import UserKind
 from itou.utils.templatetags.matomo import matomo_event
 
 
@@ -258,3 +260,30 @@ def new_service_v2_details(context, service):
 def new_service_v2_responsive(context, service):
     template = get_template("nexus/components/new_service_v2_responsive.html")
     return template.render(get_template_context(context, service))
+
+
+@register.simple_tag(takes_context=True)
+def nexus_dropdown(context):
+    dropdown_status = context["request"].nexus_dropdown
+    if dropdown_status.get("mvp-enabled"):
+        if dropdown_status["proconnect"] is False:
+            template = get_template("nexus/components/dropdown_no_proconnect.html")
+            proconnect_params = {
+                # we don't care which kind is chosen since the user already exists so the kind won't be updated
+                "user_kind": UserKind.PRESCRIBER,
+                "previous_url": context["request"].get_full_path(),
+                "next_url": reverse("nexus:homepage"),
+            }
+            pro_connect_url = (
+                reverse("pro_connect:authorize", query=proconnect_params) if settings.PRO_CONNECT_BASE_URL else None
+            )
+            template_context = {"pro_connect_url": pro_connect_url, "matomo_account_type": "non défini"}
+            return template.render(template_context)
+        template = get_template("nexus/components/dropdown.html")
+        template_context = {
+            "user_name": f"{context['user'].first_name} {context['user'].last_name[0]}",
+            "user": context["user"],
+            "activated_services": dropdown_status["activated_services"],
+        }
+        return template.render(template_context)
+    return ""
