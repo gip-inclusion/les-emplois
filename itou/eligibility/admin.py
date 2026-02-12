@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin, messages
 from django.forms import ValidationError
 from django.forms.models import BaseInlineFormSet
@@ -14,6 +15,7 @@ from itou.utils.admin import (
     ReadonlyMixin,
     get_admin_view_link,
 )
+from itou.utils.enums import ItouEnvironment
 
 
 class AbstractSelectedAdministrativeCriteriaInlineFormSet(BaseInlineFormSet):
@@ -39,14 +41,13 @@ class AbstractSelectedAdministrativeCriteriaInline(ItouTabularInline):
     )
     readonly_fields = (
         "certified_at",
-        "certification_period",
         "last_certification_attempt_at",
         "data_returned_by_api",
         "created_at",
     )
 
     def has_change_permission(self, request, obj=None):
-        return False
+        return settings.ITOU_ENVIRONMENT in {ItouEnvironment.DEV, ItouEnvironment.REVIEW_APP}
 
 
 class SelectedAdministrativeCriteriaInline(AbstractSelectedAdministrativeCriteriaInline):
