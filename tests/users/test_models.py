@@ -1322,6 +1322,14 @@ def test_user_first_login(client):
 
 
 class TestJobSeekerAssignment:
+    def test_str(self):
+        organization_id = random.choice([PrescriberOrganizationFactory().pk, None])
+        assignment = JobSeekerAssignmentFactory(prescriber_organization_id=organization_id)
+        assert str(assignment) == (
+            f"Affectation de JobSeeker pk={assignment.job_seeker.pk} à "
+            f"prescriber={assignment.prescriber.pk}, organization={organization_id}"
+        )
+
     @pytest.mark.parametrize("factory", [PrescriberFactory, EmployerFactory, LaborInspectorFactory, ItouStaffFactory])
     def test_is_job_seeker(self, factory):
         not_a_job_seeker = factory()
