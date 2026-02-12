@@ -1667,5 +1667,5 @@ class JobSeekerAssignment(models.Model):
     def __str__(self):
         return (
             f"Affectation de JobSeeker pk={self.job_seeker.pk} à "
-            f"prescriber={self.prescriber.pk}, organization={self.prescriber_organization.pk}"
+            f"prescriber={self.prescriber.pk}, organization={self.prescriber_organization_id}"
         )
