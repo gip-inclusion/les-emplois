@@ -417,7 +417,6 @@ sentry_init()
 SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (
     ItouEnvironment.DEMO,
     ItouEnvironment.PENTEST,
-    ItouEnvironment.REVIEW_APP,
 )
 
 # https://geoservices.ign.fr/documentation/services/services-geoplateforme/geocodage
