@@ -204,7 +204,7 @@ class TestIAEEligibilityDetail:
 
     @property
     def template(self):
-        return load_template("eligibility/includes/iae/eligibility_diagnosis.html")
+        return load_template("eligibility/includes/iae/diagnosis_details.html")
 
     def default_params(self, diagnosis):
         job_application = JobApplicationFactory(

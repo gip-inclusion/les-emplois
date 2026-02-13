@@ -95,7 +95,7 @@
                                     {% include "eligibility/includes/geiq/diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis job_application=job_application request=request itou_help_center_url=ITOU_HELP_CENTER_URL %}
                                 {% else %}
                                     {# Eligibility ------------------------------------------------------------------------- #}
-                                    {% include "eligibility/includes/iae/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company job_application=job_application itou_help_center_url=ITOU_HELP_CENTER_URL %}
+                                    {% include "eligibility/includes/iae/diagnosis_details.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company job_application=job_application itou_help_center_url=ITOU_HELP_CENTER_URL %}
                                 {% endif %}
                             </div>
 
