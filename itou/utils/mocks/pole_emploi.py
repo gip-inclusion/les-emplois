@@ -242,13 +242,13 @@ RESPONSES = {
             "codeRetour": "S002",
             "message": "Aucun approchant trouvé",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": "null",
         },
         ResponseKind.MULTIPLE_USERS_RETURNED: {
             "codeRetour": "S003",
             "message": "Plusieurs usagers trouvés",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": "null",
         },
         # TODO(cms): check if this is common to all endpoints and, if so, add them too.
         ResponseKind.BAD_REQUEST: {
