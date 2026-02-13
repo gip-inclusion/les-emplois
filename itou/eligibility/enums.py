@@ -133,6 +133,7 @@ class AdministrativeCriteriaKind(models.TextChoices):
         )
 
 
-CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = AdministrativeCriteriaKind.certifiable_by_api_particulier().union(
-    AdministrativeCriteriaKind.certifiable_by_api_france_travail()
+CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS = (
+    AdministrativeCriteriaKind.certifiable_by_api_particulier()
+    | AdministrativeCriteriaKind.certifiable_by_api_france_travail()
 )

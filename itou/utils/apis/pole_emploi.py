@@ -23,6 +23,12 @@ class Endpoints(enum.StrEnum):
     RQTH = "/donnees-rqth/v1/rqth"
 
 
+class TopIdentiteCertifiee(enum.StrEnum):
+    YES = "O"
+    NO = "N"
+    NA = "null"
+
+
 # Source:
 # https://francetravail.io/produits-partages/catalogue/offres-emploi/documentation#/api-reference/operations/recupererListeOffre
 OFFERS_MIN_INDEX = 0
@@ -427,7 +433,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             case _ as response_code:
                 raise PoleEmploiAPIBadResponse(response_code=response_code, response_data=data)
 
-        if data["topIdentiteCertifiee"] != "O":
+        if data["topIdentiteCertifiee"] != TopIdentiteCertifiee.YES:
             raise IdentityNotCertified(response_data=data)
 
         return data["jetonUsager"]

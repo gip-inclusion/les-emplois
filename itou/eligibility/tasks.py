@@ -32,7 +32,7 @@ def certify_criterion_with_api_particulier(criterion):
         return
     job_seeker = criterion.eligibility_diagnosis.job_seeker
     if not api_particulier.has_required_info(job_seeker):
-        logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
+        logger.info("Skipping job seeker %s, missing required information for API Particulier.", job_seeker.pk)
         return
 
     criterion.last_certification_attempt_at = timezone.now()
@@ -113,7 +113,7 @@ def certify_criterion_with_api_france_travail(criterion):
     job_seeker = criterion.eligibility_diagnosis.job_seeker
     profile = job_seeker.jobseeker_profile
     if not (len(profile.pole_emploi_id) == 11 or profile.birthdate and profile.nir):
-        logger.info("Skipping job seeker %s, missing required information.", job_seeker.pk)
+        logger.info("Skipping job seeker %s, missing required information for API France Travail.", job_seeker.pk)
         return
 
     criterion.last_certification_attempt_at = timezone.now()
@@ -123,11 +123,13 @@ def certify_criterion_with_api_france_travail(criterion):
         user_found = False
         try:
             data = pe_client.rqth(jobseeker_profile=profile)
-        except (UserDoesNotExist, MultipleUsersReturned, IdentityNotCertified) as e:
+        except (UserDoesNotExist, MultipleUsersReturned) as e:
             logger.info("Could not certify criterion %r: json=%s", criterion, e.response_data)
             criterion.data_returned_by_api = e.response_data
-            if isinstance(e, IdentityNotCertified):
-                criterion.certification_period = InclusiveDateRange(empty=True)
+        except IdentityNotCertified as e:
+            logger.info("Could not certify job seeker %d: json=%s", job_seeker.pk, e.response_data)
+            criterion.data_returned_by_api = e.response_data
+            criterion.certification_period = InclusiveDateRange(empty=True)
         except PoleEmploiAPIBadResponse as e:
             logger.error("Error certifying criterion %r: code=%d json=%s", criterion, e.response_code, e.response_data)
             criterion.data_returned_by_api = e.response_data
@@ -144,13 +146,13 @@ def certify_criterion_with_api_france_travail(criterion):
             raise e
         else:
             user_found = True
+            criterion.certified_at = timezone.now()
             criterion.data_returned_by_api = data["raw_response"]
             criterion.certification_period = (
                 InclusiveDateRange(data["start_at"], data["end_at"])
                 if data["is_certified"]
                 else InclusiveDateRange(empty=True)
             )
-    criterion.certified_at = timezone.now()
     with transaction.atomic():
         criterion.save()
         if user_found:

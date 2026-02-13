@@ -240,8 +240,8 @@ class TestCertifyCriteriaWithFranceTravail:
         criterion.refresh_from_db()
         assert criterion.certified_at is None
         assert (
-            f"Skipping job seeker {eligibility_diagnosis.job_seeker_id}, missing required information."
-            in caplog.messages
+            f"Skipping job seeker {eligibility_diagnosis.job_seeker_id}, missing required information "
+            "for API France Travail." in caplog.messages
         )
 
     @pytest.mark.parametrize(
@@ -355,11 +355,17 @@ class TestCertifyCriteriaWithFranceTravail:
             rechercher_usager_url,
         ]
         criterion.refresh_from_db()
-        assert criterion.certified_at is not None
+        assert criterion.certified_at is None
         assert criterion.data_returned_by_api == json_response
         assert criterion.certification_period == certification_period
         assertQuerySetEqual(eligibility_diagnosis.job_seeker.jobseeker_profile.identity_certifications.all(), [])
-        assert f"Could not certify criterion {criterion!r}: json={json_response}" in caplog.messages
+        if response_kind == ApiPoleEmploiResponseKind.NOT_CERTIFIED:
+            assert (
+                f"Could not certify job seeker {eligibility_diagnosis.job_seeker_id}: json={json_response}"
+                in caplog.messages
+            )
+        else:
+            assert f"Could not certify criterion {criterion!r}: json={json_response}" in caplog.messages
 
     def test_bad_response(self, respx_mock):
         eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
