@@ -427,7 +427,7 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
                     "codeRetour": "S009",
                     "message": "Nouveau cas non identifié",
                     "jetonUsager": None,
-                    "topIdentiteCertifiee": None,
+                    "topIdentiteCertifiee": "null",
                 },
                 PoleEmploiAPIBadResponse,
                 r"PoleEmploiAPIBadResponse\(code=S009\)",
