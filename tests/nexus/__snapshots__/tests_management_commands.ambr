@@ -10,6 +10,8 @@
           'Command.populate_users[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -19,6 +21,8 @@
           'Command.populate_users[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -80,6 +84,8 @@
           'Command.populate_memberships[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -102,6 +108,8 @@
           'Command.populate_memberships[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescribermembership"."id",
@@ -124,6 +132,8 @@
           'Command.populate_structures[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -177,6 +187,8 @@
           'Command.populate_structures[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.handle[nexus/management/commands/populate_metabase_nexus.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",

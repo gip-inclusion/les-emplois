@@ -684,9 +684,9 @@ invoke==2.2.1 \
     --hash=sha256:2413bc441b376e5cd3f55bb5d364f973ad8bdd7bf87e53c79de3c11bf3feecc8 \
     --hash=sha256:515bf49b4a48932b79b024590348da22f39c4942dff991ad1fb8b8baea1be707
     # via paramiko
-itoutils[django]==26.2.9.0 \
-    --hash=sha256:66da5ef675755389085e3d307d69a85bf2970a5fa02d316b8dc98879c6cd44cc \
-    --hash=sha256:e7f2208b0e818f0018469f566053f4a57e54b203fa10d95c439e76e17de6bfdd
+itoutils[django]==26.2.12.0 \
+    --hash=sha256:565d0669326dfddbab502d6beba1acbd79a3987f17e6c83ce2fd9ed6c0a00fe2 \
+    --hash=sha256:6e45f9bc809c52fed1c8fbca95f001a05583744306a89b840f5c0cfa8816ee78
     # via -r requirements/base.in
 jmespath==1.1.0 \
     --hash=sha256:472c87d80f36026ae83c6ddd0f1d05d4e510134ed462851fd5f754c8c3cbb88d \
