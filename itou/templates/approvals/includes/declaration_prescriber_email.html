@@ -6,6 +6,6 @@
     </button>
     <p>L'organisation s'affichera ci-dessous, s'il y en a plusieurs, selectionnez-la dans la liste.</p>
     {% if form.prescriber_organization %}
-        {% bootstrap_field form.prescriber_organization %}
+        {% bootstrap_field form.prescriber_organization show_label="skip" %}
     {% endif %}
 </div>
