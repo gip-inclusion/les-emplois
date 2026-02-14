@@ -445,9 +445,9 @@ django==6.0.2 \
     #   drf-spectacular
     #   itoutils
     #   slippers
-django-allauth==65.14.0 \
-    --hash=sha256:448f5f7877f95fcbe1657256510fe7822d7871f202521a29e23ef937f3325a97 \
-    --hash=sha256:5529227aba2b1377d900e9274a3f24496c645e65400fbae3cad5789944bc4d0b
+django-allauth==65.14.3 \
+    --hash=sha256:1d8e1127bdffceb8001bdd9bafbf97661f81e92f4b7bd4f6e799167b0311286d \
+    --hash=sha256:548eef76ab85f6e48f46f98437abf22acf0e834f73e9915fb6cc3f31a0dcdf4d
     # via -r requirements/base.in
 django-anymail==14.0 \
     --hash=sha256:98e5575bcff231952a92117b7d0a4dd37fab582333a343de302d415a31dc72b1 \
