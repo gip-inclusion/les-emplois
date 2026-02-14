@@ -792,6 +792,7 @@ httpx==0.28.1 \
     --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
     # via
     #   -r requirements/test.txt
+    #   itoutils
     #   respx
 huey==2.6.0 \
     --hash=sha256:1b9df9d370b49c6d5721ba8a01ac9a787cf86b3bdc584e4679de27b920395c3f \
@@ -841,9 +842,9 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django,django-testing]==26.1.28.1 \
-    --hash=sha256:86b63873ee8c69bc534295f65e0cca60659036168d7f7b6059eab475911dc983 \
-    --hash=sha256:917106653b92c21017882f3ab323c8706201ff46b893f05af52ddb4aae5a9a3a
+itoutils[django, django-testing]==26.2.12.0 \
+    --hash=sha256:565d0669326dfddbab502d6beba1acbd79a3987f17e6c83ce2fd9ed6c0a00fe2 \
+    --hash=sha256:6e45f9bc809c52fed1c8fbca95f001a05583744306a89b840f5c0cfa8816ee78
     # via -r requirements/test.txt
 jedi==0.19.2 \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
@@ -2130,7 +2131,9 @@ requests-mock==1.12.1 \
 respx==0.22.0 \
     --hash=sha256:3c8924caa2a50bd71aefc07aa812f2466ff489f1848c96e954a5362d17095d91 \
     --hash=sha256:631128d4c9aba15e56903fb5f66fb1eff412ce28dd387ca3a81339e52dbd3ad0
-    # via -r requirements/test.txt
+    # via
+    #   -r requirements/test.txt
+    #   itoutils
 rpds-py==0.30.0 \
     --hash=sha256:07ae8a593e1c3c6b82ca3292efbe73c30b61332fd612e05abee07c79359f292f \
     --hash=sha256:0a59119fc6e3f460315fe9d08149f8102aa322299deaa5cab5b40092345c2136 \

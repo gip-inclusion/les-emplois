@@ -6,6 +6,8 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -14,6 +16,8 @@
           '_set_context_connection_wrapper[utils/triggers/__init__.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': "SELECT set_config('itou.context', %s, TRUE)",
       }),
@@ -21,6 +25,8 @@
         'origin': list([
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -146,6 +152,8 @@
         'origin': list([
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -205,6 +213,8 @@
         'origin': list([
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           UPDATE "companies_jobdescription"
@@ -218,6 +228,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -278,6 +290,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -298,6 +312,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -317,6 +333,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT "companies_companymembership"."id",
@@ -377,6 +395,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -397,6 +417,8 @@
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           INSERT INTO "emails_email" ("to",
@@ -415,6 +437,8 @@
         'origin': list([
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -443,6 +467,8 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
