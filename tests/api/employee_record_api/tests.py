@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.mocks.address_format import mock_get_geocoding_data
-from tests.employee_record.factories import EmployeeRecordWithProfileFactory
+from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 
@@ -375,3 +375,22 @@ class TestEmployeeRecordAPIParameters:
 
         results = response.json().get("results")
         assert len(results) == 0
+
+
+class TestEmployeeRecordUpdateNotificationViewSet:
+    endpoint_url = reverse("v1:employee-record-notifications-list")
+
+    def test_companies_isolation(self, api_client):
+        """
+        An employer admin of a company must not see notifications from a company he does not belongs to
+        """
+        notification = EmployeeRecordUpdateNotificationFactory()
+        company = notification.employee_record.job_application.to_company
+        employer = company.members.first()
+
+        # Employer must only see the notification from its own company
+        EmployeeRecordUpdateNotificationFactory()
+        api_client.force_login(employer)
+        response = api_client.get(self.endpoint_url, format="json")
+        assert response.status_code == 200
+        assert response.data["count"] == 1
