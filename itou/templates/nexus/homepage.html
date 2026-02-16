@@ -35,14 +35,12 @@
                         <p class="mb-0">
                             Cet espace est en phase d’expérimentation dans les départements {{ departments_list }}.
                             Nous prévoyons de l’étendre progressivement à d’autres territoires.
-
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
 
     {% if activated_services %}
         <section class="s-section">
@@ -237,4 +235,82 @@
             }
         }]);
     </script>
+
+    <!-- IntroJS -->
+    {% enums "nexus" "NexusUserKind" as NexusUserKind %}
+    {% if user_kind == NexusUserKind.FACILITY_MANAGER %}
+        <script nonce="{{ csp_nonce }}">
+            window.addEventListener("load", () => {
+                const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
+                if (window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
+                    const tour = introJs.tour();
+                    tour.setOptions({
+                        disableInteraction: false,
+                        dontShowAgain: true,
+                        dontShowAgainCookie: "introjsNexusFACILITYDontShowAgain",
+                        dontShowAgainCookieDays: 90,
+                        dontShowAgainLabel: "Ne plus afficher",
+                        showProgress: false,
+                        showBullets: false,
+                        skipLabel: '',
+                        prevLabel: 'Précédent',
+                        nextLabel: 'Suivant',
+                        doneLabel: 'J’ai compris',
+                        steps: [{
+                            title: '<span class="badge badge-sm rounded-pill bg-important text-white">Félicitations !</span>',
+                            intro: '<p class="fs-lg mb-3"><strong>Bienvenue sur votre nouveau portail&nbsp;!</strong></p><p>Vous pourrez y retrouver vos services numériques activés et découvrir l\'ensemble des services numériques de La Plateforme de l\'inclusion.</p>'
+                        }, {
+                            element: nexusMyOffersItems,
+                            title: 'Gérez l’ensemble de votre offre',
+                            intro: 'Offres d’emplois, services d’insertion, offre commerciale, tout se passe ici.',
+                            position: 'right'
+                        }, {
+                            element: nexusAccompanyItems,
+                            title: 'Accompagnez vos bénéficiaires et suivez votre activité',
+                            intro: 'La Plateforme de l’inclusion vous met à disposition des outils pour centraliser le suivi de vos bénéficiaires et de votre activité.',
+                            position: 'right'
+                        }],
+                    });
+                    tour.start();
+                }
+            });
+        </script>
+    {% elif user_kind == NexusUserKind.GUIDE %}
+        <script nonce="{{ csp_nonce }}">
+            window.addEventListener("load", () => {
+                const breakpointMD = getComputedStyle(document.documentElement).getPropertyValue('--bs-breakpoint-md');
+                if (window.matchMedia('(min-width: ' + breakpointMD + ')').matches) {
+                    const tour = introJs.tour();
+                    tour.setOptions({
+                        disableInteraction: false,
+                        dontShowAgain: true,
+                        dontShowAgainCookie: "introjsNexusGUIDEDontShowAgain",
+                        dontShowAgainCookieDays: 90,
+                        dontShowAgainLabel: "Ne plus afficher",
+                        showProgress: false,
+                        showBullets: false,
+                        skipLabel: '',
+                        prevLabel: 'Précédent',
+                        nextLabel: 'Suivant',
+                        doneLabel: 'J’ai compris',
+                        steps: [{
+                            title: '<span class="badge badge-sm rounded-pill bg-important text-white">Félicitations !</span>',
+                            intro: '<p class="fs-lg mb-3"><strong>Bienvenue sur votre nouveau portail&nbsp;!</strong></p><p>Vous pourrez y retrouver vos services numériques activés et découvrir l\'ensemble des services numériques de La Plateforme de l\'inclusion.</p>'
+                        }, {
+                            element: nexusFindItems,
+                            title: 'Orientez vos bénéficiaires',
+                            intro: 'Offres d’emplois, services d’insertion, tout se passe ici.',
+                            position: 'right'
+                        }, {
+                            element: nexusAccompanyItems,
+                            title: 'Accompagnez vos bénéficiaires et suivez votre activité',
+                            intro: 'La Plateforme de l’inclusion vous met à disposition des outils pour centraliser le suivi de vos bénéficiaires et de votre activité.',
+                            position: 'right'
+                        }],
+                    });
+                    tour.start();
+                }
+            });
+        </script>
+    {% endif %}
 {% endblock %}
