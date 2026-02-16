@@ -105,6 +105,11 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         not_geiq_kind = factory.Trait(
             kind=factory.fuzzy.FuzzyChoice([kind for kind in CompanyKind if kind != CompanyKind.GEIQ]),
         )
+        not_ea_eatt_kind = factory.Trait(
+            kind=factory.fuzzy.FuzzyChoice(
+                [kind for kind in CompanyKind if kind not in [CompanyKind.EA, CompanyKind.EATT]]
+            ),
+        )
         evaluable_kind = factory.Trait(kind=factory.fuzzy.FuzzyChoice(EvaluationSiaesKind.Evaluable))
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
