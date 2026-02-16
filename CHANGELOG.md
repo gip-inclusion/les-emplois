@@ -1,5 +1,23 @@
 # Journal des modifications
 
+## 2026-02-16
+
+### Ajouté
+
+- [Demandeur d’emploi : Dans le formulaire de régularisation du NIR, ajout d'un champ permettant de préciser le contexte de la demande](https://github.com/gip-inclusion/les-emplois/pull/7486)
+- [Page d’accueil : Ajout d'une bannière de demande d’avis auprès des prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/7545)
+- [Tech : Création d'un objet intermédiaire entre candidats et prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/7323)
+- [Éligibilité : Réduire la fréquence de ré-essai de certification](https://github.com/gip-inclusion/les-emplois/pull/7525)
+
+### Modifié
+
+- [GEIQ : Ajouter des indications complémentaires au champ commentaire du bilan d’exécution](https://github.com/gip-inclusion/les-emplois/pull/7532)
+- [Navigation : Afficher automatiquement le badge "Nouveau" sur un groupe si un de ses éléments est marqué comme tel](https://github.com/gip-inclusion/les-emplois/pull/7508)
+- [Nexus : Améliorations diverses](https://github.com/gip-inclusion/les-emplois/pull/7504)
+- [Tech : Correction d'un bug dans les affectations utilisateur empêchant la fusion d'utilisateurs](https://github.com/gip-inclusion/les-emplois/pull/7546)
+- [Élargissement de la campagne AFPA à d'autres régions](https://github.com/gip-inclusion/les-emplois/pull/7530)
+- [Éligibilité : Ne pas réessayer de certifier un critère d’éligibilité si l’API Particulier indique 404](https://github.com/gip-inclusion/les-emplois/pull/7539)
+
 ## 2026-02-09
 
 ### Ajouté
