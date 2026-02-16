@@ -12,10 +12,8 @@ from tests.job_applications.factories import JobApplicationWithCompleteJobSeeker
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
 
 
-ENDPOINT_URL = reverse("v1:employee-records-list")
-
-
 class TestEmployeeRecordAPIPermissions:
+    endpoint_url = reverse("v1:employee-records-list")
     token_url = reverse("v1:token-auth")
 
     def setup_method(self):
@@ -40,7 +38,7 @@ class TestEmployeeRecordAPIPermissions:
         assert token is not None
 
         api_client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
 
         # Result list found but empty
         assert response.status_code == 200
@@ -54,7 +52,7 @@ class TestEmployeeRecordAPIPermissions:
         assert token is not None
 
         api_client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
 
         # Result list exists, but user is not member of any SIAE
         assert response.status_code == 403
@@ -66,17 +64,19 @@ class TestEmployeeRecordAPIPermissions:
         """
         api_client.force_login(self.user)
 
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 200
 
     def test_permission_ko_with_session(self, api_client):
         api_client.force_login(self.unauthorized_user)
 
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 403
 
 
 class TestEmployeeRecordAPIFetchList:
+    endpoint_url = reverse("v1:employee-records-list")
+
     def setup_method(self):
         # We only care about status filtering: no coherence check on ASP return values
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
@@ -105,14 +105,14 @@ class TestEmployeeRecordAPIFetchList:
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
 
         # There should be no result at this point
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 200
 
         result = response.json()
         assert len(result.get("results")) == 0
 
         self.employee_record.process(code=process_code, label=process_message, archive={})
-        response = api_client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 200
 
         result = response.json()
@@ -125,14 +125,14 @@ class TestEmployeeRecordAPIFetchList:
         employee_record_sent.ready()
 
         # There should be no result at this point
-        response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
+        response = api_client.get(self.endpoint_url + "?status=SENT", format="json")
         assert response.status_code == 200
 
         result = response.json()
         assert len(result.get("results")) == 0
 
         employee_record_sent.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
-        response = api_client.get(ENDPOINT_URL + "?status=SENT", format="json")
+        response = api_client.get(self.endpoint_url + "?status=SENT", format="json")
         assert response.status_code == 200
 
         result = response.json()
@@ -146,7 +146,7 @@ class TestEmployeeRecordAPIFetchList:
         employee_record_rejected.wait_for_asp_response(file=faker.asp_batch_filename(), line_number=1, archive=None)
 
         # There should be no result at this point
-        response = api_client.get(ENDPOINT_URL + "?status=REJECTED", format="json")
+        response = api_client.get(self.endpoint_url + "?status=REJECTED", format="json")
         assert response.status_code == 200
 
         result = response.json()
@@ -156,7 +156,7 @@ class TestEmployeeRecordAPIFetchList:
         employee_record_rejected.reject(code=err_code, label=err_message, archive=None)
 
         # Status case is not important
-        response = api_client.get(ENDPOINT_URL + "?status=rEjEcTeD", format="json")
+        response = api_client.get(self.endpoint_url + "?status=rEjEcTeD", format="json")
         assert response.status_code == 200
 
         result = response.json()
@@ -167,7 +167,7 @@ class TestEmployeeRecordAPIFetchList:
         api_client.force_login(self.employer)
 
         with assertSnapshotQueries(snapshot):
-            api_client.get(ENDPOINT_URL, data={"status": list(Status)}, format="json")
+            api_client.get(self.endpoint_url, data={"status": list(Status)}, format="json")
 
     def test_show_phone_email_api(self, api_client, mocker):
         mocker.patch(
@@ -179,7 +179,7 @@ class TestEmployeeRecordAPIFetchList:
         # to API serializer.
         api_client.force_login(self.employer)
 
-        response = api_client.get(ENDPOINT_URL + "?status=READY", format="json")
+        response = api_client.get(self.endpoint_url + "?status=READY", format="json")
         assert response.status_code == 200
 
         json = response.json()
@@ -191,6 +191,8 @@ class TestEmployeeRecordAPIFetchList:
 
 
 class TestEmployeeRecordAPIParameters:
+    endpoint_url = reverse("v1:employee-records-list")
+
     def test_status_parameter(self, api_client, mocker):
         mocker.patch(
             "itou.common_apps.address.format.get_geocoding_data",
@@ -203,7 +205,7 @@ class TestEmployeeRecordAPIParameters:
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
 
-        response = api_client.get(ENDPOINT_URL + "?status=READY", format="json")
+        response = api_client.get(self.endpoint_url + "?status=READY", format="json")
 
         assert response.status_code == 200
 
@@ -234,13 +236,13 @@ class TestEmployeeRecordAPIParameters:
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
-        response = api_client.get(ENDPOINT_URL + "?status=READY", format="json")
+        response = api_client.get(self.endpoint_url + "?status=READY", format="json")
         assert response.status_code == 200
 
         results = response.json()
         assert len(results.get("results")) == 1
 
-        response = api_client.get(ENDPOINT_URL + "?status=SENT&status=READY", format="json")
+        response = api_client.get(self.endpoint_url + "?status=SENT&status=READY", format="json")
         assert response.status_code == 200
 
         results = response.json()
@@ -268,7 +270,7 @@ class TestEmployeeRecordAPIParameters:
 
         member = employee_record.job_application.to_company.members.first()
         api_client.force_login(member)
-        response = api_client.get(ENDPOINT_URL + f"?created={today_param}", format="json")
+        response = api_client.get(self.endpoint_url + f"?created={today_param}", format="json")
         assert response.status_code == 200
 
         results = response.json()
@@ -277,7 +279,7 @@ class TestEmployeeRecordAPIParameters:
         result = results.get("results")[0]
         assert result.get("siret") == job_application.to_company.siret
 
-        response = api_client.get(ENDPOINT_URL + f"?created={yesterday_param}", format="json")
+        response = api_client.get(self.endpoint_url + f"?created={yesterday_param}", format="json")
         results = response.json()
         assert response.status_code == 200
         assert not results.get("results")
@@ -308,20 +310,20 @@ class TestEmployeeRecordAPIParameters:
         member = employee_record_1.job_application.to_company.members.first()
 
         api_client.force_login(member)
-        response = api_client.get(ENDPOINT_URL + f"?since={today}", format="json")
+        response = api_client.get(self.endpoint_url + f"?since={today}", format="json")
         assert response.status_code == 200
 
         results = response.json()
         assert not results.get("results")
 
-        response = api_client.get(ENDPOINT_URL + f"?since={sooner}", format="json")
+        response = api_client.get(self.endpoint_url + f"?since={sooner}", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
         assert results
         assert results[0].get("siret") == job_application_1.to_company.siret
 
-        response = api_client.get(ENDPOINT_URL + f"?since={ancient}", format="json")
+        response = api_client.get(self.endpoint_url + f"?since={ancient}", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
@@ -350,25 +352,25 @@ class TestEmployeeRecordAPIParameters:
         member = employee_record_1.job_application.to_company.members.first()
 
         api_client.force_login(member)
-        response = api_client.get(ENDPOINT_URL + "?status=NEW", format="json")
+        response = api_client.get(self.endpoint_url + "?status=NEW", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
         assert len(results) == 1
 
-        response = api_client.get(ENDPOINT_URL + f"?status=NEW&created={sooner}", format="json")
+        response = api_client.get(self.endpoint_url + f"?status=NEW&created={sooner}", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
         assert len(results) == 1
 
-        response = api_client.get(ENDPOINT_URL + f"?status=READY&since={ancient}", format="json")
+        response = api_client.get(self.endpoint_url + f"?status=READY&since={ancient}", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
         assert len(results) == 1
 
-        response = api_client.get(ENDPOINT_URL + f"?status=READY&since={sooner}", format="json")
+        response = api_client.get(self.endpoint_url + f"?status=READY&since={sooner}", format="json")
         assert response.status_code == 200
 
         results = response.json().get("results")
