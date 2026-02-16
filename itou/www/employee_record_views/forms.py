@@ -125,6 +125,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
         widget=widgets.CheckboxInput(
             attrs={
                 "data-disable-target": "#id_nir",
+                "data-required-on-check": "#id_ntt",
             }
         ),
     )
@@ -173,6 +174,7 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
 
         if self["lack_of_nir"].value():
             self.fields["nir"].disabled = True
+            self.fields["nir"].required = False
 
     def clean(self):
         super().clean()

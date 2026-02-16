@@ -8,7 +8,18 @@ from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Wi
 
 
 class BirthPlaceModelForm(forms.ModelForm):
-    birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
+    birth_country = forms.ModelChoiceField(
+        Country.objects,
+        label="Pays de naissance",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "data-required-indicator": "#id_birth_country",
+                "data-required-target": "#id_birth_place",
+                "data-required-value": str(Country.FRANCE_ID),
+            }
+        ),
+    )
     birth_place = forms.ModelChoiceField(
         queryset=Commune.objects,
         label="Commune de naissance",
