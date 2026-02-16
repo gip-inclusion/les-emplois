@@ -54,7 +54,7 @@ class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyMode
             .active_or_in_grace_period()
             .values_list("pk", flat=True)
         )
-        return queryset.filter(**{f"{self.company_lookup}__in": companies})
+        return queryset.filter(**{f"{self.company_lookup}__in": companies}).order_by("-created_at", "-updated_at")
 
 
 def _annotate_convert_created_at(queryset):
@@ -90,12 +90,10 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         if since := params.get("since"):
             result = _annotate_convert_created_at(result).filter(creation_date__gte=since)
 
-        # => Add as many params as necessary here (PASS IAE number, SIRET, fuzzy name ...)
-        return result.order_by("-created_at")
+        return result
 
     def get_queryset(self):
-        queryset = self._filter_by_query_params(self.request, super().get_queryset())
-        return queryset.order_by("-created_at", "-updated_at")
+        return self._filter_by_query_params(self.request, super().get_queryset())
 
 
 # Doc section is in French for Swagger / OAS auto doc generation
@@ -160,7 +158,7 @@ L’interrogation de cette API est limitée à 60 appels par minute.
 
 
 class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
-    queryset = EmployeeRecordUpdateNotification.objects.all()
+    queryset = EmployeeRecordUpdateNotification.objects.full_fetch()
     serializer_class = EmployeeRecordUpdateNotificationAPISerializer
     company_lookup = "employee_record__job_application__to_company__id"
 

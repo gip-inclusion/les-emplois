@@ -7,6 +7,7 @@ from pytest_django.asserts import assertContains
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.utils.mocks.address_format import mock_get_geocoding_data
+from tests.companies.factories import CompanyMembershipFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory
@@ -162,6 +163,20 @@ class TestEmployeeRecordAPIFetchList:
         result = response.json()
         assert len(result.get("results")) == 1
         assertContains(response, self.siae.siret)
+
+    def test_companies_isolation(self, api_client):
+        """
+        An employer admin of a company must not see employee records from another company.
+        """
+        # setup_method already created and employee record visible by self.employer
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.ready()
+
+        api_client.force_login(self.employer)
+        response = api_client.get(self.endpoint_url + "?status=READY", format="json")
+        assert response.status_code == 200
+        assert response.data["count"] == 1
 
     def test_fetch_employee_record_list_query_count(self, api_client, snapshot):
         api_client.force_login(self.employer)
@@ -394,3 +409,24 @@ class TestEmployeeRecordUpdateNotificationViewSet:
         response = api_client.get(self.endpoint_url, format="json")
         assert response.status_code == 200
         assert response.data["count"] == 1
+
+    def test_non_admin_member_is_forbidden(self, api_client):
+        """
+        A regular member of a company must not access notifications
+        """
+        notification = EmployeeRecordUpdateNotificationFactory()
+        company = notification.employee_record.job_application.to_company
+        membership = CompanyMembershipFactory(company=company, is_admin=False)
+
+        api_client.force_login(membership.user)
+        response = api_client.get(self.endpoint_url, format="json")
+        assert response.status_code == 403
+
+    def test_query_count(self, api_client, snapshot):
+        notification = EmployeeRecordUpdateNotificationFactory()
+        company = notification.employee_record.job_application.to_company
+        employer = company.members.first()
+
+        api_client.force_login(employer)
+        with assertSnapshotQueries(snapshot):
+            api_client.get(self.endpoint_url, format="json")
