@@ -39,6 +39,23 @@ class AbstractEmployeeRecordViewSet(LoginNotRequiredMixin, viewsets.ReadOnlyMode
 
     queryset = EmployeeRecord.objects.full_fetch()
 
+    # Lookup path from the model to `to_company`, used for company filtering.
+    company_lookup = None
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Query optimization:
+        # if `companies` is not wrapped into a list,
+        # the resulting queryset will be reused as a subquery in the main query (below),
+        # leading to ghastly performance issues.
+        # Using a list gives a 20-50x speed gain on the query.
+        companies = list(
+            self.request.user.company_set.filter(memberships__is_active=True, memberships__is_admin=True)
+            .active_or_in_grace_period()
+            .values_list("pk", flat=True)
+        )
+        return queryset.filter(**{f"{self.company_lookup}__in": companies})
+
 
 def _annotate_convert_created_at(queryset):
     # Add a new `creation_date` field (cast of `created_at` to a date)
@@ -51,6 +68,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
     # See: https://www.django-rest-framework.org/api-guide/routers/
 
     serializer_class = EmployeeRecordAPISerializer
+    company_lookup = "job_application__to_company__id"
 
     def _filter_by_query_params(self, request, queryset):
         """
@@ -76,29 +94,8 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         return result.order_by("-created_at")
 
     def get_queryset(self):
-        # We only get to this point if permissions are OK
-        queryset = super().get_queryset()
-
-        # Get (registered) query parameters filters
-        queryset = self._filter_by_query_params(self.request, queryset)
-
-        # Employee record API will return objects related to
-        # all SIAE memberships of authenticated user.
-        # There's something similar in context processors, but:
-        # - ctx processors are called AFTER this
-        # - and only when rendering a template
-
-        # Query optimization:
-        # if `companies` is not wrapped into a list,
-        # the resulting queryset will be reused as a subquery in the main query (below),
-        # leading to ghastly performance issues.
-        # Using a list gives a 20-50x speed gain on the query.
-        companies = list(
-            self.request.user.company_set.filter(memberships__is_active=True, memberships__is_admin=True)
-            .active_or_in_grace_period()
-            .values_list("pk", flat=True)
-        )
-        return queryset.filter(job_application__to_company__id__in=companies).order_by("-created_at", "-updated_at")
+        queryset = self._filter_by_query_params(self.request, super().get_queryset())
+        return queryset.order_by("-created_at", "-updated_at")
 
 
 # Doc section is in French for Swagger / OAS auto doc generation
@@ -165,6 +162,7 @@ L’interrogation de cette API est limitée à 60 appels par minute.
 class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
     queryset = EmployeeRecordUpdateNotification.objects.all()
     serializer_class = EmployeeRecordUpdateNotificationAPISerializer
+    company_lookup = "employee_record__job_application__to_company__id"
 
 
 EmployeeRecordUpdateNotificationViewSet.__doc__ = f"""\

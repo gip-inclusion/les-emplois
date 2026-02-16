@@ -210,6 +210,7 @@
       dict({
         'origin': list([
           'EmployeeRecordViewSet.get_queryset[api/employee_record_api/viewsets.py]',
+          'EmployeeRecordViewSet.get_queryset[api/employee_record_api/viewsets.py]',
           'EmployeeRecordViewSet.list[<site-packages>/rest_framework/mixins.py]',
         ]),
         'sql': '''
@@ -251,14 +252,14 @@
           SELECT COUNT(*) AS "__count"
           FROM "employee_record_employeerecord"
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
-          WHERE ("employee_record_employeerecord"."status" IN (%s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s))
+          WHERE ("job_applications_jobapplication"."to_company_id" IN (%s)
+                 AND "employee_record_employeerecord"."status" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s))
         ''',
       }),
       dict({
@@ -551,14 +552,14 @@
           LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           LEFT OUTER JOIN "companies_siaefinancialannex" ON ("employee_record_employeerecord"."financial_annex_id" = "companies_siaefinancialannex"."id")
-          WHERE ("employee_record_employeerecord"."status" IN (%s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s,
-                                                               %s)
-                 AND "job_applications_jobapplication"."to_company_id" IN (%s))
+          WHERE ("job_applications_jobapplication"."to_company_id" IN (%s)
+                 AND "employee_record_employeerecord"."status" IN (%s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s,
+                                                                   %s))
           ORDER BY "employee_record_employeerecord"."created_at" DESC,
                    "employee_record_employeerecord"."updated_at" DESC
           LIMIT 1
