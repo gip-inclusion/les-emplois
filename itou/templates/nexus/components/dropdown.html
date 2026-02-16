@@ -1,7 +1,6 @@
 {% load enums %}
 {% load theme_inclusion %}
 
-
 {% enums "nexus" "Service" as Service %}
 
 {% partialdef activated %}
@@ -19,16 +18,16 @@
     </span>
 {% endpartialdef %}
 
-<div class="dropdown dropdown-nexus">
-    <button class="btn btn-outline-primary btn-block dropdown-toggle" type="button" id="dropdownNexusMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<div class="dropup dropup-center dropdown-nexus">
+    <button class="btn btn-outline-primary btn-block bg-white dropdown-toggle" type="button" id="dropdownNexusMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span>Mon portail</span>
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownNexusMenuButton">
+    <div class="dropdown-menu w-100" aria-labelledby="dropdownNexusMenuButton">
         <div class="dropdown-item dropdown-item__profil">
             <span>
                 <strong>{{ user_name }}</strong>
                 <br>
-                {{ user.email }}
+                <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">{{ user.email }}</span>
             </span>
             <a href="{% url 'nexus:homepage' %}" class="btn btn-block btn-outline-primary">Accéder à mon portail</a>
         </div>
