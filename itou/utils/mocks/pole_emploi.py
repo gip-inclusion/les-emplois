@@ -242,13 +242,13 @@ RESPONSES = {
             "codeRetour": "S002",
             "message": "Aucun approchant trouvé",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": "null",
         },
         ResponseKind.MULTIPLE_USERS_RETURNED: {
             "codeRetour": "S003",
             "message": "Plusieurs usagers trouvés",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": "null",
         },
         # TODO(cms): check if this is common to all endpoints and, if so, add them too.
         ResponseKind.BAD_REQUEST: {
@@ -282,6 +282,26 @@ RESPONSES = {
             "message": "Approchant trouvé",
             "jetonUsager": "a_long_token",
             "topIdentiteCertifiee": "O",
+        },
+    },
+    Endpoints.RQTH: {
+        ResponseKind.CERTIFIED: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "2030-01-20",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "dateDebutRqth": "",
+            "dateFinRqth": "",
+            "source": "",
+            "topValiditeRQTH": False,
+        },
+        ResponseKind.CERTIFIED_FOR_EVER: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "9999-12-31",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
         },
     },
 }
