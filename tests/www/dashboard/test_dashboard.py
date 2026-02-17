@@ -1051,7 +1051,7 @@ class TestDashboardView:
 
 
 @pytest.mark.parametrize(
-    "factory,expected",
+    "factory,assertion",
     [
         pytest.param(partial(JobSeekerFactory, with_address=True), assertNotContains, id="JobSeeker"),
         pytest.param(partial(EmployerFactory, membership=True), assertNotContains, id="Employer"),
@@ -1069,11 +1069,11 @@ class TestDashboardView:
         ),
     ],
 )
-def test_prolongation_requests_access(client, factory, expected):
+def test_prolongation_requests_access(client, factory, assertion):
     client.force_login(factory())
     response = client.get(reverse("dashboard:index"))
-    expected(response, "Gérer mes prolongations de PASS IAE")
-    expected(response, reverse("approvals:prolongation_requests_list"))
+    assertion(response, "Gérer mes prolongations de PASS IAE")
+    assertion(response, reverse("approvals:prolongation_requests_list"))
 
 
 def test_prolongation_requests_badge(client):
