@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import pytest
 from django.contrib import messages
@@ -903,7 +904,7 @@ def test_display_reminder_banner_not_updated_jobs_for_employer(client):
     Appellation.objects.create(code="I13042", name="Doer", rome=rome)
 
     # Spontaneous application recently updated
-    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=RECENT_DATE)
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=RECENT_DATE, not_ea_eatt_kind=True)
     client.force_login(company.members.first())
     response = client.get(reverse("dashboard:index"))
     assertNotContains(
@@ -923,7 +924,7 @@ def test_display_reminder_banner_not_updated_jobs_for_employer(client):
     )
 
     # Recently updated job application
-    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=None)
+    company = CompanyWith2MembershipsFactory(spontaneous_applications_open_since=None, not_ea_eatt_kind=True)
     job_description = JobDescriptionFactory(
         company=company, created_at=RECENT_DATE, last_employer_update_at=RECENT_DATE
     )
@@ -940,6 +941,16 @@ def test_display_reminder_banner_not_updated_jobs_for_employer(client):
     job_description.save()
     response = client.get(reverse("dashboard:index"))
     assertContains(
+        response,
+        REMINDER_BANNER,
+        html=True,
+    )
+
+    # Do not display for EA/EATT
+    company.kind = random.choice([CompanyKind.EA, CompanyKind.EATT])
+    company.save()
+    response = client.get(reverse("dashboard:index"))
+    assertNotContains(
         response,
         REMINDER_BANNER,
         html=True,
