@@ -11,9 +11,9 @@
         </div>
         <div class="col-12 col-sm-auto">
             {% if kind == "IAE" %}
-                {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=eligibility_diagnosis.job_seeker eligibility_diagnosis=eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                {% include "eligibility/includes/iae/eligibility_badge.html" with job_seeker=job_seeker eligibility_diagnosis=eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
             {% elif kind == "GEIQ" %}
-                {% include "eligibility/includes/geiq/eligibility_badge.html" with job_seeker=eligibility_diagnosis.job_seeker geiq_eligibility_diagnosis=eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
+                {% include "eligibility/includes/geiq/eligibility_badge.html" with job_seeker=job_seeker geiq_eligibility_diagnosis=eligibility_diagnosis force_valid_approval=False badge_size="badge-sm" only %}
             {% endif %}
         </div>
     </div>
