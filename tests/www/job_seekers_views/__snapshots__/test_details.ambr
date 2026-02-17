@@ -4117,7 +4117,7 @@
   
   '''
 # ---
-# name: test_with_approval[HTML page]
+# name: test_with_approval_and_diagnosis_from_employer[HTML page]
   '''
   <main class="s-main" id="main" role="main">
       <div aria-atomic="true" aria-live="polite" class="toast-container">
@@ -4358,13 +4358,13 @@
                                                   </small>
                                                   <strong>
                                                       <span>
-                                                          99999
+                                                          XXXXX
                                                       </span>
                                                       <span class="ms-1">
-                                                          99
+                                                          12
                                                       </span>
                                                       <span class="ms-1">
-                                                          99999
+                                                          12345
                                                       </span>
                                                   </strong>
                                               </li>
@@ -4373,7 +4373,7 @@
                                                       Date de début
                                                   </small>
                                                   <strong>
-                                                      01/01/2000
+                                                      14/08/2024
                                                   </strong>
                                               </li>
                                               <li>
@@ -4383,7 +4383,7 @@
                                                       </i>
                                                   </small>
                                                   <strong>
-                                                      01/01/3000
+                                                      13/08/2026
                                                   </strong>
                                               </li>
                                               <li>
@@ -4393,7 +4393,7 @@
                                                       </i>
                                                   </small>
                                                   <strong class="text-success">
-                                                      356252 jours (Environ 975 ans et 4 mois)
+                                                      730 jours (Environ 2 ans)
                                                       <br/>
                                                       <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
                                                           Comment est calculée cette durée ?
@@ -4414,7 +4414,7 @@
   
   '''
 # ---
-# name: test_with_approval[SQL queries]
+# name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
     'num_queries': 17,
     'queries': list([
@@ -5001,6 +5001,1110 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'can_view_approval_details[approvals/perms.py]',
+          'approval_details_box[utils/templatetags/approvals.py]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          
+            (SELECT %s AS "a"
+             FROM "users_user"
+             LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+             WHERE (("users_user"."created_by_id" = %s
+                     AND "users_jobseekerprofile"."created_by_prescriber_organization_id" IS NULL)
+                    OR ("users_user"."created_by_id" = %s
+                        AND "users_jobseekerprofile"."created_by_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "job_applications_jobapplication"
+             WHERE (("job_applications_jobapplication"."sender_id" = %s
+                     AND "job_applications_jobapplication"."sender_prescriber_organization_id" IS NULL)
+                    OR ("job_applications_jobapplication"."sender_id" = %s
+                        AND "job_applications_jobapplication"."sender_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "eligibility_eligibilitydiagnosis"
+             WHERE (("eligibility_eligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_eligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "eligibility_geiqeligibilitydiagnosis"
+             WHERE (("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                     AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NULL)
+                    OR ("eligibility_geiqeligibilitydiagnosis"."author_id" = %s
+                        AND "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = %s)))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'IfNode[utils/templatetags/approval_box.html]',
+          'InclusionNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "approvals_prolongationrequest"."id",
+                 "approvals_prolongationrequest"."approval_id",
+                 "approvals_prolongationrequest"."start_at",
+                 "approvals_prolongationrequest"."end_at",
+                 "approvals_prolongationrequest"."reason",
+                 "approvals_prolongationrequest"."reason_explanation",
+                 "approvals_prolongationrequest"."declared_by_id",
+                 "approvals_prolongationrequest"."declared_by_siae_id",
+                 "approvals_prolongationrequest"."prescriber_organization_id",
+                 "approvals_prolongationrequest"."created_at",
+                 "approvals_prolongationrequest"."created_by_id",
+                 "approvals_prolongationrequest"."updated_at",
+                 "approvals_prolongationrequest"."updated_by_id",
+                 "approvals_prolongationrequest"."report_file_id",
+                 "approvals_prolongationrequest"."require_phone_interview",
+                 "approvals_prolongationrequest"."contact_email",
+                 "approvals_prolongationrequest"."contact_phone",
+                 "approvals_prolongationrequest"."status",
+                 "approvals_prolongationrequest"."assigned_to_id",
+                 "approvals_prolongationrequest"."processed_at",
+                 "approvals_prolongationrequest"."processed_by_id",
+                 "approvals_prolongationrequest"."reminder_sent_at"
+          FROM "approvals_prolongationrequest"
+          WHERE ("approvals_prolongationrequest"."approval_id" = %s
+                 AND "approvals_prolongationrequest"."status" = %s)
+          ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: test_with_approval_and_diagnosis_from_prescriber[HTML page]
+  '''
+  <main class="s-main" id="main" role="main">
+      <div aria-atomic="true" aria-live="polite" class="toast-container">
+      </div>
+      <section class="s-title-02">
+          <div class="s-title-02__container container">
+              <div class="s-title-02__row row">
+                  <div class="s-title-02__col col-12">
+                      <div class="c-prevstep">
+                          <a aria-label="Retour à la liste" class="btn btn-ico btn-link ps-0" href="/job-seekers/list">
+                              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl fw-medium">
+                              </i>
+                              <span>
+                                  Retour
+                  à la liste
+                              </span>
+                          </a>
+                      </div>
+                      <div class="c-title">
+                          <div class="c-title__main">
+                              <h1>
+                                  Candidat : DOE Jane
+                              </h1>
+                              <p id="copy_public_id">
+                                  Copier l'ID du candidat
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="7614fc4b-aef9-4694-ab17-12324300180a" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_public_id" type="button">
+                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                      </i>
+                                      <span class="visually-hidden">
+                                          Copier
+                                      </span>
+                                  </button>
+                              </p>
+                          </div>
+                          <div aria-label="Actions sur le candidat" class="c-title__cta" role="group">
+                              <a class="btn btn-lg btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="postuler-pour-ce-candidat" href="/search/employers/results?job_seeker_public_id=7614fc4b-aef9-4694-ab17-12324300180a&city=rennes-35">
+                                  <i aria-hidden="true" class="ri-draft-line fw-medium">
+                                  </i>
+                                  <span>
+                                      Postuler pour ce candidat
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+                      <ul class="s-tabs-01__nav nav nav-tabs mb-0" data-it-sliding-tabs="true">
+                          <li class="nav-item">
+                              <a class="nav-link active" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="informations candidat" href="/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Informations générales
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" data-matomo-action="clic-onglet" data-matomo-category="candidat" data-matomo-event="true" data-matomo-option="candidatures" href="/job-seekers/job_applications/7614fc4b-aef9-4694-ab17-12324300180a?back_url=/job-seekers/list">
+                                  Candidatures
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-section">
+          <div class="s-section__container container">
+              <div class="s-section__row row">
+                  <div class="s-section__col col-12">
+                      <div class="tab-content">
+                          <div class="tab-pane fade show active">
+                              <div class="row">
+                                  <div class="col-12 col-xxl-8 col-xxxl-9 order-2 order-xxl-1">
+                                      <h2>
+                                          Informations générales
+                                      </h2>
+                                      <div class="c-box mb-3 mb-md-4">
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Informations personnelles
+                                                  </h3>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary disabled" data-matomo-action="clic" data-matomo-category="salaries" data-matomo-event="true" data-matomo-option="edit_jobseeker_infos" href="">
+                                                      <i aria-hidden="true" class="ri-pencil-line fw-medium">
+                                                      </i>
+                                                      <span>
+                                                          Modifier
+                                                      </span>
+                                                  </a>
+                                                  <button data-bs-placement="top" data-bs-title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." data-bs-toggle="tooltip" type="button">
+                                                      <i aria-label="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations." class="ri-information-line ri-xl text-info ms-1">
+                                                      </i>
+                                                  </button>
+                                              </div>
+                                          </div>
+                                          <ul class="list-data mb-3">
+                                              <li>
+                                                  <small>
+                                                      Prénom
+                                                  </small>
+                                                  <strong>
+                                                      Jane
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Nom
+                                                  </small>
+                                                  <strong>
+                                                      DOE
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Téléphone
+                                                  </small>
+                                                  <strong>
+                                                      06 12 34 56 78
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_sender_phone" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse e-mail
+                                                  </small>
+                                                  <strong>
+                                                      jane.doe@test.local
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Date de naissance
+                                                  </small>
+                                                  <strong>
+                                                      01/01/1990
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Adresse
+                                                  </small>
+                                                  <address>
+                                                      12 rue Georges Bizet, 35000 Rennes
+                                                  </address>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Numéro de sécurité sociale
+                                                  </small>
+                                                  <strong>
+                                                      <span>
+                                                          2
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          90
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          01
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          010
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          101
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          25
+                                                      </span>
+                                                  </strong>
+                                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="290010101010125" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="copied_jobseeker_email" type="button">
+                                                      <i aria-hidden="true" class="ri-file-copy-line fw-normal">
+                                                      </i>
+                                                      <span class="visually-hidden">
+                                                          Copier
+                                                      </span>
+                                                  </button>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Identifiant France Travail
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Non renseigné
+                                                  </i>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                      <div class="c-box mb-3 mb-md-4">
+                                          <div class="row mb-3">
+                                              <div class="col-12 col-sm">
+                                                  <h3 class="mb-0">
+                                                      Éligibilité à l'IAE
+                                                  </h3>
+                                                  <span class="text-success fs-sm">
+                                                      Valide du 14/08/2024 au 14/02/2025
+                                                  </span>
+                                              </div>
+                                              <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+                                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                                                      <i aria-hidden="true" class="ri-check-line">
+                                                      </i>
+                                                      Éligible à l’IAE
+                                                  </span>
+                                              </div>
+                                          </div>
+                                          <ul class="list-data mb-3">
+                                              <li>
+                                                  <small>
+                                                      Confirmée par
+                                                  </small>
+                                                  <strong>
+                                                      Pierre DUPONT
+                  
+                  
+                      (Pres. Org.)
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Critères administratifs
+                                                      <i aria-label="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic, elle a peut-être changé depuis cette date." class="ri-information-line text-info" data-bs-title="Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic ayant permis la délivrance d’un PASS IAE, elle a peut-être changé depuis cette date." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
+                                                  </small>
+                                                  <i class="text-disabled">
+                                                      Le prescripteur habilité n’a pas renseigné de critères.
+                                                  </i>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Type
+                                                  </small>
+                                                  <strong>
+                                                      Prescripteur habilité
+                                                  </strong>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                      <div class="c-box mb-3 mb-md-4">
+                                          <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                                              <h3>
+                                                  Qui accompagne ce candidat ?
+                                              </h3>
+                                          </div>
+                                          <div class="d-flex flex-column flex-md-row gap-2 align-items-center gap-md-3" id="card-no-referent">
+                                              <div class="flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                                                  <i>
+                                                      L’accompagnateur de DOE Jane n’est pas connu de nos services
+                                                  </i>
+                                              </div>
+                                              <div>
+                                                  <a class="btn btn-ico btn-primary btn-block w-100 w-md-auto white-space-nowrap" href="/gps/request-new-participant/[Public ID of JobSeeker]">
+                                                      <i aria-hidden="true" class="ri-user-add-line">
+                                                      </i>
+                                                      <span>
+                                                          Ajouter un intervenant
+                                                      </span>
+                                                  </a>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
+                                      <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+                                          <div class="mb-3 mb-md-4">
+                                              <span class="badge badge-base rounded-pill bg-success text-white">
+                                                  <i aria-hidden="true" class="ri-pass-valid-line">
+                                                  </i>
+                                                  PASS IAE valide
+                                              </span>
+                                          </div>
+                                          <ul class="list-data">
+                                              <li>
+                                                  <small>
+                                                      Numéro de PASS IAE
+                                                  </small>
+                                                  <strong>
+                                                      <span>
+                                                          XXXXX
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          12
+                                                      </span>
+                                                      <span class="ms-1">
+                                                          12345
+                                                      </span>
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Date de début
+                                                  </small>
+                                                  <strong>
+                                                      14/08/2024
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Date de fin prévisionnelle
+                                                      <i aria-label="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." class="ri-information-line ri-xl text-info" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
+                                                  </small>
+                                                  <strong>
+                                                      13/08/2026
+                                                  </strong>
+                                              </li>
+                                              <li>
+                                                  <small>
+                                                      Durée de validité
+                                                      <i aria-label="La durée de validité est calculée sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, elle décroît donc tous les jours (samedi, dimanche et jours fériés compris)." class="ri-information-line ri-xl text-info" data-bs-title="La durée de validité est calculée sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, elle décroît donc tous les jours (samedi, dimanche et jours fériés compris)." data-bs-toggle="tooltip" role="button" tabindex="0">
+                                                      </i>
+                                                  </small>
+                                                  <strong class="text-success">
+                                                      730 jours (Environ 2 ans)
+                                                      <br/>
+                                                      <a class="btn-link has-external-link" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733528375185--PASS-IAE-Comment-%C3%A7a-marche" target="_blank">
+                                                          Comment est calculée cette durée ?
+                                                      </a>
+                                                  </strong>
+                                              </li>
+                                          </ul>
+                                          <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[Public ID of Approval]?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                              <i aria-hidden="true" class="ri-eye-line font-weight-medium">
+                                              </i>
+                                              <span>
+                                                  Afficher le PASS IAE
+                                              </span>
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </main>
+  
+  '''
+# ---
+# name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
+  dict({
+    'num_queries': 19,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'JobSeekerDetailView.get_object[<site-packages>/django/views/generic/detail.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."ft_gps_id",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."are_allocation_since",
+                 "users_jobseekerprofile"."activity_bonus_since",
+                 "users_jobseekerprofile"."cape_freelance",
+                 "users_jobseekerprofile"."cesa_freelance",
+                 "users_jobseekerprofile"."actor_met_for_business_creation",
+                 "users_jobseekerprofile"."mean_monthly_income_before_process",
+                 "users_jobseekerprofile"."eiti_contributions",
+                 "users_jobseekerprofile"."ase_exit",
+                 "users_jobseekerprofile"."isolated_parent",
+                 "users_jobseekerprofile"."housing_issue",
+                 "users_jobseekerprofile"."refugee",
+                 "users_jobseekerprofile"."detention_exit_or_ppsmj",
+                 "users_jobseekerprofile"."low_level_in_french",
+                 "users_jobseekerprofile"."mobility_issue",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at",
+                 "users_jobseekerprofile"."created_by_prescriber_organization_id",
+                 "users_jobseekerprofile"."is_stalled",
+                 "users_jobseekerprofile"."is_not_stalled_anymore",
+                 "users_jobseekerprofile"."fields_history"
+          FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_geiqeligibilitydiagnosis"."id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_kind",
+                 "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_geiqeligibilitydiagnosis"."created_at",
+                 "eligibility_geiqeligibilitydiagnosis"."updated_at",
+                 "eligibility_geiqeligibilitydiagnosis"."expires_at",
+                 "eligibility_geiqeligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_geiqeligibilitydiagnosis"."author_geiq_id",
+                 T5."id",
+                 T5."password",
+                 T5."last_login",
+                 T5."is_superuser",
+                 T5."username",
+                 T5."first_name",
+                 T5."last_name",
+                 T5."is_staff",
+                 T5."is_active",
+                 T5."date_joined",
+                 T5."address_line_1",
+                 T5."address_line_2",
+                 T5."post_code",
+                 T5."city",
+                 T5."department",
+                 T5."coords",
+                 T5."geocoding_score",
+                 T5."geocoding_updated_at",
+                 T5."ban_api_resolved_address",
+                 T5."insee_city_id",
+                 T5."title",
+                 T5."full_name_search_vector",
+                 T5."email",
+                 T5."phone",
+                 T5."kind",
+                 T5."identity_provider",
+                 T5."has_completed_welcoming_tour",
+                 T5."created_by_id",
+                 T5."external_data_source_history",
+                 T5."last_checked_at",
+                 T5."public_id",
+                 T5."address_filled_at",
+                 T5."first_login",
+                 T5."upcoming_deletion_notified_at",
+                 T5."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_geiqeligibilitydiagnosis"
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" = "companies_company"."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          INNER JOIN "users_user" T5 ON ("eligibility_geiqeligibilitydiagnosis"."author_id" = T5."id")
+          WHERE ("eligibility_geiqeligibilitydiagnosis"."expires_at" > %s
+                 AND "eligibility_geiqeligibilitydiagnosis"."job_seeker_id" = %s
+                 AND ("eligibility_geiqeligibilitydiagnosis"."author_geiq_id" IS NULL
+                      OR "eligibility_geiqeligibilitydiagnosis"."author_prescriber_organization_id" IS NOT NULL))
+          ORDER BY "eligibility_geiqeligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE ("approvals_approval"."user_id" = %s
+                 AND "approvals_approval"."end_at" >= %s)
+          ORDER BY "approvals_approval"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_suspension"."id",
+                 "approvals_suspension"."approval_id",
+                 "approvals_suspension"."start_at",
+                 "approvals_suspension"."end_at",
+                 "approvals_suspension"."siae_id",
+                 "approvals_suspension"."reason",
+                 "approvals_suspension"."reason_explanation",
+                 "approvals_suspension"."created_at",
+                 "approvals_suspension"."created_by_id",
+                 "approvals_suspension"."updated_at",
+                 "approvals_suspension"."updated_by_id"
+          FROM "approvals_suspension"
+          WHERE "approvals_suspension"."approval_id" IN (%s)
+          ORDER BY "approvals_suspension"."start_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.latest_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" = %s
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_eligibilitydiagnosis"."id",
+                 "eligibility_eligibilitydiagnosis"."author_id",
+                 "eligibility_eligibilitydiagnosis"."author_kind",
+                 "eligibility_eligibilitydiagnosis"."author_prescriber_organization_id",
+                 "eligibility_eligibilitydiagnosis"."created_at",
+                 "eligibility_eligibilitydiagnosis"."updated_at",
+                 "eligibility_eligibilitydiagnosis"."expires_at",
+                 "eligibility_eligibilitydiagnosis"."job_seeker_id",
+                 "eligibility_eligibilitydiagnosis"."author_siae_id",
+                 CASE
+                     WHEN "eligibility_eligibilitydiagnosis"."author_kind" = %s THEN %s
+                     ELSE %s
+                 END AS "from_prescriber",
+                 T3."id",
+                 T3."password",
+                 T3."last_login",
+                 T3."is_superuser",
+                 T3."username",
+                 T3."first_name",
+                 T3."last_name",
+                 T3."is_staff",
+                 T3."is_active",
+                 T3."date_joined",
+                 T3."address_line_1",
+                 T3."address_line_2",
+                 T3."post_code",
+                 T3."city",
+                 T3."department",
+                 T3."coords",
+                 T3."geocoding_score",
+                 T3."geocoding_updated_at",
+                 T3."ban_api_resolved_address",
+                 T3."insee_city_id",
+                 T3."title",
+                 T3."full_name_search_vector",
+                 T3."email",
+                 T3."phone",
+                 T3."kind",
+                 T3."identity_provider",
+                 T3."has_completed_welcoming_tour",
+                 T3."created_by_id",
+                 T3."external_data_source_history",
+                 T3."last_checked_at",
+                 T3."public_id",
+                 T3."address_filled_at",
+                 T3."first_login",
+                 T3."upcoming_deletion_notified_at",
+                 T3."allow_next_sso_sub_update",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized",
+                 "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_company"."fields_history"
+          FROM "eligibility_eligibilitydiagnosis"
+          INNER JOIN "users_user" T3 ON ("eligibility_eligibilitydiagnosis"."author_id" = T3."id")
+          LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("eligibility_eligibilitydiagnosis"."author_prescriber_organization_id" = "prescribers_prescriberorganization"."id")
+          LEFT OUTER JOIN "companies_company" ON ("eligibility_eligibilitydiagnosis"."author_siae_id" = "companies_company"."id")
+          WHERE ("eligibility_eligibilitydiagnosis"."author_kind" = %s
+                 AND "eligibility_eligibilitydiagnosis"."job_seeker_id" = %s)
+          ORDER BY 10 DESC,
+                   "eligibility_eligibilitydiagnosis"."created_at" DESC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_selectedadministrativecriteria"."id",
+                 "eligibility_selectedadministrativecriteria"."certified_at",
+                 "eligibility_selectedadministrativecriteria"."certification_period",
+                 "eligibility_selectedadministrativecriteria"."data_returned_by_api",
+                 "eligibility_selectedadministrativecriteria"."last_certification_attempt_at",
+                 "eligibility_selectedadministrativecriteria"."created_at",
+                 "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id",
+                 "eligibility_selectedadministrativecriteria"."administrative_criteria_id"
+          FROM "eligibility_selectedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("eligibility_selectedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" IN (%s)
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'FollowUpGroupQueryset.first[<site-packages>/django/db/models/query.py]',
+          'JobSeekerDetailView.get_context_data[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "gps_followupgroup"."id",
+                 "gps_followupgroup"."created_at",
+                 "gps_followupgroup"."created_in_bulk",
+                 "gps_followupgroup"."updated_at",
+                 "gps_followupgroup"."beneficiary_id"
+          FROM "gps_followupgroup"
+          INNER JOIN "users_user" ON ("gps_followupgroup"."beneficiary_id" = "users_user"."id")
+          WHERE ("users_user"."is_active"
+                 AND "gps_followupgroup"."beneficiary_id" = %s)
+          ORDER BY "gps_followupgroup"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'IfNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'WithNode[job_seekers_views/includes/eligibility_diagnosis.html]',
+          'IncludeNode[job_seekers_views/details.html]',
+          'IfNode[job_seekers_views/details.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[job_seekers_views/details.html]',
+        ]),
+        'sql': '''
+          SELECT "eligibility_administrativecriteria"."id",
+                 "eligibility_administrativecriteria"."level",
+                 "eligibility_administrativecriteria"."name",
+                 "eligibility_administrativecriteria"."desc",
+                 "eligibility_administrativecriteria"."written_proof",
+                 "eligibility_administrativecriteria"."written_proof_url",
+                 "eligibility_administrativecriteria"."written_proof_validity",
+                 "eligibility_administrativecriteria"."kind",
+                 "eligibility_administrativecriteria"."ui_rank",
+                 "eligibility_administrativecriteria"."created_at"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE "eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+          ORDER BY "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
       }),
       dict({
         'origin': list([

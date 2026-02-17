@@ -121,14 +121,49 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
 
 
 @freeze_time("2024-08-14")
-def test_with_approval(client, snapshot):
+def test_with_approval_and_diagnosis_from_employer(client, snapshot):
+    """
+    Employer diagnosis is not displayed to prescriber.
+    """
     job_seeker = JobSeekerFactory(for_snapshot=True)
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-    approval = ApprovalFactory(user=job_seeker, for_snapshot=True)
+    approval = ApprovalFactory(user=job_seeker, number="XXXXX1212345", with_diagnosis_from_employer=True)
 
     authorized_prescriber = PrescriberMembershipFactory(
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
     ).user
+    client.force_login(authorized_prescriber)
+    with assertSnapshotQueries(snapshot(name="SQL queries")):
+        response = client.get(url)
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            ("href", f"/approvals/details/{approval.public_id}", "/approvals/details/[Public ID of Approval]"),
+            (
+                "href",
+                f"/gps/request-new-participant/{job_seeker.public_id}",
+                "/gps/request-new-participant/[Public ID of JobSeeker]",
+            ),
+        ],
+    )
+    assert pretty_indented(soup) == snapshot(name="HTML page")
+
+
+@freeze_time("2024-08-14")
+def test_with_approval_and_diagnosis_from_prescriber(client, snapshot):
+    job_seeker = JobSeekerFactory(for_snapshot=True)
+    url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
+    authorized_prescriber = PrescriberMembershipFactory(
+        user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
+    ).user
+    approval = ApprovalFactory(
+        user=job_seeker,
+        number="XXXXX1212345",
+        eligibility_diagnosis__author=authorized_prescriber,
+        eligibility_diagnosis__author_prescriber_organization=authorized_prescriber.prescriberorganization_set.first(),
+    )
+
     client.force_login(authorized_prescriber)
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(url)
