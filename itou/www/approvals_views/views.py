@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
-from django.db.models import F, Max, OuterRef, Prefetch, Subquery
+from django.db.models import Exists, F, Max, OuterRef, Prefetch, Subquery
 from django.db.models.base import Coalesce
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -394,7 +394,16 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     """
 
     siae = get_current_company_or_404(request)
-    approval = get_object_or_404(Approval, pk=approval_id)
+    approval = get_object_or_404(
+        Approval.objects.filter(
+            Exists(
+                JobApplication.objects.filter(
+                    approval=OuterRef("pk"), to_company=siae, state=JobApplicationState.ACCEPTED
+                )
+            )
+        ),
+        pk=approval_id,
+    )
 
     if not siae.is_subject_to_iae_rules or not approval.can_be_prolonged:
         raise PermissionDenied()
@@ -482,7 +491,16 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         self.siae = get_current_company_or_404(request)
         if not self.siae.is_subject_to_iae_rules:
             raise PermissionDenied()
-        self.approval = get_object_or_404(Approval, pk=approval_id)
+        self.approval = get_object_or_404(
+            Approval.objects.filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        approval=OuterRef("pk"), to_company=self.siae, state=JobApplicationState.ACCEPTED
+                    )
+                )
+            ),
+            pk=approval_id,
+        )
 
         if not self.approval.can_be_prolonged:
             raise PermissionDenied()

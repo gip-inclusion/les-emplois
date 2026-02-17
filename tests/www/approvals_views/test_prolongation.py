@@ -15,6 +15,7 @@ from itou.approvals.models import Prolongation
 from itou.companies.enums import CompanyKind
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
@@ -123,6 +124,41 @@ class TestApprovalProlongation:
         email = mailoutbox[0]
         assert len(email.to) == 1
         assert email.to[0] == post_data["email"]
+
+    def test_approval_prolongation_with_other_employer(self, client):
+        """
+        An employer should not be able to declare a prolongation for an approval that belongs to an employee of
+        another company
+        """
+        other_company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        other_employer = other_company.members.first()
+
+        client.force_login(other_employer)
+
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "view_name",
+        [
+            "prolongation_form_for_reason",
+            "check_prescriber_email",
+            "check_contact_details",
+        ],
+    )
+    def test_htmx_fragments_approval_prolongation_with_other_employer(self, client, view_name):
+        """
+        HTMX fragments views should also deny access to non-related employers
+        """
+        other_company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
+        other_employer = other_company.members.first()
+
+        client.force_login(other_employer)
+
+        url = reverse(f"approvals:{view_name}", kwargs={"approval_id": self.approval.pk})
+        response = client.post(url, {"reason": ProlongationReason.SENIOR})
+        assert response.status_code == 404
 
     def test_prolong_approval_view_prepopulates_SENIOR_CDI(self, client, snapshot):
         client.force_login(self.employer)
