@@ -16,7 +16,7 @@
 # ---
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 28,
+    'num_queries': 30,
     'queries': list([
       dict({
         'origin': list([
@@ -982,6 +982,70 @@
                            AND U0."is_admin"
                            AND U1."is_active"))
                  AND "users_user"."id" = %s)
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'User.latest_approval[users/models.py]',
+          'User.has_valid_approval[users/models.py]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[employees/detail.html]',
+        ]),
+        'sql': '''
+          SELECT "approvals_approval"."id",
+                 "approvals_approval"."start_at",
+                 "approvals_approval"."end_at",
+                 "approvals_approval"."created_at",
+                 "approvals_approval"."number",
+                 "approvals_approval"."pe_notification_status",
+                 "approvals_approval"."pe_notification_time",
+                 "approvals_approval"."pe_notification_endpoint",
+                 "approvals_approval"."pe_notification_exit_code",
+                 "approvals_approval"."user_id",
+                 "approvals_approval"."created_by_id",
+                 "approvals_approval"."origin",
+                 "approvals_approval"."eligibility_diagnosis_id",
+                 "approvals_approval"."updated_at",
+                 "approvals_approval"."origin_siae_siret",
+                 "approvals_approval"."origin_siae_kind",
+                 "approvals_approval"."origin_sender_kind",
+                 "approvals_approval"."origin_prescriber_organization_kind",
+                 "approvals_approval"."public_id"
+          FROM "approvals_approval"
+          WHERE "approvals_approval"."user_id" = %s
+          ORDER BY "approvals_approval"."created_at" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Approval.is_suspended[approvals/models.py]',
+          'Approval.state[approvals/models.py]',
+          'approval_state_badge[utils/templatetags/badges.py]',
+          'SimpleNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IfNode[eligibility/includes/iae/eligibility_badge.html]',
+          'WithNode[eligibility/includes/iae/eligibility_badge.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[employees/detail.html]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "approvals_suspension"
+          WHERE ("approvals_suspension"."approval_id" = %s
+                 AND "approvals_suspension"."end_at" >= %s
+                 AND "approvals_suspension"."start_at" <= %s)
           LIMIT 1
         ''',
       }),

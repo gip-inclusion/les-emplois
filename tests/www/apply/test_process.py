@@ -123,6 +123,24 @@ class TestProcessViews:
         "Ces critères reflètent la situation du candidat lors de l’établissement du diagnostic "
         "ayant permis la délivrance d’un PASS IAE"
     )
+    IAE_VALID_ELIGIBILITY_BADGE = """
+        <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>
+            Éligible à l’IAE
+        </span>
+    """
+    IAE_TO_VALIDATE_ELIGIBILITY_BADGE = """
+        <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">
+            <i class="ri-error-warning-line" aria-hidden="true"></i>
+            Éligibilité IAE à valider
+        </span>
+    """
+    IAE_VALID_APPROVAL_BADGE = """
+    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+        <i class="ri-pass-valid-line" aria-hidden="true"></i>
+        PASS&nbsp;IAE valide
+    </span>
+    """
 
     @pytest.fixture(autouse=True)
     def setup_method(self):
@@ -188,6 +206,9 @@ class TestProcessViews:
         )
         assert_previous_step(response, back_url)  # Back_url is restored from session
 
+        assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_TO_VALIDATE_ELIGIBILITY_BADGE, html=True)
+        assertContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
         assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
@@ -270,6 +291,9 @@ class TestProcessViews:
         )
         assert_previous_step(response, back_url, back_to_list=True)  # Back_url is restored from session
 
+        assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_TO_VALIDATE_ELIGIBILITY_BADGE, html=True)
+        assertContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
         assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertNotContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
@@ -317,6 +341,9 @@ class TestProcessViews:
                 response = client.get(url)
                 # Check if approval is displayed
                 assertion(response, "Numéro de PASS IAE")
+                assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+                assertContains(response, self.IAE_TO_VALIDATE_ELIGIBILITY_BADGE, html=True)
+                assertNotContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
 
     def test_details_for_company_with_identity_certified_by_api_particulier_after_expiration(self, client):
         company = CompanyFactory(subject_to_iae_rules=True, with_membership=True)
@@ -488,6 +515,9 @@ class TestProcessViews:
         assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
+        assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_TO_VALIDATE_ELIGIBILITY_BADGE, html=True)
+        assertContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
         assertContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
         assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
@@ -681,6 +711,9 @@ class TestProcessViews:
         assertContains(response, f"<strong>{job_application.to_company.display_name}</strong>")
         assertContains(response, reverse("companies_views:card", kwargs={"company_pk": job_application.to_company.pk}))
 
+        assertContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_TO_VALIDATE_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
         assertNotContains(response, self.IAE_ELIGIBILITY_WITH_CRITERIA_MENTION)
         assertContains(response, self.IAE_ELIGIBILITY_NO_CRITERIA_MENTION)
 
