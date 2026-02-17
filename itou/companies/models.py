@@ -611,6 +611,8 @@ class Company(AddressMixin, OrganizationAbstract):
         not updated for at least 60 days.
         """
         DAYS = 60
+        if self.kind in [CompanyKind.EA, CompanyKind.EATT]:
+            return False
         if self.is_open_to_spontaneous_applications:
             spontaneous_applications_time_since_last_update = timezone.now() - self.spontaneous_applications_open_since
             if spontaneous_applications_time_since_last_update.days >= DAYS:

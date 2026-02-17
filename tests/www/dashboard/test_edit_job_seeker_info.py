@@ -63,7 +63,9 @@ class TestEditJobSeekerInfo:
             "itou.utils.apis.geocoding.get_geocoding_data",
             side_effect=mock_get_geocoding_data_by_ban_api_resolved,
         )
-        job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
+        job_application = JobApplicationSentByPrescriberFactory(
+            job_seeker__jobseeker_profile__nir="178122978200508", to_company__not_ea_eatt_kind=True
+        )
         user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
