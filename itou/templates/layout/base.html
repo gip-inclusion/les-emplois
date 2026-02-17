@@ -1,4 +1,5 @@
 {% load django_bootstrap5 %}
+{% load enums %}
 {% load static %}
 {% load theme_inclusion %}
 <!DOCTYPE HTML>
@@ -68,6 +69,14 @@
                     <div class="alert alert-info fade show" role="status" id="deactivation-job-banner">
                         <p class="mb-0">
                             Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. Elles seront automatiquement dépubliées après 3 mois sans mise à jour. <a href="{% url "companies_views:job_description_list" %}">Pensez à les mettre à jour pour maintenir leur visibilité</a>.
+                        </p>
+                    </div>
+                {% endif %}
+                {% enums "companies" "CompanyKind" as CompanyKind %}
+                {% if request.user.is_employer and request.current_organization and request.current_organization.kind == CompanyKind.EA or request.current_organization.kind == CompanyKind.EATT %}
+                    <div class="alert alert-info fade show" role="status" id="deactivation-job-banner">
+                        <p class="mb-0">
+                            À partir du <strong>11 mai 2026</strong>, les comptes EA/EATT seront clôturés. Publiez désormais vos offres sur <a class="has-external-link" href="https://www.francetravail.fr" target="_blank">France Travail</a>.
                         </p>
                     </div>
                 {% endif %}

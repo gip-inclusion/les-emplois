@@ -1105,3 +1105,39 @@ def test_stalled_job_seekers_box(client):
     response = client.get(reverse("dashboard:index"))
     assert response.context["stalled_job_seekers_count"] == 1
     assertContains(response, "<span>Candidat sans solution</span>", count=1)
+
+
+@pytest.mark.parametrize(
+    "factory,assertion",
+    [
+        pytest.param(
+            partial(
+                EmployerFactory,
+                membership=True,
+                membership__company__kind=random.choice([CompanyKind.EA, CompanyKind.EATT]),
+            ),
+            assertContains,
+            id="EA/EATT employer kind",
+        ),
+        pytest.param(
+            partial(EmployerFactory, membership=True, membership__company__not_ea_eatt_kind=True),
+            assertNotContains,
+            id="Other employer kind",
+        ),
+    ],
+)
+def test_end_of_support_for_ea_eatt_banner(client, factory, assertion):
+    employer = factory()
+    client.force_login(employer)
+    response = client.get(reverse("dashboard:index"))
+    assertion(
+        response,
+        """
+        <p class="mb-0">
+          À partir du <strong>11 mai 2026</strong>, les comptes EA/EATT seront clôturés.
+          Publiez désormais vos offres sur
+          <a class="has-external-link" href="https://www.francetravail.fr" target="_blank">France Travail</a>.
+        </p>
+        """,
+        html=True,
+    )
