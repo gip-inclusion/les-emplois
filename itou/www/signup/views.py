@@ -195,7 +195,10 @@ def company_select(request, template_name="signup/company_select.html"):
     if request.method in ["GET", "POST"] and siren_form.is_valid():
         # Make sure to look only for active structures.
         companies_for_siren = (
-            Company.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"]).distinct("pk")
+            Company.objects.active()
+            .filter(siret__startswith=siren_form.cleaned_data["siren"])
+            .exclude(kind__in=[CompanyKind.EA, CompanyKind.EATT])  # Dropping EA/EATT companies support
+            .distinct("pk")
         )
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.

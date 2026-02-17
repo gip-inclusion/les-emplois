@@ -64,15 +64,23 @@
                             </p>
 
                             <p>
-                                <strong>Une Entreprise Adaptée & GEIQ</strong> :
+                                <strong>Un GEIQ</strong> :
                                 <br>
-                                Complétez <a href="{% tally_form_url "wA799W" %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien pour une Entreprise Adaptée ou un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
+                                Complétez <a href="{% tally_form_url "wA799W" %}" class="has-external-link" target="_blank" rel="noopener" aria-label="lien pour un GEIQ (ouverture dans un nouvel onglet)">ce formulaire de demande d'inscription</a>.
                             </p>
 
-                            <p class="mb-0">
+                            <p>
                                 <strong>Si votre organisation est porteuse de la clause sociale</strong> :
                                 <br>
                                 Complétez <a href="{% url "signup:facilitator_search" %}" rel="noopener" aria-label="lien pour une organisation porteuse de la clause sociale">ce formulaire de demande d'inscription</a>.
+                            </p>
+
+                            <p class="mb-0">
+                                <strong>Une Entreprise Adaptée</strong> :
+                                <br>
+                                Les inscriptions EA/EATT ne sont désormais plus disponibles.
+                                Les comptes EA/EATT existants seront définitivement clôturés le 11 mai 2026.
+                                Nous vous invitons à publier vos offres directement sur le site de <a class="has-external-link" href="https://www.francetravail.fr" target="_blank">France Travail</a>.
                             </p>
                         </div>
                     {% endif %}
@@ -81,7 +89,7 @@
                     {% if companies_without_members and company_select_form %}
                         <div class="c-form mt-3 mt-md-5">
                             <h3 class="mb-1">{{ companies_without_members|pluralizefr:"Entreprise disponible,Entreprises disponibles" }}</h3>
-                            <p>Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
+                            <p>Les données sont fournies par la DGEFP et l’extranet IAE 2.0 de l’ASP.</p>
 
                             <form method="post" class="js-prevent-multiple-submit">
 
@@ -119,7 +127,7 @@
                                         En cliquant sur "Envoyer ma demande de validation", un e-mail contenant un lien de confirmation sera envoyé au correspondant enregistré dans nos bases :
                                     </p>
                                     <ul>
-                                        <li>Pour les SIAE et les EA, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 ou EA 2 de l’ASP,</li>
+                                        <li>Pour les SIAE, il s’agit du correspondant enregistré dans l’extranet IAE 2.0 de l’ASP,</li>
                                         <li>Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.</li>
                                     </ul>
                                 </div>

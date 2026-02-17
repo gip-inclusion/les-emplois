@@ -1,4 +1,7 @@
+import random
+
 import httpx
+import pytest
 import respx
 from django.contrib import messages
 from django.urls import reverse
@@ -121,7 +124,7 @@ class TestCompanySignup:
 
     @freeze_time("2022-09-15 15:53:54")
     def test_join_a_company_without_members_but_invalid_auth_email(self, client, mailoutbox):
-        company = CompanyFactory(kind=CompanyKind.EA, auth_email="Non renseigné")  # Real case from production
+        company = CompanyFactory(kind=CompanyKind.OPCS, auth_email="Non renseigné")
         assert 0 == company.members.count()
 
         url = reverse("signup:company_select")
@@ -391,10 +394,10 @@ class TestCompanySignup:
 
     def test_company_select_does_not_die_under_requests(self, client, snapshot):
         companies = (
-            CompanyFactory(siret="40219166200001", with_membership=True),
-            CompanyFactory(siret="40219166200002", with_membership=True),
-            CompanyFactory(siret="40219166200003", with_membership=True),
-            CompanyFactory(siret="40219166200004", with_membership=True),
+            CompanyFactory(siret="40219166200001", with_membership=True, not_ea_eatt_kind=True),
+            CompanyFactory(siret="40219166200002", with_membership=True, not_ea_eatt_kind=True),
+            CompanyFactory(siret="40219166200003", with_membership=True, not_ea_eatt_kind=True),
+            CompanyFactory(siret="40219166200004", with_membership=True, not_ea_eatt_kind=True),
             CompanyFactory(siret="40219166200005", kind=CompanyKind.EI, with_membership=True),
             CompanyFactory(siret="40219166200005", kind=CompanyKind.AI, with_membership=True),
         )
@@ -417,7 +420,7 @@ class TestCompanySignup:
         assertContains(response, "00005", count=2)
 
     def test_ignores_inactive_members(self, client, snapshot):
-        company = CompanyFactory(siret="40219166200001", with_jobs=True)
+        company = CompanyFactory(siret="40219166200001", with_jobs=True, not_ea_eatt_kind=True)
         membership = CompanyMembershipFactory.create(company=company, is_active=False)
         response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
         assertNotContains(response, self.to_join_msg(membership.user))
@@ -433,6 +436,16 @@ class TestCompanySignup:
         url = add_url_params(url, {"siren": company.siret[:9]})
         response = client.post(url, data=post_data)
         assertRedirects(response, next_url, fetch_redirect_response=False)
+
+    @pytest.mark.parametrize("with_membership", [True, False])
+    def test_cannot_join_ea_eatt(self, client, with_membership):
+        CompanyFactory(
+            siret="40219166200001",
+            with_membership=with_membership,
+            kind=random.choice([CompanyKind.EA, CompanyKind.EATT]),
+        )
+        response = client.get(reverse("signup:company_select"), {"siren": "402191662"})
+        assertContains(response, "Aucun résultat pour 402191662")
 
 
 def test_non_staff_cant_join_a_company(client):
