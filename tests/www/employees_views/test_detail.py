@@ -7,6 +7,7 @@ from django.utils import timezone
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.immersion_facile import immersion_convention_url, immersion_search_url
 from itou.utils.templatetags import format_filters
@@ -22,6 +23,18 @@ from tests.utils.testing import assert_previous_step, parse_response_to_soup, pr
 
 class TestEmployeeDetailView:
     APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
+    IAE_VALID_ELIGIBILITY_BADGE = """
+        <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+            <i class="ri-check-line" aria-hidden="true"></i>
+            Éligible à l’IAE
+        </span>
+    """
+    IAE_VALID_APPROVAL_BADGE = """
+    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+        <i class="ri-pass-valid-line" aria-hidden="true"></i>
+        PASS&nbsp;IAE valide
+    </span>
+    """
 
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()
@@ -30,7 +43,7 @@ class TestEmployeeDetailView:
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_detail_view(self, client, snapshot):
-        approval = ApprovalFactory()
+        approval = ApprovalFactory(start_at=timezone.localdate() - datetime.timedelta(days=365))
         job_application = JobApplicationFactory(
             approval=approval,
             job_seeker=approval.user,
@@ -69,6 +82,8 @@ class TestEmployeeDetailView:
         assertContains(response, reverse("approvals:details", kwargs={"public_id": approval.public_id}))
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE", html=True)
+        assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
         assertContains(response, "Candidatures de ce salarié")
         assertContains(response, "Voir sa candidature", count=2)
         job_application_base_url = reverse(
@@ -94,6 +109,23 @@ class TestEmployeeDetailView:
             replace_in_attr=[("data-it-copy-to-clipboard", str(job_application.job_seeker.public_id), "PUBLIC_ID")],
         )
         assert pretty_indented(content) == snapshot(name="copy_public_id")
+
+        # Expired approval but valid eligibility diagnosis
+        approval.end_at = timezone.localdate() - datetime.timedelta(days=2)
+        approval.save(update_fields=["end_at", "updated_at"])
+        response = client.get(url)
+        assertContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
+
+        # Expired approval and expired eligibility diagnosis: dont show the eligibility section
+        diags = EligibilityDiagnosis.objects.all()
+        for diag in diags:
+            diag.created_at = timezone.now() - datetime.timedelta(days=10)
+            diag.expires_at = timezone.localdate() - datetime.timedelta(days=2)
+        EligibilityDiagnosis.objects.bulk_update(diags, ["created_at", "expires_at", "updated_at"])
+        response = client.get(url)
+        assertNotContains(response, self.IAE_VALID_ELIGIBILITY_BADGE, html=True)
+        assertNotContains(response, self.IAE_VALID_APPROVAL_BADGE, html=True)
 
     def test_detail_view_no_job_application(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
