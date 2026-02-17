@@ -70,6 +70,8 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND "companies_companymembership"."user_id" IS NULL)
         ''',
       }),
@@ -135,6 +137,8 @@
                                 AND U0."is_active")
                          LIMIT 1))
                  AND "companies_company"."siret"::text LIKE %s
+                 AND NOT ("companies_company"."kind" IN (%s,
+                                                         %s))
                  AND NOT (EXISTS
                             (SELECT %s AS "a"
                              FROM "companies_company" U0
