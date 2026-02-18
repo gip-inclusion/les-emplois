@@ -14,8 +14,8 @@ from itoutils.urls import add_url_params
 
 from itou.companies.models import Company, JobDescription
 from itou.nexus.enums import Auth, NexusUserKind, Service
-from itou.nexus.models import ActivatedService, NexusUser
-from itou.nexus.utils import build_user, serialize_user
+from itou.nexus.models import ActivatedService
+from itou.nexus.utils import get_service_users
 from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import UserKind
 from itou.utils.enums import ItouEnvironment
@@ -45,19 +45,15 @@ class NexusMixin:
         if not (request.user.is_employer or request.user.is_prescriber):
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
 
-        self.service_users = list(NexusUser.objects.filter(email=self.request.user.email))
-        user_data = serialize_user(request.user)
-        self.service_users.append(build_user(user_data, Service.EMPLOIS))
-        for activated_service in request.user.activated_services.all():
-            self.service_users.append(build_user(user_data, activated_service.service))
+        service_users = get_service_users(user=request.user)
 
         # Retrieve user data from nexus ressources
-        self.activated_services = {user.source for user in self.service_users}
+        self.activated_services = {user.source for user in service_users}
 
-        if Auth.PRO_CONNECT not in {user.auth for user in self.service_users}:
+        if Auth.PRO_CONNECT not in {user.auth for user in service_users}:
             raise PermissionDenied("Seul un utilisateur ayant un compte ProConnect peut accéder à cette page.")
 
-        if {user.kind for user in self.service_users if user.kind} == {NexusUserKind.GUIDE}:
+        if {user.kind for user in service_users if user.kind} == {NexusUserKind.GUIDE}:
             self.user_kind = NexusUserKind.GUIDE
         else:
             self.user_kind = NexusUserKind.FACILITY_MANAGER

@@ -1,0 +1,94 @@
+{% load enums %}
+{% load theme_inclusion %}
+
+{% enums "nexus" "Service" as Service %}
+
+{% partialdef activated %}
+    <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+        <i class="ri-check-line" aria-hidden="true"></i>
+        Activé
+    </span>
+{% endpartialdef %}
+
+
+{% partialdef one_click_activation %}
+    <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+        <i class="ri-timer-flash-line" aria-hidden="true"></i>
+        Activable en 1 clic
+    </span>
+{% endpartialdef %}
+
+<div class="dropup dropup-center dropdown-nexus">
+    <button class="btn btn-outline-primary btn-block bg-white dropdown-toggle" type="button" id="dropdownNexusMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span>Mon portail</span>
+    </button>
+    <div class="dropdown-menu w-100" aria-labelledby="dropdownNexusMenuButton">
+        <div class="dropdown-item dropdown-item__profil">
+            <span>
+                <strong>{{ user_name }}</strong>
+                <br>
+                <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">{{ user.email }}</span>
+            </span>
+            <a href="{% url 'nexus:homepage' %}" class="btn btn-block btn-outline-primary">Accéder à mon portail</a>
+        </div>
+        <div class="dropdown-divider"></div>
+        {% if Service.EMPLOIS in activated_services %}
+            <a class="dropdown-item dropdown-item__service active" href="{% url 'nexus:emplois' %}">
+                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="35" alt="Les emplois de l'inclusion">
+                {% partial activated %}
+            </a>
+        {% endif %}
+        {% if Service.DORA in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:dora' %}">
+                <img src="{% static_theme_images 'logo-dora.svg' %}" height="35" alt="DORA">
+                {% partial activated %}
+            </a>
+        {% endif %}
+        {% if Service.PILOTAGE in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:pilotage' %}">
+                <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="35" alt="Le pilotage de l'inclusion">
+                {% partial activated %}
+            </a>
+        {% endif %}
+        {% if Service.MON_RECAP in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:mon_recap' %}">
+                <img src="{% static_theme_images 'logo-monrecap.svg' %}" height="35" alt="Mon récap">
+                {% partial activated %}
+            </a>
+        {% endif %}
+        {% if Service.MARCHE in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:marche' %}">
+                <img src="{% static_theme_images 'logo-marche-inclusion.svg' %}" height="35" alt="Le marché de l'inclusion">
+                {% partial activated %}
+            </a>
+        {% endif %}
+        <div class="dropdown-divider"></div>
+        {% if Service.EMPLOIS not in activated_services %}
+            <a class="dropdown-item dropdown-item__service active" href="{% url 'nexus:emplois' %}">
+                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="35" alt="Les emplois de l'inclusion">
+                {% partial one_click_activation %}
+            </a>
+        {% endif %}
+        {% if Service.DORA not in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:dora' %}">
+                <img src="{% static_theme_images 'logo-dora.svg' %}" height="35" alt="DORA">
+            </a>
+        {% endif %}
+        {% if Service.PILOTAGE not in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:pilotage' %}">
+                <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="35" alt="Le pilotage de l'inclusion">
+                {% partial one_click_activation %}
+            </a>
+        {% endif %}
+        {% if Service.MON_RECAP not in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:mon_recap' %}">
+                <img src="{% static_theme_images 'logo-monrecap.svg' %}" height="35" alt="Mon récap">
+            </a>
+        {% endif %}
+        {% if Service.MARCHE not in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{% url 'nexus:marche' %}">
+                <img src="{% static_theme_images 'logo-marche-inclusion.svg' %}" height="35" alt="Le marché de l'inclusion">
+            </a>
+        {% endif %}
+    </div>
+</div>

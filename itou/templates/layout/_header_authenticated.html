@@ -1,5 +1,6 @@
 {% load matomo %}
 {% load nav %}
+{% load nexus %}
 {% load redirection_fields %}
 {% load static %}
 {% load structure_switcher %}
@@ -19,6 +20,7 @@
                     <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
                         <ul>
                             <li class="dropdown d-none d-sm-inline-block">
+                                {% nexus_dropdown %}
                                 <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown" aria-expanded="false">
                                     <i class="ri-account-circle-line" aria-hidden="true"></i>
                                     <span class="ms-2">Mon espace</span>
@@ -54,6 +56,7 @@
             <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale">
                 {% nav request %}
             </nav>
+            {% nexus_dropdown %}
             <div class="dropup dropup-center d-sm-none d-xl-inline-block">
                 <button type="button"
                         class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3"
