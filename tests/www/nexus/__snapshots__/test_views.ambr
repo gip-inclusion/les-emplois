@@ -2049,59 +2049,63 @@
                           </a>
                       </li>
                   </ul>
-                  <strong>
-                      GÉRER MES OFFRES
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Fiches de poste
-                              </span>
-                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
-                                  1
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Services d’insertion
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Prestations commerciales
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
-                  <strong>
-                      ACCOMPAGNER & SUIVRE
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Commande de carnets
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
+                  <div class="rounded-3" id="nexusMyOffersItems">
+                      <strong>
+                          GÉRER MES OFFRES
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Fiches de poste
+                                  </span>
+                                  <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                      1
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Services d’insertion
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Prestations commerciales
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="rounded-3" id="nexusAccompanyItems">
+                      <strong>
+                          ACCOMPAGNER & SUIVRE
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Commande de carnets
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Suivi d’activité
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
               </nav>
               <div class="mt-3">
                   <hr/>
@@ -2233,59 +2237,63 @@
                           </a>
                       </li>
                   </ul>
-                  <strong>
-                      GÉRER MES OFFRES
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Fiches de poste
-                              </span>
-                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
-                                  0
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Services d’insertion
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Prestations commerciales
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
-                  <strong>
-                      ACCOMPAGNER & SUIVRE
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Commande de carnets
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
+                  <div class="rounded-3" id="nexusMyOffersItems">
+                      <strong>
+                          GÉRER MES OFFRES
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Fiches de poste
+                                  </span>
+                                  <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                      0
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Services d’insertion
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Prestations commerciales
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="rounded-3" id="nexusAccompanyItems">
+                      <strong>
+                          ACCOMPAGNER & SUIVRE
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Commande de carnets
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Suivi d’activité
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
               </nav>
               <div class="mt-3">
                   <hr/>
@@ -2417,59 +2425,63 @@
                           </a>
                       </li>
                   </ul>
-                  <strong>
-                      GÉRER MES OFFRES
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Fiches de poste
-                              </span>
-                              <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
-                                  0
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Services d’insertion
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Prestations commerciales
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
-                  <strong>
-                      ACCOMPAGNER & SUIVRE
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Commande de carnets
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
+                  <div class="rounded-3" id="nexusMyOffersItems">
+                      <strong>
+                          GÉRER MES OFFRES
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Mes offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/emplois">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Fiches de poste
+                                  </span>
+                                  <span class="badge rounded-pill badge-sm bg-info-lighter text-info">
+                                      0
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Services d’insertion
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mon activité commerciale" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/marche">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-marche.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Prestations commerciales
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="rounded-3" id="nexusAccompanyItems">
+                      <strong>
+                          ACCOMPAGNER & SUIVRE
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Commande de carnets
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Suivi d’activité
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
               </nav>
               <div class="mt-3">
                   <hr/>
@@ -2601,48 +2613,52 @@
                           </a>
                       </li>
                   </ul>
-                  <strong>
-                      TROUVER & ORIENTER
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/search/employers">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Offres d’emploi
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Services d’insertion
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
-                  <strong>
-                      ACCOMPAGNER & SUIVRE
-                  </strong>
-                  <ul>
-                      <li>
-                          <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Commande de carnets
-                              </span>
-                          </a>
-                      </li>
-                      <li>
-                          <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
-                              <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
-                              <span class="d-md-none d-xl-inline-flex flex-grow-1">
-                                  Suivi d’activité
-                              </span>
-                          </a>
-                      </li>
-                  </ul>
+                  <div class="rounded-3" id="nexusFindItems">
+                      <strong>
+                          TROUVER & ORIENTER
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Offres d’emploi" class="btn btn-lg btn-logo btn-nexus" href="/search/employers">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-emplois.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Offres d’emploi
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Mes services d’insertion" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/dora">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-dora.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Services d’insertion
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+                  <div class="rounded-3" id="nexusAccompanyItems">
+                      <strong>
+                          ACCOMPAGNER & SUIVRE
+                      </strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Commande de carnets" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/mon-recap">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-monrecap.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Commande de carnets
+                                  </span>
+                              </a>
+                          </li>
+                          <li>
+                              <a aria-label="Suivi d’activité" class="btn btn-lg btn-logo btn-nexus" href="/portal/service/pilotage">
+                                  <img alt="" height="40" src="/static/vendor/theme-inclusion/images/nexus/nx-header-logo-pilotage.svg" width="40"/>
+                                  <span class="d-md-none d-xl-inline-flex flex-grow-1">
+                                      Suivi d’activité
+                                  </span>
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
               </nav>
               <div class="mt-3">
                   <hr/>
