@@ -81,15 +81,12 @@
                             Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                         </p>
                     {% endif %}
-
-                    {% include "geiq_assessments_views/includes/assessment_contracts_filters/top_filters.html" %}
                 </div>
             </div>
 
-            {# ID used as target by HTMX in top_filters.html #}
             <div class="row">
                 <div class="col-12" id="contracts-list-container-ajax">
-                    {% include "geiq_assessments_views/includes/list_contracts.html" %}
+                    {% include "geiq_assessments_views/includes/filter_and_list.html" %}
                 </div>
             </div>
         </div>

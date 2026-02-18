@@ -1,0 +1,9 @@
+{# Push the reset button to the right of the filter bar on medium screen and up #}
+<div class="ms-md-auto">
+    {% if filters_counter > 0 %}
+        <a href="{{ request.path }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+            <i class="ri-eraser-line fw-medium" aria-hidden="true"></i>
+            <span>Effacer tout</span>
+        </a>
+    {% endif %}
+</div>

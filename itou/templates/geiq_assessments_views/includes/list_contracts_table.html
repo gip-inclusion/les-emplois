@@ -2,20 +2,6 @@
 {% load buttons_form %}
 
 
-{% if filters_form.errors %}
-    <div class="alert alert-danger d-flex align-items-start mb-4" role="alert">
-        <i class="ri-error-warning-line me-2 mt-1"></i>
-        <div class="small">
-            {% for field, errors in filters_form.errors.items %}
-                {% for error in errors %}
-                    {{ error }}
-                    {% if not forloop.last %}<br>{% endif %}
-                {% endfor %}
-            {% endfor %}
-        </div>
-    </div>
-{% endif %}
-
 <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
     <div class="flex-md-grow-1">
         <p class="h4 mb-0">
@@ -96,3 +82,5 @@
         {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
     </form>
 {% endif %}
+
+</section>
