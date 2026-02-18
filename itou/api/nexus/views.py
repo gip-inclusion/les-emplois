@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from itou.api.auth import ServiceTokenAuthentication
 from itou.api.nexus.serializers import (
     DeleteObjectSerializer,
+    EmailSerializer,
     MembershipSerializer,
     StructureSerializer,
     SyncCompletedSerializer,
@@ -111,3 +112,12 @@ class SyncCompletedView(NexusApiMixin, generics.GenericAPIView):
 
         logger.warning("Got invalid start_at for source=%s", self.source, exc_info=True)
         return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+
+@extend_schema(exclude=True)
+class DropDownStatusView(NexusApiMixin, generics.GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = EmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payload = nexus_utils.dropdown_status(email=serializer.validated_data["email"])
+        return Response(payload, status=status.HTTP_200_OK)

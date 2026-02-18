@@ -1,8 +1,12 @@
+from django.conf import settings
 from django.utils import timezone
 
+from itou.companies.models import CompanyMembership
 from itou.nexus.enums import STRUCTURE_KIND_MAPPING, USER_KIND_MAPPING, Auth, Service
 from itou.nexus.models import ActivatedService, NexusMembership, NexusRessourceSyncStatus, NexusStructure, NexusUser
-from itou.users.enums import IdentityProvider
+from itou.prescribers.models import PrescriberMembership
+from itou.users.enums import IdentityProvider, UserKind
+from itou.users.models import User
 
 
 SERVICE_MAPPING = {
@@ -17,6 +21,58 @@ SERVICE_MAPPING = {
 
 def service_id(service, id):
     return f"{SERVICE_MAPPING[service]}--{id}"
+
+
+# ------------------------------------------------
+# Check user
+
+
+def get_service_users(*, email=None, user=None):
+    assert bool(email) ^ bool(user), "One and only one of email and user is required"
+    if email:
+        user = User.objects.filter(
+            email=email,
+            is_active=True,
+            kind__in=[UserKind.PRESCRIBER, UserKind.EMPLOYER],
+        ).first()
+    else:
+        email = email or user.email
+
+    service_users = list(NexusUser.objects.filter(email=email))
+
+    if user:
+        user_data = serialize_user(user)
+        service_users.append(build_user(user_data, Service.EMPLOIS))
+        for activated_service in user.activated_services.all():
+            service_users.append(build_user(user_data, activated_service.service))
+
+    return service_users
+
+
+def dropdown_status(*, email=None, user=None):
+    assert bool(email) ^ bool(user), "One and only one of email and user is required"
+    service_users = get_service_users(email=email, user=user)
+    email = email or user.email
+
+    mvp_enabled = (
+        CompanyMembership.objects.filter(user__email=email, company__department__in=settings.NEXUS_MVP_DEPARTMENTS)
+        .values_list("pk", flat=True)
+        .union(
+            PrescriberMembership.objects.filter(
+                user__email=email, organization__department__in=settings.NEXUS_MVP_DEPARTMENTS
+            ).values_list("pk", flat=True)
+        )
+        .union(
+            NexusMembership.objects.filter(user__email=email, structure__department__in=settings.NEXUS_MVP_DEPARTMENTS)
+        )
+        .exists()
+    )
+
+    return {
+        "proconnect": Auth.PRO_CONNECT in {user.auth for user in service_users},
+        "activated_services": sorted([user.source for user in service_users]),
+        "mvp-enabled": mvp_enabled,
+    }
 
 
 # ------------------------------------------------
