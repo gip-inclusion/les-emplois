@@ -544,7 +544,7 @@
       dict({
         'origin': list([
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -593,7 +593,7 @@
       dict({
         'origin': list([
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
@@ -632,7 +632,7 @@
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
           'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -654,7 +654,7 @@
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
           'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -682,7 +682,7 @@
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
           'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -741,7 +741,7 @@
           'ExtendsNode[geiq_assessments_views/_assessment_base_for_geiq.html]',
           'ExtendsNode[geiq_assessments_views/assessment_details_for_geiq.html]',
           'assessment_details_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2953,7 +2953,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
           'list_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2974,7 +2974,7 @@
           'IfNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
           'list_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2999,7 +2999,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
           'list_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessment"."id",
@@ -3087,7 +3087,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/list_for_geiq.html]',
           'list_for_geiq[www/geiq_assessments_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "geiq_assessments_assessmentinstitutionlink"."id",
