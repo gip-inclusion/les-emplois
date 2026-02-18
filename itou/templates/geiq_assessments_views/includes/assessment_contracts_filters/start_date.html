@@ -1,0 +1,13 @@
+{% load django_bootstrap5 %}
+
+<div class="dropdown d-inline-block">
+    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-auto-close="outside" aria-expanded="false" id="btn-filter-start-date">
+        Date de début de contrat
+    </button>
+    <div class="dropdown-menu p-3 shadow border-0 overflow-visible" aria-labelledby="btn-filter-start-date">
+        <div class="d-flex flex-column gap-3">
+            <div class="mb-0">{% bootstrap_field filters_form.start_date_min %}</div>
+            <div class="mb-0">{% bootstrap_field filters_form.start_date_max %}</div>
+        </div>
+    </div>
+</div>

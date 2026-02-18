@@ -1,4 +1,7 @@
+import datetime
+
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.utils import timezone
 
@@ -8,6 +11,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
 from itou.utils.templatetags.format_filters import format_int_euros
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class CreateForm(forms.Form):
@@ -223,3 +227,72 @@ class ReviewForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.decision_validated_at = timezone.now()
         return super().save(commit=commit)
+
+
+class ContractFilterForm(forms.Form):
+    """
+    Allow users to filter the list of contracts.
+    """
+
+    start_date_min = forms.DateField(label="Du", required=False, widget=DuetDatePickerWidget())
+    start_date_max = forms.DateField(
+        label="Au",
+        required=False,
+        widget=DuetDatePickerWidget(),
+    )
+
+    def clean(self):
+        """
+        Global validation: check date consistency and normalize times.
+        """
+        cleaned_data = super().clean()
+        start_date_min = cleaned_data.get("start_date_min")
+        start_date_max = cleaned_data.get("start_date_max")
+
+        # Validation of date order
+        if start_date_min and start_date_max and start_date_min > start_date_max:
+            self.add_error("start_date_max", "La date de fin doit être postérieure à la date de début.")
+
+        # Time normalization (essential for database lookups)
+        if start_date_min:
+            # Combine with 00:00:00
+            start_date_min = datetime.datetime.combine(start_date_min, datetime.time.min)
+            cleaned_data["start_date_min"] = timezone.make_aware(start_date_min)
+        if start_date_max:
+            # Combine with 23:59:59 to include the whole day
+            start_date_max = datetime.datetime.combine(start_date_max, datetime.time.max)
+            cleaned_data["start_date_max"] = timezone.make_aware(start_date_max)
+
+        return cleaned_data
+
+    def filter(self, queryset):
+        """
+        Apply filters to the given queryset based on cleaned data.
+        """
+        if not self.is_valid():
+            return queryset  # Return unfiltered if form is not valid
+
+        filters = []
+        data = self.cleaned_data
+
+        if start_date_min := data.get("start_date_min"):
+            filters.append(Q(start_at__gte=start_date_min))
+
+        if start_date_max := data.get("start_date_max"):
+            filters.append(Q(start_at__lte=start_date_max))
+
+        if filters:
+            queryset = queryset.filter(*filters)
+
+        return queryset
+
+    def get_qs_filters_counter(self):
+        """
+        Get number of filters selected.
+        """
+
+        if not hasattr(self, "cleaned_data"):
+            return 0
+
+        # We count fildes that have a value
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)

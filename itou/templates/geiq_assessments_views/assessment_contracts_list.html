@@ -56,9 +56,13 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-12">
                     {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-12">
                     {% if request.user.is_employer %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
                         <p>
@@ -77,67 +81,15 @@
                             Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                         </p>
                     {% endif %}
-                    <div class="table-responsive mt-3 mt-md-4">
-                        <table class="table table-hover">
-                            <caption class="visually-hidden">Liste des bilans d’exécution</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">NOM Prénom</th>
-                                    <th scope="col">Date de début</th>
-                                    <th scope="col">Date de fin</th>
-                                    <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
-                                    <th scope="col">Aide potentielle</th>
-                                    {% if request.user.is_employer %}
-                                        <th scope="col">Obtenir l’aide</th>
-                                    {% elif request.user.is_labor_inspector %}
-                                        <th scope="col">Éligible à l’aide</th>
-                                    {% endif %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for contract in contracts_page %}
-                                    <tr>
-                                        <td>
-                                            <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
-                                        </td>
-                                        <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
-                                        <td>
-                                            {% if contract.end_at %}
-                                                {{ contract.end_at|date:"d/m/Y" }}
-                                            {% else %}
-                                                {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if contract.nb_days_in_campaign_year >= 90 %}
-                                                Oui
-                                            {% else %}
-                                                Non
-                                            {% endif %}
 
-                                        </td>
-                                        <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
-                                        <td>
-                                            {% if request.user.is_employer %}
-                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
-                                            {% elif request.user.is_labor_inspector %}
-                                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% include "includes/pagination.html" with page=contracts_page boost=True request=request only %}
+                    {% include "geiq_assessments_views/includes/assessment_contracts_filters/top_filters.html" %}
+                </div>
+            </div>
 
-                    {% if can_validate %}
-
-                        <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
-                        </form>
-                    {% endif %}
+            {# ID used as target by HTMX in top_filters.html #}
+            <div class="row">
+                <div class="col-12" id="contracts-list-container-ajax">
+                    {% include "geiq_assessments_views/includes/list_contracts.html" %}
                 </div>
             </div>
         </div>

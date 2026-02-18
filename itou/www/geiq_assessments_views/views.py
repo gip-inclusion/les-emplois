@@ -47,6 +47,7 @@ from itou.www.geiq_assessments_views.export import (
 )
 from itou.www.geiq_assessments_views.forms import (
     ActionFinancialAssessmentForm,
+    ContractFilterForm,
     CreateForm,
     GeiqCommentForm,
     ReviewForm,
@@ -166,6 +167,7 @@ def create_assessment(request, template_name="geiq_assessments_views/create.html
         "geiq_info": geiq_info,
         "conflicting_antennas": [],
     }
+
     if geiq_info is None:
         return render(request, template_name, context)
 
@@ -558,10 +560,23 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
     elif request.user.is_labor_inspector:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
-    contracts_page = pager(
+
+    # Initializing the filter form with the raw parameters
+    filters_form = ContractFilterForm(request.GET or None)
+
+    # QuerySet for contracts
+    contracts_qs = (
         EmployeeContract.objects.filter(employee__assessment=assessment, **contract_filter_kwargs)
         .select_related("employee__assessment")
-        .order_by("employee__last_name", "employee__first_name"),
+        .order_by("employee__last_name", "employee__first_name")
+    )
+
+    if filters_form.is_valid():
+        contracts_qs = filters_form.filter(contracts_qs)
+    # Get filters count for the 'Effacer tout' button
+    filters_counter = filters_form.get_qs_filters_counter()
+    contracts_page = pager(
+        contracts_qs,
         request.GET.get("page"),
         items_per_page=settings.PAGE_SIZE_LARGE,
     )
@@ -574,7 +589,15 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "AssessmentContractDetailsTab": AssessmentContractDetailsTab,
         "ContractsAction": ContractsAction,
         "stats": stats,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
     }
+
+    if request.htmx:
+        context["stats"] = None
+        context["disable_stats_oob"] = True
+        return render(request, "geiq_assessments_views/includes/list_contracts.html", context)
+
     return render(request, template_name, context)
 
 

@@ -1,0 +1,98 @@
+{% load format_filters %}
+{% load buttons_form %}
+
+
+{% if filters_form.errors %}
+    <div class="alert alert-danger d-flex align-items-start mb-4" role="alert">
+        <i class="ri-error-warning-line me-2 mt-1"></i>
+        <div class="small">
+            {% for field, errors in filters_form.errors.items %}
+                {% for error in errors %}
+                    {{ error }}
+                    {% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+    <div class="flex-md-grow-1">
+        <p class="h4 mb-0">
+            <strong>{{ contracts_page.paginator.count }}</strong> résultats
+        </p>
+    </div>
+</div>
+
+<div class="table-responsive mt-3 mt-md-4">
+    <table class="table table-hover">
+        <caption class="visually-hidden">Liste des contrats</caption>
+        <thead>
+            <tr>
+                <th scope="col">NOM Prénom</th>
+                <th scope="col">Date de début</th>
+                <th scope="col">Date de fin</th>
+                <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
+                <th scope="col">Aide potentielle</th>
+                <th scope="col">
+                    {% if request.user.is_employer %}
+                        Obtenir l’aide
+                    {% else %}
+                        Éligible à l’aide
+                    {% endif %}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contract in contracts_page %}
+                <tr>
+                    <td>
+                        <a class="btn-link" href="{% url 'geiq_assessments_views:assessment_contracts_details' contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">
+                            {{ contract.employee.get_full_name }}
+                        </a>
+                    </td>
+                    <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                    <td>
+                        {% if contract.end_at %}
+                            {{ contract.end_at|date:"d/m/Y" }}
+                        {% else %}
+                            {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if contract.nb_days_in_campaign_year >= 90 %}
+                            Oui
+                        {% else %}
+                            Non
+                        {% endif %}
+                    </td>
+                    <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
+                    <td>
+                        {% if request.user.is_employer %}
+                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate  disable_stats_oob=disable_stats_oob only %}
+                        {% elif request.user.is_labor_inspector %}
+                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate  disable_stats_oob=disable_stats_oob only %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        Aucun contrat ne correspond à votre recherche pour cette période.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{# Pagination compatible with HTMX through boost=True #}
+{% include "includes/pagination.html" with page=contracts_page boost=True request=request only %}
+
+
+{# Button for final validation #}
+{% if can_validate %}
+    <form method="post" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
+    </form>
+{% endif %}
