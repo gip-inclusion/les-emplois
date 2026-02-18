@@ -108,15 +108,15 @@ class CompanyFilterSet(FilterSet):
 
 class SiaeViewSet(LoginNotRequiredMixin, viewsets.mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-    # Liste des SIAE
+    # Liste des structures
 
-    La plateforme renvoie une liste de SIAE à proximité d’une ville (déterminée par son code INSEE)
+    La plateforme renvoie une liste de structures à proximité d’une ville (déterminée par son code INSEE)
     et dans un rayon de recherche en kilomètres autour du centre de cette ville.
 
     Les coordonnées des centres-villes sont issus de [https://geo.api.gouv.fr](https://geo.api.gouv.fr/)
 
-    Chaque SIAE est accompagnée d’un certain nombre de métadonnées, et peut proposer 0, 1 ou plusieurs postes.
-    Pour le détail des métadonnées des SIAE et de leur postes, voir plus bas dans la section Responses
+    Chaque structure est accompagnée d’un certain nombre de métadonnées, et peut proposer 0, 1 ou plusieurs postes.
+    Pour le détail des métadonnées des structures et de leur postes, voir plus bas dans la section Responses
     """
 
     serializer_class = SiaeSerializer
