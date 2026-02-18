@@ -38,7 +38,7 @@ from itou.geiq_assessments.notifications import (
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.utils.apis import geiq_label
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.export import to_streaming_response
 from itou.utils.pagination import pager
 from itou.www.geiq_assessments_views.export import (
@@ -56,10 +56,20 @@ from itou.www.geiq_assessments_views.forms import (
 logger = logging.getLogger(__name__)
 
 
-def company_has_access_to_assessments(company):
-    return company.kind == CompanyKind.GEIQ and company.post_code.startswith(
-        tuple(settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES)
-    )
+def employer_has_access_to_assessments(request):
+    """
+    Return True if the user can access the GEIQ assessment module.
+
+    Access is restricted to:
+    - GEIQ organization admins within the configured campaign regions
+    """
+
+    if (organization := getattr(request, "current_organization", None)) and organization.kind == CompanyKind.GEIQ:
+        return (
+            organization.post_code.startswith(tuple(settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES))
+            and request.is_current_organization_admin
+        )
+    return False
 
 
 def get_allowance_stats_for_geiq(assessment, *, for_assessment_details=False):
@@ -119,10 +129,8 @@ def get_allowance_stats_for_institution(assessment, *, for_assessment_details=Fa
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.html"):
-    if not company_has_access_to_assessments(request.current_organization):
-        raise Http404
     assessments = (
         Assessment.objects.filter(companies=request.current_organization)
         .select_related("campaign", "created_by")
@@ -140,10 +148,8 @@ def list_for_geiq(request, template_name="geiq_assessments_views/list_for_geiq.h
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def create_assessment(request, template_name="geiq_assessments_views/create.html"):
-    if not company_has_access_to_assessments(request.current_organization):
-        raise Http404
     current_siret = request.current_organization.siret
     campaign_label_infos = LabelInfos.objects.filter(campaign__year=timezone.localdate().year - 1).first()
     label_data = campaign_label_infos.data if campaign_label_infos else []
@@ -262,10 +268,8 @@ class AssessmentDetailsTab(models.TextChoices):
     RESULT = "result", "Résultat"
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_views/assessment_details_for_geiq.html"):
-    if not company_has_access_to_assessments(request.current_organization):
-        raise Http404
     assessment = get_object_or_404(
         Assessment.objects.select_related("campaign")
         .filter(companies=request.current_organization)
@@ -332,7 +336,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_get_file(request, pk, *, file_field):
     if request.user.is_employer:
         filter_kwargs = {"companies": request.current_organization}
@@ -360,7 +364,7 @@ def assessment_get_file(request, pk, *, file_field):
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_sync_file(request, pk, *, file_field):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
@@ -396,7 +400,7 @@ def assessment_sync_file(request, pk, *, file_field):
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def upload_action_financial_assessment(
     request, pk, template_name="geiq_assessments_views/action_financial_assessment_upload.html"
 ):
@@ -418,7 +422,7 @@ def upload_action_financial_assessment(
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_comment(request, pk, template_name="geiq_assessments_views/assessment_comment.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(companies=request.current_organization, submitted_at__isnull=True), pk=pk
@@ -443,7 +447,7 @@ def assessment_comment(request, pk, template_name="geiq_assessments_views/assess
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_contracts_sync(request, pk):
     assessment = get_object_or_404(Assessment.objects.filter(companies=request.current_organization), pk=pk)
 
@@ -471,7 +475,7 @@ class ContractsAction(enum.StrEnum):
     do_not_call_in_templates = enum.nonmember(True)
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
     if request.user.is_employer:
         filter_kwargs = {"companies": request.current_organization}
@@ -575,7 +579,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
 
 @require_safe
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_export(request, pk):
     if request.user.is_employer:
         filter_kwargs = {"companies": request.current_organization}
@@ -609,7 +613,7 @@ class AssessmentContractDetailsTab(models.TextChoices):
     EXIT = "exit", "Sortie"
 
 
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_details(
     request, contract_pk, tab, template_name="geiq_assessments_views/assessment_contracts_details.html"
 ):
@@ -654,7 +658,7 @@ def assessment_contracts_details(
 
 
 @require_POST
-@check_user(lambda user: user.is_employer or user.is_labor_inspector)
+@check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
@@ -708,7 +712,7 @@ def assessment_contracts_toggle(
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment_kpi.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(contracts_synced_at__isnull=False)
@@ -732,7 +736,7 @@ def assessment_kpi(request, pk, template_name="geiq_assessments_views/assessment
 
 
 @require_safe
-@check_user(lambda user: user.is_employer)
+@check_request(employer_has_access_to_assessments)
 def assessment_result(request, pk, template_name="geiq_assessments_views/assessment_result.html"):
     assessment = get_object_or_404(
         Assessment.objects.filter(final_reviewed_at__isnull=False)

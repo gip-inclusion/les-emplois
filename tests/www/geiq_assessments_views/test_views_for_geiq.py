@@ -49,7 +49,7 @@ class TestListAssessmentsView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -62,7 +62,7 @@ class TestListAssessmentsView:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = []
 
         response = client.get(reverse("geiq_assessments_views:list_for_geiq"))
-        assert response.status_code == 404
+        assert response.status_code == 403
 
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:list_for_geiq"))
@@ -138,6 +138,14 @@ class TestListAssessmentsView:
             [new_assessment, submitted_assessment, final_reviewed_assessment],
         )
 
+    @pytest.mark.parametrize("is_admin, expected_status_code", [(True, 200), (False, 403)])
+    def test_geiq_employer_access_based_on_admin(self, client, settings, is_admin, expected_status_code):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ, is_admin=is_admin)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        response = client.get(reverse("geiq_assessments_views:list_for_geiq"))
+        assert response.status_code == expected_status_code
+
 
 class TestCreateAssessmentView:
     def test_anonymous_access(self, client):
@@ -150,7 +158,7 @@ class TestCreateAssessmentView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -163,7 +171,7 @@ class TestCreateAssessmentView:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = []
 
         response = client.get(reverse("geiq_assessments_views:create"))
-        assert response.status_code == 404
+        assert response.status_code == 403
 
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:create"))
@@ -356,7 +364,7 @@ class TestAssessmentDetailsForGEIQView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -371,7 +379,7 @@ class TestAssessmentDetailsForGEIQView:
         assessment = AssessmentFactory(companies=[membership.company])
         url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         response = client.get(url)
-        assert response.status_code == 404
+        assert response.status_code == 403
 
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(url)
@@ -707,7 +715,7 @@ class TestAssessmentGetFile:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -719,8 +727,9 @@ class TestAssessmentGetFile:
                 response = client.get(url)
                 assert response.status_code == expected_status
 
-    def test_access(self, client):
+    def test_access(self, client, settings):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         filled_assessment = AssessmentFactory(
             campaign__year=2023,
@@ -816,7 +825,7 @@ class TestAssessmentSyncFile:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -828,9 +837,10 @@ class TestAssessmentSyncFile:
                 assert response.status_code == expected_status
 
     @pytest.mark.usefixtures("temporary_bucket")
-    def test_sync(self, client, pdf_file, respx_mock, label_settings):
+    def test_sync(self, client, pdf_file, respx_mock, settings, label_settings):
         pdf_file_content = pdf_file.read()
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
@@ -888,7 +898,7 @@ class TestAssessmentSyncFile:
         with default_storage.open(assessment.structure_financial_assessment_file.key) as f:
             assert f.read() == pdf_file_content
 
-    def test_with_existing_files(self, client):
+    def test_with_existing_files(self, client, settings):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         summary_document_file = FileFactory()
         structure_financial_assessment_file = FileFactory()
@@ -898,12 +908,12 @@ class TestAssessmentSyncFile:
             structure_financial_assessment_file=structure_financial_assessment_file,
             companies=[geiq_membership.company],
         )
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         client.force_login(geiq_membership.user)
         response = client.post(reverse("geiq_assessments_views:sync_summary_document", kwargs={"pk": assessment.pk}))
         assertContains(response, reverse("geiq_assessments_views:summary_document", kwargs={"pk": assessment.pk}))
         assessment.refresh_from_db()
         assert assessment.summary_document_file == summary_document_file
-
         response = client.post(
             reverse("geiq_assessments_views:sync_structure_financial_assessment", kwargs={"pk": assessment.pk})
         )
@@ -969,7 +979,7 @@ class TestAssessmentUploadActionFinancialAssessment:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1005,8 +1015,9 @@ class TestAssessmentUploadActionFinancialAssessment:
         with default_storage.open(assessment.action_financial_assessment_file.key) as f:
             assert f.read() == pdf_file.read()
 
-    def test_no_access_after_submission(self, client):
+    def test_no_access_after_submission(self, client, settings):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             campaign__year=2023,
             summary_document_file=FileFactory(),
@@ -1045,7 +1056,7 @@ class TestAssessmentComment:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1115,14 +1126,14 @@ class TestAssessmentContractsSync:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
             response = client.post(url)
             assert response.status_code == expected_status
 
-    def test_sync(self, client, respx_mock, label_settings):
+    def test_sync(self, client, respx_mock, settings, label_settings):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         client.force_login(membership.user)
         assessment = AssessmentFactory(
@@ -1171,6 +1182,7 @@ class TestAssessmentContractsSync:
                 "result": [EXPECTED_LABEL_RATES],
             },
         )
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.post(
             reverse("geiq_assessments_views:assessment_contracts_sync", kwargs={"pk": assessment.pk}),
         )
@@ -1181,7 +1193,7 @@ class TestAssessmentContractsSync:
         assert assessment.label_rates == EXPECTED_LABEL_RATES
         assert assessment.contracts_synced_at is not None
 
-    def test_with_contracts_synced(self, client):
+    def test_with_contracts_synced(self, client, settings):
         geiq_membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         assessment = AssessmentFactory(
             campaign__year=2023,
@@ -1189,6 +1201,7 @@ class TestAssessmentContractsSync:
             contracts_synced_at=timezone.now() + datetime.timedelta(seconds=1),
         )
         client.force_login(geiq_membership.user)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [geiq_membership.company.post_code[:2]]
         response = client.post(
             reverse("geiq_assessments_views:assessment_contracts_sync", kwargs={"pk": assessment.pk})
         )
@@ -1243,15 +1256,16 @@ class TestAssessmentKPI:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == expected_status
 
-    def test_access(self, client, snapshot):
+    def test_access(self, client, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         client.force_login(membership.user)
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
@@ -1278,7 +1292,7 @@ class TestAssessmentKPI:
         assert str(parse_response_to_soup(response, ".s-title-02")) == snapshot(name="assessment details title")
         assert str(parse_response_to_soup(response, ".s-section")) == snapshot(name="assessment details section")
 
-    def test_no_access_before_sync(self, client):
+    def test_no_access_before_sync(self, client, settings):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         client.force_login(membership.user)
         assessment = AssessmentFactory(
@@ -1293,6 +1307,7 @@ class TestAssessmentKPI:
             ).institution,
             with_convention=True,
         )
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:assessment_kpi", kwargs={"pk": assessment.pk}))
         assert response.status_code == 404
 
@@ -1342,16 +1357,17 @@ class TestAssessmentResult:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 404),
+            (EmployerFactory(membership=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == expected_status
 
-    def test_access(self, client, snapshot):
+    def test_access(self, client, settings, snapshot):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         assessment = AssessmentFactory(
             id=uuid.UUID("00000000-1111-2222-3333-444444444444"),
             companies=[membership.company],
@@ -1392,7 +1408,7 @@ class TestAssessmentResult:
             name="assessment details negative balance"
         )
 
-    def test_no_access_before_final_review(self, client):
+    def test_no_access_before_final_review(self, client, settings):
         membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
         dreets_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DREETS_GEIQ)
         assessment = AssessmentFactory(
@@ -1418,5 +1434,6 @@ class TestAssessmentResult:
             with_convention=True,
         )
         client.force_login(membership.user)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:assessment_result", kwargs={"pk": assessment.pk}))
         assert response.status_code == 404
