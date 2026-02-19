@@ -1,6 +1,9 @@
-
 {% with eligibility_diagnosis.selected_administrative_criteria_for_display as selected_administrative_criteria %}
     <ul class="list-data mb-3">
+        <li>
+            <small>Durée de validité du diagnostic</small>
+            <strong>du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}</strong>
+        </li>
         <li>
             <small>
                 Critères administratifs
@@ -22,15 +25,3 @@
 {% endwith %}
 
 {% include "eligibility/includes/certification_info_box.html" with diagnosis=eligibility_diagnosis itou_help_center_url=itou_help_center_url request=request only %}
-
-<p class="mb-0">
-    <i>
-        {% if is_sent_by_authorized_prescriber %}
-            Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% else %}
-            Ce diagnostic expire le
-            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
-        {% endif %}
-    </i>
-</p>
