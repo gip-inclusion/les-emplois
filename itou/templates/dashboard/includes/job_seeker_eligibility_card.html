@@ -37,7 +37,6 @@
                         </li>
                     </ul>
                     <hr class="mb-3">
-
                     <p class="fs-sm mb-lg-5">
                         {% if not eligibility_diagnosis %}
                             Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE.
@@ -46,11 +45,11 @@
                         {% endif %}
                     </p>
                 {% else %}
-                    <div class="fs-sm mb-lg-5">
-                        <p class="text-success mb-1">
+                    <div class="mb-lg-5">
+                        <p class="fs-sm text-success">
                             Critères validés
-                            le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
-                            <strong>{{ eligibility_diagnosis.author.get_full_name }}</strong>
+                            le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par
+                            {{ eligibility_diagnosis.author.get_full_name }}
                             {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
                             {% if eligibility_diagnosis.author_prescriber_organization %}
                                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
@@ -61,10 +60,14 @@
                     </div>
                 {% endif %}
             {% elif kind == "GEIQ" %}
-                <p>
-                    Éligibilité GEIQ confirmée par <b>{{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }})</b>
+                <p class="fs-sm text-success">
+                    Éligibilité GEIQ confirmée par {{ eligibility_diagnosis.author.get_full_name }} ({{ eligibility_diagnosis.author_structure.display_name }}).
                 </p>
                 <ul class="list-data mb-3">
+                    <li>
+                        <small>Date d'expiration du diagnostic</small>
+                        <strong>le {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                    </li>
                     <li>
                         <small>Critères administratifs</small>
                         {% if not eligibility_diagnosis.selected_administrative_criteria_for_display %}
@@ -81,9 +84,6 @@
                         {% endif %}
                     </li>
                 </ul>
-                <p>
-                    <i>Ce diagnostic {{ eligibility_diagnosis.is_valid|yesno:"expire,a expiré" }} le {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}.</i>
-                </p>
             {% endif %}
         </div>
     </div>
