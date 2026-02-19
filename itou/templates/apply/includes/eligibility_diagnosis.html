@@ -1,11 +1,11 @@
 {% if siae.is_subject_to_iae_rules or request.user.is_prescriber %}
     {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
         <hr class="my-4">
-        <h3>Éligibilité à l'IAE</h3>
-        <p class="text-success mb-1">
+        <h3 class="mb-0">Éligibilité à l'IAE</h3>
+        <p class="fs-sm text-success">
             {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validée" }}
-            le <span class="fw-bold">{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</span> par
-            <strong>{{ eligibility_diagnosis.author.get_inverted_full_name }}</strong>
+            le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par
+            {{ eligibility_diagnosis.author.get_inverted_full_name }}
             {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
             {% if eligibility_diagnosis.author_prescriber_organization %}
                 ({{ eligibility_diagnosis.author_prescriber_organization.display_name }}).
@@ -15,8 +15,17 @@
     {% elif expired_eligibility_diagnosis %}
         <hr class="my-4">
         <h3>Éligibilité à l'IAE</h3>
-        <p class="mb-0">
-            Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
-        </p>
+        <div class="alert alert-warning mt-4 mb-0" role="status">
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
+                    </p>
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endif %}
