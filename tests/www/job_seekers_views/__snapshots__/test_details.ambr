@@ -246,7 +246,7 @@
                                                   </strong>
                                               </li>
                                           </ul>
-                                          <div class="alert alert-info" role="status">
+                                          <div class="alert alert-info mt-4" role="status">
                                               <div class="row">
                                                   <div class="col-auto pe-0">
                                                       <i aria-hidden="true" class="ri-information-line ri-xl text-info">
@@ -2698,7 +2698,7 @@
                                                   </strong>
                                               </li>
                                           </ul>
-                                          <div class="alert alert-info" role="status">
+                                          <div class="alert alert-info mt-4" role="status">
                                               <div class="row">
                                                   <div class="col-auto pe-0">
                                                       <i aria-hidden="true" class="ri-information-line ri-xl text-info">

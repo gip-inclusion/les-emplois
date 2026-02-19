@@ -83,24 +83,26 @@
                     <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">Vérifier</a>
                 {% endwith %}
             </div>
-            {# GEIQ eligibility diagnosis expired #}
-            {% if diagnosis and not diagnosis.is_valid %}
-                <div class="alert alert-warning mt-4" role="status">
-                    <div class="row">
-                        <div class="col-auto pe-0">
-                            <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
-                        </div>
-                        <div class="col">
-                            <p class="mb-2">
-                                <strong>Aide à l'accompagement GEIQ</strong>
-                            </p>
-                            <p class="mb-0">
-                                Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
         {% endif %}
     </div>
+    {% if request.user.is_employer %}
+        {# GEIQ eligibility diagnosis expired #}
+        {% if diagnosis and not diagnosis.is_valid %}
+            <div class="alert alert-warning mt-4" role="status">
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-alert-line ri-xl text-warning" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Aide à l'accompagement GEIQ</strong>
+                        </p>
+                        <p class="mb-0">
+                            Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
 {% endif %}
