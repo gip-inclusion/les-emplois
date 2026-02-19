@@ -533,6 +533,10 @@ class User(AbstractUser, AddressMixin):
         return self.kind == UserKind.LABOR_INSPECTOR
 
     @property
+    def is_professional(self):
+        return self.kind in UserKind.professionals()
+
+    @property
     def is_itou_admin(self):
         return self.is_superuser or self.is_staff and self.groups.filter(name="itou-admin").exists()
 
