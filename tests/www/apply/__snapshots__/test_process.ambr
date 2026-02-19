@@ -2330,37 +2330,9 @@
       }),
       dict({
         'origin': list([
-          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-                 AND "eligibility_administrativecriteria"."kind" IN (%s,
-                                                                     %s,
-                                                                     %s))
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IfNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',
@@ -2395,6 +2367,34 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
           ORDER BY "approvals_approval"."created_at" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s))
           LIMIT 1
         ''',
       }),
@@ -3676,37 +3676,9 @@
       }),
       dict({
         'origin': list([
-          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IfNode[eligibility/includes/certification_info_box.html]',
-          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
-          'IncludeNode[apply/process_details_company.html]',
-          'IfNode[apply/process_details_company.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
-        ]),
-        'sql': '''
-          SELECT %s AS "a"
-          FROM "eligibility_administrativecriteria"
-          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
-          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
-                 AND "eligibility_administrativecriteria"."kind" IN (%s,
-                                                                     %s,
-                                                                     %s))
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IfNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',
@@ -3741,6 +3713,34 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."eligibility_diagnosis_id" = %s
           ORDER BY "approvals_approval"."created_at" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EligibilityDiagnosis.criteria_can_be_certified[eligibility/models/common.py]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IfNode[eligibility/includes/certification_info_box.html]',
+          'IncludeNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IfNode[eligibility/includes/iae/diagnosis_details.html]',
+          'IncludeNode[apply/process_details_company.html]',
+          'IfNode[apply/process_details_company.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/process_base.html]',
+          'ExtendsNode[apply/process_details_company.html]',
+          'details_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT %s AS "a"
+          FROM "eligibility_administrativecriteria"
+          INNER JOIN "eligibility_selectedadministrativecriteria" ON ("eligibility_administrativecriteria"."id" = "eligibility_selectedadministrativecriteria"."administrative_criteria_id")
+          WHERE ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id" = %s
+                 AND "eligibility_administrativecriteria"."kind" IN (%s,
+                                                                     %s,
+                                                                     %s))
           LIMIT 1
         ''',
       }),
@@ -4807,7 +4807,7 @@
         'origin': list([
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IfNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',
           'IfNode[eligibility/includes/iae/diagnosis_details.html]',

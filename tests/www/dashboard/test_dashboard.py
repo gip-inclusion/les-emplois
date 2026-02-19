@@ -31,10 +31,7 @@ from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_approval_number, format_siret
 from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactory
-from tests.companies.factories import (
-    CompanyFactory,
-    CompanyMembershipFactory,
-)
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
@@ -751,8 +748,8 @@ class TestDashboardView:
         DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE valide"
         DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE</span>"""
-        VALIDATED_CRITERIA = """<p class="text-success mb-1">Critères validés le
-            <span class="fw-bold">%(date)s</span> par <strong>%(author)s</strong> (%(org)s).</p>"""
+        VALIDATED_CRITERIA = """<p class="fs-sm text-success">Critères validés le
+            %(date)s par %(author)s (%(org)s).</p>"""
         NO_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE non renseigné"
         NO_DIAG_TEXT = "Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE."
         NO_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
@@ -873,12 +870,14 @@ class TestDashboardView:
         DIAG_TITLE = "Diagnostic public prioritaire GEIQ valide"
         DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ confirmée</span>"""
-        DIAG_EXPIRATION = "<i>Ce diagnostic expire le %s.</i>"
-        VALIDATED_ELIGIBILITY = """<p>Éligibilité GEIQ confirmée par <b>%(author)s (%(structure)s)</b></p>"""
+        DIAG_EXPIRATION = "<strong>le %s</strong>"
+        VALIDATED_ELIGIBILITY = (
+            """<p class="fs-sm text-success">Éligibilité GEIQ confirmée par %(author)s (%(structure)s).</p>"""
+        )
         EXPIRED_DIAG_TITLE = "Diagnostic public prioritaire GEIQ expiré"
         EXPIRED_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée</span>"""
-        EXPIRED_DIAG_EXPIRATION = "<i>Ce diagnostic a expiré le %s.</i>"
+        EXPIRED_DIAG_EXPIRATION = "<strong>le %s</strong>"
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)

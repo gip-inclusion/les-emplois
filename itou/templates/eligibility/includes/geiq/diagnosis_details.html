@@ -2,9 +2,13 @@
 
 {% if diagnosis.is_valid or job_application.state.is_accepted and diagnosis %}
     <hr class="my-4">
-    <div class="row mb-3">
+    <div class="row">
         <div class="col-12 col-md">
-            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ</h3>
+            {% if diagnosis.allowance_amount %}
+                <h3 class="mb-0">Éligibilité public prioritaire GEIQ validée</h3>
+            {% else %}
+                <h3 class="mb-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
+            {% endif %}
         </div>
         <div class="col-12 col-sm-auto">
             {% if diagnosis.allowance_amount %}
@@ -16,16 +20,22 @@
     </div>
 
     {% if diagnosis.allowance_amount %}
-        <p>
-            Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+        <p class="fs-sm text-success">
+            Éligibilité GEIQ confirmée par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).
         </p>
     {% else %}
-        <p>
-            Renseignée par <b>{{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
+        <p class="fs-sm">
+            Renseignée par {{ diagnosis.author.get_inverted_full_name }} ({{ diagnosis.author_structure.display_name }}).
         </p>
     {% endif %}
 
     <ul class="list-data mb-3">
+        {% if diagnosis.allowance_amount %}
+            <li>
+                <small>Durée de validité du diagnostic</small>
+                <strong>du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}</strong>
+            </li>
+        {% endif %}
         <li>
             <small>
                 Critères administratifs
@@ -48,9 +58,6 @@
     {% include "eligibility/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
     {% if diagnosis.allowance_amount %}
-        <p>
-            <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
-        </p>
         {% if request.user.is_employer %}
             {% include "eligibility/includes/geiq/diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
         {% endif %}
@@ -80,7 +87,7 @@
     <hr class="my-4">
     <div class="row">
         <div class="col-12 col-md">
-            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ</h3>
+            <h3 class="mb-0">Éligibilité public prioritaire GEIQ</h3>
         </div>
         <div class="col-12 col-sm-auto">
             {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
@@ -88,8 +95,8 @@
                 {% with back_and_next_url=request.get_full_path|urlencode %}
                     <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary ms-2">Vérifier</a>
                 {% endwith %}
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
     {% if request.user.is_employer %}
         {# GEIQ eligibility diagnosis expired #}
