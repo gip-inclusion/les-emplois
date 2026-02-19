@@ -52,8 +52,8 @@ class CreateForm(forms.Form):
     def __init__(self, *args, geiq_name, antenna_names, existing_main_geiq, existing_antenna_ids, **kwargs):
         super().__init__(*args, **kwargs)
         self.antenna_names = antenna_names
-        self.fields["ddets"].form_group_class = "form-group ms-4 collapse ddets_group"
-        self.fields["dreets"].form_group_class = "form-group ms-4 collapse dreets_group"
+        self.fields["ddets"].form_group_class = "form-group form-group-input-w-lg-66 ms-4 collapse ddets_group"
+        self.fields["dreets"].form_group_class = "form-group form-group-input-w-lg-66 ms-4 collapse dreets_group"
         if self["convention_with_ddets"].value():
             # Make sure the collapse state is consistent
             self.fields["convention_with_ddets"].widget.attrs["aria-expanded"] = "true"

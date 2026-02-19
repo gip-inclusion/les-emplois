@@ -259,9 +259,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
-                      <h4>
+                      <h3>
                           Bilan d’exécution à contrôler
-                      </h4>
+                      </h3>
                       <p>
                           Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
@@ -392,9 +392,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-warning-lightest border-warning">
-                      <h4>
+                      <h3>
                           Bilan d’exécution à valider
-                      </h4>
+                      </h3>
                       <p class="mb-0">
                           Le GEIQ a jusqu’au 01/07/2025 pour importer son rapport d’activité et valider le bilan.
                       </p>
@@ -638,9 +638,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
-                      <h4>
+                      <h3>
                           Bilan d’exécution à contrôler
-                      </h4>
+                      </h3>
                       <p>
                           Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
@@ -955,9 +955,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-accent-03">
-                      <h4>
+                      <h3>
                           Bilan d’exécution traité le 27/05/2025
-                      </h4>
+                      </h3>
                       <p>
                           La décision a été envoyée au GEIQ.
                       </p>
@@ -1263,9 +1263,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-accent-03-lightest border-accent-03">
-                      <h4>
+                      <h3>
                           Bilan d’exécution à contrôler
-                      </h4>
+                      </h3>
                       <p>
                           Vous avez jusqu’au 01/08/2025 pour contrôler les informations de ce bilan d’exécution.
                       </p>
@@ -1585,9 +1585,9 @@
               </div>
               <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2 mt-xxl-6">
                   <div class="c-box mb-3 mb-md-4 bg-info-lightest border-info">
-                      <h4>
+                      <h3>
                           Bilan d’exécution à valider
-                      </h4>
+                      </h3>
                       <p>
                           Ce bilan a été contrôlé le 27/05/2025 par Jean DUPONT. Il doit désormais être validé par la DREETS.
                       </p>
