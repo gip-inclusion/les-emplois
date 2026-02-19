@@ -16,8 +16,8 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 class BaseIAEEligibilityViewForPrescriber(UserPassesTestMixin, FormView):
     template_name = None
     # Any child class should include the following templates :
-    # "eligibility/includes/iae_help_for_prescriber.html"
-    # "eligibility/includes/iae_form_content_for_prescriber.html"
+    # "eligibility/includes/iae/help_for_prescriber.html"
+    # "eligibility/includes/iae/form_content_for_prescriber.html"
     form_class = AdministrativeCriteriaForm
     display_success_messages = False
 

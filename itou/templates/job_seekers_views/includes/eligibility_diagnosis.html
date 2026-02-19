@@ -34,7 +34,7 @@
         <li>
             <small>
                 Critères administratifs
-                {% include "apply/includes/situation_criteria_tooltip.html" with request=request kind=kind only %}
+                {% include "eligibility/includes/situation_criteria_tooltip.html" with request=request kind=kind only %}
             </small>
             {# Keep ordering from manager (level then ui_rank) #}
             {% with criteria=eligibility_diagnosis.administrative_criteria.all %}
@@ -53,6 +53,6 @@
         </li>
     </ul>
     {% if kind == "GEIQ" and with_allowance %}
-        {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
+        {% include "eligibility/includes/geiq/diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
     {% endif %}
 </div>
