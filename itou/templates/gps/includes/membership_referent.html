@@ -3,7 +3,11 @@
 
 <div class="c-box mb-3 mb-md-4">
     <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between mb-3 mb-md-4">
-        <h3>{{ alternative_title|default:"Qui accompagne ce candidat ?" }}</h3>
+        {% if request.user == job_seeker %}
+            <h3>Qui m'accompagne ?</h3>
+        {% else %}
+            <h3>{{ alternative_title|default:"Qui accompagne ce candidat ?" }}</h3>
+        {% endif %}
         {% if group.referent.member_id == request.user.pk %}
             <div>
                 <a href="{% url 'gps:group_edition' group_id=group.pk %}" class="btn btn-outline-primary btn-ico btn-block w-100 w-md-auto white-space-nowrap">
