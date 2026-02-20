@@ -22,6 +22,8 @@
         </label>
     </div>
 </form>
-{% if from_list and request.htmx %}
-    {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
-{% endif %}
+{% with disable_oob=disable_stats_oob|default:False %}
+    {% if from_list and request.htmx and not disable_oob %}
+        {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=True request=request only %}
+    {% endif %}
+{% endwith %}

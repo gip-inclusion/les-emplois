@@ -594,8 +594,6 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     }
 
     if request.htmx:
-        context["stats"] = None
-        context["disable_stats_oob"] = True
         return render(request, "geiq_assessments_views/includes/filter_and_list.html", context)
 
     return render(request, template_name, context)
