@@ -1,5 +1,13 @@
 {% load format_filters %}
 
+<div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+    <div class="flex-md-grow-1">
+        <p class="h4 mb-0">
+            <strong>{{ contracts_page.paginator.count }}</strong> résultats
+        </p>
+    </div>
+</div>
+
 <div class="table-responsive mt-3 mt-md-4">
     <table class="table table-hover">
         <caption class="visually-hidden">Liste des bilans d’exécution</caption>

@@ -914,7 +914,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          3
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
@@ -1103,7 +1140,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          3
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
@@ -1318,7 +1392,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          0
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
@@ -1730,7 +1841,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          2
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
@@ -1887,7 +2035,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          2
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
@@ -2070,7 +2255,44 @@
                   <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#filter-and-list-container" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                       </div>
+                      <div class="dropdown d-inline-block">
+                          <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              Date de début de contrat
+                          </button>
+                          <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
+                              <div class="d-flex flex-column gap-3">
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              Du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                                  <div class="mb-0">
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                       <div id="contracts-list-results">
+                          <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
+                              <div class="flex-md-grow-1">
+                                  <p class="h4 mb-0">
+                                      <strong>
+                                          0
+                                      </strong>
+                                      résultats
+                                  </p>
+                              </div>
+                          </div>
                           <div class="table-responsive mt-3 mt-md-4">
                               <table class="table table-hover">
                                   <caption class="visually-hidden">
