@@ -1162,6 +1162,8 @@
                                   </button>
                               </div>
                           </div>
+                          <div class="ms-md-auto" id="reset-button-container">
+                          </div>
                       </div>
                   </form>
                   <div id="contracts-results-table">
@@ -1380,6 +1382,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -1625,6 +1629,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -2042,6 +2048,8 @@
                                   </button>
                               </div>
                           </div>
+                          <div class="ms-md-auto" id="reset-button-container">
+                          </div>
                       </div>
                   </form>
                   <div id="contracts-results-table">
@@ -2228,6 +2236,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -2441,6 +2451,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>

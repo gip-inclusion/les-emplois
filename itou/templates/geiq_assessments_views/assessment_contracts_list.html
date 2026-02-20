@@ -95,6 +95,8 @@
                         <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                             {# filter 1/6 #}
                             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
+                            {# reset button #}
+                            {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                         </div>
                     </form>
                     {% partialdef contracts-results-table inline %}
@@ -102,6 +104,7 @@
 
                             {% if request.htmx and not request.htmx.boosted %}
                                 {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with request=request filters_form=filters_form only %}
+                                {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_form.get_qs_filters_counter only %}
                             {% endif %}
                             {% if filters_form.is_valid %}
                                 <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
