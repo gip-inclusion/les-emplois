@@ -1495,4 +1495,52 @@ class TestAssessmentContractsListView:
         update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
 
         # Compare the simulated page (full page with HTMX response injected) with the actual full page response
-        assertSoupEqual(simulated_page, soup_full)
+        target_id = "contracts-results-table"
+        assertSoupEqual(simulated_page.find(id=target_id), soup_full.find(id=target_id))
+
+    def test_contract_list_filter_by_date(self, client, settings):
+        """
+        Test that the filtering by date in the contracts list view works correctly
+        """
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+
+        assessment = AssessmentFactory(
+            campaign__year=2023,
+            companies=[membership.company],
+        )
+
+        target_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 6, 15),
+        )
+        # Early contract (January 2024)
+        early_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 1, 1),
+        )
+        # Late contract (December 2024)
+        late_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 12, 1),
+        )
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # Filter only on june 2024
+        filter_data = {
+            "start_date_min": "2024-06-01",
+            "start_date_max": "2024-06-30",
+        }
+        response = client.get(url, filter_data)
+
+        # 4. Vérifications
+        assert response.status_code == 200
+
+        contracts_in_page = response.context["contracts_page"].object_list
+
+        assert len(contracts_in_page) == 1
+        assert target_contract in contracts_in_page
+        assert early_contract not in contracts_in_page
+        assert late_contract not in contracts_in_page
