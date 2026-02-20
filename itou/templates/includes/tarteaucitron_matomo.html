@@ -108,6 +108,12 @@
                     url = tarteaucitron.fixSelfXSS(x.getAttribute("data-url"));
                 return '<iframe id="stats-iframe" title="' + frame_title + '" src="' + url + '" style="min-height:' + height + 'px;" allowtransparency allowfullscreen></iframe>';
             });
+            // Initialiser iFrameResize après la création de l'iframe par tarteaucitron
+            if (typeof iFrameResize === 'function') {
+                iFrameResize({
+                    waitForLoad: true
+                }, "#stats-iframe");
+            }
         },
         "fallback": function() {
             "use strict";

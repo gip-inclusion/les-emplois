@@ -4,6 +4,8 @@
 
 {% block title %}Statistiques et pilotage {{ block.super }}{% endblock %}
 
+{% block extra_head %}<script src="{{ stats_base_url }}/app/iframeResizer.js"></script>{% endblock %}
+
 {% block title_content %}
     {% component_title c_title__main=c_title__main c_title__secondary=c_title__secondary %}
         {% fragment as c_title__main %}
@@ -100,13 +102,6 @@
 
 {% block script %}
     {{ block.super }}
-
-    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
-    <script nonce="{{ csp_nonce }}">
-        iFrameResize({
-            waitForLoad: true
-        }, "#stats-iframe")
-    </script>
 
     {% if tally_popup_form_id or tally_embed_form_id %}
         {# Do not use `async` here otherwise the Tally popup will randomly fail to load. #}
