@@ -1128,7 +1128,7 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
@@ -1161,6 +1161,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -1347,7 +1349,7 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
@@ -1380,6 +1382,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -1592,7 +1596,7 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
@@ -1625,6 +1629,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -2008,7 +2014,7 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
@@ -2041,6 +2047,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -2195,7 +2203,7 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
@@ -2228,6 +2236,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>
@@ -2408,7 +2418,7 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
@@ -2441,6 +2451,8 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="ms-md-auto" id="reset-button-container">
                           </div>
                       </div>
                   </form>

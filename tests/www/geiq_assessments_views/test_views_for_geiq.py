@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 import pytest
+from bs4 import BeautifulSoup
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.urls import reverse
@@ -12,6 +13,7 @@ from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import (
     assertContains,
     assertMessages,
+    assertNotContains,
     assertQuerySetEqual,
     assertRedirects,
 )
@@ -1445,6 +1447,8 @@ class TestAssessmentResult:
 
 
 class TestAssessmentContractsListView:
+    RESET_BTN_LABEL = "Effacer tout"
+
     def test_contract_list_htmx_consistency(self, client, settings):
         """
         Check that the HTMX response for the contracts list view is consistent with the full page response,
@@ -1504,4 +1508,50 @@ class TestAssessmentContractsListView:
 
         contracts_in_page = response.context["contracts_page"].object_list
 
+        assert len(contracts_in_page) == 1
+        assert target_contract in contracts_in_page
         assert contracts_in_page == [target_contract]
+
+    def test_contract_list_reset_button_visibility(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # without filter : the button should not be visible
+        response = client.get(url)
+        assertNotContains(response, self.RESET_BTN_LABEL)
+
+        # with filter : the button should be visible
+        response = client.get(url, {"start_date_lower": "2024-01-01"})
+        assertContains(response, self.RESET_BTN_LABEL)
+        # Check that filters_counter is correctly set in the context to display the number of active filters in the UI
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_reset_action(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+
+        EmployeeContractFactory(employee__assessment=assessment, start_at=datetime.date(2024, 1, 1))
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        response = client.get(url, {"start_date_lower": "2025-01-01"})
+        assert len(response.context["contracts_page"].object_list) == 0
+
+        soup = BeautifulSoup(response.content, "html.parser")
+        # Retrive the link of the final page
+        text_node = soup.find(string=lambda t: t and self.RESET_BTN_LABEL in t)
+        reset_link = text_node.find_parent("a") if text_node else None
+
+        assert reset_link is not None, f"Le bouton '{self.RESET_BTN_LABEL}' est introuvable."
+        # Check that the link of the reset button is correct (should be the same url without filters)
+        reset_href = reset_link["href"]
+        assert reset_href == url
+
+        response = client.get(url)
+        assert len(response.context["contracts_page"].object_list) == 1
+        assertNotContains(response, self.RESET_BTN_LABEL)

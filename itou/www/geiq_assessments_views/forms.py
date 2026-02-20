@@ -270,3 +270,14 @@ class ContractFilterForm(forms.Form):
         ):
             queryset = queryset.filter(start_at__contained_by=InclusiveDateRange(*start_at_bounds))
         return queryset
+
+    def get_qs_filters_counter(self):
+        """
+        Get number of filters selected.
+        """
+
+        if not hasattr(self, "cleaned_data"):
+            return 0
+
+        # We count fields that have a value
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
