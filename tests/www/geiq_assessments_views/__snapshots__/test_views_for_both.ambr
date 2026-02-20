@@ -1458,6 +1458,11 @@
                                       </tr>
                                   </thead>
                                   <tbody>
+                                      <tr>
+                                          <td class="text-center py-5 text-muted" colspan="6">
+                                              Aucun contrat trouvé.
+                                          </td>
+                                      </tr>
                                   </tbody>
                               </table>
                           </div>
@@ -2321,6 +2326,11 @@
                                       </tr>
                                   </thead>
                                   <tbody>
+                                      <tr>
+                                          <td class="text-center py-5 text-muted" colspan="6">
+                                              Aucun contrat trouvé.
+                                          </td>
+                                      </tr>
                                   </tbody>
                               </table>
                           </div>
