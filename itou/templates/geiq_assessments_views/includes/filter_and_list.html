@@ -11,6 +11,8 @@
         <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
             {# filter 1/6 #}
             {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" with assessment=assessment contracts_page=contracts_page request=request can_validate=can_validate csrf_token=csrf_token filters_form=filters_form only %}
+            {# reset button #}
+            {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" with request=request filters_counter=filters_counter only %}
         </div>
     </form>
     {# List of contracts #}

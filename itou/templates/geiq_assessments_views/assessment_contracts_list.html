@@ -78,7 +78,7 @@
                         </p>
                     {% endif %}
 
-                    {% include "geiq_assessments_views/includes/filter_and_list.html" with assessment=assessment contracts_page=contracts_page request=request AssessmentContractDetailsTab=AssessmentContractDetailsTab can_validate=can_validate csrf_token=csrf_token filters_form=filters_form only %}
+                    {% include "geiq_assessments_views/includes/filter_and_list.html" with assessment=assessment contracts_page=contracts_page request=request AssessmentContractDetailsTab=AssessmentContractDetailsTab can_validate=can_validate csrf_token=csrf_token filters_form=filters_form filters_counter=filters_counter only %}
 
                     {% if can_validate %}
 

@@ -944,6 +944,8 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
+                              </div>
                           </div>
                       </form>
                       <div id="contracts-list-results">
@@ -1175,6 +1177,8 @@
                                           </button>
                                       </div>
                                   </div>
+                              </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
                               </div>
                           </div>
                       </form>
@@ -1433,6 +1437,8 @@
                                           </button>
                                       </div>
                                   </div>
+                              </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
                               </div>
                           </div>
                       </form>
@@ -1892,6 +1898,8 @@
                                       </div>
                                   </div>
                               </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
+                              </div>
                           </div>
                       </form>
                       <div id="contracts-list-results">
@@ -2091,6 +2099,8 @@
                                           </button>
                                       </div>
                                   </div>
+                              </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
                               </div>
                           </div>
                       </form>
@@ -2317,6 +2327,8 @@
                                           </button>
                                       </div>
                                   </div>
+                              </div>
+                              <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
                               </div>
                           </div>
                       </form>

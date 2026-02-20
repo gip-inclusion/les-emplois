@@ -1544,3 +1544,37 @@ class TestAssessmentContractsListView:
         assert target_contract in contracts_in_page
         assert early_contract not in contracts_in_page
         assert late_contract not in contracts_in_page
+
+    def test_contract_list_reset_button_visibility(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # without filter : the button should not be visible
+        response = client.get(url)
+        assert "Effacer tout" not in response.content.decode()
+
+        # with filter : the button should be visible
+        response = client.get(url, {"start_date_min": "2024-01-01"})
+        assert "Effacer tout" in response.content.decode()
+        # Check that filters_counter is correctly set in the context to display the number of active filters in the UI
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_reset_action(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+
+        EmployeeContractFactory(employee__assessment=assessment, start_at=datetime.date(2024, 1, 1))
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        response = client.get(url, {"start_date_min": "2025-01-01"})
+        assert len(response.context["contracts_page"].object_list) == 0
+
+        response = client.get(url)
+        assert len(response.context["contracts_page"].object_list) == 1
+        assert "Effacer tout" not in response.content.decode()

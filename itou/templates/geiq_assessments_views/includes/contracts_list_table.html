@@ -3,6 +3,7 @@
 
 {% if request.htmx %}
     {% include "geiq_assessments_views/includes/assessment_contracts_filters/start_date.html" %}
+    {% include "geiq_assessments_views/includes/assessment_contracts_filters/filter_reset.html" %}
 {% endif %}
 
 <div id="contracts-results-table">

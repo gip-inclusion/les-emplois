@@ -571,6 +571,9 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
     contracts_qs = filters_form.filter(contracts_qs)
 
+    # Get filters count for the 'Effacer tout' button
+    filters_counter = filters_form.get_qs_filters_counter()
+
     contracts_page = pager(
         contracts_qs,
         request.GET.get("page"),
@@ -586,6 +589,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         "ContractsAction": ContractsAction,
         "stats": stats,
         "filters_form": filters_form,
+        "filters_counter": filters_counter,
     }
 
     if request.htmx:
