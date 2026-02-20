@@ -777,7 +777,8 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
@@ -1578,7 +1579,8 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/assessment_contracts_list.html]',
+          'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
           'assessment_contracts_list[www/geiq_assessments_views/views.py]',
