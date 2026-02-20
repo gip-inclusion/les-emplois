@@ -778,6 +778,7 @@
       dict({
         'origin': list([
           'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IncludeNode[geiq_assessments_views/includes/filter_and_list.html]',
           'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
@@ -910,126 +911,136 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Obtenir l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
-                                          DUPOND Jean-Pierre
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/04/2024
-                                  </td>
-                                  <td>
-                                      30/06/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      1 400 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
                                                   Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
-                                          DUPONT Jean
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/01/2024
-                                  </td>
-                                  <td>
-                                      30/04/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      0 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                                  Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
-                                          MARTIN Cécile
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/02/2024
-                                  </td>
-                                  <td>
-                                      30/03/2024
-                                  </td>
-                                  <td>
-                                      Non
-                                  </td>
-                                  <td>
-                                      814 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                                  Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                                      DUPOND Jean-Pierre
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/04/2024
+                                              </td>
+                                              <td>
+                                                  30/06/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  1 400 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" disabled="" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                                      DUPONT Jean
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/01/2024
+                                              </td>
+                                              <td>
+                                                  30/04/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  0 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                                      MARTIN Cécile
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/02/2024
+                                              </td>
+                                              <td>
+                                                  30/03/2024
+                                              </td>
+                                              <td>
+                                                  Non
+                                              </td>
+                                              <td>
+                                                  814 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1095,126 +1106,136 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Obtenir l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
-                                          DUPOND Jean-Pierre
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/04/2024
-                                  </td>
-                                  <td>
-                                      30/06/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      1 400 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
                                                   Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
-                                          DUPONT Jean
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/01/2024
-                                  </td>
-                                  <td>
-                                      30/04/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      0 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                                  Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
-                                          MARTIN Cécile
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/02/2024
-                                  </td>
-                                  <td>
-                                      30/03/2024
-                                  </td>
-                                  <td>
-                                      Non
-                                  </td>
-                                  <td>
-                                      814 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                                  Obtenir l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/employee">
+                                                      DUPOND Jean-Pierre
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/04/2024
+                                              </td>
+                                              <td>
+                                                  30/06/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  1 400 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/33333333-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" id="allowance_for_contract_33333333-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_33333333-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                                      DUPONT Jean
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/01/2024
+                                              </td>
+                                              <td>
+                                                  30/04/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  0 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input checked="" class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                                      MARTIN Cécile
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/02/2024
+                                              </td>
+                                              <td>
+                                                  30/03/2024
+                                              </td>
+                                              <td>
+                                                  Non
+                                              </td>
+                                              <td>
+                                                  814 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                              Obtenir l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                   <form class="js-prevent-multiple-submit" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -1306,36 +1327,46 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Obtenir l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                      </table>
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
+                                                  Obtenir l’aide
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                   <form class="js-prevent-multiple-submit" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -1580,6 +1611,7 @@
       dict({
         'origin': list([
           'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IncludeNode[geiq_assessments_views/includes/filter_and_list.html]',
           'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[geiq_assessments_views/assessment_contracts_list.html]',
@@ -1711,96 +1743,106 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Éligible à l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
-                                          DUPONT Jean
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/01/2024
-                                  </td>
-                                  <td>
-                                      30/04/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      0 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                                  Accorder l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
-                                          MARTIN Cécile
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/02/2024
-                                  </td>
-                                  <td>
-                                      30/03/2024
-                                  </td>
-                                  <td>
-                                      Non
-                                  </td>
-                                  <td>
-                                      814 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                                  Accorder l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
+                                                  Éligible à l’aide
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                                      DUPONT Jean
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/01/2024
+                                              </td>
+                                              <td>
+                                                  30/04/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  0 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" disabled="" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                              Accorder l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                                      MARTIN Cécile
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/02/2024
+                                              </td>
+                                              <td>
+                                                  30/03/2024
+                                              </td>
+                                              <td>
+                                                  Non
+                                              </td>
+                                              <td>
+                                                  814 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input checked="" class="form-check-input" disabled="" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                              Accorder l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           </div>
@@ -1864,96 +1906,106 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Éligible à l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
-                                          DUPONT Jean
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/01/2024
-                                  </td>
-                                  <td>
-                                      30/04/2024
-                                  </td>
-                                  <td>
-                                      Oui
-                                  </td>
-                                  <td>
-                                      0 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
-                                                  Accorder l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <td>
-                                      <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
-                                          MARTIN Cécile
-                                      </a>
-                                  </td>
-                                  <td>
-                                      01/02/2024
-                                  </td>
-                                  <td>
-                                      30/03/2024
-                                  </td>
-                                  <td>
-                                      Non
-                                  </td>
-                                  <td>
-                                      814 €
-                                  </td>
-                                  <td>
-                                      <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                                          <div class="form-check form-switch">
-                                              <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
-                                              <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
-                                                  Accorder l’aide
-                                              </label>
-                                          </div>
-                                      </form>
-                                  </td>
-                              </tr>
-                          </tbody>
-                      </table>
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
+                                                  Éligible à l’aide
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/employee">
+                                                      DUPONT Jean
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/01/2024
+                                              </td>
+                                              <td>
+                                                  30/04/2024
+                                              </td>
+                                              <td>
+                                                  Oui
+                                              </td>
+                                              <td>
+                                                  0 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/11111111-4444-4444-4444-444444444444/include?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input class="form-check-input" id="allowance_for_contract_11111111-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_11111111-4444-4444-4444-444444444444">
+                                                              Accorder l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <a class="btn-link" href="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/employee">
+                                                      MARTIN Cécile
+                                                  </a>
+                                              </td>
+                                              <td>
+                                                  01/02/2024
+                                              </td>
+                                              <td>
+                                                  30/03/2024
+                                              </td>
+                                              <td>
+                                                  Non
+                                              </td>
+                                              <td>
+                                                  814 €
+                                              </td>
+                                              <td>
+                                                  <form class="js-prevent-multiple-submit" hx-post="/geiq-assessments/contracts/22222222-4444-4444-4444-444444444444/exclude?from_list=1" hx-swap="outerHTML" hx-target="this" hx-trigger="change" id="toggle_allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                                      <div class="form-check form-switch">
+                                                          <input checked="" class="form-check-input" id="allowance_for_contract_22222222-4444-4444-4444-444444444444" name="allowance" type="checkbox"/>
+                                                          <label class="form-check-label visually-hidden" for="allowance_for_contract_22222222-4444-4444-4444-444444444444">
+                                                              Accorder l’aide
+                                                          </label>
+                                                      </div>
+                                                  </form>
+                                              </td>
+                                          </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                   <form class="js-prevent-multiple-submit" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
@@ -2043,36 +2095,46 @@
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
-                  <div class="table-responsive mt-3 mt-md-4">
-                      <table class="table table-hover">
-                          <caption class="visually-hidden">
-                              Liste des bilans d’exécution
-                          </caption>
-                          <thead>
-                              <tr>
-                                  <th scope="col">
-                                      NOM Prénom
-                                  </th>
-                                  <th scope="col">
-                                      Date de début
-                                  </th>
-                                  <th scope="col">
-                                      Date de fin
-                                  </th>
-                                  <th scope="col">
-                                      ≥ 90 jours en 2024
-                                  </th>
-                                  <th scope="col">
-                                      Aide potentielle
-                                  </th>
-                                  <th scope="col">
-                                      Éligible à l’aide
-                                  </th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                      </table>
+                  <div id="contracts-view-wrapper">
+                      <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s, duetChange from:duet-date-picker delay:.5s" id="filter-and-list-container">
+                          <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
+                          </div>
+                      </form>
+                      <div id="contracts-list-results">
+                          <div id="contracts-results-table">
+                              <div class="table-responsive mt-3 mt-md-4">
+                                  <table class="table table-hover">
+                                      <caption class="visually-hidden">
+                                          Liste des bilans d’exécution
+                                      </caption>
+                                      <thead>
+                                          <tr>
+                                              <th scope="col">
+                                                  NOM Prénom
+                                              </th>
+                                              <th scope="col">
+                                                  Date de début
+                                              </th>
+                                              <th scope="col">
+                                                  Date de fin
+                                              </th>
+                                              <th scope="col">
+                                                  ≥ 90 jours en 2024
+                                              </th>
+                                              <th scope="col">
+                                                  Aide potentielle
+                                              </th>
+                                              <th scope="col">
+                                                  Éligible à l’aide
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
                   </div>
                   <form class="js-prevent-multiple-submit" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>

@@ -9,7 +9,13 @@ from django.utils import timezone
 from django.utils.http import content_disposition_header
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertMessages, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
@@ -1437,3 +1443,56 @@ class TestAssessmentResult:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:assessment_result", kwargs={"pk": assessment.pk}))
         assert response.status_code == 404
+
+
+class TestAssessmentContractsListView:
+    def test_htmx_returns_only_table_include(self, client, settings):
+        """
+        Check that when we request the contracts list with HTMX, we only get the contracts_list_table.html snippet
+        """
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+
+        assessment = AssessmentFactory(companies=[membership.company])
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        response = client.get(url, headers={"HX-Request": "true"})
+
+        assert response.status_code == 200
+
+        assertNotContains(response, "<form")
+        assertNotContains(response, 'id="contracts-filter-form"')
+
+        assertContains(response, "<table")
+
+    def test_contract_list_htmx_consistency(self, client, settings):
+        """
+        Check that the HTMX response for the contracts list view is consistent with the full page response,
+        meaning that if we take the full page response and "inject" the HTMX response into it at the correct place,
+        we should end up with the same HTML structure as the full page response.
+        """
+        # Setup
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        EmployeeContractFactory(employee__assessment=assessment)  # Un peu de donnée
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # retrieve full page response
+        response_full = client.get(url)
+        soup_full = parse_response_to_soup(response_full, selector="#contracts-view-wrapper")
+
+        response_initial = client.get(url)
+        simulated_page = parse_response_to_soup(response_initial, selector="#contracts-view-wrapper")
+
+        # retrieve HTMX response
+        response_htmx = client.get(url, headers={"HX-Request": "true"})
+
+        # retrieve the part of the full page that should be updated by HTMX (the contracts list table)
+        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
+
+        # Compare the simulated page (full page with HTMX response injected) with the actual full page response
+        assertSoupEqual(simulated_page, soup_full)

@@ -1,56 +1,58 @@
 {% load format_filters %}
 
-<div class="table-responsive mt-3 mt-md-4">
-    <table class="table table-hover">
-        <caption class="visually-hidden">Liste des bilans d’exécution</caption>
-        <thead>
-            <tr>
-                <th scope="col">NOM Prénom</th>
-                <th scope="col">Date de début</th>
-                <th scope="col">Date de fin</th>
-                <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
-                <th scope="col">Aide potentielle</th>
-                {% if request.user.is_employer %}
-                    <th scope="col">Obtenir l’aide</th>
-                {% elif request.user.is_labor_inspector %}
-                    <th scope="col">Éligible à l’aide</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for contract in contracts_page %}
+<div id="contracts-results-table">
+    <div class="table-responsive mt-3 mt-md-4">
+        <table class="table table-hover">
+            <caption class="visually-hidden">Liste des bilans d’exécution</caption>
+            <thead>
                 <tr>
-                    <td>
-                        <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
-                    </td>
-                    <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
-                    <td>
-                        {% if contract.end_at %}
-                            {{ contract.end_at|date:"d/m/Y" }}
-                        {% else %}
-                            {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if contract.nb_days_in_campaign_year >= 90 %}
-                            Oui
-                        {% else %}
-                            Non
-                        {% endif %}
-
-                    </td>
-                    <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
-                    <td>
-                        {% if request.user.is_employer %}
-                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
-                        {% elif request.user.is_labor_inspector %}
-                            {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
-                        {% endif %}
-                    </td>
+                    <th scope="col">NOM Prénom</th>
+                    <th scope="col">Date de début</th>
+                    <th scope="col">Date de fin</th>
+                    <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
+                    <th scope="col">Aide potentielle</th>
+                    {% if request.user.is_employer %}
+                        <th scope="col">Obtenir l’aide</th>
+                    {% elif request.user.is_labor_inspector %}
+                        <th scope="col">Éligible à l’aide</th>
+                    {% endif %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                {% for contract in contracts_page %}
+                    <tr>
+                        <td>
+                            <a class="btn-link" href="{% url "geiq_assessments_views:assessment_contracts_details" contract_pk=contract.pk tab=AssessmentContractDetailsTab.EMPLOYEE %}">{{ contract.employee.get_full_name }}</a>
+                        </td>
+                        <td>{{ contract.start_at|date:"d/m/Y"|default:"-" }}</td>
+                        <td>
+                            {% if contract.end_at %}
+                                {{ contract.end_at|date:"d/m/Y" }}
+                            {% else %}
+                                {{ contract.planned_end_at|date:"d/m/Y"|default:"-" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if contract.nb_days_in_campaign_year >= 90 %}
+                                Oui
+                            {% else %}
+                                Non
+                            {% endif %}
 
-{% include "includes/pagination.html" with page=contracts_page boost=True request=request only %}
+                        </td>
+                        <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
+                        <td>
+                            {% if request.user.is_employer %}
+                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
+                            {% elif request.user.is_labor_inspector %}
+                                {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request disable_stats_oob=True only %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "includes/pagination.html" with page=contracts_page boost=True boost_target="#contracts-results-table" request=request only %}
+</div>
