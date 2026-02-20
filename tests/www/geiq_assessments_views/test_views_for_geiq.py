@@ -1459,16 +1459,49 @@ class TestAssessmentContractsListView:
         EmployeeContractFactory(employee__assessment=assessment)
 
         url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+        filter_data = {
+            "start_date_lower": "2024-06-01",
+            "start_date_upper": "2024-06-30",
+        }
+        response_full = client.get(url, filter_data)
+        form_full = parse_response_to_soup(response_full, selector="#filter-and-list-container")
+        table_full = parse_response_to_soup(response_full, selector="#contracts-results-table")
 
-        # retrieve full page response
-        response_full = client.get(url)
-        soup_full = parse_response_to_soup(response_full, selector="#contracts-results-table", no_html_body=True)
+        response_initial = client.get(url)
+        simulated_page = parse_response_to_soup(response_initial, selector="body")
 
-        # retrieve HTMX response
-        response_htmx = client.get(url, headers={"HX-Request": "true"})
+        response_htmx = client.get(url, filter_data, headers={"HX-Request": "true"})
 
-        soup_htmx = parse_response_to_soup(response_htmx, no_html_body=True)
+        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
 
-        # Compare the simulated page (full page with HTMX response injected) with the actual full page response
-        soup_htmx = soup_htmx.find(id="contracts-results-table")
-        assertSoupEqual(soup_htmx, soup_full)
+        form_simulated = simulated_page.select_one("#filter-and-list-container")
+        table_simulated = simulated_page.select_one("#contracts-results-table")
+
+        assertSoupEqual(form_simulated, form_full)
+        assertSoupEqual(table_simulated, table_full)
+
+    def test_contract_list_filter_by_date(self, client, settings):
+        """
+        Test that the filtering by date in the contracts list view works correctly
+        """
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+
+        assessment = AssessmentFactory(campaign__year=2023, companies=[membership.company])
+        target_contract = EmployeeContractFactory(employee__assessment=assessment, start_at=datetime.date(2024, 6, 15))
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # Filter only on june 2024
+        filter_data = {
+            "start_date_lower": "2024-06-01",
+            "start_date_upper": "2024-06-30",
+        }
+        response = client.get(url, filter_data)
+
+        assert response.status_code == 200
+
+        contracts_in_page = response.context["contracts_page"].object_list
+
+        assert contracts_in_page == [target_contract]
