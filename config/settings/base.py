@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "itou.job_applications",
     "itou.approvals",
     "itou.eligibility",
+    "itou.openid_connect",
     "itou.openid_connect.france_connect",
     "itou.openid_connect.pe_connect",
     "itou.openid_connect.pro_connect",

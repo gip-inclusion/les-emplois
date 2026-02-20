@@ -106,9 +106,6 @@ class OIDConnectState(models.Model):
 
     @classmethod
     def get_from_state(cls, signed_state):
-        # Cleanup old states if any.
-        cls.objects.cleanup()
-
         if not signed_state:
             return None
 
