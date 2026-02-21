@@ -656,9 +656,9 @@ faker==40.4.0 \
     # via
     #   -r requirements/test.txt
     #   factory-boy
-filelock==3.23.0 \
-    --hash=sha256:4203c3f43983c7c95e4bbb68786f184f6acb7300899bf99d686bb82d526bdf62 \
-    --hash=sha256:f64442f6f4707b9385049bb490be0bc48e3ab8e74ad27d4063435252917f4d4b
+filelock==3.24.3 \
+    --hash=sha256:011a5644dc937c22699943ebbfc46e969cdde3e171470a6e40b9533e5a72affa \
+    --hash=sha256:426e9a4660391f7f8a810d71b0555bce9008b0a1cc342ab1f6947d37639e002d
     # via virtualenv
 freezegun==1.5.5 \
     --hash=sha256:ac7742a6cc6c25a2c35e9292dfd554b897b517d2dec26891a2e8debf205cb94a \
@@ -842,7 +842,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django, django-testing]==26.2.12.0 \
+itoutils[django,django-testing]==26.2.12.0 \
     --hash=sha256:565d0669326dfddbab502d6beba1acbd79a3987f17e6c83ce2fd9ed6c0a00fe2 \
     --hash=sha256:6e45f9bc809c52fed1c8fbca95f001a05583744306a89b840f5c0cfa8816ee78
     # via -r requirements/test.txt
