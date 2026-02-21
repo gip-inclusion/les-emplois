@@ -782,7 +782,7 @@ invoke==2.2.1 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-itoutils[django, django-testing]==26.2.12.0 \
+itoutils[django,django-testing]==26.2.12.0 \
     --hash=sha256:565d0669326dfddbab502d6beba1acbd79a3987f17e6c83ce2fd9ed6c0a00fe2 \
     --hash=sha256:6e45f9bc809c52fed1c8fbca95f001a05583744306a89b840f5c0cfa8816ee78
     # via
@@ -1741,9 +1741,9 @@ pytest==9.0.2 \
     #   pytest-randomly
     #   pytest-xdist
     #   syrupy
-pytest-django==4.11.1 \
-    --hash=sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10 \
-    --hash=sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991
+pytest-django==4.12.0 \
+    --hash=sha256:3ff300c49f8350ba2953b90297d23bf5f589db69545f56f1ec5f8cff5da83e85 \
+    --hash=sha256:df94ec819a83c8979c8f6de13d9cdfbe76e8c21d39473cfe2b40c9fc9be3c758
     # via -r requirements/test.in
 pytest-mock==3.15.1 \
     --hash=sha256:0a25e2eb88fe5168d535041d09a4529a188176ae608a6d249ee65abc0949630d \
