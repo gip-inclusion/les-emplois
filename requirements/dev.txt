@@ -842,7 +842,7 @@ ipython-pygments-lexers==1.1.1 \
     --hash=sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81 \
     --hash=sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c
     # via ipython
-itoutils[django, django-testing]==26.2.12.0 \
+itoutils[django,django-testing]==26.2.12.0 \
     --hash=sha256:565d0669326dfddbab502d6beba1acbd79a3987f17e6c83ce2fd9ed6c0a00fe2 \
     --hash=sha256:6e45f9bc809c52fed1c8fbca95f001a05583744306a89b840f5c0cfa8816ee78
     # via -r requirements/test.txt
@@ -1838,9 +1838,9 @@ pynacl==1.6.2 \
     # via
     #   -r requirements/test.txt
     #   paramiko
-pypdf==6.7.0 \
-    --hash=sha256:62e85036d50839cbdf45b8067c2c1a1b925517514d7cba4cbe8755a6c2829bc9 \
-    --hash=sha256:eb95e244d9f434e6cfd157272283339ef586e593be64ee699c620f756d5c3f7e
+pypdf==6.7.1 \
+    --hash=sha256:6b7a63be5563a0a35d54c6d6b550d75c00b8ccf36384be96365355e296e6b3b0 \
+    --hash=sha256:a02ccbb06463f7c334ce1612e91b3e68a8e827f3cee100b9941771e6066b094e
     # via -r requirements/test.txt
 pytest==9.0.2 \
     --hash=sha256:711ffd45bf766d5264d487b917733b453d917afd2b0ad65223959f59089f875b \
