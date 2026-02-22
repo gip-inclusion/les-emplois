@@ -9,7 +9,14 @@ from itou.api.employee_record_api.viewsets import EmployeeRecordUpdateNotificati
 from itou.api.geiq.views import GeiqJobApplicationListView
 from itou.api.job_application_api.views import JobApplicationSearchView
 from itou.api.marche_api.views import MarcheCompanyView
-from itou.api.nexus.views import MembershipsView, StructuresView, SyncCompletedView, SyncStartView, UsersView
+from itou.api.nexus.views import (
+    DropDownStatusView,
+    MembershipsView,
+    StructuresView,
+    SyncCompletedView,
+    SyncStartView,
+    UsersView,
+)
 from itou.api.redoc_views import ItouSpectacularRedocView
 from itou.api.siae_api.viewsets import SiaeViewSet
 from itou.api.token_auth.views import ObtainAuthToken
@@ -57,5 +64,6 @@ urlpatterns = [
     path("nexus/memberships", MembershipsView.as_view(), name="nexus-memberships"),
     path("nexus/sync-start", SyncStartView.as_view(), name="nexus-sync-start"),
     path("nexus/sync-completed", SyncCompletedView.as_view(), name="nexus-sync-completed"),
+    path("nexus/dropdown-status", DropDownStatusView.as_view(), name="nexus-dropdown-status"),
     *router.urls,
 ]

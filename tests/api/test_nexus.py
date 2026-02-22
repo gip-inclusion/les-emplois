@@ -16,6 +16,7 @@ from tests.nexus.factories import (
     NexusStructureFactory,
     NexusUserFactory,
 )
+from tests.prescribers.factories import PrescriberMembershipFactory
 
 
 class NexusApiTestMixin:
@@ -691,3 +692,46 @@ class TestSyncCompletedAPI(NexusApiTestMixin):
         assert updated_api_synced.service == Service.DORA
         assert updated_api_synced.valid_since == start_at
         assert updated_api_synced.in_progress_since is None
+
+
+class TestDropDownStatus(NexusApiTestMixin):
+    url = reverse("v1:nexus-dropdown-status")
+
+    def test_unauthenticated(self, api_client):
+        api_client = self.api_client()
+
+        response = api_client.post(self.url, content_type="application/json")
+        assert response.status_code == 401
+
+    def test_api_invalid_methods(self):
+        api_client = self.api_client(service=Service.DORA)
+
+        response = api_client.get(self.url, content_type="application/json")
+        assert response.status_code == 405
+
+        response = api_client.delete(self.url, content_type="application/json")
+        assert response.status_code == 405
+
+    def test_invalid_payloads(self):
+        api_client = self.api_client(service=Service.DORA)
+
+        response = api_client.post(self.url, content_type="application/json")
+        assert response.status_code == 400
+        assert response.json() == {"email": ["Ce champ est obligatoire."]}
+
+        response = api_client.post(self.url, content_type="application/json", data={"email": "bad_émail@orange.f"})
+        assert response.status_code == 400
+        assert response.json() == {"email": ["Saisissez une adresse e-mail valide."]}
+
+    def test_api_post(self):
+        api_client = self.api_client(service=Service.DORA)
+        user = PrescriberMembershipFactory(organization__department="31").user
+        NexusUserFactory(source=Service.DORA, email=user.email)
+        payload = {
+            "proconnect": True,
+            "activated_services": ["dora", "les-emplois"],
+            "mvp_enabled": True,
+        }
+        response = api_client.post(self.url, data={"email": user.email})
+        assert response.status_code == 200
+        assert response.json() == payload
