@@ -1,14 +1,31 @@
 import random
 
 import pytest
+from django.conf import settings
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.nexus.enums import Service
+from itou.nexus.enums import Auth, Service
 from itou.nexus.models import DEFAULT_VALID_SINCE, ActivatedService, NexusRessourceSyncStatus
-from itou.nexus.utils import build_user, complete_full_sync, get_service_users, init_full_sync, serialize_user
-from tests.nexus.factories import NexusRessourceSyncStatusFactory, NexusUserFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
+from itou.nexus.utils import (
+    build_user,
+    complete_full_sync,
+    dropdown_status,
+    get_service_users,
+    init_full_sync,
+    serialize_user,
+)
+from itou.users.enums import IdentityProvider
+from tests.companies.factories import CompanyMembershipFactory
+from tests.nexus.factories import NexusMembershipFactory, NexusRessourceSyncStatusFactory, NexusUserFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 
 
 def test_init_full_sync():
@@ -90,3 +107,77 @@ class TestGetServiceUsers:
         for factory in [JobSeekerFactory, ItouStaffFactory, LaborInspectorFactory]:
             user = factory()
             assert get_service_users(email=user.email) == []
+
+
+class TestDropDownStatus:
+    @pytest.mark.parametrize("pc_on_emplois", [True, False])
+    @pytest.mark.parametrize("pc_on_service", [True, False])
+    def test_proconnect(self, pc_on_emplois, pc_on_service):
+        user = PrescriberFactory(
+            identity_provider=IdentityProvider.PRO_CONNECT if pc_on_emplois else IdentityProvider.DJANGO
+        )
+        NexusUserFactory(email=user.email, auth=Auth.MAGIC_LINK, source=Service.DORA)
+        NexusUserFactory(email=user.email, auth=Auth.DJANGO, source=Service.MARCHE)
+        if pc_on_service:
+            NexusUserFactory(email=user.email, auth=Auth.PRO_CONNECT, source=Service.PILOTAGE)
+
+        assert dropdown_status(user=user)["proconnect"] == (pc_on_emplois or pc_on_service)
+        assert dropdown_status(email=user.email)["proconnect"] == (pc_on_emplois or pc_on_service)
+
+    def test_mvp_enabled_prescriber(self):
+        user = PrescriberFactory()
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        PrescriberMembershipFactory(user=user, organization__department=75)
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        PrescriberMembershipFactory(user=user, organization__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(user=user)["mvp_enabled"] is True
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
+
+    def test_mvp_enabled_employer(self):
+        user = EmployerFactory()
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        CompanyMembershipFactory(user=user, company__department=75)
+        assert dropdown_status(user=user)["mvp_enabled"] is False
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        CompanyMembershipFactory(user=user, company__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(user=user)["mvp_enabled"] is True
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
+
+    def test_mvp_enabled_external_service(self):
+        user = NexusUserFactory()
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        NexusMembershipFactory(user=user, structure__department=75)
+        assert dropdown_status(email=user.email)["mvp_enabled"] is False
+
+        NexusMembershipFactory(user=user, structure__department=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        assert dropdown_status(email=user.email)["mvp_enabled"] is True
+
+    def test_activated_service(self):
+        user = PrescriberFactory()
+        expected = [Service.EMPLOIS]
+        assert dropdown_status(user=user)["activated_services"] == expected
+        assert dropdown_status(email=user.email)["activated_services"] == expected
+
+        activated_service = ActivatedService.objects.create(
+            user=user, service=random.choice([Service.PILOTAGE, Service.MON_RECAP])
+        )
+        expected = [Service.EMPLOIS, activated_service.service]
+        assert dropdown_status(user=user)["activated_services"] == expected
+        assert dropdown_status(email=user.email)["activated_services"] == expected
+
+        nexus_user = NexusUserFactory(email=user.email, source=random.choice([Service.DORA, Service.MARCHE]))
+        expected = sorted([Service.EMPLOIS, activated_service.service, nexus_user.source])
+        assert dropdown_status(user=user)["activated_services"] == expected
+        assert dropdown_status(email=user.email)["activated_services"] == expected
+
+        user.delete()
+        expected = [nexus_user.source]
+        assert dropdown_status(email=nexus_user.email)["activated_services"] == [nexus_user.source]
