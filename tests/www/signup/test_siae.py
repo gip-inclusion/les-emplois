@@ -23,7 +23,7 @@ from itou.utils.templatetags.format_filters import format_siret
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.testing import ItouClient
+from tests.utils.testing import ItouClient, accept_legal_terms
 
 
 class TestCompanySignup:
@@ -42,7 +42,7 @@ class TestCompanySignup:
         response = client.post(url, data={"kind": UserKind.EMPLOYER})
         assertRedirects(response, reverse("signup:company_select"))
 
-    @freeze_time("2022-09-15 15:53:54")
+    @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members(self, client, mailoutbox, pro_connect):
         """
         A user joins a company without members.
@@ -96,11 +96,11 @@ class TestCompanySignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = client.get(response.url)
+        response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         # Check user is redirected to the welcoming tour
         assertRedirects(response, reverse("welcoming_tour:index"))
         # Check user sees the employer tour
-        response = client.get(response.url)
         assertContains(response, "Publiez vos offres, augmentez votre visibilité")
 
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
@@ -122,7 +122,7 @@ class TestCompanySignup:
         )
         assertContains(response, escape(expected_message))
 
-    @freeze_time("2022-09-15 15:53:54")
+    @freeze_time("2024-09-15 15:53:54")
     def test_join_a_company_without_members_but_invalid_auth_email(self, client, mailoutbox):
         company = CompanyFactory(kind=CompanyKind.OPCS, auth_email="Non renseigné")
         assert 0 == company.members.count()
@@ -173,7 +173,7 @@ class TestCompanySignup:
         response = client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
         assert response.status_code == 200
 
-    @freeze_time("2022-09-15 15:53:54")
+    @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members_as_an_existing_employer(self, client, pro_connect):
         """
         A user joins a company without members.
@@ -221,7 +221,7 @@ class TestCompanySignup:
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
-    @freeze_time("2022-09-15 15:53:54")
+    @freeze_time("2024-09-15 15:53:54")
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(
         self, client, pro_connect
     ):

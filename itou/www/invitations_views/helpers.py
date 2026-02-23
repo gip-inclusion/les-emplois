@@ -14,7 +14,8 @@ def handle_prescriber_intivation(invitation, request):
         # Send an email after the model changes
         invitation.accept()
         messages.success(
-            request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
+            request,
+            f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}.",
         )
     elif not invitation.accepted_at:
         messages.error(request, "Ce lien n'est plus valide.")
@@ -29,7 +30,10 @@ def handle_employer_invitation(invitation, request):
     elif invitation.can_be_accepted:
         invitation.add_invited_user_to_company()
         invitation.accept()
-        messages.success(request, f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
+        messages.success(
+            request,
+            f"Vous êtes désormais membre de la structure {invitation.company.display_name}.",
+        )
     elif not invitation.accepted_at:
         messages.error(request, "Ce lien n'est plus valide.")
 
@@ -42,7 +46,8 @@ def handle_labor_inspector_invitation(invitation, request):
         invitation.add_invited_user_to_institution()
         invitation.accept()
         messages.success(
-            request, f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}."
+            request,
+            f"Vous êtes désormais membre de l'organisation {invitation.institution.display_name}.",
         )
     elif not invitation.accepted_at:
         messages.error(request, "Ce lien n'est plus valide.")

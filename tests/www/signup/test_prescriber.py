@@ -28,7 +28,7 @@ from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.openid_connect.pro_connect.testing import ID_TOKEN
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.testing import ItouClient
+from tests.utils.testing import ItouClient, accept_legal_terms
 
 
 @pytest.fixture(autouse=True)
@@ -114,6 +114,7 @@ class TestPrescriberSignup:
         )
         # Follow the redirection.
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
@@ -191,8 +192,9 @@ class TestPrescriberSignup:
             next_url=next_url,
             other_client=other_client,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = other_client.get(response.url, follow=True)
+        response = accept_legal_terms(other_client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
@@ -268,8 +270,9 @@ class TestPrescriberSignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
@@ -366,8 +369,9 @@ class TestPrescriberSignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
@@ -451,8 +455,9 @@ class TestPrescriberSignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
@@ -586,8 +591,9 @@ class TestPrescriberSignup:
             KIND_PRESCRIBER,
             previous_url=previous_url,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check `User` state.
@@ -663,8 +669,9 @@ class TestPrescriberSignup:
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
+        # Follow the redirections
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Check new org is OK.
