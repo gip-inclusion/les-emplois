@@ -74,16 +74,7 @@ def certify_criterion_with_api_particulier(criterion):
             user_found = True
             criterion.certified_at = timezone.now()
             criterion.data_returned_by_api = data["raw_response"]
-            start_at = data["start_at"]
-            # The API can only tell whether the job seeker is beneficiary
-            # on the day of the request.
-            # Since we cannot tell when the certification expires, the
-            # upper bound is set to None, and we rely on the expiry of
-            # related objects (EligibilityDiagnosis) to actually expire a
-            # SelectedAdministrativeCriteria.
-            criterion.certification_period = (
-                InclusiveDateRange(start_at) if data["is_certified"] else InclusiveDateRange(empty=True)
-            )
+            criterion.certification_period = data["certification_period"]
     with transaction.atomic():
         criterion.save()
         if user_found:

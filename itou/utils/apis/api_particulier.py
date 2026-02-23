@@ -6,6 +6,7 @@ from django.conf import settings
 
 from itou.eligibility.enums import AdministrativeCriteriaKind
 from itou.users.enums import Title
+from itou.utils.types import InclusiveDateRange
 
 
 logger = logging.getLogger("APIParticulierClient")
@@ -80,10 +81,17 @@ def certify_criteria(criteria, client, job_seeker):
     # Endpoints from the "Prestations sociales" section share the same response schema.
     # See https://particulier.api.gouv.fr/developpeurs/openapi#tag/Prestations-sociales
     data = response["data"]
-    certified = data["est_beneficiaire"]
     return {
-        "start_at": datetime.date.fromisoformat(data["date_debut_droit"]) if certified else None,
-        # When offered by the endpoint, the end_at field is always null. Ignore it.
-        "is_certified": certified,
+        "certification_period": (
+            # The API can only tell whether the job seeker is beneficiary on
+            # the day of the request.
+            # Since we cannot tell when the certification expires, the upper
+            # bound is set to None, and we rely on the expiry of related
+            # objects (EligibilityDiagnosis) to actually expire a
+            # SelectedAdministrativeCriteria.
+            InclusiveDateRange(datetime.date.fromisoformat(data["date_debut_droit"]))
+            if data["est_beneficiaire"]
+            else InclusiveDateRange(empty=True)
+        ),
         "raw_response": response,
     }
