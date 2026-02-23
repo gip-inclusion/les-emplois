@@ -627,13 +627,12 @@ class TestProcessViews:
 
     def test_details_for_unauthorized_prescriber(self, client):
         """As an unauthorized prescriber I cannot access personal information of arbitrary job seekers"""
-        prescriber = PrescriberFactory()
+        prescriber = PrescriberFactory(phone="0612345678", email="prescriber@mailinator.com")
         job_application = JobApplicationFactory(
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
             job_seeker__jobseeker_profile__nir="11111111111111",
             job_seeker__post_code="59140",
-            job_seeker__with_mocked_address=True,
             sender=prescriber,
             sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
         )
