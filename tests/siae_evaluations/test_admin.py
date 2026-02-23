@@ -14,8 +14,10 @@ from tests.institutions.factories import InstitutionFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
+    EvaluatedJobApplicationSanctionFactory,
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
+    SanctionsFactory,
 )
 from tests.users.factories import ItouStaffFactory
 from tests.utils.testing import BASE_NUM_QUERIES, get_rows_from_streaming_response
@@ -355,4 +357,41 @@ def test_percent_set_at_is_filled(admin_client):
             "admin:siae_evaluations_evaluationcampaign_change",
             kwargs={"object_id": set_campaign.pk},
         ),
+    )
+
+
+def test_evaluated_job_application_sanction_filter(admin_client):
+    sanctions_with_subsidy_cut = EvaluatedJobApplicationSanctionFactory().sanctions
+    sanctions_without_subsidy_cut = SanctionsFactory(
+        evaluated_siae__evaluation_campaign__institution=sanctions_with_subsidy_cut.evaluated_siae.evaluation_campaign.institution
+    )
+
+    response = admin_client.get(f"{reverse('admin:siae_evaluations_sanctions_changelist')}?has_subsidy_cut=yes")
+    assertContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_with_subsidy_cut.pk}),
+    )
+    assertNotContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_without_subsidy_cut.pk}),
+    )
+
+    response = admin_client.get(f"{reverse('admin:siae_evaluations_sanctions_changelist')}?has_subsidy_cut=no")
+    assertNotContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_with_subsidy_cut.pk}),
+    )
+    assertContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_without_subsidy_cut.pk}),
+    )
+
+    response = admin_client.get(reverse("admin:siae_evaluations_sanctions_changelist"))
+    assertContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_with_subsidy_cut.pk}),
+    )
+    assertContains(
+        response,
+        reverse("admin:siae_evaluations_sanctions_change", kwargs={"object_id": sanctions_without_subsidy_cut.pk}),
     )

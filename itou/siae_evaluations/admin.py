@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -22,6 +23,24 @@ class DeleteOnlyMixin:
 
     def has_change_permission(self, *args, **kwargs):
         return False
+
+
+class SubsidyCutSanctionFilter(admin.SimpleListFilter):
+    title = "retrait partiel ou total de l'aide au poste"
+    parameter_name = "has_subsidy_cut"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        evaluated_job_application_sanction_qs = models.EvaluatedJobApplicationSanction.objects.filter(
+            sanctions=OuterRef("pk")
+        )
+        if self.value() == "yes":
+            return queryset.filter(Exists(evaluated_job_application_sanction_qs))
+        elif self.value() == "no":
+            return queryset.exclude(Exists(evaluated_job_application_sanction_qs))
+        return queryset
 
 
 class EvaluatedSiaesInline(ItouTabularInline):
@@ -385,7 +404,7 @@ class SanctionsAdmin(DeleteOnlyMixin, ItouModelAdmin):
         "suspension_dates",
         "no_sanction_reason",
     ]
-    list_filter = ("evaluated_siae__evaluation_campaign__name",)
+    list_filter = ("evaluated_siae__evaluation_campaign__name", SubsidyCutSanctionFilter)
     inlines = [EvaluatedJobApplicationSanctionsInline]
 
     @admin.display(description="campagne", ordering="evaluated_siae__evaluation_campaign")
