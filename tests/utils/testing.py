@@ -19,10 +19,12 @@ from django.template import Template
 from django.template.loader import render_to_string
 from django.test import Client, RequestFactory, TestCase
 from django.test.utils import TestContextDecorator
+from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.utils.legal_terms import get_terms_versions
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 
 
@@ -203,6 +205,29 @@ def assert_previous_step(response, url, back_to_list=False):
     else:
         assertNotContains(response, "Retour à la liste")
     assertContains(response, previous_step)
+
+
+def accept_legal_terms(client, response, next_url=None, follow=True):
+    """Helper to accept legal terms in tests, following redirections if needed.
+
+    Handles both followed responses (200 on the legal-terms page) and
+    unfollowed redirects (302 pointing somewhere that eventually leads
+    to the legal-terms page through the TermsAcceptanceMiddleware).
+    """
+    legal_terms_url = reverse("legal-terms")
+    # follow any pending redirects to reach the legal-terms page
+    if response.status_code == 302:
+        response = client.get(response.url, follow=True)
+    assert response.wsgi_request.path == legal_terms_url, (
+        f"Expected to end up on {legal_terms_url}, but landed on {response.wsgi_request.path}"
+    )
+    redirect_target = response.wsgi_request.GET.get("next") or next_url
+    latest_terms = get_terms_versions()[0]
+    return client.post(
+        legal_terms_url,
+        data={"next": redirect_target, "terms_slug": latest_terms.slug},
+        follow=follow,
+    )
 
 
 def create_fake_postcode(ignore=None):

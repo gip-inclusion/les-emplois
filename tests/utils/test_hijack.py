@@ -85,8 +85,10 @@ class TestUserHijack:
         assertRedirects(response, "/bar/", fetch_redirect_response=False)
         assert caplog.records[0].message == f"admin={hijacker.pk} has ended impersonation of user={hijacked.pk}"
 
-    def test_release_redirects_to_admin(self, client):
-        hijacked = JobSeekerFactory()
+    @pytest.mark.parametrize("hijacked_must_accept_terms", [True, False])
+    def test_release_redirects_to_admin(self, client, hijacked_must_accept_terms):
+        kwargs = {"terms_accepted_at": None} if hijacked_must_accept_terms else {}
+        hijacked = PrescriberFactory(**kwargs)
         hijacker = ItouStaffFactory(is_superuser=True)
         client.force_login(hijacker)
 

@@ -791,3 +791,8 @@ def detect_missing_csrf_token():
         return origin_render(self, context)
 
     CsrfTokenNode.render = render
+
+
+@pytest.fixture(autouse=True)
+def do_not_bypass_terms_acceptance(settings):
+    settings.BYPASS_TERMS_ACCEPTANCE = False

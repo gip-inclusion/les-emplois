@@ -1,5 +1,8 @@
+from django.utils.decorators import method_decorator
 from django_otp import DEVICE_ID_SESSION_KEY
 from hijack import views
+
+from itou.utils.legal_terms import bypass_terms_acceptance
 
 
 HIJACK_PREVIOUS_URL_SESSION_KEY = "hijack_previous_url"
@@ -18,6 +21,7 @@ class AcquireUserView(views.AcquireUserView):
         return res
 
 
+@method_decorator(bypass_terms_acceptance, name="dispatch")
 class ReleaseUserView(views.ReleaseUserView):
     def post(self, request, *args, **kwargs):
         self.previous_url = self.request.session.get(HIJACK_PREVIOUS_URL_SESSION_KEY)
