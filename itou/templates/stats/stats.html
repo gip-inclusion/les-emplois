@@ -71,8 +71,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="js-tac-metabase" data-url="{{ iframeurl }}" title="{{ page_title }} - Tableau de bord Metabase"></div>
-
+                    <iframe id="stats-iframe" title="{{ page_title }} - Tableau de bord Metabase" src="{{ iframeurl }}"></iframe>
                     {% if back_url %}
                         <p class="mt-4">
                             <a href="{{ back_url }}">Retour</a>
