@@ -98,15 +98,10 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_script_files %}<script src="{{ stats_base_url }}/app/iframeResizer.js"></script>{% endblock %}
+
 {% block script %}
     {{ block.super }}
-
-    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
-    <script nonce="{{ csp_nonce }}">
-        iFrameResize({
-            waitForLoad: true
-        }, "#stats-iframe")
-    </script>
 
     {% if tally_popup_form_id or tally_embed_form_id %}
         {# Do not use `async` here otherwise the Tally popup will randomly fail to load. #}
