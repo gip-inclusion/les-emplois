@@ -187,10 +187,15 @@ class TestApprovalProlongation:
             count=1,
         )
 
-    def test_prolongation_approval_view_with_disabled_values(self, client, snapshot):
+    def test_prolongation_approval_view_with_disabled_values(self, settings, client, snapshot):
         """
         Test the deactivation of reasons if too many prolongations have already been created.
         """
+        # since 'freeze_time' is called twice with non deterministic dates and
+        # since the repo might contain a future version of the 'CGU' (not yet in force),
+        # explicitly calling 'accept_legal_terms' below is a very tricky alternative
+        settings.BYPASS_TERMS_ACCEPTANCE = True
+
         # This should be several succeeding prolongations but this is good enough for our test
         prolongation = ProlongationFactory(
             approval=self.approval,

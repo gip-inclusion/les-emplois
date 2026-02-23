@@ -60,7 +60,13 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assert_previous_step, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    accept_legal_terms,
+    assert_previous_step,
+    get_session_name,
+    parse_response_to_soup,
+    pretty_indented,
+)
 from tests.www.eligibility_views.utils import (
     CERTIFICATION_ERROR_BADGE_HTML,
     CERTIFIED_BADGE_HTML,
@@ -770,6 +776,7 @@ class TestProcessViews:
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
+        response = accept_legal_terms(client, response)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
         assert pretty_indented(html_fragment) == snapshot
@@ -816,6 +823,7 @@ class TestProcessViews:
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
+        response = accept_legal_terms(client, response)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
         assert pretty_indented(html_fragment) == snapshot(name="transition_logs")
@@ -843,6 +851,7 @@ class TestProcessViews:
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk})
         response = client.get(url)
+        response = accept_legal_terms(client, response)
         html_fragment = self._get_transition_logs_content(response, job_app)
 
         assert pretty_indented(html_fragment) == snapshot
@@ -875,6 +884,7 @@ class TestProcessViews:
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app1.pk})
         response = client.get(url)
+        response = accept_legal_terms(client, response)
         html_fragment = self._get_transition_logs_content(response, job_app1)
 
         assert pretty_indented(html_fragment) == snapshot

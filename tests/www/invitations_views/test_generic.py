@@ -37,7 +37,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import ItouClient, assert_previous_step
+from tests.utils.testing import ItouClient, accept_legal_terms, assert_previous_step
 
 
 class PrescriberMixin:
@@ -319,7 +319,15 @@ class TestSendCompanyInvitation(CompanyMixin, BaseTestSendInvitation):
 
 
 class BaseTestAcceptInvitation:
-    def assert_invitation_is_accepted(self, response, user, invitation, mailoutbox):
+    def assert_invitation_is_accepted(self, response, user, invitation, mailoutbox, *, messages_response=None):
+        """Make sure that the invitation has been accepted and the user is now a member.
+
+        When the flow goes through the legal terms acceptance page, messages are consumed there. In that case
+        pass the intermediate response (the one rendered on the legal-terms page) as ``messages_response`` so
+        that the message assertions are run against the right response object.
+        """
+        if messages_response is None:
+            messages_response = response
         user.refresh_from_db()
         invitation.refresh_from_db()
         assert user.kind == self.user_kind
@@ -331,13 +339,15 @@ class BaseTestAcceptInvitation:
         # Make sure there's a welcome message.
         if self.user_kind == UserKind.EMPLOYER:
             assertContains(
-                response, escape(f"Vous êtes désormais membre de la structure {organization.display_name}.")
+                messages_response,
+                escape(f"Vous êtes désormais membre de la structure {organization.display_name}."),
             )
         else:
             assertContains(
-                response, escape(f"Vous êtes désormais membre de l'organisation {organization.display_name}.")
+                messages_response,
+                escape(f"Vous êtes désormais membre de l'organisation {organization.display_name}."),
             )
-        assertNotContains(response, escape("Ce lien n'est plus valide."))
+        assertNotContains(messages_response, escape("Ce lien n'est plus valide."))
 
         # A confirmation e-mail is sent to the invitation sender.
         assert len(mailoutbox) == 1
@@ -498,11 +508,14 @@ class DjangoSignupTestAcceptInvitation:
             "password1": DEFAULT_PASSWORD,
             "password2": DEFAULT_PASSWORD,
         }
-        response = client.post(invitation.acceptance_link, data=form_data, follow=True)
+        terms_page_response = client.post(invitation.acceptance_link, data=form_data, follow=True)
+        response = accept_legal_terms(client, terms_page_response)
         assertRedirects(response, reverse("dashboard:index"))
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+        self.assert_invitation_is_accepted(
+            response, user, invitation, mailoutbox, messages_response=terms_page_response
+        )
 
 
 class ProConnectSignupTestAcceptInvitation:
@@ -532,11 +545,14 @@ class ProConnectSignupTestAcceptInvitation:
             previous_url=previous_url,
             next_url=next_url,
         )
-        response = client.get(response.url, follow=True)
+        terms_page_response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, terms_page_response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+        self.assert_invitation_is_accepted(
+            response, user, invitation, mailoutbox, messages_response=terms_page_response
+        )
 
     def test_new_user__ProConnect_signup__returns_on_other_browser(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])
@@ -566,11 +582,14 @@ class ProConnectSignupTestAcceptInvitation:
             next_url=next_url,
             other_client=other_client,
         )
-        response = other_client.get(response.url, follow=True)
+        terms_page_response = other_client.get(response.url, follow=True)
+        response = accept_legal_terms(other_client, terms_page_response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+        self.assert_invitation_is_accepted(
+            response, user, invitation, mailoutbox, messages_response=terms_page_response
+        )
 
     def test_auto_accept_invitation__ProConnect_login(self, client, mailoutbox, pro_connect):
         # The user's invitations are automatically accepted at login
@@ -582,10 +601,13 @@ class ProConnectSignupTestAcceptInvitation:
             user_email=invitation.email,
         )
         assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
-        response = client.get(response.url, follow=True)
+        terms_page_response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, terms_page_response)
 
         user = User.objects.get(email=invitation.email)
-        self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
+        self.assert_invitation_is_accepted(
+            response, user, invitation, mailoutbox, messages_response=terms_page_response
+        )
 
     def test_existing_user__login_with_ProConnect(self, client, mailoutbox, pro_connect):
         invitation = self.invitation_factory(email=pro_connect.oidc_userinfo["email"])

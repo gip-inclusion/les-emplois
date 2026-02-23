@@ -448,6 +448,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 "upcoming_deletion_notified_at",
                 "external_data_source_history_formatted",
                 "first_login",
+                "terms_accepted_at",
             ]
         )
         if not request.user.is_superuser:
@@ -510,6 +511,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     "date_joined",
                     "last_checked_at",
                     "upcoming_deletion_notified_at",
+                    "terms_accepted_at",
                 )
             },
         )
