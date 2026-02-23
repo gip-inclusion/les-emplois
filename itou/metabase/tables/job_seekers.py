@@ -38,6 +38,8 @@ def get_user_age_in_years(user):
 
 
 def get_user_signup_kind(user):
+    # FIXME : we won't be able to compute this like that
+    # Maybe store creator_kind on the user ?
     creator = user.created_by
     if creator is None:
         return "autonome"

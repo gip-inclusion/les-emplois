@@ -105,6 +105,7 @@ class JobApplicationSearchView(LoginNotRequiredMixin, mixins.ListModelMixin, gen
             employer_email=Coalesce(
                 Subquery(
                     JobApplicationTransitionLog.objects.filter(user__kind=UserKind.EMPLOYER)
+                    # FIXME: how do we do this ?
                     .order_by("-timestamp")
                     .values("user__email")[:1],
                 ),
