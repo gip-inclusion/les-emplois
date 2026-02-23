@@ -131,7 +131,7 @@ dumprestore: $(VIRTUAL_ENV)
 	python manage.py migrate
 
 DBREADY := 0
-$(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/*/fixtures.py
+$(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/*/fixtures.py itou/fixtures/django/dynamic.py
 	$(MAKE) dumpcreate
 	$(eval DBREADY := 1)
 
