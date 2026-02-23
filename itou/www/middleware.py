@@ -2,14 +2,17 @@ from math import ceil
 
 import sentry_sdk
 from django.conf import settings
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import connection
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
+from itoutils.urls import add_url_params
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
 
@@ -91,3 +94,46 @@ def maintenance(get_response):
         return get_response(request)
 
     return middleware
+
+
+class TermsAcceptanceMiddleware:
+    """Middleware to ensure that professionals have accepted the latest terms before accessing the app."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        requires_login = getattr(view_func, "login_required", True)
+        if not requires_login:
+            return None  # don't enforce terms acceptance for public endpoints
+        if not request.user.is_authenticated or not request.user.must_accept_terms():
+            return None
+        path = request.path
+        match = request.resolver_match
+        namespace = (match.namespace or "") if match else ""
+        allowed_paths = {  # "Mon espace" must stay accessible
+            reverse("dashboard:edit_user_email"),
+            reverse("dashboard:edit_user_info"),
+            reverse("dashboard:edit_user_notifications"),
+        }
+        allowed_prefixes = ["/accounts/"]
+        allowed_namespaces = [
+            "admin",  # anyway, should be unreachable by superusers
+            "hijack",
+            "invitations_views",
+            "login",  # redundant... Except for the VerifyOTPView
+            "logout",
+            "signup",
+            "itou_staff_views",  # anyway, should be unreachable by staff members
+        ]
+        if (
+            any(path.startswith(prefix) for prefix in allowed_prefixes)
+            or path in allowed_paths
+            or namespace in allowed_namespaces
+        ):
+            return None
+        url = add_url_params(reverse("legal-terms"), {REDIRECT_FIELD_NAME: request.get_full_path()})
+        return HttpResponseRedirect(url)

@@ -107,7 +107,9 @@ def test_unused_templates():
 
     template_names_to_check = set()
     for template_name in iter_template_names():
-        if template_name not in APP_TEMPLATES:
+        # 'CGU' versions stored in static/legal/terms/versions are dynamically included
+        # in static/legal/terms/base.html, so we can't check them for usage
+        if template_name not in APP_TEMPLATES and not template_name.startswith("static/legal/terms/versions/"):
             template_names_to_check.add(template_name)
 
     for dirpath, _dirnames, filenames in itertools.chain(

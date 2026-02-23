@@ -1,0 +1,110 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+
+{% block title %}Conditions d'utilisation {{ block.super }}{% endblock %}
+
+{% block toasts %}{# This empty block avoids message consumption here #}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Conditions Générales d'Utilisation</h1>
+            <p>
+                {% if requested_terms.slug == latest_terms.slug %}
+                    {% if is_update %}Mise à jour&nbsp;-&nbsp;{% endif %}
+                    En vigueur à partir du {{ requested_terms.date|date:"d/m/Y" }}
+                {% else %}
+                    Version du {{ requested_terms.date|date:"d/m/Y" }}
+                {% endif %}
+            </p>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block title_messages %}{# This empty block avoids message consumption here #}{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    {% if require_acceptance %}
+                        <div class="c-form">
+                            <h2>
+                                Prenez connaissance des
+                                {% if is_update %}nouvelles{% endif %}
+                                Conditions Générales d'Utilisation
+                            </h2>
+                            <p class="mt-3">
+                                Pour continuer à utiliser le service des Emplois de l'Inclusion, nous vous invitons à prendre connaissance
+                                {% if is_update %}de la nouvelle version{% endif %}
+                                des Conditions Générales d'Utilisation.
+                            </p>
+                            <div id="terms-container" class="border rounded p-3 overflow-auto my-4 mh-50vh">
+                                {% include requested_terms.template_name %}
+                            </div>
+                            <form id="cgu-acceptance-form" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="{{ redirect_field_name }}" value="{{ next_url }}">
+                                <input type="hidden" name="terms_slug" value="{{ requested_terms.slug }}">
+                                <hr class="mb-3">
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" id="cgu-acceptance-checkbox" class="form-check-input">
+                                    <label class="form-check-label" for="cgu-acceptance-checkbox">
+                                        Je déclare avoir pris connaissance des Conditions Générales d'Utilisation et je les accepte.
+                                    </label>
+                                </div>
+                                <div class="form-row justify-content-end">
+                                    <div class="form-group col col-auto">
+                                        <button data-bs-toggle="tooltip" data-bs-title="Faites défiler les CGU jusqu'en bas et cochez la case pour activer le bouton" type="submit" class="btn btn-block btn-primary" disabled>
+                                            J'accepte
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    {% else %}
+                        {% include requested_terms.template_name %}
+                        {% include "static/legal/terms/all_versions.html" %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if require_acceptance %}
+        <script nonce="{{ csp_nonce }}">
+            const termsContainer = document.querySelector("#terms-container");
+            const acceptCheckbox = document.querySelector("#cgu-acceptance-checkbox");
+            const acceptButton = document.querySelector("#cgu-acceptance-form button");
+            const acceptBtnTooltip = bootstrap.Tooltip.getInstance(acceptButton);
+
+            if (termsContainer && acceptButton && acceptCheckbox) {
+
+                let hasReachedBottom = false;
+
+                const enableSubmit = () => {
+                    const isAtBottom =
+                        Math.ceil(termsContainer.scrollTop + termsContainer.clientHeight) >=
+                        termsContainer.scrollHeight * 0.99;
+                    if (isAtBottom) hasReachedBottom = true;
+                    acceptButton.disabled = !(hasReachedBottom && acceptCheckbox.checked);
+                    // the user might wonder why the button is not clickable, the tooltip gives them a hint
+                    acceptButton.disabled ? acceptBtnTooltip.enable() : acceptBtnTooltip.disable();
+                };
+
+                acceptCheckbox.addEventListener("change", enableSubmit);
+                termsContainer.addEventListener("scroll", enableSubmit, {
+                    // https://stackoverflow.com/questions/37721782/what-are-passive-event-listeners#answer-37721906
+                    passive: true
+                });
+            };
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block modals %}{# This empty block avoids message consumption here #}{% endblock %}

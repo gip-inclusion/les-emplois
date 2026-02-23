@@ -9,6 +9,7 @@ from itou.utils.constants import ITOU_CONTACT_FORM_URL
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
 from itou.www.error import server_error
+from itou.www.legal_views.views import legal_terms, legal_terms_version
 from itou.www.login import views as login_views
 from itou.www.signup import views as signup_views
 
@@ -88,6 +89,8 @@ urlpatterns = [
     path("announcements/", include("itou.www.announcements.urls")),
     path("versions/", include("itou.www.releases.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
+    path("legal/terms/", legal_terms, name="legal-terms"),
+    path("legal/terms/<slug:version_slug>/", legal_terms_version, name="legal-terms-version"),
     # Static pages.
     path(
         "accessibility/",
@@ -108,21 +111,6 @@ urlpatterns = [
         "legal/privacy/",
         login_not_required(TemplateView.as_view(template_name="static/legal/privacy.html")),
         name="legal-privacy",
-    ),
-    path(
-        "legal/terms/",
-        login_not_required(TemplateView.as_view(template_name="static/legal/terms.html")),
-        name="legal-terms",
-    ),
-    path(
-        "legal/terms/05022024/",
-        login_not_required(TemplateView.as_view(template_name="static/legal/terms-05022024.html")),
-        name="legal-terms-05022024",
-    ),
-    path(
-        "legal/terms/14102022/",
-        login_not_required(TemplateView.as_view(template_name="static/legal/terms-14102022.html")),
-        name="legal-terms-14102022",
     ),
     path("", include("itou.www.security.urls")),
     path("gps/", include("itou.www.gps.urls")),

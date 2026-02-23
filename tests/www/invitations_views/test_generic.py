@@ -37,7 +37,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.testing import ItouClient, assert_previous_step
+from tests.utils.testing import ItouClient, accept_legal_terms, assert_previous_step
 
 
 class PrescriberMixin:
@@ -499,7 +499,8 @@ class DjangoSignupTestAcceptInvitation:
             "password2": DEFAULT_PASSWORD,
         }
         response = client.post(invitation.acceptance_link, data=form_data, follow=True)
-        assertRedirects(response, reverse("dashboard:index"))
+        response = accept_legal_terms(client, response)
+        assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
@@ -533,6 +534,7 @@ class ProConnectSignupTestAcceptInvitation:
             next_url=next_url,
         )
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
@@ -567,6 +569,7 @@ class ProConnectSignupTestAcceptInvitation:
             other_client=other_client,
         )
         response = other_client.get(response.url, follow=True)
+        response = accept_legal_terms(other_client, response)
         assertRedirects(response, reverse("welcoming_tour:index"))
 
         user = User.objects.get(email=invitation.email)
@@ -583,6 +586,7 @@ class ProConnectSignupTestAcceptInvitation:
         )
         assertRedirects(response, reverse("welcoming_tour:index"), fetch_redirect_response=False)
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
 
         user = User.objects.get(email=invitation.email)
         self.assert_invitation_is_accepted(response, user, invitation, mailoutbox)
