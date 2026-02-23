@@ -247,7 +247,7 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         self.company.refresh_from_db()
         assert self.company.spontaneous_applications_open_since == timezone.now()
 
-    @freeze_time("2021-06-21 10:10:10.10")
+    @freeze_time("2024-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self, client):
         client.force_login(self.user)
         response = client.get(self.url)
@@ -263,7 +263,7 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         assert not job_description.is_active
         assert job_description.field_history == [
             {
-                "at": "2021-06-21T10:10:10.100Z",
+                "at": "2024-06-21T10:10:10.100Z",
                 "field": "is_active",
                 "from": True,
                 "to": False,
@@ -282,13 +282,13 @@ class TestJobDescriptionListView(JobDescriptionAbstract):
         assert job_description.is_active
         assert job_description.field_history == [
             {
-                "at": "2021-06-21T10:10:10.100Z",
+                "at": "2024-06-21T10:10:10.100Z",
                 "field": "is_active",
                 "from": True,
                 "to": False,
             },
             {
-                "at": "2021-06-21T10:10:10.100Z",
+                "at": "2024-06-21T10:10:10.100Z",
                 "field": "is_active",
                 "from": False,
                 "to": True,

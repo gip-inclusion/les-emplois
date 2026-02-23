@@ -8,6 +8,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from tests.companies.factories import CompanyFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.utils.testing import accept_legal_terms
 
 
 def get_confirm_email_url(request, email):
@@ -62,6 +63,7 @@ class TestWelcomingTour:
         session.save()
         response = pro_connect.mock_oauth_dance(client, KIND_PRESCRIBER)
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")
@@ -79,6 +81,7 @@ class TestWelcomingTour:
             next_url=next_url,
         )
         response = client.get(response.url, follow=True)
+        response = accept_legal_terms(client, response)
 
         # User should be redirected to the welcoming tour as he just signed up
         assert response.wsgi_request.path == reverse("welcoming_tour:index")

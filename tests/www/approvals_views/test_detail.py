@@ -368,7 +368,11 @@ class TestApprovalDetailView:
             name="Approval prolongations list as job_seeker/prescriber"
         )
 
-    def test_prolongation_button(self, client):
+    def test_prolongation_button(self, settings, client):
+        # since 'freeze_time' is called twice with non deterministic dates and
+        # since the repo might contain a future version of the 'CGU' (not yet in force),
+        # explicitly calling 'accept_legal_terms' below is a tricky alternative
+        settings.BYPASS_TERMS_ACCEPTANCE = True
         TOO_SOON = (
             "Les prolongations ne sont possibles qu’entre le 12ème mois avant la "
             "fin d’un PASS IAE et jusqu’à son dernier jour de validité."
@@ -430,7 +434,8 @@ class TestApprovalDetailView:
             check_prolongation_url_and_reason(employer, with_url=False, expected_reason=TOO_LATE)
             check_prolongation_url_and_reason(prescriber, with_url=False, expected_reason=None)
 
-    def test_suspend_button(self, client):
+    def test_suspend_button(self, settings, client):
+        settings.BYPASS_TERMS_ACCEPTANCE = True
         ALREADY_SUSPENDED = "La suspension n’est pas possible car une suspension est déjà en cours."
         NOT_STARTED = "La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."
         HANDLED_BY_OTHER_SIAE = "La suspension n’est pas possible car un autre employeur a embauché le candidat."

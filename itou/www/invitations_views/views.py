@@ -21,6 +21,7 @@ from itou.openid_connect.pro_connect.enums import ProConnectChannel
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
     BaseEmployerInvitationFormSet,
@@ -227,6 +228,7 @@ class InvitePrescriberView(BaseInviteUserView):
         return {"sender": self.request.user, "organization": self.organization}
 
 
+@bypass_terms_acceptance
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
     handle_prescriber_intivation(invitation, request)
@@ -251,6 +253,7 @@ class InviteEmployerView(BaseInviteUserView):
         return {"sender": self.request.user, "company": self.organization}
 
 
+@bypass_terms_acceptance
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     handle_employer_invitation(invitation, request)
@@ -275,6 +278,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
         return {"sender": self.request.user, "institution": self.organization}
 
 
+@bypass_terms_acceptance
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     handle_labor_inspector_invitation(invitation, request)

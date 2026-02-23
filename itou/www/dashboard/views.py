@@ -15,6 +15,7 @@ from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, 
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 from rest_framework.authtoken.models import Token
@@ -35,6 +36,7 @@ from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.legal_terms import bypass_terms_acceptance
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.utils import can_edit_personal_information
@@ -285,6 +287,7 @@ class ItouPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("dashboard:index")
 
 
+@bypass_terms_acceptance
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     if request.user.has_sso_provider:
         return HttpResponseForbidden()
@@ -298,6 +301,7 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, {"form": form})
 
 
+@bypass_terms_acceptance
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     Edit a user.
@@ -383,6 +387,7 @@ def switch_organization(request):
     return HttpResponseRedirect(next_url)
 
 
+@bypass_terms_acceptance
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
     if request.user.is_staff:
         raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
@@ -435,6 +440,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
     return render(request, template_name, context)
 
 
+@method_decorator(bypass_terms_acceptance, name="dispatch")
 class AccountMigrationView(TemplateView):
     template_name = "account/activate_pro_connect_account.html"
 

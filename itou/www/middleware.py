@@ -6,9 +6,10 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.db import connection
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
 from itou.utils.throttling import FailSafeAnonRateThrottle, FailSafeUserRateThrottle
@@ -91,3 +92,41 @@ def maintenance(get_response):
         return get_response(request)
 
     return middleware
+
+
+class TermsAcceptanceMiddleware:
+    """Middleware to ensure that professionals have accepted the latest terms before accessing the app."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if getattr(settings, "BYPASS_TERMS_ACCEPTANCE", False):
+            return None  # setting to globally disable this check
+        if not getattr(view_func, "login_required", True):
+            return None  # don't enforce terms acceptance for public endpoints
+        if not request.user.is_authenticated or not request.user.must_accept_terms:
+            return None
+        if request.method == "POST" or request.htmx:
+            return None  # avoid a brutal redirection for HTMX requests or form submissions
+        if request.path.startswith("/accounts/"):
+            return None
+        if not (match := getattr(request, "resolver_match", None)):
+            return None
+        top_level_namespace = match.namespaces[0] if match.namespaces else ""
+        if top_level_namespace in [
+            "logout",
+            "itou.api",
+            # Anyway, this should be only reachable by superusers and staff members... But we don't want
+            # professionals reaching these endpoints to first accept the terms and then get a 403/404
+            "admin",
+            "itou_staff_views",
+        ]:
+            return None
+        if getattr(view_func, "_bypass_terms_acceptance", False):  # views can be decorated to be exempt from the check
+            return None
+        url = reverse("legal-terms", query={"next": request.get_full_path()})
+        return HttpResponseRedirect(url)
