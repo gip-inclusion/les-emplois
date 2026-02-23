@@ -89,7 +89,9 @@
         {% endif %}
 
         <main id="main" role="main" class="s-main">
-            <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
+            {% block toasts %}
+                <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
+            {% endblock toasts %}
 
             <section class="s-title-02">
                 <div class="s-title-02__container container">
