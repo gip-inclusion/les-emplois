@@ -29,7 +29,7 @@ class ProConnectUserData(OIDConnectUserData):
         }
 
     def join_org(self, user: User, safir: str):
-        if not user.is_prescriber:
+        if not user.is_prescriber:  # FIXME Replace with user.is_professional
             raise ValueError("Invalid user kind: %s", user.kind)
         try:
             organization = PrescriberOrganization.objects.get(code_safir_pole_emploi=safir)

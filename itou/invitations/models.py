@@ -181,7 +181,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def guest_can_join_organization(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_prescriber
+        return user == request.user and user.is_prescriber  # FIXME Replace with user.is_professional
 
     # Notifications
     @property
