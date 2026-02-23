@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2026-02-23
+
+### Ajouté
+
+- [Tableau de bord : Ajouter un bandeau d’information pour les EA/EATT](https://github.com/gip-inclusion/les-emplois/pull/7561)
+
+### Modifié
+
+- [API : Amélioration des performances et de la sécurité de l'API Fiches Salarié](https://github.com/gip-inclusion/les-emplois/pull/7564)
+- [API : Correction sémantique dans la description de l'API structure](https://github.com/gip-inclusion/les-emplois/pull/7570)
+- [GEIQ : Restreindre l’accès au module bilan d’exécution aux admins GEIQ](https://github.com/gip-inclusion/les-emplois/pull/7521)
+- [GPS : Changement de wording dans l'espace candidat](https://github.com/gip-inclusion/les-emplois/pull/7544)
+- [Inscription : Empêcher les EA/EATT de s'inscrire](https://github.com/gip-inclusion/les-emplois/pull/7566)
+- [Interface : Ajout d'un encart "Mon Récap" sur la page "Réseau d'intervenants"](https://github.com/gip-inclusion/les-emplois/pull/7383)
+- [PASS IAE : Correction d'une vulnérabilité sur la prolongation des PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/7567)
+- [Performances : Déplacement du nettoyage des états OIDC dans un CRON plutôt qu'à chaque connexion](https://github.com/gip-inclusion/les-emplois/pull/7573)
+
 ## 2026-02-16
 
 ### Ajouté
