@@ -103,6 +103,12 @@
 {% block script %}
     {{ block.super }}
 
+    <script nonce="{{ csp_nonce }}">
+        iFrameResize({
+            waitForLoad: true
+        }, "#stats-iframe")
+    </script>
+
     {% if tally_popup_form_id or tally_embed_form_id %}
         {# Do not use `async` here otherwise the Tally popup will randomly fail to load. #}
         <script src="https://tally.so/widgets/embed.js"></script>
