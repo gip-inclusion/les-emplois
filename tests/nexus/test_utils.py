@@ -179,5 +179,4 @@ class TestDropDownStatus:
         assert dropdown_status(email=user.email)["activated_services"] == expected
 
         user.delete()
-        expected = [nexus_user.source]
         assert dropdown_status(email=nexus_user.email)["activated_services"] == [nexus_user.source]

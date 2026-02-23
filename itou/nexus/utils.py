@@ -28,7 +28,7 @@ def service_id(service, id):
 
 
 def get_service_users(*, email=None, user=None):
-    assert bool(email) ^ bool(user), "One and only one of email and user is required"
+    assert (email is None) ^ (user is None), "One and only one of email and user is required"
     if email:
         user = User.objects.filter(
             email=email,
@@ -36,7 +36,7 @@ def get_service_users(*, email=None, user=None):
             kind__in=[UserKind.PRESCRIBER, UserKind.EMPLOYER],
         ).first()
     else:
-        email = email or user.email
+        email = user.email
 
     service_users = list(NexusUser.objects.filter(email=email))
 
@@ -50,17 +50,16 @@ def get_service_users(*, email=None, user=None):
 
 
 def dropdown_status(*, email=None, user=None):
-    assert bool(email) ^ bool(user), "One and only one of email and user is required"
+    assert (email is None) ^ (user is None), "One and only one of email and user is required"
     service_users = get_service_users(email=email, user=user)
     email = email or user.email
 
     mvp_enabled = (
         CompanyMembership.objects.filter(user__email=email, company__department__in=settings.NEXUS_MVP_DEPARTMENTS)
-        .values_list("pk", flat=True)
         .union(
             PrescriberMembership.objects.filter(
                 user__email=email, organization__department__in=settings.NEXUS_MVP_DEPARTMENTS
-            ).values_list("pk", flat=True)
+            )
         )
         .union(
             NexusMembership.objects.filter(user__email=email, structure__department__in=settings.NEXUS_MVP_DEPARTMENTS)
