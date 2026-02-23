@@ -289,7 +289,7 @@ def pro_connect_callback(request):
 
     code_safir_pole_emploi = user_data.get("custom", {}).get("structureTravail")
     # Only handle user creation for the moment, not updates.
-    if is_successful and user.is_prescriber and code_safir_pole_emploi:
+    if is_successful and user.is_prescriber and code_safir_pole_emploi:  # FIXME Replace with user.is_professional
         try:
             pc_user_data.join_org(user=user, safir=code_safir_pole_emploi)
         except PrescriberOrganization.DoesNotExist:

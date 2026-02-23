@@ -31,7 +31,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_prescriber:
+            if not user.is_prescriber:  # FIXME Replace with user.is_professional
                 error = forms.ValidationError("Cet utilisateur n'est pas un prescripteur.")
                 self.add_error("email", error)
             else:
@@ -105,7 +105,7 @@ class EmployerInvitationForm(forms.ModelForm):
         """
         user = User.objects.filter(email__iexact=email).first()
         if user:
-            if not user.is_employer:
+            if not user.is_employer:  # FIXME replace with not user.is_professional
                 error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:

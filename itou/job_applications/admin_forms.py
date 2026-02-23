@@ -46,7 +46,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 raise ValidationError("Émetteur SIAE manquant.")
             else:
                 # Sender is optional, but if it exists, check its role.
-                if not sender.is_employer:
+                if not sender.is_employer:  # FIXME: Replace with sender.is_professional
                     raise ValidationError("Émetteur du mauvais type.")
 
         elif sender_company is not None:
@@ -55,7 +55,7 @@ class JobApplicationAdminForm(forms.ModelForm):
         if sender_kind == SenderKind.PRESCRIBER:
             if sender:
                 # Sender is optional, but if it exists, check its role.
-                if not sender.is_prescriber:
+                if not sender.is_prescriber:  # FIXME: Replace with sender.is_professional
                     raise ValidationError("Émetteur du mauvais type.")
                 # Request organization only if prescriber is actively linked to an organization
                 if sender_prescriber_organization is None and sender.prescribermembership_set.exists():
