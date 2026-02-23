@@ -170,6 +170,7 @@ def get_permissions_dict():
             siae_evaluations_models.EvaluationCampaign: PERMS_ALL,
             siae_evaluations_models.EvaluatedSiae: PERMS_ALL,
             siae_evaluations_models.EvaluatedJobApplication: PERMS_ALL,
+            siae_evaluations_models.EvaluatedJobApplicationSanction: PERMS_ALL,
             siae_evaluations_models.EvaluatedAdministrativeCriteria: PERMS_ALL,
             siae_evaluations_models.Sanctions: PERMS_ALL,
         },
