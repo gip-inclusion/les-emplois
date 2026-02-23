@@ -41,6 +41,7 @@ class NexusUserAdmin(NexusAdminMixin, ItouModelAdmin):
         "email",
         "first_name",
         "last_name",
+        "auth",
         "source",
         "updated_at",
         "is_active",
@@ -57,6 +58,7 @@ class NexusUserAdmin(NexusAdminMixin, ItouModelAdmin):
                     "last_name",
                     "email",
                     "phone",
+                    "auth",
                     "kind",
                 )
             },
