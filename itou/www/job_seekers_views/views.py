@@ -112,6 +112,10 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
                 for_siae=self.request.current_organization if self.request.user.is_employer else None,
                 prefetch=["selected_administrative_criteria__administrative_criteria"],
             )
+            if iae_eligibility_diagnosis:
+                # The job_seeker object already contains a lot of information: no need to re-retrieve it
+                iae_eligibility_diagnosis.job_seeker = self.object
+
         if self.request.from_authorized_prescriber and approval is None:
             can_edit_iae_eligibility = True
 
