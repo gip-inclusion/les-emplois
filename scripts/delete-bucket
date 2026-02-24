@@ -12,36 +12,31 @@ import subprocess
 import boto3
 
 
-def main():
+def read_clever_env():
     output = subprocess.run([os.environ["CLEVER_CLI"], "env"], check=True, capture_output=True, text=True)
     envlines = shlex.split(
         "\n".join(
             (line for line in output.stdout.splitlines() if not line.startswith("#")),
         )
     )
-
-    cred_keys = ["CELLAR_ADDON_HOST", "CELLAR_ADDON_KEY_ID", "CELLAR_ADDON_KEY_SECRET", "S3_STORAGE_BUCKET_NAME"]
-    verif_key = "ITOU_ENVIRONMENT"
-    keys_to_find = set(cred_keys)
-    keys_to_find.add(verif_key)
-    creds = {}
+    env = {}
     for envline in envlines:
         key, value = envline.split("=", maxsplit=1)
-        if key in cred_keys:
-            creds[key] = value
-            keys_to_find.remove(key)
-        if key == verif_key:
-            assert value == "REVIEW-APP"
-            keys_to_find.remove(key)
-    assert keys_to_find == set(), keys_to_find
+        env[key] = value
+    return env
 
+
+def main():
+    env = read_clever_env()
+    if env["ITOU_ENVIRONMENT"] != "REVIEW-APP":
+        raise RuntimeError("Only run this command for review apps.")
     s3_client = boto3.client(
         service_name="s3",
-        aws_access_key_id=creds["CELLAR_ADDON_KEY_ID"],
-        aws_secret_access_key=creds["CELLAR_ADDON_KEY_SECRET"],
-        endpoint_url=f"https://{creds['CELLAR_ADDON_HOST']}",
+        aws_access_key_id=env["CELLAR_ADDON_KEY_ID"],
+        aws_secret_access_key=env["CELLAR_ADDON_KEY_SECRET"],
+        endpoint_url=f"https://{env['CELLAR_ADDON_HOST']}",
     )
-    bucket_name = creds["S3_STORAGE_BUCKET_NAME"]
+    bucket_name = env["S3_STORAGE_BUCKET_NAME"]
     paginator = s3_client.get_paginator("list_object_versions")
     try:
         for page in paginator.paginate(Bucket=bucket_name):
