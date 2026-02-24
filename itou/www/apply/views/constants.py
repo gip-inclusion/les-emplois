@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.safestring import mark_safe
 
 from itou.utils import constants as global_constants
@@ -34,3 +36,5 @@ ERROR_EMPLOYER_BLOCKING_SPONTANEOUS_APPLICATIONS = (
 ERROR_EMPLOYER_BLOCKING_APPLICATIONS_FOR_JOB_DESCRIPTION = (
     "Cet employeur a fermé les candidatures pour un des métiers sélectionnés."
 )
+
+APPLICATIONS_VISIBILITY_FOR_EMPLOYERS = datetime.timedelta(days=365 * 2)
