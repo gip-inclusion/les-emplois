@@ -48,7 +48,7 @@
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                   </ul>
                   <div class="mt-md-1">
-                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
                           <span>
                               Voir la fiche détaillée
                           </span>
@@ -78,7 +78,7 @@
                           Coiffeur
                       </span>
                       <h3>
-                          Coupe aussi les cheveux
+                          Coupe que les cheveux
                       </h3>
                   </div>
               </div>
@@ -86,7 +86,7 @@
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                   </ul>
                   <div class="mt-md-1">
-                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--svc3?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--autre-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
                           <span>
                               Voir la fiche détaillée
                           </span>
@@ -99,10 +99,48 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <p class="mb-2">
-                  Coupe aussi les cheveux longs
+                  Coupe que les cheveux longs
               </p>
               <span class="badge badge-xs rounded-pill bg-light text-primary">
                   Source : autre, via data·inclusion
+              </span>
+          </div>
+      </div>
+      <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
+          <div class="c-box--results__header">
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-community-line">
+                  </i>
+                  <div>
+                      <span>
+                          Coiffeur
+                      </span>
+                      <h3>
+                          Coupe tout les cheveux
+                      </h3>
+                  </div>
+              </div>
+              <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                  <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                  </ul>
+                  <div class="mt-md-1">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                          <span>
+                              Voir la fiche détaillée
+                          </span>
+                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+                          </i>
+                      </a>
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <p class="mb-2">
+                  Coupe tout les cheveux longs
+              </p>
+              <span class="badge badge-xs rounded-pill bg-light text-primary">
+                  Source : dora, via data·inclusion
               </span>
           </div>
       </div>
@@ -124,7 +162,7 @@
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                   </ul>
                   <div class="mt-md-1">
-                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc1?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-distanciel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
                           <span>
                               Voir la fiche détaillée
                           </span>
@@ -154,6 +192,44 @@
                           Coiffeur
                       </span>
                       <h3>
+                          Coupe que les cheveux
+                      </h3>
+                  </div>
+              </div>
+              <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+                  <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                  </ul>
+                  <div class="mt-md-1">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--autre-distanciel-geispolsheim?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                          <span>
+                              Voir la fiche détaillée
+                          </span>
+                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+                          </i>
+                      </a>
+                  </div>
+              </div>
+          </div>
+          <hr class="m-0"/>
+          <div class="c-box--results__body">
+              <p class="mb-2">
+                  Coupe que les cheveux longs
+              </p>
+              <span class="badge badge-xs rounded-pill bg-light text-primary">
+                  Source : autre, via data·inclusion
+              </span>
+          </div>
+      </div>
+      <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
+          <div class="c-box--results__header">
+              <div class="c-box--results__summary">
+                  <i aria-hidden="true" class="ri-community-line">
+                  </i>
+                  <div>
+                      <span>
+                          Coiffeur
+                      </span>
+                      <h3>
                           Coupe entre autres les cheveux
                       </h3>
                   </div>
@@ -162,7 +238,7 @@
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
                   </ul>
                   <div class="mt-md-1">
-                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--svc4?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+                      <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--autre-none-nowhere?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
                           <span>
                               Voir la fiche détaillée
                           </span>
@@ -188,7 +264,7 @@
 # ---
 # name: test_results_html_link[anonymous]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -200,7 +276,7 @@
 # ---
 # name: test_results_html_link[employer]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-employer" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-employer" rel="noopener" target="_blank">
       <span>
           Orienter
       </span>
@@ -212,7 +288,7 @@
 # ---
 # name: test_results_html_link[itou_staff]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-itou_staff" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-itou_staff" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -224,7 +300,7 @@
 # ---
 # name: test_results_html_link[jobseeker]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-job_seeker" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-job_seeker" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -236,7 +312,7 @@
 # ---
 # name: test_results_html_link[labor_inspector]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-labor_inspector" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-labor_inspector" rel="noopener" target="_blank">
       <span>
           Voir la fiche détaillée
       </span>
@@ -248,7 +324,7 @@
 # ---
 # name: test_results_html_link[prescriber]
   '''
-  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/svc2?mtm_campaign=lesemplois&mtm_kwd=rechservice-prescriber" rel="noopener" target="_blank">
+  <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-presentiel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-prescriber" rel="noopener" target="_blank">
       <span>
           Orienter
       </span>

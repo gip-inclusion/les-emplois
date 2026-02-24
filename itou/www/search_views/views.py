@@ -3,12 +3,14 @@ import json
 import logging
 import warnings
 from collections import defaultdict, namedtuple
+from functools import partial
 from urllib.parse import urlencode
 
 from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
 from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
 from django.http import HttpResponseRedirect
@@ -378,6 +380,21 @@ def search_services_home(request, template_name="search/services/home.html"):
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 
+def _sort_api_results(result, *, city):
+    modes_accueil = set(result["modes_accueil"] or [])
+    if result.get("longitude") and result.get("latitude"):
+        # The SRID 4326 (WGS 84) return the distance as degree so approximate to 111km.
+        # See here: https://stackoverflow.com/a/8477438
+        distance = city.coords.distance(Point(result["longitude"], result["latitude"], srid=city.coords.srid)) * 111
+    else:
+        distance = 40_075_017 // 2 / 1_000  # Max distance from the Earth circumference
+    return (
+        data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in modes_accueil,
+        -1 * distance,
+        result["source"] == "dora",
+    )
+
+
 @login_not_required
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
@@ -420,10 +437,7 @@ def search_services_results(request, template_name="search/services/results.html
                     False,
                     sorted(
                         results,
-                        key=lambda i: (
-                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in (i["modes_accueil"] or []),
-                            i["source"] == "dora",
-                        ),
+                        key=partial(_sort_api_results, city=city),
                         reverse=True,
                     ),
                 )

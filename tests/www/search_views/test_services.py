@@ -22,57 +22,89 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 
 @pytest.fixture(name="search_services_route")
 def search_services_route_fixture(respx_mock, settings):
-    return respx_mock.route(url=f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
-        json={
-            "items": [
-                {
-                    "service": {
-                        "id": "svc1",
-                        "source": "dora",
-                        "nom": "Coupe les cheveux",
-                        "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
-                        "lien_source": f"{settings.DORA_BASE_URL}/services/svc1",
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc2",
-                        "source": "dora",
-                        "nom": "Coupe également les cheveux",
-                        "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
-                        "lien_source": f"{settings.DORA_BASE_URL}/services/svc2",
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe également les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc3",
-                        "source": "autre",
-                        "nom": "Coupe aussi les cheveux",
-                        "modes_accueil": list(data_inclusion_v1.ModeAccueil),
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe aussi les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc4",
-                        "source": "autre",
-                        "nom": "Coupe entre autres les cheveux",
-                        "modes_accueil": None,
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe entre autres les cheveux longs",
-                    },
-                },
-            ]
+    items = [
+        {
+            "service": {
+                "id": "dora-distanciel-vannes",
+                "source": "dora",
+                "nom": "Coupe les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-distanciel-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe les cheveux longs",
+            },
         },
+        {
+            "service": {
+                "id": "dora-presentiel-vannes",
+                "source": "dora",
+                "nom": "Coupe également les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-presentiel-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe également les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-presentiel-vannes",
+                "source": "autre",
+                "nom": "Coupe que les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe que les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-distanciel-geispolsheim",
+                "source": "autre",
+                "nom": "Coupe que les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "67152",
+                "longitude": 7.644817,
+                "latitude": 48.515883,
+                "description": "Coupe que les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "dora-geispolsheim",
+                "source": "dora",
+                "nom": "Coupe tout les cheveux",
+                "modes_accueil": list(data_inclusion_v1.ModeAccueil),
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "67152",
+                "longitude": 7.644817,
+                "latitude": 48.515883,
+                "description": "Coupe tout les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-none-nowhere",
+                "source": "autre",
+                "nom": "Coupe entre autres les cheveux",
+                "modes_accueil": None,
+                "structure": {"nom": "Coiffeur"},
+                "description": "Coupe entre autres les cheveux longs",
+            },
+        },
+    ]
+    random.shuffle(items)
+    return respx_mock.route(url=f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
+        json={"items": items},
     )
 
 
@@ -97,7 +129,7 @@ def test_invalid_query_parameters(client):
 
 
 def test_results_html(snapshot, client, search_services_route):
-    expected_items = 4
+    expected_items = 6
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
@@ -144,7 +176,14 @@ def test_results_ordering(client, search_services_route):
     category = random.choice(list(data_inclusion_v1.Categorie))
 
     response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assert [service["id"] for service in response.context["results"].object_list] == ["svc2", "svc3", "svc1", "svc4"]
+    assert [service["id"] for service in response.context["results"].object_list] == [
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+        "dora-geispolsheim",
+        "dora-distanciel-vannes",
+        "autre-distanciel-geispolsheim",
+        "autre-none-nowhere",
+    ]
 
 
 def test_results_are_cached(client, search_services_route):
