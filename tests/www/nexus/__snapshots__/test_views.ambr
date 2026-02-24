@@ -485,24 +485,6 @@
                           <div class="col mb-3 mb-md-4">
                               <div class="c-box h-100">
                                   <div class="d-flex align-items-center gap-3">
-                                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
-                                      <div>
-                                          <strong class="d-block fs-lg">
-                                              Mon Récap
-                                          </strong>
-                                          <p class="mb-0 fs-sm">
-                                              Plateforme de l’inclusion
-                                          </p>
-                                      </div>
-                                  </div>
-                                  <a aria-label="Accéder à Mon Récap (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
-                                      Accéder
-                                  </a>
-                              </div>
-                          </div>
-                          <div class="col mb-3 mb-md-4">
-                              <div class="c-box h-100">
-                                  <div class="d-flex align-items-center gap-3">
                                       <img alt="Le pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
                                       <div>
                                           <strong class="d-block fs-lg">
@@ -514,6 +496,24 @@
                                       </div>
                                   </div>
                                   <a aria-label="Accéder au pilotage de l’inclusion (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats" target="_blank">
+                                      Accéder
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="col mb-3 mb-md-4">
+                              <div class="c-box h-100">
+                                  <div class="d-flex align-items-center gap-3">
+                                      <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
+                                      <div>
+                                          <strong class="d-block fs-lg">
+                                              Mon Récap
+                                          </strong>
+                                          <p class="mb-0 fs-sm">
+                                              Plateforme de l’inclusion
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <a aria-label="Accéder à Mon Récap (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
                                       Accéder
                                   </a>
                               </div>
@@ -697,6 +697,45 @@
                               <li class="list-group-item list-group-item-action">
                                   <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
                                       <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Le Pilotage de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service présentant les données sur les politiques publiques d’insertion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Statistiques nationales
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Données sur votre organisation
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Aide à la décision
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
                                           <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
                                           <div>
                                               <strong class="d-block fs-lg">
@@ -734,45 +773,6 @@
                                               </span>
                                           </button>
                                       </form>
-                                  </div>
-                              </li>
-                              <li class="list-group-item list-group-item-action">
-                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                          <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
-                                          <div>
-                                              <strong class="d-block fs-lg">
-                                                  Le Pilotage de l’inclusion
-                                              </strong>
-                                              <p class="mb-0 fs-sm">
-                                                  Le service présentant les données sur les politiques publiques d’insertion.
-                                              </p>
-                                              <ul class="list-inline fs-xs">
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Statistiques nationales
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Données sur votre organisation
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Aide à la décision
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </a>
                                   </div>
                               </li>
                           </ul>
@@ -840,25 +840,6 @@
                                       <li class="list-group-item list-group-item-action">
                                           <div class="d-flex align-items-center gap-3">
                                               <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block fs-sm">
-                                                          Mon Récap
-                                                      </strong>
-                                                      <p class="mb-0 fs-sm">
-                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="monrecapInfoMore" aria-expanded="false" aria-label="En savoir plus sur Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
                                                   <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
                                                   <div>
                                                       <strong class="d-block fs-sm">
@@ -870,6 +851,25 @@
                                                   </div>
                                               </div>
                                               <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="monrecapInfoMore" aria-expanded="false" aria-label="En savoir plus sur Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
                                                   <i aria-hidden="true" class="ri-arrow-drop-right-line">
                                                   </i>
                                               </button>
@@ -974,6 +974,54 @@
                                           En savoir plus
                                       </a>
                                   </div>
+                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
+                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                              <img alt="Le Pilotage de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="60"/>
+                                              <div>
+                                                  <strong class="d-block fs-lg">
+                                                      Le Pilotage de l’inclusion
+                                                  </strong>
+                                                  <p class="mb-0 fs-sm">
+                                                      Plateforme de l’inclusion
+                                                  </p>
+                                              </div>
+                                          </div>
+                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                          Le service présentant les données sur les politiques publiques d’insertion.
+                                      </p>
+                                      <ul class="list-unstyled mb-3 mb-md-4">
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                              </span>
+                                          </li>
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Suivez et analysez les données spécifiques à votre organisation
+                                              </span>
+                                          </li>
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Prenez des décisions et argumentez grâce aux données
+                                              </span>
+                                          </li>
+                                      </ul>
+                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                          En savoir plus
+                                      </a>
+                                  </div>
                                   <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="monrecapInfoMore">
                                       <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
                                           <div class="flex-grow-1 d-flex align-items-center gap-3">
@@ -1022,54 +1070,6 @@
                                           </li>
                                       </ul>
                                       <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
-                                          En savoir plus
-                                      </a>
-                                  </div>
-                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
-                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                              <img alt="Le Pilotage de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="60"/>
-                                              <div>
-                                                  <strong class="d-block fs-lg">
-                                                      Le Pilotage de l’inclusion
-                                                  </strong>
-                                                  <p class="mb-0 fs-sm">
-                                                      Plateforme de l’inclusion
-                                                  </p>
-                                              </div>
-                                          </div>
-                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </a>
-                                      </div>
-                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
-                                          Le service présentant les données sur les politiques publiques d’insertion.
-                                      </p>
-                                      <ul class="list-unstyled mb-3 mb-md-4">
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Consultez les statistiques nationales sur l’inclusion dans l’emploi
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Suivez et analysez les données spécifiques à votre organisation
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Prenez des décisions et argumentez grâce aux données
-                                              </span>
-                                          </li>
-                                      </ul>
-                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
                                           En savoir plus
                                       </a>
                                   </div>
@@ -1183,6 +1183,57 @@
                                       <li class="list-group-item list-group-item-action">
                                           <div class="d-flex align-items-center gap-3 position-relative">
                                               <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
+                                                  <div>
+                                                      <strong class="d-block">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0">
+                                                          Le service présentant les données sur les politiques publiques d’insertion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="pilotageInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoCollapse" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="pilotageInfoCollapse">
+                                              <ul class="list-unstyled my-3">
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                                      </span>
+                                                  </li>
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Suivez et analysez les données spécifiques à votre organisation
+                                                      </span>
+                                                  </li>
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Prenez des décisions et argumentez grâce aux données
+                                                      </span>
+                                                  </li>
+                                              </ul>
+                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                                  En savoir plus
+                                              </a>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3 position-relative">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
                                                   <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
                                                   <div>
                                                       <strong class="d-block">
@@ -1232,57 +1283,6 @@
                                                       </span>
                                                   </button>
                                               </form>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3 position-relative">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block">
-                                                          Le Pilotage de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0">
-                                                          Le service présentant les données sur les politiques publiques d’insertion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="pilotageInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoCollapse" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="pilotageInfoCollapse">
-                                              <ul class="list-unstyled my-3">
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Consultez les statistiques nationales sur l’inclusion dans l’emploi
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Suivez et analysez les données spécifiques à votre organisation
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Prenez des décisions et argumentez grâce aux données
-                                                      </span>
-                                                  </li>
-                                              </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </a>
                                           </div>
                                       </li>
                                   </ul>
@@ -1428,6 +1428,45 @@
                               <li class="list-group-item list-group-item-action">
                                   <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
                                       <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                          <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
+                                          <div>
+                                              <strong class="d-block fs-lg">
+                                                  Le Pilotage de l’inclusion
+                                              </strong>
+                                              <p class="mb-0 fs-sm">
+                                                  Le service présentant les données sur les politiques publiques d’insertion.
+                                              </p>
+                                              <ul class="list-inline fs-xs">
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Statistiques nationales
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Données sur votre organisation
+                                                  </li>
+                                                  <li class="list-inline-item">
+                                                      <i class="ri-check-line ri-sm">
+                                                      </i>
+                                                      Aide à la décision
+                                                  </li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                          <i aria-hidden="true" class="ri-toggle-line">
+                                          </i>
+                                          <span>
+                                              Activer ce service
+                                          </span>
+                                      </a>
+                                  </div>
+                              </li>
+                              <li class="list-group-item list-group-item-action">
+                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
                                           <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
                                           <div>
                                               <strong class="d-block fs-lg">
@@ -1465,45 +1504,6 @@
                                               </span>
                                           </button>
                                       </form>
-                                  </div>
-                              </li>
-                              <li class="list-group-item list-group-item-action">
-                                  <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                      <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                          <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
-                                          <div>
-                                              <strong class="d-block fs-lg">
-                                                  Le Pilotage de l’inclusion
-                                              </strong>
-                                              <p class="mb-0 fs-sm">
-                                                  Le service présentant les données sur les politiques publiques d’insertion.
-                                              </p>
-                                              <ul class="list-inline fs-xs">
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Statistiques nationales
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Données sur votre organisation
-                                                  </li>
-                                                  <li class="list-inline-item">
-                                                      <i class="ri-check-line ri-sm">
-                                                      </i>
-                                                      Aide à la décision
-                                                  </li>
-                                              </ul>
-                                          </div>
-                                      </div>
-                                      <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                          <i aria-hidden="true" class="ri-toggle-line">
-                                          </i>
-                                          <span>
-                                              Activer ce service
-                                          </span>
-                                      </a>
                                   </div>
                               </li>
                           </ul>
@@ -1552,25 +1552,6 @@
                                       <li class="list-group-item list-group-item-action">
                                           <div class="d-flex align-items-center gap-3">
                                               <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block fs-sm">
-                                                          Mon Récap
-                                                      </strong>
-                                                      <p class="mb-0 fs-sm">
-                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="monrecapInfoMore" aria-expanded="false" aria-label="En savoir plus sur Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
                                                   <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
                                                   <div>
                                                       <strong class="d-block fs-sm">
@@ -1582,6 +1563,25 @@
                                                   </div>
                                               </div>
                                               <button aria-controls="pilotageInfoMore" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoMore" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-right-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
+                                                  <div>
+                                                      <strong class="d-block fs-sm">
+                                                          Mon Récap
+                                                      </strong>
+                                                      <p class="mb-0 fs-sm">
+                                                          Le carnet papier retraçant le parcours d’insertion d’une personne.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="monrecapInfoMore" aria-expanded="false" aria-label="En savoir plus sur Mon Récap" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#monrecapInfoMore" data-bs-toggle="collapse" type="button">
                                                   <i aria-hidden="true" class="ri-arrow-drop-right-line">
                                                   </i>
                                               </button>
@@ -1638,6 +1638,54 @@
                                           En savoir plus
                                       </a>
                                   </div>
+                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
+                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
+                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                              <img alt="Le Pilotage de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="60"/>
+                                              <div>
+                                                  <strong class="d-block fs-lg">
+                                                      Le Pilotage de l’inclusion
+                                                  </strong>
+                                                  <p class="mb-0 fs-sm">
+                                                      Plateforme de l’inclusion
+                                                  </p>
+                                              </div>
+                                          </div>
+                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                              <i aria-hidden="true" class="ri-toggle-line">
+                                              </i>
+                                              <span>
+                                                  Activer ce service
+                                              </span>
+                                          </a>
+                                      </div>
+                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
+                                          Le service présentant les données sur les politiques publiques d’insertion.
+                                      </p>
+                                      <ul class="list-unstyled mb-3 mb-md-4">
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                              </span>
+                                          </li>
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Suivez et analysez les données spécifiques à votre organisation
+                                              </span>
+                                          </li>
+                                          <li class="my-md-2">
+                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                              <span>
+                                                  Prenez des décisions et argumentez grâce aux données
+                                              </span>
+                                          </li>
+                                      </ul>
+                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                          En savoir plus
+                                      </a>
+                                  </div>
                                   <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="monrecapInfoMore">
                                       <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
                                           <div class="flex-grow-1 d-flex align-items-center gap-3">
@@ -1686,54 +1734,6 @@
                                           </li>
                                       </ul>
                                       <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
-                                          En savoir plus
-                                      </a>
-                                  </div>
-                                  <div class="h-100 border-start ps-4 collapse" data-bs-parent="#nxAccordionInfoMore" id="pilotageInfoMore">
-                                      <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-                                          <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                              <img alt="Le Pilotage de l’inclusion" height="60" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="60"/>
-                                              <div>
-                                                  <strong class="d-block fs-lg">
-                                                      Le Pilotage de l’inclusion
-                                                  </strong>
-                                                  <p class="mb-0 fs-sm">
-                                                      Plateforme de l’inclusion
-                                                  </p>
-                                              </div>
-                                          </div>
-                                          <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                              <i aria-hidden="true" class="ri-toggle-line">
-                                              </i>
-                                              <span>
-                                                  Activer ce service
-                                              </span>
-                                          </a>
-                                      </div>
-                                      <p class="fs-lg fw-bold mt-3 mt-md-4 lh-sm">
-                                          Le service présentant les données sur les politiques publiques d’insertion.
-                                      </p>
-                                      <ul class="list-unstyled mb-3 mb-md-4">
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Consultez les statistiques nationales sur l’inclusion dans l’emploi
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Suivez et analysez les données spécifiques à votre organisation
-                                              </span>
-                                          </li>
-                                          <li class="my-md-2">
-                                              <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                              <span>
-                                                  Prenez des décisions et argumentez grâce aux données
-                                              </span>
-                                          </li>
-                                      </ul>
-                                      <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
                                           En savoir plus
                                       </a>
                                   </div>
@@ -1796,6 +1796,57 @@
                                       <li class="list-group-item list-group-item-action">
                                           <div class="d-flex align-items-center gap-3 position-relative">
                                               <div class="flex-grow-1 d-flex align-items-center gap-3">
+                                                  <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
+                                                  <div>
+                                                      <strong class="d-block">
+                                                          Le Pilotage de l’inclusion
+                                                      </strong>
+                                                      <p class="mb-0">
+                                                          Le service présentant les données sur les politiques publiques d’insertion.
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                              <button aria-controls="pilotageInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoCollapse" data-bs-toggle="collapse" type="button">
+                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
+                                                  </i>
+                                              </button>
+                                          </div>
+                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="pilotageInfoCollapse">
+                                              <ul class="list-unstyled my-3">
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Consultez les statistiques nationales sur l’inclusion dans l’emploi
+                                                      </span>
+                                                  </li>
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Suivez et analysez les données spécifiques à votre organisation
+                                                      </span>
+                                                  </li>
+                                                  <li class="my-md-1">
+                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
+                                                      <span>
+                                                          Prenez des décisions et argumentez grâce aux données
+                                                      </span>
+                                                  </li>
+                                              </ul>
+                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
+                                                  En savoir plus
+                                              </a>
+                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
+                                                  <i aria-hidden="true" class="ri-toggle-line">
+                                                  </i>
+                                                  <span>
+                                                      Activer ce service
+                                                  </span>
+                                              </a>
+                                          </div>
+                                      </li>
+                                      <li class="list-group-item list-group-item-action">
+                                          <div class="d-flex align-items-center gap-3 position-relative">
+                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
                                                   <img alt="Mon Récap" height="35" src="/static/vendor/theme-inclusion/images/logo-monrecap-mono.svg" width="35"/>
                                                   <div>
                                                       <strong class="d-block">
@@ -1845,57 +1896,6 @@
                                                       </span>
                                                   </button>
                                               </form>
-                                          </div>
-                                      </li>
-                                      <li class="list-group-item list-group-item-action">
-                                          <div class="d-flex align-items-center gap-3 position-relative">
-                                              <div class="flex-grow-1 d-flex align-items-center gap-3">
-                                                  <img alt="Le Pilotage de l’inclusion" height="35" src="/static/vendor/theme-inclusion/images/logo-pilotage-inclusion-mono.svg" width="35"/>
-                                                  <div>
-                                                      <strong class="d-block">
-                                                          Le Pilotage de l’inclusion
-                                                      </strong>
-                                                      <p class="mb-0">
-                                                          Le service présentant les données sur les politiques publiques d’insertion.
-                                                      </p>
-                                                  </div>
-                                              </div>
-                                              <button aria-controls="pilotageInfoCollapse" aria-expanded="false" aria-label="En savoir plus sur Le Pilotage de l’inclusion" class="btn btn-lg btn-ico-only btn-link stretched-link" data-bs-target="#pilotageInfoCollapse" data-bs-toggle="collapse" type="button">
-                                                  <i aria-hidden="true" class="ri-arrow-drop-down-line">
-                                                  </i>
-                                              </button>
-                                          </div>
-                                          <div class="collapse" data-bs-parent="#nxAccordionListGroupCollapse" id="pilotageInfoCollapse">
-                                              <ul class="list-unstyled my-3">
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Consultez les statistiques nationales sur l’inclusion dans l’emploi
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Suivez et analysez les données spécifiques à votre organisation
-                                                      </span>
-                                                  </li>
-                                                  <li class="my-md-1">
-                                                      <img alt="" src="/static/vendor/theme-inclusion/images/nexus/nx-forme-commune-01.png"/>
-                                                      <span>
-                                                          Prenez des décisions et argumentez grâce aux données
-                                                      </span>
-                                                  </li>
-                                              </ul>
-                                              <a class="btn btn-link has-external-link ps-0" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="https://pilotage.inclusion.beta.gouv.fr/" target="_blank">
-                                                  En savoir plus
-                                              </a>
-                                              <a class="btn btn-ico btn-primary" data-matomo-action="activer-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="pilotage" href="/dashboard/stats">
-                                                  <i aria-hidden="true" class="ri-toggle-line">
-                                                  </i>
-                                                  <span>
-                                                      Activer ce service
-                                                  </span>
-                                              </a>
                                           </div>
                                       </li>
                                   </ul>

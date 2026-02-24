@@ -72,15 +72,15 @@
                                     {% endcomponent_box_nexus_activated_service %}
                                 </div>
                             {% endif %}
-                            {% if Service.MON_RECAP in activated_services %}
-                                <div class="col mb-3 mb-md-4">
-                                    {% component_box_nexus_activated_service name="Mon Récap" logo="logo-monrecap-mono.svg" url=monrecap_url aria_label="Accéder à Mon Récap" service=Service.MON_RECAP %}
-                                    {% endcomponent_box_nexus_activated_service %}
-                                </div>
-                            {% endif %}
                             {% if Service.PILOTAGE in activated_services %}
                                 <div class="col mb-3 mb-md-4">
                                     {% component_box_nexus_activated_service name="Le pilotage de l’inclusion" logo="logo-pilotage-inclusion-mono.svg" url=pilotage_url aria_label="Accéder au pilotage de l’inclusion" service=Service.PILOTAGE %}
+                                    {% endcomponent_box_nexus_activated_service %}
+                                </div>
+                            {% endif %}
+                            {% if Service.MON_RECAP in activated_services %}
+                                <div class="col mb-3 mb-md-4">
+                                    {% component_box_nexus_activated_service name="Mon Récap" logo="logo-monrecap-mono.svg" url=monrecap_url aria_label="Accéder à Mon Récap" service=Service.MON_RECAP %}
                                     {% endcomponent_box_nexus_activated_service %}
                                 </div>
                             {% endif %}
@@ -114,11 +114,11 @@
                                 {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
                                     {% new_service_v1 service=Service.MARCHE %}
                                 {% endif %}
-                                {% if Service.MON_RECAP not in activated_services %}
-                                    {% new_service_v1 service=Service.MON_RECAP %}
-                                {% endif %}
                                 {% if Service.PILOTAGE not in activated_services %}
                                     {% new_service_v1 service=Service.PILOTAGE %}
+                                {% endif %}
+                                {% if Service.MON_RECAP not in activated_services %}
+                                    {% new_service_v1 service=Service.MON_RECAP %}
                                 {% endif %}
                             </ul>
                         </div>
@@ -151,11 +151,11 @@
                                         {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
                                             {% new_service_v2 service=Service.MARCHE %}
                                         {% endif %}
-                                        {% if Service.MON_RECAP not in activated_services %}
-                                            {% new_service_v2 service=Service.MON_RECAP %}
-                                        {% endif %}
                                         {% if Service.PILOTAGE not in activated_services %}
                                             {% new_service_v2 service=Service.PILOTAGE %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% new_service_v2 service=Service.MON_RECAP %}
                                         {% endif %}
                                     </ul>
                                 </div>
@@ -169,11 +169,11 @@
                                     {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
                                         {% new_service_v2_details service=Service.MARCHE %}
                                     {% endif %}
-                                    {% if Service.MON_RECAP not in activated_services %}
-                                        {% new_service_v2_details service=Service.MON_RECAP %}
-                                    {% endif %}
                                     {% if Service.PILOTAGE not in activated_services %}
                                         {% new_service_v2_details service=Service.PILOTAGE %}
+                                    {% endif %}
+                                    {% if Service.MON_RECAP not in activated_services %}
+                                        {% new_service_v2_details service=Service.MON_RECAP %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -190,11 +190,11 @@
                                         {% if Service.MARCHE not in activated_services and user_kind == NexusUserKind.FACILITY_MANAGER %}
                                             {% new_service_v2_responsive service=Service.MARCHE %}
                                         {% endif %}
-                                        {% if Service.MON_RECAP not in activated_services %}
-                                            {% new_service_v2_responsive service=Service.MON_RECAP %}
-                                        {% endif %}
                                         {% if Service.PILOTAGE not in activated_services %}
                                             {% new_service_v2_responsive service=Service.PILOTAGE %}
+                                        {% endif %}
+                                        {% if Service.MON_RECAP not in activated_services %}
+                                            {% new_service_v2_responsive service=Service.MON_RECAP %}
                                         {% endif %}
                                     </ul>
                                 </div>
