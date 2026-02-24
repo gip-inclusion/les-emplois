@@ -28,12 +28,8 @@ class Migration(migrations.Migration):
                     "service",
                     models.CharField(
                         choices=[
-                            ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
-                            ("les-emplois", "les emplois de l’inclusion"),
                             ("le-marche", "Le marché de l’inclusion"),
-                            ("mon-recap", "Mon Récap"),
-                            ("pilotage", "Le pilotage de l’inclusion"),
                         ],
                         unique=True,
                         verbose_name="service",
@@ -215,12 +211,8 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
-                            ("les-emplois", "les emplois de l’inclusion"),
                             ("le-marche", "Le marché de l’inclusion"),
-                            ("mon-recap", "Mon Récap"),
-                            ("pilotage", "Le pilotage de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),
@@ -353,12 +345,8 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
-                            ("les-emplois", "les emplois de l’inclusion"),
                             ("le-marche", "Le marché de l’inclusion"),
-                            ("mon-recap", "Mon Récap"),
-                            ("pilotage", "Le pilotage de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),
@@ -409,12 +397,8 @@ class Migration(migrations.Migration):
                     "source",
                     models.CharField(
                         choices=[
-                            ("data-inclusion", "Data inclusion"),
                             ("dora", "Dora"),
-                            ("les-emplois", "les emplois de l’inclusion"),
                             ("le-marche", "Le marché de l’inclusion"),
-                            ("mon-recap", "Mon Récap"),
-                            ("pilotage", "Le pilotage de l’inclusion"),
                         ],
                         verbose_name="source de la donnée",
                     ),

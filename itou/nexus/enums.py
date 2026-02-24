@@ -24,6 +24,14 @@ class Service(models.TextChoices):
             cls.PILOTAGE,
         ]
 
+    @classmethod
+    def sync_source_choices(cls):
+        return [(k, v) for k, v in cls.choices if k in [cls.DORA, cls.MARCHE]]
+
+    @classmethod
+    def activated_services_choices(cls):
+        return [(k, v) for k, v in cls.choices if k in [cls.MON_RECAP, cls.PILOTAGE]]
+
 
 class Auth(models.TextChoices):
     DJANGO = "DJANGO", "Django"

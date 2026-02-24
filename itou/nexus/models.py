@@ -45,7 +45,7 @@ class NexusManager(models.Manager.from_queryset(NexusQuerySet)):
 class NexusUser(NexusModelMixin, models.Model):
     id = models.CharField(verbose_name="ID unique", primary_key=True)  # Built from source and source_id
 
-    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
+    source = models.CharField(verbose_name="source de la donnée", choices=Service.sync_source_choices())
     source_id = models.CharField(verbose_name="ID source")
     source_kind = models.CharField(verbose_name="type d'origine")
 
@@ -73,7 +73,7 @@ class NexusUser(NexusModelMixin, models.Model):
 class NexusStructure(NexusModelMixin, AddressMixin, models.Model):
     # Built from source and source_id, matches the id in data-inclusion database
     id = models.CharField(verbose_name="ID unique", primary_key=True)
-    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
+    source = models.CharField(verbose_name="source de la donnée", choices=Service.sync_source_choices())
     source_id = models.CharField(verbose_name="ID Source")
     source_kind = models.CharField(verbose_name="type d'origine", blank=True)
     source_link = models.URLField(verbose_name="page du produit sur le service", blank=True)
@@ -120,7 +120,7 @@ class NexusMembership(NexusModelMixin, models.Model):
         related_name="memberships",
         on_delete=models.CASCADE,
     )
-    source = models.CharField(verbose_name="source de la donnée", choices=Service.choices)
+    source = models.CharField(verbose_name="source de la donnée", choices=Service.sync_source_choices())
     role = models.CharField(verbose_name="rôle", choices=Role.choices)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -148,7 +148,7 @@ class NexusRessourceSyncStatus(models.Model):
     and it becomes the new valid_since.
     """
 
-    service = models.CharField(verbose_name="service", choices=Service.choices, unique=True)
+    service = models.CharField(verbose_name="service", choices=Service.sync_source_choices(), unique=True)
     in_progress_since = models.DateTimeField(verbose_name="date début de synchronisation", null=True)
     valid_since = models.DateTimeField(verbose_name="date de dernière synchronisation", default=DEFAULT_VALID_SINCE)
 
@@ -171,7 +171,7 @@ class ActivatedService(models.Model):
         related_name="activated_services",
         on_delete=models.CASCADE,
     )
-    service = models.CharField(verbose_name="service", choices=Service.choices)
+    service = models.CharField(verbose_name="service", choices=Service.activated_services_choices())
     created_at = models.DateTimeField(verbose_name="date d'activation", default=timezone.now)
 
     objects = ActivatedServiceManager()
