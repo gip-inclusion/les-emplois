@@ -20,8 +20,8 @@ class Service(models.TextChoices):
             cls.EMPLOIS,
             cls.DORA,
             cls.MARCHE,
-            cls.MON_RECAP,
             cls.PILOTAGE,
+            cls.MON_RECAP,
         ]
 
     @classmethod
