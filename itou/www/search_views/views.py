@@ -20,8 +20,10 @@ from django.views.generic import FormView
 from itoutils.urls import add_url_params
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
+from itou.common_apps.address.models import lat_lon_to_coords
 from itou.companies.enums import CompanyKind, JobSource, JobSourceTag
 from itou.companies.models import Company, JobDescription
+from itou.geo.utils import MAX_DISTANCE_FROM_EARTH_CIRCUMFERENCE, distance_in_km
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
@@ -378,6 +380,34 @@ def search_services_home(request, template_name="search/services/home.html"):
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 
+def _enrich_api_result(result, *, city):
+    distance = None
+    if result.get("longitude") and result.get("latitude"):
+        distance = int(distance_in_km(city.coords, lat_lon_to_coords(result["latitude"], result["longitude"])))
+
+    modes_accueil = set(result["modes_accueil"] or [])
+    result["is_in_person"] = data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in modes_accueil
+    result["is_remote"] = data_inclusion_v1.ModeAccueil.A_DISTANCE in modes_accueil
+    result["is_local"] = any(
+        [
+            # If we get an "in person" only service than trust DI at the API only give us those in a 50km radius
+            modes_accueil == {data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value},
+            # Choose 70 km as our distance cutoff to take into account our approximation and that DI seems
+            # to compute the distance from the city limit while we use the city center.
+            result["is_in_person"] and (distance <= 70 if distance else False),
+        ]
+    )
+    result["distance"] = distance
+
+
+def _api_results_sorter(result):
+    return (
+        0 if result["is_in_person"] else 1,
+        result["distance"] if result["distance"] is not None else MAX_DISTANCE_FROM_EARTH_CIRCUMFERENCE,
+        0 if result["source"] == "dora" else 1,
+    )
+
+
 @login_not_required
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
@@ -416,15 +446,13 @@ def search_services_results(request, template_name="search/services/results.html
                 # 15 minutes seems like a reasonable amount of time for DI to get back on track
                 caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
             else:
+                for result in results:
+                    _enrich_api_result(result, city=city)
                 api_error, results = (
                     False,
                     sorted(
                         results,
-                        key=lambda i: (
-                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in (i["modes_accueil"] or []),
-                            i["source"] == "dora",
-                        ),
-                        reverse=True,
+                        key=_api_results_sorter,
                     ),
                 )
                 # 6 hours is reasonable enough to get fresh results while still avoiding
