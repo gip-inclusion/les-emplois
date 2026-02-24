@@ -38,6 +38,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
                     ignore=[
                         *settings.AFPA_DEPARTMENTS,
                         *settings.MON_RECAP_BANNER_DEPARTMENTS,
+                        *settings.NEXUS_MVP_DEPARTMENTS,
                     ],
                 )
             )
