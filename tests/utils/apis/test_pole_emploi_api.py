@@ -368,18 +368,17 @@ class TestPoleEmploiRoyaumeAgentAPIClient:
             assert headers[key] == value
 
     @respx.mock
-    def test_request_http_additional_request_headers(self):
+    def test_request_http_jeton_usager(self):
         rechercher_usager_url = f"{settings.API_ESD['BASE_URL']}{Endpoints.RECHERCHER_USAGER_DATE_NAISSANCE_NIR}"
         mock = respx.post(rechercher_usager_url).respond(200, json={"sample": "data"})
-        additional_headers = {"ft-jeton-usager": "something-very-long"}
-        self.api_client._request(rechercher_usager_url, additional_headers=additional_headers)
+        self.api_client._request(rechercher_usager_url, jeton_usager="something-very-long")
         expected_headers = {
             "Authorization": "Bearer Catwoman",
             "Content-Type": "application/json",
             "pa-nom-agent": "<string>",
             "pa-prenom-agent": "<string>",
             "pa-identifiant-agent": "<string>",
-            **additional_headers,
+            "ft-jeton-usager": "something-very-long",
         }
         headers = mock.calls[-1].request.headers
         for key, value in expected_headers.items():

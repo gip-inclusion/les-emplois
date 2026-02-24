@@ -349,7 +349,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
     REALM = "/agent"
     CACHE_API_TOKEN_KEY = "pole_emploi_api_agent_client_token"
 
-    def _request(self, url, data=None, params=None, method="POST", additional_headers=None):
+    def _request(self, url, data=None, params=None, method="POST", jeton_usager=None):
         token = caches["failsafe"].get(self.CACHE_API_TOKEN_KEY)
         if not token:
             token = self._refresh_token()
@@ -369,8 +369,8 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
             "pa-prenom-agent": "<string>",
             "pa-identifiant-agent": "<string>",
         }
-        if additional_headers:
-            headers.update(additional_headers)
+        if jeton_usager is not None:
+            headers["ft-jeton-usager"] = jeton_usager
 
         response = (
             self._get_httpx_client()
@@ -445,7 +445,7 @@ class PoleEmploiRoyaumeAgentAPIClient(BasePoleEmploiApiClient):
         data = self._request(
             f"{self.base_url}{Endpoints.RQTH}",
             method="GET",
-            additional_headers={"ft-jeton-usager": jeton_usager},
+            jeton_usager=jeton_usager,
         )
         if data["topValiditeRQTH"]:
             start_at = datetime.date.fromisoformat(data["dateDebutRqth"])
