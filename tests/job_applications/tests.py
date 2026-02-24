@@ -1037,6 +1037,19 @@ class TestJobApplicationQuerySet:
 
         assert JobApplication.objects.is_active_company_member(user).count() == 0
 
+    def test_visible_by_employers(self):
+        ALL_BUT_ACCEPTED_STATES = list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})
+        TWO_YEARS_AGO = timezone.now() - relativedelta(days=365 * 2)
+        LESS_THAN_TWO_YEARS_AGO = timezone.now() - relativedelta(days=365 * 2 - 1)
+
+        JobApplicationFactory(state=random.choice(ALL_BUT_ACCEPTED_STATES), created_at=TWO_YEARS_AGO)  # Too old
+        old_but_accepted = JobApplicationFactory(state=JobApplicationState.ACCEPTED, created_at=TWO_YEARS_AGO)
+        recent = JobApplicationFactory(
+            state=random.choice(JobApplicationState.values), created_at=LESS_THAN_TWO_YEARS_AGO
+        )
+
+        assertQuerySetEqual(JobApplication.objects.all().visible_by_employers(), [recent, old_but_accepted])
+
     @pytest.mark.parametrize(
         "state,expected",
         [(state, state in AUTO_REJECT_JOB_APPLICATION_STATES) for state in JobApplicationState],
