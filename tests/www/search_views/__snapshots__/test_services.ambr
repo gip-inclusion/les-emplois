@@ -122,6 +122,11 @@
               </div>
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                      <li>
+                          <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                          </i>
+                          A distance
+                      </li>
                   </ul>
                   <div class="mt-md-1">
                       <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
@@ -160,6 +165,11 @@
               </div>
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                      <li>
+                          <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                          </i>
+                          A distance
+                      </li>
                   </ul>
                   <div class="mt-md-1">
                       <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/dora-distanciel-vannes?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
@@ -198,6 +208,11 @@
               </div>
               <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                   <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                      <li>
+                          <i aria-hidden="true" class="ri-map-pin-2-line fw-normal me-1">
+                          </i>
+                          A distance
+                      </li>
                   </ul>
                   <div class="mt-md-1">
                       <a aria-label="Voir la fiche de Coiffeur sur DORA (ouverture dans un nouvel onglet)" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link" href="https://dora.inclusion.beta.gouv.fr/services/di--autre-distanciel-geispolsheim?mtm_campaign=lesemplois&mtm_kwd=rechservice-accueil" rel="noopener" target="_blank">
