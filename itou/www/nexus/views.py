@@ -115,6 +115,7 @@ class HomePageView(NexusMixin, TemplateView):
             (service for service in Service.activable() if service not in context["activated_services"]), None
         )
         context["a_b_test_url"] = get_absolute_url(reverse("nexus:homepage")).replace("/", "\\/")
+        context["departments_list"] = ", ".join(settings.NEXUS_MVP_DEPARTMENTS)
         return context
 
 
