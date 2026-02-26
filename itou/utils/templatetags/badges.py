@@ -122,19 +122,43 @@ def criterion_certification_badge(selected_criterion, job_application):
     if not selected_criterion.administrative_criteria.is_certifiable:
         return ""
 
+    context = {
+        "extra_classes": "ms-1",
+    }
     if selected_criterion.certified_at:
         if selected_criterion.certification_period is None:
             template = "eligibility/includes/badge_certification_error.html"
         else:
-            certification_as_of = (
-                job_application.hiring_start_at
-                if job_application and job_application.state == JobApplicationState.ACCEPTED
-                else timezone.localdate()
-            )
-            if certification_as_of in selected_criterion.certification_period:
-                template = "eligibility/includes/badge_certified.html"
+            if job_application and job_application.state == JobApplicationState.ACCEPTED:
+                template = (
+                    "eligibility/includes/badge_certified.html"
+                    if job_application.hiring_start_at in selected_criterion.certification_period
+                    else "eligibility/includes/badge_not_certified.html"
+                )
             else:
-                template = "eligibility/includes/badge_not_certified.html"
+                certification_start_date = selected_criterion.certification_period.lower
+                certification_end_date = selected_criterion.certification_period.upper
+                today = timezone.localdate()
+                if selected_criterion.certification_period.isempty:
+                    template = "eligibility/includes/badge_not_certified.html"
+                elif today in selected_criterion.certification_period:
+                    if (
+                        certification_end_date is None
+                        or certification_end_date >= selected_criterion.eligibility_diagnosis.expires_at
+                    ):
+                        template = "eligibility/includes/badge_certified.html"
+                    else:
+                        context["certification_end_date"] = certification_end_date
+                        template = "eligibility/includes/badge_temporarily_certified.html"
+                elif today < certification_start_date:
+                    context["certification_start_date"] = certification_start_date
+                    template = "eligibility/includes/badge_certification_future.html"
+                elif today > certification_end_date:
+                    context["certification_end_date"] = certification_end_date
+                    template = "eligibility/includes/badge_certification_expired.html"
+                else:
+                    # Avoid silent fallthrough.
+                    raise ValueError(f"{today=} {selected_criterion.certification_period=}")
     else:
         template = "eligibility/includes/badge_certification_in_progress.html"
-    return get_template(template).render({"extra_classes": "ms-1"})
+    return get_template(template).render(context)

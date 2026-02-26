@@ -1,3 +1,5 @@
+from datetime import UTC, date, datetime
+
 import pytest
 from django import forms
 from django.contrib.auth import authenticate, get_user
@@ -5,16 +7,32 @@ from django.core.management import call_command
 from django.template import Context, Template
 from django.test import override_settings
 from django.urls import URLPattern, URLResolver, get_resolver
+from freezegun import freeze_time
+from pytest_django.asserts import assertHTMLEqual
 
+from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
+from itou.utils.templatetags.badges import criterion_certification_badge
 from itou.utils.templatetags.demo_accounts import (
     employers_accounts_tag,
     job_seekers_accounts_tag,
     prescribers_accounts_tag,
 )
 from itou.utils.templatetags.nav import NAV_ENTRIES
+from itou.utils.types import InclusiveDateRange
+from tests.eligibility.factories import IAESelectedAdministrativeCriteriaFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.testing import pretty_indented
+from tests.www.eligibility_views.utils import (
+    CERTIFICATION_ERROR_BADGE_HTML,
+    CERTIFIED_BADGE_HTML,
+    EXPIRED_CERTIFICATION_HTML,
+    IN_PROGRESS_BADGE_HTML,
+    NOT_CERTIFIED_BADGE_HTML,
+    certified_in_the_future_html,
+    certified_temporarily_html,
+)
 
 
 def test_matomo_event(snapshot):
@@ -165,3 +183,129 @@ class TestDemoAccount:
             # NOTE: Login redirects tested elsewhere.
             assert response.status_code == 302
             assert get_user(client).is_authenticated is True
+
+
+@freeze_time("2026-01-01")
+class TestCriterionCertificationBadge:
+    def test_accepted_job_app_certified(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+            state=JobApplicationState.ACCEPTED,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            CERTIFIED_BADGE_HTML,
+        )
+
+    def test_accepted_job_app_certified_in_the_past(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(
+            criteria_certified=True,
+            certification_period=InclusiveDateRange(date(2025, 9, 1), date(2025, 12, 31)),
+            eligibility_diagnosis__created_at=datetime(2025, 8, 31, tzinfo=UTC),
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+            hiring_start_at=date(2025, 12, 31),
+            state=JobApplicationState.ACCEPTED,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            CERTIFIED_BADGE_HTML,
+        )
+
+    def test_accepted_job_app_not_certified(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_not_certified=True)
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+            state=JobApplicationState.ACCEPTED,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            NOT_CERTIFIED_BADGE_HTML,
+        )
+
+    def test_certified_complete_eligibility_diagnosis_duration(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certified=True)
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            CERTIFIED_BADGE_HTML,
+        )
+
+    def test_certified_partial_eligibility_diagnosis_duration(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(
+            criteria_certified=True,
+            certification_period=InclusiveDateRange(date(2026, 1, 1), date(2026, 1, 31)),
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            certified_temporarily_html(date(2026, 1, 31)),
+        )
+        with freeze_time("2026-02-01"):
+            assertHTMLEqual(
+                criterion_certification_badge(criterion, job_application),
+                EXPIRED_CERTIFICATION_HTML,
+            )
+
+    def test_certification_starts_in_the_future(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(
+            criteria_certified=True,
+            certification_period=InclusiveDateRange(date(2026, 2, 1), date(2026, 2, 28)),
+        )
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            certified_in_the_future_html(date(2026, 2, 1)),
+        )
+        with freeze_time("2026-02-01"):
+            assertHTMLEqual(
+                criterion_certification_badge(criterion, job_application),
+                certified_temporarily_html(date(2026, 2, 28)),
+            )
+
+    def test_not_certified(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_not_certified=True)
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            NOT_CERTIFIED_BADGE_HTML,
+        )
+
+    def test_certification_error(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory(criteria_certification_error=True)
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            CERTIFICATION_ERROR_BADGE_HTML,
+        )
+
+    def test_certification_in_progress(self):
+        criterion = IAESelectedAdministrativeCriteriaFactory()
+        job_application = JobApplicationFactory(
+            eligibility_diagnosis=criterion.eligibility_diagnosis,
+            job_seeker=criterion.eligibility_diagnosis.job_seeker,
+        )
+        assertHTMLEqual(
+            criterion_certification_badge(criterion, job_application),
+            IN_PROGRESS_BADGE_HTML,
+        )
