@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import random
 import uuid
 from urllib.parse import parse_qs, unquote, urlsplit
 
@@ -650,6 +651,34 @@ class TestProcessListSiae:
             )
         assert len(response.context["job_applications_page"].object_list) == 1
 
+    def test_hide_old_job_applications(self, client):
+        membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+        company = membership.company
+        employer = membership.user
+
+        JobApplicationFactory(
+            to_company=company,
+            created_at=timezone.now() - timezone.timedelta(days=365 * 2),
+            sent_by_authorized_prescriber_organisation=True,
+            state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
+        )  # old job application
+        recent_enough_job_app = JobApplicationFactory(
+            to_company=company,
+            created_at=timezone.now() - timezone.timedelta(days=365 * 2 - 1),
+            sent_by_authorized_prescriber_organisation=True,
+            state=random.choice(list(set(JobApplicationState.values) - {JobApplicationState.ACCEPTED})),
+        )
+        old_accepted_job_app = JobApplicationFactory(
+            to_company=company,
+            created_at=timezone.now() - timezone.timedelta(days=365 * 2 + 1),
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationState.ACCEPTED,
+        )
+
+        client.force_login(employer)
+        response = client.get(reverse("apply:list_for_siae"))
+        assert response.context["job_applications_page"].object_list == [recent_enough_job_app, old_accepted_job_app]
+
     def test_prescriptions(self, client):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
@@ -986,12 +1015,23 @@ def test_list_snapshot(client, snapshot):
 
 def test_list_for_siae_exports(client, snapshot):
     job_application = JobApplicationFactory()
-    client.force_login(job_application.to_company.members.get())
+    company = job_application.to_company
+    JobApplicationFactory(
+        to_company=company,
+        created_at=timezone.now() - datetime.timedelta(days=365 * 2),
+        state=JobApplicationState.CANCELLED,
+    )  # Hidden job application
+    client.force_login(company.members.get())
 
     response = client.get(reverse("apply:list_for_siae_exports"))
     assertContains(response, "Toutes les candidatures")
     assert_previous_step(response, reverse("dashboard:index"))
-    assert pretty_indented(parse_response_to_soup(response, selector="#besoin-dun-chiffre")) == snapshot
+    assert pretty_indented(parse_response_to_soup(response, selector="#besoin-dun-chiffre")) == snapshot(
+        name="besoin-dun-chiffre"
+    )
+    assert pretty_indented(parse_response_to_soup(response, selector=".table-hover")) == snapshot(
+        name="job_application_table"
+    )
 
 
 def test_list_for_siae_exports_as_prescriber(client):
@@ -1015,6 +1055,22 @@ def test_list_for_siae_exports_back_to_list(client):
     [
         pytest.param({"for_snapshot": True, "with_iae_eligibility_diagnosis": True}, id="for_snapshot"),
         pytest.param({"for_snapshot": True}, id="no_eligibility_diag"),
+        pytest.param(
+            {
+                "for_snapshot": True,
+                "state": JobApplicationState.CANCELLED,
+                "created_at": datetime.datetime(2022, 8, 15, tzinfo=timezone.UTC),
+            },
+            id="old_job_application",
+        ),
+        pytest.param(
+            {
+                "for_snapshot": True,
+                "state": JobApplicationState.ACCEPTED,
+                "created_at": datetime.datetime(2022, 8, 15, tzinfo=timezone.UTC),
+            },
+            id="old_accepted_job_application",
+        ),
     ],
 )
 @freeze_time("2024-08-18")
