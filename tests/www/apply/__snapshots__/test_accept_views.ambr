@@ -808,6 +808,7 @@
         'origin': list([
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -825,6 +826,7 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -879,6 +881,7 @@
       dict({
         'origin': list([
           'JobApplication.clean[job_applications/models.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -925,12 +928,14 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -947,6 +952,7 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -954,12 +960,14 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -972,6 +980,7 @@
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1845,6 +1854,7 @@
         'origin': list([
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -1862,6 +1872,7 @@
         'origin': list([
           'AcceptForm.__init__[www/apply/forms.py]',
           'ConfirmationForAcceptView.get_forms[www/apply/views/common.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
@@ -1916,6 +1927,7 @@
       dict({
         'origin': list([
           'JobApplication.clean[job_applications/models.py]',
+          'ConfirmationForAcceptView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForAcceptView.get[www/apply/views/common.py]',
         ]),
         'sql': '''
