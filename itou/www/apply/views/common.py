@@ -284,18 +284,21 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
         context["reset_url"] = self.get_reset_url()
         return context
 
-    def get(self, request, *args, **kwargs):
+    def missing_steps_redirect(self):
         self.forms = self.get_forms()
         if not all([form.is_valid() for form in self.forms.values()]):
-            messages.error(request, "Certaines informations sont manquantes ou invalides")
+            messages.error(self.request, "Certaines informations sont manquantes ou invalides")
             return HttpResponseRedirect(self.get_back_url())
+        return None
+
+    def get(self, request, *args, **kwargs):
+        if redirect := self.missing_steps_redirect():
+            return redirect
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self.forms = self.get_forms()
-        if not all([form.is_valid() for form in self.forms.values()]):
-            messages.error(request, "Certaines informations sont manquantes ou invalides")
-            return HttpResponseRedirect(self.get_back_url())
+        if redirect := self.missing_steps_redirect():
+            return redirect
 
         return self.confirm_acceptance(creating=self.job_application is None, request=request)
 
