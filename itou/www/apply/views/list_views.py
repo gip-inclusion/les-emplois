@@ -54,7 +54,7 @@ class JobApplicationsListKind(enum.Enum):
 def _get_job_applications_qs(request, *, list_kind):
     match list_kind:
         case JobApplicationsListKind.RECEIVED:
-            return request.current_organization.job_applications_received
+            return request.current_organization.job_applications_received.visible_by_employers()
         case JobApplicationsListKind.SENT:
             return JobApplication.objects.prescriptions_of(request.user, request.current_organization)
         case JobApplicationsListKind.SENT_FOR_ME:
