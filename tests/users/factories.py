@@ -101,6 +101,12 @@ class UserFactory(factory.django.DjangoModelFactory):
             if create:
                 obj.save(update_fields=["last_login"])
 
+    @factory.lazy_attribute
+    def terms_accepted_at(self):
+        if self.kind in UserKind.professionals():
+            return timezone.now() + datetime.timedelta(days=30 * 365)
+        return None
+
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF

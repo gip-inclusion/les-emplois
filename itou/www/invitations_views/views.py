@@ -275,4 +275,5 @@ def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     handle_labor_inspector_invitation(invitation, request)
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.institution.pk
-    return redirect("dashboard:index")
+    url = get_adapter(request).get_login_redirect_url(request)
+    return HttpResponseRedirect(url)

@@ -54,6 +54,7 @@ from itou.utils.apis import api_particulier
 from itou.utils.db import or_queries
 from itou.utils.emails import get_email_message
 from itou.utils.france_standards import NIR
+from itou.utils.legal_terms import get_latest_terms_datetime
 from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.triggers import FieldsHistory
 from itou.utils.urls import get_absolute_url
@@ -342,6 +343,12 @@ class User(AbstractUser, AddressMixin):
 
     last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
 
+    terms_accepted_at = models.DateTimeField(
+        verbose_name="date d'acceptation des CGU",
+        null=True,
+        blank=True,
+    )
+
     public_id = models.UUIDField(
         verbose_name="identifiant public",
         help_text="identifiant opaque, pour les API et les URLs publiques",
@@ -531,6 +538,10 @@ class User(AbstractUser, AddressMixin):
     @property
     def is_labor_inspector(self):
         return self.kind == UserKind.LABOR_INSPECTOR
+
+    @property
+    def is_professional(self):
+        return self.kind in UserKind.professionals()
 
     @property
     def is_itou_admin(self):
@@ -765,6 +776,18 @@ class User(AbstractUser, AddressMixin):
 
     def get_kind_display(self):
         return UserKind(self.kind).label
+
+    def must_accept_terms(self):
+        if not self.is_professional:
+            return False
+        if self.terms_accepted_at is None:
+            return True
+        return self.terms_accepted_at < get_latest_terms_datetime()
+
+    def set_terms_accepted(self):
+        if self.is_professional:
+            self.terms_accepted_at = timezone.now()
+            self.save(update_fields=["terms_accepted_at"])
 
 
 def get_allauth_account_user_display(user):

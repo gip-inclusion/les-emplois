@@ -512,6 +512,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                     "date_joined",
                     "last_checked_at",
                     "upcoming_deletion_notified_at",
+                    "terms_accepted_at",
                 )
             },
         )

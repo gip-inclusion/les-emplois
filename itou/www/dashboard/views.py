@@ -373,11 +373,7 @@ def switch_organization(request):
     except (KeyError, ValueError):
         return HttpResponseBadRequest(b"organization_id key is missing")
 
-    if request.user.kind not in {
-        UserKind.EMPLOYER,
-        UserKind.PRESCRIBER,
-        UserKind.LABOR_INSPECTOR,
-    } or pk not in {organization.pk for organization in request.organizations}:
+    if not request.user.is_professional or pk not in {organization.pk for organization in request.organizations}:
         raise Http404()
 
     request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = pk

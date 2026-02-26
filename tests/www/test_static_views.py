@@ -11,7 +11,6 @@ from itou.utils.constants import ITOU_CONTACT_FORM_URL
         ("accessibility", "<h1>Accessibilité</h1>"),
         ("legal-notice", "<h1>Mentions légales</h1>"),
         ("legal-privacy", "<h1>Politique de confidentialité</h1>"),
-        ("legal-terms", '<h1 id="conditions-générales-dutilisation">Conditions Générales d&#39;Utilisation</h1>'),
     ],
 )
 def test_navigation_not_authenticated(client, view_name, expected_title):
