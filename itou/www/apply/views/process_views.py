@@ -159,6 +159,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     """
     queryset = (
         JobApplication.objects.is_active_company_member(request.user)
+        .visible_by_employers()
         .with_upcoming_participations_count()
         .select_related(
             "job_seeker__jobseeker_profile",
