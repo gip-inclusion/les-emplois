@@ -21,6 +21,7 @@ def get_template_context(context, service):
             "name": "Les Emplois de l’inclusion",
             "description": "Le service de recrutement et de gestion des PASS IAE.",
             "logo": "logo-emploi-inclusion-mono.svg",
+            "etoile": "nexus/nx-forme-etoile-emplois.png",
             "items_short": [
                 "Publiez vos recrutements",
                 "Recevez des candidatures",
@@ -67,6 +68,7 @@ def get_template_context(context, service):
             "name": "DORA",
             "description": "Le service d’aide à la prescription pour la levée des freins périphériques à l’emploi.",
             "logo": "logo-dora-mono.svg",
+            "etoile": "nexus/nx-forme-etoile-dora.png",
             "items_short": [
                 "Saisissez votre offre de service",
                 "Service identifié par les pro",
@@ -107,6 +109,7 @@ def get_template_context(context, service):
             "name": "Le marché de l’inclusion",
             "description": "Le service de mise en relation entre acheteurs et structures d’insertion.",
             "logo": "logo-marche-inclusion-mono.svg",
+            "etoile": "nexus/nx-forme-etoile-marche.png",
             "items_short": [
                 "Renseignez votre activité",
                 "Recevez des demandes de devis",
@@ -147,6 +150,7 @@ def get_template_context(context, service):
             "name": "Mon Récap",
             "description": "Le carnet papier retraçant le parcours d’insertion d’une personne.",
             "logo": "logo-monrecap-mono.svg",
+            "etoile": "nexus/nx-forme-etoile-monrecap.png",
             "items_short": [
                 "Démarches et parcours centralisés",
                 "Support accessible",
@@ -195,6 +199,7 @@ def get_template_context(context, service):
             "name": "Le Pilotage de l’inclusion",
             "description": "Le service présentant les données sur les politiques publiques d’insertion.",
             "logo": "logo-pilotage-inclusion-mono.svg",
+            "etoile": "nexus/nx-forme-etoile-pilotage.png",
             "items_short": [
                 "Statistiques nationales",
                 "Données sur votre organisation",
