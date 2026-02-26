@@ -213,7 +213,7 @@ def test_add_comment_too_long(client, is_too_long, assertion, expected_comments_
     assert JobApplicationComment.objects.count() == expected_comments_count
 
 
-def test_cannot_delete_somebody_else_comment(client):
+def test_cannot_delete_somebody_else_comment(client, snapshot):
     company = CompanyWith2MembershipsFactory()
     user = company.members.last()
     client.force_login(user)
@@ -235,7 +235,8 @@ def test_cannot_delete_somebody_else_comment(client):
         "apply:delete_comment_for_company",
         kwargs={"job_application_id": job_app.id, "comment_id": comment.id},
     )
-    response = client.post(delete_comment_url)
+    with assertSnapshotQueries(snapshot(name="delete comment queries")):
+        response = client.post(delete_comment_url)
     assert response.status_code == 200
     assertQuerySetEqual(
         JobApplicationComment.objects.all(), [other_user_comment], ordered=False
