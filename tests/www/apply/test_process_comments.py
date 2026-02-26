@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertQuery
 
 from itou.job_applications.models import JobApplicationComment
 from itou.www.apply.views.process_views import LAST_COMMENTS_COUNT
-from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWith2MembershipsFactory
 from tests.job_applications.factories import JobApplicationCommentFactory, JobApplicationFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
 from tests.utils.testing import parse_response_to_soup, pretty_indented
@@ -241,6 +241,26 @@ def test_cannot_delete_somebody_else_comment(client, snapshot):
     assertQuerySetEqual(
         JobApplicationComment.objects.all(), [other_user_comment], ordered=False
     )  # the user's comment was deleted
+
+
+def test_cannot_view_other_company_comments_on_delete(client):
+    membership = CompanyMembershipFactory()
+    user = membership.user
+
+    other_membership = CompanyMembershipFactory()
+    other_user = other_membership.user
+    other_company = other_membership.company
+    other_job_app = JobApplicationFactory(to_company=other_company)
+    JobApplicationCommentFactory(job_application=other_job_app, created_by=other_user)
+
+    client.force_login(user)
+
+    delete_other_user_comment_url = reverse(
+        "apply:delete_comment_for_company",
+        kwargs={"job_application_id": other_job_app.id, "comment_id": 9999},  # any comment_id
+    )
+    response = client.post(delete_other_user_comment_url)
+    assert response.status_code == 404
 
 
 def test_delete_comment_htmx(client, caplog):

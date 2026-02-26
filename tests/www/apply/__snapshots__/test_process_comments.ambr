@@ -800,7 +800,7 @@
 # ---
 # name: test_cannot_delete_somebody_else_comment[delete comment queries]
   dict({
-    'num_queries': 9,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -978,6 +978,63 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'delete_comment_for_company[www/apply/views/process_views.py]',
+          '_check_user_view_wrapper[utils/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "job_applications_jobapplication"."id",
+                 "job_applications_jobapplication"."job_seeker_id",
+                 "job_applications_jobapplication"."eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
+                 "job_applications_jobapplication"."create_employee_record",
+                 "job_applications_jobapplication"."resume_id",
+                 "job_applications_jobapplication"."sender_id",
+                 "job_applications_jobapplication"."sender_kind",
+                 "job_applications_jobapplication"."sender_company_id",
+                 "job_applications_jobapplication"."sender_prescriber_organization_id",
+                 "job_applications_jobapplication"."to_company_id",
+                 "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
+                 "job_applications_jobapplication"."hired_job_id",
+                 "job_applications_jobapplication"."message",
+                 "job_applications_jobapplication"."answer",
+                 "job_applications_jobapplication"."answer_to_prescriber",
+                 "job_applications_jobapplication"."refusal_reason",
+                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
+                 "job_applications_jobapplication"."hiring_start_at",
+                 "job_applications_jobapplication"."hiring_end_at",
+                 "job_applications_jobapplication"."origin",
+                 "job_applications_jobapplication"."approval_id",
+                 "job_applications_jobapplication"."approval_delivery_mode",
+                 "job_applications_jobapplication"."approval_number_sent_by_email",
+                 "job_applications_jobapplication"."approval_number_sent_at",
+                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_by_id",
+                 "job_applications_jobapplication"."approval_manually_refused_at",
+                 "job_applications_jobapplication"."transferred_at",
+                 "job_applications_jobapplication"."transferred_by_id",
+                 "job_applications_jobapplication"."transferred_from_id",
+                 "job_applications_jobapplication"."created_at",
+                 "job_applications_jobapplication"."updated_at",
+                 "job_applications_jobapplication"."processed_at",
+                 "job_applications_jobapplication"."prehiring_guidance_days",
+                 "job_applications_jobapplication"."contract_type",
+                 "job_applications_jobapplication"."nb_hours_per_week",
+                 "job_applications_jobapplication"."contract_type_details",
+                 "job_applications_jobapplication"."qualification_type",
+                 "job_applications_jobapplication"."qualification_level",
+                 "job_applications_jobapplication"."planned_training_hours",
+                 "job_applications_jobapplication"."inverted_vae_contract",
+                 "job_applications_jobapplication"."diagoriente_invite_sent_at"
+          FROM "job_applications_jobapplication"
+          WHERE ("job_applications_jobapplication"."id" = %s
+                 AND "job_applications_jobapplication"."to_company_id" = %s)
+          LIMIT 21
+        ''',
       }),
       dict({
         'origin': list([
