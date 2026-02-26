@@ -49,7 +49,7 @@ jobs:
         enable-cache: true
 
     - name: 🗑 Delete S3 bucket
-      run: uv run --script scripts/delete-bucket
+      run: uv run --script scripts/delete-buckets --use-case=review_app
 
     - name: 🗑 Delete the review app
       run: |
