@@ -15,7 +15,7 @@
         {% fragment as c_title__main %}
             <h1>
                 Détail et sélection des contrats
-                {% if request.user.is_employer %}
+                {% if request.from_employer %}
                     {% if assessment.contracts_selection_validated_at %}
                         {% include "geiq_assessments_views/includes/badge_completed.html" with badge_size="badge-base" only %}
                     {% else %}
@@ -59,7 +59,7 @@
             <div class="row">
                 <div class="col-12">
                     {% include "geiq_assessments_views/includes/contracts_list_stats.html" with stats=stats hx_swap_oob=False request=request only %}
-                    {% if request.user.is_employer %}
+                    {% if request.from_employer %}
                         <h2>Sélectionnez les contrats pour lesquels vous souhaitez obtenir une aide</h2>
                         <p>
                             Les contrats compris dans la période du 1er octobre de l’année N-2 au 31 décembre de l’année N-1 sont importés ici depuis Label.
@@ -87,7 +87,7 @@
                                     <th scope="col">Date de fin</th>
                                     <th scope="col">≥ 90 jours en {{ assessment.campaign.year }}</th>
                                     <th scope="col">Aide potentielle</th>
-                                    {% if request.user.is_employer %}
+                                    {% if request.from_employer %}
                                         <th scope="col">Obtenir l’aide</th>
                                     {% elif request.user.is_labor_inspector %}
                                         <th scope="col">Éligible à l’aide</th>
@@ -118,7 +118,7 @@
                                         </td>
                                         <td>{{ contract.employee.allowance_amount|format_int_euros }}</td>
                                         <td>
-                                            {% if request.user.is_employer %}
+                                            {% if request.from_employer %}
                                                 {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_requested csrf_token=csrf_token from_list=True editable=can_validate request=request only %}
                                             {% elif request.user.is_labor_inspector %}
                                                 {% include "geiq_assessments_views/includes/contracts_switch.html" with contract=contract value=contract.allowance_granted csrf_token=csrf_token from_list=True editable=can_validate request=request only %}

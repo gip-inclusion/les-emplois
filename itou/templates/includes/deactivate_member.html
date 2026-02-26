@@ -1,7 +1,7 @@
 {% load buttons_form %}
 
 <div class="c-form">
-    {% with request.user.is_employer|yesno:"structure,organisation" as org_display %}
+    {% with request.from_employer|yesno:"structure,organisation" as org_display %}
         <div class="alert alert-warning">
             Êtes-vous sûr de vouloir retirer <b>{{ target_member.get_inverted_full_name }}</b> de votre {{ org_display }} <b>{{ structure.display_name }}</b> ?
         </div>

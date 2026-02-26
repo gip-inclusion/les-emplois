@@ -339,7 +339,7 @@ def nav(request):
                         items=organization_items,
                     )
                 )
-        elif request.user.is_employer and request.current_organization:
+        elif request.from_employer and request.current_organization:
             menu_items.append(NAV_ENTRIES["employer-job-apps"])
             menu_items.append(NAV_ENTRIES["employer-job-apps-sent"])
             if request.current_organization.is_subject_to_iae_rules:

@@ -345,7 +345,7 @@ class TestGEIQEligibilityDetail:
 
     def default_params_geiq(self, diagnosis, job_application):
         authorized_prescriber = PrescriberOrganizationFactory(authorized=True, with_membership=True).members.first()
-        # Use an authorized prescriber to not have to deal with the template heavily relying on user.is_employer
+        # Use an authorized prescriber to not have to deal with the template heavily relying on request.from_employer
         request = get_request(authorized_prescriber)
         return {
             "request": request,

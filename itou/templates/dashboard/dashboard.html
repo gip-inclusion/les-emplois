@@ -15,7 +15,7 @@
     {% enums "prescribers" "PrescriberOrganizationKind" as PrescriberOrganizationKind %}
     {{ block.super }}
 
-    {% if user.is_employer and request.current_organization and not request.current_organization.jobs.exists %}
+    {% if request.from_employer and request.current_organization and not request.current_organization.jobs.exists %}
         <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
@@ -44,7 +44,7 @@
     {% endif %}
 
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
-    {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
+    {% if request.from_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Nous n'avons pas pu géolocaliser votre établissement.
@@ -97,7 +97,7 @@
         </div>
     {% endif %}
 
-    {% if user.is_employer and request.current_organization and not request.current_organization.is_active %}
+    {% if request.from_employer and request.current_organization and not request.current_organization.is_active %}
         <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
                 Votre structure
@@ -155,7 +155,7 @@
         {% if can_view_stats_dashboard_widget %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
-                    {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
+                    {% if request.from_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
                         <span>Pilotage</span>
                     {% else %}
                         Pilotage
@@ -163,7 +163,7 @@
                 </a>
             </li>
         {% endif %}
-        {% if user.is_employer or user.is_prescriber %}
+        {% if request.from_employer or user.is_prescriber %}
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false" {% matomo_event "dashboard" "clic-onglet" "evenements" %}>Événements à venir</a>
             </li>
@@ -218,7 +218,7 @@
                                 {% endif %}
                                 {# end of if user.is_prescriber #}
 
-                                {% if user.is_employer %}
+                                {% if request.from_employer %}
                                     {% include "dashboard/includes/employer_job_applications_card.html" %}
                                     {% if request.current_organization.is_subject_to_iae_rules %}
                                         {% include "dashboard/includes/employer_employees_card.html" %}
@@ -229,7 +229,7 @@
                                         {% include "dashboard/includes/employer_evaluation_campaigns_card.html" %}
                                     {% endif %}
                                 {% endif %}
-                                {# end of if user.is_employer #}
+                                {# end of if request.from_employer #}
 
                                 {% if user.is_labor_inspector %}
                                     {% include "dashboard/includes/labor_inspector_organization_card.html" %}
@@ -239,14 +239,14 @@
                                 {% endif %}
                                 {# end of if user.is_labor_inspector #}
                             </div>
-                            {% if user.is_employer or user.is_prescriber %}
+                            {% if request.from_employer or user.is_prescriber %}
                                 <h2>Services partenaires</h2>
                                 <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                                     {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                                 </div>
                             {% endif %}
                         </div>
-                        {% if user.is_employer or user.is_prescriber %}
+                        {% if request.from_employer or user.is_prescriber %}
                             <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
                                 <h2>Événements à venir</h2>
                                 <div class="mt-3 mt-md-4">

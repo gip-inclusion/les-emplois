@@ -158,7 +158,7 @@ class StartView(ApplicationPermissionMixin, View):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
         if hire_process:
             tunnel = ApplyTunnel.HIRE
-        elif request.user.is_employer and self.company == request.current_organization:
+        elif request.from_employer and self.company == request.current_organization:
             tunnel = ApplyTunnel.AUTO_PRESCRIPTION
         elif request.user.is_job_seeker:
             tunnel = ApplyTunnel.JOB_SEEKER
@@ -284,7 +284,7 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         )
         if kwargs.pop("hire_process", False):
             tunnel = ApplyTunnel.HIRE
-        elif request.user.is_employer and self.company == request.current_organization:
+        elif request.from_employer and self.company == request.current_organization:
             tunnel = ApplyTunnel.AUTO_PRESCRIPTION
         elif request.user.is_job_seeker:
             tunnel = ApplyTunnel.JOB_SEEKER
@@ -330,7 +330,7 @@ class ApplicationBaseView(ApplyStepBaseView):
                 self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         # Prescribers do not see employer diagnosis.
-        for_company = self.company if self.request.user.is_employer else None
+        for_company = self.company if self.request.from_employer else None
         if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, for_company
@@ -660,7 +660,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         )
         if self.request.user.is_prescriber:
             job_application.sender_prescriber_organization = self.request.current_organization
-        if self.request.user.is_employer:
+        if self.request.from_employer:
             job_application.sender_company = self.request.current_organization
 
         if resume := self.form.cleaned_data.get("resume"):
@@ -677,7 +677,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
 
-        if self.request.user.is_employer or self.request.user.is_prescriber:
+        if self.request.from_employer or self.request.user.is_prescriber:
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
@@ -752,7 +752,7 @@ class ApplicationEndView(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        if self.request.user.is_employer and self.company == self.request.current_organization:
+        if self.request.from_employer and self.company == self.request.current_organization:
             page_title = "Auto-prescription enregistrée"
             matomo_custom_title = "Auto-prescription enregistrée"
         else:
@@ -959,7 +959,7 @@ class ApplyForJobSeekerMixin:
         ):
             if request.user.is_prescriber:
                 self.exit_url = reverse("job_seekers_views:list")
-            elif request.user.is_employer:
+            elif request.from_employer:
                 self.exit_url = reverse("apply:list_prescriptions")
 
             self.job_seeker = _get_job_seeker_to_apply_for(request)
