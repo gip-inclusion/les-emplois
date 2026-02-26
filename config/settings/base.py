@@ -528,9 +528,7 @@ HUEY = {
     "huey_class": "itou.tasks.huey.ItouHuey",
     # Use value from CleverCloud deployment config, or a value per REVIEW-APP, but not None.
     "name": os.getenv("HUEY_QUEUE_NAME", DATABASES["default"]["NAME"]) or "huey",
-    # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{redis_url}/?db={redis_db}",
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
