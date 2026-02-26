@@ -140,7 +140,7 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
     template_name = "invitations_views/create.html"
 
     def setup(self, request, *args, **kwargs):
-        self.organization = request.current_organization
+        self.organization = getattr(request, "current_organization", None)
         if self.organization is None:
             raise PermissionDenied
         self.invitation_left = MAX_PENDING_INVITATION - self.organization.invitations.pending().count()

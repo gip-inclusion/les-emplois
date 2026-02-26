@@ -706,3 +706,16 @@ class TestAcceptCompanyInvitation(CompanyMixin, BaseTestAcceptInvitation, ProCon
         join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
         response = client.get(join_url, follow=True)
         assertContains(response, escape("Cette structure n'est plus active."))
+
+
+def test_job_seeker_no_access(client, subtests):
+    client.force_login(JobSeekerFactory())
+
+    for view_name in [
+        "invitations_views:invite_labor_inspector",
+        "invitations_views:invite_prescriber_with_org",
+        "invitations_views:invite_employer",
+    ]:
+        with subtests.test(view_name):
+            response = client.get(reverse(view_name))
+            assert response.status_code == 403
