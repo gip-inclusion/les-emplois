@@ -135,6 +135,11 @@
                                 </tbody>
                             </table>
                         </div>
+                        {% if export_for == "siae" %}
+                            <p>
+                                Les informations détaillées sur la conservation des candidatures sont disponibles dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank">notre documentation</a>.
+                            </p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

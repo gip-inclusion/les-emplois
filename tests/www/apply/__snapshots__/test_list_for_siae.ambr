@@ -6581,6 +6581,8 @@
                       <p>
                           En ajoutant cette candidature au vivier, elle ne sera pas automatiquement refusée après deux mois.
                                           Toutefois, nous vous invitons à la traiter dans un délai raisonnable afin d’informer le candidat de l’avancement de sa candidature.
+                                      
+                                      Les candidatures placées en vivier seront automatiquement masquées après 2 ans.
                       </p>
                       <div class="form-group">
                           <label class="form-label" for="id_answer">
@@ -6627,6 +6629,8 @@
                       <p>
                           En ajoutant ces candidatures au vivier, elles ne seront pas automatiquement refusées après deux mois.
                                           Toutefois, nous vous invitons à les traiter dans un délai raisonnable afin d’informer les candidats de l’avancement de leurs candidatures.
+                                      
+                                      Les candidatures placées en vivier seront automatiquement masquées après 2 ans.
                       </p>
                       <div class="form-group">
                           <label class="form-label" for="id_answer">
@@ -7538,6 +7542,13 @@
               </div>
           </div>
       </div>
+      <p>
+          Les informations détaillées sur la conservation des candidatures sont disponibles dans
+          <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44240682937745" rel="noopener" target="_blank">
+              notre documentation
+          </a>
+          .
+      </p>
   </section>
   
   '''
@@ -7738,6 +7749,13 @@
               </table>
           </form>
       </div>
+      <p>
+          Les informations détaillées sur la conservation des candidatures sont disponibles dans
+          <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44240682937745" rel="noopener" target="_blank">
+              notre documentation
+          </a>
+          .
+      </p>
   </section>
   
   '''
@@ -8234,6 +8252,13 @@
               </table>
           </form>
       </div>
+      <p>
+          Les informations détaillées sur la conservation des candidatures sont disponibles dans
+          <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/44240682937745" rel="noopener" target="_blank">
+              notre documentation
+          </a>
+          .
+      </p>
   </section>
   
   '''
