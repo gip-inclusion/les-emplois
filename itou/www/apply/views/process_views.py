@@ -292,6 +292,9 @@ def add_comment_for_company(request, job_application_id):
 @require_POST
 @check_user(lambda user: user.is_employer)
 def delete_comment_for_company(request, job_application_id, comment_id):
+    # Used for permissions check only
+    get_object_or_404(JobApplication, id=job_application_id, to_company_id=request.current_organization)
+
     comment = JobApplicationComment.objects.filter(
         job_application_id=job_application_id, created_by=request.user, id=comment_id
     )
