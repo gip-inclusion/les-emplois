@@ -1,9 +1,22 @@
+import random
+from functools import partial
+
+import pytest
+from django.conf import settings
 from django.urls import reverse
 from itoutils.django.nexus.token import generate_auto_login_token
 from pytest_django.asserts import assertRedirects
 
+from itou.nexus.enums import Service
 from itou.users.enums import IdentityProvider
-from tests.users.factories import EmployerFactory
+from tests.companies.factories import CompanyMembershipFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    LaborInspectorFactory,
+    PrescriberFactory,
+)
 
 
 class TestAutoLoginMiddleware:
@@ -75,3 +88,42 @@ class TestAutoLoginMiddleware:
             fetch_redirect_response=False,
         )
         assert caplog.messages == [f"Nexus auto login: {user} was found and forwarded to ProConnect"]
+
+
+class TestDropDownMiddleware:
+    def test_context(self, client):
+        user = EmployerFactory()
+        CompanyMembershipFactory(user=user, company__post_code=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"))
+        assert response.wsgi_request.nexus_dropdown == {
+            "proconnect": True,
+            "activated_services": [Service.EMPLOIS],
+            "mvp_enabled": True,
+        }
+
+    def test_nexus_page(self, client):
+        user = EmployerFactory()
+        CompanyMembershipFactory(user=user, company__post_code=random.choice(settings.NEXUS_MVP_DEPARTMENTS))
+        client.force_login(user)
+        response = client.get(reverse("nexus:homepage"))
+        assert response.wsgi_request.nexus_dropdown == {}
+
+    @pytest.mark.parametrize(
+        "factory", [JobSeekerFactory, partial(LaborInspectorFactory, membership=True), ItouStaffFactory]
+    )
+    def test_wrong_user_kind(self, client, factory):
+        user = factory()
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"))
+        assert response.wsgi_request.nexus_dropdown == {}
+
+    def test_inactive_user(self, client):
+        user = PrescriberFactory(is_active=False)
+        client.force_login(user)
+        response = client.get(reverse("dashboard:index"))
+        assert response.wsgi_request.nexus_dropdown == {}
+
+    def test_unauthenticated_user(self, client):
+        response = client.get(reverse("dashboard:index"))
+        assert response.wsgi_request.nexus_dropdown == {}
