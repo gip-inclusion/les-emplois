@@ -816,6 +816,7 @@ class TestProcessViews:
 
         assert pretty_indented(html_fragment) == snapshot(name="transition_logs")
 
+    @freeze_time("2024-06-27")
     def test_external_transfer_log_display(self, client, snapshot):
         job_seeker = JobSeekerFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
@@ -842,6 +843,7 @@ class TestProcessViews:
 
         assert pretty_indented(html_fragment) == snapshot
 
+    @freeze_time("2025-06-27")
     def test_details_for_company_transition_logs_hides_hired_by_other(self, client, snapshot):
         job_seeker = JobSeekerFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
