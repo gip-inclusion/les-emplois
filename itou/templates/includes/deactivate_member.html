@@ -10,14 +10,14 @@
         <ul>
             <li>Cet utilisateur sera notifié par e-mail de son retrait de votre {{ org_display }}.</li>
             <li>Le tableau de bord de votre {{ org_display }} ne lui sera plus accessible.</li>
-            {% if request.user.is_prescriber %}
+            {% if request.from_prescriber %}
                 <li>Les candidatures effectuées par cet utilisateur resteront dans le tableau de bord de votre {{ org_display }}.</li>
             {% else %}
                 <li>
                     Les modifications et ajouts réalisés par cet utilisateur seront toujours accessibles par les autres membres de votre {{ org_display }}.
                 </li>
             {% endif %}
-            {% if request.user.is_prescriber %}
+            {% if request.from_prescriber %}
                 <li>Cet utilisateur sera notifié par mail des éventuelles suites données aux candidatures qu'il a transmises.</li>
             {% else %}
                 <li>Cet utilisateur continuera de recevoir ses notifications e-mail.</li>

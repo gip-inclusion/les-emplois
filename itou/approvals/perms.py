@@ -28,7 +28,7 @@ def can_view_approval_details(request, approval):
             return PERMS_READ
         if approval.user.job_applications.prescriptions_of(request.user, request.current_organization).exists():
             return PERMS_READ
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if (
             request.from_authorized_prescriber
             and User.objects.linked_job_seeker_ids(request.user, request.current_organization).exists()

@@ -11,7 +11,7 @@
     {% fragment as c_title__main %}
         {% if not request.organizations %}
             {% if user.get_full_name %}<h1>{{ user.get_full_name }}</h1>{% endif %}
-            {% if user.is_prescriber %}
+            {% if request.from_prescriber %}
                 <p>Orienteur seul</p>
             {% elif user.is_job_seeker %}
                 <p>
@@ -22,7 +22,7 @@
         {% else %}
             <h1>{{ request.current_organization.display_name }}</h1>
             <p>
-                {% if user.is_prescriber %}
+                {% if request.from_prescriber %}
                     {% if request.current_organization.code_safir_pole_emploi %}
                         {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
                         Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
