@@ -25,11 +25,28 @@
 {% block title_extra %}
     <div class="c-search mt-3 mt-md-4">
         <div class="c-search__bar">
-            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results">
+            <form hx-boost="true" hx-push-url="true" hx-indicator="#services-search-results" id="top_search_form">
+                {% if orientation.job_seeker.public_id %}
+                    <input type="hidden" name="job_seeker_public_id" value="{{ orientation.job_seeker.public_id }}">
+                {% endif %}
+                {% if orientation.jwt %}<input type="hidden" name="op" value="{{ orientation.jwt }}">{% endif %}
                 {% include "search/services/includes/form.html" with form=form is_home=False only %}
             </form>
         </div>
     </div>
+{% endblock %}
+
+{% block global_messages %}
+    {{ block.super }}
+    {% if orientation.job_seeker %}
+        {% component_alert_global__acting_for content=content exit_url=orientation.exit_url %}
+            {% fragment as content %}
+                {# Authorized prescribers can_view_personal_information, it is not checked here. #}
+                {# Needs to change with can_prefill_orientation_on_dora #}
+                <strong>Vous recherchez un service pour {{ orientation.job_seeker.get_inverted_full_name }}</strong>
+            {% endfragment %}
+        {% endcomponent_alert_global__acting_for %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -41,7 +58,7 @@
                     <div class="d-block w-100">
                         <form hx-get="{% url 'search:services_results' %}"
                               hx-trigger="change delay:.5s"
-                              hx-include="#id_city, #id_category"
+                              hx-include="#top_search_form"
                               hx-indicator="#services-search-results"
                               hx-target="#services-search-results"
                               hx-swap="outerHTML"
