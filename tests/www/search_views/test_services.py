@@ -133,7 +133,9 @@ def test_results_html(snapshot, client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    response = client.get(
+        reverse("search:services_results"), {"city": city.slug, "category": category, "reception": "tous"}
+    )
     assertContains(response, f"{expected_items} résultats")
     assertContains(
         response,
@@ -175,7 +177,9 @@ def test_results_ordering(client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    response = client.get(
+        reverse("search:services_results"), {"city": city.slug, "category": category, "reception": "tous"}
+    )
     assert [service["id"] for service in response.context["results"].object_list] == [
         "dora-presentiel-vannes",
         "autre-presentiel-vannes",
@@ -222,14 +226,15 @@ def test_filter_reception_strictness(client, search_services_route):
         "autre-distanciel-geispolsheim",
     }
 
-    response = client.get(reverse("search:services_results"), query_params)
+
+def test_filter_reception_default(client, search_services_route):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+
+    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
     assert {service["id"] for service in response.context["results"].object_list} == {
         "dora-presentiel-vannes",
         "autre-presentiel-vannes",
-        "dora-geispolsheim",
-        "dora-distanciel-vannes",
-        "autre-distanciel-geispolsheim",
-        "autre-none-nowhere",
     }
 
 
