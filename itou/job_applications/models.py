@@ -43,7 +43,7 @@ from itou.job_applications.enums import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
-from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.enums import KIND_EMPLOYER, LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
@@ -1477,6 +1477,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 viewer=self.sender,
                 user=self.job_seeker,
                 viewer_is_prescriber_from_authorized_org=self.sender.is_prescriber_with_authorized_org_memberships,
+                viewer_is_employer=self.sender_kind == KIND_EMPLOYER,
             ),
         }
         return get_email_message(to, context, subject, body)

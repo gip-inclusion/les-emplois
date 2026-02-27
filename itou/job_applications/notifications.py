@@ -34,6 +34,7 @@ class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
                 viewer=self.user,
                 user=job_application.job_seeker,
                 viewer_is_prescriber_from_authorized_org=self.user.is_prescriber_with_authorized_org_memberships,
+                viewer_is_employer=self.user.is_employer,  # FIXME
             ),
         }
 
