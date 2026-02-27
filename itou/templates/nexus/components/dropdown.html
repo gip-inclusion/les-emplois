@@ -1,0 +1,51 @@
+{% load enums %}
+{% load matomo %}
+{% load theme_inclusion %}
+
+{% enums "nexus" "Service" as Service %}
+
+
+<div class="dropup dropup-center dropdown-nexus">
+    <button class="btn btn-outline-primary btn-block bg-white dropdown-toggle"
+            type="button"
+            id="dropdownNexusMenuButton"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            {% matomo_event "nexus" "mon-portail" "" %}>
+        <span>Mon portail</span>
+    </button>
+    <div class="dropdown-menu w-100" aria-labelledby="dropdownNexusMenuButton">
+        <div class="dropdown-item dropdown-item__profil">
+            <span>
+                <strong>{{ user_name }}</strong>
+                <br>
+                <span class="fs-sm lh-sm has-ellipsis d-inline-block w-100">{{ user.email }}</span>
+            </span>
+            <a href="{% url 'nexus:homepage' %}" class="btn btn-block btn-outline-primary" {% matomo_event "nexus" "acceder-mon-portail" Service.EMPLOIS %} target='_blank'>
+            Accéder à mon portail</a>
+        </div>
+        <div class="dropdown-divider"></div>
+        {% for activated_service in activated_services %}
+            <a class="dropdown-item dropdown-item__service" href="{{ activated_service.url }}" {% matomo_event "nexus" "portail-acceder-service" activated_service.service %} target='_blank'>
+                <img src="{% static_theme_images activated_service.logo %}" height="35" alt="{{ activated_service.name }}">
+                <span class="badge badge-xs rounded-pill bg-info-lighter text-info">
+                    <i class="ri-check-line" aria-hidden="true"></i>
+                    Activé
+                </span>
+            </a>
+        {% endfor %}
+        <div class="dropdown-divider"></div>
+        {% for activable_service in activable_services %}
+            <a class="dropdown-item dropdown-item__service" href="{{ activable_service.url }}" {% matomo_event "nexus" "portail-activer-service" activable_service.service %} target='_blank'>
+                <img src="{% static_theme_images activable_service.logo %}" height="35" alt="{{ activable_service.name }}">
+                {% if activable_service.one_click_activation %}
+                    <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                        <i class="ri-timer-flash-line" aria-hidden="true"></i>
+                        Activable en 1 clic
+                    </span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</div>
