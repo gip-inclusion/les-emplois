@@ -31,24 +31,34 @@
             </h1>
         {% endfragment %}
         {% fragment as c_title__cta %}
-            {% if can_invalidate %}
-                {% if assessment.decision_validated_at %}
-                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
-                        Modifier la sélection
-                    </button>
-                {% else %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <button class="btn btn-lg btn-outline-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
-                            Modifier la sélection
-                        </button>
-                    </form>
-                {% endif %}
-            {% endif %}
             <a class="btn btn-lg btn-ico btn-secondary" href="{% url "geiq_assessments_views:assessment_contracts_export" pk=assessment.pk %}">
                 <i class="ri-download-line fw-medium" aria-hidden="true"></i>
                 <span>Exporter</span>
             </a>
+            {% if can_validate %}
+                <form method="post" class="js-prevent-multiple-submit">
+                    {% csrf_token %}
+                    <button class="btn btn-lg btn-ico btn-primary" name="action" value="{{ ContractsAction.VALIDATE }}">
+                        <i class="ri-check-line fw-medium" aria-hidden="true"></i>
+                        <span>Valider la sélection</span>
+                    </button>
+                </form>
+            {% else %}
+                {% if assessment.decision_validated_at %}
+                    <button type="button" class="btn btn-lg btn-ico btn-primary" data-bs-toggle="modal" data-bs-target="#invalidate_modal">
+                        <i class="ri-list-check-3 fw-medium" aria-hidden="true"></i>
+                        <span>Modifier la sélection</span>
+                    </button>
+                {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-lg btn-ico btn-primary" name="action" value="{{ ContractsAction.INVALIDATE }}">
+                            <i class="ri-list-check-3 fw-medium" aria-hidden="true"></i>
+                            <span>Modifier la sélection</span>
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
         {% endfragment %}
     {% endcomponent_title %}
 {% endblock %}
@@ -82,13 +92,6 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     {% include "geiq_assessments_views/includes/filter_and_list.html" with assessment=assessment contracts_page=contracts_page request=request AssessmentContractDetailsTab=AssessmentContractDetailsTab can_validate=can_validate csrf_token=csrf_token filters_form=filters_form filters_counter=filters_counter only %}
-
-                    {% if can_validate %}
-                        <form method="post" class="js-prevent-multiple-submit">
-                            {% csrf_token %}
-                            {% itou_buttons_form primary_label="Valider la sélection" primary_name="action" primary_value=ContractsAction.VALIDATE reset_url=back_url show_mandatory_fields_mention=False %}
-                        </form>
-                    {% endif %}
                 </div>
             </div>
         </div>

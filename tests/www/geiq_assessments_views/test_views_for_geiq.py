@@ -1464,7 +1464,7 @@ class TestAssessmentContractsListView:
         assertNotContains(response, "<form")
         assertNotContains(response, 'id="contracts-filter-form"')
 
-        assertContains(response, "<table")
+        assertContains(response, "Aucun contrat pour le moment")
 
     def test_contract_list_htmx_consistency(self, client, settings):
         """
