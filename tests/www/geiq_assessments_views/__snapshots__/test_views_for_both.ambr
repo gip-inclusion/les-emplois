@@ -777,7 +777,7 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IfNode[geiq_assessments_views/includes/contracts_list_table.html]',
           'IncludeNode[geiq_assessments_views/includes/filter_and_list.html]',
           'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
@@ -858,8 +858,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -907,41 +907,39 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -952,7 +950,7 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           3 résultats
                                       </p>
                                   </div>
@@ -1092,8 +1090,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -1141,41 +1139,39 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -1186,7 +1182,7 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           3 résultats
                                       </p>
                                   </div>
@@ -1352,8 +1348,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -1401,41 +1397,39 @@
                       <br/>
                       Par défaut, tous les contrats dont la durée est inférieure à 3 mois (90 jours) sont désélectionnés, vous pouvez toujours les sélectionner si la situation le nécessite.
                   </p>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que vous souhaitez présenter à la DDETS et/ou DREETS.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -1446,46 +1440,18 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           0 résultat
                                       </p>
                                   </div>
                               </div>
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">
-                                          Liste des bilans d’exécution
-                                      </caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">
-                                                  NOM Prénom
-                                              </th>
-                                              <th scope="col">
-                                                  Date de début
-                                              </th>
-                                              <th scope="col">
-                                                  Date de fin
-                                              </th>
-                                              <th scope="col">
-                                                  ≥ 90 jours en 2024
-                                              </th>
-                                              <th scope="col">
-                                                  Aide potentielle
-                                              </th>
-                                              <th scope="col">
-                                                  Obtenir l’aide
-                                              </th>
-                                          </tr>
-                                      </thead>
-                                      <tbody>
-                                          <tr>
-                                              <td class="text-center py-5 text-muted" colspan="6">
-                                                  Aucun contrat trouvé.
-                                              </td>
-                                          </tr>
-                                      </tbody>
-                                  </table>
+                              <div class="text-center my-3 my-md-4">
+                                  <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
+                                  <p class="mb-1 mt-3">
+                                      <strong>
+                                          Aucun contrat pour le moment
+                                      </strong>
+                                  </p>
                               </div>
                           </div>
                       </div>
@@ -1732,7 +1698,7 @@
       }),
       dict({
         'origin': list([
-          'ForNode[geiq_assessments_views/includes/contracts_list_table.html]',
+          'IfNode[geiq_assessments_views/includes/contracts_list_table.html]',
           'IncludeNode[geiq_assessments_views/includes/filter_and_list.html]',
           'IncludeNode[geiq_assessments_views/assessment_contracts_list.html]',
           'BlockNode[layout/base.html]',
@@ -1814,8 +1780,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -1861,41 +1827,39 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -1906,7 +1870,7 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           2 résultats
                                       </p>
                                   </div>
@@ -2016,8 +1980,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -2063,41 +2027,39 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -2108,7 +2070,7 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           2 résultats
                                       </p>
                                   </div>
@@ -2244,8 +2206,8 @@
   '''
   <section class="s-section">
       <div class="s-section__container container">
-          <div class="row">
-              <div class="col-12">
+          <div class="s-section__row row">
+              <div class="col-12 mb-3 mb-md-4">
                   <div class="c-box mb-3" id="contracts-list-stats">
                       <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
                           <div class="d-flex flex-column">
@@ -2291,41 +2253,39 @@
                   <h2>
                       Sélectionnez les contrats pour lesquels vous souhaitez accorder l’aide
                   </h2>
-                  <p>
+                  <p class="mb-0">
                       L’aide potentielle est calculée à partir de critères administratifs sélectionnés par le GEIQ.
                               Elle ne prend pas en compte la durée d’accompagnement réellement effectuée, afin de ne pas exclure automatiquement certaines situations particulières que le GEIQ souhaiterait vous soumettre.
                   </p>
+              </div>
+          </div>
+          <div class="s-section__row row">
+              <div class="col-12">
                   <div id="contracts-view-wrapper">
                       <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-list-results" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="change from:input delay:.5s" id="filter-and-list-container">
                           <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
-                              <div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
-                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-boundary="viewport" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
+                              <div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
+                                  <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
                                       Date de début de contrat
                                   </button>
                                   <div aria-labelledby="btn-filter-start-date" class="dropdown-menu p-3 shadow border-0 overflow-visible">
-                                      <div class="d-flex flex-column gap-3">
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_min">
-                                                      Du
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <div class="mb-0">
-                                              <div class="form-group">
-                                                  <label class="form-label" for="id_start_date_max">
-                                                      Au
-                                                  </label>
-                                                  <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
-                                                  </duet-date-picker>
-                                              </div>
-                                          </div>
-                                          <button class="btn btn-sm btn-primary w-100" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
-                                              Appliquer
-                                          </button>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_min">
+                                              À partir du
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_min" name="start_date_min">
+                                          </duet-date-picker>
                                       </div>
+                                      <div class="form-group">
+                                          <label class="form-label" for="id_start_date_max">
+                                              Jusqu'au
+                                          </label>
+                                          <duet-date-picker class="" identifier="id_start_date_max" name="start_date_max">
+                                          </duet-date-picker>
+                                      </div>
+                                      <button class="btn btn-sm btn-primary btn-block" hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-include="#filter-and-list-container" hx-push-url="true" hx-target="#contracts-results-table" type="button">
+                                          Appliquer
+                                      </button>
                                   </div>
                               </div>
                               <div class="ms-md-auto" hx-swap-oob="true" id="reset-button-container">
@@ -2336,46 +2296,18 @@
                           <div id="contracts-results-table">
                               <div class="d-flex flex-column flex-md-row align-items-md-center mt-4 mb-3 mb-md-4">
                                   <div class="flex-md-grow-1">
-                                      <p class="h4 mb-0">
+                                      <p class="mb-0">
                                           0 résultat
                                       </p>
                                   </div>
                               </div>
-                              <div class="table-responsive mt-3 mt-md-4">
-                                  <table class="table table-hover">
-                                      <caption class="visually-hidden">
-                                          Liste des bilans d’exécution
-                                      </caption>
-                                      <thead>
-                                          <tr>
-                                              <th scope="col">
-                                                  NOM Prénom
-                                              </th>
-                                              <th scope="col">
-                                                  Date de début
-                                              </th>
-                                              <th scope="col">
-                                                  Date de fin
-                                              </th>
-                                              <th scope="col">
-                                                  ≥ 90 jours en 2024
-                                              </th>
-                                              <th scope="col">
-                                                  Aide potentielle
-                                              </th>
-                                              <th scope="col">
-                                                  Éligible à l’aide
-                                              </th>
-                                          </tr>
-                                      </thead>
-                                      <tbody>
-                                          <tr>
-                                              <td class="text-center py-5 text-muted" colspan="6">
-                                                  Aucun contrat trouvé.
-                                              </td>
-                                          </tr>
-                                      </tbody>
-                                  </table>
+                              <div class="text-center my-3 my-md-4">
+                                  <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-card-no-result.png"/>
+                                  <p class="mb-1 mt-3">
+                                      <strong>
+                                          Aucun contrat pour le moment
+                                      </strong>
+                                  </p>
                               </div>
                           </div>
                       </div>

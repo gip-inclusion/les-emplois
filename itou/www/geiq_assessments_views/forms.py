@@ -234,9 +234,9 @@ class ContractFilterForm(forms.Form):
     Allow users to filter the list of contracts.
     """
 
-    start_date_min = forms.DateField(label="Du", required=False, widget=DuetDatePickerWidget())
+    start_date_min = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
     start_date_max = forms.DateField(
-        label="Au",
+        label="Jusqu'au",
         required=False,
         widget=DuetDatePickerWidget(),
     )

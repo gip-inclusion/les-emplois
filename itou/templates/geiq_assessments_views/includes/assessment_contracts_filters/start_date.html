@@ -1,21 +1,17 @@
 {% load django_bootstrap5 %}
 
-<div class="dropdown d-inline-block" hx-swap-oob="true" id="dropdown-start-date-container">
+<div class="dropdown" hx-swap-oob="true" id="dropdown-start-date-container">
     <button type="button"
-            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.start_date_min.value or filters_form.start_date_max.value %}border-primary fw-bold text-primary{% endif %} {% if filters_form.start_date_min.errors or filters_form.start_date_max.errors %}border-danger text-danger{% endif %}"
+            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.start_date_min.value or filters_form.start_date_max.value %}border-primary fw-bold text-primary{% endif %} {% if filters_form.start_date_min.errors or filters_form.start_date_max.errors %}border-danger{% endif %}"
             data-bs-toggle="dropdown"
-            data-bs-boundary="viewport"
             data-bs-auto-close="outside"
             aria-expanded="false"
             id="btn-filter-start-date">Date de début de contrat</button>
     <div class="dropdown-menu p-3 shadow border-0 overflow-visible" aria-labelledby="btn-filter-start-date">
-        <div class="d-flex flex-column gap-3">
-            <div class="mb-0">{% bootstrap_field filters_form.start_date_min %}</div>
-            <div class="mb-0">{% bootstrap_field filters_form.start_date_max %}</div>
-
-            <button type="button" class="btn btn-sm btn-primary w-100" hx-get="{{ request.path }}" hx-target="#contracts-results-table" hx-include="#filter-and-list-container" hx-push-url="true">
-                Appliquer
-            </button>
-        </div>
+        {% bootstrap_field filters_form.start_date_min %}
+        {% bootstrap_field filters_form.start_date_max %}
+        <button type="button" class="btn btn-sm btn-primary btn-block" hx-get="{{ request.path }}" hx-target="#contracts-results-table" hx-include="#filter-and-list-container" hx-push-url="true">
+            Appliquer
+        </button>
     </div>
 </div>
