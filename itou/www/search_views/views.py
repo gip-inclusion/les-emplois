@@ -9,6 +9,7 @@ from data_inclusion.schema import v1 as data_inclusion_v1
 from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
 from django.core.cache import caches
 from django.db.models import Case, F, Prefetch, Q, When
 from django.http import HttpResponseRedirect
@@ -378,6 +379,31 @@ def search_services_home(request, template_name="search/services/home.html"):
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 
+def _enrich_api_result(result, *, city):
+    if result.get("longitude") and result.get("latitude"):
+        # The SRID 4326 (WGS 84) return the distance as degree so approximate to 111km.
+        # See here: https://stackoverflow.com/a/8477438
+        result["distance"] = (
+            city.coords.distance(Point(result["longitude"], result["latitude"], srid=city.coords.srid)) * 111
+        )
+    else:
+        result["distance"] = None
+    result["is_near"] = result["distance"] < 50 if result["distance"] else None
+
+    modes_accueil = set(result["modes_accueil"] or [])
+    result["is_local"] = data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in modes_accueil
+    result["is_remote"] = data_inclusion_v1.ModeAccueil.A_DISTANCE in modes_accueil
+
+
+def _api_results_sorter(result):
+    max_distance_from_earth_circumference = 40_075_017 // 2 / 1_000
+    return (
+        result["is_local"],
+        -1 * int(max_distance_from_earth_circumference if result["distance"] is None else result["distance"]),
+        result["source"] == "dora",
+    )
+
+
 @login_not_required
 def search_services_results(request, template_name="search/services/results.html"):
     city, category = None, None
@@ -389,13 +415,13 @@ def search_services_results(request, template_name="search/services/results.html
         thematics = form.cleaned_data["thematics"] or [
             t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
         ]
-        receptions = form.cleaned_data["receptions"]
+        reception = form.cleaned_data["reception"]
         services = form.cleaned_data["services"]
 
         search_query = {
             "code_commune": city.code_insee,
             "thematiques": thematics,
-            "modes_accueil": receptions,
+            "modes_accueil": [reception] if reception != ServiceSearchForm.RECEPTION_ALL else [],
             "types": services,
         }
         search_query_hash = hashlib.md5(
@@ -416,14 +442,15 @@ def search_services_results(request, template_name="search/services/results.html
                 # 15 minutes seems like a reasonable amount of time for DI to get back on track
                 caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
             else:
+                if reception != ServiceSearchForm.RECEPTION_ALL:
+                    results = [r for r in results if r["modes_accueil"] == [reception]]
+                for result in results:
+                    _enrich_api_result(result, city=city)
                 api_error, results = (
                     False,
                     sorted(
                         results,
-                        key=lambda i: (
-                            data_inclusion_v1.ModeAccueil.EN_PRESENTIEL in (i["modes_accueil"] or []),
-                            i["source"] == "dora",
-                        ),
+                        key=_api_results_sorter,
                         reverse=True,
                     ),
                 )

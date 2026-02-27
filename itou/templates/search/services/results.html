@@ -49,7 +49,7 @@
                               hx-disinherit="*">
                             <div class="btn-dropdown-filter-group my-3 my-md-4">
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.thematics only %}
-                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.receptions only %}
+                                {% include "includes/btn_dropdown_filter/radio.html" with field=form.reception only %}
                                 {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.services only %}
                                 <div class="ms-lg-auto">
                                     <a href="{% url_add_query request.path city=request.GET.city|default:None category=request.GET.category|default:None %}"

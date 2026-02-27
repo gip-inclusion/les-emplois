@@ -15,16 +15,29 @@
                 </div>
                 <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
                     <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
-                        {% if service.code_postal and service.commune %}
+                        {% if service.is_near %}
                             <li>
                                 <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
-                                <address class="m-0">
-                                    {% if service.adresse %}
-                                        {{ service.adresse }}, {{ service.code_postal }} {{ service.commune }}
-                                    {% else %}
-                                        {{ service.code_postal }} {{ service.commune }}
-                                    {% endif %}
-                                </address>
+                                {% if service.code_postal and service.commune %}
+                                    <address class="m-0">
+                                        {% if service.adresse %}
+                                            {{ service.adresse }}, {{ service.code_postal }} {{ service.commune }}
+                                        {% else %}
+                                            {{ service.code_postal }} {{ service.commune }}
+                                        {% endif %}
+                                    </address>
+                                {% endif %}
+                                {% if service.distance %}
+                                    <span class="badge badge-xs rounded-pill bg-light text-primary ms-1">{{ service.distance|floatformat:"0" }} km</span>
+                                {% endif %}
+                                {% if service.is_remote %}
+                                    <span class="badge badge-xs rounded-pill bg-light text-primary">Également disponible à distance</span>
+                                {% endif %}
+                            </li>
+                        {% elif service.is_remote %}
+                            <li>
+                                <i class="ri-map-pin-2-line fw-normal me-1" aria-hidden="true"></i>
+                                A distance
                             </li>
                         {% endif %}
                     </ul>

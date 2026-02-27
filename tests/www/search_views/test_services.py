@@ -22,57 +22,89 @@ from tests.utils.testing import PAGINATION_PAGE_ONE_MARKUP, parse_response_to_so
 
 @pytest.fixture(name="search_services_route")
 def search_services_route_fixture(respx_mock, settings):
-    return respx_mock.route(url=f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
-        json={
-            "items": [
-                {
-                    "service": {
-                        "id": "svc1",
-                        "source": "dora",
-                        "nom": "Coupe les cheveux",
-                        "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
-                        "lien_source": f"{settings.DORA_BASE_URL}/services/svc1",
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc2",
-                        "source": "dora",
-                        "nom": "Coupe également les cheveux",
-                        "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
-                        "lien_source": f"{settings.DORA_BASE_URL}/services/svc2",
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe également les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc3",
-                        "source": "autre",
-                        "nom": "Coupe aussi les cheveux",
-                        "modes_accueil": list(data_inclusion_v1.ModeAccueil),
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe aussi les cheveux longs",
-                    },
-                },
-                {
-                    "service": {
-                        "id": "svc4",
-                        "source": "autre",
-                        "nom": "Coupe entre autres les cheveux",
-                        "modes_accueil": None,
-                        "structure": {"nom": "Coiffeur"},
-                        "code_postal": "56260",
-                        "description": "Coupe entre autres les cheveux longs",
-                    },
-                },
-            ]
+    items = [
+        {
+            "service": {
+                "id": "dora-distanciel-vannes",
+                "source": "dora",
+                "nom": "Coupe les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-distanciel-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe les cheveux longs",
+            },
         },
+        {
+            "service": {
+                "id": "dora-presentiel-vannes",
+                "source": "dora",
+                "nom": "Coupe également les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-presentiel-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe également les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-presentiel-vannes",
+                "source": "autre",
+                "nom": "Coupe que les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.EN_PRESENTIEL],
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "56260",
+                "longitude": -2.8186843,
+                "latitude": 47.657641,
+                "description": "Coupe que les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-distanciel-geispolsheim",
+                "source": "autre",
+                "nom": "Coupe que les cheveux",
+                "modes_accueil": [data_inclusion_v1.ModeAccueil.A_DISTANCE],
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "67152",
+                "longitude": 7.644817,
+                "latitude": 48.515883,
+                "description": "Coupe que les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "dora-geispolsheim",
+                "source": "dora",
+                "nom": "Coupe tout les cheveux",
+                "modes_accueil": list(data_inclusion_v1.ModeAccueil),
+                "lien_source": f"{settings.DORA_BASE_URL}/services/dora-vannes",
+                "structure": {"nom": "Coiffeur"},
+                "code_postal": "67152",
+                "longitude": 7.644817,
+                "latitude": 48.515883,
+                "description": "Coupe tout les cheveux longs",
+            },
+        },
+        {
+            "service": {
+                "id": "autre-none-nowhere",
+                "source": "autre",
+                "nom": "Coupe entre autres les cheveux",
+                "modes_accueil": None,
+                "structure": {"nom": "Coiffeur"},
+                "description": "Coupe entre autres les cheveux longs",
+            },
+        },
+    ]
+    random.shuffle(items)
+    return respx_mock.route(url=f"{global_constants.API_DATA_INCLUSION_BASE_URL}/api/v1/search/services").respond(
+        json={"items": items},
     )
 
 
@@ -97,11 +129,13 @@ def test_invalid_query_parameters(client):
 
 
 def test_results_html(snapshot, client, search_services_route):
-    expected_items = 4
+    expected_items = 6
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    response = client.get(
+        reverse("search:services_results"), {"city": city.slug, "category": category, "reception": "tous"}
+    )
     assertContains(response, f"{expected_items} résultats")
     assertContains(
         response,
@@ -143,8 +177,17 @@ def test_results_ordering(client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
-    assert [service["id"] for service in response.context["results"].object_list] == ["svc2", "svc3", "svc1", "svc4"]
+    response = client.get(
+        reverse("search:services_results"), {"city": city.slug, "category": category, "reception": "tous"}
+    )
+    assert [service["id"] for service in response.context["results"].object_list] == [
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+        "dora-geispolsheim",
+        "dora-distanciel-vannes",
+        "autre-distanciel-geispolsheim",
+        "autre-none-nowhere",
+    ]
 
 
 def test_results_are_cached(client, search_services_route):
@@ -160,6 +203,39 @@ def test_results_are_cached(client, search_services_route):
         reverse("search:services_results"), {"city": city.slug, "category": data_inclusion_v1.Categorie.MOBILITE}
     )
     assert search_services_route.call_count == 2
+
+
+def test_filter_reception_strictness(client, search_services_route):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+    query_params = {"city": city.slug, "category": category}
+
+    response = client.get(
+        reverse("search:services_results"), {**query_params, "reception": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
+    )
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+    }
+
+    response = client.get(
+        reverse("search:services_results"), {**query_params, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+    )
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-distanciel-vannes",
+        "autre-distanciel-geispolsheim",
+    }
+
+
+def test_filter_reception_default(client, search_services_route):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+
+    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+    }
 
 
 def test_api_error(snapshot, client, search_services_route):
@@ -192,29 +268,29 @@ def test_htmx_reload_for_filters(client, htmx_client, search_services_route):
 
     simulated_page = parse_response_to_soup(
         client.get(
-            url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
+            url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
         )
     )
-    [checkbox_input] = simulated_page.find_all(
+    [radio_input] = simulated_page.find_all(
         "input",
-        attrs={"type": "checkbox", "name": "receptions", "value": data_inclusion_v1.ModeAccueil.A_DISTANCE},
+        attrs={"type": "radio", "name": "reception", "value": data_inclusion_v1.ModeAccueil.A_DISTANCE},
     )
-    checkbox_input["checked"] = ""
-    [checkbox_input] = simulated_page.find_all(
+    radio_input["checked"] = ""
+    [radio_input] = simulated_page.find_all(
         "input",
-        attrs={"type": "checkbox", "name": "receptions", "value": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL},
+        attrs={"type": "radio", "name": "reception", "value": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL},
     )
-    del checkbox_input.attrs["checked"]
+    del radio_input.attrs["checked"]
     update_page_with_htmx(
         simulated_page,
         f"form[hx-get='{url}']",
         htmx_client.get(
-            url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+            url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
         ),
     )
 
     response = client.get(
-        url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+        url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
     )
     fresh_page = parse_response_to_soup(response)
 
