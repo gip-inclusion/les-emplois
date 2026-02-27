@@ -415,13 +415,13 @@ def search_services_results(request, template_name="search/services/results.html
         thematics = form.cleaned_data["thematics"] or [
             t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
         ]
-        receptions = form.cleaned_data["receptions"]
+        reception = form.cleaned_data["reception"]
         services = form.cleaned_data["services"]
 
         search_query = {
             "code_commune": city.code_insee,
             "thematiques": thematics,
-            "modes_accueil": receptions,
+            "modes_accueil": [reception] if reception else [],
             "types": services,
         }
         search_query_hash = hashlib.md5(
@@ -442,6 +442,8 @@ def search_services_results(request, template_name="search/services/results.html
                 # 15 minutes seems like a reasonable amount of time for DI to get back on track
                 caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
             else:
+                if reception:
+                    results = [r for r in results if r["modes_accueil"] == [reception]]
                 for result in results:
                     _enrich_api_result(result, city=city)
                 api_error, results = (

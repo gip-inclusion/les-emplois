@@ -196,11 +196,11 @@ class ServiceSearchForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )
-    receptions = forms.MultipleChoiceField(
+    reception = forms.ChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil],
         label="Mode d'accueil",
         required=False,
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.RadioSelect,
     )
     services = forms.MultipleChoiceField(
         choices=[(t.value, t.label) for t in data_inclusion_v1.TypeService],

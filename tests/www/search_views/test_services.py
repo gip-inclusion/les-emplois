@@ -201,6 +201,38 @@ def test_results_are_cached(client, search_services_route):
     assert search_services_route.call_count == 2
 
 
+def test_filter_reception_strictness(client, search_services_route):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+    query_params = {"city": city.slug, "category": category}
+
+    response = client.get(
+        reverse("search:services_results"), {**query_params, "reception": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
+    )
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+    }
+
+    response = client.get(
+        reverse("search:services_results"), {**query_params, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+    )
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-distanciel-vannes",
+        "autre-distanciel-geispolsheim",
+    }
+
+    response = client.get(reverse("search:services_results"), query_params)
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+        "dora-geispolsheim",
+        "dora-distanciel-vannes",
+        "autre-distanciel-geispolsheim",
+        "autre-none-nowhere",
+    }
+
+
 def test_api_error(snapshot, client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
@@ -231,29 +263,29 @@ def test_htmx_reload_for_filters(client, htmx_client, search_services_route):
 
     simulated_page = parse_response_to_soup(
         client.get(
-            url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
+            url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL}
         )
     )
-    [checkbox_input] = simulated_page.find_all(
+    [radio_input] = simulated_page.find_all(
         "input",
-        attrs={"type": "checkbox", "name": "receptions", "value": data_inclusion_v1.ModeAccueil.A_DISTANCE},
+        attrs={"type": "radio", "name": "reception", "value": data_inclusion_v1.ModeAccueil.A_DISTANCE},
     )
-    checkbox_input["checked"] = ""
-    [checkbox_input] = simulated_page.find_all(
+    radio_input["checked"] = ""
+    [radio_input] = simulated_page.find_all(
         "input",
-        attrs={"type": "checkbox", "name": "receptions", "value": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL},
+        attrs={"type": "radio", "name": "reception", "value": data_inclusion_v1.ModeAccueil.EN_PRESENTIEL},
     )
-    del checkbox_input.attrs["checked"]
+    del radio_input.attrs["checked"]
     update_page_with_htmx(
         simulated_page,
         f"form[hx-get='{url}']",
         htmx_client.get(
-            url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+            url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
         ),
     )
 
     response = client.get(
-        url, {"city": vannes.slug, "category": category, "receptions": data_inclusion_v1.ModeAccueil.A_DISTANCE}
+        url, {"city": vannes.slug, "category": category, "reception": data_inclusion_v1.ModeAccueil.A_DISTANCE}
     )
     fresh_page = parse_response_to_soup(response)
 
