@@ -84,11 +84,11 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
     context_object_name = "job_seeker"
 
     def test_func(self):
-        return self.request.user.is_prescriber or self.request.from_employer
+        return self.request.from_prescriber or self.request.from_employer
 
     def get_context_data(self, **kwargs):
         geiq_eligibility_diagnosis = None
-        if self.request.user.is_prescriber or (
+        if self.request.from_prescriber or (
             self.request.from_employer and self.request.current_organization.kind == CompanyKind.GEIQ
         ):
             geiq_eligibility_diagnosis = (
@@ -103,7 +103,7 @@ class JobSeekerDetailView(UserPassesTestMixin, DetailView):
         approval = None
         iae_eligibility_diagnosis = None
         can_edit_iae_eligibility = False
-        if self.request.user.is_prescriber or (
+        if self.request.from_prescriber or (
             self.request.from_employer and self.request.current_organization.is_subject_to_iae_rules
         ):
             approval = self.object.approvals.valid().prefetch_related("suspension_set").first()
@@ -172,7 +172,7 @@ def switch_stalled_status(request, public_id):
 
 
 @require_safe
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def list_job_seekers(request, template_name="job_seekers_views/list.html", list_organization=False):
     if list_organization:
         if not request.current_organization:
@@ -349,9 +349,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
             not self.hire_process
             and not self.is_gps
             and not self.standalone_creation
-            and (
-                request.user.is_prescriber or (request.from_employer and self.company != request.current_organization)
-            )
+            and (request.from_prescriber or (request.from_employer and self.company != request.current_organization))
         )
         self.auto_prescription_process = (
             not self.hire_process
@@ -405,7 +403,7 @@ class JobSeekerBaseView(ExpectedJobSeekerSessionMixin, TemplateView):
         }
 
     def is_job_seeker_in_user_jobseekers_list(self, job_seeker):
-        if not self.request.user.is_prescriber:
+        if not self.request.from_prescriber:
             return False
 
         return job_seeker.pk in User.objects.linked_job_seeker_ids(
@@ -874,7 +872,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 self.profile = user.jobseeker_profile
                 for k, v in self._get_profile_data_from_session().items():
                     setattr(self.profile, k, v)
-                if request.user.is_prescriber:
+                if request.from_prescriber:
                     self.profile.created_by_prescriber_organization = request.current_organization
                 if self.standalone_creation:
                     messages.success(
@@ -910,7 +908,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 gps_utils.add_beneficiary(request, user, notify_duplicate, created=True)
             else:
                 FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
-            if request.user.is_prescriber:
+            if request.from_prescriber:
                 # Sync job seeker assignment to a prescriber
                 JobSeekerAssignment.objects.upsert_assignment(
                     user, request.user, request.current_organization, ActionKind.CREATE

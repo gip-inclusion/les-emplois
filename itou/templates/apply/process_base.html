@@ -97,7 +97,7 @@
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}
-                            {% elif request.user.is_prescriber %}
+                            {% elif request.from_prescriber %}
                                 {# Approval status. #}
                                 {% if job_application.approval %}
                                     {% approval_details_box approval=job_application.approval version='box' request=request extra_classes='mb-3 mb-md-4' %}

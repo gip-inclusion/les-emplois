@@ -106,7 +106,7 @@
                         </div>
                         <div class="s-section__col col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-3">
                             {% block sidebar %}
-                                {% if request.user.is_prescriber %}
+                                {% if request.from_prescriber %}
                                     <div class="c-box mb-4">
                                         <h3>Suivi du candidat</h3>
                                         <p>Retrouvez l’ensemble de ses candidatures en un seul endroit.</p>
