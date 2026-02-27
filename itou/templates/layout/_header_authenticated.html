@@ -1,5 +1,6 @@
 {% load matomo %}
 {% load nav %}
+{% load nexus %}
 {% load redirection_fields %}
 {% load static %}
 {% load structure_switcher %}
@@ -54,7 +55,8 @@
             <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale">
                 {% nav request %}
             </nav>
-            <div class="dropup dropup-center d-sm-none d-xl-inline-block">
+            {% nexus_dropdown %}
+            <div class="dropup dropup-center">
                 <button type="button"
                         class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3"
                         data-bs-toggle="dropdown"
