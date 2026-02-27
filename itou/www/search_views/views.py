@@ -418,6 +418,8 @@ def search_services_results(request, template_name="search/services/results.html
             t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
         ]
         reception = form.cleaned_data["reception"]
+        if reception == form.RECEPTION_ALL_VALUE:
+            reception = []
         services = form.cleaned_data["services"]
 
         search_query = {
