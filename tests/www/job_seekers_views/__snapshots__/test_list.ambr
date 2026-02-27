@@ -839,7 +839,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           
@@ -882,7 +882,7 @@
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1017,7 +1017,7 @@
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1052,7 +1052,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1186,7 +1186,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1221,7 +1221,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1271,7 +1271,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -1317,7 +1317,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -1451,7 +1451,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1487,7 +1487,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"
@@ -1513,7 +1513,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1997,7 +1997,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           
@@ -2036,7 +2036,7 @@
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2170,7 +2170,7 @@
           'FilterForm._get_choices_for_job_seeker[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2204,7 +2204,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2337,7 +2337,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2371,7 +2371,7 @@
           'FilterForm._get_choices_for_organization_members[www/job_seekers_views/forms.py]',
           'FilterForm.__init__[www/job_seekers_views/forms.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2423,7 +2423,7 @@
           'ItouPaginator.count[<site-packages>/django/core/paginator.py]',
           'pager[utils/pagination.py]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*)
@@ -2468,7 +2468,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2601,7 +2601,7 @@
       dict({
         'origin': list([
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2636,7 +2636,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[job_seekers_views/list.html]',
           'list_job_seekers[www/job_seekers_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT COUNT(*) AS "__count"

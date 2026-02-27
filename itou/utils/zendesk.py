@@ -24,7 +24,7 @@ def serialize_zendesk_params(request):
     if request.user.is_job_seeker:
         zendesk_user_kind = "candidat"
 
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if request.from_authorized_prescriber:
             zendesk_user_kind = "prescripteur_prescripteur-habilité"
         else:

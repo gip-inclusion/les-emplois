@@ -52,7 +52,7 @@ class ApplyTunnel(enum.StrEnum):
 
 def _check_job_seeker_approval(request, job_seeker, siae):
     if job_seeker.new_approval_blocked_by_waiting_period(
-        siae=siae, sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None
+        siae=siae, sender_prescriber_organization=request.current_organization if request.from_prescriber else None
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
         # by reusing the 403 template and its logic. I'm not 100% sure that this is a good idea but,
@@ -223,7 +223,7 @@ class StartView(ApplicationPermissionMixin, View):
 
         # Warn message if prescriber's authorization is pending
         if (
-            request.user.is_prescriber
+            request.from_prescriber
             and request.current_organization
             and request.current_organization.has_pending_authorization()
         ):
@@ -394,7 +394,7 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
     template_name = "apply/submit_step_pending_authorization.html"
 
     def test_func(self):
-        return self.request.user.is_prescriber
+        return self.request.from_prescriber
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -606,7 +606,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
                     request.user,
-                    request.current_organization if request.user.is_prescriber else None,
+                    request.current_organization if request.from_prescriber else None,
                     self.form.cleaned_data,
                 )
             else:
@@ -615,7 +615,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
                         self.geiq_eligibility_diagnosis,
                         request.user,
-                        request.current_organization if request.user.is_prescriber else None,
+                        request.current_organization if request.from_prescriber else None,
                         self.form.cleaned_data,
                     )
 
@@ -658,7 +658,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             sender_kind=self.request.user.kind,
             message=self.form.cleaned_data["message"],
         )
-        if self.request.user.is_prescriber:
+        if self.request.from_prescriber:
             job_application.sender_prescriber_organization = self.request.current_organization
         if self.request.from_employer:
             job_application.sender_company = self.request.current_organization
@@ -677,11 +677,11 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
 
-        if self.request.from_employer or self.request.user.is_prescriber:
+        if self.request.from_employer or self.request.from_prescriber:
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
-            if self.request.user.is_prescriber:
+            if self.request.from_prescriber:
                 # Sync job seeker assignment to a prescriber
                 JobSeekerAssignment.objects.upsert_assignment(
                     self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
@@ -957,7 +957,7 @@ class ApplyForJobSeekerMixin:
             UserKind.PRESCRIBER,
             UserKind.EMPLOYER,
         ):
-            if request.user.is_prescriber:
+            if request.from_prescriber:
                 self.exit_url = reverse("job_seekers_views:list")
             elif request.from_employer:
                 self.exit_url = reverse("apply:list_prescriptions")
