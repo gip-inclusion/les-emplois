@@ -380,7 +380,7 @@ def search_services_home(request, template_name="search/services/home.html"):
     return render(request, template_name, {"form": ServiceSearchForm()})
 
 
-def _enrich_api_result(result, *, city):
+def _enrich_api_result(result, *, city, local_distance_cutoff):
     distance = None
     if result.get("longitude") and result.get("latitude"):
         distance = int(distance_in_km(city.coords, lat_lon_to_coords(result["latitude"], result["longitude"])))
@@ -392,9 +392,7 @@ def _enrich_api_result(result, *, city):
         [
             # If we get an "in person" only service than trust DI at the API only give us those in a 50km radius
             modes_accueil == {data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value},
-            # Choose 70 km as our distance cutoff to take into account our approximation and that DI seems
-            # to compute the distance from the city limit while we use the city center.
-            result["is_in_person"] and (distance <= 70 if distance else False),
+            result["is_in_person"] and (distance <= int(local_distance_cutoff) if distance else False),
         ]
     )
     result["distance"] = distance
@@ -419,13 +417,13 @@ def search_services_results(request, template_name="search/services/results.html
         thematics = form.cleaned_data["thematics"] or [
             t.value for t in data_inclusion_v1.Thematique if t.value.startswith(category.value)
         ]
-        receptions = form.cleaned_data["receptions"]
+        reception = form.cleaned_data["reception"]
         services = form.cleaned_data["services"]
 
         search_query = {
             "code_commune": city.code_insee,
             "thematiques": thematics,
-            "modes_accueil": receptions,
+            "modes_accueil": [reception] if reception else [],
             "types": services,
         }
         search_query_hash = hashlib.md5(
@@ -446,8 +444,16 @@ def search_services_results(request, template_name="search/services/results.html
                 # 15 minutes seems like a reasonable amount of time for DI to get back on track
                 caches["failsafe"].set(cache_key, (api_error, results), 60 * 15)
             else:
+                # Choose 70 km as our distance cutoff to take into account our distance approximation
+                # and that DI seems to compute the distance from the city limit while we use the city center.
+                local_distance_cutoff = 70
                 for result in results:
-                    _enrich_api_result(result, city=city)
+                    _enrich_api_result(result, city=city, local_distance_cutoff=local_distance_cutoff)
+                # In person services should only be displayed if they are within local distance
+                if reception == data_inclusion_v1.ModeAccueil.EN_PRESENTIEL:
+                    results = [
+                        r for r in results if r["distance"] is not None and r["distance"] <= local_distance_cutoff
+                    ]
                 api_error, results = (
                     False,
                     sorted(
