@@ -1228,7 +1228,7 @@
         'origin': list([
           'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
           'VariableNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
-          'IfNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
+          'WithNode[eligibility/includes/iae/valid_eligibility_diagnosis_and_criteria.html]',
           'IncludeNode[dashboard/includes/job_seeker_eligibility_card.html]',
           'IfNode[dashboard/includes/job_seeker_eligibility_card.html]',
           'IfNode[dashboard/includes/job_seeker_eligibility_card.html]',
@@ -1288,13 +1288,18 @@
               </span>
           </div>
           <div class="px-3 px-lg-4">
-              <p>
-                  Éligibilité GEIQ confirmée par
-                  <b>
-                      John DOE (ACME Inc.)
-                  </b>
+              <p class="fs-sm text-success">
+                  Éligibilité GEIQ confirmée par John DOE (ACME Inc.).
               </p>
               <ul class="list-data mb-3">
+                  <li>
+                      <small>
+                          Date d'expiration du diagnostic
+                      </small>
+                      <strong>
+                          le 19/11/2025
+                      </strong>
+                  </li>
                   <li>
                       <small>
                           Critères administratifs
@@ -1312,11 +1317,6 @@
                       </ul>
                   </li>
               </ul>
-              <p>
-                  <i>
-                      Ce diagnostic expire le 19/11/2025.
-                  </i>
-              </p>
           </div>
       </div>
   </div>
@@ -1340,20 +1340,24 @@
               </span>
           </div>
           <div class="px-3 px-lg-4">
-              <div class="fs-sm mb-lg-5">
-                  <p class="text-success mb-1">
+              <div class="mb-lg-5">
+                  <p class="fs-sm text-success">
                       Critères validés
-                              le
-                      <span class="fw-bold">
-                          19/05/2025
-                      </span>
-                      par
-                      <strong>
-                          Pierre DUPONT
-                      </strong>
-                      (Pres. Org.).
+                              le 19/05/2025 par
+                              Pierre DUPONT
+                              
+                              
+                                  (Pres. Org.).
                   </p>
                   <ul class="list-data mb-3">
+                      <li>
+                          <small>
+                              Durée de validité du diagnostic
+                          </small>
+                          <strong>
+                              du 19/05/2025 au 19/11/2025
+                          </strong>
+                      </li>
                       <li>
                           <small>
                               Critères administratifs
@@ -1371,12 +1375,6 @@
                           </ul>
                       </li>
                   </ul>
-                  <p class="mb-0">
-                      <i>
-                          Ce diagnostic expire le
-              19/11/2025.
-                      </i>
-                  </p>
               </div>
           </div>
       </div>

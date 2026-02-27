@@ -201,7 +201,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
@@ -215,16 +215,16 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par John DOE
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      John DOE
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -246,7 +246,7 @@
                                                   </strong>
                                               </li>
                                           </ul>
-                                          <div class="alert alert-info" role="status">
+                                          <div class="alert alert-info mt-4" role="status">
                                               <div class="row">
                                                   <div class="col-auto pe-0">
                                                       <i aria-hidden="true" class="ri-information-line ri-xl text-info">
@@ -508,7 +508,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
@@ -522,17 +522,17 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par John DOE
+          (ACME Inc.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      John DOE
-                  (ACME Inc.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -1042,7 +1042,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
@@ -1056,19 +1056,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -1092,7 +1092,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
@@ -1106,19 +1106,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -2758,7 +2758,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
@@ -2772,19 +2772,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -2811,7 +2811,7 @@
                                                   </strong>
                                               </li>
                                           </ul>
-                                          <div class="alert alert-info" role="status">
+                                          <div class="alert alert-info mt-4" role="status">
                                               <div class="row">
                                                   <div class="col-auto pe-0">
                                                       <i aria-hidden="true" class="ri-information-line ri-xl text-info">
@@ -3080,7 +3080,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité public prioritaire GEIQ
@@ -3094,19 +3094,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -3607,7 +3607,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
@@ -3621,19 +3621,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -3905,7 +3905,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
@@ -3919,19 +3919,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
@@ -5543,7 +5543,7 @@
                                           </ul>
                                       </div>
                                       <div class="c-box mb-3 mb-md-4">
-                                          <div class="row mb-3">
+                                          <div class="row">
                                               <div class="col-12 col-sm">
                                                   <h3 class="mb-2 mb-md-0">
                                                       Éligibilité à l'IAE
@@ -5557,19 +5557,19 @@
                                                   </span>
                                               </div>
                                           </div>
-                                          <span class="text-success fs-sm">
-                                              Valide du 14/08/2024 au 14/02/2025
-                                          </span>
+                                          <p class="fs-sm text-success">
+                                              Confirmée par Pierre DUPONT
+          
+          
+              (Pres. Org.)
+                                          </p>
                                           <ul class="list-data mb-3">
                                               <li>
                                                   <small>
-                                                      Confirmée par
+                                                      Durée de validité
                                                   </small>
                                                   <strong>
-                                                      Pierre DUPONT
-                  
-                  
-                      (Pres. Org.)
+                                                      du 14/08/2024 au 14/02/2025
                                                   </strong>
                                               </li>
                                               <li>
