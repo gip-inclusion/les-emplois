@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
+from itoutils.urls import add_url_params
 from pytest_django.asserts import assertContains, assertNotContains, assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
@@ -2078,9 +2079,6 @@ def test_list_for_siae_select_applications_batch_accept_geiq(client, snapshot):
         [accept_button] = accept_buttons
         return accept_button
 
-    def get_confirm_button():
-        return simulated_page.find(id="confirm_no_allowance_modal").find("a")
-
     assert get_accept_button() is None
     # Select 1 acceptable application
     for acceptable_app in [acceptable_app_1, acceptable_app_2, acceptable_app_3]:
@@ -2090,13 +2088,9 @@ def test_list_for_siae_select_applications_batch_accept_geiq(client, snapshot):
         assert pretty_indented(accept_button).replace(str(acceptable_app.pk), "[PK of JobApplication]") == snapshot(
             name="active accept button"
         )
-        # button opens a model
-        assert accept_button["data-bs-target"] == "#confirm_no_allowance_modal"
-
-        # Check that the next_url is correctly transmitted
-        confirm_button = get_confirm_button()
-        assert confirm_button["href"] == reverse(
-            "apply:start-accept", kwargs={"job_application_id": acceptable_app.pk}
+        # button starts acceptance wizard
+        assert accept_button["href"] == add_url_params(
+            reverse("apply:start-accept", kwargs={"job_application_id": acceptable_app.pk}), {"next_url": table_url}
         )
 
     # Test with unacceptable batches

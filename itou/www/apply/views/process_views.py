@@ -573,21 +573,29 @@ class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
         self.company = self.job_application.to_company
         self.job_seeker = self.job_application.job_seeker
 
-        self.next_url = get_safe_url(request, "next_url")
+        self.next_url = get_safe_url(
+            request,
+            "next_url",
+            fallback_url=reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
+        )
 
     def get_success_url(self):
-        return reverse(
-            "apply:start-accept",
-            kwargs={"job_application_id": self.job_application.id},
-            query={"next_url": self.next_url} if self.next_url else None,
+        return self.next_url
+
+    def get_back_url(self):
+        return get_safe_url(
+            self.request,
+            "back_url",
+            fallback_url=None,
         )
 
     def get_cancel_url(self):
-        return self.next_url
+        return reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["job_application"] = self.job_application
+        context["back_url"] = self.get_back_url()
         return context
 
 

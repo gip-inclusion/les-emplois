@@ -250,8 +250,14 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
 
         response = client.post(url_accept_contract, data=post_data)
 
-        assertRedirects(response, url_accept_confirmation, fetch_redirect_response=False)
+        url_geiq_eligibility = reverse(
+            "apply:geiq_eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": url_accept_contract, "next_url": url_accept_confirmation},
+        )
+        assertRedirects(response, url_geiq_eligibility, fetch_redirect_response=False)
 
+        # Skip eligibility step as we're not testing it here
         response = client.get(url_accept_confirmation)
         assert response.status_code == 200
 
@@ -307,8 +313,15 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         }
 
         response = client.post(url_accept_contract, data=post_data)
-        assertRedirects(response, url_accept_confirmation, fetch_redirect_response=False)
 
+        url_geiq_eligibility = reverse(
+            "apply:geiq_eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": url_accept_contract, "next_url": url_accept_confirmation},
+        )
+        assertRedirects(response, url_geiq_eligibility, fetch_redirect_response=False)
+
+        # Skip eligibility step as we're not testing it here
         response = client.get(url_accept_confirmation)
         assert response.status_code == 200
 
@@ -379,7 +392,14 @@ class TestJobApplicationAcceptFormInWizardWithGEIQFields:
         url_accept_confirmation = reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name})
         response = client.post(url_accept_contract, data=post_data)
 
-        assertRedirects(response, url_accept_confirmation)
+        url_geiq_eligibility = reverse(
+            "apply:geiq_eligibility",
+            kwargs={"job_application_id": job_application.pk},
+            query={"back_url": url_accept_contract, "next_url": url_accept_confirmation},
+        )
+        assertRedirects(response, url_geiq_eligibility, fetch_redirect_response=False)
+
+        # Skip eligibility step as we're not testing it here
         response = client.get(url_accept_confirmation)
         assertNotContains(response, CANNOT_BACKDATE_TEXT)
 
