@@ -1,4 +1,4 @@
-{% if request.user.is_employer or request.from_authorized_prescriber %}
+{% if request.from_employer or request.from_authorized_prescriber %}
     {% if diagnosis.criteria_can_be_certified %}
         <div class="c-info my-4">
             <button class="c-info__summary" data-bs-toggle="collapse" data-bs-target="#collapse-certif-help-text" aria-expanded="true" aria-controls="collapse-certif-help-text">

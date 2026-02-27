@@ -51,10 +51,10 @@
         <p>
             <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
         </p>
-        {% if request.user.is_employer %}
+        {% if request.from_employer %}
             {% include "eligibility/includes/geiq/diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
         {% endif %}
-    {% elif request.user.is_employer %}
+    {% elif request.from_employer %}
         {# Existing GEIQ, diagnosis but no allowance #}
         <div class="alert alert-warning mt-4" role="status">
             <div class="row">
@@ -84,7 +84,7 @@
         </div>
         <div class="col-12 col-sm-auto">
             {% geiq_eligibility_badge is_eligible=False extra_classes="badge-sm" %}
-            {% if request.user.is_employer %}
+            {% if request.from_employer %}
                 {% with back_and_next_url=request.get_full_path|urlencode %}
                     <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary ms-2">Vérifier</a>
                 {% endwith %}

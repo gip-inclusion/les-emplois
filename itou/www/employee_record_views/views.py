@@ -22,7 +22,7 @@ from itou.employee_record.utils import is_ntt_required
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason, UserKind
 from itou.users.models import User
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
@@ -68,7 +68,7 @@ STEPS = [
 ]
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def start_add_wizard(request):
     return AddView.initialize_session_and_start(request, reset_url=get_safe_url(request, "reset_url"))
 
@@ -140,7 +140,7 @@ class AddView(UserPassesTestMixin, WizardView):
         return reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def missing_employee(request, template_name="employee_record/missing_employee.html"):
     siae = get_current_company_or_404(request)
     back_url = reverse(

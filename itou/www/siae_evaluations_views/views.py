@@ -124,7 +124,7 @@ def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evalua
     owner_data = {}
     if request.user.is_labor_inspector:
         owner_data["evaluation_campaign__institution"] = get_current_institution_or_404(request)
-    elif request.user.is_employer:
+    elif request.from_employer:
         owner_data["siae"] = get_current_company_or_404(request)
 
     evaluated_siae = get_object_or_404(
@@ -143,7 +143,7 @@ def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evalua
     )
     evaluation_campaign = evaluated_siae.evaluation_campaign
 
-    if request.user.is_employer and not evaluation_campaign.ended_at:
+    if request.from_employer and not evaluation_campaign.ended_at:
         raise Http404("Campagne non terminée")
 
     context = {
@@ -468,7 +468,7 @@ def evaluated_job_application(
     owner_data = {}
     if request.user.is_labor_inspector:
         owner_data["evaluated_siae__evaluation_campaign__institution"] = get_current_institution_or_404(request)
-    elif request.user.is_employer:
+    elif request.from_employer:
         owner_data["evaluated_siae__siae"] = get_current_company_or_404(request)
     else:
         raise Http404(request.user.kind)
@@ -489,7 +489,7 @@ def evaluated_job_application(
     )
     evaluated_siae = evaluated_job_application.evaluated_siae
 
-    if request.user.is_employer and not evaluated_siae.evaluation_campaign.ended_at:
+    if request.from_employer and not evaluated_siae.evaluation_campaign.ended_at:
         raise Http404("Campagne non terminée")
 
     back_url = (
@@ -811,7 +811,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
 
 @require_safe
 def view_proof(request, evaluated_administrative_criteria_id):
-    if request.user.is_employer:
+    if request.from_employer:
         org_lookup = "evaluated_job_application__evaluated_siae__siae__in"
     elif request.user.is_labor_inspector:
         org_lookup = "evaluated_job_application__evaluated_siae__evaluation_campaign__institution__in"

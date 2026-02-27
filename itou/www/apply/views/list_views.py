@@ -19,7 +19,7 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis, GEIQSelectedA
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.rdv_insertion.models import InvitationRequest
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.ordering import OrderEnum
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -479,7 +479,7 @@ def list_for_siae_exports_download(request, month_identifier=None):
     return stream_xlsx_export(job_applications, filename, request=request)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def list_for_siae_actions(request):
     company = get_current_company_or_404(request)
     selected_job_applications = list(
@@ -565,7 +565,7 @@ def list_for_siae_actions(request):
 @check_user(lambda u: u.is_caseworker)
 def autocomplete(request, list_kind, field_name):
     if list_kind == JobApplicationsListKind.RECEIVED:
-        if not request.user.is_employer:
+        if not request.from_employer:
             raise Http404
         allowed_fields = ("job_seeker", "sender", "sender_company", "sender_prescriber_organization")
     elif list_kind == JobApplicationsListKind.SENT:

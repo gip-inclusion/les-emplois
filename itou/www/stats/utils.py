@@ -38,7 +38,7 @@ def can_view_stats_siae(request):
     Users of a SIAE can view their SIAE data and only theirs.
     """
     return (
-        request.user.is_employer
+        request.from_employer
         and isinstance(request.current_organization, Company)
         # Metabase expects a filter on the SIAE ASP id (technically `siae.convention.asp_id`) which is why
         # we require a convention object to exist here.

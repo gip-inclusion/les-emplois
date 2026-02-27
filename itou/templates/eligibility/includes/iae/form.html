@@ -17,7 +17,7 @@
 
     {% bootstrap_form_errors form type="all" %}
 
-    {% if request.user.is_employer %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
+    {% if request.from_employer %}<h3>Critères administratifs de niveau 1</h3>{% endif %}
 
     {% for field in form %}
         {% if form.LEVEL_1_PREFIX in field.name %}
@@ -25,7 +25,7 @@
         {% endif %}
     {% endfor %}
 
-    {% if request.user.is_employer %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
+    {% if request.from_employer %}<h3>Critères administratifs de niveau 2</h3>{% endif %}
 
     {% for field in form %}
         {% if form.LEVEL_2_PREFIX in field.name %}

@@ -64,7 +64,7 @@
         <div class="global-messages-container">
             {% block global_messages %}
                 {% include "includes/demo_accounts.html" %}
-                {% if request.user.is_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
+                {% if request.from_employer and request.current_organization and request.current_organization.has_job_descriptions_not_updated_recently %}
                     <div class="alert alert-info fade show" role="status" id="deactivation-job-banner">
                         <p class="mb-0">
                             Une ou plusieurs de vos fiches de poste n’ont pas été actualisées depuis plus de 2 mois. Elles seront automatiquement dépubliées après 3 mois sans mise à jour. <a href="{% url "companies_views:job_description_list" %}">Pensez à les mettre à jour pour maintenir leur visibilité</a>.

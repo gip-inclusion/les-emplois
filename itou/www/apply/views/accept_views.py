@@ -180,7 +180,7 @@ class AcceptHTMXFragmentView(UserPassesTestMixin, TemplateView):
     NO_ERROR_FIELDS = []
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def setup(self, request, company_pk=None, job_seeker_public_id=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)

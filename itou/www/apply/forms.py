@@ -752,7 +752,7 @@ def get_field_label_from_instance_funcs(field_name, request):
             "lookup": "unaccent__icontains",
         },
     }
-    if request.user.is_employer:
+    if request.from_employer:
         return fields_display[field_name], qs_infos[field_name]
     elif request.user.is_prescriber:
         if field_name == "job_seeker":
