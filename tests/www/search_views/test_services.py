@@ -8,6 +8,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
+from itou.www.search_views.forms import ServiceSearchForm
 from tests.cities.factories import create_city_vannes
 from tests.users.factories import (
     EmployerFactory,
@@ -150,7 +151,10 @@ def test_results_html(snapshot, client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    response = client.get(
+        reverse("search:services_results"),
+        {"city": city.slug, "category": category, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE},
+    )
     assertContains(response, f"{expected_items} résultats")
     assertContains(
         response,
@@ -192,7 +196,10 @@ def test_results_ordering(client, search_services_route):
     city = create_city_vannes()
     category = random.choice(list(data_inclusion_v1.Categorie))
 
-    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    response = client.get(
+        reverse("search:services_results"),
+        {"city": city.slug, "category": category, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE},
+    )
     assert [service["id"] for service in response.context["results"].object_list] == [
         "dora-presentiel-vannes",
         "autre-presentiel-vannes",
@@ -248,7 +255,9 @@ def test_filter_reception_strictness(client, search_services_route):
         "autre-none-nowhere",
     }
 
-    response = client.get(reverse("search:services_results"), query_params)
+    response = client.get(
+        reverse("search:services_results"), {**query_params, "reception": ServiceSearchForm.RECEPTION_ALL_VALUE}
+    )
     assert {service["id"] for service in response.context["results"].object_list} == {
         "dora-presentiel-vannes",
         "autre-presentiel-vannes",
@@ -257,6 +266,22 @@ def test_filter_reception_strictness(client, search_services_route):
         "autre-distanciel-geispolsheim",
         "autre-presentiel-nowhere",
         "autre-none-nowhere",
+    }
+
+
+def test_filter_reception_default(client, search_services_route):
+    city = create_city_vannes()
+    category = random.choice(list(data_inclusion_v1.Categorie))
+
+    response = client.get(reverse("search:services_results"), {"city": city.slug, "category": category})
+    reception_input = parse_response_to_soup(
+        response, selector=f"input[value='{data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value}']"
+    )
+    assert "checked" in reception_input.attrs
+    assert {service["id"] for service in response.context["results"].object_list} == {
+        "dora-presentiel-vannes",
+        "autre-presentiel-vannes",
+        "dora-distanciel-vannes",
     }
 
 

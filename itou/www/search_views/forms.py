@@ -168,6 +168,8 @@ class PrescriberSearchForm(forms.Form):
 
 
 class ServiceSearchForm(forms.Form):
+    RECEPTION_ALL_VALUE = "tous"
+
     city = forms.ModelChoiceField(
         queryset=City.objects,
         label="Ville",
@@ -197,7 +199,8 @@ class ServiceSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
     reception = forms.ChoiceField(
-        choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil],
+        choices=[(t.value, t.label) for t in data_inclusion_v1.ModeAccueil] + [(RECEPTION_ALL_VALUE, "Tous")],
+        initial=data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value,
         label="Mode d'accueil",
         required=False,
         widget=forms.RadioSelect,
@@ -209,8 +212,12 @@ class ServiceSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, data=None, *args, **kwargs):
+        if data is not None:
+            data = data.copy()
+            data.setdefault("reception", self.base_fields["reception"].initial)
+
+        super().__init__(data, *args, **kwargs)
         if not_cleaned_category := self.data.get("category"):
             self.fields["thematics"].choices = [
                 (t.value, t.label) for t in data_inclusion_v1.Thematique if t.value.startswith(not_cleaned_category)
