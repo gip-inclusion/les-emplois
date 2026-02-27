@@ -42,7 +42,7 @@ class NexusMixin:
 
         # We cannot use UserPassesTestMixin because the call of serialize_user will crash
         # with a bad kind, and test_func is called later, in self.dispatch()
-        if not (request.user.is_employer or request.user.is_prescriber):
+        if not request.user.is_caseworker:
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
 
         service_users = get_service_users(user=request.user)
