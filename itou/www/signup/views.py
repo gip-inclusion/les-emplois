@@ -299,7 +299,7 @@ class CompanyUserView(LoginNotRequiredMixin, CompanyBaseView, TemplateView):
 
 class CompanyJoinView(CompanyBaseView):
     def get(self, request, *args, **kwargs):
-        if not request.user.is_employer:
+        if not request.from_employer:
             logger.error("A non staff user tried to join a company")
             messages.error(
                 request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur."

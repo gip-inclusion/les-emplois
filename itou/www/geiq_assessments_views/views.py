@@ -338,7 +338,7 @@ def assessment_details_for_geiq(request, pk, template_name="geiq_assessments_vie
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_get_file(request, pk, *, file_field):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {"institutions": request.current_organization, "submitted_at__isnull": False}
@@ -477,7 +477,7 @@ class ContractsAction(enum.StrEnum):
 
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_list(request, pk, template_name="geiq_assessments_views/assessment_contracts_list.html"):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
         contract_filter_kwargs = {}
     elif request.user.is_labor_inspector:
@@ -488,7 +488,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     assessment = get_object_or_404(Assessment.objects.filter(**filter_kwargs).select_related("campaign"), pk=pk)
 
     back_url, can_validate, can_invalidate, stats = None, False, False, None  # defined to please the linters
-    if request.user.is_employer:
+    if request.from_employer:
         back_url = reverse("geiq_assessments_views:details_for_geiq", kwargs={"pk": assessment.pk})
         if not assessment.submitted_at:
             can_validate = not assessment.contracts_selection_validated_at
@@ -506,7 +506,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         if action == ContractsAction.VALIDATE:
             if not can_validate:
                 raise PermissionDenied
-            if request.user.is_employer:
+            if request.from_employer:
                 assessment.contracts_selection_validated_at = timezone.now()
                 assessment.save(update_fields=("contracts_selection_validated_at",))
                 logger.info(
@@ -528,7 +528,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
         elif action == ContractsAction.INVALIDATE:
             if not can_invalidate:
                 raise PermissionDenied
-            if request.user.is_employer:
+            if request.from_employer:
                 assessment.contracts_selection_validated_at = None
                 assessment.save(update_fields=("contracts_selection_validated_at",))
                 logger.info(
@@ -554,7 +554,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 
         return HttpResponseRedirect(next_url)
 
-    if request.user.is_employer:
+    if request.from_employer:
         stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
     elif request.user.is_labor_inspector:
         stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)
@@ -581,7 +581,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
 @require_safe
 @check_request(lambda request: employer_has_access_to_assessments(request) or request.user.is_labor_inspector)
 def assessment_contracts_export(request, pk):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"companies": request.current_organization}
         contract_filter_kwargs = {}
     elif request.user.is_labor_inspector:
@@ -621,7 +621,7 @@ def assessment_contracts_details(
         details_tab = AssessmentContractDetailsTab(tab)
     except ValueError:
         raise Http404
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {
@@ -637,7 +637,7 @@ def assessment_contracts_details(
     contract = get_object_or_404(contract_qs, pk=contract_pk)
 
     editable = False
-    if request.user.is_employer:
+    if request.from_employer:
         if not contract.employee.assessment.submitted_at:
             editable = not contract.employee.assessment.contracts_selection_validated_at
     elif request.user.is_labor_inspector:
@@ -662,7 +662,7 @@ def assessment_contracts_details(
 def assessment_contracts_toggle(
     request, contract_pk, new_value, template_name="geiq_assessments_views/includes/contracts_switch.html"
 ):
-    if request.user.is_employer:
+    if request.from_employer:
         filter_kwargs = {"employee__assessment__companies": request.current_organization}
     elif request.user.is_labor_inspector:
         filter_kwargs = {
@@ -680,7 +680,7 @@ def assessment_contracts_toggle(
     )
     assessment = contract.employee.assessment
     if (
-        request.user.is_employer
+        request.from_employer
         and not assessment.contracts_selection_validated_at
         and contract.allowance_requested != new_value
     ):
@@ -696,7 +696,7 @@ def assessment_contracts_toggle(
     from_list = bool(request.GET.get("from_list"))
     stats = None
     if from_list:
-        if request.user.is_employer:
+        if request.from_employer:
             stats = get_allowance_stats_for_geiq(assessment, for_assessment_details=False)
         elif request.user.is_labor_inspector:
             stats = get_allowance_stats_for_institution(assessment, for_assessment_details=False)

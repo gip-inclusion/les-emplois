@@ -189,7 +189,7 @@ class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
     active_tab = None
 
     def can_view_contracts(self):
-        return self.request.from_authorized_prescriber or self.request.user.is_employer
+        return self.request.from_authorized_prescriber or self.request.from_employer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -208,7 +208,7 @@ class BaseApprovalDetailView(UserPassesTestMixin, DetailView):
 
         # Display or not the deletion form link
         context["approval_deletion_form_url"] = None
-        if self.request.user.is_employer and approval.is_in_progress:
+        if self.request.from_employer and approval.is_in_progress:
             approval_can_be_deleted = False
 
             long_suspensions = [
@@ -264,7 +264,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
 
     def test_func(self):
         # More checks are performed in get_context_data method
-        return self.request.user.is_prescriber or self.request.user.is_employer or self.request.user.is_job_seeker
+        return self.request.user.is_prescriber or self.request.from_employer or self.request.user.is_job_seeker
 
     def get_prolongation_and_requests(self, approval):
         def _format_for_template(user, org):
@@ -301,7 +301,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
     def get_suspensions(self, approval):
         suspensions = sorted(approval.suspension_set.all(), key=lambda s: s.start_at, reverse=True)
         for suspension in suspensions:
-            if self.request.user.is_employer:
+            if self.request.from_employer:
                 suspension.can_be_handled_by_current_user = suspension.can_be_handled_by_siae(
                     self.request.current_organization
                 )
@@ -319,11 +319,11 @@ class ApprovalDetailView(BaseApprovalDetailView):
             getattr(prolongation, "status", None) == approvals_enums.ProlongationRequestStatus.PENDING
             for prolongation in context["prolongations"]
         )
-        context["can_be_suspended_by_current_user"] = (
-            self.request.user.is_employer and approval.can_be_suspended_by_siae(self.request.current_organization)
+        context["can_be_suspended_by_current_user"] = self.request.from_employer and approval.can_be_suspended_by_siae(
+            self.request.current_organization
         )
         context["can_be_prolonged_by_current_user"] = (
-            self.request.user.is_employer
+            self.request.from_employer
             and self.request.current_organization.is_subject_to_iae_rules
             and approval.can_be_prolonged
         )

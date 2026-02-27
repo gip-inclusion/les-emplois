@@ -19,7 +19,7 @@
             <p class="mb-1">
                 Ce critère étant certifié, aucun justificatif n’est à déposer pour le moment.
                 <br>
-                {% if request_user.is_employer %}
+                {% if request.from_employer %}
                     Cependant, conformément à l’article R5132-1-7 du Code du travail,
                     votre structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
                     <br>
@@ -29,7 +29,7 @@
                        rel="noreferrer noopener"
                        aria-label="Page de détails de la candidature correspondant à l’auto-prescription (ouverture dans un nouvel onglet)">la page de détails de la candidature</a>
                     mentionnant la certification, celle-ci valant pièce justificative.
-                {% elif request_user.is_labor_inspector %}
+                {% elif request.user.is_labor_inspector %}
                     Cependant, conformément à l’article R5132-1-7 du Code du travail,
                     la structure doit conserver un justificatif relatif à ce critère pendant une durée de deux ans.
                 {% endif %}

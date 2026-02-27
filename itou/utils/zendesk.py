@@ -60,7 +60,7 @@ def serialize_zendesk_params(request):
                 case _:
                     zendesk_prescriber_kind = request.current_organization.kind.lower()
 
-    elif request.user.is_employer:
+    elif request.from_employer:
         if request.current_organization:  # We might not have one in the invitation flow
             zendesk_company_kind = request.current_organization.kind.lower()
             match request.current_organization.kind:

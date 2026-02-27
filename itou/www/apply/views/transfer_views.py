@@ -11,7 +11,7 @@ from django.views.generic.base import TemplateView
 from itou.companies.models import Company
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import TransferJobApplicationForm
 from itou.www.apply.views.process_views import JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY
@@ -28,7 +28,7 @@ from itou.www.search_views.views import EmployerSearchView
 logger = logging.getLogger(__name__)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def transfer(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
@@ -133,7 +133,7 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(JobDescriptionCa
         }
 
 
-@check_user(lambda user: user.is_employer)  # redondant with is_active_company_member() but more obvious
+@check_request(lambda request: request.from_employer)  # redondant with is_active_company_member() but more obvious
 def job_application_external_transfer_start_view(request, job_application_id, company_pk, **kwargs):
     job_application = get_object_or_404(
         JobApplication.objects.is_active_company_member(request.user), pk=job_application_id

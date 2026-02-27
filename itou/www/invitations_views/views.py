@@ -243,7 +243,7 @@ class InviteEmployerView(BaseInviteUserView):
     back_url = reverse_lazy("companies_views:members")
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def get_form_kwargs(self):
         return {"sender": self.request.user, "company": self.organization}
