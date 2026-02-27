@@ -593,7 +593,7 @@ def assessment_contracts_list(request, pk, template_name="geiq_assessments_views
     }
 
     if request.htmx:
-        template_name = "geiq_assessments_views/includes/contracts_list_table.html"
+        template_name += "#contracts-results-table"
     return render(request, template_name, context)
 
 
