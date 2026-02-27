@@ -29,12 +29,13 @@ from itou.eligibility.models.common import AbstractSelectedAdministrativeCriteri
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecordTransition, EmployeeRecordTransitionLog
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason
+from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.templatetags.str_filters import mask_unless
@@ -92,6 +93,11 @@ EMPLOYER_PRIVATE_COMMENT_MARKUP = "<small>Commentaire privé de l'employeur</sma
 
 
 class TestProcessViews:
+    CANCEL_OLD_JOB_APP_WARNING = f"""
+        Cette candidature sera automatiquement masquée, car elle a été créée il y a plus de 2 ans.
+        Pour plus de détails, consultez <a href="{global_constants.ITOU_HELP_CENTER_URL}/articles/44240682937745"
+        rel="noopener" target="_blank">notre documentation</a>.
+        """
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
@@ -1873,10 +1879,30 @@ class TestProcessViews:
                 assertContains(response, msg)
             else:
                 assertNotContains(response, msg)
+        assertNotContains(response, self.CANCEL_OLD_JOB_APP_WARNING, html=True)
 
         response = client.post(cancel_url)
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         assertRedirects(response, next_url)
+
+        job_application.refresh_from_db()
+        assert job_application.state.is_cancelled
+        assertMessages(response, [messages.Message(messages.SUCCESS, "L'embauche a bien été annulée.")])
+
+    def test_cancel_old_job_application(self, client):
+        job_application = JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED, created_at=timezone.now() - datetime.timedelta(365 * 2)
+        )
+        employer = job_application.to_company.members.first()
+        client.force_login(employer)
+        detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        cancel_url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        list_url = reverse("apply:list_for_siae")
+        response = client.get(detail_url)
+        assertContains(response, self.CANCEL_OLD_JOB_APP_WARNING, html=True)
+
+        response = client.post(cancel_url)
+        assertRedirects(response, list_url)
 
         job_application.refresh_from_db()
         assert job_application.state.is_cancelled

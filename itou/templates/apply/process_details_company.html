@@ -264,6 +264,12 @@
                         {% else %}
                             <p>En validant, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.</p>
                         {% endif %}
+                        {% if display_warning_in_cancel_modal %}
+                            <p>
+                                Cette candidature sera automatiquement masquée, car elle a été créée il y a plus de 2 ans.
+                                Pour plus de détails, consultez <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank">notre documentation</a>.
+                            </p>
+                        {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
