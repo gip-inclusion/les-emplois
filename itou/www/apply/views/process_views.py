@@ -39,6 +39,7 @@ from itou.www.apply.forms import (
     PriorActionForm,
 )
 from itou.www.apply.views import common as common_views
+from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_DAYS_FOR_EMPLOYERS
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
@@ -224,12 +225,19 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     group = FollowUpGroup.objects.filter(beneficiary=job_application.job_seeker).first()
     user_in_group = False if group is None else group.members.contains(request.user)
 
+    # Display a warning in the cancel modal for old job applications: cancelling a job application will immediately
+    # hide it from the user.
+    display_warning_in_cancel_modal = job_application.created_at < timezone.now() - datetime.timedelta(
+        days=APPLICATIONS_VISIBILITY_DAYS_FOR_EMPLOYERS
+    )
+
     context = (
         {
             "can_be_cancelled": can_be_cancelled,
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "can_edit_personal_information": can_edit_personal_information(request, job_application.job_seeker),
             "display_refusal_info": False,
+            "display_warning_in_cancel_modal": display_warning_in_cancel_modal,
             "eligibility_diagnosis": eligibility_diagnosis,
             "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -517,7 +525,14 @@ def cancel(request, job_application_id):
     """
     queryset = JobApplication.objects.is_active_company_member(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
-    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    if job_application.created_at < timezone.now() - datetime.timedelta(
+        days=APPLICATIONS_VISIBILITY_DAYS_FOR_EMPLOYERS
+    ):
+        # An old (>2 years) cancelled job application is unaccessible to employers, redirect to the list.
+        next_url = reverse("apply:list_for_siae")
+        logger.info("user=%d cancelled an old job_application=%s", request.user.pk, job_application_id)
+    else:
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
     session_key = JOB_APP_DETAILS_FOR_COMPANY_BACK_URL_KEY % job_application.pk
     if back_url := request.session.get(session_key):
