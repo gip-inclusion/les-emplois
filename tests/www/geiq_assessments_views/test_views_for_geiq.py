@@ -9,7 +9,13 @@ from django.utils import timezone
 from django.utils.http import content_disposition_header
 from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
-from pytest_django.asserts import assertContains, assertMessages, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertMessages,
+    assertNotContains,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import Assessment, AssessmentInstitutionLink, LabelInfos
@@ -1437,3 +1443,138 @@ class TestAssessmentResult:
         settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
         response = client.get(reverse("geiq_assessments_views:assessment_result", kwargs={"pk": assessment.pk}))
         assert response.status_code == 404
+
+
+class TestAssessmentContractsListView:
+    def test_htmx_returns_only_table_include(self, client, settings):
+        """
+        Check that when we request the contracts list with HTMX, we only get the contracts_list_table.html snippet
+        """
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+
+        assessment = AssessmentFactory(companies=[membership.company])
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        response = client.get(url, headers={"HX-Request": "true"})
+
+        assert response.status_code == 200
+
+        assertNotContains(response, "<form")
+        assertNotContains(response, 'id="contracts-filter-form"')
+
+        assertContains(response, "Aucun contrat pour le moment")
+
+    def test_contract_list_htmx_consistency(self, client, settings):
+        """
+        Check that the HTMX response for the contracts list view is consistent with the full page response,
+        meaning that if we take the full page response and "inject" the HTMX response into it at the correct place,
+        we should end up with the same HTML structure as the full page response.
+        """
+        # Setup
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        EmployeeContractFactory(employee__assessment=assessment)  # Un peu de donnée
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # retrieve full page response
+        response_full = client.get(url)
+        soup_full = parse_response_to_soup(response_full, selector="#contracts-view-wrapper")
+
+        response_initial = client.get(url)
+        simulated_page = parse_response_to_soup(response_initial, selector="#contracts-view-wrapper")
+
+        # retrieve HTMX response
+        response_htmx = client.get(url, headers={"HX-Request": "true"})
+
+        # retrieve the part of the full page that should be updated by HTMX (the contracts list table)
+        update_page_with_htmx(simulated_page, "#filter-and-list-container", response_htmx)
+
+        # Compare the simulated page (full page with HTMX response injected) with the actual full page response
+        target_id = "contracts-results-table"
+        assertSoupEqual(simulated_page.find(id=target_id), soup_full.find(id=target_id))
+
+    def test_contract_list_filter_by_date(self, client, settings):
+        """
+        Test that the filtering by date in the contracts list view works correctly
+        """
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+
+        assessment = AssessmentFactory(
+            campaign__year=2023,
+            companies=[membership.company],
+        )
+
+        target_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 6, 15),
+        )
+        # Early contract (January 2024)
+        early_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 1, 1),
+        )
+        # Late contract (December 2024)
+        late_contract = EmployeeContractFactory(
+            employee__assessment=assessment,
+            start_at=datetime.date(2024, 12, 1),
+        )
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # Filter only on june 2024
+        filter_data = {
+            "start_date_min": "2024-06-01",
+            "start_date_max": "2024-06-30",
+        }
+        response = client.get(url, filter_data)
+
+        # 4. Vérifications
+        assert response.status_code == 200
+
+        contracts_in_page = response.context["contracts_page"].object_list
+
+        assert len(contracts_in_page) == 1
+        assert target_contract in contracts_in_page
+        assert early_contract not in contracts_in_page
+        assert late_contract not in contracts_in_page
+
+    def test_contract_list_reset_button_visibility(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        # without filter : the button should not be visible
+        response = client.get(url)
+        assert "Effacer tout" not in response.content.decode()
+
+        # with filter : the button should be visible
+        response = client.get(url, {"start_date_min": "2024-01-01"})
+        assert "Effacer tout" in response.content.decode()
+        # Check that filters_counter is correctly set in the context to display the number of active filters in the UI
+        assert response.context["filters_counter"] == 1
+
+    def test_contract_list_reset_action(self, client, settings):
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = [membership.company.post_code[:2]]
+        client.force_login(membership.user)
+        assessment = AssessmentFactory(companies=[membership.company])
+
+        EmployeeContractFactory(employee__assessment=assessment, start_at=datetime.date(2024, 1, 1))
+
+        url = reverse("geiq_assessments_views:assessment_contracts_list", kwargs={"pk": assessment.pk})
+
+        response = client.get(url, {"start_date_min": "2025-01-01"})
+        assert len(response.context["contracts_page"].object_list) == 0
+
+        response = client.get(url)
+        assert len(response.context["contracts_page"].object_list) == 1
+        assert "Effacer tout" not in response.content.decode()
