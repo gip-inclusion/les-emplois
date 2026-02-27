@@ -126,7 +126,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin",
     )
     readonly_fields = (
-        "created_at",
         "updated_at",
         "processed_at",
         "archived_at",
