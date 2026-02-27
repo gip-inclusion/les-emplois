@@ -2084,6 +2084,8 @@
                            AND U0."company_id" = ("job_applications_jobapplication"."to_company_id")
                            AND U0."user_id" = %s)
                     LIMIT 1)
+                 AND ("job_applications_jobapplication"."state" = %s
+                      OR "job_applications_jobapplication"."created_at" >= %s)
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
         ''',

@@ -1,5 +1,6 @@
 import logging
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -48,6 +49,7 @@ from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
 from itou.utils.urls import get_absolute_url
+from itou.www.apply.views.constants import APPLICATIONS_VISIBILITY_DAYS_FOR_EMPLOYERS
 
 
 logger = logging.getLogger(__name__)
@@ -519,6 +521,13 @@ class JobApplicationQuerySet(models.QuerySet):
         if organization and isinstance(organization, Company) and user.is_employer:
             return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
+
+    def visible_by_employers(self):
+        """
+        Employers should only see job applications created less than 2 years ago or accepted job applications.
+        """
+        visibility_date_limit = timezone.now() - timedelta(days=APPLICATIONS_VISIBILITY_DAYS_FOR_EMPLOYERS)
+        return self.filter(Q(state=JobApplicationState.ACCEPTED) | Q(created_at__gte=visibility_date_limit))
 
     def automatically_rejectable_applications(self):
         return self.filter(

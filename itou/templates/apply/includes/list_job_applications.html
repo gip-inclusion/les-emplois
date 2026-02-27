@@ -73,6 +73,11 @@
             {% endfor %}
         {% endif %}
         {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" extra_attributes='data-emplois-elements-visibility-on-selection="hidden"' request=request only %}
+        {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+            <p>
+                Les informations détaillées sur la conservation des candidatures sont disponibles dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/44240682937745" rel="noopener" target="_blank">notre documentation</a>.
+            </p>
+        {% endif %}
     {% endif %}
 </section>
 
