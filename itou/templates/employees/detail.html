@@ -30,16 +30,16 @@
                         <h2>Informations du salarié</h2>
                         <hr>
                         {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token only %}
-                        {# Eligibility ------------------------------------------------------------------------- #}
-                        {% if eligibility_diagnosis %}
-                            {% include "eligibility/includes/iae/diagnosis_details.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company job_application=job_application itou_help_center_url=ITOU_HELP_CENTER_URL %}
-                        {% endif %}
                     </div>
+
+                    {# Eligibility ------------------------------------------------------------------------- #}
+                    {% if eligibility_diagnosis %}
+                        {% include "eligibility/includes/iae/diagnosis_details.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company job_application=job_application itou_help_center_url=ITOU_HELP_CENTER_URL %}
+                    {% endif %}
 
                     {# Job applications ------------------------------------------------------------------------ #}
                     <div class="c-box mb-3 mb-md-4">
-                        <h2>Candidatures de ce salarié</h2>
-                        <hr>
+                        <h3>Candidatures de ce salarié</h3>
                         {% matomo_event "salaries" "clic" "voir-candidature-employeur" as matomo_event_attrs %}
                         {% for job_application_for_card in all_job_applications %}
                             {% url 'apply:details_for_company' job_application_id=job_application_for_card.id as detail_url %}
@@ -75,14 +75,10 @@
                                     {% endif %}
                                 </p>
                                 <p>
-                                    <a href="{{ immersion_search_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">
-                                        Rechercher une immersion
-                                    </a>
+                                    <a href="{{ immersion_search_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">Rechercher une immersion</a>
                                 </p>
                                 <p>
-                                    <a href="{{ immersion_convention_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Initier une convention (ouverture dans un nouvel onglet)">
-                                        Initier une convention
-                                    </a>
+                                    <a href="{{ immersion_convention_url }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Initier une convention (ouverture dans un nouvel onglet)">Initier une convention</a>
                                 </p>
                             </div>
                         </div>
