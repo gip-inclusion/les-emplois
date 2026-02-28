@@ -383,9 +383,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
 
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        if obj.is_employer:
-            return "Voir pour chaque structure ci-dessous"
-        if obj.is_prescriber:
+        if obj.is_caseworker:
             return "Voir pour chaque organisation ci-dessous"
         notification_settings, _ = NotificationSettings.get_or_create(obj)
         disabled_notifications = notification_settings.disabled_notifications_names
@@ -406,7 +404,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                 url = reverse("admin:gps_followupgroup_change", args=(memberships[0].follow_up_group_id,))
                 return format_html('<a href="{}">Groupe de suivi de ce bénéficiaire</a>', url, len(memberships))
             return "Pas de groupe de suivi"
-        if obj.is_prescriber or obj.is_employer:
+        if obj.is_caseworker:
             url = reverse("admin:gps_followupgroupmembership_changelist", query={"member": obj.id})
             count = FollowUpGroupMembership.objects.filter(member=obj).count()
             return format_html('<a href="{}">Liste des relations de cet utilisateur ({}) </a>', url, count)

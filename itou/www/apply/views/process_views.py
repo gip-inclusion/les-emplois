@@ -322,7 +322,7 @@ def delete_comment_for_company(request, job_application_id, comment_id):
     )
 
 
-@check_user(lambda u: u.is_prescriber or u.is_employer)
+@check_user(lambda u: u.is_caseworker)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
     Detail of an application for an SIAE with the ability:
