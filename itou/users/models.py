@@ -559,7 +559,7 @@ class User(AbstractUser, AddressMixin):
         if self.is_active:  # Already active
             return False
 
-        if self.kind not in UserKind.professionals():  # Limit to professionals
+        if not self.is_professional:  # Limit to professionals
             return False
         if self.username and self.has_sso_provider:  # Login will be possible after reactivation
             # Target the users deactivated by the anonymization process as we can
