@@ -133,9 +133,9 @@ def render_stats(
 
     if request.user.is_authenticated and metabase_dashboard:
         extra_data = {}
-        if request.user.is_employer:
+        if request.from_employer:
             extra_data["current_company_id"] = request.current_organization.pk
-        elif request.user.is_prescriber and request.current_organization:
+        elif request.from_prescriber and request.current_organization:
             extra_data["current_prescriber_organization_id"] = request.current_organization.pk
         elif request.user.is_labor_inspector:
             extra_data["current_institution_id"] = request.current_organization.pk
@@ -153,7 +153,7 @@ def render_stats(
             **extra_data,
         )
 
-    if request.user.is_authenticated and (request.user.is_employer or request.user.is_prescriber):
+    if request.user.is_authenticated and request.user.is_caseworker:
         activate_pilotage(request.user)
 
     return render(request, template_name, base_context)

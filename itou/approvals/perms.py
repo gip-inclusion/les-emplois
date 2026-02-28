@@ -17,7 +17,7 @@ def can_view_approval_details(request, approval):
     - an authorized prescriber whose job seekers list contains the approval's job seeker
     - an employer with a sent or received job_application
     """
-    if request.user.is_employer:
+    if request.from_employer:
         if application_states := approval.user.job_applications.filter(
             to_company=request.current_organization,
         ).values_list("state", flat=True):
@@ -28,7 +28,7 @@ def can_view_approval_details(request, approval):
             return PERMS_READ
         if approval.user.job_applications.prescriptions_of(request.user, request.current_organization).exists():
             return PERMS_READ
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if (
             request.from_authorized_prescriber
             and User.objects.linked_job_seeker_ids(request.user, request.current_organization).exists()

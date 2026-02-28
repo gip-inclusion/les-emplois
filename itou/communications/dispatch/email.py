@@ -31,7 +31,7 @@ class EmailNotification(BaseNotification):
             # Don't use should_send() if the user left the org because we don't want to use his settings
             and self.is_applicable()
             and self.structure
-            and (self.user.is_prescriber or self.user.is_employer)
+            and self.user.is_caseworker
         ):
             if isinstance(self.structure, PrescriberOrganization):
                 memberships = PrescriberMembership.objects.filter(organization=self.structure).select_related("user")

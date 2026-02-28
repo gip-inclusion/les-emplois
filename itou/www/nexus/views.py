@@ -42,7 +42,7 @@ class NexusMixin:
 
         # We cannot use UserPassesTestMixin because the call of serialize_user will crash
         # with a bad kind, and test_func is called later, in self.dispatch()
-        if not (request.user.is_employer or request.user.is_prescriber):
+        if not request.user.is_caseworker:
             raise PermissionDenied("Votre type de compte ne permet pas d'afficher cette page.")
 
         service_users = get_service_users(user=request.user)
@@ -67,7 +67,7 @@ class NexusMixin:
         context["emplois_badge_count"] = None
         if Service.EMPLOIS in self.activated_services and self.user_kind == NexusUserKind.FACILITY_MANAGER:
             # No job descriptions for prescribers : The user may have a facility manager role in another service
-            if self.request.user.is_employer:
+            if self.request.from_employer:
                 context["emplois_badge_count"] = JobDescription.objects.filter(
                     is_active=True, company_id__in=[company.pk for company in self.request.organizations]
                 ).count()

@@ -75,7 +75,7 @@
                                         </a>
                                     </i>
                                 </p>
-                                {% if request.user.is_employer %}
+                                {% if request.from_employer %}
                                     <form method="post" action="{% url "apply:unarchive" job_application_id=job_application.pk %}" class="my-2">
                                         {% csrf_token %}
                                         <button class="btn btn-ico btn-outline-primary w-100">
@@ -87,7 +87,7 @@
                             </div>
                         {% endif %}
                         {% if job_application.to_company.is_subject_to_iae_rules %}
-                            {% if request.user.is_employer %}
+                            {% if request.from_employer %}
                                 {# Employers need to know the expiration date of an approval #}
                                 {# to decide whether they may accept a job application or not. #}
                                 {% with approval=job_application.job_seeker.latest_approval %}
@@ -97,7 +97,7 @@
                                         {% endif %}
                                     {% endif %}
                                 {% endwith %}
-                            {% elif request.user.is_prescriber %}
+                            {% elif request.from_prescriber %}
                                 {# Approval status. #}
                                 {% if job_application.approval %}
                                     {% approval_details_box approval=job_application.approval version='box' request=request extra_classes='mb-3 mb-md-4' %}

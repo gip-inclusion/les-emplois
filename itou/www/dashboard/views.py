@@ -147,9 +147,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "stalled_job_seekers_count": None,
     }
 
-    if request.user.is_employer:
+    if request.from_employer:
         context.update(_employer_dashboard_context(request))
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if current_org := request.current_organization:
             context["stalled_job_seekers_count"] = User.objects.linked_job_seeker_ids(
                 request.user,
@@ -198,7 +198,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     if not stats_utils.can_view_stats_dashboard_widget(request):
         return HttpResponseForbidden()
 
-    if request.user.is_authenticated and (request.user.is_employer or request.user.is_prescriber):
+    if request.user.is_authenticated and request.user.is_caseworker:
         activate_pilotage(request.user)
 
     context = {
@@ -207,7 +207,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
         "stats_kpi": None,
     }
 
-    if request.user.is_employer:
+    if request.from_employer:
         context["siae_suspension_text_with_dates"] = (
             request.current_organization.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
@@ -222,7 +222,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
                     "can_view_stats_siae_beneficiaries": stats_utils.can_view_stats_siae_beneficiaries(request),
                 }
             )
-    elif request.user.is_prescriber:
+    elif request.from_prescriber:
         if stats_utils.can_view_stats_cd(request):
             context["layout_kind"] = DashboardStatsLayoutKind.PRESCRIBER_DEPT
         elif stats_utils.can_view_stats_ft(request):
@@ -414,7 +414,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 
 
 def api_token(request, template_name="dashboard/api_token.html"):
-    if not (request.user.is_employer and request.is_current_organization_admin):
+    if not (request.from_employer and request.is_current_organization_admin):
         raise PermissionDenied
 
     if request.method == "POST":

@@ -32,6 +32,13 @@ class UserKind(models.TextChoices):
         return reverse(url_lookup[user_kind]) if user_kind in url_lookup else reverse(default)
 
     @classmethod
+    def caseworkers(cls):
+        return [
+            cls.PRESCRIBER,
+            cls.EMPLOYER,
+        ]
+
+    @classmethod
     def professionals(cls):
         return [
             cls.PRESCRIBER,

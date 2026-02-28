@@ -24,7 +24,7 @@
             {% fragment as c_title__secondary %}
                 <p>
                     Vous avez déjà rejoint cette
-                    {% if request.user.is_employer %}
+                    {% if request.from_employer %}
                         structure.
                     {% else %}
                         organisation.

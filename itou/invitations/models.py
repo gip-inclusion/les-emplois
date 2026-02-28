@@ -248,7 +248,7 @@ class EmployerInvitation(InvitationAbstract):
 
     def guest_can_join_company(self, request):
         user = get_object_or_404(User, email=self.email)
-        return user == request.user and user.is_employer
+        return user == request.user and request.user.is_employer  # FIXME replace with is_caseworker
 
     # Notifications
     @property

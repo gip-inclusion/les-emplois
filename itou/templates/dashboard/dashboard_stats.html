@@ -24,14 +24,14 @@
                aria-controls="statistiques"
                aria-selected="true"
                {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>
-                {% if request.user.is_employer and request.current_organization.is_subject_to_iae_rules or request.user.is_prescriber %}
+                {% if request.from_employer and request.current_organization.is_subject_to_iae_rules or request.from_prescriber %}
                     <span>Pilotage</span>
                 {% else %}
                     Pilotage
                 {% endif %}
             </a>
         </li>
-        {% if user.is_employer or user.is_prescriber %}
+        {% if request.from_employer or request.from_prescriber %}
             <li class="nav-item">
                 <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false" {% matomo_event "dashboard" "clic-onglet" "evenements" %}>Événements à venir</a>
             </li>
@@ -70,7 +70,7 @@
                                 {% include "dashboard/includes/stats/dgefp.html" %}
                             {% endif %}
                         </div>
-                        {% if user.is_employer or user.is_prescriber %}
+                        {% if request.from_employer or request.from_prescriber %}
                             <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
                                 <h2>Événements à venir</h2>
                                 <div class="mt-3 mt-md-4">

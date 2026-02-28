@@ -521,6 +521,10 @@ class User(AbstractUser, AddressMixin):
         return self.kind == UserKind.JOB_SEEKER
 
     @property
+    def is_caseworker(self):
+        return self.kind in UserKind.caseworkers()
+
+    @property
     def is_prescriber(self):
         return self.kind == UserKind.PRESCRIBER
 
@@ -531,6 +535,10 @@ class User(AbstractUser, AddressMixin):
     @property
     def is_labor_inspector(self):
         return self.kind == UserKind.LABOR_INSPECTOR
+
+    @property
+    def is_professional(self):
+        return self.kind in UserKind.professionals()
 
     @property
     def is_itou_admin(self):
@@ -551,7 +559,7 @@ class User(AbstractUser, AddressMixin):
         if self.is_active:  # Already active
             return False
 
-        if self.kind not in UserKind.professionals():  # Limit to professionals
+        if not self.is_professional:  # Limit to professionals
             return False
         if self.username and self.has_sso_provider:  # Login will be possible after reactivation
             # Target the users deactivated by the anonymization process as we can
