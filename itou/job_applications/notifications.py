@@ -7,6 +7,7 @@ from itou.communications.dispatch import (
     JobSeekerNotification,
     PrescriberOrEmployerNotification,
 )
+from itou.companies.models import Company
 from itou.job_applications.enums import RefusalReason
 from itou.job_applications.utils import show_afpa_ad
 from itou.utils.perms.utils import _can_view_personal_information
@@ -34,6 +35,7 @@ class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
                 viewer=self.user,
                 user=job_application.job_seeker,
                 viewer_is_prescriber_from_authorized_org=self.user.is_prescriber_with_authorized_org_memberships,
+                viewer_is_employer=isinstance(self.structure, Company),
             ),
         }
 
