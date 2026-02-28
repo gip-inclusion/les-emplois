@@ -2,6 +2,7 @@ import datetime
 import random
 from functools import partial
 
+import freezegun
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -642,6 +643,7 @@ def test_is_from_employer():
     assert not diagnosis.is_from_employer
 
 
+@freezegun.freeze_time("2026-03-02")
 def test_get_criteria_from_job_seeker():
     kind_to_criterion = {c.kind: c for c in AdministrativeCriteria.objects.all()}
     job_seeker = JobSeekerFactory.build()
