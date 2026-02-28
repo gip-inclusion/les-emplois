@@ -162,7 +162,7 @@ class ItouCurrentOrganizationMiddleware:
         if (
             user.is_authenticated
             and user.identity_provider != IdentityProvider.PRO_CONNECT
-            and user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+            and user.kind in UserKind.caseworkers()
             and not request.path.startswith(
                 "/dashboard/activate-pro-connect-account"
             )  # Allow to access ic activation view

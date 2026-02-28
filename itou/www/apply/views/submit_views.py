@@ -692,7 +692,7 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
         for employer in company_recipients:
             job_application.notifications_new_for_employer(employer).send()
         job_application.notifications_new_for_job_seeker.send()
-        if self.request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if self.request.user.is_caseworker:
             job_application.notifications_new_for_proxy.send()
         return job_application
 

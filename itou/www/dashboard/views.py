@@ -198,7 +198,7 @@ def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
     if not stats_utils.can_view_stats_dashboard_widget(request):
         return HttpResponseForbidden()
 
-    if request.user.is_authenticated and (request.user.is_employer or request.user.is_prescriber):
+    if request.user.is_authenticated and (request.user.is_caseworker):
         activate_pilotage(request.user)
 
     context = {

@@ -15,14 +15,12 @@ class PrescriberNotification:
 
 class PrescriberOrEmployerNotification:
     def is_manageable_by_user(self):
-        return super().is_manageable_by_user() and (self.user.is_prescriber or self.user.is_employer)
+        return super().is_manageable_by_user() and self.user.is_caseworker
 
 
 class PrescriberOrEmployerOrLaborInspectorNotification:
     def is_manageable_by_user(self):
-        return super().is_manageable_by_user() and (
-            self.user.is_prescriber or self.user.is_employer or self.user.is_labor_inspector
-        )
+        return super().is_manageable_by_user() and self.user.is_caseworker
 
 
 class WithStructureMixin:
