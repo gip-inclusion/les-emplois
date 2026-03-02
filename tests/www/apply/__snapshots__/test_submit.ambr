@@ -2393,7 +2393,7 @@
         'origin': list([
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -2449,7 +2449,7 @@
       dict({
         'origin': list([
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2502,7 +2502,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2538,7 +2538,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -2674,7 +2674,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -3247,7 +3247,7 @@
         'origin': list([
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -3303,7 +3303,7 @@
       dict({
         'origin': list([
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -3356,7 +3356,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -3392,7 +3392,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -3527,7 +3527,7 @@
         'origin': list([
           'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_geiqeligibilitydiagnosis"."id",
@@ -3657,7 +3657,7 @@
         'origin': list([
           'GEIQEligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_geiqselectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -4296,7 +4296,7 @@
         'origin': list([
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -4352,7 +4352,7 @@
       dict({
         'origin': list([
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -4405,7 +4405,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -4441,7 +4441,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -4577,7 +4577,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -5256,7 +5256,7 @@
         'origin': list([
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -5312,7 +5312,7 @@
       dict({
         'origin': list([
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -5365,7 +5365,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -5401,7 +5401,7 @@
           'User.new_approval_blocked_by_waiting_period[users/models.py]',
           '_check_job_seeker_approval[www/apply/views/submit_views.py]',
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
@@ -5537,7 +5537,7 @@
           'EligibilityDiagnosisQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
           'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "eligibility_eligibilitydiagnosis"."id",
