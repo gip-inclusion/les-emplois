@@ -1,5 +1,25 @@
 # Journal des modifications
 
+## 2026-03-02
+
+### Ajouté
+
+- [Contrôle a posteriori : Ajout d'un filtre sur le retrait total ou partiel de l'aide au poste](https://github.com/gip-inclusion/les-emplois/pull/7595)
+- [Interface : Ajout des badges éligibilité dans les blocs "Éligibilité" dans le détail des candidatures](https://github.com/gip-inclusion/les-emplois/pull/7562)
+- [Interface : Ajout du menu "Mon Portail"](https://github.com/gip-inclusion/les-emplois/pull/7537)
+
+### Modifié
+
+- [Admin : Ajout du type d'authentification sur la page d'admin des NexusUser](https://github.com/gip-inclusion/les-emplois/pull/7593)
+- [Candidature : Bloquer l'affichage des commentaires de candidatures d'autres entreprises sur la vue de suppression](https://github.com/gip-inclusion/les-emplois/pull/7603)
+- [Interface : Harmonisation des badges d'éligibilité dans les blocs "Éligibilité" dans le détail des candidats](https://github.com/gip-inclusion/les-emplois/pull/7565)
+- [Nexus : Ajout de l'API pour le dropdown](https://github.com/gip-inclusion/les-emplois/pull/7519)
+- [Page d’accueil : Retrait d'une bannière pour participer à une enquête pour les prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/7585)
+
+### Tech
+
+- [Enregistrer les tâches Huey dans la base de données en cas d’indisponibilité Redis](https://github.com/gip-inclusion/les-emplois/pull/7547)
+
 ## 2026-02-23
 
 ### Ajouté
