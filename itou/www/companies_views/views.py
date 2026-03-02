@@ -21,7 +21,7 @@ from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.auth import LoginNotRequiredMixin, check_request, check_user
+from itou.utils.auth import LoginNotRequiredMixin, check_request
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.session import SessionNamespace, SessionNamespaceException
@@ -46,7 +46,7 @@ def report_tally_url(user, company, job_description=None):
 ### Main company view
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def overview(request, template_name="companies/overview.html"):
     context = {
         "company": request.current_organization,
@@ -74,7 +74,7 @@ class JobDescriptionCardView(LoginNotRequiredMixin, ApplyForJobSeekerMixin, Temp
         company = self.job_description.company
         can_update_job_description = (
             self.request.user.is_authenticated
-            and self.request.user.is_employer
+            and self.request.from_employer
             and self.request.current_organization.pk == company.pk
         )
 
@@ -214,7 +214,7 @@ def job_description_list(request, template_name="companies/job_description_list.
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def refresh_spontaneous_applications(request):
     company = get_current_company_or_404(request)
     if company.spontaneous_applications_open_since:
@@ -228,7 +228,7 @@ def refresh_spontaneous_applications(request):
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def refresh_job_description(request, job_description_id, for_detail=False):
     company = get_current_company_or_404(request)
     job_description = get_object_or_404(company.job_description_through.all(), pk=job_description_id)
@@ -244,7 +244,7 @@ def refresh_job_description(request, job_description_id, for_detail=False):
 JOB_DESCRIPTION_EDIT_SESSION_KIND = "job_description_edit"
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def edit_job_description(
     request,
     edit_session_id=None,
@@ -290,7 +290,7 @@ def edit_job_description(
     return render(request, template_name, {"form": form})
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def edit_job_description_details(
     request,
     *,
@@ -335,7 +335,7 @@ def edit_job_description_details(
     return render(request, template_name, context)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def edit_job_description_preview(
     request,
     *,
@@ -649,7 +649,7 @@ class MemberList(BaseMemberList):
     template_name = "companies/members.html"
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -667,7 +667,7 @@ class MemberList(BaseMemberList):
         return context
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def deactivate_member(request, public_id, template_name="companies/deactivate_member.html"):
     user = get_object_or_404(User, public_id=public_id)
     return deactivate_org_member(
@@ -678,7 +678,7 @@ def deactivate_member(request, public_id, template_name="companies/deactivate_me
     )
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def update_admin_role(request, action, public_id, template_name="companies/update_admins.html"):
     if action not in ["add", "remove"]:
         raise BadRequest("Invalid action")

@@ -28,7 +28,7 @@ from itou.job_applications.models import (
 from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
 from itou.rdv_insertion.models import Invitation, InvitationRequest
 from itou.users.enums import Title
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request, check_user
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -151,7 +151,7 @@ def get_siae_actions_context(request, job_application):
     }
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def details_for_company(request, job_application_id, template_name="apply/process_details_company.html"):
     """
     Detail of an application for an SIAE with the ability:
@@ -266,7 +266,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def add_comment_for_company(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -299,7 +299,7 @@ def add_comment_for_company(request, job_application_id):
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def delete_comment_for_company(request, job_application_id, comment_id):
     # Used for permissions check only
     get_object_or_404(JobApplication, id=job_application_id, to_company_id=request.current_organization)
@@ -417,7 +417,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def process(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -432,7 +432,7 @@ def process(request, job_application_id):
     return HttpResponseRedirect(next_url)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def start_refuse_wizard(request, job_application_id):
     from itou.www.apply.views.batch_views import _start_refuse_wizard
 
@@ -444,7 +444,7 @@ def start_refuse_wizard(request, job_application_id):
     )
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -485,7 +485,7 @@ Nous vous souhaitons une bonne continuation et espérons que vous trouverez rapi
 correspond."""
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def add_to_pool(request, job_application_id, template_name="apply/process_add_to_pool.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -518,7 +518,7 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def cancel(request, job_application_id):
     """
     Trigger the `cancel` transition.
@@ -552,7 +552,7 @@ def cancel(request, job_application_id):
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def send_diagoriente_invite(request, job_application_id):
     """
     As a company member, I can send a Diagoriente invite to the prescriber or the job seeker.
@@ -642,7 +642,7 @@ class GEIQEligiblityCriteriaView(common_views.BaseGEIQEligibilityCriteriaHtmxVie
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def delete_prior_action(request, job_application_id, prior_action_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
@@ -677,7 +677,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
     return HttpResponse(content)
 
 
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def add_or_modify_prior_action(request, job_application_id, prior_action_id=None):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
@@ -775,7 +775,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
 
 
 @require_POST
-@check_user(lambda user: user.is_employer)
+@check_request(lambda request: request.from_employer)
 def rdv_insertion_invite(request, job_application_id, for_detail=False):
     if for_detail:
         template_name = "apply/includes/invitation_requests.html"

@@ -67,7 +67,7 @@ class NexusMixin:
         context["emplois_badge_count"] = None
         if Service.EMPLOIS in self.activated_services and self.user_kind == NexusUserKind.FACILITY_MANAGER:
             # No job descriptions for prescribers : The user may have a facility manager role in another service
-            if self.request.user.is_employer:
+            if self.request.from_employer:
                 context["emplois_badge_count"] = JobDescription.objects.filter(
                     is_active=True, company_id__in=[company.pk for company in self.request.organizations]
                 ).count()
