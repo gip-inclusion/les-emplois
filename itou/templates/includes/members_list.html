@@ -28,7 +28,7 @@
                     Vous êtes connecté(e) en tant que <b>{{ user.get_inverted_full_name }}</b> ({{ user.email }})
                 </p>
 
-                {% if request.user.is_prescriber %}
+                {% if request.from_prescriber %}
                     <div class="c-info mb-3 mb-md-4">
                         <span class="c-info__summary">Besoin d’aide</span>
                         <div class="c-info__detail">

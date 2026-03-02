@@ -37,7 +37,7 @@ from itou.files.models import save_file
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
-from itou.utils.auth import check_user
+from itou.utils.auth import check_request
 from itou.utils.db import (
     ExclusionViolationError,
     UniqueViolationError,
@@ -264,7 +264,7 @@ class ApprovalDetailView(BaseApprovalDetailView):
 
     def test_func(self):
         # More checks are performed in get_context_data method
-        return self.request.user.is_prescriber or self.request.from_employer or self.request.user.is_job_seeker
+        return self.request.from_prescriber or self.request.from_employer or self.request.user.is_job_seeker
 
     def get_prolongation_and_requests(self, approval):
         def _format_for_template(user, org):
@@ -584,7 +584,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
 
 
 @require_safe
-@check_user(lambda user: user.is_prescriber)
+@check_request(lambda request: request.from_prescriber)
 def prolongation_request_report_file(request, prolongation_request_id):
     prolongation_request = get_object_or_404(
         ProlongationRequest.objects.select_related("report_file"),
