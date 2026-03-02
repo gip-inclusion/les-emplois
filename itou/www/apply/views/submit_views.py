@@ -433,7 +433,7 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
 
 
-class CheckPreviousApplications(ApplicationBaseView):
+class CheckPreviousApplicationsBaseView(ApplicationBaseView):
     """
     Check previous job applications to avoid duplicates.
     """
@@ -446,11 +446,7 @@ class CheckPreviousApplications(ApplicationBaseView):
         self.prev_application = self.get_previous_applications_queryset().order_by("created_at").last()
 
     def get_next_url(self):
-        if self.tunnel == ApplyTunnel.HIRE:
-            view_name = "apply:hire_fill_job_seeker_infos"
-        else:
-            view_name = "apply:application_jobs"
-        return reverse(view_name, kwargs={"session_uuid": self.apply_session.name})
+        raise NotImplementedError
 
     def get(self, request, *args, **kwargs):
         if self.prev_application is None:
@@ -484,6 +480,16 @@ class CheckPreviousApplications(ApplicationBaseView):
                 "Mettre à jour l’éligibilité IAE" if self.eligibility_diagnosis else "Valider l’éligibilité IAE"
             )
         return context
+
+
+class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseView):
+    def get_next_url(self):
+        return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
+
+
+class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseView):
+    def get_next_url(self):
+        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
 
 
 class ApplicationJobsView(ApplicationBaseView):

@@ -31,7 +31,7 @@ urlpatterns = [
     # Submit - common.
     path(
         "<uuid:session_uuid>/create/check_prev_applications",
-        submit_views.CheckPreviousApplications.as_view(),
+        submit_views.CheckPreviousApplicationsForSubmitView.as_view(),
         name="step_check_prev_applications",
     ),
     path(
@@ -62,7 +62,7 @@ urlpatterns = [
     # Direct hire process
     path(
         "<uuid:session_uuid>/hire/check-previous-applications",
-        submit_views.CheckPreviousApplications.as_view(),
+        submit_views.CheckPreviousApplicationsForHireView.as_view(),
         name="check_prev_applications_for_hire",
         kwargs={"hire_process": True},
     ),
