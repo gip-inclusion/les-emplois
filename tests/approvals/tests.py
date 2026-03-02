@@ -545,6 +545,7 @@ class TestApprovalModel:
         assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 10))
         assert approval.get_remainder_display() == "187 jours (Environ 6 mois)"
 
+    @freeze_time("2026-02-21")
     def test_human_readable_estimate(self):
         approval = Approval()
         for delta, expected_display in [
