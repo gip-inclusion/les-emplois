@@ -312,7 +312,7 @@ def nav(request):
     try:
         if request.user.is_job_seeker:
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
-        elif request.user.is_prescriber:
+        elif request.from_prescriber:
             menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
             jobseekers_items = [
                 NAV_ENTRIES["prescriber-jobseekers-user"],
