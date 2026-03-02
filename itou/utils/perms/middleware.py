@@ -58,7 +58,7 @@ class ItouCurrentOrganizationMiddleware:
         request.from_employer = False
         request.from_prescriber = False
         if user.is_authenticated:
-            if user.is_employer:
+            if user.is_employer:  # FIXME: Will be refactored to remove is_employer
                 # Do not use the default manager to avoid double checking whether the user is_active.
                 # The AuthenticationMiddleware already checked that the user is_active.
                 active_memberships = list(CompanyMembership.include_inactive.filter(user=user, is_active=True))
@@ -98,7 +98,7 @@ class ItouCurrentOrganizationMiddleware:
                     else:
                         logout_warning = LogoutWarning.EMPLOYER_INACTIVE_COMPANY
 
-            elif user.is_prescriber:
+            elif user.is_prescriber:  # FIXME: Will be refactored to remove is_prescriber
                 active_memberships = list(
                     # Do not use the default manager to avoid double checking whether the user is_active.
                     # The AuthenticationMiddleware already checked that the user is_active.
@@ -139,7 +139,13 @@ class ItouCurrentOrganizationMiddleware:
 
             request.from_authorized_prescriber = bool(
                 user.is_prescriber and request.current_organization and request.current_organization.is_authorized
-            )
+            )  # FIXME: Replace with the following line when merging kinds
+            # request.from_authorized_prescriber = bool(
+            #     user.is_prescriber
+            #     and request.current_organization
+            #     and isinstance(request.current_organization, PrescriberOrganization)
+            #     and request.current_organization.is_authorized
+            # )
             request.from_prescriber = user.is_prescriber  # FIXME: Replace with the following line when merging kinds
             # request.fromprescriber = bool(
             #     user.is_caseworker and (

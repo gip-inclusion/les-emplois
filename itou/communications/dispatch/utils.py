@@ -3,12 +3,12 @@ class JobSeekerNotification:
         return super().is_manageable_by_user() and self.user.is_job_seeker
 
 
-class EmployerNotification:
+class EmployerNotification:  # FIXME use PrescriberOrEmployerNotification instead ?
     def is_manageable_by_user(self):
         return super().is_manageable_by_user() and self.user.is_employer
 
 
-class PrescriberNotification:
+class PrescriberNotification:  # FIXME use PrescriberOrEmployerNotification instead ?
     def is_manageable_by_user(self):
         return super().is_manageable_by_user() and self.user.is_prescriber
 

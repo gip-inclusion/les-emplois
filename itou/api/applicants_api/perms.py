@@ -9,7 +9,7 @@ class ApplicantsAPIPermission(IsAuthenticated):
         if not super().has_permission(request, view):
             return False
 
-        if not request.user.is_employer:
+        if not request.user.is_employer:  # FIXME replace with is_professional
             return False
 
         memberships_status_is_admin = request.user.active_or_in_grace_period_company_memberships().values_list(
