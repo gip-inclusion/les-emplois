@@ -16,12 +16,11 @@ app_name = "apply"
 
 urlpatterns = [
     # Submit.
-    path("<int:company_pk>/start", submit_views.StartView.as_view(), name="start"),
+    path("<int:company_pk>/start", submit_views.StartViewForSubmit.as_view(), name="start"),
     path(
         "<int:company_pk>/hire",
-        submit_views.StartView.as_view(),
+        submit_views.StartViewForHire.as_view(),
         name="start_hire",
-        kwargs={"hire_process": True},
     ),
     # Submit - sender.
     path(

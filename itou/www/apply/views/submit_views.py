@@ -151,14 +151,12 @@ class ApplicationPermissionMixin:
         return self.job_seeker.job_applications.filter(to_company=self.company)
 
 
-class StartView(ApplicationPermissionMixin, View):
-    def setup(self, request, company_pk, *args, hire_process=False, **kwargs):
+class StartViewForSubmit(ApplicationPermissionMixin, View):
+    def setup(self, request, company_pk, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        if hire_process:
-            tunnel = ApplyTunnel.HIRE
-        elif request.from_employer and self.company == request.current_organization:
+        if request.from_employer and self.company == request.current_organization:
             tunnel = ApplyTunnel.AUTO_PRESCRIPTION
         elif request.user.is_job_seeker:
             tunnel = ApplyTunnel.JOB_SEEKER
@@ -200,8 +198,6 @@ class StartView(ApplicationPermissionMixin, View):
 
         if request.user.is_job_seeker:
             job_seeker_tunnel = "job_seeker"
-        elif self.tunnel == ApplyTunnel.HIRE:
-            job_seeker_tunnel = "hire"
         else:
             job_seeker_tunnel = "sender"
             job_seeker = _get_job_seeker_to_apply_for(self.request)
@@ -241,6 +237,33 @@ class StartView(ApplicationPermissionMixin, View):
 
         params = {
             "tunnel": job_seeker_tunnel,
+            "apply_session_uuid": self.apply_session.name,
+            "company": self.company.pk,
+            "from_url": self.get_reset_url(),
+        }
+
+        next_url = reverse("job_seekers_views:get_or_create_start", query=params)
+        return HttpResponseRedirect(next_url)
+
+
+class StartViewForHire(ApplicationPermissionMixin, View):
+    def setup(self, request, company_pk, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
+        self.tunnel = ApplyTunnel.HIRE
+        self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
+
+    def get_reset_url(self):
+        return self.reset_url
+
+    def get(self, request, *args, **kwargs):
+        self.apply_session = initialize_apply_session(
+            request, {"reset_url": self.reset_url, "company_pk": self.company.pk}
+        )
+
+        params = {
+            "tunnel": "hire",
             "apply_session_uuid": self.apply_session.name,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
