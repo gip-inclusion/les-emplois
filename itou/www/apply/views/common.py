@@ -87,7 +87,7 @@ class BaseFillJobSeekerInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, 
     template_name = None
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def get_back_url(self):
         raise NotImplementedError
@@ -145,7 +145,7 @@ class BaseContractInfosView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templ
     template_name = None
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -230,7 +230,7 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
     template_name = None
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -367,7 +367,7 @@ class BaseGEIQEligibilityView(UserPassesTestMixin, FormView):
     form_class = CheckJobSeekerGEIQEligibilityForm
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def dispatch(self, request, *args, **kwargs):
         if self.company.kind != CompanyKind.GEIQ:
@@ -423,7 +423,7 @@ class BaseGEIQEligibilityCriteriaHtmxView(UserPassesTestMixin, FormView):
     form_class = GEIQAdministrativeCriteriaForGEIQForm
 
     def test_func(self):
-        return self.request.user.is_employer
+        return self.request.from_employer
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

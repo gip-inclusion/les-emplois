@@ -106,7 +106,7 @@
                     {% if job_application.job_seeker.has_valid_approval %}
                         {% if job_application.job_seeker.latest_approval.eligibility_diagnosis %}
                             {% if job_application.job_seeker.latest_approval.eligibility_diagnosis.is_from_employer %}
-                                {% if request.user.is_employer and job_application.job_seeker.latest_approval.eligibility_diagnosis.author_siae_id == request.current_organization.id %}
+                                {% if request.from_employer and job_application.job_seeker.latest_approval.eligibility_diagnosis.author_siae_id == request.current_organization.id %}
                                     <span class="d-block">Éligibilité validée par votre entreprise</span>
                                 {% else %}
                                     <span class="d-block">Éligibilité validée par un employeur</span>

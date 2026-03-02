@@ -17,7 +17,7 @@ def can_view_approval_details(request, approval):
     - an authorized prescriber whose job seekers list contains the approval's job seeker
     - an employer with a sent or received job_application
     """
-    if request.user.is_employer:
+    if request.from_employer:
         if application_states := approval.user.job_applications.filter(
             to_company=request.current_organization,
         ).values_list("state", flat=True):
