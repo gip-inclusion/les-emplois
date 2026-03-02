@@ -17,7 +17,6 @@ from itou.gps.models import FollowUpGroupMembership
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
 from itou.users.models import JobSeekerAssignment, User
 from itou.users.utils import merge_job_seeker_assignments
 from itou.utils.admin import add_support_remark_to_obj
@@ -231,7 +230,7 @@ def migrate_field(model, field_name, from_user, to_user):
 
 @transaction.atomic
 def merge_users(to_user, from_user, update_personal_data):
-    assert to_user.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]
+    assert to_user.is_caseworker
     assert to_user.kind == from_user.kind
     support_remark = f"{timezone.localdate()}: Fusion des utilisateurs {to_user.email} et {from_user.email}"
     for model, field_name in get_users_relations():

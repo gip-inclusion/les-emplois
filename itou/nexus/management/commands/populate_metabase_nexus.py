@@ -120,11 +120,7 @@ class Command(BaseCommand):
     help = "Populate nexus metabase database."
 
     def populate_users(self):
-        queryset = User.objects.filter(
-            is_active=True,
-            kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER],
-            email__isnull=False,
-        ).annotate(
+        queryset = User.objects.filter(is_active=True, kind__in=UserKind.caseworkers(), email__isnull=False).annotate(
             has_authorized_prescriber_orgnization_membership=Exists(
                 PrescriberMembership.objects.filter(
                     user=OuterRef("pk"), organization__authorization_status=PrescriberAuthorizationStatus.VALIDATED

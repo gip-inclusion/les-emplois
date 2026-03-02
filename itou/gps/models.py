@@ -39,7 +39,7 @@ class ActiveFollowUpGroupManager(models.Manager.from_queryset(FollowUpGroupQuery
         if not user.is_active:
             logger.warning("Cannot follow beneficiary with inactive user=%s", user)
             return
-        if user.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
+        if not user.is_caseworker:
             # This should not happen but we don't want to block everything
             logger.warning("We should not try to add a FollowUpGroupMembership on user=%s", user)
             return

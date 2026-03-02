@@ -508,7 +508,7 @@ class TestProConnectCallbackView:
         user = UserFactory(
             username=pc_user_data.username,
             email=pc_user_data.email,
-            kind=random.choice([UserKind.EMPLOYER, UserKind.PRESCRIBER]),
+            kind=random.choice(UserKind.caseworkers()),
             is_active=False,
         )
         response = pro_connect.mock_oauth_dance(

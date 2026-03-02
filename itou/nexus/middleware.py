@@ -9,7 +9,7 @@ from itou.users.models import User
 
 class AutoLoginMiddleware(BaseAutoLoginMiddleware):
     def get_queryset(self):
-        return User.objects.filter(kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
+        return User.objects.filter(kind__in=UserKind.caseworkers())
 
     def get_proconnect_authorize_url(self, user, next_url):
         return reverse(
@@ -31,7 +31,7 @@ class DropDownMiddleware:
             and not request.path.startswith("/portal")
             and request.user.is_authenticated
             and request.user.is_active
-            and request.user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+            and request.user.is_caseworker
         )
 
     def __call__(self, request):
