@@ -4,6 +4,7 @@ from itou.www.apply.views import (
     accept_views,
     batch_views,
     edit_views,
+    hire_views,
     list_views,
     process_views,
     submit_views,
@@ -19,7 +20,7 @@ urlpatterns = [
     path("<int:company_pk>/start", submit_views.StartViewForSubmit.as_view(), name="start"),
     path(
         "<int:company_pk>/hire",
-        submit_views.StartViewForHire.as_view(),
+        hire_views.StartViewForHire.as_view(),
         name="start_hire",
     ),
     # Submit - sender.
@@ -62,43 +63,43 @@ urlpatterns = [
     # Direct hire process
     path(
         "<uuid:session_uuid>/hire/check-previous-applications",
-        submit_views.CheckPreviousApplicationsForHireView.as_view(),
+        hire_views.CheckPreviousApplicationsForHireView.as_view(),
         name="check_prev_applications_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/iae-eligibility",
-        submit_views.IAEEligibilityForHireView.as_view(),
+        hire_views.IAEEligibilityForHireView.as_view(),
         name="iae_eligibility_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/geiq-eligibility",
-        submit_views.GEIQEligibilityForHireView.as_view(),
+        hire_views.GEIQEligibilityForHireView.as_view(),
         name="geiq_eligibility_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/geiq-eligibility-criteria",
-        submit_views.GEIQEligiblityCriteriaForHireView.as_view(),
+        hire_views.GEIQEligiblityCriteriaForHireView.as_view(),
         name="geiq_eligibility_criteria_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/job-seeker-infos",
-        submit_views.FillJobSeekerInfosForHireView.as_view(),
+        hire_views.FillJobSeekerInfosForHireView.as_view(),
         name="hire_fill_job_seeker_infos",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/contract",
-        submit_views.ContractInfosForHireView.as_view(),
+        hire_views.ContractInfosForHireView.as_view(),
         name="hire_contract_infos",
         kwargs={"hire_process": True},
     ),
     path(
         "<uuid:session_uuid>/hire/confirm",
-        submit_views.ConfirmationForHireView.as_view(),
+        hire_views.ConfirmationForHireView.as_view(),
         name="hire_confirmation",
         kwargs={"hire_process": True},
     ),
