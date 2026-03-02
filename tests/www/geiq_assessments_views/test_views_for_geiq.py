@@ -49,7 +49,7 @@ class TestListAssessmentsView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -158,7 +158,7 @@ class TestCreateAssessmentView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -364,7 +364,7 @@ class TestAssessmentDetailsForGEIQView:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -715,7 +715,7 @@ class TestAssessmentGetFile:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 404),
         ]:
             client.force_login(user)
@@ -825,7 +825,7 @@ class TestAssessmentSyncFile:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -979,7 +979,7 @@ class TestAssessmentUploadActionFinancialAssessment:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1056,7 +1056,7 @@ class TestAssessmentComment:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1126,7 +1126,7 @@ class TestAssessmentContractsSync:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1256,7 +1256,7 @@ class TestAssessmentKPI:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)
@@ -1357,7 +1357,7 @@ class TestAssessmentResult:
         for user, expected_status in [
             (JobSeekerFactory(), 403),
             (PrescriberFactory(), 403),
-            (EmployerFactory(membership=True), 403),
+            (EmployerFactory(membership=True, membership__company__not_in_territorial_experimentation=True), 403),
             (LaborInspectorFactory(membership=True), 403),
         ]:
             client.force_login(user)

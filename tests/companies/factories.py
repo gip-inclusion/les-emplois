@@ -133,6 +133,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
                         *settings.AFPA_DEPARTMENTS,
                         *settings.MON_RECAP_BANNER_DEPARTMENTS,
                         *settings.NEXUS_MVP_DEPARTMENTS,
+                        *settings.GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES,
                     ],
                 )
             )
