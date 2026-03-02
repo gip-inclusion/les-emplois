@@ -342,10 +342,10 @@ _CRITERIA_KIND_TO_PROFILE_FUNC = {
         profile.education_level in EducationLevel.eligible_for_cap_bep_criterion()
     ),
     AdministrativeCriteriaKind.SENIOR: lambda profile: (
-        profile.birthdate and profile.birthdate + relativedelta(years=50) <= timezone.localdate()
+        profile.birthdate and profile.birthdate <= timezone.localdate() - relativedelta(years=50)
     ),
     AdministrativeCriteriaKind.JEUNE: lambda profile: (
-        profile.birthdate and profile.birthdate + relativedelta(years=26) > timezone.localdate()
+        profile.birthdate and profile.birthdate > timezone.localdate() - relativedelta(years=26)
     ),
     AdministrativeCriteriaKind.ASE: lambda profile: profile.ase_exit,
     AdministrativeCriteriaKind.DETENTION_MJ: lambda profile: profile.detention_exit_or_ppsmj,
