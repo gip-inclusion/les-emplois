@@ -29,7 +29,7 @@ def get_users_contacts(ids):
             job_apps_senders=ArraySubquery(
                 # only look for employer or prescriber
                 JobApplication.objects.filter(job_seeker=OuterRef("pk"))
-                .filter(sender__kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
+                .filter(sender__kind__in=UserKind.caseworkers())
                 .values(json=JSONObject(user_id="sender_id", timestamp="created_at"))
             )
         )
@@ -52,7 +52,7 @@ def get_users_contacts(ids):
                 JobApplicationTransitionLog.objects.filter(
                     job_application__job_seeker=OuterRef("pk"), to_state=JobApplicationState.ACCEPTED
                 )
-                .filter(user__kind__in=[UserKind.EMPLOYER, UserKind.PRESCRIBER])
+                .filter(user__kind__in=UserKind.caseworkers())
                 .values(json=JSONObject(user_id="user_id", timestamp="timestamp"))
             )
         )
@@ -71,7 +71,7 @@ def get_users_contacts(ids):
             )
         ]:
             contacts[user_id].append(timestamp)
-        if beneficiary.created_by and beneficiary.created_by.kind in [UserKind.EMPLOYER, UserKind.PRESCRIBER]:
+        if beneficiary.created_by and beneficiary.created_by.is_caseworker:
             contacts[beneficiary.created_by_id].append(beneficiary.date_joined)
         users_contacts[beneficiary.pk] = contacts
     return users_contacts

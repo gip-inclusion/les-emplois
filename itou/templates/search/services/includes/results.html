@@ -35,7 +35,7 @@
                            rel="noopener"
                            aria-label="Voir la fiche de {{ service.structure.nom }} sur DORA (ouverture dans un nouvel onglet)">
                             <span>
-                                {% if user.is_employer or user.is_prescriber %}
+                                {% if user.is_caseworker %}
                                     Orienter
                                 {% else %}
                                     Voir la fiche détaillée

@@ -294,7 +294,7 @@ def merge_users(request, template_name="itou_staff_views/merge_users.html"):
 def merge_users_confirm(
     request, user_1_public_id, user_2_public_id, template_name="itou_staff_views/merge_users_confirm.html"
 ):
-    ALLOWED_USER_KINDS = [UserKind.PRESCRIBER, UserKind.EMPLOYER]
+    ALLOWED_USER_KINDS = UserKind.caseworkers()
 
     user_1 = get_object_or_404(User, public_id=user_1_public_id)
     user_2 = get_object_or_404(User, public_id=user_2_public_id)

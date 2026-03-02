@@ -1094,7 +1094,7 @@ class TestProcessAcceptViewsInWizard:
         assert job_application.state.is_accepted
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1190,7 +1190,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
     @freeze_time("2024-09-11")
     def test_accept_iae_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1242,7 +1242,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified_no_missing_data(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1297,7 +1297,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certified_at
 
     @pytest.mark.usefixtures("api_particulier_settings")
-    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
     @freeze_time("2024-09-11")
     def test_accept_geiq_criteria_can_be_certified(self, client, mocker, from_kind):
         criteria_kind = random.choice(list(AdministrativeCriteriaKind.certifiable_by_api_particulier()))
@@ -1377,7 +1377,7 @@ class TestProcessAcceptViewsInWizard:
             assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1))
             assert criterion.certified_at
 
-    @pytest.mark.parametrize("from_kind", {UserKind.EMPLOYER, UserKind.PRESCRIBER})
+    @pytest.mark.parametrize("from_kind", UserKind.caseworkers())
     @freeze_time("2024-09-11")
     def test_accept_not_an_siae_or_geiq_cannot_be_certified(self, client, mocker, from_kind):
         mocker.patch(

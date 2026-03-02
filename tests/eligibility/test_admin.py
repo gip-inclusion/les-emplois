@@ -116,7 +116,7 @@ class TestAdminForm:
         return "author_geiq"
 
     @freeze_time("2025-01-21")
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("user_kind", UserKind.caseworkers())
     def test_add_eligibility_diagnostic(self, admin_client, kind, user_kind):
         author = self.user_factory(kind, user_kind)
         post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
@@ -131,7 +131,7 @@ class TestAdminForm:
         assert diagnostic.administrative_criteria.count() == 1
 
     @freeze_time("2025-01-21")
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("user_kind", UserKind.caseworkers())
     def test_add_eligibility_diagnostic_old_membership(self, admin_client, kind, user_kind):
         # Allow inactive memberships
         author = self.user_factory(kind, user_kind)
@@ -251,7 +251,7 @@ class TestAdminForm:
         assert response.status_code == 200
         assert response.context["errors"] == [["L'auteur n'appartient pas à cette structure."]]
 
-    @pytest.mark.parametrize("user_kind", [UserKind.EMPLOYER, UserKind.PRESCRIBER])
+    @pytest.mark.parametrize("user_kind", UserKind.caseworkers())
     def test_add_eligibility_not_both_org_and_company(self, admin_client, kind, user_kind):
         author = self.user_factory(kind, user_kind)
         post_data = self.build_post_data(kind, author=author, job_seeker=JobSeekerFactory())
