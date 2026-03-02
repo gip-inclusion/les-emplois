@@ -7,47 +7,42 @@
             <div class="row">
                 <div class="col-12">
                     <h2>Indicateurs clés</h2>
-                    <div class="c-box c-box--summary mb-3 mb-md-4">
-                        <div class="c-box--summary__body">
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">
-                                    Les taux présentés ci-dessous correspondent aux résultats en sortie de parcours.
-                                    Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                                </span>
-                            </div>
-
-                            <div class="c-box--summary__list-data">
-                                <ul class="list-unstyled">
-                                    <li class="d-flex gap-2">
-                                        <span class="flex-grow-1">Taux de rupture en période d’essai</span>
-                                        <strong>{{ assessment.label_rates.taux_rupture_periode_essai|formatfloat_with_unit:"%"|default:"-" }}</strong>
-                                    </li>
-                                    <li class="d-flex gap-2">
-                                        <span class="flex-grow-1">Taux de rupture hors période d’essai</span>
-                                        <strong>{{ assessment.label_rates.taux_rupture_hors_periode_essai|formatfloat_with_unit:"%"|default:"-" }}</strong>
-                                    </li>
-                                    <li class="d-flex gap-2">
-                                        <span class="flex-grow-1">Taux de sortie emploi durable</span>
-                                        <strong>{{ assessment.label_rates.taux_sortie_emploi_durable|formatfloat_with_unit:"%"|default:"-" }}</strong>
-                                    </li>
-                                    <li class="d-flex gap-2">
-                                        <span class="flex-grow-1">Taux de sortie emploi</span>
-                                        <strong>{{ assessment.label_rates.taux_sortie_emploi|formatfloat_with_unit:"%"|default:"-" }}</strong>
-                                    </li>
-                                    <li class="d-flex gap-2 mb-4">
-                                        <span class="flex-grow-1">Taux d’obtention de qualification</span>
-                                        <strong>{{ assessment.label_rates.taux_obtention_qualification|formatfloat_with_unit:"%"|default:"-" }}</strong>
-                                    </li>
-                                    <li aria-hidden="true">
-                                        <hr class="my-2">
-                                    </li>
-                                    <li class="d-flex gap-2">
-                                        <span class="flex-grow-1">Nombre de salariés sur l’année N-1</span>
-                                        <strong>{{ assessment.employee_nb }}</strong>
-                                    </li>
-                                </ul>
-                            </div>
+                    <div class="c-box mb-3 mb-md-4">
+                        <div class="c-info">
+                            <span class="c-info__summary">
+                                Les taux présentés ci-dessous correspondent aux résultats en sortie de parcours.
+                                Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                            </span>
                         </div>
+                        <ul class="list-unstyled mb-0 mt-3">
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Taux de rupture en période d’essai</span>
+                                <strong>{{ assessment.label_rates.taux_rupture_periode_essai|formatfloat_with_unit:"%"|default:"-" }}</strong>
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Taux de rupture hors période d’essai</span>
+                                <strong>{{ assessment.label_rates.taux_rupture_hors_periode_essai|formatfloat_with_unit:"%"|default:"-" }}</strong>
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Taux de sortie emploi durable</span>
+                                <strong>{{ assessment.label_rates.taux_sortie_emploi_durable|formatfloat_with_unit:"%"|default:"-" }}</strong>
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Taux de sortie emploi</span>
+                                <strong>{{ assessment.label_rates.taux_sortie_emploi|formatfloat_with_unit:"%"|default:"-" }}</strong>
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Taux d’obtention de qualification</span>
+                                <strong>{{ assessment.label_rates.taux_obtention_qualification|formatfloat_with_unit:"%"|default:"-" }}</strong>
+                            </li>
+                            <li aria-hidden="true">
+                                <hr class="my-3">
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="flex-grow-1">Nombre de salariés sur l’année N-1</span>
+                                <strong>{{ assessment.employee_nb }}</strong>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
