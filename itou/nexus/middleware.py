@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.urls import reverse
 from itoutils.django.nexus.middleware import BaseAutoLoginMiddleware
 
@@ -27,8 +26,7 @@ class DropDownMiddleware:
 
     def must_load_dropdown(self, request):
         return (
-            settings.NEXUS_DROPDOWN_ENABLED
-            and not request.path.startswith("/portal")
+            not request.path.startswith("/portal")
             and request.user.is_authenticated
             and request.user.is_active
             and request.user.is_caseworker

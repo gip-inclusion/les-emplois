@@ -888,7 +888,6 @@ NEXUS_METABASE_DB_USER = os.getenv("NEXUS_METABASE_DB_USER")
 NEXUS_METABASE_DB_PASSWORD = os.getenv("NEXUS_METABASE_DB_PASSWORD")
 NEXUS_ALLOWED_REDIRECT_HOSTS = os.getenv("NEXUS_ALLOWED_REDIRECT_HOSTS", "").split(",")
 NEXUS_MVP_DEPARTMENTS = ["29", "31", "33", "34", "44", "67", "76", "88"]
-NEXUS_DROPDOWN_ENABLED = os.getenv("NEXUS_DROPDOWN_ENABLED") == "True"
 
 pdi_jwt_key = os.getenv("PDI_JWT_KEY")
 PDI_JWT_KEY = json.loads(pdi_jwt_key) if pdi_jwt_key else None
