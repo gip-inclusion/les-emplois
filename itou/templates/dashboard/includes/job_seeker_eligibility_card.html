@@ -4,14 +4,9 @@
         <div class="p-3 p-lg-4">
             <span class="h4 mb-0">
                 {% if kind == "IAE" %}
-                    Diagnostic d’éligibilité à l’IAE
-                    {% if not eligibility_diagnosis %}
-                        non renseigné
-                    {% else %}
-                        {{ eligibility_diagnosis.is_considered_valid|yesno:"valide,expiré" }}
-                    {% endif %}
+                    Éligibilité à l'IAE
                 {% elif kind == "GEIQ" %}
-                    Diagnostic public prioritaire GEIQ {{ eligibility_diagnosis.is_valid|yesno:"valide,expiré" }}
+                    Éligibilité public prioritaire GEIQ
                 {% endif %}
             </span>
             {% if kind == "IAE" %}
@@ -65,8 +60,8 @@
                 </p>
                 <ul class="list-data mb-3">
                     <li>
-                        <small>Date d'expiration du diagnostic</small>
-                        <strong>le {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
+                        <small>Durée de validité du diagnostic</small>
+                        <strong>du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
                     </li>
                     <li>
                         <small>Critères administratifs</small>

@@ -1279,7 +1279,7 @@
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">
-                  Diagnostic public prioritaire GEIQ valide
+                  Éligibilité public prioritaire GEIQ
               </span>
               <span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
                   <i aria-hidden="true" class="ri-check-line">
@@ -1294,10 +1294,10 @@
               <ul class="list-data mb-3">
                   <li>
                       <small>
-                          Date d'expiration du diagnostic
+                          Durée de validité du diagnostic
                       </small>
                       <strong>
-                          le 19/11/2025
+                          du 19/05/2025 au 19/11/2025
                       </strong>
                   </li>
                   <li>
@@ -1329,9 +1329,7 @@
       <div class="c-box p-0 h-100">
           <div class="p-3 p-lg-4">
               <span class="h4 mb-0">
-                  Diagnostic d’éligibilité à l’IAE
-                      
-                          valide
+                  Éligibilité à l'IAE
               </span>
               <span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
                   <i aria-hidden="true" class="ri-check-line">
