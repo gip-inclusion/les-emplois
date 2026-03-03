@@ -182,8 +182,8 @@ class JobSeekerSignupConflictModalResolver:
             request,
             format_html(
                 "<p><strong>Un compte est déjà enregistré avec l’adresse e-mail {}.</strong></p>"
-                "<ul><li>Si cette adresse mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur "
-                '<strong>"Je me connecte avec ce compte".</strong></li>{}<li>Si cette adresse mail '
+                "<ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur "
+                '<strong>"Je me connecte avec ce compte".</strong></li>{}<li>Si cette adresse e-mail '
                 'n’est pas la vôtre veuillez contacter <a href="{}" target="_blank">notre support</a>.</li></ul>',
                 redact_email_address(self.existing_user.email),
                 reinitialize_pass_option,
@@ -208,8 +208,8 @@ class JobSeekerSignupConflictModalResolver:
             request,
             format_html(
                 "<p><strong>Un compte est déjà enregistré avec l’adresse e-mail {}.</strong></p>"
-                "<ul><li>Si cette adresse mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur "
-                '<strong>"Je me connecte avec ce compte".</strong></li>{}<li>Si cette adresse mail '
+                "<ul><li>Si cette adresse e-mail est bien la vôtre, connectez-vous avec celle-ci en cliquant sur "
+                '<strong>"Je me connecte avec ce compte".</strong></li>{}<li>Si cette adresse e-mail '
                 "n’est pas la vôtre vous pouvez <strong>continuez l’inscription</strong></li></ul>",
                 redact_email_address(self.existing_user.email),
                 reinitialize_pass_option,

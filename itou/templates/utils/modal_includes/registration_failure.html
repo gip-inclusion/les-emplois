@@ -7,7 +7,7 @@
         <div class="modal-header">
             <h3 class="modal-title" id="message-modal-{{ forloop.counter }}-label">
                 {% if "email_conflict" in message.extra_tags %}
-                    Un compte existe déjà avec cette adresse mail
+                    Un compte existe déjà avec cette adresse e-mail
                 {% elif "nir_conflict" in message.extra_tags %}
                     Un compte existe déjà avec ce NIR
                 {% elif "user_exists_without_birthdate" in message.extra_tags %}
