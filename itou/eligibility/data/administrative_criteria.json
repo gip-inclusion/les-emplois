@@ -199,8 +199,8 @@
     "pk": 14,
     "fields": {
       "level": "2",
-      "name": "Résident ZRR",
-      "desc": "Zone de revitalisation rurale",
+      "name": "Résident ZRR/ZFRR",
+      "desc": "Zone de revitalisation rurale / zone France ruralités revitalisation",
       "written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
       "written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",

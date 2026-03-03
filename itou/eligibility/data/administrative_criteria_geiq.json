@@ -250,7 +250,7 @@
 		"model": "eligibility.geiqadministrativecriteria",
 		"pk": 14,
 		"fields": {
-			"name": "Résident en zone de revitalisation rurale (ZRR)",
+			"name": "Résident en zone de revitalisation rurale (ZRR) / zone France ruralités revitalisation (ZFRR)",
 			"desc": "",
 			"api_code": "ZRR|QPV/ZRR",
 			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",

@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
                                 "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou "
                                 "demandeur d'asile",
                             ),
-                            ("ZRR", "Résident ZRR"),
+                            ("ZRR", "Résident ZRR/ZFRR"),
                             ("QPV", "Résident QPV"),
                             ("DETENTION_MJ", "Sortant de détention ou personne placée sous main de justice"),
                             ("FLE", "Maîtrise de la langue française"),
@@ -329,7 +329,7 @@ class Migration(migrations.Migration):
                                 "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou "
                                 "demandeur d'asile",
                             ),
-                            ("ZRR", "Résident ZRR"),
+                            ("ZRR", "Résident ZRR/ZFRR"),
                             ("QPV", "Résident QPV"),
                             ("DETENTION_MJ", "Sortant de détention ou personne placée sous main de justice"),
                             ("FLE", "Maîtrise de la langue française"),
