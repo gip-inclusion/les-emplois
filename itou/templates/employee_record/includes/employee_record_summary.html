@@ -117,8 +117,13 @@
             {% if employee_record.financial_annex %}
                 {{ employee_record.financial_annex.number }} ({{ employee_record.financial_annex.get_state_display|lower }})
             {% else %}
-                Aucune annexe financière n'a été selectionnée.
+                Aucune annexe financière n’a été sélectionnée.
             {% endif %}
+        </p>
+        <p class="mb-0">
+            L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.
+            Elle est destinée uniquement aux logiciels de gestion des salariés.
+            {% if is_creation %}Si vous n’en utilisez pas, vous pouvez laisser cette étape vide.{% endif %}
         </p>
     </div>
 {% endwith %}
