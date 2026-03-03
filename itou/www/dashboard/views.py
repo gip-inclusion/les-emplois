@@ -365,8 +365,7 @@ def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard
 
 @require_POST
 def switch_organization(request):
-    # TODO: Fallback may be removed in a few days
-    next_url = get_safe_url(request, "next_url", fallback_url=reverse("dashboard:index"))
+    next_url = get_safe_url(request, "next_url")
 
     try:
         pk = int(request.POST["organization_id"])
