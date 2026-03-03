@@ -20,6 +20,7 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import JobApplicationWithCompleteJobSeekerProfileFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.www.employee_record_views.test_create import FINANCIAL_ANNEX_FORM_HELPER
 
 
 class TestSummaryEmployeeRecords:
@@ -78,6 +79,8 @@ class TestSummaryEmployeeRecords:
         profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
+        assertContains(response, "L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.")
+        assertNotContains(response, FINANCIAL_ANNEX_FORM_HELPER)
 
     def test_job_seeker_profile_infos_all_fields_etti(self, client, snapshot):
         client.force_login(self.user)
