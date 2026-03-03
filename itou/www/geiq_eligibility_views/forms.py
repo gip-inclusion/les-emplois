@@ -138,7 +138,7 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
             )
 
         if cleaned_data.get("resident_qpv") and cleaned_data.get("resident_zrr"):
-            raise forms.ValidationError("Le cumul des critères QPV et ZRR n’est pas possible")
+            raise forms.ValidationError("Le cumul des critères QPV et ZRR/ZFRR n’est pas possible")
 
         criteria = self._get_administrative_criteria()
 

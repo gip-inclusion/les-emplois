@@ -5,7 +5,7 @@ from operator import attrgetter
 from django.utils import timezone
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
-from itou.eligibility.enums import AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -130,6 +130,10 @@ def _format_criteria_name_as_column_comment(criteria):
 def format_criteria_name_as_column_name(criteria):
     column_comment = _format_criteria_name_as_column_comment(criteria)
     column_name = column_comment.replace("(", "").replace(")", "").replace(" ", "_").lower()
+    if criteria.kind == AdministrativeCriteriaKind.ZRR:
+        # Criteria name has changed in "itou", but we want to keep the
+        # old name for Metabase.
+        column_name = column_name.replace("zrr/zfrr", "zrr")
     return f"critère_n{criteria.level}_{column_name}"
 
 

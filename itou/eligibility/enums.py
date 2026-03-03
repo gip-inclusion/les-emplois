@@ -54,7 +54,7 @@ class AdministrativeCriteriaKind(models.TextChoices):
         "REF_DA",
         "Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile",
     )
-    ZRR = "ZRR", "Résident ZRR"
+    ZRR = "ZRR", "Résident ZRR/ZFRR"
     QPV = "QPV", "Résident QPV"
     DETENTION_MJ = "DETENTION_MJ", "Sortant de détention ou personne placée sous main de justice"
     FLE = "FLE", "Maîtrise de la langue française"

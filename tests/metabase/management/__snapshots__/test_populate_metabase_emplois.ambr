@@ -6160,7 +6160,7 @@
           'Command.execute[itoutils/django/commands.py]',
           'Command.execute[itoutils/django/commands.py]',
         ]),
-        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."critère_n2_résident_zrr" IS \'Critère Résident ZRR (niveau 2)\'',
+        'sql': 'COMMENT ON COLUMN "z_new_candidats_v0"."critère_n2_résident_zrr" IS \'Critère Résident ZRR/ZFRR (niveau 2)\'',
       }),
       dict({
         'origin': list([
