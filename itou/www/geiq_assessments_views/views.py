@@ -347,10 +347,10 @@ def assessment_get_file(request, pk, *, file_field):
     assessments = Assessment.objects.filter(**filter_kwargs).select_related("campaign")
     assessment = get_object_or_404(assessments, pk=pk)
     match file_field:
-        case "summary_document_file":
-            filename = assessment.summary_document_filename()
-        case "structure_financial_assessment_file":
-            filename = assessment.structure_financial_assessment_filename()
+        # case "summary_document_file":
+        #    filename = assessment.summary_document_filename()
+        # case "structure_financial_assessment_file":
+        #    filename = assessment.structure_financial_assessment_filename()
         case "action_financial_assessment_file":
             filename = assessment.action_financial_assessment_filename()
         case _:
