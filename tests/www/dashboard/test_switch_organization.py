@@ -127,7 +127,8 @@ class TestSwitchCompany:
 
         url = reverse("dashboard:switch_organization")
         response = client.post(url, data={"organization_id": related_company.pk})
-        assertRedirects(response, reverse("dashboard:index"))
+        response = client.get(response.url)
+        assert response.status_code == 404  # No fallback
 
         url = add_url_params(reverse("dashboard:switch_organization"), {"next_url": "/other_url"})
         response = client.post(url, data={"organization_id": related_company.pk}, follow=False)
