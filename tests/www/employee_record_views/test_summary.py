@@ -78,6 +78,8 @@ class TestSummaryEmployeeRecords:
         profile.save()
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
+        assertContains(response, "L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.")
+        assertNotContains(response, "laisser cette étape vide")  # no creation-specific hint
 
     def test_job_seeker_profile_infos_all_fields_etti(self, client, snapshot):
         client.force_login(self.user)

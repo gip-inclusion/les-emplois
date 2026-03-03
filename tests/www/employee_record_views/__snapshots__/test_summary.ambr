@@ -509,7 +509,11 @@
               Annexe financière
           </h2>
           <p>
-              Aucune annexe financière n'a été selectionnée.
+              Aucune annexe financière n’a été sélectionnée.
+          </p>
+          <p class="mb-0">
+              L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.
+              Elle est destinée uniquement aux logiciels de gestion des salariés.
           </p>
       </div>
   </div>
