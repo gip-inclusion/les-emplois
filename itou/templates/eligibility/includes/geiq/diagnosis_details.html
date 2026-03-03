@@ -58,7 +58,7 @@
     {% include "eligibility/includes/certification_info_box.html" with diagnosis=diagnosis itou_help_center_url=itou_help_center_url request=request only %}
 
     {% if diagnosis.allowance_amount %}
-        {% if request.user.is_employer %}
+        {% if request.from_employer %}
             {% include "eligibility/includes/geiq/diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
         {% endif %}
     {% elif request.from_employer %}

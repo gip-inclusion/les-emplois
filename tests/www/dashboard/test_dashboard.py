@@ -755,16 +755,14 @@ class TestDashboardView:
 
     @freeze_time("2025-05-19")
     def test_jobseeker_iae_eligibility_diagnosis(self, client):
-        DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE valide"
+        DIAG_TITLE = "Éligibilité à l'IAE"
         DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE</span>"""
         VALIDATED_CRITERIA = """<p class="fs-sm text-success">Critères validés le
             %(date)s par %(author)s (%(org)s).</p>"""
-        NO_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE non renseigné"
         NO_DIAG_TEXT = "Veuillez vous rapprocher d’un prescripteur habilité pour vérifier votre éligibilité à l’IAE."
         NO_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité IAE à valider</span>"""
-        EXPIRED_DIAG_TITLE = "Diagnostic d’éligibilité à l’IAE expiré"
         EXPIRED_DIAG_TEXT = (
             "Votre diagnostic d’éligibilité IAE a expiré le %s. Pour en savoir plus, veuillez vous rapprocher "
             "d’un prescripteur habilité."
@@ -776,9 +774,8 @@ class TestDashboardView:
 
         # No diagnosis
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE, html=True)
+        assertContains(response, DIAG_TITLE, html=True, count=1)
         assertNotContains(response, DIAG_BADGE, html=True)
-        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
 
@@ -789,9 +786,8 @@ class TestDashboardView:
             criteria_kinds=[random.choice(list(CERTIFIABLE_ADMINISTRATIVE_CRITERIA_KINDS))],
         )
         response = client.get(url)
-        assertNotContains(response, DIAG_TITLE, html=True)
+        assertContains(response, DIAG_TITLE, html=True, count=1)
         assertNotContains(response, DIAG_BADGE, html=True)
-        assertContains(response, NO_DIAG_TITLE, html=True, count=1)
         assertContains(response, NO_DIAG_TEXT, html=True, count=1)
         assertContains(response, NO_DIAG_BADGE, html=True, count=1)
 
@@ -816,7 +812,6 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
 
@@ -837,7 +832,6 @@ class TestDashboardView:
                 html=True,
                 count=1,
             )
-            assertNotContains(response, NO_DIAG_TITLE, html=True)
             assertNotContains(response, NO_DIAG_TEXT, html=True)
             assertNotContains(response, NO_DIAG_BADGE, html=True)
 
@@ -846,9 +840,8 @@ class TestDashboardView:
         with freeze_time(approval.end_at + timedelta(days=1)):
             client.force_login(user)
             response = client.get(url)
-            assertNotContains(response, DIAG_TITLE, html=True)
+            assertContains(response, DIAG_TITLE, html=True, count=1)
             assertNotContains(response, DIAG_BADGE, html=True)
-            assertContains(response, EXPIRED_DIAG_TITLE, html=True, count=1)
             assertContains(response, EXPIRED_DIAG_TEXT % "19/11/2025", html=True, count=1)
             assertContains(response, NO_DIAG_BADGE, html=True, count=1)
 
@@ -871,23 +864,21 @@ class TestDashboardView:
             html=True,
             count=1,
         )
-        assertNotContains(response, NO_DIAG_TITLE, html=True)
         assertNotContains(response, NO_DIAG_TEXT, html=True)
         assertNotContains(response, NO_DIAG_BADGE, html=True)
 
     @freeze_time("2025-05-19")
     def test_jobseeker_geiq_eligibility_diagnosis(self, client, administrative_criteria_annex_1):
-        DIAG_TITLE = "Diagnostic public prioritaire GEIQ valide"
+        DIAG_TITLE = "Éligibilité public prioritaire GEIQ"
         DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ confirmée</span>"""
-        DIAG_EXPIRATION = "<strong>le %s</strong>"
+        DIAG_EXPIRATION = "<strong>du %s au %s</strong>"
         VALIDATED_ELIGIBILITY = (
             """<p class="fs-sm text-success">Éligibilité GEIQ confirmée par %(author)s (%(structure)s).</p>"""
         )
-        EXPIRED_DIAG_TITLE = "Diagnostic public prioritaire GEIQ expiré"
         EXPIRED_DIAG_BADGE = """<span class="badge badge-sm float-end rounded-pill bg-accent-02-lighter text-primary">
             <i class="ri-error-warning-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée</span>"""
-        EXPIRED_DIAG_EXPIRATION = "<strong>le %s</strong>"
+        EXPIRED_DIAG_EXPIRATION = "<strong>du %s au %s</strong>"
 
         user = JobSeekerFactory(with_address=True)
         client.force_login(user)
@@ -932,7 +923,7 @@ class TestDashboardView:
         )
         assertContains(
             response,
-            DIAG_EXPIRATION % "19/11/2025",
+            DIAG_EXPIRATION % ("19/05/2025", "19/11/2025"),
             html=True,
             count=1,
         )
@@ -941,7 +932,7 @@ class TestDashboardView:
         with freeze_time(diagnosis.expires_at + timedelta(days=1)):
             client.force_login(user)
             response = client.get(url)
-            assertContains(response, EXPIRED_DIAG_TITLE, count=1)
+            assertContains(response, DIAG_TITLE, count=1)
             assertContains(response, EXPIRED_DIAG_BADGE, html=True, count=1)
             assertContains(
                 response,
@@ -952,7 +943,7 @@ class TestDashboardView:
             )
             assertContains(
                 response,
-                EXPIRED_DIAG_EXPIRATION % "19/11/2025",
+                EXPIRED_DIAG_EXPIRATION % ("19/05/2025", "19/11/2025"),
                 html=True,
                 count=1,
             )
