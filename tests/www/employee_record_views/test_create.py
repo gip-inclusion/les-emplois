@@ -33,6 +33,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
+FINANCIAL_ANNEX_FORM_HELPER = "Si vous n’en utilisez pas, vous pouvez laisser cette étape vide."
+
+
 # Helper functions
 def _get_user_form_data(user):
     form_data = {
@@ -1135,6 +1138,8 @@ class TestCreateEmployeeRecordStep4(CreateEmployeeRecordTestMixin):
 
         response = client.get(self.url)
         assert response.context["form"].employee_record == recent_employee_record
+        alert = parse_response_to_soup(response=response, selector='fieldset div.alert-info[role="status"]')
+        assert "Si vous utilisez un logiciel de gestion des salariés," in alert.get_text(strip=True)
 
     def test_financial_annexes_ordering(self, client):
         current_annex = self.company.convention.financial_annexes.get()
@@ -1262,6 +1267,8 @@ class TestCreateEmployeeRecordStep5(CreateEmployeeRecordTestMixin):
         assertNotContains(response, self.ACTOR_MET_LABEL)
         assertNotContains(response, self.MONTHLY_INCOME_LABEL)
         assertNotContains(response, self.EITI_CONTRIBUTIONS_LABEL)
+        assertContains(response, "L’annexe financière n’est pas transmise à l’Extranet IAE 2.0 de l’ASP.")
+        assertContains(response, FINANCIAL_ANNEX_FORM_HELPER)
 
     def test_ntt_display(self, client):
         NTT_MARKUP = "<small>Numéro technique temporaire</small>"
