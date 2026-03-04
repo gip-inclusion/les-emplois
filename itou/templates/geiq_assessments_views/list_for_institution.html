@@ -43,10 +43,13 @@
                                     {% for assessment in assessments %}
                                         <tr>
                                             <td>
-                                                <a class="btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
+                                                {% if can_access_details %}
+                                                    <a class="btn-link" href="{% url "geiq_assessments_views:details_for_institution" pk=assessment.pk %}">
+                                                        {{ assessment.label_geiq_name }}
+                                                    </a>
+                                                {% else %}
                                                     {{ assessment.label_geiq_name }}
-
-                                                </a>
+                                                {% endif %}
                                             </td>
                                             <td>
                                                 <ul class="mb-0">

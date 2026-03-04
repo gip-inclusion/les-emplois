@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -10,6 +11,10 @@ from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRed
 from itou.companies.enums import CompanyKind
 from itou.geiq_assessments.models import AssessmentInstitutionLink
 from itou.institutions.enums import InstitutionKind
+from itou.www.geiq_assessments_views.views import (
+    INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
+    INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
+)
 from tests.companies.factories import CompanyMembershipFactory
 from tests.geiq_assessments.factories import (
     AssessmentCampaignFactory,
@@ -44,6 +49,59 @@ class TestListAssessmentsView:
         response = client.get(reverse("geiq_assessments_views:list_for_institution"))
         assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
             name="assessments empty list"
+        )
+
+    @pytest.mark.parametrize(
+        "institution_kind",
+        set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST).difference(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS),
+    )
+    def test_limited_access_without_links_to_details(self, client, institution_kind, snapshot):
+        user = InstitutionMembershipFactory(institution__kind=institution_kind).user
+
+        campaign = AssessmentCampaignFactory(year=2024)
+        AssessmentFactory(
+            campaign=campaign,
+            with_main_geiq=True,
+            label_geiq_name="Un Joli GEIQ",
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessment list without links to details"
+        )
+
+    @pytest.mark.parametrize(
+        "institution_kind",
+        set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST).intersection(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS),
+    )
+    def test_full_access_with_links_to_details(self, client, institution_kind, snapshot):
+        membership = InstitutionMembershipFactory(
+            institution__kind=institution_kind, institution__name="Une institution GEIQ"
+        )
+
+        campaign = AssessmentCampaignFactory(year=2024)
+        related_assessment = AssessmentFactory(
+            id=uuid.UUID("00000000-0d2c-4f29-ba5b-a27ffb8ecc84"),
+            campaign=campaign,
+            with_main_geiq=True,
+            label_geiq_name="Un Joli GEIQ",
+            label_geiq_post_code="12345",
+            label_antennas=[{"id": 1234, "name": "Une antenne", "post_code": "12345"}],
+        )
+        AssessmentInstitutionLink.objects.create(
+            assessment=related_assessment,
+            institution=membership.institution,
+            with_convention=True,
+        )
+        _unrelated_assessment = AssessmentFactory()
+
+        client.force_login(membership.user)
+        response = client.get(reverse("geiq_assessments_views:list_for_institution"))
+        assert pretty_indented(parse_response_to_soup(response, ".s-section")) == snapshot(
+            name="assessment list with links to details"
         )
 
     @freeze_time("2025-05-21 12:00", tick=True)
@@ -174,6 +232,46 @@ class TestAssessmentDetailsForInstitutionView:
             client.force_login(user)
             response = client.get(url)
             assert response.status_code == expected_status
+
+    @pytest.mark.parametrize(
+        "institution_kind",
+        set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST).difference(set(INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS)),
+    )
+    def test_unauthorized_access_by_national_geiq_institution(self, client, institution_kind):
+        user = InstitutionMembershipFactory(institution__kind=institution_kind).user
+        assessment = AssessmentFactory()
+        client.force_login(user)
+        url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "institution_kind",
+        INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
+    )
+    def test_unauthorized_access_by_unrelated_institution(self, client, institution_kind):
+        user = InstitutionMembershipFactory(institution__kind=institution_kind).user
+        assessment = AssessmentFactory()
+        client.force_login(user)
+        url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 404
+
+    @pytest.mark.parametrize(
+        "institution_kind",
+        INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
+    )
+    def test_authorized_access_by_related_institution(self, client, institution_kind):
+        membership = InstitutionMembershipFactory(institution__kind=institution_kind)
+        assessment = AssessmentFactory()
+        AssessmentInstitutionLink.objects.create(
+            assessment=assessment,
+            institution=membership.institution,
+        )
+        client.force_login(membership.user)
+        url = reverse("geiq_assessments_views:details_for_institution", kwargs={"pk": assessment.pk})
+        response = client.get(url)
+        assert response.status_code == 200
 
     @freeze_time("2025-05-27 12:00")
     def test_details_for_institution(self, client, snapshot):

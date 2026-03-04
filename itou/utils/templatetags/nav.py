@@ -2,9 +2,11 @@ from django import template
 from django.urls import reverse
 from django.utils.text import slugify
 
-from itou.institutions.enums import InstitutionKind
 from itou.utils.errors import silently_report_exception
-from itou.www.geiq_assessments_views.views import employer_has_access_to_assessments
+from itou.www.geiq_assessments_views.views import (
+    INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST,
+    employer_has_access_to_assessments,
+)
 
 
 register = template.Library()
@@ -364,9 +366,9 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
-            if request.current_organization and request.current_organization.kind in (
-                InstitutionKind.DDETS_GEIQ,
-                InstitutionKind.DREETS_GEIQ,
+            if (
+                request.current_organization
+                and request.current_organization.kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST
             ):
                 menu_items.append(NAV_ENTRIES["labor-inspector-geiq-assessments"])
         menu_items.append(
