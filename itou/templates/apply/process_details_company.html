@@ -1,4 +1,5 @@
 {% extends "apply/process_base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load enums %}
 {% load format_filters %}
@@ -211,9 +212,11 @@
                         </div>
                         <div class="modal-body">
                             {% bootstrap_field transfer_form.target_company_id label_class="" %}
-                            <div class="c-info">
-                                <span class="c-info__summary">Les commentaires restent internes à votre structure et ne seront pas transmis lors du transfert.</span>
-                            </div>
+                            {% component_info c_info__summary=c_info__summary %}
+                                {% fragment as c_info__summary %}
+                                    Les commentaires restent internes à votre structure et ne seront pas transmis lors du transfert.
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-sm btn-outline-primary me-auto" data-bs-dismiss="modal">Annuler</button>

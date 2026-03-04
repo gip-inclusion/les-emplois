@@ -1,5 +1,6 @@
 {% extends "apply/submit/application/base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 {% load static %}
@@ -118,9 +119,11 @@
 
 {% block form_content %}
     {% bootstrap_field form.message %}
-    <div class="c-info mb-4">
-        <span class="c-info__summary">Bon à savoir</span>
-        <div class="c-info__detail">
+    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-4" %}
+        {% fragment as c_info__summary %}
+            Bon à savoir
+        {% endfragment %}
+        {% fragment as c_info__detail %}
             {% if auto_prescription_process %}
                 <p class="mb-0">Précisez dans le message :</p>
                 <ul class="mb-0">
@@ -186,8 +189,8 @@
                     <li>ses disponibilités</li>
                 </ul>
             {% endif %}
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_info %}
 
     {% block form_resume_field %}
         {% bootstrap_field form.resume %}

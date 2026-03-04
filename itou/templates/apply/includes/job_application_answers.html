@@ -1,3 +1,4 @@
+{% load components %}
 {% load matomo %}
 
 {% if job_application.answer or job_application.state.is_refused %}
@@ -37,24 +38,18 @@
         </ul>
 
         {% if display_refusal_info %}
-            <div class="c-info">
-                <button class="c-info__summary collapsed"
-                        {% matomo_event "candidature" "clic" "prescriber_displayed_company_details" %}
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseInfoExample"
-                        type="button"
-                        aria-expanded="false"
-                        aria-controls="collapseInfoExample">
-                    <span>Contactez l’employeur pour en savoir plus</span>
-                </button>
-                <div class="c-info__detail collapse" id="collapseInfoExample">
+            {% matomo_event "candidature" "clic" "prescriber_displayed_company_details" as matomo_event_attrs %}
+            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoExample" extra_button_attrs=matomo_event_attrs %}
+                {% fragment as c_info__summary %}
+                    Contactez l’employeur pour en savoir plus
+                {% endfragment %}
+                {% fragment as c_info__detail %}
                     <p>
                         L’employeur a refusé la candidature avec le motif “Autre”.
                         <br>
                         Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus, vous pouvez contacter l’employeur.
                     </p>
-
-                    <p class="text-primary fs-sm fw-bold my-3">Coordonnées de l’employeur :</p>
+                    <p class="text-primary fw-bold my-3">Coordonnées de l’employeur :</p>
                     <ul class="list-unstyled">
                         {% if refused_by %}
                             <li class="d-flex justify-content-start align-items-center">
@@ -87,8 +82,8 @@
                             {% include "includes/copy_to_clipboard.html" with content=job_application.to_company.phone css_classes="btn-ico btn-link btn-sm ms-2 py-0" matomo_event_attrs=matomo_event_attrs placement="right" %}
                         </li>
                     </ul>
-                </div>
-            </div>
+                {% endfragment %}
+            {% endcomponent_info %}
         {% endif %}
     </div>
 {% endif %}

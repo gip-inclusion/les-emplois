@@ -1,37 +1,39 @@
+{% load components %}
 {% load str_filters %}
 
 {% with all_jobs=job_application.selected_jobs.all %}
     {% if all_jobs|length == 0 %}
-        <div class="c-info c-info--secondary">
-            <span class="c-info__summary">Candidature spontanée</span>
-        </div>
+        {% component_info borderless=True c_info__summary=c_info__summary %}
+            {% fragment as c_info__summary %}
+                Candidature spontanée
+            {% endfragment %}
+        {% endcomponent_info %}
     {% else %}
-        <div class="c-info c-info--secondary">
-            <button class="c-info__summary"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapse-job-application-{{ job_application.id }}"
-                    aria-expanded="false"
-                    type="button"
-                    aria-controls="collapse-job-application-{{ job_application.id }}">
-                <span>{{ all_jobs|length }} {{ all_jobs|pluralizefr:"poste recherché,postes recherchés" }}</span>
-            </button>
-            <div class="c-info__detail collapse" id="collapse-job-application-{{ job_application.id }}">
-                <ul class="list-unstyled">
-                    {% for job in all_jobs %}
-                        <li class="d-flex gap-2">
-                            <span class="flex-grow-1 has-ellipsis">{{ job.display_name }}</span>
-                            <span class="text-nowrap">
-                                <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
-                                {% if job.location %}
-                                    {{ job.location }}
-                                {% else %}
-                                    {{ job.display_location }}
-                                {% endif %}
-                            </span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+        {% with collapse_suffix=job_application.id|stringformat:"s" %}
+            {% with collapse_id="collapse-job-application-"|add:collapse_suffix %}
+                {% component_info borderless=True c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id=collapse_id %}
+                    {% fragment as c_info__summary %}
+                        {{ all_jobs|length }} {{ all_jobs|pluralizefr:"poste recherché,postes recherchés" }}
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
+                        <ul class="list-unstyled">
+                            {% for job in all_jobs %}
+                                <li class="d-flex gap-2">
+                                    <span class="flex-grow-1 has-ellipsis">{{ job.display_name }}</span>
+                                    <span class="text-nowrap">
+                                        <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
+                                        {% if job.location %}
+                                            {{ job.location }}
+                                        {% else %}
+                                            {{ job.display_location }}
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endfragment %}
+                {% endcomponent_info %}
+            {% endwith %}
+        {% endwith %}
     {% endif %}
 {% endwith %}

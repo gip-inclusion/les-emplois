@@ -1,4 +1,5 @@
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load matomo %}
 
@@ -37,16 +38,16 @@
             </div>
         {% else %}
             {% bootstrap_field form.message %}
-            <div class="c-info mb-3">
-                <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWarningInfo" aria-expanded="false" aria-controls="collapseWarningInfo">
-                    <span>Attention à vos propos</span>
-                </button>
-                <div class="c-info__detail collapse" id="collapseWarningInfo">
+            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseWarningInfo" extra_classes="mb-3" %}
+                {% fragment as c_info__summary %}
+                    Attention à vos propos
+                {% endfragment %}
+                {% fragment as c_info__detail %}
                     <p>
                         La communication de données sensibles sur les usagers et les propos dégradants, sexistes, homophobes ou racistes ne sont pas autorisés.
                     </p>
-                </div>
-            </div>
+                {% endfragment %}
+            {% endcomponent_info %}
             {% itou_buttons_form primary_label="Envoyer" reset_url=None primary_aria_label="Envoyer votre commentaire partagé avec tous les membres de la structure" show_mandatory_fields_mention=False matomo_category="candidature" matomo_action="clic" matomo_name="ajout-commentaire-onglet" %}
         {% endif %}
     </form>

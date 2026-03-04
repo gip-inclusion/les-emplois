@@ -46,27 +46,27 @@
             <div class="row">
                 <div class="col-12">
                     {% if export_for == "siae" or can_view_stats_ft %}
-                        <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
-                            <button class="c-info__summary collapsed" data-bs-toggle="collapse" type="button" data-bs-target="#collapseBesoinChiffre" aria-expanded="false" aria-controls="collapseBesoinChiffre">
-                                <span>Besoin d'un chiffre ?</span>
-                            </button>
-                            {% if export_for == "siae" %}
-                                <div id="collapseBesoinChiffre" class="c-info__detail collapse">
-                                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
-                                </div>
-                            {% elif export_for == "prescriptions" and can_view_stats_ft %}
-                                <div id="collapseBesoinChiffre" class="c-info__detail collapse">
-                                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
-                                    <ul class="mb-0">
-                                        <li>
-                                            <a href="{% url 'stats:stats_ft_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
-                                        </li>
-                                        <li>
-                                            <a href="{% url 'stats:stats_ft_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            {% endif %}
+                        <div id="besoin-dun-chiffre">
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseBesoinChiffre" extra_classes="mb-3 mb-md-4" %}
+                                {% fragment as c_info__summary %}
+                                    Besoin d'un chiffre ?
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
+                                    {% if export_for == "siae" %}
+                                        Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}" target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
+                                    {% elif export_for == "prescriptions" and can_view_stats_ft %}
+                                        Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                        <ul class="mb-0">
+                                            <li>
+                                                <a href="{% url 'stats:stats_ft_state_main' %}" target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'stats:stats_ft_conversion_main' %}" target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
+                                            </li>
+                                        </ul>
+                                    {% endif %}
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         </div>
                     {% endif %}
                     {% if not job_applications_by_month %}
