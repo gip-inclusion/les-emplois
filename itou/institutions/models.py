@@ -30,6 +30,11 @@ class Institution(AddressMixin, OrganizationAbstract):
                     kind__in=(InstitutionKind.DDETS_GEIQ, InstitutionKind.DDETS_IAE, InstitutionKind.DDETS_LOG)
                 ),
             ),
+            models.UniqueConstraint(
+                fields=["kind"],
+                name="unique_national_institutions",
+                condition=models.Q(kind__in=InstitutionKind.get_singletons()),
+            ),
         ]
 
     kind = models.CharField(

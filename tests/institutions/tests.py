@@ -327,3 +327,11 @@ def test_unique_ddets_per_department_constraint(kind):
     with pytest.raises(IntegrityError):
         with transaction.atomic():
             Institution.objects.create(kind=kind, department=first_institution.department)
+
+
+@pytest.mark.parametrize("kind", InstitutionKind.get_singletons())
+def test_unique_national_institutions_constraint(kind):
+    InstitutionFactory(kind=kind)
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            Institution.objects.create(kind=kind)

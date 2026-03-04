@@ -5,7 +5,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
-from tests.institutions.factories import InstitutionFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -199,17 +199,16 @@ def test_can_view_stats_dreets_iae():
 
 
 def test_can_view_stats_dgefp_iae():
+    institution = InstitutionFactory(kind=InstitutionKind.DGEFP_IAE, department="93")
     # Admin member of DGEFP can access.
-    institution = InstitutionFactory(kind=InstitutionKind.DGEFP_IAE, department="93", with_membership=True)
-    request = get_request(institution.members.get())
+    admin_member = InstitutionMembershipFactory(institution=institution, is_admin=True)
+    request = get_request(admin_member.user)
     assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin member of DGEFP can access as well.
-    institution = InstitutionFactory(
-        kind=InstitutionKind.DGEFP_IAE, with_membership=True, membership__is_admin=False, department="93"
-    )
-    request = get_request(institution.members.get())
+    non_admin_member = InstitutionMembershipFactory(institution=institution, is_admin=False)
+    request = get_request(non_admin_member.user)
     assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
