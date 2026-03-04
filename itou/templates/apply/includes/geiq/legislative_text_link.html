@@ -1,11 +1,13 @@
-<div class="c-info mb-4">
-    <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseInfoAccompagnement" aria-expanded="false" aria-controls="collapseInfoAccompagnement">
-        <span>En savoir plus sur l’aide à l’accompagnement</span>
-    </button>
-    <div class="c-info__detail collapse" id="collapseInfoAccompagnement">
+{% load components %}
+
+{% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoAccompagnement" extra_classes="mb-4" %}
+    {% fragment as c_info__summary %}
+        En savoir plus sur l’aide à l’accompagnement
+    {% endfragment %}
+    {% fragment as c_info__detail %}
         <p>
             Pour en savoir plus sur l’aide à l’accompagnement, consultez
             <a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000045398420" class="has-external-link" target="_blank">l’Arrêté du 10 mars 2022 relatif à l'aide de l'Etat prévue par l'article D. 6325-23</a>.
         </p>
-    </div>
-</div>
+    {% endfragment %}
+{% endcomponent_info %}

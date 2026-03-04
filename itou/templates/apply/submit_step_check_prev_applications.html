@@ -1,5 +1,6 @@
 {% extends "apply/submit_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block content_extend %}
@@ -28,16 +29,16 @@
             <input type="hidden" name="force_new_application" value="force">
 
             {% if iae_eligibility_url %}
-                <div class="c-info mb-3 mb-md-4">
-                    <div class="c-info__summary">
-
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
                         Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
-                        <br>
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
                         Vous pouvez simplement valider ou mettre à jour l’éligibilité.
                         <br>
                         Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
-                    </div>
-                </div>
+                    {% endfragment %}
+                {% endcomponent_info %}
 
                 {% if block_apply %}
                     {% itou_buttons_form primary_label=iae_eligibility_label primary_url=iae_eligibility_url primary_aria_label=iae_eligibility_label show_mandatory_fields_mention=False reset_url=reset_url %}

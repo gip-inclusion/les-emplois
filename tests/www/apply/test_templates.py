@@ -20,10 +20,7 @@ from itou.jobs.models import Appellation
 from itou.utils.mocks.api_particulier import RESPONSES, ResponseKind
 from itou.utils.types import InclusiveDateRange
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind, JobApplicationsListKind
-from tests.eligibility.factories import (
-    GEIQEligibilityDiagnosisFactory,
-    IAEEligibilityDiagnosisFactory,
-)
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -77,7 +74,7 @@ def test_job_application_multiple_jobs():
     # and 2 more
     assertInHTML(
         f"""
-        <button class="c-info__summary"
+        <button class="c-info__summary collapsed"
                 data-bs-toggle="collapse"
                 data-bs-target="#collapse-job-application-{job_application.pk}"
                 aria-expanded="false"

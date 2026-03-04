@@ -3621,26 +3621,28 @@
 # ---
 # name: test_exports_as_pole_emploi_prescriber
   '''
-  <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
-      <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
-          <span>
-              Besoin d'un chiffre ?
-          </span>
-      </button>
-      <div class="c-info__detail collapse" id="collapseBesoinChiffre">
-          Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
-          <ul class="mb-0">
-              <li>
-                  <a href="/stats/pe/state/main" rel="noopener" target="_blank">
-                      Voir les données de l'ensemble de l'état des candidatures orientées
-                  </a>
-              </li>
-              <li>
-                  <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">
-                      Voir les données du taux de transformation des candidatures
-                  </a>
-              </li>
-          </ul>
+  <div id="besoin-dun-chiffre">
+      <div class="c-info mb-3 mb-md-4">
+          <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
+              <span>
+                  Besoin d'un chiffre ?
+              </span>
+          </button>
+          <div class="c-info__detail collapse" id="collapseBesoinChiffre">
+              Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+              <ul class="mb-0">
+                  <li>
+                      <a href="/stats/pe/state/main" rel="noopener" target="_blank">
+                          Voir les données de l'ensemble de l'état des candidatures orientées
+                      </a>
+                  </li>
+                  <li>
+                      <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">
+                          Voir les données du taux de transformation des candidatures
+                      </a>
+                  </li>
+              </ul>
+          </div>
       </div>
   </div>
   
@@ -7283,7 +7285,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7362,7 +7364,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7441,7 +7443,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7520,7 +7522,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7578,7 +7580,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7651,7 +7653,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7709,7 +7711,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7779,7 +7781,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7837,7 +7839,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7895,7 +7897,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -7968,7 +7970,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8026,7 +8028,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8709,7 +8711,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8788,7 +8790,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8852,7 +8854,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8931,7 +8933,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8989,7 +8991,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9047,7 +9049,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9105,7 +9107,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9169,7 +9171,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9239,7 +9241,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9309,7 +9311,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9367,7 +9369,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9425,7 +9427,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9495,7 +9497,7 @@
                           </li>
                       </ul>
                   </div>
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9553,7 +9555,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -9611,7 +9613,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
