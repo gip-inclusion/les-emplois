@@ -11,13 +11,14 @@
     <section class="s-section">
         <div class="s-section__container container">
             <h2>Suivi des contrats IAE</h2>
-
-            <div class="c-info mb-3 mb-md-4">
-                <span class="c-info__summary">Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
-                    <br>
-                Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.</span>
-            </div>
-
+            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                {% fragment as c_info__summary %}
+                    Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
+                {% endfragment %}
+                {% fragment as c_info__detail %}
+                    Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                {% endfragment %}
+            {% endcomponent_info %}
             {% for contract in contracts %}
                 <div class="c-box c-box--results mb-3 mb-md-4">
                     <div class="c-box--results__header">
@@ -44,8 +45,6 @@
                     </div>
                 </div>
             {% endfor %}
-
-
         </div>
     </section>
 {% endblock %}

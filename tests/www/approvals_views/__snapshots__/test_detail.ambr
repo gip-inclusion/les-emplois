@@ -2617,7 +2617,7 @@
           </table>
       </div>
       <div class="c-info">
-          <button aria-controls="collapseProlongationInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseProlongationInfo" data-bs-toggle="collapse">
+          <button aria-controls="collapseProlongationInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseProlongationInfo" data-bs-toggle="collapse" type="button">
               <span>
                   Comment gérer mes prolongations ?
               </span>
@@ -5108,7 +5108,7 @@
           </table>
       </div>
       <div class="c-info">
-          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
+          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse" type="button">
               <span>
                   Comment gérer mes suspensions ?
               </span>
@@ -5217,7 +5217,7 @@
           </table>
       </div>
       <div class="c-info">
-          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse">
+          <button aria-controls="collapseSuspensionInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseSuspensionInfo" data-bs-toggle="collapse" type="button">
               <span>
                   Comment gérer mes suspensions ?
               </span>
@@ -5381,9 +5381,10 @@
               <div class="c-info mb-3 mb-md-4">
                   <span class="c-info__summary">
                       Cette page affiche l’ensemble des contrats IAE déclarés dans l’Extranet IAE 2.0 de l’ASP.
-                      <br/>
-                      Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
                   </span>
+                  <div class="c-info__detail">
+                      Il y a quelques jours de décalage entre la saisie de données dans l'ASP et leur mise à jour sur cette page.
+                  </div>
               </div>
               <div class="c-box c-box--results mb-3 mb-md-4">
                   <div class="c-box--results__header">
