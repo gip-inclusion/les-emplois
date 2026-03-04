@@ -1,5 +1,6 @@
 {% extends "companies/edit_job_description_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load static %}
 
@@ -24,31 +25,39 @@
                 {% bootstrap_form_errors form type="all" %}
 
                 {% bootstrap_field form.description %}
-                <div class="c-info mb-3 mb-md-4">
-                    <span class="c-info__summary">Conseil</span>
-                    <div class="c-info__detail">
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Conseil
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
                         <p>
                             Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" aria-label="Référentiel des codes ROME" rel="noopener" target="_blank" class="has-external-link">Répertoire Opérationnel des Métiers et des Emplois (ROME)</a>.
                         </p>
-                    </div>
-                </div>
+                    {% endfragment %}
+                {% endcomponent_info %}
 
                 {% bootstrap_field form.profile_description %}
-                <div class="c-info mb-3 mb-md-4">
-                    {% if is_opcs %}
-                        <span class="c-info__summary">Conseil</span>
-                        <div class="c-info__detail">
+                {% if is_opcs %}
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Conseil
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             <p>
                                 Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
                             </p>
-                        </div>
-                    {% else %}
-                        <span class="c-info__summary">Exemple</span>
-                        <div class="c-info__detail">
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                {% else %}
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Exemple
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             <p>« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
-                        </div>
-                    {% endif %}
-                </div>
+                        {% endfragment %}
+                    {% endcomponent_info %}
+                {% endif %}
 
                 {% bootstrap_field form.is_resume_mandatory %}
                 {% if form.is_qpv_mandatory %}

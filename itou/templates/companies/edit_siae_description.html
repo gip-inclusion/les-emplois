@@ -1,5 +1,6 @@
 {% extends "companies/edit_siae_base.html" %}
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 
 {% block stepper %}
@@ -24,14 +25,18 @@
                 {% bootstrap_form_errors form type="all" %}
 
                 {% bootstrap_field form.description %}
-                <div class="c-info mb-3 mb-md-4">
-                    <span class="c-info__summary">Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.</span>
-                </div>
+                {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Plus la description sera précise sur la nature de l’activité, plus vous aurez de chances de recevoir des candidatures pertinentes.
+                    {% endfragment %}
+                {% endcomponent_info %}
 
                 {% bootstrap_field form.provided_support %}
-                <div class="c-info mb-3 mb-md-4">
-                    <span class="c-info__summary">Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever.</span>
-                </div>
+                {% component_info c_info__summary=c_info__summary extra_classes="mb-3 mb-md-4" %}
+                    {% fragment as c_info__summary %}
+                        Détaillez l’accompagnement délivré ainsi que les freins que votre structure peut aider à lever.
+                    {% endfragment %}
+                {% endcomponent_info %}
 
                 {% itou_buttons_form primary_label="Suivant" secondary_url=prev_url secondary_aria_label="Retourner à l'édition des coordonnées" matomo_category="employeurs" matomo_action="submit" matomo_name="maj-description-structure" %}
             </fieldset>
