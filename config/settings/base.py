@@ -154,6 +154,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "django_otp.middleware.OTPMiddleware",
     # Itou specific
+    "itou.www.middleware.TermsAcceptanceMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     "itou.www.middleware.RateLimitMiddleware",
