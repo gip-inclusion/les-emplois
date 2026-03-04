@@ -94,6 +94,7 @@ class LabelApiClient:
             response_data = self.client.get(
                 f"rest/{LabelCommand.SynthesePDF}",
                 params={"id": geiq_id},
+                timeout=httpx.Timeout(API_TIMEOUT_SECONDS, read=10),  # this endpoint can be slow to generate the PDF
             ).raise_for_status()
         except httpx.HTTPError as exc:
             raise LabelAPIError("Error requesting Label API") from exc
