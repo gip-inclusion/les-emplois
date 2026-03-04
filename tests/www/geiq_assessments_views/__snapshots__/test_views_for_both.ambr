@@ -1114,7 +1114,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -1335,7 +1335,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -1582,7 +1582,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -2005,7 +2005,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -2194,7 +2194,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -2409,7 +2409,7 @@
                               Montant total potentiel
                           </div>
                       </div>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
