@@ -207,6 +207,11 @@ urlpatterns = [
         name="accept_contract_infos",
     ),
     path(
+        "<uuid:session_uuid>/accept/eligibility/iae",
+        accept_views.IAEEligibilityForAcceptView.as_view(),
+        name="accept_iae_eligibility",
+    ),
+    path(
         "<uuid:session_uuid>/accept/confirm",
         accept_views.ConfirmationForAcceptView.as_view(),
         name="accept_confirmation",

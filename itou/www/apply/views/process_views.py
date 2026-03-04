@@ -572,6 +572,7 @@ def send_diagoriente_invite(request, job_application_id):
     return HttpResponseRedirect(redirect_url)
 
 
+# TODO(xfernandez): drop now unused view
 class IAEEligibilityView(BaseIAEEligibilityViewForEmployer):
     template_name = "apply/process_eligibility.html"
 
