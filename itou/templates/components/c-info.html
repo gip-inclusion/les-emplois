@@ -1,0 +1,37 @@
+{% comment %}
+    .c-info highlights important information.
+    c_info__summary is required.
+    c_info__detail is optional.
+
+    Options:
+    - borderless=True: adds .c-info--borderless
+    - collapse_id="...": enables Bootstrap collapse
+    - collapsed=True/False: initial state (default: collapsed)
+    - extra_classes="...": extra classes on the wrapper
+    - extra_button_attrs="...": extra HTML attributes on collapse button
+
+    Without collapse_id, details are always visible.
+
+    Documentation -> https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-info--docs
+{% endcomment %}
+<div class="c-info{% if borderless|default:False %} c-info--borderless{% endif %}{% if extra_classes|default:'' %} {{ extra_classes }}{% endif %}">
+    {% if collapse_id|default:"" %}
+        <button class="c-info__summary{% if collapsed %} collapsed{% endif %}"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#{{ collapse_id }}"
+                aria-expanded="{% if collapsed %}false{% else %}true{% endif %}"
+                aria-controls="{{ collapse_id }}"
+                {% if extra_button_attrs|default:'' %}{{ extra_button_attrs }}{% endif %}>
+            <span>{{ c_info__summary }}</span>
+        </button>
+        {% if c_info__detail|default:"" %}
+            <div class="c-info__detail collapse{% if not collapsed %} show{% endif %}" id="{{ collapse_id }}">
+                {{ c_info__detail }}
+            </div>
+        {% endif %}
+    {% else %}
+        <span class="c-info__summary">{{ c_info__summary }}</span>
+        {% if c_info__detail|default:"" %}<div class="c-info__detail">{{ c_info__detail }}</div>{% endif %}
+    {% endif %}
+</div>

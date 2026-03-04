@@ -6,9 +6,16 @@ from slippers.templatetags.slippers import ComponentNode
 register = template.Library()
 
 
-def create_component_tag(template_path):
+def create_component_tag(template_path, default_attributes=None):
     def do_component(parser, token):
         tag_name, *remaining_bits = token.split_contents()
+
+        if default_attributes:
+            # Ensure component-level defaults exist even when callers omit attrs.
+            provided_keys = {bit.split("=", 1)[0] for bit in remaining_bits}
+            for key, value in default_attributes.items():
+                if key not in provided_keys:
+                    remaining_bits.append(f"{key}={value}")
 
         # This function comes directly from https://github.com/mixxorz/slippers/blob/0.6.2/slippers/templatetags/slippers.py#L23-L29
         # but changed from here:
@@ -48,4 +55,7 @@ register.tag("component_navinfo", create_component_tag("components/c-navinfo.htm
 register.tag("component_alert_global__acting_for", create_component_tag("components/alerts/global--acting-for.html"))
 register.tag(
     "component_box_nexus_activated_service", create_component_tag("components/c-box_nexus_activated_service.html")
+)
+register.tag(
+    "component_info", create_component_tag("components/c-info.html", default_attributes={"collapsed": "True"})
 )
