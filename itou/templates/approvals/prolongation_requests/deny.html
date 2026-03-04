@@ -46,19 +46,19 @@
                                 {% bootstrap_form wizard.form alert_error_type="non_fields" %}
 
                                 {% if wizard.steps.current == "reason" %}
-                                    <div class="c-info mb-4">
-                                        <button type="button" class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#legalInformation" aria-expanded="false" aria-controls="legalInformation">
-                                            <span>Contexte légal</span>
-                                        </button>
-                                        <div class="c-info__detail collapse" id="legalInformation">
+                                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="legalInformation" extra_classes="mb-4" %}
+                                        {% fragment as c_info__summary %}
+                                            Contexte légal
+                                        {% endfragment %}
+                                        {% fragment as c_info__detail %}
                                             <p>
                                                 Conformément à l’article Art. R. 5132-1-8. du Décret n° 2021-1128 du 30 août 2021 relatif à l'insertion par l'activité économique, le refus de prolongation d'un prescripteur est motivé par écrit et notifié, par tout moyen donnant date certaine à la réception de cette notification, à la structure et à l'intéressé.
                                             </p>
                                             <a class="btn-link has-external-link" href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043990367" aria-label="En savoir plus concernant le contexte légal" rel="noopener" target="_blank">
                                                 En savoir plus
                                             </a>
-                                        </div>
-                                    </div>
+                                        {% endfragment %}
+                                    {% endcomponent_info %}
                                 {% endif %}
                                 <hr>
                                 <p class="fs-xs">* champ obligatoire</p>

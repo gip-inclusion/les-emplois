@@ -99,11 +99,11 @@
                             <p class="fs-sm fst-italic">Aucune suspension enregistrée pour l’instant.</p>
                         {% endif %}
                         {% if is_employer_with_accepted_application %}
-                            <div class="c-info">
-                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSuspensionInfo" aria-expanded="false" aria-controls="collapseSuspensionInfo">
-                                    <span>Comment gérer mes suspensions ?</span>
-                                </button>
-                                <div class="c-info__detail collapse" id="collapseSuspensionInfo">
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseSuspensionInfo" %}
+                                {% fragment as c_info__summary %}
+                                    Comment gérer mes suspensions ?
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
                                     <p>
                                         Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
                                         <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14739233143953--Suspendre-un-PASS-IAE"
@@ -112,11 +112,10 @@
                                            rel="noopener"
                                            target="_blank">documentation</a>.
                                     </p>
-                                </div>
-                            </div>
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         {% endif %}
                     </div>
-
                 </div>
             </div>
             <div class="row">
@@ -204,11 +203,11 @@
                             <p class="fs-sm fst-italic">Aucune prolongation enregistrée pour l’instant.</p>
                         {% endif %}
                         {% if is_employer_with_accepted_application %}
-                            <div class="c-info">
-                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseProlongationInfo" aria-expanded="false" aria-controls="collapseProlongationInfo">
-                                    <span>Comment gérer mes prolongations ?</span>
-                                </button>
-                                <div class="c-info__detail collapse" id="collapseProlongationInfo">
+                            {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseProlongationInfo" %}
+                                {% fragment as c_info__summary %}
+                                    Comment gérer mes prolongations ?
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
                                     <p>
                                         Retrouvez toutes les informations sur le fonctionnement des prolongations dans notre
                                         <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE"
@@ -217,8 +216,8 @@
                                            rel="noopener"
                                            target="_blank">documentation</a>.
                                     </p>
-                                </div>
-                            </div>
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         {% endif %}
                     </div>
                 </div>
