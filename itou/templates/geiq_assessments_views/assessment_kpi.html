@@ -1,4 +1,5 @@
 {% extends "geiq_assessments_views/_assessment_base_for_geiq.html" %}
+{% load components %}
 {% load format_filters %}
 
 {% block content %}
@@ -9,13 +10,14 @@
                     <h2>Indicateurs clés</h2>
                     <div class="c-box c-box--summary mb-3 mb-md-4">
                         <div class="c-box--summary__body">
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">
+                            {% component_info borderless=True c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
                                     Les taux présentés ci-dessous correspondent aux résultats en sortie de parcours.
+                                {% endfragment %}
+                                {% fragment as c_info__detail %}
                                     Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
-                                </span>
-                            </div>
-
+                                {% endfragment %}
+                            {% endcomponent_info %}
                             <div class="c-box--summary__list-data">
                                 <ul class="list-unstyled">
                                     <li class="d-flex gap-2">

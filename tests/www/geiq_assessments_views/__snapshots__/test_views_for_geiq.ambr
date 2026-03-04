@@ -1450,7 +1450,7 @@
                               </strong>
                           </div>
                       </ul>
-                      <div class="c-info">
+                      <div class="c-info c-info--borderless">
                           <span class="c-info__summary">
                               Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
                           </span>
@@ -1550,12 +1550,17 @@
                       <h2>Indicateurs clés</h2>
                       <div class="c-box c-box--summary mb-3 mb-md-4">
                           <div class="c-box--summary__body">
-                              <div class="c-info mb-3">
-                                  <span class="c-info__summary">
+                              
+  <div class="c-info c-info--borderless mb-3">
+      
+          <span class="c-info__summary">
                                       Les taux présentés ci-dessous correspondent aux résultats en sortie de parcours.
-                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
                                   </span>
-                              </div>
+          <div class="c-info__detail">
+                                      Ils sont générés automatiquement par le site du label GEIQ et incluent à la fois les données du GEIQ principal et de ses antennes.
+                                  </div>
+      
+  </div>
   
                               <div class="c-box--summary__list-data">
                                   <ul class="list-unstyled">
@@ -1758,9 +1763,16 @@
                                       </li>
                                   </ul>
                               </div>
-                              <div class="c-info mb-3">
-                                  <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
-                              </div>
+                              
+  <div class="c-info c-info--borderless mb-3">
+      
+          <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+          
+      
+  </div>
+  
                           </div>
                       </div>
                   </div>
@@ -1865,9 +1877,16 @@
                                       </li>
                                   </ul>
                               </div>
-                              <div class="c-info mb-3">
-                                  <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
-                              </div>
+                              
+  <div class="c-info c-info--borderless mb-3">
+      
+          <span class="c-info__summary">
+                                      Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                  </span>
+          
+      
+  </div>
+  
                           </div>
                       </div>
                   </div>
@@ -2613,9 +2632,16 @@
                                           
                                       
                                   </fieldset>
-                                  <div class="c-info mt-3 mb-3">
-                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
-                                  </div>
+                                  
+  <div class="c-info c-info--borderless mt-3 mb-3">
+      
+          <span class="c-info__summary">
+                                          Les données des structures sélectionnées apparaitront dans le bilan
+                                      </span>
+          
+      
+  </div>
+  
                                   
                                   
   
@@ -2706,9 +2732,16 @@
                                           
                                       
                                   </fieldset>
-                                  <div class="c-info mt-3 mb-3">
-                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
-                                  </div>
+                                  
+  <div class="c-info c-info--borderless mt-3 mb-3">
+      
+          <span class="c-info__summary">
+                                          Les données des structures sélectionnées apparaitront dans le bilan
+                                      </span>
+          
+      
+  </div>
+  
                                   
                                   
   
@@ -2813,9 +2846,16 @@
                                           Aucune
                                       
                                   </fieldset>
-                                  <div class="c-info mt-3 mb-3">
-                                      <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
-                                  </div>
+                                  
+  <div class="c-info c-info--borderless mt-3 mb-3">
+      
+          <span class="c-info__summary">
+                                          Les données des structures sélectionnées apparaitront dans le bilan
+                                      </span>
+          
+      
+  </div>
+  
                                   
                                   
   

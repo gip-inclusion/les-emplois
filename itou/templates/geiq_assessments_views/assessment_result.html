@@ -1,4 +1,5 @@
 {% extends "geiq_assessments_views/_assessment_base_for_geiq.html" %}
+{% load components %}
 {% load format_filters %}
 {% load geiq_assessments_badges %}
 
@@ -102,9 +103,11 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">Contrats éligibles à l'aide / Contrats soumis par le GEIQ</span>
-                            </div>
+                            {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Contrats éligibles à l'aide / Contrats soumis par le GEIQ
+                                {% endfragment %}
+                            {% endcomponent_info %}
                         </div>
                     </div>
                 </div>
