@@ -9,7 +9,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.utils import constants as global_constants
 from itou.utils.apis.data_inclusion import DataInclusionApiException
 from itou.www.search_views.forms import ServiceSearchForm
-from tests.cities.factories import create_city_vannes
+from tests.cities.factories import create_city_guerande, create_city_vannes
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -190,6 +190,37 @@ def test_results_html_link(snapshot, client, search_services_route, user_factory
         )
         == snapshot()
     )
+
+
+def test_results_html_with_zero_distance(snapshot, settings, client, search_services_route):
+    guerande = create_city_guerande()
+    search_services_route.respond(
+        json={
+            "items": [
+                {
+                    "service": {
+                        "id": "dora-guerande",
+                        "source": "dora",
+                        "nom": "La boule à Zéro",
+                        "modes_accueil": list(data_inclusion_v1.ModeAccueil),
+                        "lien_source": f"{settings.DORA_BASE_URL}/services/dora-guerande",
+                        "structure": {"nom": "Coiffeur"},
+                        "code_postal": guerande.post_codes[0],
+                        "commune": guerande.name,
+                        "longitude": guerande.longitude,
+                        "latitude": guerande.latitude,
+                        "description": "Ne fait que des boules à zéro",
+                    },
+                }
+            ]
+        },
+    )
+
+    response = client.get(
+        reverse("search:services_results"),
+        {"city": guerande.slug, "category": random.choice(list(data_inclusion_v1.Categorie))},
+    )
+    assert pretty_indented(parse_response_to_soup(response, selector="#services-search-results")) == snapshot()
 
 
 def test_results_ordering(client, search_services_route):
