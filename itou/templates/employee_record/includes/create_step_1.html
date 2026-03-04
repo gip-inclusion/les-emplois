@@ -1,4 +1,5 @@
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load theme_inclusion %}
 {% load url_add_query %}
@@ -25,11 +26,11 @@
                         {% bootstrap_field form.ntt %}
                     </div>
                     {% if not job_application.job_seeker.jobseeker_profile.nir %}
-                        <div class="c-info">
-                            <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoNoNir" aria-expanded="true" aria-controls="collapseInfoNoNir">
-                                <span>Le candidat n’a pas de numéro de sécurité sociale (NIR) ?</span>
-                            </button>
-                            <div class="c-info__detail collapse show" id="collapseInfoNoNir">
+                        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoNoNir" opened=True %}
+                            {% fragment as c_info__summary %}
+                                Le candidat n’a pas de numéro de sécurité sociale (NIR) ?
+                            {% endfragment %}
+                            {% fragment as c_info__detail %}
                                 <p>Vous pouvez quand même continuer en renseignant :</p>
                                 <ul class="mt-0">
                                     <li>un numéro d’immatriculation d’attente (NIA);</li>
@@ -39,21 +40,21 @@
                                         <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
                                     </li>
                                 </ul>
-                            </div>
-                        </div>
+                            {% endfragment %}
+                        {% endcomponent_info %}
                     {% elif mandatory_ntt %}
-                        <div class="c-info">
-                            <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoNir78" aria-expanded="true" aria-controls="collapseInfoNir78">
-                                <span>Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?</span>
-                            </button>
-                            <div class="c-info__detail collapse show" id="collapseInfoNir78">
+                        {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoNir78" opened=True %}
+                            {% fragment as c_info__summary %}
+                                Le candidat a un numéro d’immatriculation d’attente (NIA) commençant par 7 ou par 8 ?
+                            {% endfragment %}
+                            {% fragment as c_info__detail %}
                                 <p>Vous pouvez poursuivre la démarche en renseignant un numéro technique temporaire (NTT).</p>
                                 <p class="mt-0">
                                     Ce numéro peut être généré par votre logiciel de paie ou créé manuellement.
                                     <a href="https://net-entreprises.custhelp.com/app/answers/detail_dsn/a_id/2952/" class="has-external-link" target="_blank" rel="noopener">En savoir plus</a>.
                                 </p>
-                            </div>
-                        </div>
+                            {% endfragment %}
+                        {% endcomponent_info %}
 
                     {% endif %}
                 </fieldset>
