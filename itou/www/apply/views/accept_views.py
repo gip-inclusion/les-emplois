@@ -81,6 +81,8 @@ class AcceptWizardMixin:
         self.job_seeker = None
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
+        self.geiq_eligibility_missing = False
+        self.iae_eligibility_missing = False
 
     def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -101,9 +103,13 @@ class AcceptWizardMixin:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, self.company
             ).first()
+            self.geiq_eligibility_missing = self.geiq_eligibility_diagnosis is None
         elif self.company.is_subject_to_iae_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
+            )
+            self.iae_eligibility_missing = (
+                self.eligibility_diagnosis is None and not self.job_seeker.has_valid_approval
             )
 
     def get_reset_url(self):
@@ -163,9 +169,9 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
 
     def get_success_url(self):
         next_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
-        if eligibility_view_name := self.get_eligibility_view_name():
+        if self.iae_eligibility_missing or self.geiq_eligibility_missing:
             return reverse(
-                eligibility_view_name,
+                self.get_eligibility_view_name(),
                 kwargs={"job_application_id": self.job_application.pk},
                 query={"next_url": next_url, "back_url": self.request.get_full_path()},
             )
@@ -241,10 +247,10 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
 
     def get_back_url(self):
         back_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
-        if eligibility_view_name := self.get_eligibility_view_name():
+        if self.iae_eligibility_missing or self.geiq_eligibility_missing:
             # Typically if GEIQ diagnosis wasn't created
             return reverse(
-                eligibility_view_name,
+                self.get_eligibility_view_name(),
                 kwargs={"job_application_id": self.job_application.pk},
                 query={"back_url": back_url, "next_url": self.request.get_full_path()},
             )
@@ -263,7 +269,7 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
 
     def missing_steps_redirect(self):
         redirect = super().missing_steps_redirect()
-        if redirect is None and self.job_application.eligibility_diagnosis_by_siae_required():
+        if redirect is None and self.iae_eligibility_missing:  # GEIQ eligibility might be skipped
             # This should not happen
             messages.error(
                 self.request,
