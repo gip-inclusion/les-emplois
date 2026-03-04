@@ -182,7 +182,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -553,7 +553,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -870,7 +870,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1182,7 +1182,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1500,7 +1500,7 @@
                                       </strong>
                                   </li>
                               </ul>
-                              <div class="c-info mb-3 mt-3 mt-lg-4">
+                              <div class="c-info c-info--borderless mb-3 mt-3 mt-md-4">
                                   <span class="c-info__summary">
                                       Contrats éligibles à l'aide / Contrats soumis par le GEIQ
                                   </span>
@@ -1929,7 +1929,7 @@
                                   </li>
                               </ul>
                           </div>
-                          <div class="c-info mt-3 mt-lg-4">
+                          <div class="c-info c-info--borderless mt-3 mt-md-4">
                               <span class="c-info__summary">
                                   Ces données ont été calculées suite à la selection que vous avez effectuée
                               </span>
@@ -2102,7 +2102,7 @@
                                   </li>
                               </ul>
                           </div>
-                          <div class="c-info mt-3 mt-lg-4">
+                          <div class="c-info c-info--borderless mt-3 mt-md-4">
                               <span class="c-info__summary">
                                   Ces données ont été calculées suite à la selection que vous avez effectuée
                               </span>
@@ -2267,7 +2267,7 @@
                                   </li>
                               </ul>
                           </div>
-                          <div class="c-info mt-3 mt-lg-4">
+                          <div class="c-info c-info--borderless mt-3 mt-md-4">
                               <span class="c-info__summary">
                                   Ces données ont été calculées suite à la selection que vous avez effectuée
                               </span>
