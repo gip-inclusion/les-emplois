@@ -125,11 +125,9 @@
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
-                                  <button class="c-info__summary">
-                                      <span>
-                                          Pour valider l'éligibilité IAE du candidat
-                                      </span>
-                                  </button>
+                                  <span class="c-info__summary">
+                                      Pour valider l'éligibilité IAE du candidat
+                                  </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
