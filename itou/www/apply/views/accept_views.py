@@ -25,6 +25,7 @@ from itou.www.apply.forms import (
     AcceptForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
 logger = logging.getLogger(__name__)
@@ -120,13 +121,6 @@ class AcceptWizardMixin:
             "reset_url": self.get_reset_url(),
         }
 
-    def get_eligibility_view_name(self):
-        if self.job_application.eligibility_diagnosis_by_siae_required():
-            return "apply:eligibility"
-        elif self.company.kind == CompanyKind.GEIQ and self.geiq_eligibility_diagnosis is None:
-            return "apply:geiq_eligibility"
-        return None
-
 
 class FillJobSeekerInfosForAcceptView(AcceptWizardMixin, common_views.BaseFillJobSeekerInfosView):
     template_name = "apply/process_accept_fill_job_seeker_infos_step.html"
@@ -169,9 +163,12 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
 
     def get_success_url(self):
         next_url = reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
-        if self.iae_eligibility_missing or self.geiq_eligibility_missing:
+        if self.iae_eligibility_missing:
+            return reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": self.accept_session.name})
+
+        elif self.geiq_eligibility_missing:
             return reverse(
-                self.get_eligibility_view_name(),
+                "apply:geiq_eligibility",
                 kwargs={"job_application_id": self.job_application.pk},
                 query={"next_url": next_url, "back_url": self.request.get_full_path()},
             )
@@ -185,6 +182,25 @@ class ContractInfosForAcceptView(AcceptWizardMixin, common_views.BaseContractInf
             self.eligibility_diagnosis.job_seeker = self.job_seeker
 
         context["expired_eligibility_diagnosis"] = None
+        return context
+
+
+class IAEEligibilityForAcceptView(AcceptWizardMixin, BaseIAEEligibilityViewForEmployer):
+    template_name = "apply/process_eligibility.html"
+
+    def get_success_url(self):
+        return reverse("apply:accept_confirmation", kwargs={"session_uuid": self.accept_session.name})
+
+    def get_back_url(self):
+        return reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
+
+    def get_cancel_url(self):
+        return self.get_reset_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["job_application"] = self.job_application
+        context["back_url"] = self.get_back_url()
         return context
 
 
@@ -247,10 +263,10 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
 
     def get_back_url(self):
         back_url = reverse("apply:accept_contract_infos", kwargs={"session_uuid": self.accept_session.name})
-        if self.iae_eligibility_missing or self.geiq_eligibility_missing:
+        if self.geiq_eligibility_missing:
             # Typically if GEIQ diagnosis wasn't created
             return reverse(
-                self.get_eligibility_view_name(),
+                "apply:geiq_eligibility",
                 kwargs={"job_application_id": self.job_application.pk},
                 query={"back_url": back_url, "next_url": self.request.get_full_path()},
             )
@@ -277,10 +293,6 @@ class ConfirmationForAcceptView(AcceptWizardMixin, common_views.BaseConfirmation
                 extra_tags="toast",
             )
             redirect = HttpResponseRedirect(
-                reverse(
-                    self.get_eligibility_view_name(),
-                    kwargs={"job_application_id": self.job_application.pk},
-                    query={"next_url": self.request.get_full_path()},
-                )
+                reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": self.accept_session.name})
             )
         return redirect

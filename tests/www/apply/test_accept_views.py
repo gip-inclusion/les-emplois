@@ -273,14 +273,7 @@ class TestProcessAcceptViewsInWizard:
             client, job_application, session_uuid, post_data=post_data, assert_successful=False
         )
 
-        eligibility_url = reverse(
-            "apply:eligibility",
-            kwargs={"job_application_id": job_application.pk},
-            query={
-                "back_url": self.get_contract_info_step_url(session_uuid),
-                "next_url": self.get_confirm_step_url(session_uuid),
-            },
-        )
+        eligibility_url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
         assertRedirects(response, eligibility_url, fetch_redirect_response=False)
 
         response = client.get(eligibility_url)
@@ -2482,13 +2475,7 @@ class TestAcceptConfirmation:
         response = client.get(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
         assertRedirects(
             response,
-            reverse(
-                "apply:eligibility",
-                kwargs={"job_application_id": job_application.pk},
-                query={
-                    "next_url": reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}),
-                },
-            ),
+            reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": accept_session.name}),
         )
         assertMessages(
             response,
@@ -2503,13 +2490,7 @@ class TestAcceptConfirmation:
         response = client.post(reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}))
         assertRedirects(
             response,
-            reverse(
-                "apply:eligibility",
-                kwargs={"job_application_id": job_application.pk},
-                query={
-                    "next_url": reverse("apply:accept_confirmation", kwargs={"session_uuid": accept_session.name}),
-                },
-            ),
+            reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": accept_session.name}),
         )
         assertMessages(
             response,
