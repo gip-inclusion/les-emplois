@@ -38,5 +38,6 @@ class InstitutionKind(models.TextChoices):
     DIHAL = ("DIHAL", "Délégation interministérielle à l'hébergement et à l'accès au logement")
     IAE_NETWORK = ("Réseau IAE", "Réseau employeur de l'insertion par l'activité économique")
     CONVERGENCE = ("CONVERGENCE", "Convergence France")
+    FFGEIQ = ("FFGEIQ", "Fédération Française des GEIQ")
 
     OTHER = ("Autre", "Autre")

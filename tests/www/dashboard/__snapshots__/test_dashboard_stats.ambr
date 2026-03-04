@@ -3344,6 +3344,65 @@
   
   '''
 # ---
+# name: test_index_stats_for_labor_inspector[FFGEIQ]
+  '''
+  <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">
+      <h2>
+          Pilotage de mon activité
+      </h2>
+      <section class="s-section mb-3 mb-md-5">
+          <div class="s-section__container">
+              <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
+                  <div class="col mb-3 mb-md-4">
+                      <div class="c-box p-0 h-100">
+                          <div class="p-3 p-lg-4">
+                              <span class="h4 mb-0">
+                                  Données personnalisées
+                              </span>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <p>
+                                  Vous ne disposez pas pour le moment de statistiques personnalisées.
+                      Faites-nous part de vos besoins éventuels en nous contactant
+                                  <a aria-label="Formulaire de contact (ouverture dans un nouvel onglet)" href="https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr/requests/new" rel="noreferrer noopener" target="_blank" title="Formulaire de contact (ouverture dans un nouvel onglet)">
+                                      ici
+                                  </a>
+                                  .
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col mb-3 mb-md-4">
+                      <div class="c-box p-0 h-100">
+                          <div class="p-3 p-lg-4">
+                              <span class="h4 mb-0">
+                                  Données publiques
+                              </span>
+                          </div>
+                          <div class="px-3 px-lg-4">
+                              <ul class="list-unstyled mb-lg-5">
+                                  <li class="d-flex justify-content-between align-items-center mb-3">
+                                      <a aria-label="Accéder aux tableaux de bord publics (ouverture dans un nouvel onglet)" class="btn-link btn-ico" href="https://pilotage.inclusion.beta.gouv.fr/tableaux-de-bord" rel="noopener" target="_blank">
+                                          <i aria-hidden="true" class="ri-dashboard-line ri-lg fw-normal align-self-start">
+                                          </i>
+                                          <span>
+                                              Accéder aux tableaux de bord publics
+                                          </span>
+                                          <i aria-hidden="true" class="ri-external-link-line fw-normal ms-2">
+                                          </i>
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </div>
+  
+  '''
+# ---
 # name: test_index_stats_for_labor_inspector[R\xe9seau IAE]
   '''
   <div aria-labelledby="statistiques-tab" class="tab-pane fade show active" id="statistiques" role="tabpanel">

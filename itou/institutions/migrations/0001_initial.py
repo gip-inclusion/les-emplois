@@ -208,6 +208,7 @@ class Migration(migrations.Migration):
                             ("DIHAL", "Délégation interministérielle à l'hébergement et à l'accès au logement"),
                             ("Réseau IAE", "Réseau employeur de l'insertion par l'activité économique"),
                             ("CONVERGENCE", "Convergence France"),
+                            ("FFGEIQ", "Fédération Française des GEIQ"),
                             ("Autre", "Autre"),
                         ],
                         default="Autre",
