@@ -392,7 +392,7 @@ def _enrich_api_result(result, *, city, local_distance_cutoff):
         [
             # If we get an "in person" only service than trust DI at the API only give us those in a 50km radius
             modes_accueil == {data_inclusion_v1.ModeAccueil.EN_PRESENTIEL.value},
-            result["is_in_person"] and (distance <= int(local_distance_cutoff) if distance else False),
+            result["is_in_person"] and (distance <= int(local_distance_cutoff) if distance is not None else False),
         ]
     )
     result["distance"] = distance
