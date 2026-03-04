@@ -6494,18 +6494,20 @@
 # ---
 # name: test_list_for_siae_exports[besoin-dun-chiffre]
   '''
-  <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
-      <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
-          <span>
-              Besoin d'un chiffre ?
-          </span>
-      </button>
-      <div class="c-info__detail collapse" id="collapseBesoinChiffre">
-          Accédez aux
-          <a href="/stats/siae/hiring" rel="noopener" target="_blank">
-              données de recrutement de votre structure
-          </a>
-          (non nominatives) compilées, calculées et mises à jour quotidiennement.
+  <div id="besoin-dun-chiffre">
+      <div class="c-info mb-3 mb-md-4">
+          <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse" type="button">
+              <span>
+                  Besoin d'un chiffre ?
+              </span>
+          </button>
+          <div class="c-info__detail collapse" id="collapseBesoinChiffre">
+              Accédez aux
+              <a href="/stats/siae/hiring" rel="noopener" target="_blank">
+                  données de recrutement de votre structure
+              </a>
+              (non nominatives) compilées, calculées et mises à jour quotidiennement.
+          </div>
       </div>
   </div>
   
@@ -8430,7 +8432,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8486,7 +8488,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
@@ -8544,7 +8546,7 @@
           <hr class="m-0"/>
           <div class="c-box--results__body">
               <div class="c-box--results__list-data">
-                  <div class="c-info c-info--secondary">
+                  <div class="c-info c-info--borderless">
                       <span class="c-info__summary">
                           Candidature spontanée
                       </span>
