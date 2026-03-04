@@ -49,3 +49,4 @@ register.tag("component_alert_global__acting_for", create_component_tag("compone
 register.tag(
     "component_box_nexus_activated_service", create_component_tag("components/c-box_nexus_activated_service.html")
 )
+register.tag("component_info", create_component_tag("components/c-info.html"))
