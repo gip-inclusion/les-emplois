@@ -56,6 +56,17 @@ from itou.www.geiq_assessments_views.forms import (
 logger = logging.getLogger(__name__)
 
 
+INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS = (
+    InstitutionKind.DDETS_GEIQ,
+    InstitutionKind.DREETS_GEIQ,
+)
+
+INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST = INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS + (
+    InstitutionKind.DGEFP_GEIQ,
+    InstitutionKind.FFGEIQ,
+)
+
+
 def employer_has_access_to_assessments(request):
     """
     Return True if the user can access the GEIQ assessment module.
@@ -772,10 +783,15 @@ def assessment_result(request, pk, template_name="geiq_assessments_views/assessm
 @require_safe
 @check_user(lambda user: user.is_labor_inspector)
 def list_for_institution(request, template_name="geiq_assessments_views/list_for_institution.html"):
-    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+    organization_kind = request.current_organization.kind
+    if organization_kind not in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_LIST:
         raise Http404
+    if organization_kind in (InstitutionKind.DGEFP_GEIQ, InstitutionKind.FFGEIQ):
+        filters = {}  # can list all assessments
+    else:
+        filters = {"institutions": request.current_organization}
     assessments = (
-        Assessment.objects.filter(institutions=request.current_organization)
+        Assessment.objects.filter(**filters)
         .select_related("campaign")
         .prefetch_related("institution_links__institution")
         .annotate(
@@ -785,6 +801,7 @@ def list_for_institution(request, template_name="geiq_assessments_views/list_for
     )
     context = {
         "assessments": assessments,
+        "can_access_details": organization_kind in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS,
     }
     return render(request, template_name, context)
 
@@ -804,7 +821,7 @@ class InstitutionAction(enum.StrEnum):
 def assessment_details_for_institution(
     request, pk, template_name="geiq_assessments_views/assessment_details_for_institution.html"
 ):
-    if request.current_organization.kind not in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ):
+    if request.current_organization.kind not in INSTITUTION_KINDS_CAN_VIEW_ASSESSMENT_DETAILS:
         raise Http404
     assessment = get_object_or_404(
         Assessment.objects.filter(institutions=request.current_organization).select_related(
