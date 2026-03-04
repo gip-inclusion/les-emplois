@@ -41,3 +41,13 @@ class InstitutionKind(models.TextChoices):
     FFGEIQ = ("FFGEIQ", "Fédération Française des GEIQ")
 
     OTHER = ("Autre", "Autre")
+
+    @classmethod
+    def get_singletons(cls):
+        return (
+            cls.CONVERGENCE,
+            cls.DGEFP_GEIQ,
+            cls.DGEFP_IAE,
+            cls.DIHAL,
+            cls.FFGEIQ,
+        )
