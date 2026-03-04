@@ -39,6 +39,7 @@ from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.www.apply.views.accept_views import ACCEPT_SESSION_KIND
 from itou.www.apply.views.batch_views import RefuseWizardView
 from itou.www.apply.views.process_views import job_application_sender_left_org
 from tests.approvals.factories import ApprovalFactory
@@ -1659,7 +1660,9 @@ class TestProcessViews:
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerFactory(
+                born_in_france=True,
                 with_address_in_qpv=True,
+                jobseeker_profile__with_pole_emploi_id=True,
                 last_checked_at=timezone.now() - datetime.timedelta(hours=25),  # Prevent prefilled criteria
             ),
             to_company__subject_to_iae_rules=True,
@@ -1678,7 +1681,18 @@ class TestProcessViews:
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
         criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
 
-        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        response = client.post(
+            reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}),
+            data={"hiring_start_at": timezone.localdate()},
+        )
+        url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
+        assertRedirects(response, url)
         response = client.get(url)
         assert response.status_code == 200
         assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
@@ -1716,9 +1730,7 @@ class TestProcessViews:
             f"{criterion3.key}": "true",
         }
         response = client.post(url, data=post_data)
-        assertRedirects(
-            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
+        assertRedirects(response, reverse("apply:accept_confirmation", kwargs={"session_uuid": session_uuid}))
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_company
@@ -1737,60 +1749,6 @@ class TestProcessViews:
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
-    def test_eligibility_with_next_url(self, client):
-        """Test the page propagates the next url to the accept view"""
-        job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
-            to_company__subject_to_iae_rules=True,
-        )
-
-        assert job_application.state.is_processing
-        employer = job_application.to_company.members.first()
-        client.force_login(employer)
-
-        has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_company
-        )
-        assert not has_considered_valid_diagnoses
-
-        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
-        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
-        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
-
-        next_url = reverse("apply:list_for_siae")
-        url = reverse(
-            "apply:eligibility",
-            kwargs={"job_application_id": job_application.pk},
-            query={"next_url": next_url},
-        )
-        details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = client.get(url)
-        assert response.status_code == 200
-        assertTemplateUsed(response, "eligibility/includes/iae/criteria_filled_from_job_seeker.html", count=1)
-        assertContains(
-            response,
-            f"""
-            <a href="{details_url}"
-               class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto"
-               aria-label="Annuler la saisie de ce formulaire">
-                <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                <span>Annuler</span>
-            </a>
-            """,
-            html=True,
-        )
-
-        post_data = {
-            # Administrative criteria level 1.
-            f"{criterion1.key}": "true",
-            # Administrative criteria level 2.
-            f"{criterion2.key}": "true",
-            f"{criterion3.key}": "true",
-        }
-        response = client.post(url, data=post_data)
-        assertRedirects(response, next_url)
-
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, client):
         """Test eligibility for a company not subject to eligibility rules."""
 
@@ -1802,7 +1760,13 @@ class TestProcessViews:
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
         response = client.get(url)
         assert response.status_code == 404
 
@@ -1822,7 +1786,13 @@ class TestProcessViews:
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
-        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+        url_accept = reverse(
+            "apply:start-accept",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = client.get(url_accept)
+        session_uuid = get_session_name(client.session, ACCEPT_SESSION_KIND)
+        url = reverse("apply:accept_iae_eligibility", kwargs={"session_uuid": session_uuid})
         response = client.get(url)
         assertContains(response, "suite aux mesures prises dans le cadre du contrôle a posteriori", status_code=403)
 
