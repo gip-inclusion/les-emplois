@@ -1,5 +1,6 @@
 import logging
 
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -17,7 +18,6 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
     JOB_SEEKER_INFOS_CHECK_PERIOD,
-    ApplicationPermissionMixin,
     ApplyTunnel,
     CheckPreviousApplicationsBaseMixin,
     RequireApplySessionMixin,
@@ -30,7 +30,30 @@ from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 logger = logging.getLogger(__name__)
 
 
-class StartViewForHire(ApplicationPermissionMixin, View):
+class HirePermissionMixin:
+    """
+    This mixin requires the following argument that must be setup by the child view
+
+    company: Company
+    """
+
+    def get_reset_url(self):
+        raise NotImplementedError
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.kind != UserKind.EMPLOYER:
+            raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches.")
+        if not self.company.has_member(request.user):
+            raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
+        if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+            raise PermissionDenied(
+                "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                "a posteriori. " + suspension_explanation
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class StartViewForHire(HirePermissionMixin, View):
     def setup(self, request, company_pk, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -57,7 +80,7 @@ class StartViewForHire(ApplicationPermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class HireBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
+class HireBaseView(RequireApplySessionMixin, HirePermissionMixin, TemplateView):
     def __init__(self):
         super().__init__()
         self.company = None

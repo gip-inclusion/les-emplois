@@ -105,11 +105,6 @@ class ApplicationPermissionMixin:
         raise NotImplementedError
 
     def dispatch(self, request, *args, **kwargs):
-        if self.tunnel == ApplyTunnel.HIRE:
-            if request.user.kind != UserKind.EMPLOYER:
-                raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-            if not self.company.has_member(request.user):
-                raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
         if request.user.kind not in [
             UserKind.JOB_SEEKER,
             UserKind.PRESCRIBER,
@@ -120,12 +115,13 @@ class ApplicationPermissionMixin:
             raise PermissionDenied(
                 "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
             )
-        if self.tunnel in (ApplyTunnel.AUTO_PRESCRIPTION, ApplyTunnel.HIRE):
-            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-                raise PermissionDenied(
-                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                    "a posteriori. " + suspension_explanation
-                )
+        if self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION and (
+            suspension_explanation := self.company.get_active_suspension_text_with_dates()
+        ):
+            raise PermissionDenied(
+                "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                "a posteriori. " + suspension_explanation
+            )
         # Refuse all applications except those made by an SIAE member
         if self.company.block_job_applications and not self.company.has_member(request.user):
             messages.error(request, apply_view_constants.ERROR_EMPLOYER_BLOCKING_APPLICATIONS)
@@ -136,7 +132,7 @@ class ApplicationPermissionMixin:
                 self, "SKIP_PREV_APPLICATIONS_CHECK", False
             )  # Don't enforce this rule until after CheckPreviousApplications
             and hasattr(self, "job_seeker")
-            and self.tunnel not in (ApplyTunnel.AUTO_PRESCRIPTION, ApplyTunnel.HIRE)
+            and self.tunnel != ApplyTunnel.AUTO_PRESCRIPTION
             and previous_applications_queryset(self.job_seeker, self.company).created_in_past(hours=24).exists()
         ):
             if request.user == self.job_seeker:
