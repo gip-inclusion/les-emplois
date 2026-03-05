@@ -1,7 +1,7 @@
 import logging
 
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
@@ -14,12 +14,13 @@ from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
+from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
+    APPLY_SESSION_KIND,
     JOB_SEEKER_INFOS_CHECK_PERIOD,
     CheckPreviousApplicationsBaseMixin,
-    RequireApplySessionMixin,
     _check_job_seeker_approval,
     initialize_apply_session,
 )
@@ -78,16 +79,21 @@ class StartViewForHire(HirePermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class HireBaseView(RequireApplySessionMixin, HirePermissionMixin, TemplateView):
+class HireBaseView(HirePermissionMixin, TemplateView):
     def __init__(self):
         super().__init__()
+        self.apply_session = None
         self.company = None
         self.job_seeker = None
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
+        try:
+            self.apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
+        except SessionNamespaceException:
+            raise Http404
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
         )
@@ -113,6 +119,9 @@ class HireBaseView(RequireApplySessionMixin, HirePermissionMixin, TemplateView):
     def get_back_url(self):
         return None
 
+    def get_reset_url(self):
+        return self.apply_session.get("reset_url")
+
     def get_eligibility_for_hire_step_url(self):
         if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
             return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
@@ -134,6 +143,7 @@ class HireBaseView(RequireApplySessionMixin, HirePermissionMixin, TemplateView):
         return super().get_context_data(**kwargs) | {
             "company": self.company,
             "back_url": self.get_back_url(),
+            "reset_url": self.get_reset_url(),
             "hire_process": True,
             "prescription_process": False,
             "auto_prescription_process": False,
