@@ -190,7 +190,7 @@ class TestHire:
     def test_start_view_initializes_session(self, client, back_url, expected_session):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         client.force_login(company.members.first())
-        url = reverse("apply:start", kwargs={"company_pk": company.pk})
+        url = reverse("apply:start_hire", kwargs={"company_pk": company.pk})
         client.get(url, {"back_url": back_url})
 
         assert get_session_name(client.session, APPLY_SESSION_KIND) is not None
