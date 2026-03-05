@@ -565,7 +565,8 @@ class TestManagementCommand:
         )
         evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
-        campaign.freeze(timezone.now())
+        with django_capture_on_commit_callbacks(execute=True):
+            campaign.freeze(timezone.now())
 
         with django_capture_on_commit_callbacks(execute=True):
             call_command("evaluation_campaign_notify")
@@ -573,7 +574,12 @@ class TestManagementCommand:
         assert caplog.messages[-1].startswith(
             "Management command itou.siae_evaluations.management.commands.evaluation_campaign_notify succeeded in "
         )
-        assert mailoutbox == []
+        [email] = mailoutbox
+        assert (
+            email.subject
+            # Submission frozen email.
+            == "[TEST] [Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+        )
 
 
 class TestArchivedAcceptedEvaluatedSiae:
