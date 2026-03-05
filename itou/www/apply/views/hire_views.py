@@ -3,16 +3,25 @@ import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import View
 
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.users.enums import UserKind
+from itou.users.models import User
+from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
-    ApplicationBaseView,
+    JOB_SEEKER_INFOS_CHECK_PERIOD,
     ApplicationPermissionMixin,
+    ApplyStepBaseView,
     ApplyTunnel,
     CheckPreviousApplicationsBaseMixin,
+    _check_job_seeker_approval,
     initialize_apply_session,
 )
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
@@ -48,12 +57,71 @@ class StartViewForHire(ApplicationPermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):
+class HireBaseView(ApplyStepBaseView):
+    def __init__(self):
+        super().__init__()
+
+        self.job_seeker = None
+        self.eligibility_diagnosis = None
+        self.geiq_eligibility_diagnosis = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        job_seeker_public_id = self.apply_session.get("job_seeker_public_id") or request.GET.get(
+            "job_seeker_public_id"
+        )
+        self.job_seeker = get_object_or_404(
+            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+        )
+        if "job_seeker_public_id" not in self.apply_session:
+            self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
+        _check_job_seeker_approval(request, self.job_seeker, self.company)
+        if self.company.kind == CompanyKind.GEIQ:
+            self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+                self.job_seeker, self.company
+            ).first()
+        elif self.company.is_subject_to_iae_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, self.company
+            )
+
+    def get_eligibility_for_hire_step_url(self):
+        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
+            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
+
+        bypass_eligibility_conditions = [
+            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
+            not self.company.is_subject_to_iae_rules,
+            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
+            self.job_seeker.has_valid_approval,
+            # Job seeker must not have a diagnosis
+            self.eligibility_diagnosis,
+        ]
+        if not any(bypass_eligibility_conditions):
+            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
+
+        return None
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_seeker": self.job_seeker,
+            "eligibility_diagnosis": self.eligibility_diagnosis,
+            "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,
+            "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
+            "is_subject_to_geiq_rules": self.company.kind == CompanyKind.GEIQ,
+            "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
+            "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
+            "new_check_needed": self.job_seeker.last_checked_at < timezone.now() - JOB_SEEKER_INFOS_CHECK_PERIOD,
+        }
+
+
+class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, HireBaseView):
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
 
 
-class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEmployer):
+class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer):
     template_name = "apply/submit/eligibility_for_hire.html"
 
     def dispatch(self, request, *args, **kwargs):
@@ -79,7 +147,7 @@ class IAEEligibilityForHireView(ApplicationBaseView, BaseIAEEligibilityViewForEm
         return context
 
 
-class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityView):
+class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityView):
     template_name = "apply/submit/geiq_eligibility_for_hire.html"
 
     def setup(self, request, *args, **kwargs):
@@ -113,11 +181,11 @@ class GEIQEligibilityForHireView(ApplicationBaseView, common_views.BaseGEIQEligi
         return context
 
 
-class GEIQEligiblityCriteriaForHireView(ApplicationBaseView, common_views.BaseGEIQEligibilityCriteriaHtmxView):
+class GEIQEligiblityCriteriaForHireView(HireBaseView, common_views.BaseGEIQEligibilityCriteriaHtmxView):
     pass
 
 
-class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJobSeekerInfosView):
+class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeekerInfosView):
     template_name = "apply/submit/hire_fill_job_seeker_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
@@ -146,7 +214,7 @@ class FillJobSeekerInfosForHireView(ApplicationBaseView, common_views.BaseFillJo
         return context
 
 
-class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInfosView):
+class ContractInfosForHireView(HireBaseView, common_views.BaseContractInfosView):
     template_name = "apply/submit/hire_contract_infos_step.html"
 
     def setup(self, request, *args, **kwargs):
@@ -183,7 +251,7 @@ class ContractInfosForHireView(ApplicationBaseView, common_views.BaseContractInf
         return context
 
 
-class ConfirmationForHireView(ApplicationBaseView, common_views.BaseConfirmationView):
+class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
     template_name = "apply/submit/hire_confirmation_step.html"
 
     def setup(self, request, *args, **kwargs):
