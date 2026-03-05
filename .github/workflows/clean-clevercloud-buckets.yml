@@ -3,7 +3,6 @@ name: 🧹 Clean CleverCloud test buckets
 # suite aren’t deleted. There’s a maximum of 1_000 buckets per Cellar instance.
 
 on:
-  pull_request:
   schedule:
     - cron: "0 0 * * 1"
   workflow_dispatch:
