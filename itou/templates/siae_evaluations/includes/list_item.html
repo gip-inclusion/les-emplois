@@ -1,3 +1,4 @@
+{% load components %}
 {% load str_filters %}
 
 {# navigation : anchor to scroll to a specific card when returning to this page #}
@@ -21,50 +22,54 @@
                 {% endif %}
             </div>
             {% if item.evaluated_administrative_criteria.all %}
-                <div class="c-info c-info--secondary mt-3">
-                    <button class="c-info__summary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseItemsEvaluated{{ item.pk }}" aria-expanded="true" aria-controls="collapseItemsEvaluated{{ item.pk }}">
-                        <span>{{ item.evaluated_administrative_criteria.count }} justificatif{{ item.evaluated_administrative_criteria.count|pluralizefr }}</span>
-                    </button>
-                    <div class="c-info__detail collapse show" id="collapseItemsEvaluated{{ item.pk }}">
-                        <ul class="list-unstyled">
-                            {% for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
-                                {% with criteria_review_state=evaluated_administrative_criteria.review_state_for_siae %}
-                                    <li>
-                                        {% if evaluated_administrative_criteria.criteria_certified %}
-                                            {# The criteria is certified, it has been accepted by default. #}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=True request=request evaluated_job_application=item only %}
-                                        {% elif item.evaluated_siae.reviewed_at %}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state only %}
-                                        {% else %}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
-                                        {% endif %}
-                                        <div class="text-md-end mt-2">
-                                            {% if evaluated_administrative_criteria.can_upload %}
-                                                {% if evaluated_administrative_criteria.proof_id %}
-                                                    <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-link">
-                                                        <i class="ri-pencil-line" aria-hidden="true"></i>
-                                                        <span>Modifier le justificatif</span>
-                                                    </a>
+                {% with collapse_id_suffix=item.pk|stringformat:"s" %}
+                    {% with collapse_id="collapseItemsEvaluated"|add:collapse_id_suffix %}
+                        {% component_info borderless=True c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id=collapse_id opened=True extra_classes="mt-3" %}
+                            {% fragment as c_info__summary %}
+                                {{ item.evaluated_administrative_criteria.count }} justificatif{{ item.evaluated_administrative_criteria.count|pluralizefr }}
+                            {% endfragment %}
+                            {% fragment as c_info__detail %}
+                                <ul class="list-unstyled">
+                                    {% for evaluated_administrative_criteria in item.evaluated_administrative_criteria.all %}
+                                        {% with criteria_review_state=evaluated_administrative_criteria.review_state_for_siae %}
+                                            <li>
+                                                {% if evaluated_administrative_criteria.criteria_certified %}
+                                                    {# The criteria is certified, it has been accepted by default. #}
+                                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state certified=True request=request evaluated_job_application=item only %}
+                                                {% elif item.evaluated_siae.reviewed_at %}
+                                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state only %}
                                                 {% else %}
-                                                    <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-primary">
-                                                        <i class="ri-add-line" aria-hidden="true"></i>
-                                                        <span>Ajouter un justificatif</span>
-                                                    </a>
+                                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
                                                 {% endif %}
-                                            {% elif evaluated_administrative_criteria.proof_id %}
-                                                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank" class="btn btn-sm btn-ico btn-link">
-                                                    <i class="ri-eye-line" aria-hidden="true"></i>
-                                                    <span>Voir le justificatif</span>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                        {% if not forloop.last %}<hr class="my-3">{% endif %}
-                                    </li>
-                                {% endwith %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+                                                <div class="text-md-end mt-2">
+                                                    {% if evaluated_administrative_criteria.can_upload %}
+                                                        {% if evaluated_administrative_criteria.proof_id %}
+                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-link">
+                                                                <i class="ri-pencil-line" aria-hidden="true"></i>
+                                                                <span>Modifier le justificatif</span>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'siae_evaluations_views:siae_upload_doc' evaluated_administrative_criteria.pk %}" class="btn btn-sm btn-ico btn-primary">
+                                                                <i class="ri-add-line" aria-hidden="true"></i>
+                                                                <span>Ajouter un justificatif</span>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% elif evaluated_administrative_criteria.proof_id %}
+                                                        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}" target="_blank" class="btn btn-sm btn-ico btn-link">
+                                                            <i class="ri-eye-line" aria-hidden="true"></i>
+                                                            <span>Voir le justificatif</span>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                                {% if not forloop.last %}<hr class="my-3">{% endif %}
+                                            </li>
+                                        {% endwith %}
+                                    {% endfor %}
+                                </ul>
+                            {% endfragment %}
+                        {% endcomponent_info %}
+                    {% endwith %}
+                {% endwith %}
             {% endif %}
         </div>
     {% endif %}
