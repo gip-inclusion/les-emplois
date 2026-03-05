@@ -13,7 +13,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FHIRE_SESSION_NAME%2Fhire%2Fcheck-infos">
                   <i aria-hidden="true" class="ri-pencil-line fw-medium">
                   </i>
                   <span>
@@ -200,7 +200,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FHIRE_SESSION_NAME%2Fhire%2Fcheck-infos">
                   <i aria-hidden="true" class="ri-pencil-line fw-medium">
                   </i>
                   <span>
@@ -443,7 +443,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a aria-label="Modifier les informations personnelles de " class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+              <a aria-label="Modifier les informations personnelles de " class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FHIRE_SESSION_NAME%2Fhire%2Fcheck-infos">
                   <i aria-hidden="true" class="ri-pencil-line fw-medium">
                   </i>
                   <span>
@@ -594,7 +594,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FHIRE_SESSION_NAME%2Fhire%2Fcheck-infos">
                   <i aria-hidden="true" class="ri-pencil-line fw-medium">
                   </i>
                   <span>
@@ -796,7 +796,7 @@
               </h3>
           </div>
           <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
-              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FAPPLY_SESSION_NAME%2Fhire%2Fcheck-infos">
+              <a aria-label="Modifier les informations personnelles de DOE Jane" class="btn btn-ico btn-outline-primary" href="/job-seekers/update/start?job_seeker_public_id=JOB_SEEKER_PUBLIC_ID&from_url=%2Fjob-seekers%2FHIRE_SESSION_NAME%2Fhire%2Fcheck-infos">
                   <i aria-hidden="true" class="ri-pencil-line fw-medium">
                   </i>
                   <span>
