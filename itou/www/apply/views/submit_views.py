@@ -406,7 +406,7 @@ class PendingAuthorizationForSender(UserPassesTestMixin, ApplyStepBaseView):
         return super().get_context_data(**kwargs) | {"next_url": self.next_url}
 
 
-class CheckPreviousApplicationsBaseView(ApplicationBaseView):
+class CheckPreviousApplicationsBaseMixin:
     """
     Check previous job applications to avoid duplicates.
     """
@@ -442,7 +442,7 @@ class CheckPreviousApplicationsBaseView(ApplicationBaseView):
         return context
 
 
-class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseView):
+class CheckPreviousApplicationsForSubmitView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):
     def get_next_url(self):
         return reverse("apply:application_jobs", kwargs={"session_uuid": self.apply_session.name})
 
