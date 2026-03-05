@@ -45,7 +45,6 @@ APPLY_SESSION_KIND = "apply_session"
 
 
 class ApplyTunnel(enum.StrEnum):
-    HIRE = "hire"
     PRESCRIPTION = "prescription"
     AUTO_PRESCRIPTION = "auto_prescription"
     JOB_SEEKER = "job_seeker"
