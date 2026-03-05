@@ -1,0 +1,1676 @@
+# serializer version: 1
+# name: TestMarcheCompanyAPI.test_list_companies
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_antenne_with_user_created_and_999
+  dict({
+    'num_queries': 7,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 3
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s,
+                                                                          %s,
+                                                                          %s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'MarcheCompanySerializer.get_siret[api/marche_api/serializers.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."source" = %s)
+                 AND "companies_company"."convention_id" = %s
+                 AND "companies_company"."siret"::text LIKE %s)
+          ORDER BY "companies_company"."created_at" ASC,
+                   "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_antenne_with_user_created_with_proper_siret
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 3
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s,
+                                                                          %s,
+                                                                          %s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_siret_with_999_and_no_other_siret_available
+  dict({
+    'num_queries': 7,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CompanyQuerySet.first[<site-packages>/django/db/models/query.py]',
+          'MarcheCompanySerializer.get_siret[api/marche_api/serializers.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."source" = %s)
+                 AND "companies_company"."convention_id" = %s
+                 AND "companies_company"."siret"::text LIKE %s)
+          ORDER BY "companies_company"."created_at" ASC,
+                   "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_with_multiple_admins
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_without_admins
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_companies_without_convention
+  dict({
+    'num_queries': 6,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "companies_company"."id",
+                 "companies_company"."address_line_1",
+                 "companies_company"."address_line_2",
+                 "companies_company"."post_code",
+                 "companies_company"."city",
+                 "companies_company"."department",
+                 "companies_company"."coords",
+                 "companies_company"."geocoding_score",
+                 "companies_company"."geocoding_updated_at",
+                 "companies_company"."ban_api_resolved_address",
+                 "companies_company"."insee_city_id",
+                 "companies_company"."name",
+                 "companies_company"."created_at",
+                 "companies_company"."updated_at",
+                 "companies_company"."uid",
+                 "companies_company"."active_members_email_reminder_last_sent_at",
+                 "companies_company"."automatic_geocoding_update",
+                 "companies_company"."siret",
+                 "companies_company"."naf",
+                 "companies_company"."kind",
+                 "companies_company"."brand",
+                 "companies_company"."phone",
+                 "companies_company"."email",
+                 "companies_company"."auth_email",
+                 "companies_company"."website",
+                 "companies_company"."description",
+                 "companies_company"."provided_support",
+                 "companies_company"."source",
+                 "companies_company"."created_by_id",
+                 "companies_company"."block_job_applications",
+                 "companies_company"."job_applications_blocked_at",
+                 "companies_company"."spontaneous_applications_open_since",
+                 "companies_company"."convention_id",
+                 "companies_company"."job_app_score",
+                 "companies_company"."is_searchable",
+                 "companies_company"."rdv_solidarites_id",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
+          FROM "companies_company"
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+          ORDER BY "companies_company"."id" ASC
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT "_prefetch_related_val_company_id",
+                 "col1",
+                 "col2",
+                 "col3",
+                 "col4",
+                 "col5",
+                 "col6",
+                 "col7",
+                 "col8",
+                 "col9",
+                 "col10",
+                 "col11",
+                 "col12",
+                 "col13",
+                 "col14",
+                 "col15",
+                 "col16",
+                 "col17",
+                 "col18",
+                 "col19",
+                 "col20",
+                 "col21",
+                 "col22",
+                 "col23",
+                 "col24",
+                 "col25",
+                 "col26",
+                 "col27",
+                 "col28",
+                 "col29",
+                 "col30",
+                 "col31",
+                 "col32",
+                 "col33",
+                 "col34",
+                 "col35",
+                 "col36",
+                 "col37",
+                 "col38",
+                 "col39",
+                 "col40",
+                 "col41",
+                 "col42",
+                 "col43",
+                 "col44"
+          FROM
+            (SELECT *
+             FROM
+               (SELECT ("companies_companymembership"."company_id") AS "_prefetch_related_val_company_id",
+                       "companies_companymembership"."id" AS "col1",
+                       "companies_companymembership"."user_id" AS "col2",
+                       "companies_companymembership"."joined_at" AS "col3",
+                       "companies_companymembership"."is_admin" AS "col4",
+                       "companies_companymembership"."is_active" AS "col5",
+                       "companies_companymembership"."created_at" AS "col6",
+                       "companies_companymembership"."updated_at" AS "col7",
+                       "companies_companymembership"."company_id" AS "col8",
+                       "companies_companymembership"."updated_by_id" AS "col9",
+                       ROW_NUMBER() OVER (PARTITION BY "companies_companymembership"."company_id"
+                                          ORDER BY "companies_companymembership"."joined_at" DESC) AS "qual0",
+                       "users_user"."id" AS "col10",
+                       "users_user"."password" AS "col11",
+                       "users_user"."last_login" AS "col12",
+                       "users_user"."is_superuser" AS "col13",
+                       "users_user"."username" AS "col14",
+                       "users_user"."first_name" AS "col15",
+                       "users_user"."last_name" AS "col16",
+                       "users_user"."is_staff" AS "col17",
+                       "users_user"."is_active" AS "col18",
+                       "users_user"."date_joined" AS "col19",
+                       "users_user"."address_line_1" AS "col20",
+                       "users_user"."address_line_2" AS "col21",
+                       "users_user"."post_code" AS "col22",
+                       "users_user"."city" AS "col23",
+                       "users_user"."department" AS "col24",
+                       "users_user"."coords" AS "col25",
+                       "users_user"."geocoding_score" AS "col26",
+                       "users_user"."geocoding_updated_at" AS "col27",
+                       "users_user"."ban_api_resolved_address" AS "col28",
+                       "users_user"."insee_city_id" AS "col29",
+                       "users_user"."title" AS "col30",
+                       "users_user"."full_name_search_vector" AS "col31",
+                       "users_user"."email" AS "col32",
+                       "users_user"."phone" AS "col33",
+                       "users_user"."kind" AS "col34",
+                       "users_user"."identity_provider" AS "col35",
+                       "users_user"."has_completed_welcoming_tour" AS "col36",
+                       "users_user"."created_by_id" AS "col37",
+                       "users_user"."external_data_source_history" AS "col38",
+                       "users_user"."last_checked_at" AS "col39",
+                       "users_user"."public_id" AS "col40",
+                       "users_user"."address_filled_at" AS "col41",
+                       "users_user"."first_login" AS "col42",
+                       "users_user"."upcoming_deletion_notified_at" AS "col43",
+                       "users_user"."allow_next_sso_sub_update" AS "col44"
+                FROM "companies_companymembership"
+                INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+                WHERE ("users_user"."is_active"
+                       AND "companies_companymembership"."is_active"
+                       AND "companies_companymembership"."is_admin"
+                       AND "companies_companymembership"."company_id" IN (%s))
+                ORDER BY "companies_companymembership"."joined_at" DESC) "qualify"
+             WHERE ("qual0" > %s
+                    AND "qual0" <= %s)) "qualify_mask"
+          ORDER BY "col3" DESC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestMarcheCompanyAPI.test_list_no_reserved_companies
+  dict({
+    'num_queries': 4,
+    'queries': list([
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'ServiceTokenAuthentication.authenticate_credentials[api/auth.py]',
+        ]),
+        'sql': '''
+          SELECT "api_servicetoken"."id",
+                 "api_servicetoken"."key",
+                 "api_servicetoken"."service",
+                 "api_servicetoken"."purpose",
+                 "api_servicetoken"."created_at"
+          FROM "api_servicetoken"
+          WHERE "api_servicetoken"."key" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Paginator.count[<site-packages>/django/core/paginator.py]',
+          'MarcheCompanyView.list[<site-packages>/rest_framework/mixins.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "companies_company"
+          WHERE (NOT ("companies_company"."siret" = %s)
+                 AND NOT ("companies_company"."kind" = %s))
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---

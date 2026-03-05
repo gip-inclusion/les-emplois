@@ -11,7 +11,8 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries, assertQuerySetEqual
+from itoutils.django.testing import assertSnapshotQueries
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind, CompanySource
 from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
@@ -197,26 +198,26 @@ class TestImportSiaeManagementCommands:
             ("ACI972200038A0M0", "2020-01-01", "2020-12-31"),
         ]
 
-    def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
+    def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self, snapshot):
         CompanyFactory(auth_email="tadaaa")
-        with assertNumQueries(1):
+        with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
-    def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
+    def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self, snapshot):
         CompanyFactory(auth_email="")
-        with assertNumQueries(1):
+        with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 1
 
-    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self, snapshot):
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
             membership1__user__is_active=False,
         )
-        with assertNumQueries(1):
+        with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
-    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self, snapshot):
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
@@ -224,12 +225,12 @@ class TestImportSiaeManagementCommands:
             membership2__is_active=False,
             membership2__user__is_active=False,
         )
-        with assertNumQueries(1):
+        with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 1
 
-    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
+    def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self, snapshot):
         CompanyWith2MembershipsFactory(auth_email="")
-        with assertNumQueries(1):
+        with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(

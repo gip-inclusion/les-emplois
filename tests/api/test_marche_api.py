@@ -1,21 +1,13 @@
 import datetime
 
 from django.urls import reverse
-from pytest_django.asserts import assertNumQueries
+from itoutils.django.testing import assertSnapshotQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import ServiceToken
-from itou.companies.enums import COMPANY_KIND_RESERVED, CompanySource
+from itou.companies.enums import COMPANY_KIND_RESERVED, CompanyKind, CompanySource
 from itou.nexus.enums import Service
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.utils.testing import BASE_NUM_QUERIES
-
-
-NUM_QUERIES = BASE_NUM_QUERIES
-NUM_QUERIES += 1  # count
-NUM_QUERIES += 1  # get ServiceToken
-NUM_QUERIES += 1  # get siaes
-NUM_QUERIES += 1  # Prefetch members
 
 
 class TestMarcheCompanyAPI:
@@ -43,11 +35,16 @@ class TestMarcheCompanyAPI:
         response = api_client.get(self.url, format="json")
         assert response.status_code == 403
 
-    def test_list_companies(self):
+    def test_list_companies(self, snapshot):
         api_client = self.api_client()
-        company = CompanyFactory(siret="10000000000001", with_membership=True, subject_to_iae_rules=True)
+        company = CompanyFactory(
+            kind=CompanyKind.EI,
+            siret="10000000000001",
+            with_membership=True,
+            subject_to_iae_rules=True,
+        )
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
         assert response.json()["results"] == [
@@ -77,15 +74,18 @@ class TestMarcheCompanyAPI:
             }
         ]
 
-    def test_list_companies_antenne_with_user_created_with_proper_siret(self, subtests):
+    def test_list_companies_antenne_with_user_created_with_proper_siret(self, snapshot, subtests):
         api_client = self.api_client()
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002")
+        company_1 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000001")
+        company_2 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000002")
         company_3 = CompanyFactory(
-            siret="10000000000003", source=CompanySource.USER_CREATED, convention=company_1.convention
+            kind=CompanyKind.EI,
+            siret="10000000000003",
+            source=CompanySource.USER_CREATED,
+            convention=company_1.convention,
         )
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
         company_data_list = response.json()["results"]
@@ -103,17 +103,18 @@ class TestMarcheCompanyAPI:
                 assert company_data is not None
                 assert company_data["siret"] == siret
 
-    def test_list_companies_antenne_with_user_created_and_999(self, subtests):
+    def test_list_companies_antenne_with_user_created_and_999(self, snapshot, subtests):
         api_client = self.api_client()
-        company_1 = CompanyFactory(siret="10000000000001")
-        company_2 = CompanyFactory(siret="10000000000002", source=CompanySource.ASP)
+        company_1 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000001")
+        company_2 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000002", source=CompanySource.ASP)
         company_3 = CompanyFactory(
-            siret="10000000099991", source=CompanySource.USER_CREATED, convention=company_1.convention
+            kind=CompanyKind.EI,
+            siret="10000000099991",
+            source=CompanySource.USER_CREATED,
+            convention=company_1.convention,
         )
 
-        num_queries = NUM_QUERIES
-        num_queries += 1  # get parent siae
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
 
@@ -132,13 +133,11 @@ class TestMarcheCompanyAPI:
                 assert company_data is not None
                 assert company_data["siret"] == siret
 
-    def test_list_companies_siret_with_999_and_no_other_siret_available(self):
+    def test_list_companies_siret_with_999_and_no_other_siret_available(self, snapshot):
         api_client = self.api_client()
-        company = CompanyFactory(siret="10000000099991", source=CompanySource.USER_CREATED)
+        company = CompanyFactory(kind=CompanyKind.EI, siret="10000000099991", source=CompanySource.USER_CREATED)
 
-        num_queries = NUM_QUERIES
-        num_queries += 1  # get parent siae
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
 
@@ -147,12 +146,11 @@ class TestMarcheCompanyAPI:
 
         assert company_data_list[0]["siret"] == company.siret[:9]  # fake nic is removed
 
-    def test_list_companies_without_convention(self):
+    def test_list_companies_without_convention(self, snapshot):
         api_client = self.api_client()
         CompanyFactory(convention=None)
 
-        num_queries = NUM_QUERIES
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
 
@@ -162,9 +160,9 @@ class TestMarcheCompanyAPI:
         assert company_data_list[0]["convention_is_active"] is None
         assert company_data_list[0]["convention_asp_id"] is None
 
-    def test_list_companies_without_admins(self):
+    def test_list_companies_without_admins(self, snapshot):
         api_client = self.api_client()
-        company = CompanyFactory()
+        company = CompanyFactory(kind=CompanyKind.EI)
         # An active admin membership on a disabled user
         CompanyMembershipFactory(company=company, user__is_active=False, is_active=True, is_admin=True)
         # An inactive admin membership
@@ -172,8 +170,7 @@ class TestMarcheCompanyAPI:
         # An active non-admin membership
         CompanyMembershipFactory(company=company, is_active=True, is_admin=False)
 
-        num_queries = NUM_QUERIES
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
 
@@ -183,16 +180,15 @@ class TestMarcheCompanyAPI:
         assert company_data_list[0]["admin_name"] is None
         assert company_data_list[0]["admin_email"] is None
 
-    def test_list_companies_with_multiple_admins(self):
+    def test_list_companies_with_multiple_admins(self, snapshot):
         api_client = self.api_client()
-        company = CompanyFactory()
+        company = CompanyFactory(kind=CompanyKind.EI)
         CompanyMembershipFactory(company=company, joined_at=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC))
         latest_admin = CompanyMembershipFactory(
             company=company, joined_at=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC)
         ).user
 
-        num_queries = NUM_QUERIES
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
 
@@ -202,13 +198,11 @@ class TestMarcheCompanyAPI:
         assert company_data_list[0]["admin_name"] == latest_admin.get_full_name()
         assert company_data_list[0]["admin_email"] == latest_admin.email
 
-    def test_list_no_reserved_companies(self):
+    def test_list_no_reserved_companies(self, snapshot):
         api_client = self.api_client()
         CompanyFactory(kind=COMPANY_KIND_RESERVED)
 
-        num_queries = NUM_QUERIES
-        num_queries -= 2  # no company and no prefetch memberships
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.url, format="json")
         assert response.status_code == 200
         assert response.json() == {"count": 0, "next": None, "previous": None, "results": []}

@@ -1,4 +1,98 @@
 # serializer version: 1
+# name: TestEvaluatedSiaeModel.test_state_on_closed_campaign_criteria_accepted
+  dict({
+    'num_queries': 2,
+    'queries': list([
+      dict({
+        'origin': list([
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state",
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestEvaluatedSiaeModel.test_state_on_closed_campaign_criteria_not_submitted_notified
+  dict({
+    'num_queries': 2,
+    'queries': list([
+      dict({
+        'origin': list([
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedjobapplication"."id",
+                 "siae_evaluations_evaluatedjobapplication"."job_application_id",
+                 "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id",
+                 "siae_evaluations_evaluatedjobapplication"."labor_inspector_explanation"
+          FROM "siae_evaluations_evaluatedjobapplication"
+          WHERE "siae_evaluations_evaluatedjobapplication"."evaluated_siae_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'EvaluatedJobApplication.compute_state[siae_evaluations/models.py]',
+          'state_from[siae_evaluations/models.py]',
+          '<genexpr>[siae_evaluations/models.py]',
+          'EvaluatedSiae.state_from_applications[siae_evaluations/models.py]',
+          'EvaluatedSiae.state[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."proof_id",
+                 "siae_evaluations_evaluatedadministrativecriteria"."uploaded_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."submitted_at",
+                 "siae_evaluations_evaluatedadministrativecriteria"."review_state",
+                 "siae_evaluations_evaluatedadministrativecriteria"."criteria_certified"
+          FROM "siae_evaluations_evaluatedadministrativecriteria"
+          INNER JOIN "eligibility_administrativecriteria" ON ("siae_evaluations_evaluatedadministrativecriteria"."administrative_criteria_id" = "eligibility_administrativecriteria"."id")
+          WHERE "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" = %s
+          ORDER BY "siae_evaluations_evaluatedadministrativecriteria"."evaluated_job_application_id" ASC,
+                   "eligibility_administrativecriteria"."level" ASC,
+                   "eligibility_administrativecriteria"."ui_rank" ASC
+        ''',
+      }),
+    ]),
+  })
+# ---
 # name: TestEvaluationCampaignManager.test_close_accepted_but_not_reviewed[accepted email body]
   '''
   Bonjour,
