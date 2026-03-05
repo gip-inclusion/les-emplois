@@ -16,6 +16,6 @@ class TestCheckHealth:
         assert response.status_code == 200
 
     def test_get_with_error(self, client, mocker):
-        mocker.patch("itou.www.middleware.connection.cursor", side_effect=Exception("Boom!"))
+        mocker.patch("itou.www.middleware.cache.get", side_effect=Exception("Boom!"))
         response = client.get("/check-health")
         assert response.status_code == 500

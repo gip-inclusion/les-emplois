@@ -942,7 +942,7 @@
 # ---
 # name: TestAnonymizeProfessionalManagementCommand.test_num_queries[anonymize_professionals_queries]
   dict({
-    'num_queries': 88,
+    'num_queries': 106,
     'queries': list([
       dict({
         'origin': list([
@@ -1320,7 +1320,8 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
@@ -1331,16 +1332,11 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({
@@ -1370,7 +1366,8 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
@@ -1381,16 +1378,11 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({
@@ -1420,7 +1412,8 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
@@ -1431,16 +1424,11 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({
@@ -1470,7 +1458,8 @@
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'ArchiveUser.send[communications/dispatch/email.py]',
           'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
@@ -1481,16 +1470,11 @@
           'Command.execute[itoutils/django/commands.py]',
         ]),
         'sql': '''
-          INSERT INTO "emails_email" ("to",
-                                      "cc",
-                                      "bcc",
-                                      "subject",
-                                      "body_text",
-                                      "from_email",
-                                      "reply_to",
-                                      "created_at",
-                                      "esp_response")
-          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({
@@ -1516,6 +1500,211 @@
                                       "created_at",
                                       "esp_response")
           VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "emails_email" ("to",
+                                      "cc",
+                                      "bcc",
+                                      "subject",
+                                      "body_text",
+                                      "from_email",
+                                      "reply_to",
+                                      "created_at",
+                                      "esp_response")
+          VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'ArchiveUser.send[communications/dispatch/email.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({
@@ -3399,6 +3588,186 @@
                                       %s,
                                       %s,
                                       %s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'Command.remove_from_contact[archive/management/commands/anonymize_professionals.py]',
+          'Command.anonymize_professionals_after_grace_period[archive/management/commands/anonymize_professionals.py]',
+          'Command.handle[archive/management/commands/anonymize_professionals.py]',
+          'wrapper[itoutils/django/commands.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({

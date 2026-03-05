@@ -11,8 +11,6 @@ import threading
 import uuid
 from functools import reduce
 
-# Workaround being able to use freezegun with pandas.
-# https://github.com/spulec/freezegun/issues/98
 import pandas  # noqa F401
 import paramiko
 import patchy
@@ -30,6 +28,9 @@ from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
+
+# Workaround being able to use freezegun with pandas.
+# https://github.com/spulec/freezegun/issues/98
 from paramiko import ServerInterface
 from slippers.templatetags.slippers import AttrsNode
 

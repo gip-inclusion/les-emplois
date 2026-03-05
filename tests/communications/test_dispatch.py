@@ -17,6 +17,7 @@ from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.utils.testing import execute_tasks
 
 
 class TestBaseNotification:
@@ -231,16 +232,14 @@ class TestEmailNotification:
         assert email.to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in email.body
 
-    def test_method_send(self, email_notification, django_capture_on_commit_callbacks, mailoutbox):
-        with django_capture_on_commit_callbacks(execute=True):
-            email_notification(self.user, self.organization).send()
+    def test_method_send(self, email_notification, mailoutbox):
+        email_notification(self.user, self.organization).send()
+        execute_tasks()
         assert len(mailoutbox) == 1
         assert mailoutbox[0].to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in mailoutbox[0].body
 
-    def test_method_send_for_prescriber_that_left_his_org(
-        self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
-    ):
+    def test_method_send_for_prescriber_that_left_his_org(self, email_notification, mailoutbox, caplog):
         self.user.prescribermembership_set.update(is_active=False)
 
         admin_1 = PrescriberMembershipFactory(
@@ -259,8 +258,8 @@ class TestEmailNotification:
             is_admin=False,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            email_notification(self.user, self.organization).send()
+        email_notification(self.user, self.organization).send()
+        execute_tasks()
 
         assert caplog.messages == ["Send email copy to admin, admin_count=2"]
         assert len(mailoutbox) == 3
@@ -274,9 +273,7 @@ class TestEmailNotification:
             " ne fait plus partie de votre organisation." in mailoutbox[1].body
         )
 
-    def test_method_send_for_employer_that_left_his_company(
-        self, email_notification, django_capture_on_commit_callbacks, mailoutbox, caplog
-    ):
+    def test_method_send_for_employer_that_left_his_company(self, email_notification, mailoutbox, caplog):
         user = EmployerFactory(membership=True)
         company = user.companymembership_set.first().company
         user.companymembership_set.update(is_active=False)
@@ -297,8 +294,8 @@ class TestEmailNotification:
             is_admin=False,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            email_notification(user, company).send()
+        email_notification(user, company).send()
+        execute_tasks()
 
         assert caplog.messages == ["Send email copy to admin, admin_count=2"]
         assert len(mailoutbox) == 3
@@ -312,11 +309,11 @@ class TestEmailNotification:
             " ne fait plus partie de votre structure." in mailoutbox[1].body
         )
 
-    def test_method_send_for_inactive_user(self, email_notification, django_capture_on_commit_callbacks, mailoutbox):
+    def test_method_send_for_inactive_user(self, email_notification, mailoutbox):
         self.user.is_active = False
         self.user.save()
-        with django_capture_on_commit_callbacks(execute=True):
-            email_notification(self.user, self.organization).send()
+        email_notification(self.user, self.organization).send()
+        execute_tasks()
         assert len(mailoutbox) == 0
 
         # But we still forward it if the user left his organozation
@@ -326,8 +323,8 @@ class TestEmailNotification:
             is_admin=True,
         ).user
 
-        with django_capture_on_commit_callbacks(execute=True):
-            email_notification(self.user, self.organization).send()
+        email_notification(self.user, self.organization).send()
+        execute_tasks()
         assert len(mailoutbox) == 1
         assert mailoutbox[0].to == [admin.email]
 

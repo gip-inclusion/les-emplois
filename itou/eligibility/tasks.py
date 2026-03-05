@@ -7,7 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
-from huey.contrib.djhuey import on_commit_task
+from huey.contrib.djhuey import db_task
 from huey.exceptions import RetryTask
 
 from itou.users.enums import IdentityCertificationAuthorities
@@ -96,7 +96,7 @@ API_PARTICULIER_RETRY_DELAY = datetime.timedelta(minutes=10)
 API_PARTICULIER_RETRY_COUNT = API_PARTICULIER_RETRY_DURATION / API_PARTICULIER_RETRY_DURATION
 
 
-@on_commit_task(retries=API_PARTICULIER_RETRY_COUNT, retry_delay=API_PARTICULIER_RETRY_DURATION.total_seconds())
+@db_task(retries=API_PARTICULIER_RETRY_COUNT, retry_delay=API_PARTICULIER_RETRY_DURATION.total_seconds())
 def async_certify_criterion_with_api_particulier(model_name, selected_administrative_criteria_id):
     model = apps.get_model("eligibility", model_name)
     with transaction.atomic():

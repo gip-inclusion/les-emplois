@@ -4,7 +4,7 @@ import unittest
 
 import huey.constants
 import pytest
-from django.db import connections, transaction
+from django.db import connection, connections, transaction
 from django.test import TestCase, TransactionTestCase
 from huey.tests.base import BaseTestCase
 from huey.tests.test_storage import StorageTests
@@ -96,6 +96,8 @@ def test_concurrency(arrange, act, empty_value):
     def take_lock():
         huey = ItouHuey("tests")
         with transaction.atomic():
+            with connection.cursor() as c:
+                c.execute("SET CONSTRAINTS ALL IMMEDIATE")
             act(huey.storage)
         ready.set()
         release_lock.wait(timeout=1)
@@ -104,6 +106,8 @@ def test_concurrency(arrange, act, empty_value):
     t = threading.Thread(target=take_lock)
     t.start()
     ready.wait(timeout=1)
+    with connection.cursor() as c:
+        c.execute("SET CONSTRAINTS ALL IMMEDIATE")
     try:
         value = act(huey.storage)  # Skipped locked row.
     finally:

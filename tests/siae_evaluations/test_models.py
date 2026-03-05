@@ -50,6 +50,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.testing import execute_tasks
 
 
 def create_batch_of_job_applications(company, *, size=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):
@@ -300,7 +301,7 @@ class TestEvaluationCampaignManager:
         with pytest.raises(ValidationError):
             evaluation_campaign.clean()
 
-    def test_create_campaigns_and_calendar(self, subtests, django_capture_on_commit_callbacks, mailoutbox):
+    def test_create_campaigns_and_calendar(self, subtests, mailoutbox):
         evaluated_period_start_at = timezone.localdate() - relativedelta(months=2)
         evaluated_period_end_at = timezone.localdate() - relativedelta(months=1)
         adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
@@ -309,10 +310,10 @@ class TestEvaluationCampaignManager:
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with subtests.test(kind=kind.name):
                 InstitutionFactory(kind=kind)
-                with django_capture_on_commit_callbacks(execute=True):
-                    assert 0 == create_campaigns_and_calendar(
-                        evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
-                    )
+                assert 0 == create_campaigns_and_calendar(
+                    evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+                )
+                execute_tasks()
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert 1 == Calendar.objects.all().count()
                 assert len(mailoutbox) == 0
@@ -320,10 +321,10 @@ class TestEvaluationCampaignManager:
         # institution DDETS IAE
         InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="O1")
         InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="1O")
-        with django_capture_on_commit_callbacks(execute=True):
-            assert 2 == create_campaigns_and_calendar(
-                evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
-            )
+        assert 2 == create_campaigns_and_calendar(
+            evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+        )
+        execute_tasks()
         assert 2 == EvaluationCampaign.objects.all().count()
         assert 1 == Calendar.objects.all().count()
 
@@ -518,7 +519,7 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.reviewed_at is None
         assert evaluated_siae.final_reviewed_at is None
 
-    def test_populate_all_job_applications_certified(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_populate_all_job_applications_certified(self, mailoutbox):
         institution_membership = InstitutionMembershipFactory()
         evaluation_campaign = EvaluationCampaignFactory(institution=institution_membership.institution)
         company = CompanyFactory(
@@ -540,8 +541,8 @@ class TestEvaluationCampaignManager:
                 ),
             )
         now = timezone.now()
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.populate(now)
+        evaluation_campaign.populate(now)
+        execute_tasks()
         evaluation_campaign.refresh_from_db()
 
         assert now == evaluation_campaign.percent_set_at
@@ -580,7 +581,7 @@ class TestEvaluationCampaignManager:
         assert ddets_email.to == [institution_membership.user.email]
 
     @freeze_time("2023-01-02 11:11:11")
-    def test_transition_to_adversarial_phase(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
+    def test_transition_to_adversarial_phase(self, snapshot, mailoutbox):
         institution = InstitutionFactory(name="DDETS 1", department="01", with_membership=True)
         ignored_siae = EvaluatedSiaeFactory(pk=1000, siae__pk=2000, evaluation_campaign__institution=institution)
         campaign = EvaluationCampaignFactory(institution=institution)
@@ -647,8 +648,8 @@ class TestEvaluationCampaignManager:
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.transition_to_adversarial_phase()
+        campaign.transition_to_adversarial_phase()
+        execute_tasks()
 
         assert ignored_siae == EvaluatedSiae.objects.get(reviewed_at__isnull=True)
         assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
@@ -714,9 +715,7 @@ class TestEvaluationCampaignManager:
         assert institution_email.body == snapshot(name="institution summary email body")
 
     @freeze_time("2023-01-02 11:11:11")
-    def test_transition_to_adversarial_phase_forced_to_adversarial_stage(
-        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
-    ):
+    def test_transition_to_adversarial_phase_forced_to_adversarial_stage(self, snapshot, mailoutbox):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_no_response = EvaluatedSiaeFactory(
             pk=1000,
@@ -727,8 +726,8 @@ class TestEvaluationCampaignManager:
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.transition_to_adversarial_phase()
+        campaign.transition_to_adversarial_phase()
+        execute_tasks()
 
         evaluated_siae_no_response.refresh_from_db()
         assert evaluated_siae_no_response.reviewed_at == timezone.now()
@@ -746,9 +745,7 @@ class TestEvaluationCampaignManager:
         assert institution_email.body == snapshot(name="institution summary email body")
 
     @freeze_time("2023-01-02 11:11:11")
-    def test_transition_to_adversarial_phase_force_accepted(
-        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
-    ):
+    def test_transition_to_adversarial_phase_force_accepted(self, snapshot, mailoutbox):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
             pk=1000, evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=2000
@@ -760,8 +757,8 @@ class TestEvaluationCampaignManager:
             # default review_state is PENDING
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.transition_to_adversarial_phase()
+        campaign.transition_to_adversarial_phase()
+        execute_tasks()
 
         assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
 
@@ -783,9 +780,7 @@ class TestEvaluationCampaignManager:
         assert siae_email.body == snapshot(name="force accepted email body")
 
     @freeze_time("2023-01-02 11:11:11")
-    def test_transition_to_adversarial_phase_accepted_but_not_reviewed(
-        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
-    ):
+    def test_transition_to_adversarial_phase_accepted_but_not_reviewed(self, snapshot, mailoutbox):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
             evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
@@ -800,8 +795,8 @@ class TestEvaluationCampaignManager:
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.transition_to_adversarial_phase()
+        campaign.transition_to_adversarial_phase()
+        execute_tasks()
 
         assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
 
@@ -820,9 +815,7 @@ class TestEvaluationCampaignManager:
         assert siae_email.body == snapshot(name="positive review email body")
 
     @freeze_time("2023-01-02 11:11:11")
-    def test_transition_to_adversarial_phase_refused_but_not_reviewed(
-        self, django_capture_on_commit_callbacks, snapshot, mailoutbox
-    ):
+    def test_transition_to_adversarial_phase_refused_but_not_reviewed(self, snapshot, mailoutbox):
         campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
         evaluated_siae_submitted = EvaluatedSiaeFactory(
             evaluation_campaign=campaign, siae__name="Prim’vert", siae__kind=CompanyKind.EI, siae__pk=1234
@@ -837,8 +830,8 @@ class TestEvaluationCampaignManager:
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.transition_to_adversarial_phase()
+        campaign.transition_to_adversarial_phase()
+        execute_tasks()
 
         assert not EvaluatedSiae.objects.filter(final_state__isnull=False).exists()
 
@@ -853,7 +846,7 @@ class TestEvaluationCampaignManager:
         )
         assert siae_email.body == snapshot(name="negative review email body")
 
-    def test_close_no_response(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
+    def test_close_no_response(self, snapshot, mailoutbox):
         evaluation_campaign = EvaluationCampaignFactory(
             pk=1000,
             institution__name="DDETS 01",
@@ -868,8 +861,8 @@ class TestEvaluationCampaignManager:
         )
         assert evaluation_campaign.ended_at is None
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert evaluation_campaign.ended_at is not None
         ended_at = evaluation_campaign.ended_at
 
@@ -888,13 +881,13 @@ class TestEvaluationCampaignManager:
         assert institution_email.subject == "[TEST] [Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == snapshot(name="sanction notification email body")
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mailoutbox) == 2
 
-    def test_close_notified_evaluated_siae(self, django_capture_on_commit_callbacks):
+    def test_close_notified_evaluated_siae(self):
         evaluation_campaign = EvaluationCampaignFactory(
             pk=1000,
             institution__name="DDETS 01",
@@ -915,13 +908,13 @@ class TestEvaluationCampaignManager:
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
         assert evaluated_siae.final_state is None
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
 
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.final_state == evaluation_enums.EvaluatedSiaeFinalState.REFUSED
 
-    def test_close_accepted_but_not_reviewed(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
+    def test_close_accepted_but_not_reviewed(self, snapshot, mailoutbox):
         evaluation_campaign = EvaluationCampaignFactory(
             institution__name="DDETS 01",
             evaluated_period_start_at=datetime.date(2022, 1, 1),
@@ -944,8 +937,8 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.final_reviewed_at is None
         assert evaluation_campaign.ended_at is None
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert evaluation_campaign.ended_at is not None
         # DDETS review was automatically validated
         evaluated_siae.refresh_from_db()
@@ -962,13 +955,13 @@ class TestEvaluationCampaignManager:
         )
         assert accepted_siae_email.body == snapshot(name="accepted email body")
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mailoutbox) == 1
 
-    def test_close_refused_but_not_reviewed(self, django_capture_on_commit_callbacks, snapshot, mailoutbox):
+    def test_close_refused_but_not_reviewed(self, snapshot, mailoutbox):
         evaluation_campaign = EvaluationCampaignFactory(
             pk=1000,
             institution__name="DDETS 01",
@@ -992,8 +985,8 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.final_reviewed_at is None
         assert evaluation_campaign.ended_at is None
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert evaluation_campaign.ended_at is not None
         # DDETS review was automatically validated
         evaluated_siae.refresh_from_db()
@@ -1016,8 +1009,8 @@ class TestEvaluationCampaignManager:
         assert institution_email.subject == "[TEST] [Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == snapshot(name="sanction notification email body")
 
-        with django_capture_on_commit_callbacks(execute=True):
-            evaluation_campaign.close()
+        evaluation_campaign.close()
+        execute_tasks()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mailoutbox) == 2
@@ -1045,7 +1038,7 @@ class TestEvaluationCampaignManager:
         assert evaluated_siae.submission_freezed_at is not None
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_notification(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_institution_submission_freeze_notification(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
             institution__name="DDETS 01",
@@ -1053,8 +1046,8 @@ class TestEvaluationCampaignManager:
         )
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae, complete=True)
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
 
         assert campaign.submission_freeze_notified_at is not None
         [email] = mailoutbox
@@ -1064,7 +1057,7 @@ class TestEvaluationCampaignManager:
         )
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_adversarial(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_institution_submission_freeze_adversarial(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
             calendar__adversarial_stage_start=timezone.localdate() - relativedelta(weeks=3),
@@ -1075,8 +1068,8 @@ class TestEvaluationCampaignManager:
             evaluation_campaign=campaign, reviewed_at=timezone.now() - relativedelta(days=15)
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
 
         assert campaign.submission_freeze_notified_at is not None
         [email] = mailoutbox
@@ -1086,9 +1079,7 @@ class TestEvaluationCampaignManager:
         )
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_notification_ignores_already_notified(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_institution_submission_freeze_notification_ignores_already_notified(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
             submission_freeze_notified_at=timezone.now(),
@@ -1097,14 +1088,12 @@ class TestEvaluationCampaignManager:
         )
         evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_notification_ignores_siae_evaluated(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_institution_submission_freeze_notification_ignores_siae_evaluated(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
             institution__name="DDETS 01",
@@ -1112,27 +1101,23 @@ class TestEvaluationCampaignManager:
         )
         evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=timezone.now())
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
         assert campaign.submission_freeze_notified_at is None
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_no_notification_without_docs(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_institution_submission_freeze_no_notification_without_docs(self, mailoutbox):
         campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now() - relativedelta(weeks=3))
         evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_)
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
         assert campaign.submission_freeze_notified_at is None
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_ignores_final_reviewed_at_before_adversarial_start(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_institution_submission_freeze_ignores_final_reviewed_at_before_adversarial_start(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
             calendar__adversarial_stage_start=datetime.date(2023, 2, 1),
@@ -1146,15 +1131,13 @@ class TestEvaluationCampaignManager:
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
         assert campaign.submission_freeze_notified_at is None
         assert mailoutbox == []
 
     @freeze_time("2023-01-18 11:11:11")
-    def test_institution_submission_freeze_ignores_final_reviewed_at_after_adversarial_start(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_institution_submission_freeze_ignores_final_reviewed_at_after_adversarial_start(self, mailoutbox):
         campaign = EvaluationCampaignFactory(
             evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
             calendar__adversarial_stage_start=datetime.date(2023, 1, 1),
@@ -1168,8 +1151,8 @@ class TestEvaluationCampaignManager:
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.freeze(timezone.now())
+        campaign.freeze(timezone.now())
+        execute_tasks()
         assert campaign.submission_freeze_notified_at is None
         assert mailoutbox == []
 

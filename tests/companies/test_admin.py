@@ -277,6 +277,7 @@ def test_companies_export(admin_client, snapshot):
         + 1  # Load user
         + 2  # count companies in admin list
         + 1  # select companies and created_by relation
+        + 3  # load tasks to execute from the db (with savepoint and release)
     ):
         response = admin_client.post(
             reverse("admin:companies_company_changelist"),

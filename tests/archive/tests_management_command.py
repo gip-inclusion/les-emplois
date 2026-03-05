@@ -77,6 +77,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.testing import execute_tasks
 
 
 @pytest.fixture(name="brevo_api_key", autouse=True)
@@ -107,10 +108,10 @@ def get_fields_list_for_snapshot(model):
 
 
 class TestNotifyInactiveJobseekersManagementCommand:
-    def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_dry_run(self, mailoutbox):
         user = JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY)
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_jobseekers")
+        call_command("notify_inactive_jobseekers")
+        execute_tasks()
 
         user.refresh_from_db()
         assert not mailoutbox
@@ -123,7 +124,7 @@ class TestNotifyInactiveJobseekersManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
-    def test_users_not_to_notify(self, django_capture_on_commit_callbacks, caplog, mailoutbox):
+    def test_users_not_to_notify(self, caplog, mailoutbox):
         # jobseeker_soon_without_recent_activity
         JobSeekerFactory(joined_days_ago=DAYS_OF_INACTIVITY - 1, for_snapshot=True)
 
@@ -166,8 +167,8 @@ class TestNotifyInactiveJobseekersManagementCommand:
         # itou_staff_without_recent_activity
         ItouStaffFactory(joined_days_ago=DAYS_OF_INACTIVITY)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_jobseekers", wet_run=True)
+        call_command("notify_inactive_jobseekers", wet_run=True)
+        execute_tasks()
 
         assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False).exists()
         assert "Notified inactive job seekers without recent activity: 0" in caplog.messages
@@ -206,7 +207,6 @@ class TestNotifyInactiveJobseekersManagementCommand:
         self,
         factory,
         related_object_factory,
-        django_capture_on_commit_callbacks,
         caplog,
         mailoutbox,
         snapshot,
@@ -215,8 +215,8 @@ class TestNotifyInactiveJobseekersManagementCommand:
         if related_object_factory:
             related_object_factory(user)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_jobseekers", wet_run=True)
+        call_command("notify_inactive_jobseekers", wet_run=True)
+        execute_tasks()
 
         user.refresh_from_db()
         assert user.upcoming_deletion_notified_at is not None
@@ -451,11 +451,11 @@ class TestAnonymizeJobseekersManagementCommand:
         assert not AnonymizedApproval.objects.exists()
         assert not respx_mock.calls.called
 
-    def test_archive_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
+    def test_archive_batch_size(self, respx_mock):
         JobSeekerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=30)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", batch_size=2, wet_run=True)
+        call_command("anonymize_jobseekers", batch_size=2, wet_run=True)
+        execute_tasks()
 
         assert AnonymizedJobSeeker.objects.count() == 2
         assert User.objects.count() == 1
@@ -597,14 +597,14 @@ class TestAnonymizeJobseekersManagementCommand:
         ],
     )
     def test_anonymize_notification_of_inactive_jobseekers_after_grace_period(
-        self, kwargs, django_capture_on_commit_callbacks, mailoutbox, snapshot, respx_mock, caplog
+        self, kwargs, mailoutbox, snapshot, respx_mock, caplog
     ):
         jobseeker = JobSeekerFactory(
             email="jobseeker@example.com", joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31, **kwargs
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
+        execute_tasks()
 
         assert "Anonymized jobseekers after grace period, count: 1" in caplog.messages
         if jobseeker.is_active:
@@ -621,7 +621,7 @@ class TestAnonymizeJobseekersManagementCommand:
 
         assert respx_mock.calls.call_count == 1
 
-    def test_archive_inactive_jobseekers_with_followup_group(self, django_capture_on_commit_callbacks, respx_mock):
+    def test_archive_inactive_jobseekers_with_followup_group(self, respx_mock):
         FollowUpGroupMembershipFactory(
             follow_up_group__beneficiary__joined_days_ago=DAYS_OF_INACTIVITY,
             follow_up_group__beneficiary__notified_days_ago=31,
@@ -631,8 +631,8 @@ class TestAnonymizeJobseekersManagementCommand:
         assert FollowUpGroup.objects.exists()
         assert FollowUpGroupMembership.objects.exists()
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
+        execute_tasks()
 
         assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
         assert not FollowUpGroup.objects.exists()
@@ -640,7 +640,7 @@ class TestAnonymizeJobseekersManagementCommand:
         assert AnonymizedJobSeeker.objects.exists()
         assert respx_mock.calls.call_count == 1
 
-    def test_archive_inactive_jobseekers_with_file(self, django_capture_on_commit_callbacks, respx_mock):
+    def test_archive_inactive_jobseekers_with_file(self, respx_mock):
         resume_file = FileFactory()
         JobApplicationFactory(
             job_seeker__notified_days_ago=31,
@@ -650,15 +650,14 @@ class TestAnonymizeJobseekersManagementCommand:
         )
         other_files = [FileFactory(), JobApplicationFactory().resume]
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
+        execute_tasks()
 
         assertQuerySetEqual(File.objects.all(), other_files, ordered=False)
         assert respx_mock.calls.call_count == 1
 
     def test_archive_inactive_jobseekers_after_grace_period(
         self,
-        django_capture_on_commit_callbacks,
         caplog,
         snapshot,
         respx_mock,
@@ -870,8 +869,8 @@ class TestAnonymizeJobseekersManagementCommand:
             ],
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_jobseekers", wet_run=True)
+        call_command("anonymize_jobseekers", wet_run=True)
+        execute_tasks()
 
         assert not JobApplication.objects.exists()
         assert not User.objects.filter(kind=UserKind.JOB_SEEKER).exists()
@@ -1194,13 +1193,13 @@ class TestAnonymizeJobseekersManagementCommand:
 
 
 class TestNotifyInactiveProfessionalsManagementCommand:
-    def test_dry_run(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_dry_run(self, mailoutbox):
         EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
         PrescriberFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
         LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_professionals")
+        call_command("notify_inactive_professionals")
+        execute_tasks()
 
         assert not mailoutbox
         assert not User.objects.filter(upcoming_deletion_notified_at__isnull=False)
@@ -1214,7 +1213,7 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         assert User.objects.filter(upcoming_deletion_notified_at__isnull=True).count() == 1
         assert User.objects.exclude(upcoming_deletion_notified_at__isnull=True).count() == 2
 
-    def test_professionals_not_to_be_notified(self, django_capture_on_commit_callbacks, caplog, mailoutbox):
+    def test_professionals_not_to_be_notified(self, caplog, mailoutbox):
         # professional_soon_without_recent_activity
         EmployerFactory(last_login_days_ago=DAYS_OF_INACTIVITY - 1)
         # professional_never_logged_in
@@ -1222,8 +1221,8 @@ class TestNotifyInactiveProfessionalsManagementCommand:
         # professional_without_recent_activity_already_notified
         notified_professional = LaborInspectorFactory(last_login_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=1)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_professionals", wet_run=True)
+        call_command("notify_inactive_professionals", wet_run=True)
+        execute_tasks()
 
         assert (
             not User.objects.exclude(id=notified_professional.id)
@@ -1246,7 +1245,6 @@ class TestNotifyInactiveProfessionalsManagementCommand:
     def test_notify_inactive_professionals(
         self,
         factory_kwargs,
-        django_capture_on_commit_callbacks,
         caplog,
         mailoutbox,
         snapshot,
@@ -1260,8 +1258,8 @@ class TestNotifyInactiveProfessionalsManagementCommand:
             **factory_kwargs,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("notify_inactive_professionals", wet_run=True)
+        call_command("notify_inactive_professionals", wet_run=True)
+        execute_tasks()
 
         updated_user = User.objects.get()
         assert updated_user.upcoming_deletion_notified_at is not None
@@ -1377,11 +1375,11 @@ class TestAnonymizeProfessionalManagementCommand:
         assert not AnonymizedProfessional.objects.exists()
         assert not respx_mock.calls.called
 
-    def test_anonymize_professionals_batch_size(self, django_capture_on_commit_callbacks, respx_mock):
+    def test_anonymize_professionals_batch_size(self, respx_mock):
         EmployerFactory.create_batch(3, joined_days_ago=DAYS_OF_INACTIVITY, notified_days_ago=31)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", batch_size=2, wet_run=True)
+        call_command("anonymize_professionals", batch_size=2, wet_run=True)
+        execute_tasks()
 
         assert AnonymizedProfessional.objects.count() == 2
         assert User.objects.filter(email__isnull=False).count() == 1
@@ -1415,7 +1413,6 @@ class TestAnonymizeProfessionalManagementCommand:
 
     def test_anonymize_professionals_after_grace_period(
         self,
-        django_capture_on_commit_callbacks,
         snapshot,
         caplog,
         respx_mock,
@@ -1469,8 +1466,8 @@ class TestAnonymizeProfessionalManagementCommand:
         to_delete_anonymized_labor_inspector = _create_professional(InstitutionMembershipFactory, False, None)
         to_delete_employer = _create_professional(CompanyMembershipFactory, False, create_city_geispolsheim())
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
 
         users = (
             User.objects.filter(id__in=[anonymized_employer.id, prescriber.id])
@@ -1508,9 +1505,7 @@ class TestAnonymizeProfessionalManagementCommand:
         )
         assert remark.remark.endswith("- Désactivation/archivage de l'utilisateur")
 
-    def test_anonymize_professional_had_membership_in_authorized_organization(
-        self, django_capture_on_commit_callbacks, caplog, respx_mock
-    ):
+    def test_anonymize_professional_had_membership_in_authorized_organization(self, caplog, respx_mock):
         membership = PrescriberMembershipFactory(
             user__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
             user__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
@@ -1522,16 +1517,16 @@ class TestAnonymizeProfessionalManagementCommand:
             sender=prescriber,
             with_iae_eligibility_diagnosis=True,
         )
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages
 
         caplog.clear()
         # Related objects are deleted, the prescriber can be deleted.
         job_application.delete()
         job_application.eligibility_diagnosis.delete()
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages
         assert respx_mock.calls.call_count == 1
 
@@ -1542,9 +1537,7 @@ class TestAnonymizeProfessionalManagementCommand:
         assert anonymized_prescriber.had_memberships_in_authorized_organization is True
 
     @pytest.mark.parametrize("with_organization", [True, False])
-    def test_anonymize_professional_with_job_seeker_assignment(
-        self, with_organization, django_capture_on_commit_callbacks, caplog, respx_mock
-    ):
+    def test_anonymize_professional_with_job_seeker_assignment(self, with_organization, caplog, respx_mock):
         organization = PrescriberOrganizationFactory() if with_organization else None
         JobSeekerAssignmentFactory(
             prescriber__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
@@ -1552,8 +1545,8 @@ class TestAnonymizeProfessionalManagementCommand:
             prescriber_organization=organization,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
 
         assert "Anonymized professionals after grace period, count: 1" in caplog.messages
 
@@ -1565,16 +1558,14 @@ class TestAnonymizeProfessionalManagementCommand:
         assert User.objects.filter(kind=UserKind.PRESCRIBER).exists()
 
         # …but running again the command deletes it for real, if there was no organization.
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
 
         assert caplog.messages.count("Anonymized professionals after grace period, count: 1") == 2
         assert User.objects.filter(kind=UserKind.PRESCRIBER).exists() is with_organization
 
     @pytest.mark.parametrize("is_active", [True, False])
-    def test_anonymize_professionals_notification(
-        self, is_active, django_capture_on_commit_callbacks, caplog, mailoutbox, snapshot, respx_mock
-    ):
+    def test_anonymize_professionals_notification(self, is_active, caplog, mailoutbox, snapshot, respx_mock):
         factory = random.choice([EmployerFactory, PrescriberFactory, LaborInspectorFactory])
         factory(
             date_joined=timezone.make_aware(datetime.datetime(2023, 5, 17)),
@@ -1586,8 +1577,8 @@ class TestAnonymizeProfessionalManagementCommand:
             email="micheline.dubois@example.com",
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
 
         if is_active:
             [mail] = mailoutbox
@@ -1597,7 +1588,7 @@ class TestAnonymizeProfessionalManagementCommand:
             assert mailoutbox == []
         assert respx_mock.calls.call_count == 1
 
-    def test_anonymized_professionals_annotations(self, django_capture_on_commit_callbacks, snapshot):
+    def test_anonymized_professionals_annotations(self, snapshot):
         # authorized_prescriber_admin_membership
         PrescriberMembershipFactory(
             user__date_joined=timezone.make_aware(datetime.datetime(2020, 2, 16)),
@@ -1655,8 +1646,8 @@ class TestAnonymizeProfessionalManagementCommand:
             is_active=False,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("anonymize_professionals", wet_run=True)
+        call_command("anonymize_professionals", wet_run=True)
+        execute_tasks()
 
         assert get_fields_list_for_snapshot(AnonymizedProfessional) == snapshot(
             name="anonymized_professionals_with_annotations"
@@ -1772,9 +1763,7 @@ class TestAnonymizeCancelledApprovalsManagementCommand:
 
 
 class TestRemoveUnknownEmailsFromBrevoCommand:
-    def test_remove_unknown_emails_from_brevo_dry_run(
-        self, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
-    ):
+    def test_remove_unknown_emails_from_brevo_dry_run(self, mocker, caplog, respx_mock):
         responses = [
             [
                 {
@@ -1787,8 +1776,8 @@ class TestRemoveUnknownEmailsFromBrevoCommand:
 
         mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=responses)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("remove_unknown_emails_from_brevo")
+        call_command("remove_unknown_emails_from_brevo")
+        execute_tasks()
 
         assert respx_mock.calls.call_count == 0
         for msg in [
@@ -1799,32 +1788,26 @@ class TestRemoveUnknownEmailsFromBrevoCommand:
         ]:
             assert msg in caplog.messages
 
-    def test_remove_unknown_emails_from_brevo_with_offset(
-        self, django_capture_on_commit_callbacks, caplog, respx_mock
-    ):
+    def test_remove_unknown_emails_from_brevo_with_offset(self, caplog, respx_mock):
         respx_mock.get(f"{settings.BREVO_API_URL}/contacts?limit=1000&offset=200&sort=asc").mock(
             return_value=httpx.Response(status_code=200, json={"contacts": []})
         )
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("remove_unknown_emails_from_brevo", wet_run=True, offset=200)
+        call_command("remove_unknown_emails_from_brevo", wet_run=True, offset=200)
+        execute_tasks()
 
         assert respx_mock.calls.call_count == 1
         assert "No more contact to process at offset 200" in caplog.messages
 
-    def test_remove_unknown_emails_from_brevo_exception(
-        self, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
-    ):
+    def test_remove_unknown_emails_from_brevo_exception(self, mocker, caplog, respx_mock):
         mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=MalformedResponseException)
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("remove_unknown_emails_from_brevo", wet_run=True)
+        call_command("remove_unknown_emails_from_brevo", wet_run=True)
+        execute_tasks()
 
         assert respx_mock.calls.call_count == 0
         assert "Error fetching contacts at offset 0: Malformed response" in caplog.messages
 
     @pytest.mark.parametrize("verbosity", [1, 2])
-    def test_remove_unknown_emails_from_brevo(
-        self, verbosity, django_capture_on_commit_callbacks, mocker, caplog, respx_mock
-    ):
+    def test_remove_unknown_emails_from_brevo(self, verbosity, mocker, caplog, respx_mock):
         known_users = EmployerFactory.create_batch(2)
         two_years_ago = timezone.now() - relativedelta(years=2) - datetime.timedelta(minutes=1)
         almost_two_years_ago = two_years_ago + datetime.timedelta(days=1)
@@ -1872,8 +1855,8 @@ class TestRemoveUnknownEmailsFromBrevoCommand:
 
         mocker.patch("itou.utils.brevo.BrevoClient.list_contacts", side_effect=responses)
 
-        with django_capture_on_commit_callbacks(execute=True):
-            call_command("remove_unknown_emails_from_brevo", wet_run=True, verbosity=verbosity)
+        call_command("remove_unknown_emails_from_brevo", wet_run=True, verbosity=verbosity)
+        execute_tasks()
 
         assert respx_mock.calls.call_count == 2
 

@@ -18,6 +18,7 @@ from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
+from tests.utils.testing import execute_tasks
 
 
 class TestMoveCompanyData:
@@ -207,7 +208,7 @@ def test_update_companies_coords(settings, capsys, respx_mock):
     assert company_3.coords.y == 42.42
 
 
-def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_commit_callbacks, caplog):
+def test_deactivate_old_job_description(snapshot, mailoutbox, caplog):
     create_test_romes_and_appellations(("N1101",))
     old_job_description_1 = companies_factories.JobDescriptionFactory(
         last_employer_update_at=timezone.now() - datetime.timedelta(days=90),
@@ -238,8 +239,8 @@ def test_deactivate_old_job_description(snapshot, mailoutbox, django_capture_on_
     )
     assert JobDescription.objects.active().count() == 4
     with assertSnapshotQueries(snapshot(name="SQL")):
-        with django_capture_on_commit_callbacks(execute=True):
-            management.call_command("deactivate_old_job_descriptions")
+        management.call_command("deactivate_old_job_descriptions")
+        execute_tasks()
     assertQuerySetEqual(
         JobDescription.objects.active(),
         [recently_updated_job_description, ft_job_description],

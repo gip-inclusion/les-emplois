@@ -16,6 +16,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByCompanyFactory,
 )
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import execute_tasks
 
 
 def test_transferable_states(subtests):
@@ -196,7 +197,7 @@ def test_workflow_transitions(subtests):
             job_application.save()  # Triggers transition check
 
 
-def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callbacks, mailoutbox):
+def test_transfer_must_notify_siae_and_job_seeker(mailoutbox):
     # Send email notification of transfer to :
     # - origin SIAE
     # - job seeker
@@ -214,8 +215,8 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     )
     job_seeker = job_application.job_seeker
 
-    with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+    job_application.transfer(user=origin_user, target_company=target_company)
+    execute_tasks()
 
     # Eligigibility diagnosis is done by SIAE : must not send an email
     assert len(mailoutbox) == 2
@@ -238,9 +239,7 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
         (True, "DUPONT Jean"),
     ],
 )
-def test_transfer_must_notify_unauthorized_prescriber(
-    django_capture_on_commit_callbacks, mailoutbox, is_authorized_prescriber, expected_jobseeker_name
-):
+def test_transfer_must_notify_unauthorized_prescriber(mailoutbox, is_authorized_prescriber, expected_jobseeker_name):
     # Same test and conditions as above, but this time prescriber
     origin_company = CompanyFactory(with_membership=True)
     target_company = CompanyFactory(with_membership=True)
@@ -257,8 +256,8 @@ def test_transfer_must_notify_unauthorized_prescriber(
         to_company=origin_company,
         **extra_kwargs,
     )
-    with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+    job_application.transfer(user=origin_user, target_company=target_company)
+    execute_tasks()
 
     assert len(mailoutbox) == 3
 
@@ -270,7 +269,7 @@ def test_transfer_must_notify_unauthorized_prescriber(
     assert f"a transféré la candidature de : {expected_jobseeker_name}" in mailoutbox[2].body
 
 
-def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbacks, mailoutbox):
+def test_transfer_must_notify_employer_orienter(mailoutbox):
     # Same test and conditions as above, but this time with an employer acting as orienter
     origin_company = CompanyFactory(with_membership=True)
     target_company = CompanyFactory(with_membership=True)
@@ -285,8 +284,8 @@ def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbac
     )
     job_seeker = job_application.job_seeker
 
-    with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+    job_application.transfer(user=origin_user, target_company=target_company)
+    execute_tasks()
 
     assert len(mailoutbox) == 3
     assert mailoutbox[0].to == [origin_user.email]
@@ -298,7 +297,7 @@ def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbac
     assert "a transféré la candidature de :" in mailoutbox[2].body
 
 
-def test_transfer_notifications_to_many_employers(django_capture_on_commit_callbacks, mailoutbox):
+def test_transfer_notifications_to_many_employers(mailoutbox):
     # Same as test_transfer_must_notify_siae_and_job_seeker
     # but with to recipients for SIAE transfer notification
     origin_company = CompanyWith2MembershipsFactory()
@@ -314,8 +313,8 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     )
     job_seeker = job_application.job_seeker
 
-    with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user_1, target_company=target_company)
+    job_application.transfer(user=origin_user_1, target_company=target_company)
+    execute_tasks()
 
     # Only checking SIAE email
     assert len(mailoutbox) == 3

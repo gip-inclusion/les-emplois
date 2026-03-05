@@ -185,7 +185,7 @@
 # ---
 # name: TestEvaluationCampaignManager.test_populate
   dict({
-    'num_queries': 21,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -754,6 +754,22 @@
       }),
       dict({
         'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
           'send_email_messages[utils/emails.py]',
@@ -770,6 +786,22 @@
                                       "created_at",
                                       "esp_response")
           VALUES (%s::citext[], %s::citext[], %s::citext[], %s, %s, %s, %s::citext[], %s, %s) RETURNING "emails_email"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'send_email_messages[utils/emails.py]',
+          'EvaluationCampaign.populate[siae_evaluations/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
         ''',
       }),
       dict({

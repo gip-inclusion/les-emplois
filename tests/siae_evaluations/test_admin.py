@@ -114,6 +114,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Prefetch corresponding administrative criteria
             + 1  # Prefetch siae memberships
             + 1  # Prefetch users of siae memberships
+            + 3  # load tasks to execute from the db (with savepoint and release)
         ):
             response = client.post(
                 reverse("admin:siae_evaluations_evaluationcampaign_changelist"),
@@ -229,6 +230,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Count the full results
             + 1  # Fetch selected evaluation_campaigns
             + 2 * 2  # For each campaign: update EvaluatedSiae & check if a notification is needed
+            + 3  # load tasks to execute from the db (with savepoint and release)
         ):
             response = client.post(
                 reverse("admin:siae_evaluations_evaluationcampaign_changelist"),

@@ -37,7 +37,7 @@ from tests.approvals.factories import ApprovalFactory, ProlongationRequestFactor
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.testing import normalize_fields_history
+from tests.utils.testing import execute_tasks, normalize_fields_history
 
 
 class TestImportSiaeManagementCommands:
@@ -233,15 +233,13 @@ class TestImportSiaeManagementCommands:
         with assertSnapshotQueries(snapshot):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
-    def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
-        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True) as commit_callbacks:
+    def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self, mailoutbox):
+        with freeze_time("2022-10-10"):
             create_new_siaes(
                 get_siret_to_siae_row(get_vue_structure_df()),
                 get_conventions_by_siae_key(get_vue_af_df()),
             )
-        assert len(commit_callbacks) == 6
+            execute_tasks()
         assert len(mailoutbox) == 6
         assert reverse("signup:company_select") in mailoutbox[0].body
         assert collections.Counter(mail.subject for mail in mailoutbox) == collections.Counter(
@@ -249,11 +247,12 @@ class TestImportSiaeManagementCommands:
             for (kind, name) in Company.objects.values_list("kind", "name")
         )
 
-    def test_create_siae_raise_if_siret_mismatch(self, django_capture_on_commit_callbacks):
+    def test_create_siae_raise_if_siret_mismatch(self):
         siret_to_siae = get_siret_to_siae_row(get_vue_structure_df())
 
-        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True):
+        with freeze_time("2022-10-10"):
             call_command("import_siae", wet_run=True)
+            execute_tasks()
         assert Company.objects.count() == len(siret_to_siae)
 
         # Now let's change a company SIRET on the ASP side.
@@ -265,10 +264,11 @@ class TestImportSiaeManagementCommands:
         del siret_to_siae[company.siret]
 
         # It should raise an error message and break.
-        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True):
+        with freeze_time("2022-10-10"):
             error_message = f"SIRET mismatch: existing_siae.siret='{company.siret}', row.siret='{new_siret}'"
             with pytest.raises(AssertionError, match=error_message):
                 create_new_siaes(siret_to_siae, conventions_by_siae_key=get_conventions_by_siae_key(get_vue_af_df()))
+            execute_tasks()
         assert not Company.objects.filter(siret=new_siret).exists()
 
     def test_update_siret_and_auth_email_of_existing_siaes_when_siret_changes(self, monkeypatch):

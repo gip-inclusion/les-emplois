@@ -1,3 +1,4 @@
+from django.test import Client
 from django.urls import reverse
 from pytest_django.asserts import assertNumQueries
 
@@ -5,7 +6,9 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
-def test_maintenance(client, settings, snapshot):
+def test_maintenance(settings, snapshot):
+    # Do not execute tasks.
+    client = Client()
     # Maintenance mode
     settings.MAINTENANCE_MODE = True
     with assertNumQueries(0):

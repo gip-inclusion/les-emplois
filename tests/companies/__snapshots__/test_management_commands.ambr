@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_deactivate_old_job_description[SQL]
   dict({
-    'num_queries': 21,
+    'num_queries': 34,
     'queries': list([
       dict({
         'origin': list([
@@ -330,6 +330,25 @@
       }),
       dict({
         'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
           'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
@@ -435,6 +454,25 @@
       }),
       dict({
         'origin': list([
+          'Task.save[<site-packages>/django/db/models/base.py]',
+          'DBStorage.enqueue[tasks/huey.py]',
+          'AsyncEmailBackend.send_messages[emails/tasks.py]',
+          'OldJobDescriptionDeactivationNotification.send[communications/dispatch/email.py]',
+          'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
+          'Command.execute[utils/command.py]',
+          'Command.execute[itoutils/django/commands.py]',
+          'Command.execute[itoutils/django/commands.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "tasks_task" ("queue",
+                                    "data",
+                                    "created_at",
+                                    "priority")
+          VALUES (%s, %s, %s, %s) RETURNING "tasks_task"."id"
+        ''',
+      }),
+      dict({
+        'origin': list([
           'Command.handle[companies/management/commands/deactivate_old_job_descriptions.py]',
           'Command.execute[utils/command.py]',
           'Command.execute[itoutils/django/commands.py]',
@@ -475,47 +513,45 @@
       dict({
         'origin': list([
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          '_async_send_message[emails/tasks.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
       dict({
         'origin': list([
-          '_async_send_message[emails/tasks.py]',
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': '''
-          SELECT "emails_email"."id",
-                 "emails_email"."to",
-                 "emails_email"."cc",
-                 "emails_email"."bcc",
-                 "emails_email"."subject",
-                 "emails_email"."body_text",
-                 "emails_email"."from_email",
-                 "emails_email"."reply_to",
-                 "emails_email"."created_at",
-                 "emails_email"."esp_response"
-          FROM "emails_email"
-          WHERE "emails_email"."id" = %s
-          LIMIT 21
-          FOR NO KEY
-          UPDATE OF "emails_email"
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
         ''',
       }),
       dict({
         'origin': list([
-          'Email.save[<site-packages>/django/db/models/base.py]',
-          '_async_send_message[emails/tasks.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': '''
-          UPDATE "emails_email"
-          SET "esp_response" = NULL
-          WHERE "emails_email"."id" = %s
+          DELETE
+          FROM "tasks_task"
+          WHERE "tasks_task"."id" IN (%s)
         ''',
       }),
       dict({
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          '_async_send_message[emails/tasks.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -563,6 +599,133 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          DELETE
+          FROM "tasks_task"
+          WHERE "tasks_task"."id" IN (%s)
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          SELECT "emails_email"."id",
+                 "emails_email"."to",
+                 "emails_email"."cc",
+                 "emails_email"."bcc",
+                 "emails_email"."subject",
+                 "emails_email"."body_text",
+                 "emails_email"."from_email",
+                 "emails_email"."reply_to",
+                 "emails_email"."created_at",
+                 "emails_email"."esp_response"
+          FROM "emails_email"
+          WHERE "emails_email"."id" = %s
+          LIMIT 21
+          FOR NO KEY
+          UPDATE OF "emails_email"
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Email.save[<site-packages>/django/db/models/base.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': '''
+          UPDATE "emails_email"
+          SET "esp_response" = NULL
+          WHERE "emails_email"."id" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          '_async_send_message[emails/tasks.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

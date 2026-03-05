@@ -17,6 +17,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
+from tests.utils.testing import execute_tasks
 
 
 class TestInstitutionEmailFactory:
@@ -60,9 +61,7 @@ class TestInstitutionEmailFactory:
     # did not send proofs.
 
     @freeze_time("2023-01-23")
-    def test_close_notifies_when_siae_has_negative_result(
-        self, django_capture_on_commit_callbacks, mailoutbox, snapshot
-    ):
+    def test_close_notifies_when_siae_has_negative_result(self, mailoutbox, snapshot):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(pk=1, institution=institution)
         company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins", kind=CompanyKind.EI)
@@ -80,8 +79,8 @@ class TestInstitutionEmailFactory:
             review_state=EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.close()
+        campaign.close()
+        execute_tasks()
 
         [siae_refused_email, institution_email] = mailoutbox
 
@@ -92,7 +91,7 @@ class TestInstitutionEmailFactory:
         assert siae_refused_email.subject == "[TEST] Résultat du contrôle - EI les petits jardins ID-1000"
         assert siae_refused_email.body == snapshot(name="refused result email")
 
-    def test_close_does_not_notify_when_siae_has_been_notified(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_close_does_not_notify_when_siae_has_been_notified(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
         company = CompanyWith2MembershipsFactory(name="les petits jardins")
@@ -111,15 +110,13 @@ class TestInstitutionEmailFactory:
             review_state=EvaluatedAdministrativeCriteriaState.REFUSED_2,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.close()
+        campaign.close()
+        execute_tasks()
 
         assert [] == mailoutbox
 
     @freeze_time("2023-06-07")
-    def test_close_notify_when_siae_has_positive_result_in_adversarial_phase(
-        self, django_capture_on_commit_callbacks, mailoutbox, snapshot
-    ):
+    def test_close_notify_when_siae_has_positive_result_in_adversarial_phase(self, mailoutbox, snapshot):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
         company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins", kind=CompanyKind.EI)
@@ -137,16 +134,14 @@ class TestInstitutionEmailFactory:
             review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.close()
+        campaign.close()
+        execute_tasks()
 
         [siae_accepted_email] = mailoutbox
         assert siae_accepted_email.subject == "[TEST] Résultat du contrôle - EI les petits jardins ID-1000"
         assert siae_accepted_email.body == snapshot(name="accepted result email")
 
-    def test_close_does_not_notify_when_siae_has_positive_result_in_amicable_phase(
-        self, django_capture_on_commit_callbacks, mailoutbox
-    ):
+    def test_close_does_not_notify_when_siae_has_positive_result_in_amicable_phase(self, mailoutbox):
         institution = InstitutionWith2MembershipFactory(name="DDETS 01")
         campaign = EvaluationCampaignFactory(institution=institution)
         company = CompanyWith2MembershipsFactory(pk=1000, name="les petits jardins")
@@ -165,8 +160,8 @@ class TestInstitutionEmailFactory:
             review_state=EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
-        with django_capture_on_commit_callbacks(execute=True):
-            campaign.close()
+        campaign.close()
+        execute_tasks()
         assert mailoutbox == []
 
     def test_submitted_by_siae(self):
