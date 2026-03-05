@@ -1840,7 +1840,7 @@
       dict({
         'origin': list([
           'Company.has_member[common_apps/organizations/models.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -1861,7 +1861,7 @@
         'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -1880,7 +1880,7 @@
           'JobSeekerPersonalDataForm.__init__[www/apply/forms.py]',
           'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
           'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -1940,7 +1940,7 @@
         'origin': list([
           'FillJobSeekerInfosForHireView.get_forms[www/apply/views/common.py]',
           'FillJobSeekerInfosForHireView.get[www/apply/views/common.py]',
-          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2716,7 +2716,7 @@
       dict({
         'origin': list([
           'Company.has_member[common_apps/organizations/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2737,7 +2737,7 @@
         'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -2758,7 +2758,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -2820,7 +2820,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -2839,7 +2839,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -2895,7 +2895,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -2903,7 +2903,7 @@
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -2921,7 +2921,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -2930,7 +2930,7 @@
           'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'SAVEPOINT "<snapshot>"',
       }),
@@ -2938,7 +2938,7 @@
         'origin': list([
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "_check"
@@ -2952,7 +2952,7 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -3741,7 +3741,7 @@
       dict({
         'origin': list([
           'Company.has_member[common_apps/organizations/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3762,7 +3762,7 @@
         'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -3783,7 +3783,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -3845,7 +3845,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -3864,7 +3864,7 @@
           'ConfirmationForHireView.get_forms[www/apply/views/common.py]',
           'ConfirmationForHireView.missing_steps_redirect[www/apply/views/common.py]',
           'ConfirmationForHireView.get[www/apply/views/common.py]',
-          'ConfirmationForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
@@ -4700,7 +4700,7 @@
       dict({
         'origin': list([
           'Company.has_member[common_apps/organizations/models.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -4721,7 +4721,7 @@
         'origin': list([
           'Company.get_active_suspension_dates[companies/models.py]',
           'Company.get_active_suspension_text_with_dates[companies/models.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_sanctions"."suspension_dates" AS "sanctions__suspension_dates"
@@ -4741,7 +4741,7 @@
           'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
           'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
           'ContractInfosForHireView.get[www/apply/views/common.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -4802,7 +4802,7 @@
           'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
           'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
           'ContractInfosForHireView.get[www/apply/views/common.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "asp_country"."id",
@@ -4820,7 +4820,7 @@
           'AcceptForm.__init__[www/apply/forms.py]',
           'ContractInfosForHireView.get_forms[www/apply/views/common.py]',
           'ContractInfosForHireView.get[www/apply/views/common.py]',
-          'ContractInfosForHireView.dispatch[www/apply/views/submit_views.py]',
+          'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
           SELECT "companies_jobdescription"."id",
