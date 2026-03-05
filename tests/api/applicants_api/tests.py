@@ -72,17 +72,18 @@ class TestApplicantsAPI:
     @pytest.mark.parametrize(
         ("mode_multi_structures", "uid_structures", "expected_first_names"),
         [
-            ("", "", ["Bob", "Dylan"]),
-            ("1", "", ["Bob", "Dylan", "Casper", "Nicholas"]),
-            ("", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"]),
-            (
+            pytest.param("", "", ["Bob", "Dylan"], id="single"),
+            pytest.param("1", "", ["Bob", "Dylan", "Casper", "Nicholas"], id="multi"),
+            pytest.param("", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"], id="single_structure_id"),
+            pytest.param(
                 "",
                 "76c51a19-0ae9-420c-b2e3-0ab33836bd50,87c9e1d8-4498-40d7-a1df-1d3412378c87",
                 ["Bob", "Dylan", "Casper", "Nicholas"],
+                id="single_multiple_structure_id",
             ),
-            ("1", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"]),
-            ("", "I-am-not-a-uid", []),
-            ("", "326dea3d-d17d-4f2c-9ffa-8e9cb305ae44", []),
+            pytest.param("1", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"], id="multi_structure_id"),
+            pytest.param("", "I-am-not-a-uid", [], id="single_not_uid"),
+            pytest.param("", "326dea3d-d17d-4f2c-9ffa-8e9cb305ae44", [], id="single_nonexistent_uid"),
         ],
     )
     def test_login_as_siae_multiple_memberships(
