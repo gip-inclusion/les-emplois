@@ -12,7 +12,7 @@ from itou.www.apply.views.submit_views import (
     ApplicationBaseView,
     ApplicationPermissionMixin,
     ApplyTunnel,
-    CheckPreviousApplicationsBaseView,
+    CheckPreviousApplicationsBaseMixin,
     initialize_apply_session,
 )
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
@@ -48,7 +48,7 @@ class StartViewForHire(ApplicationPermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseView):
+class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, ApplicationBaseView):
     def get_next_url(self):
         return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
 
