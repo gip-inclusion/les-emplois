@@ -18,7 +18,6 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
     JOB_SEEKER_INFOS_CHECK_PERIOD,
-    ApplyTunnel,
     CheckPreviousApplicationsBaseMixin,
     RequireApplySessionMixin,
     _check_job_seeker_approval,
@@ -58,7 +57,6 @@ class StartViewForHire(HirePermissionMixin, View):
         super().setup(request, *args, **kwargs)
 
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=company_pk)
-        self.tunnel = ApplyTunnel.HIRE
         self.reset_url = get_safe_url(request, "back_url", reverse("dashboard:index"))
 
     def get_reset_url(self):
@@ -90,7 +88,6 @@ class HireBaseView(RequireApplySessionMixin, HirePermissionMixin, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.tunnel = ApplyTunnel.HIRE
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
         )
