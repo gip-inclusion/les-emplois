@@ -1474,7 +1474,7 @@ class TestEvaluatedSiaeModel:
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
-    def test_state_on_closed_campaign_criteria_not_submitted_notified(self):
+    def test_state_on_closed_campaign_criteria_not_submitted_notified(self, snapshot):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now() - relativedelta(days=1),
             evaluated_siae__notified_at=timezone.now(),
@@ -1485,7 +1485,7 @@ class TestEvaluatedSiaeModel:
             evaluated_job_application=evaluated_job_app,
             uploaded_at=timezone.now() - relativedelta(days=1),
         )
-        with assertNumQueries(2):
+        with assertSnapshotQueries(snapshot):
             assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
         evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state
@@ -1564,7 +1564,7 @@ class TestEvaluatedSiaeModel:
         )
         assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.REFUSED
 
-    def test_state_on_closed_campaign_criteria_accepted(self):
+    def test_state_on_closed_campaign_criteria_accepted(self, snapshot):
         evaluated_job_app = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now(),
             evaluated_siae__reviewed_at=timezone.now() - relativedelta(days=5),
@@ -1575,7 +1575,7 @@ class TestEvaluatedSiaeModel:
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        with assertNumQueries(2):
+        with assertSnapshotQueries(snapshot):
             assert evaluated_job_app.evaluated_siae.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
         evaluated_job_app.evaluated_siae.final_state = evaluated_job_app.evaluated_siae.state

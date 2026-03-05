@@ -1,14 +1,13 @@
 import factory
 import pytest
 from django.urls import reverse_lazy
-from pytest_django.asserts import assertNumQueries
+from itoutils.django.testing import assertSnapshotQueries
 
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
-from tests.utils.testing import BASE_NUM_QUERIES
 
 
 class TestApplicantsAPI:
@@ -54,17 +53,12 @@ class TestApplicantsAPI:
 
         assert response.status_code == 403
 
-    def test_login_as_siae(self, api_client):
+    def test_login_as_siae(self, api_client, snapshot):
         # Connect with an admin user with member of a single SIAE
         user = CompanyFactory(with_membership=True).members.first()
         api_client.force_authenticate(user)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
-            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
-            + 1  # get queryset main query.
-        ):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.URL, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
@@ -86,8 +80,8 @@ class TestApplicantsAPI:
             pytest.param("", "326dea3d-d17d-4f2c-9ffa-8e9cb305ae44", [], id="single_nonexistent_uid"),
         ],
     )
-    def test_login_as_siae_multiple_memberships(
-        self, api_client, mode_multi_structures, uid_structures, expected_first_names
+    def test_login_as_siae_multiple_membership(
+        self, api_client, mode_multi_structures, uid_structures, expected_first_names, snapshot
     ):
         # Populate database with extra data to make sure filters work.
         JobApplicationFactory.create_batch(2, to_company_id=CompanyFactory().pk)
@@ -111,19 +105,9 @@ class TestApplicantsAPI:
         )
         JobApplicationFactory(to_company_id=company_2.pk, job_seeker_id=dylan.pk)
 
-        num_queries = (
-            BASE_NUM_QUERIES
-            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
-            + 1  # get_queryset: companies_uids aggregation
-            + 1  # get_queryset: Count job_applications (Exists JobApplication)
-        )
-        if len(expected_first_names) > 0:
-            # Subquery returned results, so the main query is executed.
-            num_queries = num_queries + 1  # get_queryset: Fetch User + Profile
-
         api_client.force_authenticate(employer)
 
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(
                 self.URL,
                 format="json",
@@ -137,7 +121,7 @@ class TestApplicantsAPI:
             assert sorted(expected_first_names) == sorted([result["prenom"] for result in results])
             assert len(results) == len(expected_first_names)
 
-    def test_applicant_data_mode_multiple_structures(self, api_client):
+    def test_applicant_data_mode_multiple_structures(self, api_client, snapshot):
         # First company: 2 applicants, 3 job applications.
         company_1 = CompanyFactory(with_membership=True)
         employer = company_1.members.first()
@@ -166,17 +150,9 @@ class TestApplicantsAPI:
         company_3 = CompanyFactory()
         JobApplicationFactory(to_company_id=company_3.pk, job_seeker_id=dylan.pk)
 
-        num_queries = (
-            BASE_NUM_QUERIES
-            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
-            + 1  # get_queryset: companies_uids aggregation
-            + 1  # get_queryset: Count job_applications (Exists JobApplication)
-            + 1  # get_queryset: Fetch User + Profile
-        )
-
         api_client.force_authenticate(employer)
 
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.URL, format="json", data={"mode_multi_structures": "1"})
 
         assert response.status_code == 200
@@ -216,7 +192,7 @@ class TestApplicantsAPI:
             },
         ] == results
 
-    def test_applicant_data(self, api_client):
+    def test_applicant_data(self, api_client, snapshot):
         company = CompanyFactory(with_membership=True)
         job_seeker1 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker
         # Will not refactor ASP factories:
@@ -238,13 +214,7 @@ class TestApplicantsAPI:
         user = company.members.first()
 
         api_client.force_authenticate(user)
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
-            + 1  # get_queryset: companies_uids aggregation
-            + 1  # get_queryset: Count job_applications (Exists JobApplication)
-            + 1  # get_queryset: Fetch User + Profile
-        ):
+        with assertSnapshotQueries(snapshot):
             response = api_client.get(self.URL, format="json")
 
         assert response.status_code == 200

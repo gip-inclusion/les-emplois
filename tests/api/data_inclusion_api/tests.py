@@ -1,5 +1,5 @@
 from django.urls import reverse
-from pytest_django.asserts import assertNumQueries
+from itoutils.django.testing import assertSnapshotQueries
 from rest_framework.test import APIClient
 
 from itou.api.models import ServiceToken
@@ -8,15 +8,6 @@ from itou.nexus.enums import Service
 from tests.api.utils import _str_with_tz
 from tests.companies.factories import CompanyFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.utils.testing import BASE_NUM_QUERIES
-
-
-NUM_QUERIES = BASE_NUM_QUERIES
-NUM_QUERIES += 1  # count
-NUM_QUERIES += 1  # get ServiceToken
-NUM_QUERIES += 1  # get siae / organization
-
-OLD_NUM_QUERIES = NUM_QUERIES - 1  # uses session Authentication, no token to fetch
 
 
 class TestDataInclusionStructure:
@@ -46,10 +37,10 @@ class TestDataInclusionSiaeStructure:
         response = self.authenticated_client.get(self.url, format="json", data={"type": "siae"})
         assert response.status_code == 403
 
-    def test_list_structures(self):
-        company = CompanyFactory(siret="10000000000001")
+    def test_list_structures(self, snapshot):
+        company = CompanyFactory(kind=CompanyKind.EI, siret="10000000000001")
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -79,17 +70,18 @@ class TestDataInclusionSiaeStructure:
             }
         ]
 
-    def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
-        company_2 = CompanyFactory(siret="10000000000002", subject_to_iae_rules=True)
+    def test_list_structures_antenne_with_user_created_with_proper_siret(self, snapshot, subtests):
+        company_1 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000001", subject_to_iae_rules=True)
+        company_2 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000002", subject_to_iae_rules=True)
         company_3 = CompanyFactory(
+            kind=CompanyKind.EI,
             siret="10000000000003",
             subject_to_iae_rules=True,
             source=CompanySource.USER_CREATED,
             convention=company_1.convention,
         )
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -114,23 +106,23 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
 
-    def test_list_structures_antenne_with_user_created_and_999(self, subtests):
-        company_1 = CompanyFactory(siret="10000000000001", subject_to_iae_rules=True)
+    def test_list_structures_antenne_with_user_created_and_999(self, snapshot, subtests):
+        company_1 = CompanyFactory(kind=CompanyKind.EI, siret="10000000000001", subject_to_iae_rules=True)
         company_2 = CompanyFactory(
+            kind=CompanyKind.EI,
             siret="10000000000002",
             subject_to_iae_rules=True,
             source=CompanySource.ASP,
         )
         company_3 = CompanyFactory(
+            kind=CompanyKind.EI,
             siret="10000000099991",
             subject_to_iae_rules=True,
             source=CompanySource.USER_CREATED,
             convention=company_1.convention,
         )
 
-        num_queries = NUM_QUERIES
-        num_queries += 1  # get parent siae
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -154,12 +146,10 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
 
-    def test_list_structures_siret_with_999_and_no_other_siret_available(self):
-        CompanyFactory(siret="10000000099991", source=CompanySource.USER_CREATED)
+    def test_list_structures_siret_with_999_and_no_other_siret_available(self, snapshot):
+        CompanyFactory(kind=CompanyKind.EI, siret="10000000099991", source=CompanySource.USER_CREATED)
 
-        num_queries = NUM_QUERIES
-        num_queries += 1  # get parent siae
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -172,11 +162,11 @@ class TestDataInclusionSiaeStructure:
 
         assert structure_data_list[0]["siret"] is None
 
-    def test_list_structures_duplicated_siret(self, subtests):
+    def test_list_structures_duplicated_siret(self, snapshot, subtests):
         company_1 = CompanyFactory(siret="10000000000001", kind=CompanyKind.ACI)
         company_2 = CompanyFactory(siret=company_1.siret, kind=CompanyKind.EI)
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -201,12 +191,10 @@ class TestDataInclusionSiaeStructure:
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
 
-    def test_list_structures_inactive_excluded(self):
-        CompanyFactory(subject_to_iae_rules=True, convention__is_active=False)
+    def test_list_structures_inactive_excluded(self, snapshot):
+        CompanyFactory(kind=CompanyKind.EI, subject_to_iae_rules=True, convention__is_active=False)
 
-        num_queries = NUM_QUERIES
-        num_queries -= 1  # no siae to fetch
-        with assertNumQueries(num_queries):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -234,10 +222,10 @@ class TestDataInclusionPrescriberStructure:
         response = self.authenticated_client.get(self.url, format="json", data={"type": "siae"})
         assert response.status_code == 403
 
-    def test_list_structures(self):
+    def test_list_structures(self, snapshot):
         orga = PrescriberOrganizationFactory(authorized=True)
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -265,10 +253,10 @@ class TestDataInclusionPrescriberStructure:
             }
         ]
 
-    def test_list_structures_date_maj_value(self):
+    def test_list_structures_date_maj_value(self, snapshot):
         orga = PrescriberOrganizationFactory()
 
-        with assertNumQueries(NUM_QUERIES):
+        with assertSnapshotQueries(snapshot):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
