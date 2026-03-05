@@ -689,7 +689,7 @@
    <div class="c-box--results__body">
     <div class="c-box--results__list-data">
     </div>
-    <div class="c-info c-info--secondary mt-3">
+    <div class="c-info c-info--borderless mt-3">
      <button aria-controls="collapseItemsEvaluated1" aria-expanded="true" class="c-info__summary" data-bs-target="#collapseItemsEvaluated1" data-bs-toggle="collapse" type="button">
       <span>
        1 justificatif
