@@ -22,12 +22,17 @@ from itou.www.apply.views.submit_views import (
     JOB_SEEKER_INFOS_CHECK_PERIOD,
     CheckPreviousApplicationsBaseMixin,
     _check_job_seeker_approval,
-    initialize_apply_session,
 )
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForEmployer
 
 
 logger = logging.getLogger(__name__)
+
+HIRE_SESSION_KIND = "hire_session"
+
+
+def initialize_hire_session(request, data):
+    return SessionNamespace.create(request.session, HIRE_SESSION_KIND, data)
 
 
 class HirePermissionMixin:
@@ -64,13 +69,13 @@ class StartViewForHire(HirePermissionMixin, View):
         return self.reset_url
 
     def get(self, request, *args, **kwargs):
-        self.apply_session = initialize_apply_session(
+        self.hire_session = initialize_hire_session(
             request, {"reset_url": self.reset_url, "company_pk": self.company.pk}
         )
 
         params = {
             "tunnel": "hire",
-            "apply_session_uuid": self.apply_session.name,
+            "hire_session_uuid": self.hire_session.name,
             "company": self.company.pk,
             "from_url": self.get_reset_url(),
         }
@@ -82,7 +87,7 @@ class StartViewForHire(HirePermissionMixin, View):
 class HireBaseView(HirePermissionMixin, TemplateView):
     def __init__(self):
         super().__init__()
-        self.apply_session = None
+        self.hire_session = None
         self.company = None
         self.job_seeker = None
         self.eligibility_diagnosis = None
@@ -91,21 +96,23 @@ class HireBaseView(HirePermissionMixin, TemplateView):
     def setup(self, request, *args, session_uuid, **kwargs):
         super().setup(request, *args, **kwargs)
         try:
-            self.apply_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
+            self.hire_session = SessionNamespace(request.session, HIRE_SESSION_KIND, session_uuid)
         except SessionNamespaceException:
-            raise Http404
+            # TODO(xfernandez): remove this fallback in a week
+            try:
+                self.hire_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
+            except SessionNamespaceException:
+                raise Http404
         self.company = get_object_or_404(
-            Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
+            Company.objects.with_has_active_members(), pk=self.hire_session.get("company_pk")
         )
 
-        job_seeker_public_id = self.apply_session.get("job_seeker_public_id") or request.GET.get(
-            "job_seeker_public_id"
-        )
+        job_seeker_public_id = self.hire_session.get("job_seeker_public_id") or request.GET.get("job_seeker_public_id")
         self.job_seeker = get_object_or_404(
             User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
         )
-        if "job_seeker_public_id" not in self.apply_session:
-            self.apply_session.set("job_seeker_public_id", job_seeker_public_id)
+        if "job_seeker_public_id" not in self.hire_session:
+            self.hire_session.set("job_seeker_public_id", job_seeker_public_id)
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
@@ -120,11 +127,11 @@ class HireBaseView(HirePermissionMixin, TemplateView):
         return None
 
     def get_reset_url(self):
-        return self.apply_session.get("reset_url")
+        return self.hire_session.get("reset_url")
 
     def get_eligibility_for_hire_step_url(self):
         if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
-            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
 
         bypass_eligibility_conditions = [
             # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
@@ -135,7 +142,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
             self.eligibility_diagnosis,
         ]
         if not any(bypass_eligibility_conditions):
-            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.hire_session.name})
 
         return None
 
@@ -161,7 +168,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
 
 class CheckPreviousApplicationsForHireView(CheckPreviousApplicationsBaseMixin, HireBaseView):
     def get_next_url(self):
-        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
 
 
 class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer):
@@ -174,14 +181,14 @@ class IAEEligibilityForHireView(HireBaseView, BaseIAEEligibilityViewForEmployer)
 
     def get_success_url(self):
         # Check if contract step is already filled
-        if not self.apply_session.get("contract_form_data"):
+        if not self.hire_session.get("contract_form_data"):
             # TODO: remove this case in a week
-            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})
 
     def get_cancel_url(self):
         return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def get_context_data(self, **kwargs):
@@ -197,7 +204,7 @@ class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityV
         super().setup(request, *args, **kwargs)
 
         self.geiq_eligibility_criteria_url = reverse(
-            "apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            "apply:geiq_eligibility_criteria_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -207,14 +214,14 @@ class GEIQEligibilityForHireView(HireBaseView, common_views.BaseGEIQEligibilityV
 
     def get_next_url(self):
         # Check if contract step is already filled
-        if not self.apply_session.get("contract_form_data"):
+        if not self.hire_session.get("contract_form_data"):
             # TODO: remove this case in a week
-            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
-        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
+        return reverse("apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name})
 
     def get_back_url(self):
         return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def get_context_data(self, **kwargs):
@@ -236,15 +243,15 @@ class FillJobSeekerInfosForHireView(HireBaseView, common_views.BaseFillJobSeeker
         return super().setup(request, *args, **kwargs)
 
     def get_session(self):
-        return self.apply_session
+        return self.hire_session
 
     def get_back_url(self):
         return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def get_success_url(self):
-        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -265,22 +272,22 @@ class ContractInfosForHireView(HireBaseView, common_views.BaseContractInfosView)
         return super().setup(request, *args, **kwargs)
 
     def get_session(self):
-        return self.apply_session
+        return self.hire_session
 
     def clean_session(self):
-        self.apply_session.delete()
+        self.hire_session.delete()
 
     def get_back_url(self):
         other_forms = {k: v for k, v in self.forms.items() if k != "accept"}
         if other_forms:
-            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.apply_session.name})
+            return reverse("apply:hire_fill_job_seeker_infos", kwargs={"session_uuid": self.hire_session.name})
         return reverse(
-            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.apply_session.name}
+            "job_seekers_views:check_job_seeker_info_for_hire", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def get_success_url(self):
         return self.get_eligibility_for_hire_step_url() or reverse(
-            "apply:hire_confirmation", kwargs={"session_uuid": self.apply_session.name}
+            "apply:hire_confirmation", kwargs={"session_uuid": self.hire_session.name}
         )
 
     def get_context_data(self, **kwargs):
@@ -302,13 +309,13 @@ class ConfirmationForHireView(HireBaseView, common_views.BaseConfirmationView):
         return super().setup(request, *args, **kwargs)
 
     def get_session(self):
-        return self.apply_session
+        return self.hire_session
 
     def clean_session(self):
-        self.apply_session.delete()
+        self.hire_session.delete()
 
     def get_back_url(self):
-        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.apply_session.name})
+        return reverse("apply:hire_contract_infos", kwargs={"session_uuid": self.hire_session.name})
 
     def get_error_url(self):
         return self.request.get_full_path()

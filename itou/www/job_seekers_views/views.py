@@ -34,7 +34,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
-from itou.www.apply.views.hire_views import HireBaseView
+from itou.www.apply.views.hire_views import HIRE_SESSION_KIND, HireBaseView
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
@@ -270,13 +270,25 @@ class GetOrCreateJobSeekerStartView(View):
             }
         }
 
-        # apply data
+        # apply or hire data
         if self.tunnel == "sender" or self.tunnel == "hire":
-            apply_session_uuid = request.GET.get("apply_session_uuid")
-            try:
-                SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
-            except SessionNamespaceException:
-                raise Http404("Session de candidature invalide")
+            if self.tunnel == "sender":
+                apply_session_uuid = request.GET.get("apply_session_uuid")
+                try:
+                    SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+                except SessionNamespaceException:
+                    raise Http404("Session de candidature invalide")
+            else:  # tunnel == "hire"
+                # TODO(xfernandez): drop fallback in a week
+                apply_session_uuid = request.GET.get("hire_session_uuid") or request.GET.get("apply_session_uuid")
+                try:
+                    SessionNamespace(self.request.session, HIRE_SESSION_KIND, apply_session_uuid)
+                except SessionNamespaceException:
+                    try:
+                        SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
+                    except SessionNamespaceException:
+                        raise Http404("Session de candidature invalide")
+
             apply_data = {"session_uuid": apply_session_uuid}
             try:
                 company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
@@ -1335,7 +1347,7 @@ class CheckJobSeekerInformationsForHire(HireBaseView):
             "profile": self.job_seeker.jobseeker_profile,
             "back_url": reverse("apply:start_hire", kwargs={"company_pk": self.company.pk}),
             "next_url": reverse(
-                "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.apply_session.name}
+                "apply:check_prev_applications_for_hire", kwargs={"session_uuid": self.hire_session.name}
             ),
             **jobseeker_personal_infos_display_kwargs(self.job_seeker.jobseeker_profile),
             "allow_modify_job_seeker": True,
