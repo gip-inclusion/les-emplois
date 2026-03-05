@@ -90,17 +90,19 @@
                                     {% endif %}
                                 </div>
 
-                                <div class="c-info mt-3 mt-lg-4">
-                                    <span class="c-info__summary">{{ organization.display_name }} est une organisation habilitée.</span>
-                                    <div class="c-info__detail">
+                                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mt-3 mt-lg-4" %}
+                                    {% fragment as c_info__summary %}
+                                        {{ organization.display_name }} est une organisation habilitée.
+                                    {% endfragment %}
+                                    {% fragment as c_info__detail %}
                                         <p>
                                             Vous pouvez réaliser le <a href="{% autologin_proconnect 'https://communaute.inclusion.gouv.fr/surveys/dsp/create/' user %}"
     target="_blank"
     class="has-external-link"
     aria-label="diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                         </p>
-                                    </div>
-                                </div>
+                                    {% endfragment %}
+                                {% endcomponent_info %}
                             </div>
                             <div class="col-12 col-xxl-4 col-xxxl-3 order-1 order-xxl-2">
                                 {% include "includes/structures/_structure_info.html" with structure=organization show=True company_show_cta=False extra_box_class="mb-3 mb-md-4" %}
