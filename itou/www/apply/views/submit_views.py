@@ -352,23 +352,6 @@ class ApplicationBaseView(ApplyStepBaseView):
                 return reverse("apply:application_iae_eligibility", kwargs={"session_uuid": self.apply_session.name})
         return None
 
-    def get_eligibility_for_hire_step_url(self):
-        if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
-            return reverse("apply:geiq_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
-
-        bypass_eligibility_conditions = [
-            # Don't perform an eligibility diagnosis if the SIAE doesn't need it,
-            not self.company.is_subject_to_iae_rules,
-            # No need for eligibility diagnosis if the job seeker already has a PASS IAE
-            self.job_seeker.has_valid_approval,
-            # Job seeker must not have a diagnosis
-            self.eligibility_diagnosis,
-        ]
-        if not any(bypass_eligibility_conditions):
-            return reverse("apply:iae_eligibility_for_hire", kwargs={"session_uuid": self.apply_session.name})
-
-        return None
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
