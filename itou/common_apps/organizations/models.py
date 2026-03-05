@@ -1,3 +1,4 @@
+import enum
 import logging
 import uuid
 
@@ -11,6 +12,14 @@ from itou.utils.emails import get_email_message
 
 
 logger = logging.getLogger("itou.members")
+
+
+class OrganizationKind(enum.StrEnum):
+    """str must match memberships' organization through field"""
+
+    COMPANY = "company"
+    PRESCRIBER_ORGANIZATION = "organization"
+    INSTITUTION = "institution"
 
 
 class OrganizationQuerySet(models.QuerySet):
