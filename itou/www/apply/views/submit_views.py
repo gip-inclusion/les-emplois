@@ -278,9 +278,8 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
         )
-        if kwargs.pop("hire_process", False):
-            tunnel = ApplyTunnel.HIRE
-        elif request.from_employer and self.company == request.current_organization:
+
+        if request.from_employer and self.company == request.current_organization:
             tunnel = ApplyTunnel.AUTO_PRESCRIPTION
         elif request.user.is_job_seeker:
             tunnel = ApplyTunnel.JOB_SEEKER
@@ -295,7 +294,7 @@ class ApplyStepBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, Te
         return super().get_context_data(**kwargs) | {
             "company": self.company,
             "back_url": self.get_back_url(),
-            "hire_process": self.tunnel == ApplyTunnel.HIRE,
+            "hire_process": False,
             "prescription_process": self.tunnel == ApplyTunnel.PRESCRIPTION,
             "auto_prescription_process": self.tunnel == ApplyTunnel.AUTO_PRESCRIPTION,
             "page_title": "Postuler",

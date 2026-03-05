@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import View
+from django.views.generic import TemplateView, View
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -18,9 +18,9 @@ from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
     JOB_SEEKER_INFOS_CHECK_PERIOD,
     ApplicationPermissionMixin,
-    ApplyStepBaseView,
     ApplyTunnel,
     CheckPreviousApplicationsBaseMixin,
+    RequireApplySessionMixin,
     _check_job_seeker_approval,
     initialize_apply_session,
 )
@@ -57,16 +57,20 @@ class StartViewForHire(ApplicationPermissionMixin, View):
         return HttpResponseRedirect(next_url)
 
 
-class HireBaseView(ApplyStepBaseView):
+class HireBaseView(RequireApplySessionMixin, ApplicationPermissionMixin, TemplateView):
     def __init__(self):
         super().__init__()
-
+        self.company = None
         self.job_seeker = None
         self.eligibility_diagnosis = None
         self.geiq_eligibility_diagnosis = None
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.tunnel = ApplyTunnel.HIRE
+        self.company = get_object_or_404(
+            Company.objects.with_has_active_members(), pk=self.apply_session.get("company_pk")
+        )
 
         job_seeker_public_id = self.apply_session.get("job_seeker_public_id") or request.GET.get(
             "job_seeker_public_id"
@@ -85,6 +89,9 @@ class HireBaseView(ApplyStepBaseView):
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, self.company
             )
+
+    def get_back_url(self):
+        return None
 
     def get_eligibility_for_hire_step_url(self):
         if self.company.kind == CompanyKind.GEIQ and not self.geiq_eligibility_diagnosis:
@@ -105,6 +112,12 @@ class HireBaseView(ApplyStepBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
+            "company": self.company,
+            "back_url": self.get_back_url(),
+            "hire_process": True,
+            "prescription_process": False,
+            "auto_prescription_process": False,
+            "page_title": "Postuler",
             "job_seeker": self.job_seeker,
             "eligibility_diagnosis": self.eligibility_diagnosis,
             "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,

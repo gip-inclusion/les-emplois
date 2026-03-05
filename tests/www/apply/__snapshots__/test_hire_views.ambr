@@ -1424,7 +1424,6 @@
       }),
       dict({
         'origin': list([
-          'FillJobSeekerInfosForHireView.setup[www/apply/views/submit_views.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
           'FillJobSeekerInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
@@ -2278,7 +2277,6 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
@@ -3327,7 +3325,6 @@
       }),
       dict({
         'origin': list([
-          'ConfirmationForHireView.setup[www/apply/views/submit_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
           'ConfirmationForHireView.setup[www/apply/views/hire_views.py]',
         ]),
@@ -4287,7 +4284,6 @@
       }),
       dict({
         'origin': list([
-          'ContractInfosForHireView.setup[www/apply/views/submit_views.py]',
           'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
           'ContractInfosForHireView.setup[www/apply/views/hire_views.py]',
         ]),
