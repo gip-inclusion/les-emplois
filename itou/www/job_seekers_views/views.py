@@ -34,6 +34,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.utils import can_edit_personal_information, can_view_personal_information
 from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
+from itou.www.apply.views.hire_views import HireBaseView
 from itou.www.apply.views.submit_views import APPLY_SESSION_KIND, ApplicationBaseView, ApplyTunnel
 from itou.www.gps import utils as gps_utils
 from itou.www.job_seekers_views.enums import JobSeekerOrder, JobSeekerSessionKinds
@@ -1322,7 +1323,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
         }
 
 
-class CheckJobSeekerInformationsForHire(ApplicationBaseView):
+class CheckJobSeekerInformationsForHire(HireBaseView):
     """
     Ensure the job seeker has all required info.
     """
