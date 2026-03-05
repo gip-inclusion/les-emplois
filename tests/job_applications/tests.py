@@ -43,7 +43,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.templatetags import format_filters
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.files.factories import FileFactory
@@ -1432,24 +1432,40 @@ class TestJobApplicationNotifications:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
-        approval = ApprovalFactory(user=job_seeker)
+        approval = ApprovalFactory(user=job_seeker, expired=True)
+        membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+        company = membership.company
+        employer = membership.user
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             approval=approval,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
-            to_company__subject_to_iae_rules=True,
+            to_company=company,
         )
-        job_application.accept(user=job_application.to_company.members.first())
         with django_capture_on_commit_callbacks(execute=True):
+            job_application.accept(user=employer)
             job_application.manually_deliver_approval(delivered_by=staff_member)
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_number_sent_at is not None
         assert job_application.approval_manually_delivered_by == staff_member
         assert job_application.approval_manually_refused_at is None
         assert job_application.approval_manually_refused_by is None
-        assert len(mailoutbox) == 1
+        expected = [
+            (settings.ITOU_EMAIL_CONTACT, "[TEST] PASS IAE requis sur Itou"),
+            (job_seeker.email, "[TEST] Candidature acceptée"),
+            (
+                employer.email,
+                f"[TEST] PASS IAE pour {job_seeker.get_inverted_full_name()} et avis sur les emplois de l'inclusion",
+            ),
+            (job_application.sender.email, "[TEST] Candidature acceptée et votre avis sur les emplois de l'inclusion"),
+        ]
+        sent_emails = list()
+        for email in mailoutbox:
+            [to] = email.to
+            sent_emails.append((to, email.subject))
+        assert sorted(sent_emails) == sorted(expected)
 
     def test_manually_refuse_approval(self, django_capture_on_commit_callbacks, mailoutbox):
         staff_member = ItouStaffFactory()
@@ -1458,21 +1474,35 @@ class TestJobApplicationNotifications:
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
+        membership = CompanyMembershipFactory(company__subject_to_iae_rules=True)
+        company = membership.company
+        employer = membership.user
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            to_company=company,
         )
-        job_application.accept(user=job_application.to_company.members.first())
         with django_capture_on_commit_callbacks(execute=True):
+            job_application.accept(user=employer)
             job_application.manually_refuse_approval(refused_by=staff_member)
         assert job_application.approval_manually_refused_by == staff_member
         assert job_application.approval_manually_refused_at is not None
         assert not job_application.approval_number_sent_by_email
         assert job_application.approval_manually_delivered_by is None
         assert job_application.approval_number_sent_at is None
-        assert len(mailoutbox) == 1
+        expected = [
+            (settings.ITOU_EMAIL_CONTACT, "[TEST] PASS IAE requis sur Itou"),
+            (job_seeker.email, "[TEST] Candidature acceptée"),
+            (employer.email, f"[TEST] PASS IAE refusé pour {job_seeker.get_inverted_full_name()}"),
+            (job_application.sender.email, "[TEST] Candidature acceptée et votre avis sur les emplois de l'inclusion"),
+        ]
+        sent_emails = list()
+        for email in mailoutbox:
+            [to] = email.to
+            sent_emails.append((to, email.subject))
+        assert sorted(sent_emails) == sorted(expected)
 
     @pytest.mark.parametrize("is_authorized_prescriber", [False, True])
     def test_cancel_sent_by_prescriber(self, is_authorized_prescriber, django_capture_on_commit_callbacks, mailoutbox):

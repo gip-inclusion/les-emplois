@@ -816,7 +816,7 @@ class TestAutomaticApprovalAdminViews:
 
 
 class TestCustomApprovalAdminViews:
-    def test_manually_add_approval(self, client, mailoutbox):
+    def test_manually_add_approval(self, client, django_capture_on_commit_callbacks, mailoutbox):
         MANUALLY_DELIVER_BUTTON_TEXT = "Enregistrer et envoyer par email"
 
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
@@ -833,7 +833,8 @@ class TestCustomApprovalAdminViews:
             approval_number_sent_by_email=False,
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with django_capture_on_commit_callbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
 
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
@@ -928,11 +929,10 @@ class TestCustomApprovalAdminViews:
         assert approval.origin_siae_siret == job_application.to_company.siret
         assert not approval.origin_prescriber_organization_kind
 
-        assert len(mailoutbox) == 1
-        email = mailoutbox[0]
+        [_approval_notification_to_assistance, _job_application_accepted, email] = mailoutbox
         assert approval.number_with_spaces in email.body
 
-    def test_manually_refuse_approval(self, client, mailoutbox, snapshot):
+    def test_manually_refuse_approval(self, client, django_capture_on_commit_callbacks, mailoutbox, snapshot):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
@@ -951,7 +951,8 @@ class TestCustomApprovalAdminViews:
             with_iae_eligibility_diagnosis=True,
         )
         employer = job_application.to_company.members.first()
-        job_application.accept(user=employer)
+        with django_capture_on_commit_callbacks(execute=True):
+            job_application.accept(user=employer)
 
         add_url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
         refuse_url = reverse("admin:approvals_approval_manually_refuse_approval", args=[job_application.pk])
@@ -991,7 +992,7 @@ class TestCustomApprovalAdminViews:
         assert job_application.approval_manually_refused_at is not None
         assert job_application.approval is None
 
-        [email] = mailoutbox
+        [_approval_notification_to_assistance, _job_application_accepted, email] = mailoutbox
         assert email.to == [employer.email]
         assert email.subject == snapshot(name="email_subject")
         assert email.body == snapshot(name="email_body")
