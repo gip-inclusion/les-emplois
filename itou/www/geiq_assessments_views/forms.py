@@ -8,6 +8,8 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.utils.constants import MB
 from itou.utils.templatetags.format_filters import format_int_euros
+from itou.utils.types import InclusiveDateRange
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class CreateForm(forms.Form):
@@ -223,3 +225,59 @@ class ReviewForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.decision_validated_at = timezone.now()
         return super().save(commit=commit)
+
+
+class ContractFilterForm(forms.Form):
+    """
+    Allow users to filter the list of contracts.
+    """
+
+    start_date_lower = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
+    start_date_upper = forms.DateField(
+        label="Jusqu'au",
+        required=False,
+        widget=DuetDatePickerWidget(),
+    )
+
+    def clean(self):
+        """
+        Global validation: check date consistency and normalize times.
+        """
+        cleaned_data = super().clean()
+        start_date_lower = cleaned_data.get("start_date_lower")
+        start_date_upper = cleaned_data.get("start_date_upper")
+        # Validation of date order
+        if start_date_lower and start_date_upper and start_date_lower > start_date_upper:
+            self.add_error("start_date_upper", "La date de fin doit être postérieure à la date de début.")
+        return cleaned_data
+
+    def filter(self, queryset):
+        """
+        Apply filters to the given queryset based on cleaned data.
+        """
+        # If the form is not bound, we don't apply any filter and return the original queryset
+        if not self.is_bound:
+            return queryset
+        # Return none if form is not valid
+        if not self.is_valid():
+            return queryset.none()
+
+        if any(
+            start_at_bounds := (
+                self.cleaned_data.get("start_date_lower"),
+                self.cleaned_data.get("start_date_upper"),
+            )
+        ):
+            queryset = queryset.filter(start_at__contained_by=InclusiveDateRange(*start_at_bounds))
+        return queryset
+
+    def get_qs_filters_counter(self):
+        """
+        Get number of filters selected.
+        """
+
+        if not hasattr(self, "cleaned_data"):
+            return 0
+
+        # We count fields that have a value
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
