@@ -179,7 +179,6 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
         context["back_url"] = self.back_url
         context["form_post_url"] = self.form_post_url
         context["formset"] = self.get_formset()
-        context["organization"] = self.organization
         return context
 
     def post(self, request, *args, **kwargs):
