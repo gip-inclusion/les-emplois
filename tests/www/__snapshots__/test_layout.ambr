@@ -19,7 +19,7 @@
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>
-                              <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="ORGANIZATION_ID">
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
                                   <i aria-hidden="true" class="ri-community-line">
                                   </i>
                                   <span>
@@ -403,7 +403,7 @@
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       <ul class="list-unstyled">
                           <li>
-                              <button class="dropdown-item dropdown-item__summary active" name="organization_id" value="ORGANIZATION_ID">
+                              <button class="dropdown-item dropdown-item__summary active" name="organization_key" value="ORGANIZATION_KEY">
                                   <i aria-hidden="true" class="ri-community-line">
                                   </i>
                                   <span>

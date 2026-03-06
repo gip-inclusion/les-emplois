@@ -12,12 +12,19 @@ from django.conf import settings
 from django.db import models
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.common_apps.organizations.models import (
+    MembershipAbstract,
+    OrganizationAbstract,
+    OrganizationKind,
+    OrganizationQuerySet,
+)
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import UserKind
 
 
 class Institution(AddressMixin, OrganizationAbstract):
+    ORGANIZATION_KIND = OrganizationKind.INSTITUTION
+
     class Meta:
         verbose_name = "institution partenaire"
         verbose_name_plural = "institutions partenaires"

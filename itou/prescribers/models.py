@@ -9,7 +9,12 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.common_apps.organizations.models import (
+    MembershipAbstract,
+    OrganizationAbstract,
+    OrganizationKind,
+    OrganizationQuerySet,
+)
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -108,6 +113,8 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 
     Case 3: refers to an authorized prescriber ("prescripteur habilité").
     """
+
+    ORGANIZATION_KIND = OrganizationKind.PRESCRIBER_ORGANIZATION
 
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
