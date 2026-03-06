@@ -28,6 +28,10 @@ from itou.www.apply.forms import (
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
+def previous_applications_queryset(job_seeker, company):
+    return job_seeker.job_applications.filter(to_company=company)
+
+
 class CommonUserInfoFormsMixin:
     def get_session(self):
         raise NotImplementedError
