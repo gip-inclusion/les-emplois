@@ -196,7 +196,7 @@ class FollowUpGroupMembership(models.Model):
         return self.follow_up_group.beneficiary.get_full_name() + " => " + self.member.get_full_name()
 
     @property
-    def organization_name(self):
+    def structure_name(self):
         return next((org.name for org in self.member.prescriberorganization_set.all()), None) or next(
             (company.display_name for company in self.member.company_set.all()), None
         )

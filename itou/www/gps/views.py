@@ -364,7 +364,7 @@ def join_group_from_coworker(request, template_name="gps/join_group_from_coworke
     if request.current_organization is None:
         raise PermissionDenied("Il faut une organisation ou une structure pour accéder à cette page")
 
-    form = JobSeekersFollowedByCoworkerSearchForm(data=request.POST or None, organizations=request.organizations)
+    form = JobSeekersFollowedByCoworkerSearchForm(data=request.POST or None, structures=request.organizations)
 
     if request.method == "POST" and form.is_valid():
         add_beneficiary(request, form.job_seeker, channel="coworker")
