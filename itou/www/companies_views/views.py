@@ -13,7 +13,7 @@ from itoutils.urls import add_url_params
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
-from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
+from itou.common_apps.structures.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.companies.enums import CompanySource
 from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.companies.perms import can_create_antenna

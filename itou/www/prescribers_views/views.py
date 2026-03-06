@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
+from itou.common_apps.structures.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User

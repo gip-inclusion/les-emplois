@@ -8,7 +8,7 @@ from django.utils import timezone
 from itou.companies.models import Company
 from itou.institutions.models import Institution
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.notifications import OrganizationActiveMembersReminderNotification
+from itou.users.notifications import StructureActiveMembersReminderNotification
 from itou.utils.command import BaseCommand
 from itou.utils.urls import get_absolute_url
 
@@ -61,7 +61,7 @@ class Command(BaseCommand):
         for company in companies:
             with transaction.atomic():
                 for membership in company.admin_memberships:
-                    OrganizationActiveMembersReminderNotification(
+                    StructureActiveMembersReminderNotification(
                         membership.user,
                         company,
                         active_admins_count=len(company.admin_memberships),
@@ -82,7 +82,7 @@ class Command(BaseCommand):
         for prescriber_organization in prescriber_organizations:
             with transaction.atomic():
                 for membership in prescriber_organization.admin_memberships:
-                    OrganizationActiveMembersReminderNotification(
+                    StructureActiveMembersReminderNotification(
                         membership.user,
                         prescriber_organization,
                         active_admins_count=len(prescriber_organization.admin_memberships),
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         for institution in institutions:
             with transaction.atomic():
                 for membership in institution.admin_memberships:
-                    OrganizationActiveMembersReminderNotification(
+                    StructureActiveMembersReminderNotification(
                         membership.user,
                         institution,
                         active_admins_count=len(institution.admin_memberships),

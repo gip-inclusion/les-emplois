@@ -12,7 +12,7 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.invitations.models import LaborInspectorInvitation
 from itou.users.models import User
-from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
+from tests.common_apps.structures.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -67,7 +67,7 @@ class TestInstitutionModel:
             in caplog.messages
         )
         assert (
-            f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"Creating institutions.InstitutionMembership of structure_id={institution.pk} "
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
@@ -91,7 +91,7 @@ class TestInstitutionModel:
             f"Expired 2 invitations to institutions.Institution {institution.pk} for user_id={other_user.pk}."
         ) in caplog.messages
         assert (
-            f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"Creating institutions.InstitutionMembership of structure_id={institution.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         assertQuerySetEqual(
@@ -125,7 +125,7 @@ class TestInstitutionModel:
             in caplog.messages
         )
         assert (
-            f"Reactivating institutions.InstitutionMembership of organization_id={institution.pk} "
+            f"Reactivating institutions.InstitutionMembership of structure_id={institution.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         invit.refresh_from_db()
@@ -223,7 +223,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
     assert email.to == [membership.user.email]
     assert (
         f"User {get_user(admin_client).pk} deactivated institutions.InstitutionMembership "
-        f"of organization_id={institution.pk} for user_id={membership.user_id} is_admin=True."
+        f"of structure_id={institution.pk} for user_id={membership.user_id} is_admin=True."
     ) in caplog.messages
 
 
@@ -269,7 +269,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
 
     assert_set_admin_role_creation(labor_inspector, institution, mailoutbox)
     assert (
-        f"Creating institutions.InstitutionMembership of organization_id={institution.pk} "
+        f"Creating institutions.InstitutionMembership of structure_id={institution.pk} "
         f"for user_id={labor_inspector.pk} is_admin=True."
     ) in caplog.messages
 
@@ -309,7 +309,7 @@ def test_reactivate_member(admin_client, caplog):
     assertRedirects(response, change_url)
     assert membership.user in institution.members.all()
     assert (
-        f"Reactivating institutions.InstitutionMembership of organization_id={institution.pk} "
+        f"Reactivating institutions.InstitutionMembership of structure_id={institution.pk} "
         f"for user_id={membership.user_id} is_admin=False." in caplog.messages
     )
 

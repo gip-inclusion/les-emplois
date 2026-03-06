@@ -183,7 +183,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_all_datas][personal-infos]
@@ -426,7 +426,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_few_datas][personal-infos]
@@ -577,7 +577,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestCheckJobSeekerInformationsForHire.test_company[job_seeker_with_single_other_data][personal-infos]
@@ -779,7 +779,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestCheckJobSeekerInformationsForHire.test_geiq[personal-infos]
@@ -946,7 +946,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestDirectHireFullProcess.test_hire_as_company[personal-infos]
@@ -1132,7 +1132,7 @@
           </li>
       </ul>
   </div>
-  
+
   '''
 # ---
 # name: TestFillJobSeekerInfosForHire.test_no_missing_data_iae[view queries]
@@ -1839,7 +1839,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'FillJobSeekerInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -2715,7 +2715,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -2981,7 +2981,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -3740,7 +3740,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'ConfirmationForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -3940,7 +3940,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -4699,7 +4699,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'ContractInfosForHireView.dispatch[www/apply/views/hire_views.py]',
         ]),
         'sql': '''
@@ -4896,7 +4896,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -7141,7 +7141,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -7588,7 +7588,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -8039,7 +8039,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -10258,7 +10258,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -10705,7 +10705,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -11156,7 +11156,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',

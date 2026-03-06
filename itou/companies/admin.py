@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.approvals.models import Approval
-from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
+from itou.common_apps.structures.admin import HasMembersFilter, MembersInline, StructureAdmin
 from itou.companies import enums, models, transfer
 from itou.companies.admin_forms import CompanyChooseFieldsToTransfer, SelectTargetCompanyForm
 from itou.companies.enums import CompanySource
@@ -106,7 +106,7 @@ def _companies_serializer(queryset):
 
 
 @admin.register(models.Company)
-class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
+class CompanyAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, StructureAdmin):
     @admin.action(description="Exporter les entreprises selectionnées")
     def export(self, request, queryset):
         export_qs = queryset.select_related("created_by")

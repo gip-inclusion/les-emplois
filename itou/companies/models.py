@@ -16,12 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import (
-    MembershipAbstract,
-    OrganizationAbstract,
-    OrganizationKind,
-    OrganizationQuerySet,
-)
+from itou.common_apps.structures.models import MembershipAbstract, StructureAbstract, StructureKind, StructureQuerySet
 from itou.companies.enums import (
     COMPANY_KIND_RESERVED,
     POLE_EMPLOI_SIRET,
@@ -40,7 +35,7 @@ from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
-class CompanyQuerySet(OrganizationQuerySet):
+class CompanyQuerySet(StructureQuerySet):
     @property
     def active_lookup(self):
         # Prefer a sub query to a join for performance reasons.
@@ -233,7 +228,7 @@ class CompanyUnfilteredManager(models.Manager.from_queryset(CompanyQuerySet)):
         return super().get_queryset().defer("fields_history")
 
 
-class Company(AddressMixin, OrganizationAbstract):
+class Company(AddressMixin, StructureAbstract):
     """
     Structures d'insertion par l'activité économique.
 
@@ -249,7 +244,7 @@ class Company(AddressMixin, OrganizationAbstract):
     # will temporarily be moved to the last page of search results.
     MAX_DEFAULT_JOB_APP_SCORE = sys.float_info.max
 
-    ORGANIZATION_KIND = OrganizationKind.COMPANY
+    ORGANIZATION_KIND = StructureKind.COMPANY
 
     # Companies have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `Company.siret`. It changes rather frequently

@@ -9,12 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import (
-    MembershipAbstract,
-    OrganizationAbstract,
-    OrganizationKind,
-    OrganizationQuerySet,
-)
+from itou.common_apps.structures.models import MembershipAbstract, StructureAbstract, StructureKind, StructureQuerySet
 from itou.prescribers.enums import (
     DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
@@ -28,7 +23,7 @@ from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
 
 
-class PrescriberOrganizationQuerySet(OrganizationQuerySet):
+class PrescriberOrganizationQuerySet(StructureQuerySet):
     def autocomplete(self, search_string, limit=10):
         queryset = (
             self.annotate(similarity=TrigramSimilarity("name", search_string))
@@ -71,7 +66,7 @@ class PrescriberOrganizationManager(models.Manager):
         return organization
 
 
-class PrescriberOrganization(AddressMixin, OrganizationAbstract):
+class PrescriberOrganization(AddressMixin, StructureAbstract):
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
@@ -114,7 +109,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     Case 3: refers to an authorized prescriber ("prescripteur habilité").
     """
 
-    ORGANIZATION_KIND = OrganizationKind.PRESCRIBER_ORGANIZATION
+    ORGANIZATION_KIND = StructureKind.PRESCRIBER_ORGANIZATION
 
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)

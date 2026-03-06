@@ -155,13 +155,13 @@ class JobSeekersFollowedByCoworkerSearchForm(forms.Form):
         required=True,
     )
 
-    def __init__(self, *args, organizations, **kwargs):
-        self.organizations = organizations
+    def __init__(self, *args, structures, **kwargs):
+        self.structures = structures
         super().__init__(*args, **kwargs)
 
     def clean_user(self):
         user = self.cleaned_data["user"]
-        all_coworkers = get_all_coworkers(self.organizations)
+        all_coworkers = get_all_coworkers(self.structures)
         if not FollowUpGroupMembership.objects.filter(
             follow_up_group__beneficiary=user,
             member__in=all_coworkers.values("pk"),

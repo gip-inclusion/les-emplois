@@ -5,8 +5,8 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.common_apps.organizations.views import BaseMemberList
-from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
+from itou.common_apps.structures.views import BaseMemberList
+from tests.common_apps.structures.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -47,7 +47,7 @@ class TestMembers:
 
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot, monkeypatch):
-        monkeypatch.setattr("itou.common_apps.organizations.views.MAX_PENDING_INVITATION", 1)
+        monkeypatch.setattr("itou.common_apps.structures.views.MAX_PENDING_INVITATION", 1)
         institution = InstitutionFactory()
         user = InstitutionMembershipFactory(user__for_snapshot=True, institution=institution).user
         client.force_login(user)
@@ -177,7 +177,7 @@ class TestMembers:
         ) in caplog.messages
         assert (
             f"User {admin_membership.user_id} deactivated institutions.InstitutionMembership "
-            f"of organization_id={institution.pk} for user_id={guest.pk} is_admin=False."
+            f"of structure_id={institution.pk} for user_id={guest.pk} is_admin=False."
         ) in caplog.messages
 
         # User must have been notified of deactivation (we're human after all)
@@ -263,7 +263,7 @@ class TestMembers:
         ) in caplog.messages
         assert (
             f"User {admin_membership.user_id} deactivated institutions.InstitutionMembership "
-            f"of organization_id={institution.pk} for user_id={other_admin.pk} is_admin=True."
+            f"of structure_id={institution.pk} for user_id={other_admin.pk} is_admin=True."
         ) in caplog.messages
         [email] = mailoutbox
         assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {institution.display_name}" == email.subject

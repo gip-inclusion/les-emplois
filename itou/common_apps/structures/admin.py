@@ -91,7 +91,7 @@ class HasMembersFilter(admin.SimpleListFilter):
         return queryset
 
 
-class OrganizationAdmin(ItouModelAdmin):
+class StructureAdmin(ItouModelAdmin):
     @admin.display(ordering="_member_count")
     def member_count(self, obj):
         return obj._member_count
