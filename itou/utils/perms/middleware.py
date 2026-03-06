@@ -16,7 +16,11 @@ from itou.www.logout.enums import LogoutWarning
 
 
 def extract_membership_infos_and_update_session(memberships, org_through_field, session):
+    # FIXME: remove condition in a week
     current_org_pk = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+    if "-" in str(current_org_pk):
+        current_org_pk = int(current_org_pk.split("-")[1])
+
     orgs = []
     current_org = None
     admin_status = {}
