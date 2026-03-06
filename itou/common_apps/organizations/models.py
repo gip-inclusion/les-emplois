@@ -38,6 +38,8 @@ class OrganizationAbstract(models.Model):
     Base model for Company, Prescriber Organization and Institution models.
     """
 
+    ORGANIZATION_KIND = None
+
     name = models.CharField(verbose_name="nom", max_length=255)
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -234,6 +236,10 @@ class OrganizationAbstract(models.Model):
         subject = "common/emails/member_deactivation_email_subject.txt"
         body = "common/emails/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def organization_switch_key(self):
+        return f"{self.ORGANIZATION_KIND.name}-{self.pk}"
 
 
 class MembershipQuerySet(models.QuerySet):

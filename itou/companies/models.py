@@ -16,7 +16,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
+from itou.common_apps.organizations.models import (
+    MembershipAbstract,
+    OrganizationAbstract,
+    OrganizationKind,
+    OrganizationQuerySet,
+)
 from itou.companies.enums import (
     COMPANY_KIND_RESERVED,
     POLE_EMPLOI_SIRET,
@@ -243,6 +248,8 @@ class Company(AddressMixin, OrganizationAbstract):
     # Large score by default to ensure any new company whose score has not yet been computed
     # will temporarily be moved to the last page of search results.
     MAX_DEFAULT_JOB_APP_SCORE = sys.float_info.max
+
+    ORGANIZATION_KIND = OrganizationKind.COMPANY
 
     # Companies have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `Company.siret`. It changes rather frequently

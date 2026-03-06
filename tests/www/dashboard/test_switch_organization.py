@@ -35,7 +35,7 @@ class TestSwitchCompany:
         data = (
             {"organization_id": related_company.pk}
             if compat_mode
-            else {"organization_key": f"COMPANY-{related_company.pk}"}
+            else {"organization_key": related_company.organization_switch_key}
         )
         response = client.post(url, data=data)
         assert response.status_code == 302
@@ -80,7 +80,7 @@ class TestSwitchCompany:
         data = (
             {"organization_id": related_company.pk}
             if compat_mode
-            else {"organization_key": f"COMPANY-{related_company.pk}"}
+            else {"organization_key": related_company.organization_switch_key}
         )
         response = client.post(url, data=data)
         assert response.status_code == 302
@@ -112,7 +112,7 @@ class TestSwitchCompany:
         data = (
             {"organization_id": related_company.pk}
             if compat_mode
-            else {"organization_key": f"COMPANY-{related_company.pk}"}
+            else {"organization_key": related_company.organization_switch_key}
         )
         response = client.post(url, data=data)
         assert response.status_code == 404
@@ -156,7 +156,7 @@ class TestSwitchCompany:
         data = (
             {"organization_id": related_company.pk}
             if compat_mode
-            else {"organization_key": f"COMPANY-{related_company.pk}"}
+            else {"organization_key": related_company.organization_switch_key}
         )
         response = client.post(url, data=data)
         response = client.get(response.url)
@@ -167,7 +167,7 @@ class TestSwitchCompany:
         data = (
             {"organization_id": related_company.pk}
             if compat_mode
-            else {"organization_key": f"COMPANY-{related_company.pk}"}
+            else {"organization_key": related_company.organization_switch_key}
         )
         response = client.post(url, data=data, follow=False)
         assertRedirects(response, "/other_url", fetch_redirect_response=False)
@@ -188,7 +188,7 @@ class TestSwitchOrganization:
             data = (
                 {"organization_id": organization.pk}
                 if compat_mode
-                else {"organization_key": f"PRESCRIBER_ORGANIZATION-{organization.pk}"}
+                else {"organization_key": organization.organization_switch_key}
             )
             response = client.post(url, data=data)
             assert response.status_code == 404
@@ -203,11 +203,7 @@ class TestSwitchOrganization:
         client.force_login(user)
 
         # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": orga1.pk}
-            if compat_mode
-            else {"organization_key": f"PRESCRIBER_ORGANIZATION-{orga1.pk}"}
-        )
+        data = {"organization_id": orga1.pk} if compat_mode else {"organization_key": orga1.organization_switch_key}
         response = client.post(url, data=data)
         assert response.status_code == 302
 
@@ -215,11 +211,7 @@ class TestSwitchOrganization:
         assert response.status_code == 200
         assert response.context["request"].current_organization == orga1
 
-        data = (
-            {"organization_id": orga2.pk}
-            if compat_mode
-            else {"organization_key": f"PRESCRIBER_ORGANIZATION-{orga2.pk}"}
-        )
+        data = {"organization_id": orga2.pk} if compat_mode else {"organization_key": orga2.organization_switch_key}
         response = client.post(url, data=data)
         assert response.status_code == 302
 
@@ -254,7 +246,7 @@ class TestSwitchInstitution:
         ):
             client.force_login(user)
             url = reverse("dashboard:switch_organization")
-            response = client.post(url, data={"organization_key": f"INSTITUTION-{institution.pk}"})
+            response = client.post(url, data={"organization_key": institution.organization_switch_key})
             assert response.status_code == 404
 
             # FIXME: remove the following compatibility code
@@ -274,7 +266,7 @@ class TestSwitchInstitution:
         data = (
             {"organization_id": institution1.pk}
             if compat_mode
-            else {"organization_key": f"INSTITUTION-{institution1.pk}"}
+            else {"organization_key": institution1.organization_switch_key}
         )
         response = client.post(url, data=data)
         assert response.status_code == 302
@@ -287,7 +279,7 @@ class TestSwitchInstitution:
         data = (
             {"organization_id": institution2.pk}
             if compat_mode
-            else {"organization_key": f"INSTITUTION-{institution2.pk}"}
+            else {"organization_key": institution2.organization_switch_key}
         )
         response = client.post(url, data=data)
         assert response.status_code == 302

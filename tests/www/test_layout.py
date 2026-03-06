@@ -72,10 +72,10 @@ def test_navigation_authenticated(snapshot, client, user_factory):
     soup = parse_response_to_soup(response)
 
     def set_org_id_for_snapshot(soup):
-        structure_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_id"})
+        structure_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_key"})
         if structure_switcher_buttons:
             [structure_switcher_button] = structure_switcher_buttons
-            structure_switcher_button["value"] = "ORGANIZATION_ID"
+            structure_switcher_button["value"] = "ORGANIZATION_KEY"
 
     [nav_primary] = soup.select("#nav-primary")
     set_org_id_for_snapshot(nav_primary)
@@ -112,10 +112,10 @@ def test_nexus_dropdown(snapshot, client, case, pro_connect):
     soup = parse_response_to_soup(response)
 
     def set_org_id_for_snapshot(soup):
-        structure_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_id"})
+        structure_switcher_buttons = soup.find_all("button", {"class": "active", "name": "organization_key"})
         if structure_switcher_buttons:
             [structure_switcher_button] = structure_switcher_buttons
-            structure_switcher_button["value"] = "ORGANIZATION_ID"
+            structure_switcher_button["value"] = "ORGANIZATION_KEY"
 
     [offcanvasNav] = soup.select("#offcanvasNav")
     for a_tags in soup.find_all("a", attrs={"href": True}):
