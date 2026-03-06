@@ -272,24 +272,17 @@ class GetOrCreateJobSeekerStartView(View):
 
         # apply or hire data
         if self.tunnel == "sender" or self.tunnel == "hire":
-            if self.tunnel == "sender":
-                apply_session_uuid = request.GET.get("apply_session_uuid")
-                try:
-                    SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
-                except SessionNamespaceException:
-                    raise Http404("Session de candidature invalide")
-            else:  # tunnel == "hire"
-                # TODO(xfernandez): drop fallback in a week
-                apply_session_uuid = request.GET.get("hire_session_uuid") or request.GET.get("apply_session_uuid")
-                try:
-                    SessionNamespace(self.request.session, HIRE_SESSION_KIND, apply_session_uuid)
-                except SessionNamespaceException:
-                    try:
-                        SessionNamespace(self.request.session, APPLY_SESSION_KIND, apply_session_uuid)
-                    except SessionNamespaceException:
-                        raise Http404("Session de candidature invalide")
+            param_key, session_kind, error_message = {
+                "sender": ("apply_session_uuid", APPLY_SESSION_KIND, "Session de candidature invalide"),
+                "hire": ("hire_session_uuid", HIRE_SESSION_KIND, "Session de déclaration d’embauche invalide"),
+            }[self.tunnel]
+            session_uuid = request.GET.get(param_key)
+            try:
+                SessionNamespace(self.request.session, session_kind, session_uuid)
+            except SessionNamespaceException:
+                raise Http404(error_message)
 
-            apply_data = {"session_uuid": apply_session_uuid}
+            apply_data = {"session_uuid": session_uuid}
             try:
                 company = get_object_or_404(Company.objects.with_has_active_members(), pk=request.GET.get("company"))
                 apply_data["company_pk"] = company.pk

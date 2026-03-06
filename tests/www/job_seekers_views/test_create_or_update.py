@@ -32,7 +32,12 @@ from tests.prescribers.factories import (
 from tests.users import constants as users_test_constants
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.testing import get_session_name, parse_response_to_soup, pretty_indented
-from tests.www.apply.test_submit import CONFIRM_RESET_MARKUP, LINK_RESET_MARKUP, fake_session_initialization
+from tests.www.apply.test_hire_views import fake_session_initialization as fake_hire_session_initialization
+from tests.www.apply.test_submit import (
+    CONFIRM_RESET_MARKUP,
+    LINK_RESET_MARKUP,
+    fake_session_initialization,
+)
 
 
 class TestGetOrCreateAsOther:
@@ -43,15 +48,17 @@ class TestGetOrCreateAsOther:
         institution_member = InstitutionMembershipFactory().user
 
         client.force_login(institution_member)
-        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in self.TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
+            if tunnel == "hire":
+                params["hire_session_uuid"] = fake_hire_session_initialization(client, company, None, {}).name
+            else:
+                params["apply_session_uuid"] = fake_session_initialization(client, company, None, {}).name
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
@@ -61,15 +68,17 @@ class TestGetOrCreateAsOther:
         user = ItouStaffFactory()
 
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in self.TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
+            if tunnel == "hire":
+                params["hire_session_uuid"] = fake_hire_session_initialization(client, company, None, {}).name
+            else:
+                params["apply_session_uuid"] = fake_session_initialization(client, company, None, {}).name
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
@@ -95,15 +104,17 @@ class TestGetOrCreateForJobSeeker:
         job_seeker = JobSeekerFactory()
 
         client.force_login(job_seeker)
-        apply_session = fake_session_initialization(client, company, None, {})
 
         for tunnel in TUNNELS:
             params = {
                 "tunnel": tunnel,
                 "company": company.pk,
-                "apply_session_uuid": apply_session.name,
                 "from_url": reverse("companies_views:card", kwargs={"company_pk": company.pk}),
             }
+            if tunnel == "hire":
+                params["hire_session_uuid"] = fake_hire_session_initialization(client, company, None, {}).name
+            else:
+                params["apply_session_uuid"] = fake_session_initialization(client, company, None, {}).name
             start_url = reverse("job_seekers_views:get_or_create_start", query=params)
             response = client.get(start_url)
             assert response.status_code == 403
@@ -232,7 +243,6 @@ class TestGetOrCreateForSender:
         company = CompanyFactory(with_membership=True)
         user = company.members.get()
         client.force_login(user)
-        apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         match company_value:
             case "valid":
@@ -253,6 +263,10 @@ class TestGetOrCreateForSender:
                 tunnel = "invalid-tunnel"
             case _:
                 tunnel = None
+        if tunnel == "hire":
+            apply_session = fake_hire_session_initialization(client, company, job_seeker, {})
+        else:
+            apply_session = fake_session_initialization(client, company, job_seeker, {})
 
         if from_url_value == "valid":
             from_url = reverse("apply:application_jobs", kwargs={"session_uuid": apply_session.name})
@@ -261,10 +275,13 @@ class TestGetOrCreateForSender:
 
         params = {
             "tunnel": tunnel,
-            "apply_session_uuid": apply_session.name,
             "company": company_pk,
             "from_url": from_url,
         }
+        if tunnel == "hire":
+            params["hire_session_uuid"] = apply_session.name
+        else:
+            params["apply_session_uuid"] = apply_session.name
         start_url = add_url_params(reverse("job_seekers_views:get_or_create_start"), params)
 
         response = client.get(start_url)
