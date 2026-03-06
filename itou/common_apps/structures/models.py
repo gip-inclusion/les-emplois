@@ -14,15 +14,15 @@ from itou.utils.emails import get_email_message
 logger = logging.getLogger("itou.members")
 
 
-class OrganizationKind(enum.StrEnum):
-    """str must match memberships' organization through field"""
+class StructureKind(enum.StrEnum):
+    """str must match memberships' structure through field"""
 
     COMPANY = "company"
     PRESCRIBER_ORGANIZATION = "organization"
     INSTITUTION = "institution"
 
 
-class OrganizationQuerySet(models.QuerySet):
+class StructureQuerySet(models.QuerySet):
     """
     Common methods used by Company, PrescriberOrganization and Institution models query sets.
     """
@@ -33,7 +33,7 @@ class OrganizationQuerySet(models.QuerySet):
         return self.prefetch_related(Prefetch("memberships", queryset=qs))
 
 
-class OrganizationAbstract(models.Model):
+class StructureAbstract(models.Model):
     """
     Base model for Company, Prescriber Organization and Institution models.
     """
@@ -45,8 +45,8 @@ class OrganizationAbstract(models.Model):
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     # This unique ID is supposed to used as a globally unique reference and should never be changed,
-    # if the organization is supposed to be the same (even in the case of a change of address or SIRET)
-    # It is meant to be the exposed ID of our organizations for external clients, such as in our APIs.
+    # if the structure is supposed to be the same (even in the case of a change of address or SIRET)
+    # It is meant to be the exposed ID of our structures for external clients, such as in our APIs.
     # This enables us to keep our internal primary key opaque and independent from any external logic.
     uid = models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)
 
@@ -67,9 +67,9 @@ class OrganizationAbstract(models.Model):
     #     verbose_name="membres",
     #     through="PrescriberMembership",
     #     blank=True,
-    #     through_fields=("organization", "user"),
+    #     through_fields=("structure", "user"),
     # )
-    objects = OrganizationQuerySet.as_manager()
+    objects = StructureQuerySet.as_manager()
 
     class Meta:
         abstract = True
@@ -123,12 +123,12 @@ class OrganizationAbstract(models.Model):
             membership.save(update_fields=["is_active", "is_admin", "joined_at", "updated_at"])
         self.expire_invitations(user)
         logger.info(
-            "%(action)s %(membership)s of organization_id=%(organization_id)d "
+            "%(action)s %(membership)s of structure_id=%(structure_id)d "
             "for user_id=%(user_id)d is_admin=%(is_admin)s.",
             {
                 "action": action,
                 "membership": membership_model._meta.label,
-                "organization_id": self.pk,
+                "structure_id": self.pk,
                 "user_id": user.pk,
                 "is_admin": membership.is_admin,
             },
@@ -141,13 +141,12 @@ class OrganizationAbstract(models.Model):
         """
         Deleting the membership was a possibility but we would have lost
         the member activity history. We need it to show to other members
-        which job applications this user was managing before leaving the organization.
+        which job applications this user was managing before leaving the
+        structure.
         """
-        membership_organization_id = getattr(membership, f"{self.members.source_field_name}_id")
-        if membership_organization_id != self.pk:
-            raise ValueError(
-                f"Cannot deactivate users from other organizations. {membership_organization_id=} {self.pk=}."
-            )
+        membership_structure_id = getattr(membership, f"{self.members.source_field_name}_id")
+        if membership_structure_id != self.pk:
+            raise ValueError(f"Cannot deactivate users from other structures. {membership_structure_id=} {self.pk=}.")
         was_admin = membership.is_admin
         membership.is_active = False
         # If this member is invited again, he should no still be an administrator.
@@ -158,23 +157,21 @@ class OrganizationAbstract(models.Model):
         self.expire_invitations(membership.user)
         self.member_deactivation_email(membership.user).send()
         logger.info(
-            "User %(updated_by)s deactivated %(membership)s of organization_id=%(organization_id)d "
+            "User %(updated_by)s deactivated %(membership)s of structure_id=%(structure_id)d "
             "for user_id=%(user_id)d is_admin=%(is_admin)s.",
             {
                 "updated_by": updated_by.pk,
                 "membership": self.members.through._meta.label,
-                "organization_id": self.pk,
+                "structure_id": self.pk,
                 "user_id": membership.user_id,
                 "is_admin": was_admin,
             },
         )
 
     def set_admin_role(self, membership, admin, *, updated_by):
-        membership_organization_id = getattr(membership, f"{self.members.source_field_name}_id")
-        if membership_organization_id != self.pk:
-            raise ValueError(
-                f"Cannot set admin role for other organizations. {membership_organization_id=} {self.pk=}."
-            )
+        membership_structure_id = getattr(membership, f"{self.members.source_field_name}_id")
+        if membership_structure_id != self.pk:
+            raise ValueError(f"Cannot set admin role for other structures. {membership_structure_id=} {self.pk=}.")
         membership.is_admin = admin
         membership.updated_by = updated_by
         membership.save(update_fields=["is_admin", "updated_by", "updated_at"])
@@ -229,7 +226,7 @@ class OrganizationAbstract(models.Model):
 
     def member_deactivation_email(self, user):
         """
-        Tell a user he is no longer a member of this organization.
+        Tell a user he is no longer a member of this structure.
         """
         to = [user.email]
         context = {"structure": self}

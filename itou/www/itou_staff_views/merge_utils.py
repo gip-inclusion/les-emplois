@@ -8,7 +8,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
-from itou.common_apps.organizations.models import MembershipAbstract
+from itou.common_apps.structures.models import MembershipAbstract
 from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis

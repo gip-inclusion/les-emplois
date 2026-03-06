@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
 
-from itou.common_apps.organizations.models import MembershipQuerySet
+from itou.common_apps.structures.models import MembershipQuerySet
 from itou.gps.models import FollowUpGroup
 from itou.utils import slack
 from itou.utils.perms.utils import can_view_personal_information

@@ -12,18 +12,13 @@ from django.conf import settings
 from django.db import models
 
 from itou.common_apps.address.models import AddressMixin
-from itou.common_apps.organizations.models import (
-    MembershipAbstract,
-    OrganizationAbstract,
-    OrganizationKind,
-    OrganizationQuerySet,
-)
+from itou.common_apps.structures.models import MembershipAbstract, StructureAbstract, StructureKind, StructureQuerySet
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import UserKind
 
 
-class Institution(AddressMixin, OrganizationAbstract):
-    ORGANIZATION_KIND = OrganizationKind.INSTITUTION
+class Institution(AddressMixin, StructureAbstract):
+    ORGANIZATION_KIND = StructureKind.INSTITUTION
 
     class Meta:
         verbose_name = "institution partenaire"
@@ -55,7 +50,7 @@ class Institution(AddressMixin, OrganizationAbstract):
         through_fields=("institution", "user"),
     )
 
-    objects = OrganizationQuerySet.as_manager()
+    objects = StructureQuerySet.as_manager()
 
 
 class InstitutionMembership(MembershipAbstract):

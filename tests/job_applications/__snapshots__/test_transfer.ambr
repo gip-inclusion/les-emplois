@@ -5,7 +5,7 @@
     'queries': list([
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'JobApplication.can_be_transferred[job_applications/models.py]',
           'JobApplication.transfer[job_applications/models.py]',
         ]),
@@ -26,7 +26,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_member[common_apps/organizations/models.py]',
+          'Company.has_member[common_apps/structures/models.py]',
           'JobApplication.can_be_transferred[job_applications/models.py]',
           'JobApplication.transfer[job_applications/models.py]',
         ]),

@@ -20,7 +20,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
-from itou.common_apps.organizations.models import OrganizationKind
+from itou.common_apps.structures.models import StructureKind
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -371,7 +371,7 @@ def switch_organization(request):
     try:
         # FIXME: remove condition and support for organization_id
         if key := request.POST.get("organization_key"):
-            assert key.split("-")[0] in [o.name for o in OrganizationKind]
+            assert key.split("-")[0] in [o.name for o in StructureKind]
             pk = int(key.split("-")[1])
         else:
             pk = int(request.POST["organization_id"])

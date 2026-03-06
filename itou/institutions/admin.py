@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 
-from itou.common_apps.organizations.admin import MembersInline, OrganizationAdmin
+from itou.common_apps.structures.admin import MembersInline, StructureAdmin
 from itou.institutions import models
 from itou.utils.admin import ItouGISMixin
 from itou.utils.apis.exceptions import GeocodingDataError
@@ -11,7 +11,7 @@ class InstitutionMembersInline(MembersInline):
 
 
 @admin.register(models.Institution)
-class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
+class InstitutionAdmin(ItouGISMixin, StructureAdmin):
     fieldsets = (
         (
             "Organisation",

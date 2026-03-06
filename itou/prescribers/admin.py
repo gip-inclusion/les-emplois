@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
 
-from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
+from itou.common_apps.structures.admin import HasMembersFilter, MembersInline, StructureAdmin
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -99,7 +99,7 @@ class PrescriberOrganizationMembersInline(MembersInline):
 
 
 @admin.register(PrescriberOrganization)
-class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, OrganizationAdmin):
+class PrescriberOrganizationAdmin(ItouGISMixin, CreatedOrUpdatedByMixin, StructureAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 

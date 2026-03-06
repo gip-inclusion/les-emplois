@@ -3156,7 +3156,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -3603,7 +3603,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -4054,7 +4054,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -6273,7 +6273,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -6720,7 +6720,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
@@ -7171,7 +7171,7 @@
       }),
       dict({
         'origin': list([
-          'Company.has_admin[common_apps/organizations/models.py]',
+          'Company.has_admin[common_apps/structures/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
           'InclusionNode[layout/_header_authenticated.html]',
