@@ -17,7 +17,6 @@ from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
-    APPLY_SESSION_KIND,
     CheckPreviousApplicationsBaseMixin,
     _check_job_seeker_approval,
 )
@@ -96,11 +95,7 @@ class HireBaseView(HirePermissionMixin, TemplateView):
         try:
             self.hire_session = SessionNamespace(request.session, HIRE_SESSION_KIND, session_uuid)
         except SessionNamespaceException:
-            # TODO(xfernandez): remove this fallback in a week
-            try:
-                self.hire_session = SessionNamespace(request.session, APPLY_SESSION_KIND, session_uuid)
-            except SessionNamespaceException:
-                raise Http404
+            raise Http404
         self.company = get_object_or_404(
             Company.objects.with_has_active_members(), pk=self.hire_session.get("company_pk")
         )
