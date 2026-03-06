@@ -1,6 +1,6 @@
 import enum
 
-from itou.utils.apis.pole_emploi import Endpoints
+from itou.utils.apis.pole_emploi import Endpoints, TopIdentiteCertifiee
 
 
 API_RECHERCHE_RESPONSE_KNOWN = {
@@ -230,49 +230,49 @@ RESPONSES = {
             "codeRetour": "S001",
             "message": "Approchant trouvé",
             "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.YES.value,
         },
         ResponseKind.NOT_CERTIFIED: {
             "codeRetour": "S001",
             "message": "Approchant trouvé",
             "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "N",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NO.value,
         },
         ResponseKind.NOT_FOUND: {
             "codeRetour": "S002",
             "message": "Aucun approchant trouvé",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
         },
         ResponseKind.MULTIPLE_USERS_RETURNED: {
             "codeRetour": "S003",
             "message": "Plusieurs usagers trouvés",
             "jetonUsager": None,
-            "topIdentiteCertifiee": None,
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
         },
         # TODO(cms): check if this is common to all endpoints and, if so, add them too.
         ResponseKind.BAD_REQUEST: {
             "codeRetour": "R997",
             "message": "Une erreur de validation s'est produite",
-            "topIdentiteCertifiee": "null",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
             "jetonUsager": "null",
         },
         ResponseKind.FORBIDDEN: {
             "codeRetour": "R001",
             "message": "Accès non autorisé",
-            "topIdentiteCertifiee": "null",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
             "jetonUsager": "null",
         },
         ResponseKind.INTERNAL_SERVER_ERROR: {
             "codeRetour": "R998",
             "message": "Un service a répondu en erreur",
-            "topIdentiteCertifiee": "null",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
             "jetonUsager": "null",
         },
         ResponseKind.SERVICE_UNAVAILABLE: {
             "codeRetour": "R999",
             "message": "Service indisponible, veuillez réessayer ultérieurement",
-            "topIdentiteCertifiee": "null",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.NA.value,
             "jetonUsager": "null",
         },
     },
@@ -281,7 +281,27 @@ RESPONSES = {
             "codeRetour": "S001",
             "message": "Approchant trouvé",
             "jetonUsager": "a_long_token",
-            "topIdentiteCertifiee": "O",
+            "topIdentiteCertifiee": TopIdentiteCertifiee.YES.value,
+        },
+    },
+    Endpoints.RQTH: {
+        ResponseKind.CERTIFIED: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "2030-01-20",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
+        },
+        ResponseKind.NOT_CERTIFIED: {
+            "dateDebutRqth": "",
+            "dateFinRqth": "",
+            "source": "",
+            "topValiditeRQTH": False,
+        },
+        ResponseKind.CERTIFIED_FOR_EVER: {
+            "dateDebutRqth": "2024-01-20",
+            "dateFinRqth": "9999-12-31",
+            "source": "FRANCE TRAVAIL",
+            "topValiditeRQTH": True,
         },
     },
 }
