@@ -117,7 +117,10 @@ class TestPrescriberSignup:
         assertTemplateUsed(response, "welcoming_tour/prescriber.html")
 
         # Organization
-        assert client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == organization.pk
+        assert (
+            client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
+            == organization.organization_switch_key
+        )
         response = client.get(reverse("dashboard:index"))
         assertContains(response, f"Code SAFIR {organization.code_safir_pole_emploi}")
 

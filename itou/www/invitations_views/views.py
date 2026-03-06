@@ -230,7 +230,9 @@ class InvitePrescriberView(BaseInviteUserView):
 def join_prescriber_organization(request, invitation_id):
     invitation = get_object_or_404(PrescriberWithOrgInvitation, pk=invitation_id)
     handle_prescriber_intivation(invitation, request)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.organization.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+        invitation.organization.organization_switch_key
+    )
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
 
@@ -252,7 +254,9 @@ class InviteEmployerView(BaseInviteUserView):
 def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     handle_employer_invitation(invitation, request)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.company.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+        invitation.company.organization_switch_key
+    )
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
 
@@ -274,5 +278,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
 def join_institution(request, invitation_id):
     invitation = get_object_or_404(LaborInspectorInvitation, pk=invitation_id)
     handle_labor_inspector_invitation(invitation, request)
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.institution.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+        invitation.institution.organization_switch_key
+    )
     return redirect("dashboard:index")

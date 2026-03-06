@@ -34,7 +34,7 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
         if orgs:
             # If an org exists, choose the first one
             current_org = orgs[0]
-            session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org.pk
+            session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org.organization_switch_key
         elif current_org_pk:
             # If the user has not active membership anymore
             # => No need to track the current org in session (none)

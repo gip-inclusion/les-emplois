@@ -538,7 +538,7 @@ def create_company(request, template_name="companies/create_siae.html"):
     if request.method == "POST" and form.is_valid():
         try:
             company = form.save()
-            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.organization_switch_key
             return HttpResponseRedirect(reverse("dashboard:index"))
         except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
