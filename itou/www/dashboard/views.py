@@ -380,8 +380,10 @@ def switch_organization(request):
 
     if not request.user.is_professional or pk not in {organization.pk for organization in request.organizations}:
         raise Http404()
+    elif not key:
+        key = {organization.pk: organization.organization_switch_key for organization in request.organizations}[pk]
 
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = key
     return HttpResponseRedirect(next_url)
 
 

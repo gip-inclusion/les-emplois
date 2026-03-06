@@ -129,7 +129,9 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == company
         assert request.organizations == [company]
@@ -165,7 +167,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company_1.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == company_1.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == company_1
         assert request.organizations == [company_1, company_2]
@@ -182,7 +187,7 @@ class TestItouCurrentOrganizationMiddleware:
 
         # FIXME: remove compat_mode in a week
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            company_2.pk if compat_mode else f"COMPANY-{company_2.pk}"
+            company_2.pk if compat_mode else company_2.organization_switch_key
         )
         request.session.save()
         with assertNumQueries(
@@ -196,7 +201,7 @@ class TestItouCurrentOrganizationMiddleware:
         # Session updated
         # FIXME: remove compat_mode in a week
         assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            company_2.pk if compat_mode else f"COMPANY-{company_2.pk}"
+            company_2.pk if compat_mode else company_2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == company_2
@@ -237,7 +242,9 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == company.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == company
         assert request.organizations == [company]
@@ -261,7 +268,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == active_company.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == active_company.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == active_company
         assert request.organizations == [company, active_company]
@@ -288,7 +298,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == organization.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == organization.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == organization
         assert request.organizations == [organization]
@@ -302,7 +315,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == organization.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == organization.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == organization
         assert request.organizations == [organization]
@@ -319,7 +335,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == organization1.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == organization1.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == organization1
         assert request.organizations == [organization1, organization2]
@@ -337,7 +356,7 @@ class TestItouCurrentOrganizationMiddleware:
         request = get_request(prescriber, with_perms_middleware=False)
         # FIXME: remove compat_mode in a week
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            organization2.pk if compat_mode else f"PRESCRIBER_ORGANIZATION-{organization2.pk}"
+            organization2.pk if compat_mode else organization2.organization_switch_key
         )
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
@@ -346,7 +365,7 @@ class TestItouCurrentOrganizationMiddleware:
         # Session updated
         # FIXME: remove compat_mode in a week
         assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            organization2.pk if compat_mode else f"PRESCRIBER_ORGANIZATION-{organization2.pk}"
+            organization2.pk if compat_mode else organization2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == organization2
@@ -360,7 +379,7 @@ class TestItouCurrentOrganizationMiddleware:
         organization = PrescriberOrganizationFactory()
         # FIXME: remove compat_mode in a week
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            organization.pk if compat_mode else f"PRESCRIBER_ORGANIZATION-{organization.pk}"
+            organization.pk if compat_mode else organization.organization_switch_key
         )
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
@@ -400,7 +419,10 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == institution.pk
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == institution.organization_switch_key
+        )
         # Check new request attributes
         assert request.current_organization == institution
         assert request.organizations == [institution]
@@ -417,7 +439,7 @@ class TestItouCurrentOrganizationMiddleware:
         request = get_request(labor_inspector, with_perms_middleware=False)
         # FIXME: remove compat_mode in a week
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            institution2.pk if compat_mode else f"INSTITUTION-{institution2.pk}"
+            institution2.pk if compat_mode else institution2.organization_switch_key
         )
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
@@ -426,7 +448,7 @@ class TestItouCurrentOrganizationMiddleware:
         # Session untouched
         # FIXME: remove compat_mode in a week
         assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            institution2.pk if compat_mode else f"INSTITUTION-{institution2.pk}"
+            institution2.pk if compat_mode else institution2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == institution2
@@ -467,13 +489,13 @@ def test_logout_as_siae_multiple_memberships(client, compat_mode):
     # Select the 1st SIAE as current one
     session = client.session
     session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-        company_1.pk if compat_mode else f"COMPANY-{company_1.pk}"
+        company_1.pk if compat_mode else company_1.organization_switch_key
     )
     session.save()
 
     response = client.get(reverse("account_logout"))
     assert client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == (
-        company_1.pk if compat_mode else f"COMPANY-{company_1.pk}"
+        company_1.pk if compat_mode else company_1.organization_switch_key
     )
     # The dropdown to switch to the 2nd SIAE is available on logout screen
     assertContains(response, company_2.name)
@@ -491,7 +513,7 @@ def test_logout_as_labor_inspector_multiple_institutions(client, compat_mode):
     session = client.session
     # FIXME: remove compat_mode in a week
     session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-        institution1.pk if compat_mode else f"INSTITUTION-{institution1.pk}"
+        institution1.pk if compat_mode else institution1.organization_switch_key
     )
     session.save()
 
