@@ -29,6 +29,7 @@ from itou.utils.session import SessionNamespace, SessionNamespaceException
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import ApplicationJobsForm, SubmitJobApplicationForm
 from itou.www.apply.views import constants as apply_view_constants
+from itou.www.apply.views.common import previous_applications_queryset
 from itou.www.eligibility_views.views import BaseIAEEligibilityViewForPrescriber
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 from itou.www.job_seekers_views.enums import JobSeekerSessionKinds
@@ -136,7 +137,7 @@ class ApplicationPermissionMixin:
             )  # Don't enforce this rule until after CheckPreviousApplications
             and hasattr(self, "job_seeker")
             and self.tunnel not in (ApplyTunnel.AUTO_PRESCRIPTION, ApplyTunnel.HIRE)
-            and self.get_previous_applications_queryset().created_in_past(hours=24).exists()
+            and previous_applications_queryset(self.job_seeker, self.company).created_in_past(hours=24).exists()
         ):
             if request.user == self.job_seeker:
                 msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
@@ -145,10 +146,6 @@ class ApplicationPermissionMixin:
             self.apply_session.delete()  # Don't allow to re-use the session in another step to skip this check
             raise PermissionDenied(msg)
         return super().dispatch(request, *args, **kwargs)
-
-    def get_previous_applications_queryset(self):
-        # Also used in CheckPreviousApplications
-        return self.job_seeker.job_applications.filter(to_company=self.company)
 
 
 class StartViewForSubmit(ApplicationPermissionMixin, View):
@@ -398,7 +395,9 @@ class CheckPreviousApplicationsBaseMixin:
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.prev_application = self.get_previous_applications_queryset().order_by("created_at").last()
+        self.prev_application = (
+            previous_applications_queryset(self.job_seeker, self.company).order_by("created_at").last()
+        )
 
     def get_next_url(self):
         raise NotImplementedError
