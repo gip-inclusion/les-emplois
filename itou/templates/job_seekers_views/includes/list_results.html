@@ -84,6 +84,14 @@
                                                     {% endif %}
                                                 </form>
                                             {% endif %}
+                                            {% if job_seeker.services_search_url %}
+                                                <a href="{{ job_seeker.services_search_url }}"
+                                                   class="dropdown-item"
+                                                   {% matomo_event "candidat" "clic" "services-search-from-list" %}
+                                                   {% if forloop.first %}id="introjs-orienter-vers-service-insertion"{% endif %}>
+                                                    Orienter vers un service d’insertion
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% endif %}
