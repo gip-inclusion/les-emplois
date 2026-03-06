@@ -514,6 +514,7 @@ class TestMergeUsers:
         assert not User.objects.filter(pk=prescriber_2.pk).exists()
 
         # reset accounts
+        User.objects.filter(pk=prescriber_1.pk).delete()
         prescriber_1.save()
         prescriber_2.save()
 
@@ -566,6 +567,7 @@ class TestMergeUsers:
         admin_remark.delete()
 
         caplog.clear()
+        User.objects.filter(pk=prescriber_1.pk).delete()
         prescriber_1.save()
         prescriber_2.save()
         url = reverse("itou_staff_views:merge_users_confirm", args=(prescriber_1.public_id, prescriber_2.public_id))

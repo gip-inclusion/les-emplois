@@ -215,6 +215,7 @@ class TestApplicantsAPI:
             },
         ] == results
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_applicant_data(self, api_client):
         company = CompanyFactory(with_membership=True)
         job_seeker1 = JobApplicationFactory(to_company=company, job_seeker__born_in_france=True).job_seeker

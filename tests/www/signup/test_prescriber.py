@@ -755,6 +755,7 @@ class TestPrescriberSignup:
         invitation_url = f"{reverse('invitations_views:invite_prescriber_with_org')}?{urlencode(requestor)}"
         assert invitation_url in mail_body
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_prescriber_already_exists_simple_signup(self, client, pro_connect):
         """
         He does not want to join an organization, only create an account.
@@ -792,6 +793,7 @@ class TestPrescriberSignup:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert user.has_sso_provider
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_prescriber_already_exists_create_organization(self, client, pro_connect):
         """
         User is already a prescriber.
@@ -907,6 +909,7 @@ class TestProConnectPrescribersViewsExceptions:
     Prescribers' signup and login exceptions: user already exists, ...
     """
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_organization_creation_error(self, client, pro_connect):
         """
         The organization creation didn't work.
@@ -974,6 +977,7 @@ class TestProConnectPrescribersViewsExceptions:
         user = User.objects.get(email=pro_connect.oidc_userinfo["email"])
         assert not user.prescriberorganization_set.exists()
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_non_prescriber_cant_join_organisation(self, client, pro_connect):
         """
         The organization creation didn't work.

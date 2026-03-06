@@ -79,6 +79,7 @@ class TestSummaryEmployeeRecords:
         response = client.get(self.url)
         assertContains(response, "<strong>Pas de numéro de sécurité sociale</strong>", html=True)
 
+    @pytest.mark.usefixtures("trigger_context")
     def test_job_seeker_profile_infos_all_fields_etti(self, client, snapshot):
         client.force_login(self.user)
         self.company.kind = CompanyKind.ETTI

@@ -307,10 +307,13 @@ class BaseConfirmationView(UserPassesTestMixin, CommonUserInfoFormsMixin, Templa
             with transaction.atomic():
                 if form_personal_data := self.forms.get("personal_data"):
                     form_personal_data.save()
+                    form_personal_data.instance.refresh_from_db(fields=["fields_history"])
                 if form_user_address := self.forms.get("user_address"):
                     form_user_address.save()
+                    form_user_address.instance.refresh_from_db(fields=["fields_history"])
                 if form_birth_data := self.forms.get("birth_data"):
                     form_birth_data.save()
+                    form_birth_data.instance.refresh_from_db(fields=["fields_history"])
                 if self.eligibility_diagnosis:
                     self.eligibility_diagnosis.schedule_certification()
                 if self.geiq_eligibility_diagnosis:

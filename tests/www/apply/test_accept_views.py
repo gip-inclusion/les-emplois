@@ -1900,6 +1900,7 @@ class TestFillJobSeekerInfosForAccept:
             response = client.get(fill_job_seeker_infos_url)
         assertRedirects(response, reverse("apply:accept_contract_infos", kwargs={"session_uuid": session_uuid}))
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("address", ["empty", "incomplete"])
     def test_no_address(self, client, address):
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1983,6 +1984,7 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.post_code == "67118"
         assert self.job_seeker.city == "Geispolsheim"
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("birth_country", [None, "france", "other"])
     def test_no_birthdate(self, client, birth_country):
         client.force_login(self.company.members.first())
@@ -2101,6 +2103,7 @@ class TestFillJobSeekerInfosForAccept:
         if birth_country != "other":
             assert self.job_seeker.jobseeker_profile.birth_country_id == Country.FRANCE_ID
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("in_france", [True, False])
     def test_company_no_birth_country(self, client, in_france):
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -2202,6 +2205,7 @@ class TestFillJobSeekerInfosForAccept:
         assert self.job_seeker.jobseeker_profile.birth_country_id == new_country.pk
         assert self.job_seeker.jobseeker_profile.birth_place == new_place
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("with_lack_of_nir_reason", [True, False])
     def test_company_no_nir(self, client, with_lack_of_nir_reason):
         client.force_login(self.company.members.first())
@@ -2284,6 +2288,7 @@ class TestFillJobSeekerInfosForAccept:
         self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.nir == NEW_NIR
 
+    @pytest.mark.usefixtures("trigger_context")
     @pytest.mark.parametrize("with_lack_of_pole_emploi_id_reason", [True, False])
     def test_company_no_pole_emploi_id(self, client, with_lack_of_pole_emploi_id_reason):
         POLE_EMPLOI_FIELD_MARKER = 'id="id_pole_emploi_id"'
