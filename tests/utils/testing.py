@@ -6,18 +6,18 @@ import random
 import re
 from collections import defaultdict
 from itertools import chain
+from pathlib import Path
 
 import openpyxl
 from bs4 import BeautifulSoup
 from bs4.formatter import HTMLFormatter
-from django.conf import Path
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
 from django.template import Template
 from django.template.loader import render_to_string
-from django.test import Client, RequestFactory, TestCase
+from django.test import Client, RequestFactory
 from django.test.utils import TestContextDecorator
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
@@ -139,8 +139,8 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
 
 class ItouClient(Client):
     def request(self, **request):
-        with TestCase.captureOnCommitCallbacks(execute=True):
-            response = super().request(**request)
+        response = super().request(**request)
+        execute_tasks()
         content_type = response["Content-Type"].split(";")[0]
         if content_type == "text/html" and response.content:
             content = response.text
@@ -270,6 +270,19 @@ def get_request(user, with_perms_middleware=True):
     if with_perms_middleware:
         ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
     return request
+
+
+def execute_tasks():
+    from huey.contrib.djhuey import HUEY
+
+    while task_data := HUEY.storage.dequeue():
+        task = HUEY.deserialize_task(task_data)
+        # Do not close the DB connection after a @db_task execution.
+        HUEY.immediate = True
+        try:
+            HUEY.execute(task)
+        finally:
+            HUEY.immediate = False
 
 
 PAGINATION_PAGE_ONE_MARKUP = """

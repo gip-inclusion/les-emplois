@@ -26,7 +26,7 @@ from tests.invitations.factories import EmployerInvitationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.testing import normalize_fields_history
+from tests.utils.testing import execute_tasks, normalize_fields_history
 
 
 class TestCompanyFactories:
@@ -167,13 +167,13 @@ class TestCompanyModel:
         assert company_2.has_member(company_1_admin_user)
         assert not company_2.has_admin(company_1_admin_user)
 
-    def test_new_signup_activation_email_to_official_contact(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_new_signup_activation_email_to_official_contact(self, mailoutbox):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         with mock.patch("itou.utils.tokens.CompanySignupTokenGenerator.make_token", return_value=token):
             message = company.new_signup_activation_email_to_official_contact()
-            with django_capture_on_commit_callbacks(execute=True):
-                message.send()
+            message.send()
+            execute_tasks()
 
             assert len(mailoutbox) == 1
             email = mailoutbox[0]

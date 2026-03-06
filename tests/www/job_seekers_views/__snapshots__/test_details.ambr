@@ -1651,7 +1651,7 @@
 # ---
 # name: test_job_application_tab[job seeker job applications view with sent job applications]
   dict({
-    'num_queries': 20,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -2550,6 +2550,41 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -4529,7 +4564,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_employer[SQL queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -5338,6 +5373,41 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
@@ -5697,7 +5767,7 @@
 # ---
 # name: test_with_approval_and_diagnosis_from_prescriber[SQL queries]
   dict({
-    'num_queries': 23,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -6576,6 +6646,41 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),

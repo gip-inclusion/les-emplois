@@ -13,6 +13,7 @@ from itou.approvals.management.commands import prolongation_requests_chores
 from itou.approvals.models import ProlongationRequest
 from tests.approvals.factories import ProlongationRequestDenyInformationFactory, ProlongationRequestFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.utils.testing import execute_tasks
 
 
 @pytest.fixture(name="command")
@@ -66,13 +67,13 @@ def test_grant():
 
 @freeze_time()
 @pytest.mark.parametrize("postcode,contained", [("59284", True), ("75001", False)])
-def test_deny(django_capture_on_commit_callbacks, mailoutbox, postcode, contained, settings):
+def test_deny(mailoutbox, postcode, contained, settings):
     settings.AFPA_DEPARTMENTS = ["59"]
     prolongation_request = ProlongationRequestFactory(approval__user__jobseeker_profile__hexa_post_code=postcode)
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
-    with django_capture_on_commit_callbacks(execute=True):
-        prolongation_request.deny(prolongation_request.assigned_to, deny_information)
+    prolongation_request.deny(prolongation_request.assigned_to, deny_information)
+    execute_tasks()
 
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
@@ -107,7 +108,7 @@ def test_deny(django_capture_on_commit_callbacks, mailoutbox, postcode, containe
     ],
 )
 def test_chores_send_reminder_to_prescriber_organization_other_members(
-    snapshot, mailoutbox, caplog, command, django_capture_on_commit_callbacks, wet_run, expected
+    snapshot, mailoutbox, caplog, command, wet_run, expected
 ):
     parameters = itertools.product(
         ProlongationRequestStatus,
@@ -122,15 +123,15 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
         ProlongationRequestFactory(status=status, created_at=created_at, reminder_sent_at=reminder_sent_at)
 
     with freeze_time():
-        with django_capture_on_commit_callbacks(execute=True):
-            command.handle(command="email_reminder", wet_run=wet_run)
-        assert len(mailoutbox) == expected
+        command.handle(command="email_reminder", wet_run=wet_run)
+        execute_tasks()
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
+    assert len(mailoutbox) == expected
     assert caplog.messages == snapshot()
 
 
 def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
-    mailoutbox, django_capture_on_commit_callbacks, command
+    mailoutbox, command
 ):
     prolongation_request = ProlongationRequestFactory()
 
@@ -149,14 +150,12 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
     ]
     for days_ago, expected in specs:
         with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
-            with django_capture_on_commit_callbacks(execute=True):
-                command.handle(command="email_reminder", wet_run=True)
+            command.handle(command="email_reminder", wet_run=True)
+            execute_tasks()
         assert len(mailoutbox) == expected
 
 
-def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit(
-    mailoutbox, snapshot, django_capture_on_commit_callbacks, command
-):
+def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limit(mailoutbox, snapshot, command):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
     admin_prescribers = PrescriberFactory.create_batch(
         9, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=True
@@ -166,8 +165,8 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_copy_limi
     )
 
     with freeze_time(prolongation_request.created_at + relativedelta(days=30)):
-        with django_capture_on_commit_callbacks(execute=True):
-            command.handle(command="email_reminder", wet_run=True)
+        command.handle(command="email_reminder", wet_run=True)
+        execute_tasks()
 
     assert len(mailoutbox) == 11  # prolongation_request.assigned_to and 10 coworkers
 

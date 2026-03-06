@@ -5,10 +5,11 @@ from requests.exceptions import ConnectTimeout
 
 from itou.emails.models import Email
 from itou.emails.tasks import AsyncEmailBackend, _async_send_message
+from tests.utils.testing import execute_tasks
 
 
 class TestAsyncEmailBackend:
-    def test_send_messages_splits_recipients(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_send_messages_splits_recipients(self, mailoutbox):
         # 2 emails are needed; one with 50 the other with 25
         recipients = [Faker("email", locale="fr_FR") for _ in range(75)]
         message = EmailMessage(
@@ -19,9 +20,8 @@ class TestAsyncEmailBackend:
         )
 
         backend = AsyncEmailBackend()
-        # Huey runs in immediate mode.
-        with django_capture_on_commit_callbacks(execute=True):
-            sent = backend.send_messages([message])
+        sent = backend.send_messages([message])
+        execute_tasks()
 
         assert sent == 2
         [email1, email2] = mailoutbox
@@ -53,13 +53,11 @@ class TestAsyncSendMessage:
         for attr in ("to", "cc", "bcc", "subject", "body_text", "from_email", "reply_to", "created_at"):
             assert getattr(email, attr) == getattr(fresh_email, attr)
 
-    def test_send_ok(
-        self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock, success_response
-    ):
+    def test_send_ok(self, anymail_mailjet_settings, caplog, requests_mock, success_response):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=success_response)
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         assert self.RETRY_TEXT not in caplog.text
         fresh_email = Email.objects.get(pk=email.pk)
         self.assert_fields_unchanged(email, fresh_email)
@@ -69,15 +67,14 @@ class TestAsyncSendMessage:
         self,
         anymail_mailjet_settings,
         caplog,
-        django_capture_on_commit_callbacks,
         error_response,
         requests_mock,
     ):
         """An exception is raised, to make Huey retry the task."""
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error_response)
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         assert self.RETRY_TEXT in caplog.text
         fresh_email = Email.objects.get(pk=email.pk)
         self.assert_fields_unchanged(email, fresh_email)
@@ -87,7 +84,6 @@ class TestAsyncSendMessage:
         self,
         anymail_mailjet_settings,
         caplog,
-        django_capture_on_commit_callbacks,
         error_response,
         mocker,
         requests_mock,
@@ -96,76 +92,70 @@ class TestAsyncSendMessage:
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error_response)
         sentry_mock = mocker.patch("itou.emails.tasks.sentry_sdk.capture_message")
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk, retries=0)
+        _async_send_message(email.pk, retries=0)
+        execute_tasks()
         sentry_mock.assert_called_once_with(f"Could not send email.pk={email.pk}.", "error")
         assert self.RETRY_TEXT not in caplog.text
         fresh_email = Email.objects.get(pk=email.pk)
         self.assert_fields_unchanged(email, fresh_email)
         assert fresh_email.esp_response == error_response
 
-    def test_nonexistent_email(self, caplog, django_capture_on_commit_callbacks):
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(0)
+    def test_nonexistent_email(self, caplog):
+        _async_send_message(0)
+        execute_tasks()
         assert self.RETRY_TEXT not in caplog.text
         assert "Not sending email_id=0, it does not exist in the database." in caplog.text
 
-    def test_mailjet_timeout(
-        self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
-    ):
+    def test_mailjet_timeout(self, anymail_mailjet_settings, caplog, requests_mock):
         # https://dev.mailjet.com/email/guides/send-api-v31/#send-in-bulk
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
             exc=ConnectTimeout,
         )
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         assert self.RETRY_TEXT in caplog.text
         assert email.esp_response is None
 
-    def test_mailjet_unavailable_json_response(
-        self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
-    ):
+    def test_mailjet_unavailable_json_response(self, anymail_mailjet_settings, caplog, requests_mock):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         error = {"error": "Server unavailable"}
         requests_mock.post(f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send", json=error)
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         assert self.RETRY_TEXT in caplog.text
         email.refresh_from_db()
         assert email.esp_response == error
 
-    def test_mailjet_unavailable_html_response(
-        self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock
-    ):
+    def test_mailjet_unavailable_html_response(self, anymail_mailjet_settings, caplog, requests_mock):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         error_text = "<html><h1>503 Maintenance</h1></html>"
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
             text=error_text,
         )
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         assert self.RETRY_TEXT in caplog.text
         assert f"Received invalid response from Mailjet, email_id={email.pk}. Payload: {error_text}" in caplog.text
         assert email.esp_response is None
 
-    def test_task_failure(self, anymail_mailjet_settings, caplog, django_capture_on_commit_callbacks, requests_mock):
+    def test_task_failure(self, anymail_mailjet_settings, caplog, requests_mock):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
         requests_mock.post(
             f"{anymail_mailjet_settings.ANYMAIL['MAILJET_API_URL']}send",
             exc=Exception("Test"),
         )
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         # Simply to pair with "assert self.HUEY_TEXT not in caplog.text" in test_django_settings.
         assert self.HUEY_TEXT in caplog.text
 
-    def test_django_settings(self, caplog, django_capture_on_commit_callbacks):
+    def test_django_settings(self, caplog):
         email = Email.objects.create(to=["you@test.local"], cc=[], bcc=[], subject="Hi", body_text="Hello")
-        with django_capture_on_commit_callbacks(execute=True):
-            _async_send_message(email.pk)
+        _async_send_message(email.pk)
+        execute_tasks()
         # No retries of the task.
         assert self.RETRY_TEXT not in caplog.text
         assert self.HUEY_TEXT not in caplog.text

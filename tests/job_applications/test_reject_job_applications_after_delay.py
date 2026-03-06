@@ -12,10 +12,11 @@ from itou.job_applications.enums import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import execute_tasks
 
 
 @pytest.mark.parametrize("state", AUTO_REJECT_JOB_APPLICATION_STATES)
-def test_reject_job_applications_after_delay(state, django_capture_on_commit_callbacks, mailoutbox, snapshot, caplog):
+def test_reject_job_applications_after_delay(state, mailoutbox, snapshot, caplog):
     limit = 2
 
     # first job_seeker with the oldest and the most recent job applications
@@ -46,8 +47,8 @@ def test_reject_job_applications_after_delay(state, django_capture_on_commit_cal
         updated_at=timezone.now() - AUTO_REJECT_JOB_APPLICATION_DELAY - datetime.timedelta(days=2),
     )
 
-    with django_capture_on_commit_callbacks(execute=True):
-        call_command("reject_job_applications_after_delay", "--limit", limit)
+    call_command("reject_job_applications_after_delay", "--limit", limit)
+    execute_tasks()
 
     assert "5 auto rejected job applications for 2 job seekers." in caplog.messages
 

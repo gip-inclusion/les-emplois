@@ -35,6 +35,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
 )
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerAssignmentFactory, PrescriberFactory
+from tests.utils.testing import execute_tasks
 
 
 class TestPrescriberOrganizationManager:
@@ -65,29 +66,29 @@ class TestPrescriberOrganizationManager:
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
         assert accredited_orgs.count() == 0
 
-    def test_create_organization(self, django_capture_on_commit_callbacks, mailoutbox):
+    def test_create_organization(self, mailoutbox):
         """
         Test `create_organization`.
         """
-        with django_capture_on_commit_callbacks(execute=True):
-            PrescriberOrganization.objects.create_organization(
-                {
-                    "siret": "11122233300000",
-                    "name": "Ma petite entreprise",
-                    "authorization_status": PrescriberAuthorizationStatus.NOT_REQUIRED,
-                },
-            )
+        PrescriberOrganization.objects.create_organization(
+            {
+                "siret": "11122233300000",
+                "name": "Ma petite entreprise",
+                "authorization_status": PrescriberAuthorizationStatus.NOT_REQUIRED,
+            },
+        )
+        execute_tasks()
         assert 1 == PrescriberOrganization.objects.count()
         assert len(mailoutbox) == 0
 
-        with django_capture_on_commit_callbacks(execute=True):
-            org = PrescriberOrganization.objects.create_organization(
-                {
-                    "siret": "11122233300001",
-                    "name": "Ma seconde entreprise",
-                    "authorization_status": PrescriberAuthorizationStatus.NOT_SET,
-                },
-            )
+        org = PrescriberOrganization.objects.create_organization(
+            {
+                "siret": "11122233300001",
+                "name": "Ma seconde entreprise",
+                "authorization_status": PrescriberAuthorizationStatus.NOT_SET,
+            },
+        )
+        execute_tasks()
         assert 2 == PrescriberOrganization.objects.count()
         assert len(mailoutbox) == 1
         assert str(org.pk) in mailoutbox[0].body

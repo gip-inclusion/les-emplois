@@ -968,7 +968,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 12,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -1274,6 +1274,41 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -1282,7 +1317,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 15,
+    'num_queries': 18,
     'queries': list([
       dict({
         'origin': list([
@@ -1688,6 +1723,41 @@
         'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
           'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
@@ -1696,7 +1766,7 @@
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1994,12 +2064,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2346,12 +2451,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - start]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -2714,12 +2854,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 18,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -3227,12 +3402,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -3629,12 +3839,47 @@
           LIMIT 1
         ''',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -4080,324 +4325,45 @@
           LIMIT 1
         ''',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - start]
-  dict({
-    'num_queries': 12,
-    'queries': list([
-      dict({
-        'origin': list([
-          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
-        ]),
-        'sql': '''
-          SELECT "django_session"."session_key",
-                 "django_session"."session_data",
-                 "django_session"."expire_date"
-          FROM "django_session"
-          WHERE ("django_session"."expire_date" > %s
-                 AND "django_session"."session_key" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id",
-                 "users_user"."password",
-                 "users_user"."last_login",
-                 "users_user"."is_superuser",
-                 "users_user"."username",
-                 "users_user"."first_name",
-                 "users_user"."last_name",
-                 "users_user"."is_staff",
-                 "users_user"."is_active",
-                 "users_user"."date_joined",
-                 "users_user"."address_line_1",
-                 "users_user"."address_line_2",
-                 "users_user"."post_code",
-                 "users_user"."city",
-                 "users_user"."department",
-                 "users_user"."coords",
-                 "users_user"."geocoding_score",
-                 "users_user"."geocoding_updated_at",
-                 "users_user"."ban_api_resolved_address",
-                 "users_user"."insee_city_id",
-                 "users_user"."title",
-                 "users_user"."full_name_search_vector",
-                 "users_user"."email",
-                 "users_user"."phone",
-                 "users_user"."kind",
-                 "users_user"."identity_provider",
-                 "users_user"."has_completed_welcoming_tour",
-                 "users_user"."created_by_id",
-                 "users_user"."external_data_source_history",
-                 "users_user"."last_checked_at",
-                 "users_user"."public_id",
-                 "users_user"."address_filled_at",
-                 "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          WHERE "users_user"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "prescribers_prescribermembership"."id",
-                 "prescribers_prescribermembership"."user_id",
-                 "prescribers_prescribermembership"."joined_at",
-                 "prescribers_prescribermembership"."is_admin",
-                 "prescribers_prescribermembership"."is_active",
-                 "prescribers_prescribermembership"."created_at",
-                 "prescribers_prescribermembership"."updated_at",
-                 "prescribers_prescribermembership"."organization_id",
-                 "prescribers_prescribermembership"."updated_by_id",
-                 "prescribers_prescriberorganization"."id",
-                 "prescribers_prescriberorganization"."address_line_1",
-                 "prescribers_prescriberorganization"."address_line_2",
-                 "prescribers_prescriberorganization"."post_code",
-                 "prescribers_prescriberorganization"."city",
-                 "prescribers_prescriberorganization"."department",
-                 "prescribers_prescriberorganization"."coords",
-                 "prescribers_prescriberorganization"."geocoding_score",
-                 "prescribers_prescriberorganization"."geocoding_updated_at",
-                 "prescribers_prescriberorganization"."ban_api_resolved_address",
-                 "prescribers_prescriberorganization"."insee_city_id",
-                 "prescribers_prescriberorganization"."name",
-                 "prescribers_prescriberorganization"."created_at",
-                 "prescribers_prescriberorganization"."updated_at",
-                 "prescribers_prescriberorganization"."uid",
-                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
-                 "prescribers_prescriberorganization"."automatic_geocoding_update",
-                 "prescribers_prescriberorganization"."siret",
-                 "prescribers_prescriberorganization"."kind",
-                 "prescribers_prescriberorganization"."is_brsa",
-                 "prescribers_prescriberorganization"."phone",
-                 "prescribers_prescriberorganization"."email",
-                 "prescribers_prescriberorganization"."website",
-                 "prescribers_prescriberorganization"."description",
-                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
-                 "prescribers_prescriberorganization"."created_by_id",
-                 "prescribers_prescriberorganization"."authorization_status",
-                 "prescribers_prescriberorganization"."authorization_updated_at",
-                 "prescribers_prescriberorganization"."authorization_updated_by_id",
-                 "prescribers_prescriberorganization"."is_gps_authorized"
-          FROM "prescribers_prescribermembership"
-          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-          WHERE ("prescribers_prescribermembership"."is_active"
-                 AND "prescribers_prescribermembership"."user_id" = %s)
-          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_nexususer"."id",
-                 "nexus_nexususer"."source",
-                 "nexus_nexususer"."source_id",
-                 "nexus_nexususer"."source_kind",
-                 "nexus_nexususer"."first_name",
-                 "nexus_nexususer"."last_name",
-                 "nexus_nexususer"."email",
-                 "nexus_nexususer"."phone",
-                 "nexus_nexususer"."last_login",
-                 "nexus_nexususer"."auth",
-                 "nexus_nexususer"."kind",
-                 "nexus_nexususer"."updated_at",
-                 COALESCE(
-                            (SELECT U0."valid_since" AS "valid_since"
-                             FROM "nexus_nexusressourcesyncstatus" U0
-                             WHERE U0."service" = ("nexus_nexususer"."source")
-                             ORDER BY RANDOM() ASC
-                             LIMIT 1), %s) AS "_threshold"
-          FROM "nexus_nexususer"
-          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
-                                                               (SELECT U0."valid_since" AS "valid_since"
-                                                                FROM "nexus_nexusressourcesyncstatus" U0
-                                                                WHERE U0."service" = ("nexus_nexususer"."source")
-                                                                ORDER BY RANDOM() ASC
-                                                                LIMIT 1), %s))
-                 AND "nexus_nexususer"."email" = %s)
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'get_service_users[nexus/utils.py]',
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          SELECT "nexus_activatedservice"."id",
-                 "nexus_activatedservice"."user_id",
-                 "nexus_activatedservice"."service",
-                 "nexus_activatedservice"."created_at"
-          FROM "nexus_activatedservice"
-          WHERE "nexus_activatedservice"."user_id" = %s
-          ORDER BY RANDOM() ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'dropdown_status[nexus/utils.py]',
-          'DropDownMiddleware.__call__[nexus/middleware.py]',
-        ]),
-        'sql': '''
-          (
-             (SELECT %s AS "a"
-              FROM "companies_companymembership"
-              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
-              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
-              WHERE ("users_user"."is_active"
-                     AND "companies_companymembership"."is_active"
-                     AND "companies_company"."department" IN (%s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s,
-                                                              %s)
-                     AND "users_user"."email" = %s))
-           UNION
-             (SELECT %s AS "a"
-              FROM "prescribers_prescribermembership"
-              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
-              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
-              WHERE ("users_user"."is_active"
-                     AND "prescribers_prescribermembership"."is_active"
-                     AND "prescribers_prescriberorganization"."department" IN (%s,
-                                                                               %s,
-                                                                               %s,
-                                                                               %s,
-                                                                               %s,
-                                                                               %s,
-                                                                               %s,
-                                                                               %s)
-                     AND "users_user"."email" = %s)))
-          UNION
-            (SELECT %s AS "a"
-             FROM "nexus_nexusmembership"
-             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
-             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
-             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
-                                                                        (SELECT U0."valid_since" AS "valid_since"
-                                                                         FROM "nexus_nexusressourcesyncstatus" U0
-                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
-                                                                         ORDER BY RANDOM() ASC
-                                                                         LIMIT 1), %s))
-                    AND "nexus_nexusstructure"."department" IN (%s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s)
-                    AND "nexus_nexususer"."email" = %s))
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "users_user"."id",
-                 "users_user"."password",
-                 "users_user"."last_login",
-                 "users_user"."is_superuser",
-                 "users_user"."username",
-                 "users_user"."first_name",
-                 "users_user"."last_name",
-                 "users_user"."is_staff",
-                 "users_user"."is_active",
-                 "users_user"."date_joined",
-                 "users_user"."address_line_1",
-                 "users_user"."address_line_2",
-                 "users_user"."post_code",
-                 "users_user"."city",
-                 "users_user"."department",
-                 "users_user"."coords",
-                 "users_user"."geocoding_score",
-                 "users_user"."geocoding_updated_at",
-                 "users_user"."ban_api_resolved_address",
-                 "users_user"."insee_city_id",
-                 "users_user"."title",
-                 "users_user"."full_name_search_vector",
-                 "users_user"."email",
-                 "users_user"."phone",
-                 "users_user"."kind",
-                 "users_user"."identity_provider",
-                 "users_user"."has_completed_welcoming_tour",
-                 "users_user"."created_by_id",
-                 "users_user"."external_data_source_history",
-                 "users_user"."last_checked_at",
-                 "users_user"."public_id",
-                 "users_user"."address_filled_at",
-                 "users_user"."first_login",
-                 "users_user"."upcoming_deletion_notified_at",
-                 "users_user"."allow_next_sso_sub_update"
-          FROM "users_user"
-          WHERE ("users_user"."kind" = %s
-                 AND "users_user"."public_id" = %s)
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
-        ]),
-        'sql': 'SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Session.save[<site-packages>/django/db/models/base.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
-        ]),
-        'sql': '''
-          UPDATE "django_session"
-          SET "session_data" = %s,
-              "expire_date" = %s
-          WHERE "django_session"."session_key" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
-          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
-        ]),
-        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-    ]),
-  })
-# ---
-# name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
     'num_queries': 15,
     'queries': list([
@@ -4417,6 +4383,355 @@
       }),
       dict({
         'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE "users_user"."id" = %s
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ItouCurrentOrganizationMiddleware.__call__[utils/perms/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "prescribers_prescribermembership"."id",
+                 "prescribers_prescribermembership"."user_id",
+                 "prescribers_prescribermembership"."joined_at",
+                 "prescribers_prescribermembership"."is_admin",
+                 "prescribers_prescribermembership"."is_active",
+                 "prescribers_prescribermembership"."created_at",
+                 "prescribers_prescribermembership"."updated_at",
+                 "prescribers_prescribermembership"."organization_id",
+                 "prescribers_prescribermembership"."updated_by_id",
+                 "prescribers_prescriberorganization"."id",
+                 "prescribers_prescriberorganization"."address_line_1",
+                 "prescribers_prescriberorganization"."address_line_2",
+                 "prescribers_prescriberorganization"."post_code",
+                 "prescribers_prescriberorganization"."city",
+                 "prescribers_prescriberorganization"."department",
+                 "prescribers_prescriberorganization"."coords",
+                 "prescribers_prescriberorganization"."geocoding_score",
+                 "prescribers_prescriberorganization"."geocoding_updated_at",
+                 "prescribers_prescriberorganization"."ban_api_resolved_address",
+                 "prescribers_prescriberorganization"."insee_city_id",
+                 "prescribers_prescriberorganization"."name",
+                 "prescribers_prescriberorganization"."created_at",
+                 "prescribers_prescriberorganization"."updated_at",
+                 "prescribers_prescriberorganization"."uid",
+                 "prescribers_prescriberorganization"."active_members_email_reminder_last_sent_at",
+                 "prescribers_prescriberorganization"."automatic_geocoding_update",
+                 "prescribers_prescriberorganization"."siret",
+                 "prescribers_prescriberorganization"."kind",
+                 "prescribers_prescriberorganization"."is_brsa",
+                 "prescribers_prescriberorganization"."phone",
+                 "prescribers_prescriberorganization"."email",
+                 "prescribers_prescriberorganization"."website",
+                 "prescribers_prescriberorganization"."description",
+                 "prescribers_prescriberorganization"."code_safir_pole_emploi",
+                 "prescribers_prescriberorganization"."created_by_id",
+                 "prescribers_prescriberorganization"."authorization_status",
+                 "prescribers_prescriberorganization"."authorization_updated_at",
+                 "prescribers_prescriberorganization"."authorization_updated_by_id",
+                 "prescribers_prescriberorganization"."is_gps_authorized"
+          FROM "prescribers_prescribermembership"
+          INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+          WHERE ("prescribers_prescribermembership"."is_active"
+                 AND "prescribers_prescribermembership"."user_id" = %s)
+          ORDER BY "prescribers_prescribermembership"."joined_at" ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_nexususer"."id",
+                 "nexus_nexususer"."source",
+                 "nexus_nexususer"."source_id",
+                 "nexus_nexususer"."source_kind",
+                 "nexus_nexususer"."first_name",
+                 "nexus_nexususer"."last_name",
+                 "nexus_nexususer"."email",
+                 "nexus_nexususer"."phone",
+                 "nexus_nexususer"."last_login",
+                 "nexus_nexususer"."auth",
+                 "nexus_nexususer"."kind",
+                 "nexus_nexususer"."updated_at",
+                 COALESCE(
+                            (SELECT U0."valid_since" AS "valid_since"
+                             FROM "nexus_nexusressourcesyncstatus" U0
+                             WHERE U0."service" = ("nexus_nexususer"."source")
+                             ORDER BY RANDOM() ASC
+                             LIMIT 1), %s) AS "_threshold"
+          FROM "nexus_nexususer"
+          WHERE ("nexus_nexususer"."updated_at" >= (COALESCE(
+                                                               (SELECT U0."valid_since" AS "valid_since"
+                                                                FROM "nexus_nexusressourcesyncstatus" U0
+                                                                WHERE U0."service" = ("nexus_nexususer"."source")
+                                                                ORDER BY RANDOM() ASC
+                                                                LIMIT 1), %s))
+                 AND "nexus_nexususer"."email" = %s)
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'get_service_users[nexus/utils.py]',
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          SELECT "nexus_activatedservice"."id",
+                 "nexus_activatedservice"."user_id",
+                 "nexus_activatedservice"."service",
+                 "nexus_activatedservice"."created_at"
+          FROM "nexus_activatedservice"
+          WHERE "nexus_activatedservice"."user_id" = %s
+          ORDER BY RANDOM() ASC
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'dropdown_status[nexus/utils.py]',
+          'DropDownMiddleware.__call__[nexus/middleware.py]',
+        ]),
+        'sql': '''
+          (
+             (SELECT %s AS "a"
+              FROM "companies_companymembership"
+              INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
+              INNER JOIN "companies_company" ON ("companies_companymembership"."company_id" = "companies_company"."id")
+              WHERE ("users_user"."is_active"
+                     AND "companies_companymembership"."is_active"
+                     AND "companies_company"."department" IN (%s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s,
+                                                              %s)
+                     AND "users_user"."email" = %s))
+           UNION
+             (SELECT %s AS "a"
+              FROM "prescribers_prescribermembership"
+              INNER JOIN "users_user" ON ("prescribers_prescribermembership"."user_id" = "users_user"."id")
+              INNER JOIN "prescribers_prescriberorganization" ON ("prescribers_prescribermembership"."organization_id" = "prescribers_prescriberorganization"."id")
+              WHERE ("users_user"."is_active"
+                     AND "prescribers_prescribermembership"."is_active"
+                     AND "prescribers_prescriberorganization"."department" IN (%s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s,
+                                                                               %s)
+                     AND "users_user"."email" = %s)))
+          UNION
+            (SELECT %s AS "a"
+             FROM "nexus_nexusmembership"
+             INNER JOIN "nexus_nexusstructure" ON ("nexus_nexusmembership"."structure_id" = "nexus_nexusstructure"."id")
+             INNER JOIN "nexus_nexususer" ON ("nexus_nexusmembership"."user_id" = "nexus_nexususer"."id")
+             WHERE ("nexus_nexusmembership"."updated_at" >= (COALESCE(
+                                                                        (SELECT U0."valid_since" AS "valid_since"
+                                                                         FROM "nexus_nexusressourcesyncstatus" U0
+                                                                         WHERE U0."service" = ("nexus_nexusmembership"."source")
+                                                                         ORDER BY RANDOM() ASC
+                                                                         LIMIT 1), %s))
+                    AND "nexus_nexusstructure"."department" IN (%s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s,
+                                                                %s)
+                    AND "nexus_nexususer"."email" = %s))
+          LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'UpdateJobSeekerStartView.setup[www/job_seekers_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT "users_user"."id",
+                 "users_user"."password",
+                 "users_user"."last_login",
+                 "users_user"."is_superuser",
+                 "users_user"."username",
+                 "users_user"."first_name",
+                 "users_user"."last_name",
+                 "users_user"."is_staff",
+                 "users_user"."is_active",
+                 "users_user"."date_joined",
+                 "users_user"."address_line_1",
+                 "users_user"."address_line_2",
+                 "users_user"."post_code",
+                 "users_user"."city",
+                 "users_user"."department",
+                 "users_user"."coords",
+                 "users_user"."geocoding_score",
+                 "users_user"."geocoding_updated_at",
+                 "users_user"."ban_api_resolved_address",
+                 "users_user"."insee_city_id",
+                 "users_user"."title",
+                 "users_user"."full_name_search_vector",
+                 "users_user"."email",
+                 "users_user"."phone",
+                 "users_user"."kind",
+                 "users_user"."identity_provider",
+                 "users_user"."has_completed_welcoming_tour",
+                 "users_user"."created_by_id",
+                 "users_user"."external_data_source_history",
+                 "users_user"."last_checked_at",
+                 "users_user"."public_id",
+                 "users_user"."address_filled_at",
+                 "users_user"."first_login",
+                 "users_user"."upcoming_deletion_notified_at",
+                 "users_user"."allow_next_sso_sub_update"
+          FROM "users_user"
+          WHERE ("users_user"."kind" = %s
+                 AND "users_user"."public_id" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Session.save[<site-packages>/django/db/models/base.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          UPDATE "django_session"
+          SET "session_data" = %s,
+              "expire_date" = %s
+          WHERE "django_session"."session_key" = %s
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'SessionStore.save[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+    ]),
+  })
+# ---
+# name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
+  dict({
+    'num_queries': 18,
+    'queries': list([
+      dict({
+        'origin': list([
+          'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
+        ]),
+        'sql': '''
+          SELECT "django_session"."session_key",
+                 "django_session"."session_data",
+                 "django_session"."expire_date"
+          FROM "django_session"
+          WHERE ("django_session"."expire_date" > %s
+                 AND "django_session"."session_key" = %s)
+          LIMIT 21
+        ''',
+      }),
+      dict({
+        'origin': list([
           'SessionStore._get_session_from_db[<site-packages>/django/contrib/sessions/backends/db.py]',
         ]),
         'sql': '''
@@ -4808,12 +5123,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5111,12 +5461,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5463,12 +5848,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - start]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -5831,12 +6251,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 18,
+    'num_queries': 21,
     'queries': list([
       dict({
         'origin': list([
@@ -6344,12 +6799,47 @@
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -6746,12 +7236,47 @@
           LIMIT 1
         ''',
       }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
     ]),
   })
 # ---
 # name: TestUpdateJobSeeker.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 13,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -7196,6 +7721,41 @@
                  AND "users_user"."id" = %s)
           LIMIT 1
         ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__enter__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': '''
+          SELECT "tasks_task"."id",
+                 "tasks_task"."queue",
+                 "tasks_task"."data",
+                 "tasks_task"."created_at",
+                 "tasks_task"."priority",
+                 COALESCE("tasks_task"."priority", %s) AS "priority_non_zero"
+          FROM "tasks_task"
+          WHERE "tasks_task"."queue" = %s
+          ORDER BY 6 DESC,
+                   "tasks_task"."created_at" ASC
+          LIMIT 1
+          FOR
+          UPDATE OF "tasks_task" SKIP LOCKED
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
+          'DBStorage.dequeue[tasks/huey.py]',
+        ]),
+        'sql': 'RELEASE SAVEPOINT "<snapshot>"',
       }),
     ]),
   })

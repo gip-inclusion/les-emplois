@@ -55,6 +55,7 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TEMPLATE_CONTEXT": True,
 }
 
+HUEY["immediate"] = True  # noqa: F405
 
 REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
     # For DRF browsable API access
