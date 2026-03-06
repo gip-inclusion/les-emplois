@@ -141,7 +141,8 @@ class TestDashboardView:
         assertContains(response, format_siret(prescriber_organization.siret))
         assertContains(response, "Liste de mes candidats")
 
-    def test_dashboard_displays_asp_badge(self, client):
+    @pytest.mark.parametrize("compat_mode", [True, False])
+    def test_dashboard_displays_asp_badge(self, client, compat_mode):
         WARNING_CLASS = "bg-warning"
         company = CompanyFactory(kind=CompanyKind.EI, with_membership=True)
         other_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
@@ -173,21 +174,30 @@ class TestDashboardView:
         session = client.session
 
         # select the first company's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
+        # FIXME: remove compat_mode in a week
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            company.pk if compat_mode else f"COMPANY-{company.pk}"
+        )
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second company's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.pk
+        # FIXME: remove compat_mode in a week
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            other_company.pk if compat_mode else f"COMPANY-{other_company.pk}"
+        )
         session.save()
         response = client.get(url)
         assertContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third company's in the session
-        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_company.pk
+        # FIXME: remove compat_mode in a week
+        session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
+            last_company.pk if compat_mode else f"COMPANY-{last_company.pk}"
+        )
         session.save()
         response = client.get(url)
         assert response.status_code == 200
