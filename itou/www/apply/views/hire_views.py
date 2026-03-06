@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.utils import timezone
 from django.views.generic import TemplateView, View
 
 from itou.companies.enums import CompanyKind
@@ -19,7 +18,6 @@ from itou.utils.urls import get_safe_url
 from itou.www.apply.views import common as common_views
 from itou.www.apply.views.submit_views import (
     APPLY_SESSION_KIND,
-    JOB_SEEKER_INFOS_CHECK_PERIOD,
     CheckPreviousApplicationsBaseMixin,
     _check_job_seeker_approval,
 )
@@ -154,7 +152,6 @@ class HireBaseView(HirePermissionMixin, TemplateView):
             "hire_process": True,
             "prescription_process": False,
             "auto_prescription_process": False,
-            "page_title": "Postuler",
             "job_seeker": self.job_seeker,
             "eligibility_diagnosis": self.eligibility_diagnosis,
             "is_subject_to_iae_rules": self.company.is_subject_to_iae_rules,
@@ -162,7 +159,6 @@ class HireBaseView(HirePermissionMixin, TemplateView):
             "is_subject_to_geiq_rules": self.company.kind == CompanyKind.GEIQ,
             "can_edit_personal_information": can_edit_personal_information(self.request, self.job_seeker),
             "can_view_personal_information": can_view_personal_information(self.request, self.job_seeker),
-            "new_check_needed": self.job_seeker.last_checked_at < timezone.now() - JOB_SEEKER_INFOS_CHECK_PERIOD,
         }
 
 
