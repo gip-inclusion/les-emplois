@@ -37,3 +37,11 @@ car on ne peut pas avoir des `{% include %}` et des `{% block %}`, mais devrait
 ## Préfixer les attributs utilisé par notre JS par data-emplois-
 
 Beaucoup de notre code JS n'utilise pas encore le préfixe `data-emplois-`.
+
+
+## `Organization` devient `Structure`
+Lorsqu'il est question d'une entreprise, d'une organisation prescriptrice ou
+d'une institution, de manière indifférenciée, on préfère désormais utiliser le
+terme de *structure*.
+
+Un renommage est en cours.
