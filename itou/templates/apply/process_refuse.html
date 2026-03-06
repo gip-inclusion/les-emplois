@@ -136,9 +136,11 @@
                                             </li>
                                         {% endfor %}
                                     </ul>
-                                    <div class="c-info refusal-reason-no-position-info mt-2 d-none">
-                                        <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
-                                    </div>
+                                    {% component_info c_info__summary=c_info__summary extra_classes="refusal-reason-no-position-info mt-2 d-none" %}
+                                        {% fragment as c_info__summary %}
+                                            En choisissant ce motif, les fiches de postes associées seront dépubliées.
+                                        {% endfragment %}
+                                    {% endcomponent_info %}
                                 </fieldset>
                                 <fieldset>
                                     <div class="form-group">

@@ -1,3 +1,4 @@
+{% load components %}
 {% load matomo %}
 {% load static %}
 {% load url_add_query %}
@@ -88,9 +89,11 @@
             </li>
         </ul>
         {% if job_description.is_pec_offer %}
-            <div class="c-info mt-2">
-                <span class="c-info__summary">Réservé au public éligible au contrat PEC</span>
-            </div>
+            {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-2" %}
+                {% fragment as c_info__summary %}
+                    Réservé au public éligible au contrat PEC
+                {% endfragment %}
+            {% endcomponent_info %}
         {% endif %}
     </div>
 </div>

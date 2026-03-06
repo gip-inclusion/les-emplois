@@ -1,4 +1,5 @@
 {% load buttons_form %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load url_add_query %}
 
@@ -34,9 +35,11 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="c-info mb-3 mb-md-5">
-                        <span class="c-info__summary">Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</span>
-                        <div class="c-info__detail">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-5" %}
+                        {% fragment as c_info__summary %}
+                            Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             {% if address_filled %}
                                 <ul class="list-unstyled mb-0">
                                     <li>{{ job_seeker.address_line_1 }}</li>
@@ -46,8 +49,8 @@
                             {% else %}
                                 <p class="mb-0">Aucune adresse n'a été saisie sur les emplois de l'inclusion !</p>
                             {% endif %}
-                        </div>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_info %}
 
                     {% bootstrap_field form.hexa_lane_number wrapper_class="form-group form-group-input-w-lg-33" %}
                     {% bootstrap_field form.hexa_std_extension wrapper_class="form-group form-group-input-w-lg-33" %}

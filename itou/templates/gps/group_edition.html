@@ -1,4 +1,5 @@
 {% extends "gps/group_details_base.html" %}
+{% load components %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
 
@@ -39,9 +40,11 @@
                         </div>
                         <div class="c-box mb-4">
                             <h3>Motif de l’intervention</h3>
-                            <div class="c-info mb-3">
-                                <span class="c-info__summary">Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.</span>
-                            </div>
+                            {% component_info c_info__summary=c_info__summary extra_classes="mb-3" %}
+                                {% fragment as c_info__summary %}
+                                    Cette information sera visible aux autres intervenants. N’inscrivez aucune information confidentielle dans ce champ.
+                                {% endfragment %}
+                            {% endcomponent_info %}
                             {% bootstrap_field form.reason show_label=False %}
                         </div>
                     </form>

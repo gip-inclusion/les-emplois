@@ -60,9 +60,11 @@
                                 </ul>
                             </div>
                             {% if assessment.grants_selection_validated_at %}
-                                <div class="c-info mt-3 mt-lg-4">
-                                    <span class="c-info__summary">Ces données ont été calculées suite à la selection que vous avez effectuée</span>
-                                </div>
+                                {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-3 mt-md-4" %}
+                                    {% fragment as c_info__summary %}
+                                        Ces données ont été calculées suite à la selection que vous avez effectuée
+                                    {% endfragment %}
+                                {% endcomponent_info %}
                             {% endif %}
                         </div>
                     </div>

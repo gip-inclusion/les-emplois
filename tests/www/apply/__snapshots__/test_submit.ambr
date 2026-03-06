@@ -164,11 +164,9 @@
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                               <div class="c-info mb-3">
-                                  <button class="c-info__summary">
-                                      <span>
-                                          Pour valider l'éligibilité IAE du candidat
-                                      </span>
-                                  </button>
+                                  <span class="c-info__summary">
+                                      Pour valider l'éligibilité IAE du candidat
+                                  </span>
                                   <div class="c-info__detail">
                                       <ul>
                                           <li>
@@ -572,9 +570,10 @@
       </p>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="c-info mb-3 mb-md-4">
-          <div class="c-info__summary">
+          <span class="c-info__summary">
               Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
-              <br/>
+          </span>
+          <div class="c-info__detail">
               Vous pouvez simplement valider ou mettre à jour l’éligibilité.
               <br/>
               Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
@@ -657,9 +656,10 @@
       </p>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="c-info mb-3 mb-md-4">
-          <div class="c-info__summary">
+          <span class="c-info__summary">
               Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
-              <br/>
+          </span>
+          <div class="c-info__detail">
               Vous pouvez simplement valider ou mettre à jour l’éligibilité.
               <br/>
               Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.
@@ -745,9 +745,10 @@
       </div>
       <input name="force_new_application" type="hidden" value="force"/>
       <div class="c-info mb-3 mb-md-4">
-          <div class="c-info__summary">
+          <span class="c-info__summary">
               Il n’est plus nécessaire de créer une nouvelle candidature pour valider une éligibilité à l’IAE.
-              <br/>
+          </span>
+          <div class="c-info__detail">
               Vous pouvez simplement valider ou mettre à jour l’éligibilité.
               <br/>
               Le statut sera automatiquement mis à jour dans la candidature déjà transmise à l’employeur.

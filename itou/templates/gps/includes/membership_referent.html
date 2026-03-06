@@ -1,3 +1,4 @@
+{% load components %}
 {% load matomo %}
 {% load str_filters %}
 
@@ -120,18 +121,18 @@
         {% endwith %}
         {% with prescribers_count=group.members.count|add:"-1" %}
             {% if user_in_group and prescribers_count > 0 %}
-                <div class="c-info mt-3 mt-md-4">
-                    <button class="c-info__summary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoExample" aria-expanded="false" aria-controls="collapseInfoExample">
+                {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseInfoExample" extra_classes="mt-3 mt-md-4" %}
+                    {% fragment as c_info__summary %}
                         {% if prescribers_count == 1 %}
-                            <span>Découvrez l'autre intervenant qui a accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</span>
+                            Découvrez l'autre intervenant qui a accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
                         {% else %}
-                            <span>Découvrez les {{ prescribers_count }} autres intervenants qui ont accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}</span>
+                            Découvrez les {{ prescribers_count }} autres intervenants qui ont accompagné {{ job_seeker.get_inverted_full_name|mask_unless:can_view_personal_information }}
                         {% endif %}
-                    </button>
-                    <div class="c-info__detail collapse" id="collapseInfoExample">
+                    {% endfragment %}
+                    {% fragment as c_info__detail %}
                         <a href="{% url 'gps:group_memberships' group.pk %}">Liste des intervenants</a>
-                    </div>
-                </div>
+                    {% endfragment %}
+                {% endcomponent_info %}
             {% endif %}
         {% endwith %}
     {% else %}

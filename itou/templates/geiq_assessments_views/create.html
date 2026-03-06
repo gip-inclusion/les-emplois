@@ -104,9 +104,11 @@
                                         Aucune
                                     {% endfor %}
                                 </fieldset>
-                                <div class="c-info mt-3 mb-3">
-                                    <span class="c-info__summary">Les données des structures sélectionnées apparaitront dans le bilan</span>
-                                </div>
+                                {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-3 mb-3" %}
+                                    {% fragment as c_info__summary %}
+                                        Les données des structures sélectionnées apparaitront dans le bilan
+                                    {% endfragment %}
+                                {% endcomponent_info %}
                                 {% url "geiq_assessments_views:list_for_geiq" as reset_url %}
                                 {% itou_buttons_form primary_label="Créer le bilan" reset_url=reset_url show_mandatory_fields_mention=False %}
                             </form>

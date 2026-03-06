@@ -1,3 +1,5 @@
+{% load components %}
+
 <section class="s-section">
     <div class="s-section__container container">
         <div class="s-section__row row">
@@ -29,9 +31,11 @@
                 </p>
 
                 {% if request.from_prescriber %}
-                    <div class="c-info mb-3 mb-md-4">
-                        <span class="c-info__summary">Besoin d’aide</span>
-                        <div class="c-info__detail">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Besoin d’aide
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             <p>
                                 Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant ce <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737313097361--Inviter-mes-collaborateurs-%C3%A0-se-rattacher-au-compte-de-l-organisation"
     target="_blank"
@@ -47,12 +51,14 @@
     aria-label="Documentation sur le rôle d'administrateur (ouverture dans un nouvel onglet)">lien vers notre documentation</a>.
                                 {% endif %}
                             </p>
-                        </div>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_info %}
                 {% elif request.from_employer %}
-                    <div class="c-info mb-3 mb-md-4">
-                        <span class="c-info__summary">Besoin d’aide</span>
-                        <div class="c-info__detail">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Besoin d’aide
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             <p>
                                 Retrouvez toutes les informations sur la fonctionnalité “inviter des collaborateurs” en suivant ce <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738409239825--Inviter-mes-collaborateurs-%C3%A0-rejoindre-le-compte-de-ma-structure"
     target="_blank"
@@ -68,8 +74,8 @@
     aria-label="Documentation sur le rôle d'administrateur (ouverture dans un nouvel onglet)">lien vers notre documentation</a>.
                                 {% endif %}
                             </p>
-                        </div>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_info %}
                 {% endif %}
 
 

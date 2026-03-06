@@ -1,3 +1,4 @@
+{% load components %}
 {% load matomo %}
 {% load str_filters %}
 {% load url_add_query %}
@@ -94,15 +95,19 @@
 
     {% if not siae.has_active_members %}
         <div class="c-box--results__body">
-            <div class="c-info mt-2">
-                <span class="c-info__summary">Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, vous ne pouvez pas déposer de candidature en ligne</span>
-            </div>
+            {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-2" %}
+                {% fragment as c_info__summary %}
+                    Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, vous ne pouvez pas déposer de candidature en ligne
+                {% endfragment %}
+            {% endcomponent_info %}
         </div>
     {% elif siae.block_job_applications %}
         <div class="c-box--results__body">
-            <div class="c-info mt-2">
-                <span class="c-info__summary">Cet employeur ne traite plus de nouvelles candidatures pour le moment</span>
-            </div>
+            {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-2" %}
+                {% fragment as c_info__summary %}
+                    Cet employeur ne traite plus de nouvelles candidatures pour le moment
+                {% endfragment %}
+            {% endcomponent_info %}
         </div>
     {% elif siae.active_job_descriptions %}
         <div class="c-box--results__body">
@@ -136,9 +141,11 @@
         {% endif %}
     {% elif not siae.is_open_to_spontaneous_applications %}
         <div class="c-box--results__body">
-            <div class="c-info mt-2">
-                <span class="c-info__summary">Cet employeur ne souhaite pas recevoir de candidatures pour le moment</span>
-            </div>
+            {% component_info borderless=True c_info__summary=c_info__summary extra_classes="mt-2" %}
+                {% fragment as c_info__summary %}
+                    Cet employeur ne souhaite pas recevoir de candidatures pour le moment
+                {% endfragment %}
+            {% endcomponent_info %}
         </div>
     {% endif %}
 

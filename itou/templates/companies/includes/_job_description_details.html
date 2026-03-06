@@ -1,3 +1,4 @@
+{% load components %}
 {% load markdownify %}
 {% load str_filters %}
 
@@ -50,20 +51,22 @@
 {% endwith %}
 
 {% if job.is_resume_mandatory %}
-    <div class="c-info my-3">
-        <span class="c-info__summary">L'ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par le recruteur.</span>
-    </div>
+    {% component_info c_info__summary=c_info__summary extra_classes="my-3" %}
+        {% fragment as c_info__summary %}
+            L'ajout du Curriculum Vitae (CV) est fortement recommandé pour que la candidature soit étudiée par le recruteur.
+        {% endfragment %}
+    {% endcomponent_info %}
 {% endif %}
 
 {% if siae.is_opcs and job.is_qpv_mandatory %}
-    <div class="c-info my-3">
-        <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQpvMandatoryInfo" aria-expanded="false" aria-controls="collapseQpvMandatoryInfo">
-            <span>Cette offre d'emploi est réservée à des typologies de public particulières</span>
-        </button>
-        <div class="c-info__detail collapse" id="collapseQpvMandatoryInfo">
+    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail collapse_id="collapseQpvMandatoryInfo" extra_classes="my-3" %}
+        {% fragment as c_info__summary %}
+            Cette offre d'emploi est réservée à des typologies de public particulières
+        {% endfragment %}
+        {% fragment as c_info__detail %}
             <p>
                 Si le profil du candidat correspond au poste, le facilitateur pourra être amené à prendre contact avec vous en amont pour vérifier l'éligibilité du candidat à l’offre.
             </p>
-        </div>
-    </div>
+        {% endfragment %}
+    {% endcomponent_info %}
 {% endif %}

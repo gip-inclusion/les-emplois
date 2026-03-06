@@ -1,3 +1,4 @@
+{% load components %}
 {% load format_filters %}
 
 <div id="contracts-list-stats" class="c-box mb-3"{% if hx_swap_oob %} hx-swap-oob="true"{% endif %}>
@@ -33,7 +34,9 @@
             Montant total potentiel
         </div>
     </div>
-    <div class="c-info">
-        <span class="c-info__summary">Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible</span>
-    </div>
+    {% component_info borderless=True c_info__summary=c_info__summary %}
+        {% fragment as c_info__summary %}
+            Sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible
+        {% endfragment %}
+    {% endcomponent_info %}
 </div>

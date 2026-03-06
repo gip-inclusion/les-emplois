@@ -21,15 +21,17 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="c-info mb-3 mb-md-4">
-                        <span class="c-info__summary">Seuls les administrateurs peuvent voir cette liste.</span>
-                        <div class="c-info__detail">
+                    {% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3 mb-md-4" %}
+                        {% fragment as c_info__summary %}
+                            Seuls les administrateurs peuvent voir cette liste.
+                        {% endfragment %}
+                        {% fragment as c_info__detail %}
                             <p>
                                 Vous constatez qu’une organisation de cette liste n’est plus conventionnée ?
                                 <a href="{% zendesk_form_url request=request %}" target="_blank" rel="noopener" class="has-external-link" aria-label="Contactez-nous pour demander son retrait (ouverture dans un nouvel onglet).">Contactez-nous pour demander son retrait</a>.
                             </p>
-                        </div>
-                    </div>
+                        {% endfragment %}
+                    {% endcomponent_info %}
                     {% if not accredited_orgs %}
                         <div class="alert alert-info" role="status">
                             <p class="mb-0">Aucun résultat.</p>

@@ -1,11 +1,12 @@
+{% load components %}
 {% load django_bootstrap5 %}
 {% load url_add_query %}
 
-<div class="c-info mb-3">
-    <button class="c-info__summary">
-        <span>Pour valider l'éligibilité IAE du candidat</span>
-    </button>
-    <div class="c-info__detail">
+{% component_info c_info__summary=c_info__summary c_info__detail=c_info__detail extra_classes="mb-3" %}
+    {% fragment as c_info__summary %}
+        Pour valider l'éligibilité IAE du candidat
+    {% endfragment %}
+    {% fragment as c_info__detail %}
         <ul>
             <li>
                 Veuillez vous assurer d’avoir réalisé un diagnostic socio-professionnel dans le cadre d'un entretien individuel.
@@ -18,8 +19,8 @@
             </li>
             <li>Il est recommandé de sélectionner le(s) critères(s) administratifs d’éligibilité correspondants.</li>
         </ul>
-    </div>
-</div>
+    {% endfragment %}
+{% endcomponent_info %}
 
 {% if criteria_filled_from_job_seeker %}
     {% include "eligibility/includes/iae/criteria_filled_from_job_seeker.html" with criteria_filled_from_job_seeker=criteria_filled_from_job_seeker only %}
