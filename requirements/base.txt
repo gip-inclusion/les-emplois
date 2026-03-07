@@ -415,9 +415,9 @@ cryptography==46.0.5 \
     # via
     #   jwcrypto
     #   paramiko
-data-inclusion-schema==1.0.5 \
-    --hash=sha256:1a4b3b0ed72988e0bce533725160aafede2262bfd70d31fc6da38228ebf8e9bb \
-    --hash=sha256:1e5a6a04b807baadeb257a30b58a4c1aa63c06a6a7f42c1a9ee31d709d559462
+data-inclusion-schema==1.0.6 \
+    --hash=sha256:764076fc5170e122f3cc3680c7cea399da7f33ff3bc276abe4848389bfb5cfca \
+    --hash=sha256:901344858a4f20fdfa815c529c86920d9500ad13e4b76e4a8e0e59858ab135e1
     # via -r requirements/base.in
 django==6.0.3 \
     --hash=sha256:2e5974441491ddb34c3f13d5e7a9f97b07ba03bf70234c0a9c68b79bbb235bc3 \
