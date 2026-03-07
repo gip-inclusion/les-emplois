@@ -1493,9 +1493,9 @@ pillow==12.1.1 \
     --hash=sha256:fc354a04072b765eccf2204f588a7a532c9511e8b9c7f900e1b64e3e33487090 \
     --hash=sha256:fc44ef1f3de4f45b50ccf9136999d71abb99dca7706bc75d222ed350b9fd2289
     # via -r requirements/test.txt
-platformdirs==4.9.2 \
-    --hash=sha256:9170634f126f8efdae22fb58ae8a0eaa86f38365bc57897a6c4f781d1f5875bd \
-    --hash=sha256:9a33809944b9db043ad67ca0db94b14bf452cc6aeaac46a88ea55b26e2e9d291
+platformdirs==4.9.4 \
+    --hash=sha256:1ec356301b7dc906d83f371c8f487070e99d3ccf9e501686456394622a01a934 \
+    --hash=sha256:68a9a4619a666ea6439f2ff250c12a853cd1cbd5158d258bd824a7df6be2f868
     # via
     #   python-discovery
     #   virtualenv
