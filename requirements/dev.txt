@@ -1979,9 +1979,9 @@ pyzipper==0.3.6 \
     --hash=sha256:0adca90a00c36a93fbe49bfa8c5add452bfe4ef85a1b8e3638739dd1c7b26bfc \
     --hash=sha256:6d097f465bfa47796b1494e12ea65d1478107d38e13bc56f6e58eedc4f6c1a87
     # via -r requirements/test.txt
-redis==7.2.1 \
-    --hash=sha256:49e231fbc8df2001436ae5252b3f0f3dc930430239bfeb6da4c7ee92b16e5d33 \
-    --hash=sha256:6163c1a47ee2d9d01221d8456bc1c75ab953cbda18cfbc15e7140e9ba16ca3a5
+redis==7.3.0 \
+    --hash=sha256:4d1b768aafcf41b01022410b3cc4f15a07d9b3d6fe0c66fc967da2c88e551034 \
+    --hash=sha256:9d4fcb002a12a5e3c3fbe005d59c48a2cc231f87fbb2f6b70c2d89bb64fec364
     # via
     #   -r requirements/test.txt
     #   django-redis
