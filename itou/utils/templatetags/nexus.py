@@ -320,7 +320,7 @@ def get_service_urls(user):
             "activable": f"{marche_url}accounts/signup/",
         },
         Service.MON_RECAP: {
-            "activated": "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/",
+            "activated": "https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer",
             "activable": reverse("nexus:mon_recap"),
         },
         Service.PILOTAGE: {

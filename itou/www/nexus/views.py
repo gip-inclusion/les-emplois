@@ -84,7 +84,9 @@ class NexusMixin:
             context["marche_url"] = "https://lemarche.inclusion.gouv.fr/accounts/signup/"
 
         if Service.MON_RECAP in self.activated_services:
-            context["monrecap_url"] = "https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/"
+            context["monrecap_url"] = (
+                "https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer"
+            )
         else:
             context["monrecap_url"] = reverse("nexus:activate_mon_recap")
 
