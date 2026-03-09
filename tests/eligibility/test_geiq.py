@@ -66,7 +66,7 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     assert membership.creator == diagnosis.author
     assignment = JobSeekerAssignment.objects.get()
     assert assignment.job_seeker == diagnosis.job_seeker
-    assert assignment.prescriber == diagnosis.author
+    assert assignment.professional == diagnosis.author
     assert assignment.prescriber_organization == prescriber_org
     assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 

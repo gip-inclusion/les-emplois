@@ -440,5 +440,5 @@ class JobSeekerAssignmentFactory(AutoNowOverrideMixin, factory.django.DjangoMode
     prescriber_organization = factory.SubFactory(
         "tests.prescribers.factories.PrescriberOrganizationFactory", with_membership=True
     )
-    prescriber = factory.SubFactory(PrescriberFactory)
+    professional = factory.SubFactory(PrescriberFactory)
     last_action_kind = factory.fuzzy.FuzzyChoice(ActionKind.values)

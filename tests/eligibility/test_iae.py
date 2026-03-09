@@ -325,7 +325,7 @@ class TestEligibilityDiagnosisModel:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == job_seeker
-        assert assignment.prescriber == prescriber
+        assert assignment.professional == prescriber
         assert assignment.prescriber_organization == organization
         assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 
@@ -393,7 +393,7 @@ class TestEligibilityDiagnosisModel:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.get()
         assert assignment.job_seeker == new_diagnosis.job_seeker
-        assert assignment.prescriber == new_diagnosis.author
+        assert assignment.professional == new_diagnosis.author
         assert assignment.prescriber_organization == prescriber_organization
         assert assignment.last_action_kind == ActionKind.IAE_ELIGIBILITY
 

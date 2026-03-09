@@ -1547,8 +1547,8 @@ class TestAnonymizeProfessionalManagementCommand:
     ):
         organization = PrescriberOrganizationFactory() if with_organization else None
         JobSeekerAssignmentFactory(
-            prescriber__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
-            prescriber__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
+            professional__date_joined=timezone.make_aware(datetime.datetime(2023, 3, 17)),
+            professional__upcoming_deletion_notified_at=timezone.make_aware(datetime.datetime(2025, 1, 15, 10, 0, 0)),
             prescriber_organization=organization,
         )
 
