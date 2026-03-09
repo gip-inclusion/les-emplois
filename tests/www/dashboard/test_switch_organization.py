@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse
 from itoutils.urls import add_url_params
 from pytest_django.asserts import assertRedirects
@@ -10,8 +9,7 @@ from tests.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 class TestSwitchCompany:
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_switch_company(self, client, compat_mode):
+    def test_switch_company(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         client.force_login(user)
@@ -31,13 +29,7 @@ class TestSwitchCompany:
         assert response.context["siae"] == company
 
         url = reverse("dashboard:switch_organization")
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": related_company.pk}
-            if compat_mode
-            else {"organization_key": related_company.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": related_company.organization_switch_key})
         assert response.status_code == 302
 
         url = reverse("dashboard:index")
@@ -61,8 +53,7 @@ class TestSwitchCompany:
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_can_still_switch_to_inactive_company_during_grace_period(self, client, compat_mode):
+    def test_can_still_switch_to_inactive_company_during_grace_period(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
         client.force_login(user)
@@ -76,13 +67,7 @@ class TestSwitchCompany:
         assert response.context["request"].current_organization == company
 
         url = reverse("dashboard:switch_organization")
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": related_company.pk}
-            if compat_mode
-            else {"organization_key": related_company.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": related_company.organization_switch_key})
         assert response.status_code == 302
 
         # User has indeed switched.
@@ -91,8 +76,7 @@ class TestSwitchCompany:
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_cannot_switch_to_inactive_company_after_grace_period(self, client, compat_mode):
+    def test_cannot_switch_to_inactive_company_after_grace_period(self, client):
         company = CompanyFactory(with_membership=True, subject_to_iae_rules=True)
         user = company.members.first()
         client.force_login(user)
@@ -108,13 +92,7 @@ class TestSwitchCompany:
         # Switching to that company is not even possible in practice because
         # it does not even show up in the menu.
         url = reverse("dashboard:switch_organization")
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": related_company.pk}
-            if compat_mode
-            else {"organization_key": related_company.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": related_company.organization_switch_key})
         assert response.status_code == 404
 
         # User is still working on the main active company.
@@ -137,13 +115,12 @@ class TestSwitchCompany:
         assert response.status_code == 400
 
         response = client.post(url, data={"organization_key": "Une entreprise entière"})
-        assert response.status_code == 400
+        assert response.status_code == 404
 
         response = client.post(url, data={"organization_key": f"RANDOM-{company.pk}"})
-        assert response.status_code == 400
+        assert response.status_code == 404
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_switch_company_redirection(self, client, compat_mode):
+    def test_switch_company_redirection(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         client.force_login(user)
@@ -152,30 +129,17 @@ class TestSwitchCompany:
         related_company.members.add(user)
 
         url = reverse("dashboard:switch_organization")
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": related_company.pk}
-            if compat_mode
-            else {"organization_key": related_company.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": related_company.organization_switch_key})
         response = client.get(response.url)
         assert response.status_code == 404  # No fallback
 
         url = add_url_params(reverse("dashboard:switch_organization"), {"next_url": "/other_url"})
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": related_company.pk}
-            if compat_mode
-            else {"organization_key": related_company.organization_switch_key}
-        )
-        response = client.post(url, data=data, follow=False)
+        response = client.post(url, data={"organization_key": related_company.organization_switch_key})
         assertRedirects(response, "/other_url", fetch_redirect_response=False)
 
 
 class TestSwitchOrganization:
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_not_allowed_user(self, client, compat_mode):
+    def test_not_allowed_user(self, client):
         organization = prescribers_factories.PrescriberOrganizationFactory()
 
         for user in (
@@ -184,17 +148,10 @@ class TestSwitchOrganization:
         ):
             client.force_login(user)
             url = reverse("dashboard:switch_organization")
-            # FIXME: remove the following compatibility code
-            data = (
-                {"organization_id": organization.pk}
-                if compat_mode
-                else {"organization_key": organization.organization_switch_key}
-            )
-            response = client.post(url, data=data)
+            response = client.post(url, data={"organization_key": organization.organization_switch_key})
             assert response.status_code == 404
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_usual_case(self, client, compat_mode):
+    def test_usual_case(self, client):
         url = reverse("dashboard:switch_organization")
 
         user = PrescriberFactory()
@@ -202,17 +159,14 @@ class TestSwitchOrganization:
         orga2 = prescribers_factories.PrescriberMembershipFactory(user=user).organization
         client.force_login(user)
 
-        # FIXME: remove the following compatibility code
-        data = {"organization_id": orga1.pk} if compat_mode else {"organization_key": orga1.organization_switch_key}
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": orga1.organization_switch_key})
         assert response.status_code == 302
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == orga1
 
-        data = {"organization_id": orga2.pk} if compat_mode else {"organization_key": orga2.organization_switch_key}
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": orga2.organization_switch_key})
         assert response.status_code == 302
 
         response = client.get(reverse("dashboard:index"))
@@ -230,8 +184,8 @@ class TestSwitchOrganization:
         response = client.post(url)
         assert response.status_code == 400
 
-        response = client.post(url, data={"organization_id": "Une orga entière"})
-        assert response.status_code == 400
+        response = client.post(url, data={"organization_key": "Une entreprise entière"})
+        assert response.status_code == 404
 
 
 class TestSwitchInstitution:
@@ -249,12 +203,7 @@ class TestSwitchInstitution:
             response = client.post(url, data={"organization_key": institution.organization_switch_key})
             assert response.status_code == 404
 
-            # FIXME: remove the following compatibility code
-            response = client.post(url, data={"organization_id": institution.pk})
-            assert response.status_code == 404
-
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_usual_case(self, client, compat_mode):
+    def test_usual_case(self, client):
         url = reverse("dashboard:switch_organization")
 
         user = LaborInspectorFactory()
@@ -262,26 +211,14 @@ class TestSwitchInstitution:
         institution2 = InstitutionMembershipFactory(user=user).institution
         client.force_login(user)
 
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": institution1.pk}
-            if compat_mode
-            else {"organization_key": institution1.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": institution1.organization_switch_key})
         assert response.status_code == 302
 
         response = client.get(reverse("dashboard:index"))
         assert response.status_code == 200
         assert response.context["request"].current_organization == institution1
 
-        # FIXME: remove the following compatibility code
-        data = (
-            {"organization_id": institution2.pk}
-            if compat_mode
-            else {"organization_key": institution2.organization_switch_key}
-        )
-        response = client.post(url, data=data)
+        response = client.post(url, data={"organization_key": institution2.organization_switch_key})
         assert response.status_code == 302
 
         response = client.get(reverse("dashboard:index"))

@@ -177,18 +177,14 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.is_current_organization_admin
         assert not request.from_authorized_prescriber
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_employer_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin, compat_mode):
+    def test_employer_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         company_1 = CompanyMembershipFactory(company__name="1", company__kind=CompanyKind.EI).company
         employer = company_1.members.first()
         company_2 = CompanyFactory(name="2", kind=CompanyKind.EI)
         company_2.members.add(employer)
         request = get_request(employer, with_perms_middleware=False)
 
-        # FIXME: remove compat_mode in a week
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            company_2.pk if compat_mode else company_2.organization_switch_key
-        )
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company_2.organization_switch_key
         request.session.save()
         with assertNumQueries(
             # Retrieve user memberships
@@ -199,9 +195,9 @@ class TestItouCurrentOrganizationMiddleware:
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        # FIXME: remove compat_mode in a week
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            company_2.pk if compat_mode else company_2.organization_switch_key
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == company_2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == company_2
@@ -345,27 +341,21 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.is_current_organization_admin
         assert not request.from_authorized_prescriber
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_prescriber_with_multiple_memberships_and_one_active(
-        self, mocked_get_response_for_middlewaremixin, compat_mode
-    ):
+    def test_prescriber_with_multiple_memberships_and_one_active(self, mocked_get_response_for_middlewaremixin):
         organization1 = PrescriberOrganizationFactory(name="1", with_membership=True)
         prescriber = organization1.members.first()
         organization2 = PrescriberOrganizationFactory(name="2")
         organization2.members.add(prescriber)
         request = get_request(prescriber, with_perms_middleware=False)
-        # FIXME: remove compat_mode in a week
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            organization2.pk if compat_mode else organization2.organization_switch_key
-        )
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization2.organization_switch_key
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session updated
-        # FIXME: remove compat_mode in a week
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            organization2.pk if compat_mode else organization2.organization_switch_key
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == organization2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == organization2
@@ -373,14 +363,10 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.is_current_organization_admin
         assert not request.from_authorized_prescriber
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin, compat_mode):
+    def test_prescriber_wrong_org_in_session(self, mocked_get_response_for_middlewaremixin):
         request = get_request(PrescriberFactory(), with_perms_middleware=False)
         organization = PrescriberOrganizationFactory()
-        # FIXME: remove compat_mode in a week
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            organization.pk if compat_mode else organization.organization_switch_key
-        )
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = organization.organization_switch_key
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
@@ -429,26 +415,22 @@ class TestItouCurrentOrganizationMiddleware:
         assert request.is_current_organization_admin
         assert not request.from_authorized_prescriber
 
-    @pytest.mark.parametrize("compat_mode", [True, False])
-    def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin, compat_mode):
+    def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin):
         institution1 = InstitutionFactory(name="1", department="01", with_membership=True)
         labor_inspector = institution1.members.first()
         institution2 = InstitutionMembershipFactory(
             is_admin=False, user=labor_inspector, institution__name="2", institution__department="02"
         ).institution
         request = get_request(labor_inspector, with_perms_middleware=False)
-        # FIXME: remove compat_mode in a week
-        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-            institution2.pk if compat_mode else institution2.organization_switch_key
-        )
+        request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution2.organization_switch_key
         request.session.save()
         with assertNumQueries(1):  # retrieve user memberships
             ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 1
         # Session untouched
-        # FIXME: remove compat_mode in a week
-        assert request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] == (
-            institution2.pk if compat_mode else institution2.organization_switch_key
+        assert (
+            request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY]
+            == institution2.organization_switch_key
         )
         # Check new request attributes
         assert request.current_organization == institution2
@@ -475,8 +457,7 @@ class TestItouCurrentOrganizationMiddleware:
         assert not request.from_authorized_prescriber
 
 
-@pytest.mark.parametrize("compat_mode", [True, False])
-def test_logout_as_siae_multiple_memberships(client, compat_mode):
+def test_logout_as_siae_multiple_memberships(client):
     company_1 = CompanyFactory(name="1st siae", with_membership=True)
     user = company_1.members.first()
     assert company_1.has_admin(user)
@@ -488,21 +469,18 @@ def test_logout_as_siae_multiple_memberships(client, compat_mode):
     client.force_login(user)
     # Select the 1st SIAE as current one
     session = client.session
-    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-        company_1.pk if compat_mode else company_1.organization_switch_key
-    )
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company_1.organization_switch_key
     session.save()
 
     response = client.get(reverse("account_logout"))
-    assert client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == (
-        company_1.pk if compat_mode else company_1.organization_switch_key
+    assert (
+        client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY) == company_1.organization_switch_key
     )
     # The dropdown to switch to the 2nd SIAE is available on logout screen
     assertContains(response, company_2.name)
 
 
-@pytest.mark.parametrize("compat_mode", [True, False])
-def test_logout_as_labor_inspector_multiple_institutions(client, compat_mode):
+def test_logout_as_labor_inspector_multiple_institutions(client):
     institution1 = InstitutionFactory(name="1st institution", department="01", with_membership=True)
     user = institution1.members.first()
     institution2 = InstitutionFactory(name="2nd institution", department="02")
@@ -511,10 +489,7 @@ def test_logout_as_labor_inspector_multiple_institutions(client, compat_mode):
     client.force_login(user)
     # Select the 1st institution as current
     session = client.session
-    # FIXME: remove compat_mode in a week
-    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = (
-        institution1.pk if compat_mode else institution1.organization_switch_key
-    )
+    session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution1.organization_switch_key
     session.save()
 
     response = client.get(reverse("account_logout"))

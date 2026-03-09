@@ -16,10 +16,7 @@ from itou.www.logout.enums import LogoutWarning
 
 
 def extract_membership_infos_and_update_session(memberships, org_through_field, session):
-    # FIXME: remove condition in a week
-    current_org_pk = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-    if "-" in str(current_org_pk):
-        current_org_pk = int(current_org_pk.split("-")[1])
+    current_org_key = session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
 
     orgs = []
     current_org = None
@@ -27,15 +24,15 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
     for membership in memberships:
         org = getattr(membership, org_through_field)
         orgs.append(org)
-        if org.pk == current_org_pk:
+        if org.organization_switch_key == current_org_key:
             current_org = org
-        admin_status[org.pk] = membership.is_admin
+        admin_status[org.organization_switch_key] = membership.is_admin
     if current_org is None:
         if orgs:
             # If an org exists, choose the first one
             current_org = orgs[0]
             session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = current_org.organization_switch_key
-        elif current_org_pk:
+        elif current_org_key:
             # If the user has not active membership anymore
             # => No need to track the current org in session (none)
             # => Remove any old session entry if needed
@@ -43,7 +40,7 @@ def extract_membership_infos_and_update_session(memberships, org_through_field, 
     return (
         sorted(orgs, key=lambda o: (o.kind, o.display_name)),
         current_org,
-        current_org and admin_status[current_org.pk],
+        current_org and admin_status[current_org.organization_switch_key],
     )
 
 
