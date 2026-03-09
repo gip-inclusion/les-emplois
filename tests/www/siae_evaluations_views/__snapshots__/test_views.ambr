@@ -252,7 +252,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -296,7 +296,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -311,7 +311,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -443,7 +443,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -469,7 +469,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -500,7 +500,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -552,7 +552,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -605,7 +605,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -626,7 +626,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -654,7 +654,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1012,7 +1012,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1056,7 +1056,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1071,7 +1071,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1203,7 +1203,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1225,7 +1225,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -1252,7 +1252,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1304,7 +1304,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1357,7 +1357,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1378,7 +1378,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1406,7 +1406,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1587,7 +1587,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1631,7 +1631,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
@@ -1646,7 +1646,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1778,7 +1778,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1800,7 +1800,7 @@
       dict({
         'origin': list([
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT ("eligibility_selectedadministrativecriteria"."eligibility_diagnosis_id") AS "_prefetch_related_val_eligibility_diagnosis_id",
@@ -1827,7 +1827,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "companies_company"."id",
@@ -1879,7 +1879,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedsiae"."id",
@@ -1932,7 +1932,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplication"."id",
@@ -1953,7 +1953,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedadministrativecriteria"."id",
@@ -1981,7 +1981,7 @@
           'BlockNode[layout/base.html]',
           'ExtendsNode[siae_evaluations/evaluated_siae_sanction.html]',
           'evaluated_siae_sanction[www/siae_evaluations_views/views.py]',
-          '_check_user_view_wrapper[utils/auth.py]',
+          '_check_request_view_wrapper[utils/auth.py]',
         ]),
         'sql': '''
           SELECT "siae_evaluations_evaluatedjobapplicationsanction"."id",
