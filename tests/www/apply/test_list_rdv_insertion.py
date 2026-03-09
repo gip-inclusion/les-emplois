@@ -18,7 +18,7 @@ from itou.utils.mocks.rdv_insertion import (
 from itou.www.apply.views.list_views import JobApplicationsDisplayKind
 from tests.job_applications.factories import JobApplicationFactory
 from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented
 
 
 @pytest.fixture(autouse=True)
@@ -197,7 +197,8 @@ class TestRdvInsertionDisplay:
         # This leads to duplicates on aggregated results due to the join with transition logs
         # Hence a subquery is required while last_change isn't persisted in a job application column
         self.job_application.process()
-        self.job_application.accept(user=self.job_application.to_company.members.first())
+        request = get_request(self.job_application.to_company.members.first())
+        self.job_application.accept(request=request)
 
         ParticipationFactory(
             job_seeker=self.job_application.job_seeker,

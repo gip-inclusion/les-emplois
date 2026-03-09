@@ -31,6 +31,7 @@ from tests.companies.factories import CompanyFactory
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory
+from tests.utils.testing import get_request
 
 
 class TestCommonApprovalQuerySet:
@@ -630,7 +631,8 @@ class TestApprovalModel:
             to_company__kind=CompanyKind.EI,
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
 
         approval = job_application.approval
 
@@ -642,9 +644,11 @@ class TestApprovalModel:
             with_iae_eligibility_diagnosis=True,
             job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
         )
-        other_application.accept(user=other_application.to_company.members.first())
+        request = get_request(other_application.to_company.members.first())
+        other_application.accept(request=request)
 
-        job_application.cancel(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.cancel(request=request)
         job_application.delete()
 
         origin_siae = job_application.to_company
@@ -661,7 +665,8 @@ class TestApprovalModel:
             state=JobApplicationState.PROCESSING,
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
 
         approval = job_application.approval
 

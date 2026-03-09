@@ -355,7 +355,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         for transition in ["accept", "cancel", "reset", "process"]:
             if f"transition_{transition}" in request.POST:
                 try:
-                    getattr(obj, transition)(user=request.user)
+                    getattr(obj, transition)(request=request)
                     # Stay on same page
                     updated_request = copy.deepcopy(request.POST)
                     updated_request.update({"_continue": ["please"]})

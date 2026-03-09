@@ -35,7 +35,7 @@ class Command(BaseCommand):
                     job_seeker_job_application.refusal_reason = RefusalReason.AUTO
                     job_seeker_job_application.refusal_reason_shared_with_job_seeker = True
                     job_seeker_job_application.answer = answer
-                    job_seeker_job_application.refuse(user=None)
+                    job_seeker_job_application.refuse(request=None)
                     job_applications_count += 1
                 job_seekers_count += 1
 

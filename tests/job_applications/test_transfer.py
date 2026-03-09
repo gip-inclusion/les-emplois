@@ -16,6 +16,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByCompanyFactory,
 )
 from tests.users.factories import JobSeekerFactory
+from tests.utils.testing import get_request
 
 
 def test_transferable_states(subtests):
@@ -91,16 +92,21 @@ def test_transfer():
 
     # Conditions should be covered by previous test, but does not hurt (and tests raise)
     with pytest.raises(xworkflows.InvalidTransitionError):
-        job_application.transfer(user=lambda_user, target_company=target_company)
+        request = get_request(lambda_user)
+        job_application.transfer(request=request, target_company=target_company)
     with pytest.raises(xworkflows.InvalidTransitionError):
-        job_application.transfer(user=origin_user, target_company=origin_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=origin_company)
     with pytest.raises(xworkflows.InvalidTransitionError):
-        job_application.transfer(user=target_user, target_company=target_company)
+        request = get_request(target_user)
+        job_application.transfer(request=request, target_company=target_company)
     with pytest.raises(xworkflows.InvalidTransitionError):
-        job_application.transfer(user=origin_user, target_company=target_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=target_company)
 
     job_application.state = JobApplicationState.PROCESSING
-    job_application.transfer(user=origin_user, target_company=target_company)
+    request = get_request(origin_user)
+    job_application.transfer(request=request, target_company=target_company)
     job_application.refresh_from_db()
 
     # "Normal" transfer
@@ -115,7 +121,8 @@ def test_transfer():
         eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
     )
     eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
-    job_application.transfer(user=origin_user, target_company=target_company)
+    request = get_request(origin_user)
+    job_application.transfer(request=request, target_company=target_company)
     job_application.refresh_from_db()
 
     assert job_application.to_company == target_company
@@ -140,7 +147,8 @@ def test_transfer_to_without_sender():
     job_application.sender = None
     job_application.save(update_fields=["sender", "updated_at"])
 
-    job_application.transfer(user=origin_user, target_company=target_company)
+    request = get_request(origin_user)
+    job_application.transfer(request=request, target_company=target_company)
     job_application.refresh_from_db()
 
     assert job_application.to_company == target_company
@@ -166,13 +174,15 @@ def test_model_fields(snapshot):
 
     # Failing to transfer must not update new fields
     with pytest.raises(ValidationError):
-        job_application.transfer(user=target_user, target_company=target_company)
+        request = get_request(target_user)
+        job_application.transfer(request=request, target_company=target_company)
     assert job_application.transferred_by is None
     assert job_application.transferred_from is None
     assert job_application.transferred_at is None
 
     with assertSnapshotQueries(snapshot):
-        job_application.transfer(user=origin_user, target_company=target_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=target_company)
 
     job_application.refresh_from_db()
 
@@ -215,7 +225,8 @@ def test_transfer_must_notify_siae_and_job_seeker(django_capture_on_commit_callb
     job_seeker = job_application.job_seeker
 
     with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=target_company)
 
     # Eligigibility diagnosis is done by SIAE : must not send an email
     assert len(mailoutbox) == 2
@@ -258,7 +269,8 @@ def test_transfer_must_notify_unauthorized_prescriber(
         **extra_kwargs,
     )
     with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=target_company)
 
     assert len(mailoutbox) == 3
 
@@ -286,7 +298,8 @@ def test_transfer_must_notify_employer_orienter(django_capture_on_commit_callbac
     job_seeker = job_application.job_seeker
 
     with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user, target_company=target_company)
+        request = get_request(origin_user)
+        job_application.transfer(request=request, target_company=target_company)
 
     assert len(mailoutbox) == 3
     assert mailoutbox[0].to == [origin_user.email]
@@ -315,7 +328,8 @@ def test_transfer_notifications_to_many_employers(django_capture_on_commit_callb
     job_seeker = job_application.job_seeker
 
     with django_capture_on_commit_callbacks(execute=True):
-        job_application.transfer(user=origin_user_1, target_company=target_company)
+        request = get_request(origin_user_1)
+        job_application.transfer(request=request, target_company=target_company)
 
     # Only checking SIAE email
     assert len(mailoutbox) == 3
@@ -347,7 +361,8 @@ def test_transfer_must_delete_comments(comments_count, caplog):
     if comments_count:
         JobApplicationCommentFactory.create_batch(comments_count, job_application=job_application)
 
-    job_application.transfer(user=origin_user, target_company=target_company)
+    request = get_request(origin_user)
+    job_application.transfer(request=request, target_company=target_company)
 
     if comments_count:
         assert (

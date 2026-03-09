@@ -43,7 +43,7 @@ from itou.job_applications.enums import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.rdv_insertion.models import Participation
-from itou.users.enums import KIND_EMPLOYER, LackOfPoleEmploiId, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, LackOfPoleEmploiId, UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.perms.utils import _can_view_personal_information
@@ -1123,7 +1123,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.archived_by = None
 
     @xwf_models.transition()
-    def transfer(self, *, user, target_company):
+    def transfer(self, *, request, target_company):
+        user = request.user
         if not self.can_be_transferred(user, target_company):
             raise ValidationError(
                 f"Cette candidature n'est pas transférable ({user=}, {target_company=}, {self.to_company=})"
@@ -1174,7 +1175,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.notifications_transfer_for_proxy(notification_context).send()
 
     @xwf_models.transition()
-    def accept(self, *, user):
+    def accept(self, *, request):
+        user = request.user
         if not self.hiring_start_at:
             raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_hiring_start_at)
 
@@ -1239,7 +1241,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
-            job_application.render_obsolete(user=user)
+            job_application.render_obsolete(request=request)
 
         # Notifications & emails.
         self.notifications_accept_for_job_seeker.send()
@@ -1256,28 +1258,28 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         FollowUpGroup.objects.follow_beneficiary(self.job_seeker, user)
 
     @xwf_models.transition()
-    def add_to_pool(self, *, user):
+    def add_to_pool(self, *, request):
         # Send notification.
         self.notifications_add_to_pool_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             self.notifications_add_to_pool_for_proxy.send()
 
     @xwf_models.transition()
-    def postpone(self, *, user):
+    def postpone(self, *, request):
         # Send notification.
         self.notifications_postpone_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             self.notifications_postpone_for_proxy.send()
 
     @xwf_models.transition()
-    def refuse(self, *, user):
+    def refuse(self, *, request):
         # Send notification.
         self.notifications_refuse_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             self.notifications_refuse_for_proxy.send()
 
     @xwf_models.transition()
-    def cancel(self, *, user):
+    def cancel(self, *, request):
         if not self.can_be_cancelled:
             raise xwf_models.AbortTransition("Cette candidature n'a pu être annulée.")
 
@@ -1296,7 +1298,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 employee_record.delete()
 
         # Send notification.
-        self.notifications_cancel_for_employer(user).send()
+        self.notifications_cancel_for_employer(request.user).send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             self.notifications_cancel_for_proxy.send()
 
@@ -1507,7 +1509,8 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 
     MODIFIED_OBJECT_FIELD = "job_application"
     EXTRA_LOG_ATTRIBUTES = (
-        ("user", "user", None),
+        # In log_transition we add user and user_kind if a request is given in the transition
+        ("request", "request", None),
         ("target_company", "target_company", None),  # used in external transfer and transfer
     )
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
@@ -1524,6 +1527,11 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
         related_name="job_application_log_transfers",
         null=True,
     )
+    user_kind = models.CharField(
+        verbose_name="type de l'utisateur",
+        choices=UserKind.choices,
+        null=True,
+    )
 
     class Meta:
         verbose_name = "log des transitions de la candidature"
@@ -1537,6 +1545,17 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     def pretty_to_state(self):
         choices = dict(JobApplicationState.choices)
         return choices[self.to_state]
+
+    @classmethod
+    def log_transition(cls, transition, from_state, to_state, modified_object, **kwargs):
+        request = kwargs.pop("request", None)
+        if request:
+            kwargs["user"] = request.user
+            if request.user.is_caseworker:
+                kwargs["user_kind"] = KIND_EMPLOYER if request.from_employer else KIND_PRESCRIBER
+            else:
+                kwargs["user_kind"] = request.user.kind
+        super().log_transition(transition, from_state, to_state, modified_object, **kwargs)
 
 
 class JobApplicationComment(models.Model):

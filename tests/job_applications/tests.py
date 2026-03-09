@@ -108,7 +108,8 @@ class TestJobApplicationModel:
             with_iae_eligibility_diagnosis=True,
         )
         user = job_application.to_company.members.first()
-        job_application.accept(user=user)
+        request = get_request(user)
+        job_application.accept(request=request)
         assert job_application.accepted_by == user
 
     def test_refused_by(self):
@@ -116,14 +117,15 @@ class TestJobApplicationModel:
             sent_by_authorized_prescriber_organisation=True,
         )
         user = job_application.to_company.members.first()
-        job_application.refuse(user=user)
+        request = get_request(user)
+        job_application.refuse(request=request)
         assert job_application.refused_by == user
 
     def test_refused_by_without_user(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
         )
-        job_application.refuse(user=None)
+        job_application.refuse(request=None)
         assert job_application.refused_by is None
 
     def test_is_sent_by_authorized_prescriber(self):
@@ -196,7 +198,8 @@ class TestJobApplicationModel:
         user = job_application.to_company.members.first()
         assert not FollowUpGroup.objects.exists()
 
-        job_application.accept(user=user)
+        request = get_request(user)
+        job_application.accept(request=request)
         group = FollowUpGroup.objects.get()
         assert group.beneficiary == job_application.job_seeker
         membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
@@ -950,7 +953,8 @@ class TestJobApplicationQuerySet:
             with_iae_eligibility_diagnosis=True,
         )
         job_application.process()
-        job_application.accept(user=job_application.sender)
+        request = get_request(job_application.sender)
+        job_application.accept(request=request)
 
         expected_created_at = JobApplicationTransitionLog.objects.filter(
             job_application=job_application,
@@ -963,12 +967,16 @@ class TestJobApplicationQuerySet:
             with_iae_eligibility_diagnosis=True,
         )
         job_application.process()
-        job_application.accept(user=job_application.sender)
+        request = get_request(job_application.sender)
+        job_application.accept(request=request)
         assert job_application.approval.number == "XXXXX0000001"
-        job_application.cancel(user=job_application.sender)
-        job_application.accept(user=job_application.sender)
+        request = get_request(job_application.sender)
+        job_application.cancel(request=request)
+        request = get_request(job_application.sender)
+        job_application.accept(request=request)
         assert job_application.approval.number == "XXXXX0000002"
-        job_application.cancel(user=job_application.sender)
+        request = get_request(job_application.sender)
+        job_application.cancel(request=request)
         assert list(CancelledApproval.objects.order_by("number").values_list("number", flat=True)) == [
             "XXXXX0000001",
             "XXXXX0000002",
@@ -993,7 +1001,8 @@ class TestJobApplicationQuerySet:
         job_application.save(update_fields=["sender", "updated_at"])
         employer = job_application.to_company.members.first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=employer)
+            request = get_request(employer)
+            job_application.accept(request=request)
         recipients = []
         for email in mailoutbox:
             [recipient] = email.to
@@ -1008,7 +1017,8 @@ class TestJobApplicationQuerySet:
         job_application.process()  # 1 transition but no accept
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
-        job_application.refuse(user=job_application.sender)  # 2 transitions, still no accept
+        request = get_request(job_application.sender)
+        job_application.refuse(request=request)  # 2 transitions, still no accept
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
     def test_with_accepted_at_for_accepted_with_no_transition(self):
@@ -1315,7 +1325,8 @@ class TestJobApplicationNotifications:
         job_application.sender = None
         job_application.save(update_fields=["sender", "updated_at"])
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.refuse(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.refuse(request=request)
         [email] = mailoutbox
         assert email.to == [job_application.job_seeker.email]
         assert self.AFPA not in email.body
@@ -1346,7 +1357,8 @@ class TestJobApplicationNotifications:
             refusal_reason=refusal_reason,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.refuse(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.refuse(request=request)
 
         if expected:
             assert [mail.to for mail in mailoutbox] == [
@@ -1441,7 +1453,8 @@ class TestJobApplicationNotifications:
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
             to_company__subject_to_iae_rules=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
         with django_capture_on_commit_callbacks(execute=True):
             job_application.manually_deliver_approval(delivered_by=staff_member)
         assert job_application.approval_number_sent_by_email
@@ -1464,7 +1477,8 @@ class TestJobApplicationNotifications:
             state=JobApplicationState.PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
         with django_capture_on_commit_callbacks(execute=True):
             job_application.manually_refuse_approval(refused_by=staff_member)
         assert job_application.approval_manually_refused_by == staff_member
@@ -1490,7 +1504,8 @@ class TestJobApplicationNotifications:
 
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.cancel(user=cancellation_user)
+            request = get_request(cancellation_user)
+            job_application.cancel(request=request)
         assert len(mailoutbox) == 2
 
         # To.
@@ -1540,7 +1555,8 @@ class TestJobApplicationNotifications:
 
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.cancel(user=cancellation_user)
+            request = get_request(cancellation_user)
+            job_application.cancel(request=request)
         assert len(mailoutbox) == 1
 
         # To.
@@ -1560,7 +1576,8 @@ class TestJobApplicationNotifications:
         job_application.save(update_fields=["sender", "updated_at"])
         cancellation_user = job_application.to_company.active_members.first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.cancel(user=cancellation_user)
+            request = get_request(cancellation_user)
+            job_application.cancel(request=request)
         [email] = mailoutbox
         assert email.to == [cancellation_user.email]
 
@@ -1605,7 +1622,8 @@ class TestJobApplicationWorkflow:
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.PROCESSING).first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 1
         assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 3
@@ -1643,7 +1661,8 @@ class TestJobApplicationWorkflow:
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).first()
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 2
         assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 4
@@ -1669,7 +1688,8 @@ class TestJobApplicationWorkflow:
             to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval == approval
         assert job_application.approval_number_sent_by_email
@@ -1692,7 +1712,8 @@ class TestJobApplicationWorkflow:
             to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval == approval
         assert job_application.approval_number_sent_by_email
@@ -1721,7 +1742,8 @@ class TestJobApplicationWorkflow:
             to_company__subject_to_iae_rules=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
         # Check sent email.
@@ -1743,7 +1765,8 @@ class TestJobApplicationWorkflow:
             with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin_siae_kind == job_application.to_company.kind
@@ -1769,7 +1792,8 @@ class TestJobApplicationWorkflow:
             with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mailoutbox) == 2
@@ -1792,7 +1816,8 @@ class TestJobApplicationWorkflow:
             with_iae_eligibility_diagnosis=True,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin_siae_kind == job_application.to_company.kind
@@ -1817,7 +1842,8 @@ class TestJobApplicationWorkflow:
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1852,7 +1878,8 @@ class TestJobApplicationWorkflow:
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.to_company.is_subject_to_iae_rules
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1899,7 +1926,8 @@ class TestJobApplicationWorkflow:
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1940,7 +1968,8 @@ class TestJobApplicationWorkflow:
             to_company__subject_to_iae_rules=True,
         )
         with pytest.raises(xwf_models.AbortTransition):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
 
     def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(
         self, django_capture_on_commit_callbacks, mailoutbox
@@ -1972,7 +2001,8 @@ class TestJobApplicationWorkflow:
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -2000,7 +2030,8 @@ class TestJobApplicationWorkflow:
         )
 
         with pytest.raises(xwf_models.AbortTransition) as raised_exception:
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert str(raised_exception.value) == JobApplicationWorkflow.error_hires_after_pass_invalid
 
     def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(
@@ -2015,7 +2046,8 @@ class TestJobApplicationWorkflow:
             to_company__kind=CompanyKind.GEIQ,
         )
         with django_capture_on_commit_callbacks(execute=True):
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         assert not job_application.to_company.is_subject_to_iae_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
@@ -2049,7 +2081,8 @@ class TestJobApplicationWorkflow:
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
-        job_application.accept(user=to_employer_member)
+        request = get_request(to_employer_member)
+        job_application.accept(request=request)
         assert job_application.to_company.is_subject_to_iae_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
 
@@ -2066,7 +2099,8 @@ class TestJobApplicationWorkflow:
         for job_application in user.job_applications.all():
             mailoutbox.clear()
             with django_capture_on_commit_callbacks(execute=True):
-                job_application.refuse(user=EmployerFactory())
+                request = get_request(EmployerFactory())
+                job_application.refuse(request=request)
             # Check sent email.
             assert len(mailoutbox) == 1
             assert "Candidature déclinée" in mailoutbox[0].subject
@@ -2077,7 +2111,8 @@ class TestJobApplicationWorkflow:
         assert JobApplication.objects.filter(approval=job_application.approval).count() == 1
 
         cancellation_user = job_application.to_company.active_members.first()
-        job_application.cancel(user=cancellation_user)
+        request = get_request(cancellation_user)
+        job_application.cancel(request=request)
 
         assert job_application.state == JobApplicationState.CANCELLED
 
@@ -2094,7 +2129,8 @@ class TestJobApplicationWorkflow:
         assert JobApplication.objects.filter(approval=approval).count() == 2
 
         cancellation_user = job_application.to_company.active_members.first()
-        job_application.cancel(user=cancellation_user)
+        request = get_request(cancellation_user)
+        job_application.cancel(request=request)
 
         assert job_application.state == JobApplicationState.CANCELLED
 
@@ -2116,7 +2152,8 @@ class TestJobApplicationWorkflow:
 
         # xworkflows.base.AbortTransition
         with pytest.raises(xwf_models.AbortTransition):
-            job_application.cancel(user=cancellation_user)
+            request = get_request(cancellation_user)
+            job_application.cancel(request=request)
 
         # Wrong state
         job_application = JobApplicationFactory(
@@ -2124,7 +2161,8 @@ class TestJobApplicationWorkflow:
         )
         cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
-            job_application.cancel(user=cancellation_user)
+            request = get_request(cancellation_user)
+            job_application.cancel(request=request)
 
     def test_cancel_delete_employee_record_that_were_not_sent(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
@@ -2135,7 +2173,8 @@ class TestJobApplicationWorkflow:
             modified_object=EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED),
         )
 
-        job_application.cancel(user=job_application.to_company.active_members.first())
+        request = get_request(job_application.to_company.active_members.first())
+        job_application.cancel(request=request)
         assertQuerySetEqual(EmployeeRecord.objects.filter(job_application=job_application), [])
 
 
@@ -2150,7 +2189,7 @@ class TestJobApplicationWorkflow:
 def test_job_application_transitions(transition, from_state):
     job_application = JobApplicationFactory(state=from_state, with_iae_eligibility_diagnosis=True)
     user = job_application.to_company.members.first()
-    kwargs = {"user": user}
+    kwargs = {"request": get_request(user)}
     if transition.name in ["transfer", "external_transfer"]:
         target_company = CompanyFactory(with_membership=True)
         target_company.members.add(user)
@@ -2182,7 +2221,7 @@ def test_job_application_transition_unarchives(transition, from_state):
         state=from_state, archived_at=timezone.now(), with_iae_eligibility_diagnosis=True
     )
     user = job_application.to_company.members.first()
-    kwargs = {"user": user}
+    kwargs = {"request": get_request(user)}
     if transition.name in ["transfer", "external_transfer"]:
         target_company = CompanyFactory(with_membership=True)
         target_company.members.add(user)
@@ -2202,7 +2241,8 @@ class TestJobApplicationXlsxExport:
             selected_jobs=Appellation.objects.all(),
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
         request = get_request(job_application.to_company.members.first())
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
@@ -2251,7 +2291,8 @@ class TestJobApplicationXlsxExport:
                 selected_jobs=Appellation.objects.all(),
                 with_iae_eligibility_diagnosis=True,
             )
-            job_application.accept(user=job_application.to_company.members.first())
+            request = get_request(job_application.to_company.members.first())
+            job_application.accept(request=request)
         request = get_request(job_application.to_company.members.first())
 
         assert job_seeker.approvals.last().is_in_waiting_period
@@ -2299,7 +2340,8 @@ class TestJobApplicationXlsxExport:
             refusal_reason=RefusalReason.DID_NOT_COME,
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.refuse(user=job_application.to_company.members.get())
+        request = get_request(job_application.to_company.members.get())
+        job_application.refuse(request=request)
 
         request = get_request(job_application.to_company.members.first())
 
@@ -2404,7 +2446,8 @@ class TestJobApplicationXlsxExport:
         )
         prescriber = job_application.sender
         assert prescriber.is_prescriber
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid

@@ -25,6 +25,7 @@ from tests.job_applications.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory
 from tests.utils.testing import (
+    get_request,
     get_session_name,
     parse_response_to_soup,
     pretty_indented,
@@ -138,7 +139,8 @@ class TestProcessTransferJobApplication:
         ) == snapshot(name="modal")
 
         # enable external transfer button if refused
-        job_application.refuse(user=user)
+        request = get_request(user)
+        job_application.refuse(request=request)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertContains(response, self.TRANSFER_MODAL_ID)
         assert pretty_indented(parse_response_to_soup(response, f"#{self.TRANSFER_BUTTON_ID}")) == snapshot(

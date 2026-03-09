@@ -39,7 +39,7 @@ def transfer(request, job_application_id):
     back_url = get_safe_url(request, "back_url", fallback_url=fallback_url)
 
     try:
-        job_application.transfer(user=request.user, target_company=target_company)
+        job_application.transfer(request=request, target_company=target_company)
         messages.success(
             request,
             (
@@ -233,7 +233,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
 
     def form_valid(self):
         new_job_application = super().form_valid()
-        self.job_application.external_transfer(target_company=self.company, user=self.request.user)
+        self.job_application.external_transfer(request=self.request, target_company=self.company)
         if self.form.cleaned_data.get("keep_original_resume"):
             new_job_application.resume = self.job_application.resume.copy()
             new_job_application.save(update_fields={"resume", "updated_at"})

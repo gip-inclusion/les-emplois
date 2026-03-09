@@ -60,7 +60,13 @@ from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.testing import assertSoupEqual, update_page_with_htmx
-from tests.utils.testing import assert_previous_step, get_session_name, parse_response_to_soup, pretty_indented
+from tests.utils.testing import (
+    assert_previous_step,
+    get_request,
+    get_session_name,
+    parse_response_to_soup,
+    pretty_indented,
+)
 from tests.www.eligibility_views.utils import (
     CERTIFICATION_ERROR_BADGE_HTML,
     CERTIFIED_BADGE_HTML,
@@ -760,10 +766,11 @@ class TestProcessViews:
 
         user = job_application.to_company.members.first()
         # transition logs setup
+        request = get_request(user)
         with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
-            job_application.process(user=user)
+            job_application.process(request=request)
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
-            job_application.accept(user=user)
+            job_application.accept(request=request)
 
         prescriber = job_application.sender_prescriber_organization.members.first()
         client.force_login(prescriber)
@@ -784,10 +791,11 @@ class TestProcessViews:
 
         user = job_application.to_company.active_members.first()
         # transition logs setup
+        request = get_request(user)
         with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
-            job_application.process(user=user)
+            job_application.process(request=request)
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
-            job_application.accept(user=user)
+            job_application.accept(request=request)
 
         client.force_login(job_application.job_seeker)
 
@@ -807,10 +815,11 @@ class TestProcessViews:
 
         user = job_application.to_company.active_members.first()
         # transition logs setup
+        request = get_request(user)
         with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
-            job_application.process(user=user)
+            job_application.process(request=request)
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
-            job_application.accept(user=user)
+            job_application.accept(request=request)
 
         client.force_login(user)
 
@@ -834,10 +843,11 @@ class TestProcessViews:
         other_company = CompanyFactory()
 
         # transition logs setup
+        request = get_request(employer)
         with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
-            job_app.refuse(user=employer)
+            job_app.refuse(request=request)
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
-            job_app.external_transfer(user=employer, target_company=other_company)
+            job_app.external_transfer(request=request, target_company=other_company)
 
         client.force_login(employer)
 
@@ -866,10 +876,11 @@ class TestProcessViews:
         user1 = job_app1.to_company.active_members.first()
         user2 = job_app2.to_company.active_members.first()
         # transition logs setup
+        request = get_request(user2)
         with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
-            job_app2.process(user=user2)
+            job_app2.process(request=request)
         with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
-            job_app2.accept(user=user2)
+            job_app2.accept(request=request)
 
         client.force_login(user1)
 
@@ -2676,7 +2687,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
         )
     # Create transition logs
     with freeze_time(timezone.now() + datetime.timedelta(minutes=3)):
-        job_application.move_to_prior_to_hire(user=user)
+        job_application.move_to_prior_to_hire(request=get_request(user))
     delete_prior_action1_url = reverse(
         "apply:delete_prior_action",
         kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action1.pk},

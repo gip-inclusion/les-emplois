@@ -43,7 +43,7 @@ from tests.employee_record.factories import EmployeeRecordFactory
 from tests.files.factories import FileFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.testing import parse_response_to_soup, pretty_indented
+from tests.utils.testing import get_request, parse_response_to_soup, pretty_indented
 
 
 class TestApprovalAdmin:
@@ -833,7 +833,8 @@ class TestCustomApprovalAdminViews:
             approval_number_sent_by_email=False,
             with_iae_eligibility_diagnosis=True,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        request = get_request(job_application.to_company.members.first())
+        job_application.accept(request=request)
 
         url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
@@ -951,7 +952,8 @@ class TestCustomApprovalAdminViews:
             with_iae_eligibility_diagnosis=True,
         )
         employer = job_application.to_company.members.first()
-        job_application.accept(user=employer)
+        request = get_request(employer)
+        job_application.accept(request=request)
 
         add_url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
         refuse_url = reverse("admin:approvals_approval_manually_refuse_approval", args=[job_application.pk])

@@ -424,7 +424,7 @@ def process(request, job_application_id):
 
     try:
         # After each successful transition, a save() is performed by django-xworkflows.
-        job_application.process(user=request.user)
+        job_application.process(request=request)
     except xwf_models.InvalidTransitionError:
         messages.error(request, "Action déjà effectuée.")
 
@@ -455,7 +455,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         try:
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.answer = form.cleaned_data["answer"]
-            job_application.postpone(user=request.user)
+            job_application.postpone(request=request)
             messages.success(
                 request,
                 f"La candidature de {job_application.job_seeker.get_inverted_full_name()} a bien été mise "
@@ -496,7 +496,7 @@ def add_to_pool(request, job_application_id, template_name="apply/process_add_to
         try:
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.answer = form.cleaned_data["answer"]
-            job_application.add_to_pool(user=request.user)
+            job_application.add_to_pool(request=request)
             toast_title = "Candidature ajoutée au vivier"
             toast_message = f"La candidature de {job_application.job_seeker.get_inverted_full_name()} "
             "a bien été ajoutée au vivier."
@@ -544,7 +544,7 @@ def cancel(request, job_application_id):
 
     try:
         # After each successful transition, a save() is performed by django-xworkflows.
-        job_application.cancel(user=request.user)
+        job_application.cancel(request=request)
         messages.success(request, "L'embauche a bien été annulée.", extra_tags="toast")
     except xwf_models.InvalidTransitionError:
         messages.error(request, "Action déjà effectuée.", extra_tags="toast")
@@ -662,7 +662,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
     state_changed = False
     prior_action.delete()
     if job_application.state.is_prior_to_hire and not job_application.prior_actions.exists():
-        job_application.cancel_prior_to_hire(user=request.user)
+        job_application.cancel_prior_to_hire(request=request)
         state_changed = True
 
     content = (
@@ -733,7 +733,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             if prior_action is None:
                 form.instance.job_application = job_application
                 if not job_application.state.is_prior_to_hire:
-                    job_application.move_to_prior_to_hire(user=request.user)
+                    job_application.move_to_prior_to_hire(request=request)
                     state_update = True
             form.save()
             geiq_eligibility_diagnosis = None

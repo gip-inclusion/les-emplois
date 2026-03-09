@@ -2108,7 +2108,8 @@
                  "job_applications_jobapplicationtransitionlog"."timestamp",
                  "job_applications_jobapplicationtransitionlog"."job_application_id",
                  "job_applications_jobapplicationtransitionlog"."user_id",
-                 "job_applications_jobapplicationtransitionlog"."target_company_id"
+                 "job_applications_jobapplicationtransitionlog"."target_company_id",
+                 "job_applications_jobapplicationtransitionlog"."user_kind"
           FROM "job_applications_jobapplicationtransitionlog"
           WHERE "job_applications_jobapplicationtransitionlog"."user_id" IN (%s,
                                                                              %s,

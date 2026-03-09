@@ -172,7 +172,7 @@ def postpone(request):
             try:
                 # After each successful transition, a save() is performed by django-xworkflows.
                 job_application.answer = form.cleaned_data["answer"]
-                job_application.postpone(user=request.user)
+                job_application.postpone(request=request)
             except xwf_models.InvalidTransitionError:
                 messages.error(
                     request,
@@ -239,7 +239,7 @@ def add_to_pool(request):
             try:
                 # After each successful transition, a save() is performed by django-xworkflows.
                 job_application.answer = form.cleaned_data["answer"]
-                job_application.add_to_pool(user=request.user)
+                job_application.add_to_pool(request=request)
             except xwf_models.InvalidTransitionError:
                 messages.error(
                     request,
@@ -292,7 +292,7 @@ def process(request):
             )
             continue
         try:
-            job_application.process(user=request.user)
+            job_application.process(request=request)
         except xwf_models.InvalidTransitionError:
             messages.error(
                 request,
@@ -500,7 +500,7 @@ class RefuseWizardView(UserPassesTestMixin, WizardView):
                 "prescriber_answer", ""
             )
             try:
-                job_application.refuse(user=self.request.user)
+                job_application.refuse(request=self.request)
             except xwf_models.InvalidTransitionError:
                 messages.error(
                     self.request,
@@ -552,7 +552,7 @@ def transfer(request):
     transferred_ids = []
     for job_application in applications:
         try:
-            job_application.transfer(user=request.user, target_company=target_company)
+            job_application.transfer(request=request, target_company=target_company)
             transferred_ids.append(job_application.pk)
         except (ValidationError, xwf_models.InvalidTransitionError):
             error_msg = (

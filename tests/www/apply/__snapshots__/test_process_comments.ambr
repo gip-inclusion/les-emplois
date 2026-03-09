@@ -2707,6 +2707,7 @@
                  "job_applications_jobapplicationtransitionlog"."job_application_id",
                  "job_applications_jobapplicationtransitionlog"."user_id",
                  "job_applications_jobapplicationtransitionlog"."target_company_id",
+                 "job_applications_jobapplicationtransitionlog"."user_kind",
                  "users_user"."id",
                  "users_user"."password",
                  "users_user"."last_login",
