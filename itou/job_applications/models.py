@@ -1052,7 +1052,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Can't transfer to same structure
         if target_company == self.to_company:
             return False
-        if not user.is_employer:
+        if not user.is_caseworker:
             return False
         return self.transfer.is_available()
 
