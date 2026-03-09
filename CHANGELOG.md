@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 2026-03-09
+
+### Modifié
+
+- [Candidature : Limiter la durée d'accès des candidatures non acceptées aux employeurs](https://github.com/gip-inclusion/les-emplois/pull/7604)
+- [Candidature : Vérification de l'éligibilité après renseignement des informations de contrat lors de l'acceptation](https://github.com/gip-inclusion/les-emplois/pull/7507)
+- [GEIQ : Autoriser la DGEFP GEIQ et la FFGEIQ à accéder à la liste des bilans d'exécution](https://github.com/gip-inclusion/les-emplois/pull/7638)
+- [Interface : Harmonisation des dates de validité, d'expiration et des phrases informatives des blocs Eligibilité à l’IAE](https://github.com/gip-inclusion/les-emplois/pull/7571)
+- [PASS IAE / GEIQ : Mentionner "ZRR/ZFRR" au lieu de "ZRR" dans les critères d'éligibilité](https://github.com/gip-inclusion/les-emplois/pull/7630)
+- [Recherche services : Amélioration du tri et du filtrage des résultats](https://github.com/gip-inclusion/les-emplois/pull/7600)
+
 ## 2026-03-02
 
 ### Ajouté
