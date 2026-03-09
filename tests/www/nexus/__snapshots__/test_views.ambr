@@ -513,7 +513,7 @@
                                           </p>
                                       </div>
                                   </div>
-                                  <a aria-label="Accéder à Mon Récap (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
+                                  <a aria-label="Accéder à Mon Récap (lien externe)" class="btn btn-outline-primary btn-block has-external-link mt-3" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer" target="_blank">
                                       Accéder
                                   </a>
                               </div>
@@ -2989,13 +2989,13 @@
                           <h2 class="h3 mb-md-4">
                               Commandez en quelques clics vos premiers carnets !
                           </h2>
-                          <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/formulaire-commande-carnets/" target="_blank">
+                          <a class="btn btn-lg btn-primary has-external-link" data-matomo-action="acceder-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/commander-carnets?mtm_campaign=nexus&mtm_kwd=activer" target="_blank">
                               <span>
                                   Commander des carnets
                               </span>
                           </a>
                           <br/>
-                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr?mtm_campaign=nexus&mtm_kwd=decouvrir" target="_blank">
                               Découvrir Mon Récap
                           </a>
                           <div class="text-center">
@@ -3062,7 +3062,7 @@
                                   </span>
                               </button>
                           </form>
-                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr/" target="_blank">
+                          <a aria-label="Découvrir Mon Récap (lien externe)" class="btn btn-sm btn-link has-external-link d-inline-block mt-3" data-matomo-action="decouvrir-service" data-matomo-category="nexus" data-matomo-event="true" data-matomo-option="mon-recap" href="https://mon-recap.inclusion.beta.gouv.fr?mtm_campaign=nexus&mtm_kwd=decouvrir" target="_blank">
                               Découvrir Mon Récap
                           </a>
                           <div class="text-center">
