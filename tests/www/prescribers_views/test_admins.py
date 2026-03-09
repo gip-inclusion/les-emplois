@@ -1,7 +1,7 @@
 import pytest  # noqa
 from django.urls import reverse
 
-from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
+from tests.common_apps.structures.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 
 

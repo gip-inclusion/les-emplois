@@ -16,7 +16,7 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.users.models import User
 from itou.utils.models import PkSupportRemark
-from tests.common_apps.organizations.tests import (
+from tests.common_apps.structures.tests import (
     assert_set_admin_role_creation,
     assert_set_admin_role_removal,
 )
@@ -131,7 +131,7 @@ class TestCompanyAdmin:
         assert email.to == [membership.user.email]
         assert (
             f"User {get_user(admin_client).pk} deactivated companies.CompanyMembership "
-            f"of organization_id={company.pk} for user_id={membership.user_id} is_admin=True."
+            f"of structure_id={company.pk} for user_id={membership.user_id} is_admin=True."
         ) in caplog.messages
 
     def test_add_admin(self, admin_client, caplog, mailoutbox):
@@ -178,7 +178,7 @@ class TestCompanyAdmin:
 
         assert_set_admin_role_creation(employer, company, mailoutbox)
         assert (
-            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"Creating companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={employer.pk} is_admin=True."
         ) in caplog.messages
 
@@ -219,7 +219,7 @@ class TestCompanyAdmin:
         assertRedirects(response, change_url)
         assert membership.user in company.members.all()
         assert (
-            f"Reactivating companies.CompanyMembership of organization_id={company.pk} "
+            f"Reactivating companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={membership.user_id} is_admin=False." in caplog.messages
         )
 

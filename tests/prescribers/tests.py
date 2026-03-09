@@ -25,7 +25,7 @@ from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrga
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import ActionKind
 from itou.users.models import JobSeekerAssignment, User
-from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
+from tests.common_apps.structures.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.job_applications import factories as job_applications_factories
@@ -188,7 +188,7 @@ class TestPrescriberOrganizationModel:
             f"Expired 0 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={admin_user.pk}."
         ) in caplog.messages
         assert (
-            f"Creating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"Creating prescribers.PrescriberMembership of structure_id={org.pk} "
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
@@ -212,7 +212,7 @@ class TestPrescriberOrganizationModel:
             f"Expired 2 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
         ) in caplog.messages
         assert (
-            f"Creating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"Creating prescribers.PrescriberMembership of structure_id={org.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         assertQuerySetEqual(
@@ -245,7 +245,7 @@ class TestPrescriberOrganizationModel:
             f"Expired 1 invitations to prescribers.PrescriberOrganization {org.pk} for user_id={other_user.pk}."
         ) in caplog.messages
         assert (
-            f"Reactivating prescribers.PrescriberMembership of organization_id={org.pk} "
+            f"Reactivating prescribers.PrescriberMembership of structure_id={org.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         invit.refresh_from_db()
@@ -1015,7 +1015,7 @@ def test_deactivate_admin(admin_client, caplog, mailoutbox):
     assert email.to == [membership.user.email]
     assert (
         f"User {get_user(admin_client).pk} deactivated prescribers.PrescriberMembership "
-        f"of organization_id={organization.pk} for user_id={membership.user_id} is_admin=True."
+        f"of structure_id={organization.pk} for user_id={membership.user_id} is_admin=True."
     ) in caplog.messages
 
 
@@ -1069,7 +1069,7 @@ def test_add_admin(admin_client, caplog, mailoutbox):
 
     assert_set_admin_role_creation(prescriber, organization, mailoutbox)
     assert (
-        f"Creating prescribers.PrescriberMembership of organization_id={organization.pk} "
+        f"Creating prescribers.PrescriberMembership of structure_id={organization.pk} "
         f"for user_id={prescriber.pk} is_admin=True."
     ) in caplog.messages
 
@@ -1130,7 +1130,7 @@ def test_reactivate_member(admin_client, caplog):
     assertRedirects(response, change_url)
     assert membership.user in organization.members.all()
     assert (
-        f"Reactivating prescribers.PrescriberMembership of organization_id={organization.pk} "
+        f"Reactivating prescribers.PrescriberMembership of structure_id={organization.pk} "
         f"for user_id={membership.user_id} is_admin=False." in caplog.messages
     )
 

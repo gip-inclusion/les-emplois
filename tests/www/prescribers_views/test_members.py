@@ -5,7 +5,7 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.common_apps.organizations.views import BaseMemberList
+from itou.common_apps.structures.views import BaseMemberList
 from tests.invitations.factories import PrescriberWithOrgInvitationFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -48,7 +48,7 @@ class TestMembers:
 
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot, monkeypatch):
-        monkeypatch.setattr("itou.common_apps.organizations.views.MAX_PENDING_INVITATION", 1)
+        monkeypatch.setattr("itou.common_apps.structures.views.MAX_PENDING_INVITATION", 1)
         organization = PrescriberOrganizationFactory()
         user = PrescriberMembershipFactory(user__for_snapshot=True, organization=organization).user
         client.force_login(user)
@@ -202,7 +202,7 @@ class TestUserMembershipDeactivation:
             in caplog.messages
         )
         assert (
-            f"User {admin.pk} deactivated prescribers.PrescriberMembership of organization_id={organization.pk} "
+            f"User {admin.pk} deactivated prescribers.PrescriberMembership of structure_id={organization.pk} "
             f"for user_id={guest.pk} is_admin=False."
         ) in caplog.messages
 
@@ -328,7 +328,7 @@ class TestUserMembershipDeactivation:
         ) in caplog.messages
         assert (
             f"User {admin_membership.user_id} deactivated prescribers.PrescriberMembership "
-            f"of organization_id={organization.pk} for user_id={other_admin.pk} is_admin=True."
+            f"of structure_id={organization.pk} for user_id={other_admin.pk} is_admin=True."
         ) in caplog.messages
         [email] = mailoutbox
         assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {organization.display_name}" == email.subject

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
 
-from itou.common_apps.organizations.models import MembershipQuerySet
+from itou.common_apps.structures.models import MembershipQuerySet
 from itou.gps.models import FollowUpGroup
 from itou.utils import slack
 from itou.utils.perms.utils import can_view_personal_information
@@ -56,8 +56,8 @@ def add_beneficiary(request, beneficiary, notify_duplicate=False, is_active=True
     return membership
 
 
-def get_all_coworkers(organizations):
-    all_active_memberships = MembershipQuerySet.union(*[org.memberships.all() for org in organizations])
+def get_all_coworkers(structures):
+    all_active_memberships = MembershipQuerySet.union(*[struct.memberships.all() for struct in structures])
     # we cannot pass a union into a filter, but we can first convert it as a subquery to feed it to to_users_qs
     return MembershipQuerySet.to_users_qs(all_active_memberships.values("pk"))
 

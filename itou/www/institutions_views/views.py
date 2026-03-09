@@ -2,7 +2,7 @@ from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 
-from itou.common_apps.organizations.views import BaseMemberList, deactivate_org_member, update_org_admin_role
+from itou.common_apps.structures.views import BaseMemberList, deactivate_org_member, update_org_admin_role
 from itou.users.models import User
 from itou.utils.auth import check_user
 

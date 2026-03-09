@@ -5,9 +5,9 @@ from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
-from itou.common_apps.organizations.views import BaseMemberList
+from itou.common_apps.structures.views import BaseMemberList
 from itou.companies.enums import CompanyKind
-from tests.common_apps.organizations.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
+from tests.common_apps.structures.tests import assert_set_admin_role_creation, assert_set_admin_role_removal
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -48,7 +48,7 @@ class TestMembers:
 
     @freeze_time("2025-07-12 10:40")
     def test_members(self, client, snapshot, monkeypatch):
-        monkeypatch.setattr("itou.common_apps.organizations.views.MAX_PENDING_INVITATION", 1)
+        monkeypatch.setattr("itou.common_apps.structures.views.MAX_PENDING_INVITATION", 1)
         company = CompanyFactory(
             # snapshot includes financial_annex link only for iae kinds, always use an iae kind to prevent flaky test
             subject_to_iae_rules=True,
@@ -185,7 +185,7 @@ class TestUserMembershipDeactivation:
         assert f"Expired 1 invitations to companies.Company {company.pk} for user_id={guest.pk}." in caplog.messages
         assert f"Expired 1 invitations to companies.Company {company.pk} from user_id={guest.pk}." in caplog.messages
         assert (
-            f"User {admin.pk} deactivated companies.CompanyMembership of organization_id={company.pk} "
+            f"User {admin.pk} deactivated companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={guest.pk} is_admin=False."
         ) in caplog.messages
 
@@ -285,7 +285,7 @@ class TestUserMembershipDeactivation:
         ) in caplog.messages
         assert (
             f"User {admin_membership.user_id} deactivated companies.CompanyMembership "
-            f"of organization_id={company.pk} for user_id={other_admin.pk} is_admin=True."
+            f"of structure_id={company.pk} for user_id={other_admin.pk} is_admin=True."
         ) in caplog.messages
         [email] = mailoutbox
         assert f"[TEST] [Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject

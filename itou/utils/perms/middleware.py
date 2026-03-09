@@ -5,7 +5,7 @@ from django.urls import reverse
 from django_otp import user_has_device
 from itoutils.urls import add_url_params
 
-from itou.common_apps.organizations.models import OrganizationKind
+from itou.common_apps.structures.models import StructureKind
 from itou.companies.models import CompanyMembership
 from itou.institutions.models import InstitutionMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -91,7 +91,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
                     really_active_memberships,
-                    OrganizationKind.COMPANY,
+                    StructureKind.COMPANY,
                     request.session,
                 )
 
@@ -121,7 +121,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
                     active_memberships,
-                    OrganizationKind.PRESCRIBER_ORGANIZATION,
+                    StructureKind.PRESCRIBER_ORGANIZATION,
                     request.session,
                 )
 
@@ -136,7 +136,7 @@ class ItouCurrentOrganizationMiddleware:
                     InstitutionMembership.include_inactive.filter(user=user, is_active=True)
                     .order_by("joined_at")
                     .select_related("institution"),
-                    OrganizationKind.INSTITUTION,
+                    StructureKind.INSTITUTION,
                     request.session,
                 )
                 if not request.current_organization:

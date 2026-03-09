@@ -272,7 +272,7 @@ class TestCompanyModel:
             f"Expired 0 invitations to companies.Company {company.pk} for user_id={admin_user.pk}." in caplog.messages
         )
         assert (
-            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"Creating companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={admin_user.pk} is_admin=True."
         ) in caplog.messages
 
@@ -296,7 +296,7 @@ class TestCompanyModel:
             f"Expired 2 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
         assert (
-            f"Creating companies.CompanyMembership of organization_id={company.pk} "
+            f"Creating companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         assertQuerySetEqual(
@@ -329,7 +329,7 @@ class TestCompanyModel:
             f"Expired 1 invitations to companies.Company {company.pk} for user_id={other_user.pk}." in caplog.messages
         )
         assert (
-            f"Reactivating companies.CompanyMembership of organization_id={company.pk} "
+            f"Reactivating companies.CompanyMembership of structure_id={company.pk} "
             f"for user_id={other_user.pk} is_admin=False."
         ) in caplog.messages
         invit.refresh_from_db()

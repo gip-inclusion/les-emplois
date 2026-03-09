@@ -2,16 +2,16 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 
 
-def assert_set_admin_role_creation(user, organization, mailoutbox):
+def assert_set_admin_role_creation(user, structure, mailoutbox):
     # New admin.
-    assert user in organization.active_admin_members
+    assert user in structure.active_admin_members
 
     # The admin should receive a valid email
     [email] = mailoutbox
     assert "[TEST] Votre rôle d’administrateur" == email.subject
     assert (
         "Vous avez désormais le statut d’administrateur sur l’espace professionnel de "
-        f"votre organisation {organization.name} ({organization.kind})"
+        f"votre organisation {structure.name} ({structure.kind})"
     ) in email.body
     assert email.to[0] == user.email
 
@@ -19,12 +19,12 @@ def assert_set_admin_role_creation(user, organization, mailoutbox):
         assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14737265161617" in email.body
     elif user.is_labor_inspector:
         assert "https://aide.emplois.inclusion.beta.gouv.fr/" not in email.body
-    elif isinstance(organization, Company):
-        if organization.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:
+    elif isinstance(structure, Company):
+        if structure.kind in [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.EITI]:
             assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738355467409" in email.body
-        elif organization.kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
+        elif structure.kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
             assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16925381169681" in email.body
-        elif organization.kind == CompanyKind.GEIQ:
+        elif structure.kind == CompanyKind.GEIQ:
             assert "https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/15209741332113" in email.body
         else:
             raise AssertionError("Invalid siae kind")
@@ -32,12 +32,12 @@ def assert_set_admin_role_creation(user, organization, mailoutbox):
         raise AssertionError("Invalid user kind")
 
 
-def assert_set_admin_role_removal(user, organization, mailoutbox):
+def assert_set_admin_role_removal(user, structure, mailoutbox):
     # Admin removal.
-    assert user not in organization.active_admin_members
+    assert user not in structure.active_admin_members
 
     # The admin should receive a valid email
     [email] = mailoutbox
-    assert f"[TEST] [Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
+    assert f"[TEST] [Désactivation] Vous n'êtes plus administrateur de {structure.display_name}" == email.subject
     assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
     assert email.to[0] == user.email

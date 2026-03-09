@@ -134,16 +134,16 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
     invitation_model = None
     form_class = None
     formset_class = None
-    organization = None
+    structure = None
     form_post_url = None
     back_url = None
     template_name = "invitations_views/create.html"
 
     def setup(self, request, *args, **kwargs):
-        self.organization = getattr(request, "current_organization", None)
-        if self.organization is None:
+        self.structure = getattr(request, "current_organization", None)
+        if self.structure is None:
             raise PermissionDenied
-        self.invitation_left = MAX_PENDING_INVITATION - self.organization.invitations.pending().count()
+        self.invitation_left = MAX_PENDING_INVITATION - self.structure.invitations.pending().count()
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -179,7 +179,6 @@ class BaseInviteUserView(UserPassesTestMixin, TemplateView):
         context["back_url"] = self.back_url
         context["form_post_url"] = self.form_post_url
         context["formset"] = self.get_formset()
-        context["organization"] = self.organization
         return context
 
     def post(self, request, *args, **kwargs):
@@ -224,7 +223,7 @@ class InvitePrescriberView(BaseInviteUserView):
         return None
 
     def get_form_kwargs(self):
-        return {"sender": self.request.user, "organization": self.organization}
+        return {"sender": self.request.user, "organization": self.structure}
 
 
 def join_prescriber_organization(request, invitation_id):
@@ -248,7 +247,7 @@ class InviteEmployerView(BaseInviteUserView):
         return self.request.from_employer
 
     def get_form_kwargs(self):
-        return {"sender": self.request.user, "company": self.organization}
+        return {"sender": self.request.user, "company": self.structure}
 
 
 def join_company(request, invitation_id):
@@ -272,7 +271,7 @@ class InviteLaborInspectorView(BaseInviteUserView):
         return self.request.user.is_labor_inspector
 
     def get_form_kwargs(self):
-        return {"sender": self.request.user, "institution": self.organization}
+        return {"sender": self.request.user, "institution": self.structure}
 
 
 def join_institution(request, invitation_id):
