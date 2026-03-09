@@ -69,6 +69,12 @@ class Command(BaseCommand):
             default=False,
             help="Set to True to move only job applications, nothing else!",
         )
+        parser.add_argument(
+            "--allow-asp-to-user-created-transfer",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Set to True to allow source=ASP to source=USER_CREATED companies transfer.",
+        )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
     @dry_runnable
@@ -80,6 +86,7 @@ class Command(BaseCommand):
         ignore_siae_evaluations,
         only_job_applications,
         preserve_to_company_data,
+        allow_asp_to_user_created_transfer,
         **options,
     ):
         if from_id == to_id:
@@ -155,6 +162,7 @@ class Command(BaseCommand):
                     fields_to_transfer,
                     disable_from_company=disable_from_company,
                     ignore_siae_evaluations=ignore_siae_evaluations,
+                    allow_asp_to_user_created_transfer=allow_asp_to_user_created_transfer,
                 )
                 for section, section_changes in reporter.changes.items():
                     if transfer.TRANSFER_SPECS.get(section, {}).get("model_field"):

@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from itoutils.django.testing import assertSnapshotQueries
 from pytest_django.asserts import assertQuerySetEqual
 
-from itou.companies.enums import CompanyKind, JobSource
+from itou.companies.enums import CompanyKind, CompanySource, JobSource
 from itou.companies.models import Company, JobDescription
 from tests.cities.factories import create_city_guerande
 from tests.companies import factories as companies_factories
@@ -116,6 +116,26 @@ class TestMoveCompanyData:
 
         management.call_command(
             "move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True, ignore_siae_evaluations=True
+        )
+        stdout, stderr = capsys.readouterr()
+        assert stderr == ""
+        assert f"MOVE DATA OF company.id={company1.pk}" in stdout
+        assert f"INTO company.id={company2.pk}" in stdout
+
+    def test_prevent_move_for_asp_to_user_created_companies(self, capsys):
+        company1 = companies_factories.CompanyFactory(source=CompanySource.ASP)
+        company2 = companies_factories.CompanyFactory(source=CompanySource.USER_CREATED)
+
+        management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
+        _stdout, stderr = capsys.readouterr()
+        assert stderr == "Impossible de transférer d'une entreprise provenant de l'ASP vers une antenne\n"
+
+        management.call_command(
+            "move_company_data",
+            from_id=company1.pk,
+            to_id=company2.pk,
+            wet_run=True,
+            allow_asp_to_user_created_transfer=True,
         )
         stdout, stderr = capsys.readouterr()
         assert stderr == ""

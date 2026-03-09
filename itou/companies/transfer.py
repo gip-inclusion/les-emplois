@@ -146,6 +146,7 @@ def transfer_company_data(
     fields_to_transfer,
     disable_from_company=False,
     ignore_siae_evaluations=False,
+    allow_asp_to_user_created_transfer=False,
 ):
     assert from_company.pk != to_company.pk, "Cannot transfer from one company to itself"
     if not ignore_siae_evaluations and EvaluatedSiae.objects.filter(siae=from_company).exists():
@@ -153,7 +154,11 @@ def transfer_company_data(
             f"Impossible de transférer les objets de l'entreprise ID={from_company.pk}: il y a un contrôle "
             "a posteriori lié. Vérifiez avec l'équipe support."
         )
-    if from_company.source == CompanySource.ASP and to_company.source == CompanySource.USER_CREATED:
+    if (
+        not allow_asp_to_user_created_transfer
+        and from_company.source == CompanySource.ASP
+        and to_company.source == CompanySource.USER_CREATED
+    ):
         raise TransferError("Impossible de transférer d'une entreprise provenant de l'ASP vers une antenne")
     fields_to_transfer = [TransferField(field_to_transfer) for field_to_transfer in fields_to_transfer]
 
