@@ -2,10 +2,8 @@
 
 from .email import EmailNotification
 from .utils import (
-    EmployerNotification,
+    CaseworkerNotification,
     JobSeekerNotification,
-    PrescriberNotification,
-    PrescriberOrEmployerNotification,
-    PrescriberOrEmployerOrLaborInspectorNotification,
+    CaseworkerOrLaborInspectorNotification,
     WithStructureMixin,
 )

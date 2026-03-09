@@ -13,7 +13,7 @@ from django_xworkflows import models as xwf_models
 from xworkflows import before_transition
 
 from itou.approvals.models import Approval, Suspension
-from itou.approvals.notifications import PassAcceptedEmployerNotification
+from itou.approvals.notifications import PassAcceptedCaseworkerNotification
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel, AuthorKind
@@ -1318,7 +1318,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # Notifications
     def notifications_new_for_employer(self, employer):
-        return job_application_notifications.JobApplicationNewForEmployerNotification(
+        return job_application_notifications.JobApplicationNewForCaseworkerNotification(
             employer,
             self.to_company,
             job_application=self,
@@ -1416,7 +1416,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def notifications_deliver_approval(self, accepted_by):
-        return PassAcceptedEmployerNotification(
+        return PassAcceptedCaseworkerNotification(
             accepted_by,
             self.to_company,
             job_application=self,
@@ -1424,7 +1424,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def notifications_transfer_for_previous_employer(self, previous_employer, notification_context):
-        return job_application_notifications.JobApplicationTransferredForEmployerNotification(
+        return job_application_notifications.JobApplicationTransferredForCaseworkerNotification(
             previous_employer,
             self.transferred_from,
             **notification_context,

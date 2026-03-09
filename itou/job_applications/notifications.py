@@ -2,10 +2,9 @@ from django.urls import reverse
 
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
+    CaseworkerNotification,
     EmailNotification,
-    EmployerNotification,
     JobSeekerNotification,
-    PrescriberOrEmployerNotification,
 )
 from itou.companies.models import Company
 from itou.job_applications.enums import RefusalReason
@@ -26,7 +25,7 @@ class WithJobSeekersApplicationsLink:
         return context
 
 
-class ProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+class ProxyNotification(CaseworkerNotification, EmailNotification):
     def get_context(self):
         context = super().get_context()
         job_application = context["job_application"]
@@ -61,7 +60,7 @@ class JobApplicationNewForProxyNotification(WithJobSeekersApplicationsLink, Prox
 
 
 @notifications_registry.register
-class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
+class JobApplicationNewForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     """Notification sent to new employers when created"""
 
     name = "Nouvelle candidature"
@@ -191,7 +190,7 @@ class JobApplicationTransferredForProxyNotification(WithJobSeekersApplicationsLi
 
 
 @notifications_registry.register
-class JobApplicationTransferredForEmployerNotification(EmployerNotification, EmailNotification):
+class JobApplicationTransferredForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     """Notification sent to original employer when transferred"""
 
     name = "Transfert de candidature"

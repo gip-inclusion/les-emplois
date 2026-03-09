@@ -4,7 +4,7 @@ from tests.approvals.factories import ProlongationRequestDenyInformationFactory,
 
 def test_prolongation_request_created(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    email = notifications.ProlongationRequestCreatedForPrescriberNotification(
+    email = notifications.ProlongationRequestCreatedForCaseworkerNotification(
         prolongation_request.assigned_to,
         prolongation_request.prescriber_organization,
         prolongation_request=prolongation_request,
@@ -17,7 +17,7 @@ def test_prolongation_request_created(snapshot):
 
 def test_prolongation_request_created_reminder(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    email = notifications.ProlongationRequestCreatedReminderForPrescriberNotification(
+    email = notifications.ProlongationRequestCreatedReminderForCaseworkerNotification(
         prolongation_request.assigned_to,
         prolongation_request.prescriber_organization,
         prolongation_request=prolongation_request,
@@ -30,7 +30,7 @@ def test_prolongation_request_created_reminder(snapshot):
 
 def test_prolongation_request_granted_employer(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    email = notifications.ProlongationRequestGrantedForEmployerNotification(
+    email = notifications.ProlongationRequestGrantedForCaseworkerNotification(
         prolongation_request.declared_by,
         prolongation_request.declared_by_siae,
         prolongation_request=prolongation_request,
@@ -55,7 +55,7 @@ def test_prolongation_request_granted_jobseeker(snapshot):
 
 def test_prolongation_request_denied_employer(snapshot):
     prolongation_request = ProlongationRequestDenyInformationFactory(for_snapshot=True).request
-    email = notifications.ProlongationRequestDeniedForEmployerNotification(
+    email = notifications.ProlongationRequestDeniedForCaseworkerNotification(
         prolongation_request.declared_by,
         prolongation_request.declared_by_siae,
         prolongation_request=prolongation_request,

@@ -1,13 +1,11 @@
 from django.conf import settings
 
 from itou.communications import NotificationCategory, registry as notifications_registry
-from itou.communications.dispatch import EmailNotification, PrescriberOrEmployerOrLaborInspectorNotification
+from itou.communications.dispatch import CaseworkerOrLaborInspectorNotification, EmailNotification
 
 
 @notifications_registry.register
-class OrganizationActiveMembersReminderNotification(
-    PrescriberOrEmployerOrLaborInspectorNotification, EmailNotification
-):
+class OrganizationActiveMembersReminderNotification(CaseworkerOrLaborInspectorNotification, EmailNotification):
     name = "Rappel périodique pour s'assurer que les membres de sa structure sont bien actifs et autorisés"
     category = NotificationCategory.MEMBERS_MANAGEMENT
     subject_template = "users/emails/check_authorized_members_email_subject.txt"

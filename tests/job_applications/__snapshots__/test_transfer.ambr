@@ -163,7 +163,7 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationTransferredForEmployerNotification.send[communications/dispatch/email.py]',
+          'JobApplicationTransferredForCaseworkerNotification.send[communications/dispatch/email.py]',
           'JobApplication.transfer[job_applications/models.py]',
         ]),
         'sql': '''
@@ -221,8 +221,8 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationTransferredForEmployerNotification.should_send[communications/dispatch/base.py]',
-          'JobApplicationTransferredForEmployerNotification.send[communications/dispatch/email.py]',
+          'JobApplicationTransferredForCaseworkerNotification.should_send[communications/dispatch/base.py]',
+          'JobApplicationTransferredForCaseworkerNotification.send[communications/dispatch/email.py]',
           'JobApplication.transfer[job_applications/models.py]',
         ]),
         'sql': '''
@@ -241,7 +241,7 @@
         'origin': list([
           'Email.save[<site-packages>/django/db/models/base.py]',
           'AsyncEmailBackend.send_messages[emails/tasks.py]',
-          'JobApplicationTransferredForEmployerNotification.send[communications/dispatch/email.py]',
+          'JobApplicationTransferredForCaseworkerNotification.send[communications/dispatch/email.py]',
           'JobApplication.transfer[job_applications/models.py]',
         ]),
         'sql': '''

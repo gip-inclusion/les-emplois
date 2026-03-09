@@ -1,15 +1,14 @@
 from django.urls import reverse
 
 from itou.communications import NotificationCategory, registry as notifications_registry
-from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
-from itou.communications.dispatch.utils import PrescriberNotification
+from itou.communications.dispatch import CaseworkerNotification, EmailNotification, JobSeekerNotification
 from itou.companies.enums import CompanyKind
 from itou.job_applications.utils import show_afpa_ad
 from itou.utils.urls import get_absolute_url
 
 
 @notifications_registry.register
-class ProlongationRequestCreatedForPrescriberNotification(PrescriberNotification, EmailNotification):
+class ProlongationRequestCreatedForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     """Notification sent to the authorized prescriber when a prolongation request is created"""
 
     name = "Nouvelle demande de prolongation"
@@ -30,7 +29,7 @@ class ProlongationRequestCreatedForPrescriberNotification(PrescriberNotification
 
 
 @notifications_registry.register
-class ProlongationRequestCreatedReminderForPrescriberNotification(PrescriberNotification, EmailNotification):
+class ProlongationRequestCreatedReminderForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     """Notification sent to the other members of the prescriber organization"""
 
     name = "Rappel de demande de prolongation"
@@ -51,7 +50,7 @@ class ProlongationRequestCreatedReminderForPrescriberNotification(PrescriberNoti
 
 
 @notifications_registry.register
-class ProlongationRequestDeniedForEmployerNotification(EmployerNotification, EmailNotification):
+class ProlongationRequestDeniedForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     """Notification sent to the employer when the prolongation request is denied"""
 
     name = "Demande de prolongation refusée"
@@ -79,7 +78,7 @@ class ProlongationRequestDeniedForJobSeekerNotification(JobSeekerNotification, E
 
 
 @notifications_registry.register
-class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
+class PassAcceptedCaseworkerNotification(CaseworkerNotification, EmailNotification):
     name = "PASS IAE accepté"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/deliver_subject.txt"
@@ -100,7 +99,7 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
 
 
 @notifications_registry.register
-class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, EmailNotification):
+class ProlongationRequestGrantedForCaseworkerNotification(CaseworkerNotification, EmailNotification):
     name = "Demande de prolongation acceptée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/employer_subject.txt"
