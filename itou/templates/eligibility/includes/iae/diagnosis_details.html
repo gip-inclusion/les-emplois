@@ -10,8 +10,7 @@
                 </div>
             </div>
             <p class="fs-sm text-success mb-3">
-                {{ is_sent_by_authorized_prescriber|yesno:"Confirmée,Validée" }}
-                le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par
+                Confirmée le {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} par
                 {{ eligibility_diagnosis.author.get_inverted_full_name }}
                 {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}).{% endif %}
                 {% if eligibility_diagnosis.author_prescriber_organization %}
