@@ -102,7 +102,7 @@ def get_users_contacts(ids):
 
 
 class Command(BaseCommand):
-    help = "Create objects that link prescribers to assigned job seekers."
+    help = "Create objects that link professionals to assigned job seekers."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -131,7 +131,7 @@ class Command(BaseCommand):
                 assignments = {
                     (
                         assignment.job_seeker_id,
-                        assignment.prescriber_id,
+                        assignment.professional_id,
                         assignment.prescriber_organization_id,
                     ): assignment
                     for assignment in JobSeekerAssignment.objects.filter(
@@ -143,12 +143,12 @@ class Command(BaseCommand):
                 assignments_to_update = set()
 
                 for job_seeker_id, contacts in users_contacts.items():
-                    for (prescriber_id, prescriber_organization_id), actions in contacts.items():
+                    for (professional_id, prescriber_organization_id), actions in contacts.items():
                         sorted_actions = sorted(actions, key=lambda a: a.get("timestamp"))
                         first_action = sorted_actions[0]
                         last_action = sorted_actions[-1]
 
-                        if assignment := assignments.get((job_seeker_id, prescriber_id, prescriber_organization_id)):
+                        if assignment := assignments.get((job_seeker_id, professional_id, prescriber_organization_id)):
                             # update assignment
                             if last_action["timestamp"] > assignment.updated_at:
                                 assignment.updated_at = last_action["timestamp"]
@@ -163,7 +163,7 @@ class Command(BaseCommand):
                             assignments_to_create.append(
                                 JobSeekerAssignment(
                                     job_seeker_id=job_seeker_id,
-                                    prescriber_id=prescriber_id,
+                                    professional_id=professional_id,
                                     prescriber_organization_id=prescriber_organization_id,
                                     created_at=first_action["timestamp"],
                                     updated_at=last_action["timestamp"],

@@ -766,10 +766,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, CreatedOrUpdatedByMixin, ItouModelM
                             # Keep sender & job_seeker consistent to comply with job_seeker_sender_coherence constraint
                             item.sender = to_user
                         if field.name == "job_seeker_assignments":
-                            # Check and merge if to_user has an assignment with same prescriber and organization
+                            # Check and merge if to_user has an assignment with same professional and organization
                             to_user_assignment = models.JobSeekerAssignment.objects.filter(
                                 job_seeker=to_user,
-                                prescriber=item.prescriber,
+                                professional=item.professional,
                                 prescriber_organization=item.prescriber_organization,
                             ).first()
                             if to_user_assignment:

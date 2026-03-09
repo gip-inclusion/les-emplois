@@ -1617,16 +1617,16 @@ class IdentityCertification(models.Model):
 
 
 class JobSeekerAssignmentManager(models.Manager):
-    def upsert_assignment(self, job_seeker, prescriber, prescriber_organization, last_action_kind):
+    def upsert_assignment(self, job_seeker, professional, prescriber_organization, last_action_kind):
         assert job_seeker.is_job_seeker
-        if prescriber.kind != UserKind.PRESCRIBER:
+        if not professional.is_professional:
             # This should not happen but we don't want to block everything
-            logger.error("We should not try to add a JobSeekerAssignment on user=%s", prescriber)
+            logger.error("We should not try to add a JobSeekerAssignment on user=%s", professional.pk)
             return
 
         assignment = JobSeekerAssignment(
             job_seeker=job_seeker,
-            prescriber=prescriber,
+            professional=professional,
             prescriber_organization=prescriber_organization,
             last_action_kind=last_action_kind,
         )
@@ -1634,13 +1634,13 @@ class JobSeekerAssignmentManager(models.Manager):
             [assignment],
             update_conflicts=True,
             update_fields=["updated_at", "last_action_kind"],
-            unique_fields=["job_seeker", "prescriber", "prescriber_organization"],
+            unique_fields=["job_seeker", "professional", "prescriber_organization"],
         )
 
 
 class JobSeekerAssignment(models.Model):
     """
-    An assignment of a job seeker to a prescriber, with or without organization.
+    An assignment of a job seeker to a professional, with or without organization.
     """
 
     # TODO(ewen): set to auto_now_add=True when the objects are created from existing contacts
@@ -1654,12 +1654,11 @@ class JobSeekerAssignment(models.Model):
         related_name="job_seeker_assignments",
         limit_choices_to={"kind": UserKind.JOB_SEEKER},
     )
-    prescriber = models.ForeignKey(
+    professional = models.ForeignKey(
         User,
-        verbose_name="prescripteur",
+        verbose_name="accompagnateur",
         on_delete=models.RESTRICT,
-        related_name="prescriber_assignments",
-        limit_choices_to={"kind": UserKind.PRESCRIBER},
+        related_name="professional_assignments",
     )
     prescriber_organization = models.ForeignKey(
         PrescriberOrganization,
@@ -1683,7 +1682,7 @@ class JobSeekerAssignment(models.Model):
         constraints = [
             models.UniqueConstraint(
                 name="unique_%(class)s_assignment_per_jobseeker",
-                fields=["job_seeker", "prescriber", "prescriber_organization"],
+                fields=["job_seeker", "professional", "prescriber_organization"],
                 nulls_distinct=False,
                 violation_error_message=(
                     "Une affectation existe déjà entre le candidat, le prescripteur et l'organisation prescriptrice."
@@ -1693,6 +1692,6 @@ class JobSeekerAssignment(models.Model):
 
     def __str__(self):
         return (
-            f"Affectation de JobSeeker pk={self.job_seeker.pk} à "
-            f"prescriber={self.prescriber.pk}, organization={self.prescriber_organization_id}"
+            f"Affectation de JobSeeker pk={self.job_seeker_id} à "
+            f"professional={self.professional_id}, organization={self.prescriber_organization_id}"
         )

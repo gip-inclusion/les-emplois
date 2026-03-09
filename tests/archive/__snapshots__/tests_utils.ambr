@@ -20,7 +20,7 @@
     'jobapplication__isnull': True,
     'jobapplicationcomment__isnull': True,
     'jobapplicationtransitionlog__isnull': True,
-    'prescriber_assignments__isnull': True,
+    'professional_assignments__isnull': True,
     'prolongationrequest_processed__isnull': True,
     'prolongationrequests_assigned__isnull': True,
     'prolongationrequests_created__isnull': True,

@@ -260,11 +260,11 @@ class TestTransferUserData:
         # assignment without collision risk
         assignment_1 = JobSeekerAssignmentFactory(job_seeker=from_user)
 
-        # assignment with the same prescriber and organization: assignment_2 will be deleted and assignmmment_3 updated
+        # assignment with the same professional and organization: assignment_2 will be deleted and assignment_3 updated
         assignment_2 = JobSeekerAssignmentFactory(job_seeker=from_user)
         assignment_3 = JobSeekerAssignmentFactory(
             job_seeker=to_user,
-            prescriber=assignment_2.prescriber,
+            professional=assignment_2.professional,
             prescriber_organization=assignment_2.prescriber_organization,
         )
 

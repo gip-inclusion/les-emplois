@@ -1129,7 +1129,7 @@
           LEFT OUTER JOIN "job_applications_jobapplication" T18 ON ("users_user"."id" = T18."transferred_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationcomment" ON ("users_user"."id" = "job_applications_jobapplicationcomment"."created_by_id")
           LEFT OUTER JOIN "job_applications_jobapplicationtransitionlog" ON ("users_user"."id" = "job_applications_jobapplicationtransitionlog"."user_id")
-          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."prescriber_id")
+          LEFT OUTER JOIN "users_jobseekerassignment" ON ("users_user"."id" = "users_jobseekerassignment"."professional_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" ON ("users_user"."id" = "approvals_prolongationrequest"."processed_by_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" T23 ON ("users_user"."id" = T23."assigned_to_id")
           LEFT OUTER JOIN "approvals_prolongationrequest" T24 ON ("users_user"."id" = T24."created_by_id")
@@ -1811,19 +1811,19 @@
                  "users_jobseekerassignment"."created_at",
                  "users_jobseekerassignment"."updated_at",
                  "users_jobseekerassignment"."job_seeker_id",
-                 "users_jobseekerassignment"."prescriber_id",
+                 "users_jobseekerassignment"."professional_id",
                  "users_jobseekerassignment"."prescriber_organization_id",
                  "users_jobseekerassignment"."last_action_kind"
           FROM "users_jobseekerassignment"
-          WHERE "users_jobseekerassignment"."prescriber_id" IN (%s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s,
-                                                                %s)
+          WHERE "users_jobseekerassignment"."professional_id" IN (%s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s,
+                                                                  %s)
           ORDER BY "users_jobseekerassignment"."updated_at" DESC
         ''',
       }),
