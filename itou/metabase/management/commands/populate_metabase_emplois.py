@@ -372,7 +372,7 @@ class Command(BaseCommand):
         """
         queryset = (
             User.objects.filter(kind=UserKind.JOB_SEEKER)
-            .select_related("jobseeker_profile", "created_by")
+            .select_related("jobseeker_profile")
             .prefetch_related(
                 Prefetch(
                     "eligibility_diagnoses",
@@ -440,8 +440,6 @@ class Command(BaseCommand):
                 "jobseeker_profile__nir",
                 "jobseeker_profile__birthdate",  # get_user_age_in_years
                 "date_joined",
-                "created_by__kind",  # get_user_signup_kind
-                "created_by__is_staff",  # get_user_signup_kind
                 "identity_provider",
                 "jobseeker_profile__pole_emploi_id",
                 "last_login",
