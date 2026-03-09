@@ -901,7 +901,7 @@ class TestStandaloneCreateAsPrescriber:
         ).exists()
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.CREATE,
         ).exists()

@@ -155,7 +155,7 @@ class Command(BaseCommand):
         # No need to keep assignments from prescribers "solo" (without organization). If a prescriber was anonymized
         # without deletion just because of an assignment like these, he will be deleted on the next command run.
         JobSeekerAssignment.objects.filter(
-            prescriber_id__in=[user.id for user in users], prescriber_organization_id__isnull=True
+            caseworker_id__in=[user.id for user in users], prescriber_organization_id__isnull=True
         ).delete()
 
         User.objects.filter(id__in=user_ids).update(

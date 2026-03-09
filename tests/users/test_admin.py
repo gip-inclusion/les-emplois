@@ -88,6 +88,7 @@ def test_get_fields_to_transfer_for_job_seekers():
         "authorization_status_set",  # PrescriberOrganization.authorization_updated_by
         "contracts",  # Contract.job_seeker
         "company",  # Company.members
+        "caseworker_assignments",  # JobSeekerAssignment.caseworker
         "created_assessments",  # Assessment.created_by
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
@@ -112,7 +113,6 @@ def test_get_fields_to_transfer_for_job_seekers():
         "jobseeker_profile",  # JobSeekerProfile.user: the target already has one
         "jobseekerexternaldata",  # JobSeekerExternalData.user: this seems largely unused
         "logentry",  # django.contrib.admin.models.LogEntry.user
-        "prescriber_assignments",  # JobSeekerAssignment.prescriber
         "prescriber_org_invitations",  # PrescriberWithOrgInvitation.sender
         "prescribermembership",  # PrescriberMembership.user
         "prescriberorganization",  # PrescriberOrganization.members

@@ -51,14 +51,14 @@ def _model_sanity_check():
 def _get_job_seeker_assignments(from_id, to_id):
     from_org_assignments = users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=from_id)
     to_org_assignments = {
-        (assignment.job_seeker, assignment.prescriber): assignment
+        (assignment.job_seeker, assignment.caseworker): assignment
         for assignment in users_models.JobSeekerAssignment.objects.filter(prescriber_organization_id=to_id)
     }
 
     assignments_to_update = []
     assignments_ids_to_delete = []
     for from_org_assignment in from_org_assignments:
-        to_org_assignment = to_org_assignments.get((from_org_assignment.job_seeker, from_org_assignment.prescriber))
+        to_org_assignment = to_org_assignments.get((from_org_assignment.job_seeker, from_org_assignment.caseworker))
         if to_org_assignment and from_org_assignment.updated_at < to_org_assignment.updated_at:
             # Keep to_org_assignment
             assignments_ids_to_delete.append(from_org_assignment.pk)

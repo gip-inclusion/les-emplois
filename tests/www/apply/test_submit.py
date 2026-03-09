@@ -1064,7 +1064,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -1138,7 +1138,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.APPLY,
         ).exists()
@@ -1396,7 +1396,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -1507,7 +1507,7 @@ class TestApplyAsAuthorizedPrescriber:
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=prescriber_organization,
             last_action_kind=ActionKind.APPLY,
         ).exists()
@@ -1928,7 +1928,7 @@ class TestApplyAsPrescriber:
         # ----------------------------------------------------------------------
         assignment = JobSeekerAssignment.objects.filter(
             job_seeker=new_job_seeker,
-            prescriber=user,
+            caseworker=user,
             prescriber_organization=None,
             last_action_kind=ActionKind.CREATE,
         ).get()
@@ -2001,7 +2001,7 @@ class TestApplyAsPrescriber:
         # Check JobSeekerAssignment again
         # ----------------------------------------------------------------------
         assert JobSeekerAssignment.objects.filter(
-            job_seeker=new_job_seeker, prescriber=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
+            job_seeker=new_job_seeker, caseworker=user, prescriber_organization=None, last_action_kind=ActionKind.APPLY
         ).exists()
 
     def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self, client):

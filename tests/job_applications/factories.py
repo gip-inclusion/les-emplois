@@ -185,7 +185,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             JobSeekerAssignmentFactory(
                 updated_at=self.created_at,
                 job_seeker=self.job_seeker,
-                prescriber=self.sender,
+                caseworker=self.sender,
                 prescriber_organization=self.sender_prescriber_organization,
                 last_action_kind=ActionKind.APPLY,
             )

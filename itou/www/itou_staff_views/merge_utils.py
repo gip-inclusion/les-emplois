@@ -121,10 +121,10 @@ def handle_follow_up_group_membership(model, from_user, to_user):
 
 
 def handle_job_seeker_assignment(model, from_user, to_user):
-    from_user_assignments = model.objects.filter(prescriber=from_user)
+    from_user_assignments = model.objects.filter(caseworker=from_user)
     to_user_assignments = {
         (assignment.job_seeker_id, assignment.prescriber_organization_id): assignment
-        for assignment in model.objects.filter(prescriber=to_user)
+        for assignment in model.objects.filter(caseworker=to_user)
     }
     updated_pks = []
     moved_pks = []
@@ -140,10 +140,10 @@ def handle_job_seeker_assignment(model, from_user, to_user):
             )
         else:
             moved_pks.append(from_user_assignment.pk)
-            from_user_assignment.prescriber = to_user
+            from_user_assignment.caseworker = to_user
 
-    JobSeekerAssignment.objects.filter(pk__in=moved_pks).update(prescriber=to_user)
-    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.prescriber"
+    JobSeekerAssignment.objects.filter(pk__in=moved_pks).update(caseworker=to_user)
+    base_log = get_log_prefix(to_user, from_user) + f"{model.__module__}.{model.__name__}.caseworker"
     if updated_pks:
         logger.info(f"{base_log} updated : {updated_pks}")
     if moved_pks:
@@ -170,7 +170,7 @@ MODEL_MAPPING = {
     (NotificationSettings, "user"): noop,
     (Token, "user"): handle_token,
     (FollowUpGroupMembership, "member"): handle_follow_up_group_membership,
-    (JobSeekerAssignment, "prescriber"): handle_job_seeker_assignment,
+    (JobSeekerAssignment, "caseworker"): handle_job_seeker_assignment,
     (User._meta.get_field("groups").remote_field.through, "user"): noop,
     (User._meta.get_field("user_permissions").remote_field.through, "user"): noop,
 }
