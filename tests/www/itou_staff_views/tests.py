@@ -1258,3 +1258,172 @@ class TestExportFS3437:
             assert response.status_code == 200
             assert response["Content-Disposition"] == ('attachment; filename="export_fs_3437_2024-05-17_11-11-11.csv"')
             assert b"".join(response.streaming_content).decode() == snapshot(name="streaming content")
+
+
+class TestImportFS3437FromAsp:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            (JobSeekerFactory, {}, 403),
+            (EmployerFactory, {"membership": True}, 403),
+            (PrescriberFactory, {}, 403),
+            (LaborInspectorFactory, {"membership": True}, 403),
+            (ItouStaffFactory, {}, 302),
+            (ItouStaffFactory, {"is_superuser": True}, 200),
+        ],
+    )
+    def test_requires_staff(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:import_fs_3437_from_asp"))
+        assert response.status_code == expected_status
+
+    def test_permission(self, client, settings):
+        user = ItouStaffFactory()
+        client.force_login(user)
+        url = reverse("itou_staff_views:import_fs_3437_from_asp")
+        response = client.get(url)
+        assertRedirects(response, f"{settings.LOGIN_URL}?next={url}", fetch_redirect_response=False)
+
+        user.user_permissions.add(Permission.objects.get(codename="import_fs_3437_from_asp"))
+        response = client.get(url)
+        assert response.status_code == 200
+
+    def test_import_file(self, admin_client, snapshot):
+        known_job_seeker_with_comment = JobSeekerFactory(
+            jobseeker_profile__asp_uid="111111111111111111111111111111", last_name="Doe", first_name="John"
+        )
+        known_job_seeker_to_update_with_3437 = JobSeekerFactory(
+            jobseeker_profile__asp_uid="222222222222222222222222222222",
+            last_name="Dupont",
+            first_name="Jeanne",
+        )
+        EmployeeRecordTransitionLogFactory(
+            to_state=Status.REJECTED,
+            employee_record__asp_processing_code="3437",
+            employee_record__job_application__job_seeker=known_job_seeker_to_update_with_3437,
+        )
+        with_3437_future_asp_uid = "555555555555555555555555555555"
+        known_job_seeker_to_update_without_3437 = JobSeekerFactory(last_name="Martin")
+        without_3437_future_asp_uid = "666666666666666666666666666666"
+        with io.BytesIO() as xlsxfile:
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.append(
+                [
+                    "idItou",
+                    "nomUsage",
+                    "prenom",
+                    "dateNaissance",
+                    "numeroIDE",
+                    "NIR",
+                    "NTT",
+                    "passIae",
+                    "siret",
+                    "mesure",
+                    "horodatage",
+                    "Année d'envoi",
+                    "Commentaires",
+                ]
+            )
+            # Unknown idItou
+            sheet.append(
+                [
+                    "1234d353eb8f0b44975ffca87862e2f",
+                    "Doe",
+                    "John",
+                    datetime.date(1990, 12, 31),
+                    "",
+                    "190123456789097",
+                    "",
+                    "999991234567",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    "a33333333333333333333333333333",
+                ]
+            )
+
+            # Known idItou with comment
+            sheet.append(
+                [
+                    known_job_seeker_with_comment.jobseeker_profile.asp_uid,
+                    known_job_seeker_with_comment.last_name,
+                    known_job_seeker_with_comment.first_name,
+                    known_job_seeker_with_comment.jobseeker_profile.birthdate,
+                    "",
+                    known_job_seeker_with_comment.jobseeker_profile.nir,
+                    "",
+                    "999991234567",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    "Problème sur le frobulateur de ce candidat: 444444444444444444444444444444",
+                ]
+            )
+            # Known idItou to update
+            sheet.append(
+                [
+                    known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid,
+                    known_job_seeker_to_update_with_3437.last_name,
+                    known_job_seeker_to_update_with_3437.first_name,
+                    known_job_seeker_to_update_with_3437.jobseeker_profile.birthdate,
+                    "",
+                    known_job_seeker_to_update_with_3437.jobseeker_profile.nir,
+                    "",
+                    "999991234567",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    with_3437_future_asp_uid,
+                ]
+            )
+            sheet.append(
+                [
+                    known_job_seeker_to_update_without_3437.jobseeker_profile.asp_uid,
+                    "Dupont",  # Not Martin
+                    known_job_seeker_to_update_without_3437.first_name,
+                    known_job_seeker_to_update_without_3437.jobseeker_profile.birthdate,
+                    "",
+                    known_job_seeker_to_update_without_3437.jobseeker_profile.nir,
+                    "",
+                    "999991234567",
+                    "98765432100001",
+                    "ACI_DC",
+                    "RIAE_FS_20260128145512.json",
+                    "2026",
+                    without_3437_future_asp_uid,
+                ]
+            )
+            workbook.save(xlsxfile)
+            xlsxfile.seek(0)
+            xlsxfile.name = "20260220_retour_ddes_idItou.xlsx"
+            response = admin_client.post(reverse("itou_staff_views:import_fs_3437_from_asp"), {"file": xlsxfile})
+            # Commentaires values that are not strictly an ASP uid are ignored
+            assertNotContains(response, known_job_seeker_with_comment.jobseeker_profile.asp_uid)
+            assertContains(response, "1234d353eb8f0b44975ffca87862e2f - Candidat non trouvé")
+            assertContains(
+                response, f"{known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid} - Candidat identifié"
+            )
+            soup = parse_response_to_soup(response, selector=".c-box")
+            assert pretty_indented(soup) == snapshot(name="result")
+
+            known_job_seeker_to_update_with_3437.refresh_from_db()
+            assert known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid != with_3437_future_asp_uid
+            known_job_seeker_to_update_without_3437.refresh_from_db()
+            assert known_job_seeker_to_update_without_3437.jobseeker_profile.asp_uid != without_3437_future_asp_uid
+
+            xlsxfile.seek(0)
+            response = admin_client.post(
+                reverse("itou_staff_views:import_fs_3437_from_asp"), {"file": xlsxfile, "wet_run": True}
+            )
+            assert response.status_code == 200
+            soup = parse_response_to_soup(response, selector=".c-box")
+            assert pretty_indented(soup) == snapshot(name="result")
+            known_job_seeker_to_update_with_3437.refresh_from_db()
+            assert known_job_seeker_to_update_with_3437.jobseeker_profile.asp_uid == with_3437_future_asp_uid
+            known_job_seeker_to_update_without_3437.refresh_from_db()
+            assert known_job_seeker_to_update_without_3437.jobseeker_profile.asp_uid == without_3437_future_asp_uid

@@ -921,6 +921,9 @@ class Migration(migrations.Migration):
             options={
                 "verbose_name": "profil demandeur d'emploi",
                 "verbose_name_plural": "profils demandeur d'emploi",
+                "permissions": [
+                    ("import_fs_3437_from_asp", "Can import FS 3437 return file from ASP and update asp_uid field"),
+                ],
                 "constraints": [
                     models.CheckConstraint(
                         condition=models.Q(("lack_of_nir_reason", ""), ("nir", ""), _connector="OR"),

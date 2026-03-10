@@ -1,0 +1,68 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load components %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load str_filters %}
+
+{% block title %}Import du fichier FS 3437 de l’ASP {{ block.super }}{% endblock %}
+
+{% block title_content %}
+    {% component_title c_title__main=c_title__main %}
+        {% fragment as c_title__main %}
+            <h1>Import du fichier FS 3437 de l’ASP</h1>
+        {% endfragment %}
+    {% endcomponent_title %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    {% if request.method == "POST" %}
+                        <div class="c-box mb-5">
+                            <h2>Résultats de l’import</h2>
+                            <p>{{ results_count }} lignes traitées.</p>
+                            <ul>
+                                {% for idItou, result, with_3437, mismatch in results %}
+                                    <li>
+                                        <span {% if with_3437 is None %}class="text-muted"{% endif %}>{{ idItou }} - {{ result }}</span>
+                                        {% if with_3437 is not None %}
+                                            <ul>
+                                                <li class="{{ with_3437|yesno:'text-success,text-warning' }}">
+                                                    Erreur 3437 détectée: {{ with_3437|yesno:"Oui,Non" }}
+                                                </li>
+                                                {% if mismatch %}
+                                                    <li>
+                                                        Données différentes du fichier
+                                                        <ul class="text-warning">
+                                                            {% for key, values in mismatch.items %}<li>{{ key }} :{{ values.0 }} / {{ values.1 }}</li>{% endfor %}
+                                                        </ul>
+                                                    </li>
+                                                {% endif %}
+                                            </ul>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="c-form">
+                        <h2>Fichier à importer</h2>
+                        <p>
+                            Dans la feuille principale, une colonne intitulée « idItou » doit contenir l’ancien identifiant itou et la colonne Commentaires le nouveau.
+                        </p>
+
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            {% itou_buttons_form primary_label="Importer" %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

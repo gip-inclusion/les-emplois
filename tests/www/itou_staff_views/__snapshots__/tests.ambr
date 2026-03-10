@@ -2884,6 +2884,54 @@
   
   '''
 # ---
+# name: TestImportFS3437FromAsp.test_import_file[result]
+  '''
+  <div class="c-box mb-5">
+      <h2>
+          Résultats de l’import
+      </h2>
+      <p>
+          3 lignes traitées.
+      </p>
+      <ul>
+          <li>
+              <span class="text-muted">
+                  1234d353eb8f0b44975ffca87862e2f - Candidat non trouvé
+              </span>
+          </li>
+          <li>
+              <span>
+                  222222222222222222222222222222 - Candidat identifié - Jeanne DUPONT - nouvel idItou: 555555555555555555555555555555
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée: Non
+                  </li>
+              </ul>
+          </li>
+          <li>
+              <span>
+                  3203e2c4230d4fb6c160767eeb3737 - Candidat identifié - Aaron MARTIN - nouvel idItou: 666666666666666666666666666666
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée: Non
+                  </li>
+                  <li>
+                      Données différentes du fichier
+                      <ul class="text-warning">
+                          <li>
+                              Nom :Martin / Dupont
+                          </li>
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
 # name: TestMergeUsers.test_merge_order[same_order]
   '''
   <div class="row mb-5" id="users_info">
