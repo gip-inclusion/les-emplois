@@ -1136,7 +1136,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -1161,6 +1161,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -1357,7 +1384,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -1382,6 +1409,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -1604,7 +1658,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -1629,6 +1683,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -2022,7 +2103,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2047,6 +2128,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -2211,7 +2319,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2236,6 +2344,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
@@ -2426,7 +2561,7 @@
           </div>
           <div class="s-section__row row">
               <div class="col-12">
-                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change from:input delay:.5s" id="filter-and-list-container">
+                  <form hx-get="/geiq-assessments/00000000-1111-2222-3333-444444444444/contracts" hx-indicator="#contracts-results-table" hx-push-url="true" hx-swap="outerHTML" hx-target="#contracts-results-table" hx-trigger="submit, change delay:.5s" id="filter-and-list-container">
                       <div class="btn-dropdown-filter-group d-flex align-items-center flex-wrap gap-2 mb-4">
                           <div class="dropdown" id="dropdown-start-date-container">
                               <button aria-expanded="false" class="btn btn-dropdown-filter dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" id="btn-filter-start-date" type="button">
@@ -2451,6 +2586,33 @@
                                       Appliquer
                                   </button>
                               </div>
+                          </div>
+                          <div class="dropdown" id="dropdown-90days-container">
+                              <button class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" id="btn-filter-90-days" type="button">
+                                  ≥ 90 jours en 2024
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_longer_or_equal_90" name="duration_longer_or_equal_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_longer_or_equal_90">
+                                                  Oui
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                                  <li>
+                                      <div class="dropdown-item">
+                                          <div class="form-check">
+                                              <input class="form-check-input" id="id_duration_strictly_shorter_90" name="duration_strictly_shorter_90" type="checkbox"/>
+                                              <label class="form-check-label" for="id_duration_strictly_shorter_90">
+                                                  Non
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </li>
+                              </ul>
                           </div>
                           <div class="ms-md-auto" id="reset-button-container">
                           </div>
