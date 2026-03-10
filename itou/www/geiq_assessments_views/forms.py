@@ -160,6 +160,9 @@ class ReviewForm(forms.ModelForm):
         labels = {
             "review_comment": "Commentaire",
         }
+        widgets = {
+            "review_comment": forms.Textarea(attrs={"data-it-expandable": "true"}),
+        }
 
     advance_amount = forms.CharField(
         label="Premier versement déjà réalisé",
