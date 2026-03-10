@@ -14,6 +14,7 @@ urlpatterns = [
     path("export-ft-api-rejections", views.export_ft_api_rejections, name="export_ft_api_rejections"),
     path("export-cta", views.export_cta, name="export_cta"),
     path("export-fs-3437", views.export_fs_3437, name="export_fs_3437"),
+    path("import-fs-3437-from-asp", views.import_fs_3437_from_asp, name="import_fs_3437_from_asp"),
     path("import-aci-convergence-phc", views.import_aci_convergence_phc, name="import_aci_convergence_phc"),
     path("merge-users", views.merge_users, name="merge_users"),
     path(
