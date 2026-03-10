@@ -6,6 +6,7 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
 )
+from tests.utils.testing import parse_response_to_soup, pretty_indented
 
 
 TOKEN_MENU_STR = "Accès aux APIs"
@@ -53,29 +54,21 @@ def test_api_token_view_for_non_company_admin(client):
     assert response.status_code == 403
 
 
-def test_api_token_view_for_mixed_admin_nonadmin_company(client):
-    admin_company = CompanyFactory(with_membership=True)
+def test_api_token_view_for_mixed_admin_nonadmin_company(client, snapshot):
+    admin_company = CompanyFactory(
+        with_membership=True, name="Job insertion 90", brand="", uid="42975396-5d50-4dea-aa38-ca498c679672"
+    )
     employer = CompanyMembershipFactory(is_admin=True, company=admin_company).user
-    non_admin_company = CompanyMembershipFactory(user=employer, is_admin=False).company
+    CompanyMembershipFactory(
+        user=employer,
+        is_admin=False,
+        company__name="Emploi dix-mille",
+        company__uid="42975396-5d50-4dea-aa38-ca498c679673",
+    ).company
     client.force_login(employer)
 
     response = client.post(API_TOKEN_URL)
-
-    assertContains(
-        response,
-        f"""<tr>
-              <th scope="row">{admin_company.name}</th>
-              <td>{admin_company.uid}</td>
-              <td>oui</td>
-            </tr>""",
-        html=True,
-    )
-    assertContains(
-        response,
-        f"""<tr>
-              <th scope="row">{non_admin_company.name}</th>
-              <td>{non_admin_company.uid}</td>
-              <td>non</td>
-            </tr>""",
-        html=True,
+    token = Token.objects.get()
+    assert (
+        pretty_indented(parse_response_to_soup(response, "#main")).replace(str(token), "[Token of user]") == snapshot
     )

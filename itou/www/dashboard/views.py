@@ -423,7 +423,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
         "back_url": reverse("dashboard:index"),
         "login_string": TOKEN_ID_STR,
         "token": token,
-        "companies": request.user.companymembership_set.values(
+        "companies": request.user.companymembership_set.order_by("pk").values(
             "is_admin", name=F("company__name"), uid=F("company__uid")
         ),
     }
