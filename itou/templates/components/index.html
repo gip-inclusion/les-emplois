@@ -1,0 +1,41 @@
+{% extends "layout/base.html" %}
+{% load components %}
+
+{% block title %}Composants Slippers{% endblock %}
+
+{% block title_content %}
+
+    <div id="alerts">
+        <h1>Alertes</h1>
+
+        {% for variant in alerts.variants %}
+            <h2>{{ variant }}</h2>
+            {% component_alert title=title content=content variant=variant %}
+                {% fragment as title %}
+                    Le titre de l&apos;alerte de type {{ variant }}
+                {% endfragment %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
+        {% endfor %}
+
+        <h2>rejetable ("dismissible")</h2>
+
+        {% component_alert variant="info" title=title content=content dismissible=True %}
+            {% fragment as title %}
+                Le titre de l&apos;alerte rejetable
+            {% endfragment %}
+            {% fragment as content %}
+                <p class="mb-0">
+                    Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                </p>
+            {% endfragment %}
+        {% endcomponent_alert %}
+
+    </div>
+    {# end of alerts #}
+
+{% endblock %}

@@ -88,6 +88,8 @@ urlpatterns = [
     path("announcements/", include("itou.www.announcements.urls")),
     path("versions/", include("itou.www.releases.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
+    # Internal tools
+    path("components/", include("itou.www.components.urls")),
     # Static pages.
     path(
         "accessibility/",

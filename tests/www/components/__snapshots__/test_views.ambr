@@ -1,0 +1,139 @@
+# serializer version: 1
+# name: test_alerts[alerts]
+  '''
+  <div id="alerts">
+      <h1>
+          Alertes
+      </h1>
+      <h2>
+          info
+      </h2>
+      <div class="alert alert-info" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte de type info
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <h2>
+          success
+      </h2>
+      <div class="alert alert-success" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-checkbox-circle-line ri-xl text-success">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte de type success
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <h2>
+          warning
+      </h2>
+      <div class="alert alert-warning" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte de type warning
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <h2>
+          danger
+      </h2>
+      <div class="alert alert-danger" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-close-circle-line ri-xl text-danger">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte de type danger
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <h2>
+          important
+      </h2>
+      <div class="alert alert-important" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-alert-line ri-xl text-important">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte de type important
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <h2>
+          rejetable ("dismissible")
+      </h2>
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+          <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button">
+          </button>
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-information-line ri-xl text-info">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-2">
+                      <strong>
+                          Le titre de l'alerte rejetable
+                      </strong>
+                  </p>
+                  <p class="mb-0">
+                      Le contenu de dolor sit amet, consectetur adipiscing elit. Mauris luctus, libero nec molestie posuere, dui augue auctor ex, vitae suscipit lacus lectus dictum elit. Nunc iaculis erat in placerat pulvinar. Vestibulum lobortis sollicitudin nulla. Pellentesque ac velit orci. Ut vitae venenatis felis, id faucibus arcu. Fusce ac urna ante. Etiam consectetur, nulla eget malesuada cursus, leo ex volutpat velit, at feugiat lectus dui a arcu.
+                  </p>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
