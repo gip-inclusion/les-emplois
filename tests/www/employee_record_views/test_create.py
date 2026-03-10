@@ -518,6 +518,14 @@ class TestCreateEmployeeRecordStep1(CreateEmployeeRecordTestMixin):
 
         assert client.session[get_session_ntt_key(self.job_application)] == self.valid_ntt
 
+        # Try with extra spaces in NTT
+        del client.session[get_session_ntt_key(self.job_application)]
+        data["ntt"] = self.valid_ntt[:10] + " " + self.valid_ntt[10:]
+        response = client.post(self.url, data=data)
+        assertRedirects(response, reverse("employee_record_views:create_step_2", args=(self.job_application.pk,)))
+
+        assert client.session[get_session_ntt_key(self.job_application)] == self.valid_ntt
+
         # If you go back to step 1, NTT is still there
         response = client.get(self.url)
         assertContains(response, self.valid_ntt)

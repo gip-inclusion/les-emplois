@@ -174,6 +174,9 @@ class NewEmployeeRecordJobSeekerForm(JobSeekerProfileModelForm):
         if self["lack_of_nir"].value():
             self.fields["nir"].disabled = True
 
+    def clean_ntt(self):
+        return self.cleaned_data.get("ntt", "").replace(" ", "")
+
     def clean(self):
         super().clean()
 
