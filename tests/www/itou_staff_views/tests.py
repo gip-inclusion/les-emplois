@@ -946,29 +946,27 @@ class TestMergeUsers:
 
         # JSA(job_seeker, from_user, None)
         # will get: JSA(job_seeker, to_user, None)
-        assignment_1 = JobSeekerAssignmentFactory(professional=prescriber_2, prescriber_organization=None)
+        assignment_1 = JobSeekerAssignmentFactory(professional=prescriber_2)
 
         # JSA(job_seeker, from_user, None) ; JSA(job_seeker, to_user, None)
         # will get: JSA(job_seeker, to_user, None)
         assignment_2 = JobSeekerAssignmentFactory(
-            professional=prescriber_2, prescriber_organization=None, last_action_kind=ActionKind.IAE_ELIGIBILITY
+            professional=prescriber_2, last_action_kind=ActionKind.IAE_ELIGIBILITY
         )
         assignment_2_to_user = JobSeekerAssignmentFactory(
             professional=prescriber_1,
             job_seeker=assignment_2.job_seeker,
-            prescriber_organization=None,
             last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
         )
 
         # JSA(job_seeker, from_user, None), most recent ; JSA(job_seeker, to_user, None)
         # will get: JSA(job_seeker, to_user, None) with updated_at and last_action_kind of from_user's assignment
         assignment_3_to_user = JobSeekerAssignmentFactory(
-            professional=prescriber_1, prescriber_organization=None, last_action_kind=ActionKind.GEIQ_ELIGIBILITY
+            professional=prescriber_1, last_action_kind=ActionKind.GEIQ_ELIGIBILITY
         )
         assignment_3 = JobSeekerAssignmentFactory(
             professional=prescriber_2,
             job_seeker=assignment_3_to_user.job_seeker,
-            prescriber_organization=None,
             last_action_kind=ActionKind.IAE_ELIGIBILITY,
         )
 
@@ -980,7 +978,6 @@ class TestMergeUsers:
         # will get: JSA(job_seeker, to_user, orgaA) ; JSA(job_seeker, to_user, None)
         assignment_5_to_user = JobSeekerAssignmentFactory(
             professional=prescriber_1,
-            prescriber_organization=None,
             last_action_kind=ActionKind.CREATE,
         )
         assignment_5 = JobSeekerAssignmentFactory(
