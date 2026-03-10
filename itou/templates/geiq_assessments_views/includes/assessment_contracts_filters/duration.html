@@ -1,0 +1,13 @@
+{% load django_bootstrap5 %}
+
+<div class="dropdown"{% if request.htmx %} hx-swap-oob="true"{% endif %} id="dropdown-90days-container">
+    <button type="button"
+            class="btn btn-dropdown-filter dropdown-toggle {% if filters_form.duration_longer_or_equal_90.value or filters_form.duration_strictly_shorter_90.value %} has-selected-item{% endif %}"
+            data-bs-toggle="dropdown"
+            id="btn-filter-90-days">≥ 90 jours en {{ assessment.campaign.year }}</button>
+
+    <ul class="dropdown-menu">
+        <li>{% bootstrap_field filters_form.duration_longer_or_equal_90 wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.duration_strictly_shorter_90 wrapper_class="dropdown-item" %}</li>
+    </ul>
+</div>
