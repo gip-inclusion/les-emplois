@@ -2684,9 +2684,15 @@ class TestApplyAsCompany:
         ).get()
         membership.delete()  # delete it to check it is created again when applying
 
-        # Check JobSeekerAssignment: no assignment is created when a job seeker is created by an employer
+        # Check JobSeekerAssignment
         # ----------------------------------------------------------------------
-        assert not JobSeekerAssignment.objects.exists()
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            company=user.company_set.first(),
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         # Step application's jobs.
         # ----------------------------------------------------------------------

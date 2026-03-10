@@ -34,7 +34,7 @@ from itou.eligibility.models import (
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
+from itou.users.enums import ActionKind, IdentityCertificationAuthorities, LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import IdentityCertification, JobSeekerAssignment, JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
@@ -496,6 +496,16 @@ class TestDirectHireFullProcess:
         assert job_seeker_session_name not in client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
         assert new_job_seeker.jobseeker_profile.nir
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            company=company,
+            last_action_kind=ActionKind.CREATE,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
 
         fill_job_seeker_infos_url = reverse(
             "apply:hire_fill_job_seeker_infos",
