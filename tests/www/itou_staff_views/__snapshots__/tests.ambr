@@ -2900,6 +2900,148 @@
   
   '''
 # ---
+# name: TestImportFS3437FromAsp.test_import_file[dry run]
+  '''
+  <div class="c-box mb-5">
+      <h2>
+          Résultats de l’import
+      </h2>
+      <p>
+          3 lignes traitées.
+      </p>
+      <div class="alert alert-warning" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-error-warning-line ri-xl text-warning">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      Aucune modification n'a été effectuée : réimportez le fichier en cochant la case "Exécuter les modifications" pour que cela soit le cas.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <ul>
+          <li>
+              <span class="text-muted">
+                  1234d353eb8f0b44975ffca87862e2f - Candidat non trouvé
+              </span>
+          </li>
+          <li>
+              <span>
+                  222222222222222222222222222222 - Candidat identifié - Jeanne DUPONT - nouvel idItou: 555555555555555555555555555555
+              </span>
+              <ul>
+                  <li class="text-success">
+                      Erreur 3437 détectée : Oui
+                  </li>
+                  <li>
+                      Cette fiche salarié passera à l'état Complétée :
+                      <ul>
+                          <li>
+                              <a href="/admin/employee_record/employeerecord/42/change/">
+                                  42
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+          <li>
+              <span>
+                  333333333333333333333333333333 - Candidat identifié - Martine MARTIN - nouvel idItou: 666666666666666666666666666666
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée : Non
+                  </li>
+                  <li>
+                      Données différentes du fichier
+                      <ul class="text-warning">
+                          <li>
+                              Nom : Martin / Dupont
+                          </li>
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
+# name: TestImportFS3437FromAsp.test_import_file[wet run]
+  '''
+  <div class="c-box mb-5">
+      <h2>
+          Résultats de l’import
+      </h2>
+      <p>
+          3 lignes traitées.
+      </p>
+      <div class="alert alert-success" role="status">
+          <div class="row">
+              <div class="col-auto pe-0">
+                  <i aria-hidden="true" class="ri-checkbox-circle-line ri-xl text-success">
+                  </i>
+              </div>
+              <div class="col">
+                  <p class="mb-0">
+                      Les modifications ont bien été effectuées en base de données.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <ul>
+          <li>
+              <span class="text-muted">
+                  1234d353eb8f0b44975ffca87862e2f - Candidat non trouvé
+              </span>
+          </li>
+          <li>
+              <span>
+                  222222222222222222222222222222 - Candidat identifié - Jeanne DUPONT - nouvel idItou: 555555555555555555555555555555
+              </span>
+              <ul>
+                  <li class="text-success">
+                      Erreur 3437 détectée : Oui
+                  </li>
+                  <li>
+                      Cette fiche salarié passera à l'état Complétée :
+                      <ul>
+                          <li>
+                              <a href="/admin/employee_record/employeerecord/42/change/">
+                                  42
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+          <li>
+              <span>
+                  333333333333333333333333333333 - Candidat identifié - Martine MARTIN - nouvel idItou: 666666666666666666666666666666
+              </span>
+              <ul>
+                  <li class="text-warning">
+                      Erreur 3437 détectée : Non
+                  </li>
+                  <li>
+                      Données différentes du fichier
+                      <ul class="text-warning">
+                          <li>
+                              Nom : Martin / Dupont
+                          </li>
+                      </ul>
+                  </li>
+              </ul>
+          </li>
+      </ul>
+  </div>
+  
+  '''
+# ---
 # name: TestMergeUsers.test_merge_order[same_order]
   '''
   <div class="row mb-5" id="users_info">
