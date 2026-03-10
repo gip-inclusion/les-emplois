@@ -232,12 +232,19 @@ class ContractFilterForm(forms.Form):
     Allow users to filter the list of contracts.
     """
 
+    FILTER_GROUPS = [
+        ["duration_longer_or_equal_90", "duration_strictly_shorter_90"],
+        ["start_date_lower", "start_date_upper"],
+    ]
+
     start_date_lower = forms.DateField(label="À partir du", required=False, widget=DuetDatePickerWidget())
     start_date_upper = forms.DateField(
         label="Jusqu'au",
         required=False,
         widget=DuetDatePickerWidget(),
     )
+    duration_longer_or_equal_90 = forms.BooleanField(label="Oui", required=False)
+    duration_strictly_shorter_90 = forms.BooleanField(label="Non", required=False)
 
     def clean(self):
         """
@@ -269,6 +276,20 @@ class ContractFilterForm(forms.Form):
             )
         ):
             queryset = queryset.filter(start_at__contained_by=InclusiveDateRange(*start_at_bounds))
+
+        # Filter on 90 days (either 90+ or 90-)
+        match (
+            self.cleaned_data.get("duration_longer_or_equal_90"),
+            self.cleaned_data.get("duration_strictly_shorter_90"),
+        ):
+            case (True, False):
+                queryset = queryset.filter(nb_days_in_campaign_year__gte=90)
+            case (False, True):
+                queryset = queryset.filter(nb_days_in_campaign_year__lt=90)
+            case _:
+                # (True, True) or (False, False) = no filter
+                pass
+
         return queryset
 
     def get_qs_filters_counter(self):
@@ -279,5 +300,9 @@ class ContractFilterForm(forms.Form):
         if not hasattr(self, "cleaned_data"):
             return 0
 
-        # We count fields that have a value
-        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
+        all_grouped_fields = set(sum(self.FILTER_GROUPS, []))
+
+        count = sum(bool(self.cleaned_data.get(f.name)) for f in self if f.name not in all_grouped_fields)
+        count += sum(any(self.cleaned_data.get(f) for f in group) for group in self.FILTER_GROUPS)
+
+        return count
