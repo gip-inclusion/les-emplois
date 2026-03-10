@@ -62,7 +62,8 @@ def test_api_token_view_for_mixed_admin_nonadmin_company(client, snapshot):
     CompanyMembershipFactory(
         user=employer,
         is_admin=False,
-        company__name="Emploi dix-mille",
+        company__name="Non affiché",
+        company__brand="Emploi CAPITAL Mais pas que",
         company__uid="42975396-5d50-4dea-aa38-ca498c679673",
     ).company
     client.force_login(employer)

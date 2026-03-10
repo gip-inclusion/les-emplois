@@ -62,7 +62,7 @@
                                             <tbody>
                                                 {% for company in companies %}
                                                     <tr>
-                                                        <th scope="row">{{ company.name }}</th>
+                                                        <th scope="row">{{ company.display_name }}</th>
                                                         <td>{{ company.uid }}</td>
                                                         <td>{{ company.is_admin|yesno:"oui,non" }}</td>
                                                     </tr>

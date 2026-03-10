@@ -8,7 +8,9 @@ from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
-from django.db.models import F
+from django.db.models import F, Value
+from django.db.models.base import Coalesce
+from django.db.models.functions import NullIf
 from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -424,7 +426,9 @@ def api_token(request, template_name="dashboard/api_token.html"):
         "login_string": TOKEN_ID_STR,
         "token": token,
         "companies": request.user.companymembership_set.order_by("pk").values(
-            "is_admin", name=F("company__name"), uid=F("company__uid")
+            "is_admin",
+            display_name=Coalesce(NullIf(F("company__brand"), Value("")), F("company__name")),
+            uid=F("company__uid"),
         ),
     }
 
