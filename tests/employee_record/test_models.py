@@ -829,6 +829,7 @@ def test_employee_record_ntt_constraint(subtests):
         (DataError, "1" * 41),  # Too long
         (IntegrityError, f"{random.randint(3, 9)}12345678901"),  # Invalid first digit
         (IntegrityError, "11234567aB01"),  # Non digit character in SIREN part
+        (IntegrityError, "1123456789Jack Sparrow"),  # With unexpected spaces
         (None, "11234567890"),  # Valid
         (None, "1123456789JackSparrow"),  # Valid
     ]:
