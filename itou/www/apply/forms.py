@@ -907,6 +907,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 "data-ajax--delay": 250,
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 1,
+                "data-placeholder": "Nom du candidat",
             }
         ),
     )
