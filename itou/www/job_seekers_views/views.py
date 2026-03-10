@@ -971,11 +971,10 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 gps_utils.add_beneficiary(request, user, notify_duplicate, created=True)
             else:
                 FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user)
-            if request.from_prescriber:
-                # Sync job seeker assignment to a prescriber
-                JobSeekerAssignment.objects.upsert_assignment(
-                    user, request.user, request.current_organization, ActionKind.CREATE
-                )
+            # Sync job seeker assignment to a professional
+            JobSeekerAssignment.objects.upsert_assignment(
+                user, request.user, request.current_organization, ActionKind.CREATE
+            )
 
         return HttpResponseRedirect(url)
 
