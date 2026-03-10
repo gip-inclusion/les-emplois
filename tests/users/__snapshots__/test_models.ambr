@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestJobSeekerAssignment.test_assign_job_seeker[False][assignment creation sql queries]
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False-False][assignment creation sql queries]
   dict({
     'num_queries': 1,
     'queries': list([
@@ -13,8 +13,9 @@
                                                    "job_seeker_id",
                                                    "professional_id",
                                                    "prescriber_organization_id",
+                                                   "company_id",
                                                    "last_action_kind")
-          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id") DO
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
@@ -23,7 +24,7 @@
     ]),
   })
 # ---
-# name: TestJobSeekerAssignment.test_assign_job_seeker[False][assignment update sql queries]
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False-False][assignment update sql queries]
   dict({
     'num_queries': 1,
     'queries': list([
@@ -37,8 +38,9 @@
                                                    "job_seeker_id",
                                                    "professional_id",
                                                    "prescriber_organization_id",
+                                                   "company_id",
                                                    "last_action_kind")
-          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id") DO
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
@@ -47,7 +49,7 @@
     ]),
   })
 # ---
-# name: TestJobSeekerAssignment.test_assign_job_seeker[True][assignment creation sql queries]
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False-True][assignment creation sql queries]
   dict({
     'num_queries': 1,
     'queries': list([
@@ -61,8 +63,9 @@
                                                    "job_seeker_id",
                                                    "professional_id",
                                                    "prescriber_organization_id",
+                                                   "company_id",
                                                    "last_action_kind")
-          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id") DO
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
@@ -71,7 +74,7 @@
     ]),
   })
 # ---
-# name: TestJobSeekerAssignment.test_assign_job_seeker[True][assignment update sql queries]
+# name: TestJobSeekerAssignment.test_assign_job_seeker[False-True][assignment update sql queries]
   dict({
     'num_queries': 1,
     'queries': list([
@@ -85,8 +88,59 @@
                                                    "job_seeker_id",
                                                    "professional_id",
                                                    "prescriber_organization_id",
+                                                   "company_id",
                                                    "last_action_kind")
-          VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id") DO
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobSeekerAssignment.test_assign_job_seeker[True-False][assignment creation sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "professional_id",
+                                                   "prescriber_organization_id",
+                                                   "company_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
+          UPDATE
+          SET "updated_at" = EXCLUDED."updated_at",
+              "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"
+        ''',
+      }),
+    ]),
+  })
+# ---
+# name: TestJobSeekerAssignment.test_assign_job_seeker[True-False][assignment update sql queries]
+  dict({
+    'num_queries': 1,
+    'queries': list([
+      dict({
+        'origin': list([
+          'JobSeekerAssignmentManager.upsert_assignment[users/models.py]',
+        ]),
+        'sql': '''
+          INSERT INTO "users_jobseekerassignment" ("created_at",
+                                                   "updated_at",
+                                                   "job_seeker_id",
+                                                   "professional_id",
+                                                   "prescriber_organization_id",
+                                                   "company_id",
+                                                   "last_action_kind")
+          VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT("job_seeker_id", "professional_id", "prescriber_organization_id", "company_id") DO
           UPDATE
           SET "updated_at" = EXCLUDED."updated_at",
               "last_action_kind" = EXCLUDED."last_action_kind" RETURNING "users_jobseekerassignment"."id"

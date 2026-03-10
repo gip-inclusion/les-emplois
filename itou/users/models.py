@@ -37,6 +37,7 @@ from itou.asp.models import (
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
+from itou.companies.models import Company
 from itou.prescribers.enums import PrescriberAuthorizationStatus
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import (
@@ -1617,30 +1618,35 @@ class IdentityCertification(models.Model):
 
 
 class JobSeekerAssignmentManager(models.Manager):
-    def upsert_assignment(self, job_seeker, professional, prescriber_organization, last_action_kind):
+    def upsert_assignment(self, job_seeker, professional, organization, last_action_kind):
         assert job_seeker.is_job_seeker
         if not professional.is_professional:
             # This should not happen but we don't want to block everything
             logger.error("We should not try to add a JobSeekerAssignment on user=%s", professional.pk)
             return
 
+        # The provided organization can be a prescriber organization, a company, or None.
+        prescriber_organization = organization if isinstance(organization, PrescriberOrganization) else None
+        company = organization if isinstance(organization, Company) else None
+
         assignment = JobSeekerAssignment(
             job_seeker=job_seeker,
             professional=professional,
             prescriber_organization=prescriber_organization,
+            company=company,
             last_action_kind=last_action_kind,
         )
         JobSeekerAssignment.objects.bulk_create(
             [assignment],
             update_conflicts=True,
             update_fields=["updated_at", "last_action_kind"],
-            unique_fields=["job_seeker", "professional", "prescriber_organization"],
+            unique_fields=["job_seeker", "professional", "prescriber_organization", "company"],
         )
 
 
 class JobSeekerAssignment(models.Model):
     """
-    An assignment of a job seeker to a professional, with or without organization.
+    An assignment of a job seeker to a professional, with or without organization or company.
     """
 
     # TODO(ewen): set to auto_now_add=True when the objects are created from existing contacts
@@ -1667,6 +1673,13 @@ class JobSeekerAssignment(models.Model):
         on_delete=models.SET_NULL,
         related_name="organization_assignments",
     )
+    company = models.ForeignKey(
+        Company,
+        verbose_name="entreprise",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="company_assignments",
+    )
     last_action_kind = models.CharField(
         verbose_name="dernière action effectuée",
         choices=ActionKind.choices,
@@ -1682,10 +1695,18 @@ class JobSeekerAssignment(models.Model):
         constraints = [
             models.UniqueConstraint(
                 name="unique_%(class)s_assignment_per_jobseeker",
-                fields=["job_seeker", "professional", "prescriber_organization"],
+                fields=["job_seeker", "professional", "prescriber_organization", "company"],
                 nulls_distinct=False,
                 violation_error_message=(
-                    "Une affectation existe déjà entre le candidat, le prescripteur et l'organisation prescriptrice."
+                    "Une affectation existe déjà entre le candidat, le prescripteur "
+                    "et l'organisation prescriptrice ou l'entreprise."
+                ),
+            ),
+            models.CheckConstraint(
+                name="prescriber_organization_or_company_per_%(class)s",
+                condition=~models.Q(company__isnull=False, prescriber_organization__isnull=False),
+                violation_error_message=(
+                    "Une affectation ne peut pas comporter une organisation prescriptrice et une entreprise."
                 ),
             ),
         ]
@@ -1693,5 +1714,6 @@ class JobSeekerAssignment(models.Model):
     def __str__(self):
         return (
             f"Affectation de JobSeeker pk={self.job_seeker_id} à "
-            f"professional={self.professional_id}, organization={self.prescriber_organization_id}"
+            f"professional={self.professional_id}, prescriber_organization={self.prescriber_organization_id}, "
+            f"company={self.company_id}"
         )
