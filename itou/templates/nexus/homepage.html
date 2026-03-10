@@ -25,20 +25,14 @@
 
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="alert alert-info alert-dismissible fade show" role="status">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-0">
-                            Cet espace est en phase d’expérimentation dans les départements {{ departments_list }}.
-                            Nous prévoyons de l’étendre progressivement à d’autres territoires.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {% component_alert content=content variant="info" dismissible=True %}
+                {% fragment as content %}
+                    <p class="mb-0">
+                        Cet espace est en phase d’expérimentation dans les départements {{ departments_list }}.
+                        Nous prévoyons de l’étendre progressivement à d’autres territoires.
+                    </p>
+                {% endfragment %}
+            {% endcomponent_alert %}
         </div>
     </section>
 

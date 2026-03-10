@@ -1,0 +1,50 @@
+{% load should_not_happen %}
+
+{% comment %}
+  Reference:
+    https://gip-inclusion.github.io/itou-theme/doc/?path=/docs/components-alerts--docs
+
+  Variables:
+    title: string (optional)
+    content: string (required)
+    variant: "info" | "success" | "warning" | "danger" | "important" (required)
+    role: "status" | "alert" (default: "status")
+    dismissible: True | False (default: False)
+    extra_classes: string (optional) : extra CSS classes on the wrapper (e.g. "mb-3 mb-md-4")
+
+  `content` can contain HTML markup, and should end with a tag that
+  has the "mb-0" CSS class to have a proper bottom margin. See
+  `itou/templates/components/index.html` for examples.
+{% endcomment %}
+
+<div class="alert alert-{{ variant }}{% if dismissible|default:False %} alert-dismissible fade show{% endif %}{% if extra_classes|default:'' %} {{ extra_classes }}{% endif %}"
+     role="{{ role|default:"status" }}">
+    {% if dismissible|default:False %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    {% endif %}
+    <div class="row">
+        <div class="col-auto pe-0">
+            {% if variant == "info" %}
+                <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
+            {% elif variant == "success" %}
+                <i class="ri-checkbox-circle-line ri-xl text-success" aria-hidden="true"></i>
+            {% elif variant == "warning" %}
+                <i class="ri-error-warning-line ri-xl text-warning" aria-hidden="true"></i>
+            {% elif variant == "danger" %}
+                <i class="ri-close-circle-line ri-xl text-danger" aria-hidden="true"></i>
+            {% elif variant == "important" %}
+                <i class="ri-alert-line ri-xl text-important" aria-hidden="true"></i>
+            {% else %}
+                {% should_not_happen "Unexpected variant for alert component: '%s'" variant %}
+            {% endif %}
+        </div>
+        <div class="col">
+            {% if title|default:None %}
+                <p class="mb-2">
+                    <strong>{{ title }}</strong>
+                </p>
+            {% endif %}
+            {{ content }}
+        </div>
+    </div>
+</div>
