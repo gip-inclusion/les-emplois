@@ -510,16 +510,18 @@ class JobApplicationQuerySet(models.QuerySet):
         )
 
     def prescriptions_of(self, user, organization=None):
-        if organization is None and user.is_prescriber:
+        if not user.is_caseworker:
+            return self.none()
+        if organization is None:
             return self.filter(sender=user)
-        if organization and isinstance(organization, PrescriberOrganization) and user.is_prescriber:
+        if isinstance(organization, PrescriberOrganization):
             return self.filter(
                 (Q(sender=user) & Q(sender_prescriber_organization__isnull=True))
                 | Q(sender_prescriber_organization=organization)
             )
-        if organization and isinstance(organization, Company) and user.is_employer:
+        if isinstance(organization, Company):
             return self.filter(sender_company=organization).exclude(to_company=organization)
-        return self.none()
+        raise ValueError("Invalid organization kind")
 
     def visible_by_employers(self):
         """
