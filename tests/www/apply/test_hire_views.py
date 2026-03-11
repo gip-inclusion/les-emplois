@@ -574,6 +574,16 @@ class TestDirectHireFullProcess:
         diag = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=new_job_seeker, for_siae=company)
         assert diag.expires_at == timezone.localdate() + EligibilityDiagnosis.EMPLOYER_DIAGNOSIS_VALIDITY_TIMEDELTA
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            professional=user,
+            company=company,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
+
         # Confirmation
         # ----------------------------------------------------------------------
         response = client.get(confirmation_url)
@@ -714,6 +724,9 @@ class TestDirectHireFullProcess:
                 "address_for_autocomplete": None,
             },
         }
+        # Check that no assignment was created
+        # ----------------------------------------------------------------------
+        assert not JobSeekerAssignment.objects.exists()
 
         # Contract infos
         # ----------------------------------------------------------------------
@@ -777,6 +790,16 @@ class TestDirectHireFullProcess:
 
         diag = GEIQEligibilityDiagnosis.objects.get(job_seeker=job_seeker)
         assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
+
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assert JobSeekerAssignment.objects.filter(
+            job_seeker=job_seeker,
+            professional=user,
+            prescriber_organization=None,
+            company=company,
+            last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
+        ).exists()
 
         # Confirmation
         # ----------------------------------------------------------------------

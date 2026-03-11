@@ -216,15 +216,16 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         # Sync GPS groups
         FollowUpGroup.objects.follow_beneficiary(job_seeker, author)
-        if author_kind == UserKind.PRESCRIBER:
-            # Sync job seeker assignment to a prescriber
-            JobSeekerAssignment.objects.upsert_assignment(job_seeker, author, author_org, ActionKind.GEIQ_ELIGIBILITY)
+        # Sync job seeker assignment
+        JobSeekerAssignment.objects.upsert_assignment(
+            job_seeker, author, author_structure, ActionKind.GEIQ_ELIGIBILITY
+        )
 
         return result
 
     @classmethod
     @transaction.atomic()
-    def update_eligibility_diagnosis(cls, diagnosis, author: User, administrative_criteria):
+    def update_eligibility_diagnosis(cls, diagnosis, author: User, author_geiq: Company, administrative_criteria):
         """
         Only employers can update a GEIQ eligibility diagnosis, if the diagnosis is not expired and
         does grant the allowance.
@@ -244,6 +245,11 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # - only administrative criteria are updatable
         diagnosis.administrative_criteria.set(administrative_criteria)
         diagnosis.schedule_certification()
+
+        # Sync job seeker assignment
+        JobSeekerAssignment.objects.upsert_assignment(
+            diagnosis.job_seeker, author, author_geiq, ActionKind.GEIQ_ELIGIBILITY
+        )
 
         return diagnosis
 
