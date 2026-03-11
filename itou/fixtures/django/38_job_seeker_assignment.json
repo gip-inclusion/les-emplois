@@ -1,0 +1,650 @@
+[
+{
+  "model": "users.jobseekerassignment",
+  "pk": 1,
+  "fields": {
+    "created_at": "2025-08-27T09:45:44.834Z",
+    "updated_at": "2025-08-27T09:45:44.834Z",
+    "job_seeker": 2,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 2,
+  "fields": {
+    "created_at": "2025-07-24T12:07:37.097Z",
+    "updated_at": "2025-07-24T12:08:39.650Z",
+    "job_seeker": 2,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 3,
+  "fields": {
+    "created_at": "2020-04-09T14:06:40Z",
+    "updated_at": "2020-04-09T14:06:40Z",
+    "job_seeker": 8,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 4,
+  "fields": {
+    "created_at": "2020-12-01T10:55:25.283Z",
+    "updated_at": "2020-12-01T10:55:25.283Z",
+    "job_seeker": 15,
+    "prescriber": 10,
+    "prescriber_organization": 999,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 5,
+  "fields": {
+    "created_at": "2025-07-31T13:46:54.959Z",
+    "updated_at": "2025-07-31T13:46:54.959Z",
+    "job_seeker": 17,
+    "prescriber": 3,
+    "prescriber_organization": 1004,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 6,
+  "fields": {
+    "created_at": "2021-05-11T15:59:22.823Z",
+    "updated_at": "2021-05-11T15:59:22.823Z",
+    "job_seeker": 17,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 7,
+  "fields": {
+    "created_at": "2021-05-11T15:58:10.924Z",
+    "updated_at": "2021-05-11T15:58:10.924Z",
+    "job_seeker": 17,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 8,
+  "fields": {
+    "created_at": "2021-05-12T09:11:46.159Z",
+    "updated_at": "2022-02-08T11:01:48.331Z",
+    "job_seeker": 18,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "IAE_ELIGIBILITY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 9,
+  "fields": {
+    "created_at": "2021-05-12T09:10:11Z",
+    "updated_at": "2021-05-12T09:10:11Z",
+    "job_seeker": 18,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 10,
+  "fields": {
+    "created_at": "2021-05-12T09:19:31.662Z",
+    "updated_at": "2022-02-08T11:00:49.078Z",
+    "job_seeker": 19,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "IAE_ELIGIBILITY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 11,
+  "fields": {
+    "created_at": "2021-05-12T09:18:49Z",
+    "updated_at": "2021-05-12T09:18:49Z",
+    "job_seeker": 19,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 12,
+  "fields": {
+    "created_at": "2021-05-12T09:24:56.938Z",
+    "updated_at": "2021-05-12T09:24:56.938Z",
+    "job_seeker": 20,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 13,
+  "fields": {
+    "created_at": "2021-05-12T09:23:28Z",
+    "updated_at": "2021-05-12T09:23:28Z",
+    "job_seeker": 20,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 14,
+  "fields": {
+    "created_at": "2021-05-12T09:39:28.064Z",
+    "updated_at": "2021-05-12T09:39:28.064Z",
+    "job_seeker": 21,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 15,
+  "fields": {
+    "created_at": "2021-05-12T09:38:59Z",
+    "updated_at": "2021-05-12T09:38:59Z",
+    "job_seeker": 21,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 16,
+  "fields": {
+    "created_at": "2025-07-24T13:29:08.442Z",
+    "updated_at": "2025-07-24T13:29:49.453Z",
+    "job_seeker": 47,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 17,
+  "fields": {
+    "created_at": "2024-10-10T08:22:06.278Z",
+    "updated_at": "2024-10-10T08:22:06.278Z",
+    "job_seeker": 47,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 18,
+  "fields": {
+    "created_at": "2024-10-04T05:55:52.147Z",
+    "updated_at": "2024-10-04T05:55:52.147Z",
+    "job_seeker": 47,
+    "prescriber": 3,
+    "prescriber_organization": null,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 19,
+  "fields": {
+    "created_at": "2025-02-20T13:32:13Z",
+    "updated_at": "2025-02-20T13:32:13Z",
+    "job_seeker": 68,
+    "prescriber": 65,
+    "prescriber_organization": 115,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 20,
+  "fields": {
+    "created_at": "2025-02-20T13:34:05Z",
+    "updated_at": "2025-02-20T13:34:05Z",
+    "job_seeker": 69,
+    "prescriber": 65,
+    "prescriber_organization": 115,
+    "last_action_kind": "CREATE"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 21,
+  "fields": {
+    "created_at": "2025-02-20T13:46:27.087Z",
+    "updated_at": "2025-02-20T13:46:40.488Z",
+    "job_seeker": 70,
+    "prescriber": 67,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 22,
+  "fields": {
+    "created_at": "2025-07-31T09:05:54.833Z",
+    "updated_at": "2025-07-31T09:06:07.598Z",
+    "job_seeker": 71,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 23,
+  "fields": {
+    "created_at": "2025-02-20T13:40:05.729Z",
+    "updated_at": "2025-02-20T13:40:05.729Z",
+    "job_seeker": 71,
+    "prescriber": 67,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 24,
+  "fields": {
+    "created_at": "2025-07-24T12:36:56.247Z",
+    "updated_at": "2025-07-24T12:39:15.308Z",
+    "job_seeker": 94,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 25,
+  "fields": {
+    "created_at": "2025-07-24T12:43:41.254Z",
+    "updated_at": "2025-07-24T13:32:18.166Z",
+    "job_seeker": 95,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 26,
+  "fields": {
+    "created_at": "2025-07-24T12:52:29.654Z",
+    "updated_at": "2025-07-31T09:08:45.014Z",
+    "job_seeker": 96,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 27,
+  "fields": {
+    "created_at": "2025-07-24T12:59:22.341Z",
+    "updated_at": "2025-07-24T13:01:09.152Z",
+    "job_seeker": 97,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 28,
+  "fields": {
+    "created_at": "2025-07-24T13:06:15.677Z",
+    "updated_at": "2025-07-31T08:18:16.063Z",
+    "job_seeker": 98,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 29,
+  "fields": {
+    "created_at": "2025-07-24T13:24:59.290Z",
+    "updated_at": "2025-07-24T13:26:42.600Z",
+    "job_seeker": 99,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 30,
+  "fields": {
+    "created_at": "2025-07-24T13:50:36.388Z",
+    "updated_at": "2025-07-24T13:51:31.323Z",
+    "job_seeker": 100,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 31,
+  "fields": {
+    "created_at": "2025-07-24T13:55:08.067Z",
+    "updated_at": "2025-07-24T13:56:25.353Z",
+    "job_seeker": 101,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 32,
+  "fields": {
+    "created_at": "2025-07-24T13:58:55.454Z",
+    "updated_at": "2025-07-24T13:59:29.762Z",
+    "job_seeker": 102,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 33,
+  "fields": {
+    "created_at": "2025-07-24T14:01:26.059Z",
+    "updated_at": "2025-07-24T14:01:56.402Z",
+    "job_seeker": 103,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 34,
+  "fields": {
+    "created_at": "2025-07-24T14:05:41.206Z",
+    "updated_at": "2025-07-24T14:06:20.265Z",
+    "job_seeker": 104,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 35,
+  "fields": {
+    "created_at": "2025-07-24T14:09:05.948Z",
+    "updated_at": "2025-07-24T14:09:57.863Z",
+    "job_seeker": 105,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 36,
+  "fields": {
+    "created_at": "2025-07-24T14:19:00.697Z",
+    "updated_at": "2025-07-24T14:19:36.058Z",
+    "job_seeker": 106,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 37,
+  "fields": {
+    "created_at": "2025-07-24T14:23:00.771Z",
+    "updated_at": "2025-07-24T14:23:15.677Z",
+    "job_seeker": 107,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 38,
+  "fields": {
+    "created_at": "2025-07-24T14:27:51.885Z",
+    "updated_at": "2025-07-24T14:31:28.834Z",
+    "job_seeker": 108,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 39,
+  "fields": {
+    "created_at": "2025-07-28T08:45:21.904Z",
+    "updated_at": "2025-07-28T08:46:12.217Z",
+    "job_seeker": 110,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 40,
+  "fields": {
+    "created_at": "2025-07-28T08:49:23.147Z",
+    "updated_at": "2025-07-28T08:50:45.117Z",
+    "job_seeker": 111,
+    "prescriber": 7,
+    "prescriber_organization": 121,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 41,
+  "fields": {
+    "created_at": "2025-07-28T08:52:47.101Z",
+    "updated_at": "2025-07-28T08:53:06.231Z",
+    "job_seeker": 112,
+    "prescriber": 5,
+    "prescriber_organization": null,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 42,
+  "fields": {
+    "created_at": "2025-07-28T08:55:55.433Z",
+    "updated_at": "2025-07-28T08:56:18.340Z",
+    "job_seeker": 113,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 43,
+  "fields": {
+    "created_at": "2025-07-28T08:58:37.485Z",
+    "updated_at": "2025-07-28T08:59:05.563Z",
+    "job_seeker": 114,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 44,
+  "fields": {
+    "created_at": "2025-07-28T09:01:28.690Z",
+    "updated_at": "2025-07-28T09:01:45.225Z",
+    "job_seeker": 115,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 45,
+  "fields": {
+    "created_at": "2025-07-28T09:04:29.968Z",
+    "updated_at": "2025-07-28T09:05:09.542Z",
+    "job_seeker": 116,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 46,
+  "fields": {
+    "created_at": "2025-07-28T09:37:02.924Z",
+    "updated_at": "2025-07-28T09:37:26.057Z",
+    "job_seeker": 117,
+    "prescriber": 3,
+    "prescriber_organization": 1003,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 47,
+  "fields": {
+    "created_at": "2025-07-31T07:08:16.116Z",
+    "updated_at": "2025-07-31T07:11:22.670Z",
+    "job_seeker": 118,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 48,
+  "fields": {
+    "created_at": "2025-07-31T07:14:06.405Z",
+    "updated_at": "2025-07-31T07:14:53.126Z",
+    "job_seeker": 119,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 49,
+  "fields": {
+    "created_at": "2025-07-31T07:18:28.071Z",
+    "updated_at": "2025-07-31T07:21:42.161Z",
+    "job_seeker": 120,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 50,
+  "fields": {
+    "created_at": "2025-07-31T07:37:14.753Z",
+    "updated_at": "2025-07-31T07:37:43.282Z",
+    "job_seeker": 121,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 51,
+  "fields": {
+    "created_at": "2025-07-31T08:10:48.924Z",
+    "updated_at": "2025-07-31T08:11:22.187Z",
+    "job_seeker": 122,
+    "prescriber": 3,
+    "prescriber_organization": 115,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 52,
+  "fields": {
+    "created_at": "2025-07-31T13:28:31.105Z",
+    "updated_at": "2025-07-31T13:29:11.375Z",
+    "job_seeker": 124,
+    "prescriber": 3,
+    "prescriber_organization": 1004,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 53,
+  "fields": {
+    "created_at": "2025-07-31T13:33:13.894Z",
+    "updated_at": "2025-07-31T13:33:43.349Z",
+    "job_seeker": 125,
+    "prescriber": 3,
+    "prescriber_organization": 1004,
+    "last_action_kind": "APPLY"
+  }
+},
+{
+  "model": "users.jobseekerassignment",
+  "pk": 54,
+  "fields": {
+    "created_at": "2025-07-31T13:45:37.683Z",
+    "updated_at": "2025-07-31T13:46:07.674Z",
+    "job_seeker": 126,
+    "prescriber": 3,
+    "prescriber_organization": 1004,
+    "last_action_kind": "APPLY"
+  }
+}
+]
