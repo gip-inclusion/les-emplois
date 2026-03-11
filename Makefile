@@ -42,11 +42,11 @@ venv: $(VIRTUAL_ENV)
 buckets: $(VIRTUAL_ENV)
 	python manage.py configure_bucket
 
-PIP_COMPILE_FLAGS := --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
+PIP_COMPILE_FLAGS := --directory requirements/ --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VIRTUAL_ENV)
-	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
-	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
-	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o base.txt base.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o test.txt test.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o dev.txt dev.in
 
 quality: $(VIRTUAL_ENV)
 	ruff format --check $(LINTER_CHECKED_DIRS)
