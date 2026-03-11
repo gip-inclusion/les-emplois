@@ -583,7 +583,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                 GEIQEligibilityDiagnosis.create_eligibility_diagnosis(
                     self.job_seeker,
                     request.user,
-                    request.current_organization if request.from_prescriber else None,
+                    request.current_organization,
                     self.form.cleaned_data,
                 )
             else:
@@ -592,7 +592,7 @@ class ApplicationGEIQEligibilityView(CheckApplySessionMixin, ApplicationBaseView
                     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
                         self.geiq_eligibility_diagnosis,
                         request.user,
-                        request.current_organization if request.from_prescriber else None,
+                        request.current_organization,
                         self.form.cleaned_data,
                     )
 

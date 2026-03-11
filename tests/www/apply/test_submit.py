@@ -1455,6 +1455,16 @@ class TestApplyAsAuthorizedPrescriber:
         assert diag.is_valid is True
         assert diag.expires_at == timezone.localdate() + relativedelta(months=6)
 
+        # Check JobSeekerAssignment
+        # ----------------------------------------------------------------------
+        assignment = JobSeekerAssignment.objects.filter(
+            job_seeker=new_job_seeker,
+            caseworker=user,
+            prescriber_organization=prescriber_organization,
+            last_action_kind=ActionKind.IAE_ELIGIBILITY,
+        ).get()
+        assignment.delete()  # delete it to check it is created again when applying
+
         next_url = reverse("apply:application_resume", kwargs={"session_uuid": apply_session_name})
         assertRedirects(response, next_url)
 
