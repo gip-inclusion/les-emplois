@@ -651,11 +651,10 @@ class ApplicationResumeView(CheckApplySessionMixin, ApplicationBaseView):
             # New job application -> sync GPS groups if the sender is not a jobseeker
             FollowUpGroup.objects.follow_beneficiary(self.job_seeker, self.request.user)
 
-            if self.request.from_prescriber:
-                # Sync job seeker assignment to a prescriber
-                JobSeekerAssignment.objects.upsert_assignment(
-                    self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
-                )
+            # Sync job seeker assignment
+            JobSeekerAssignment.objects.upsert_assignment(
+                self.job_seeker, self.request.user, self.request.current_organization, ActionKind.APPLY
+            )
 
         # Send notifications
         company_recipients = job_application.to_company.active_members.all()
