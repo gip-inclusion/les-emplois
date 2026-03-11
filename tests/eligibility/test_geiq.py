@@ -83,7 +83,12 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     membership = FollowUpGroupMembership.objects.get(follow_up_group=group)
     assert membership.member == diagnosis.author
     assert membership.creator == diagnosis.author
-    assert JobSeekerAssignment.objects.count() == 1  # The second diagnosis was from GEIQ, no assignment created
+    assert JobSeekerAssignment.objects.filter(
+        job_seeker=diagnosis.job_seeker,
+        professional=diagnosis.author,
+        company=geiq,
+        last_action_kind=ActionKind.GEIQ_ELIGIBILITY,
+    ).exists()
 
     # bad cops:
 
@@ -114,18 +119,26 @@ def test_create_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
     # Updating nothing
     with pytest.raises(ValueError, match="Le diagnostic fourni n'est pas un diagnostic GEIQ"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, None, ())
 
     # Trying to update an expired diagnosis
     diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
     with pytest.raises(ValueError, match="Impossible de modifier un diagnostic GEIQ expiré"):
-        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, diagnosis.author, administrative_criteria=())
+        GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
+            diagnosis, diagnosis.author, None, administrative_criteria=()
+        )
 
     # correct update case:
     diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
-        diagnosis, diagnosis.author, [administrative_criteria_annex_1]
+        diagnosis, diagnosis.author, diagnosis.author_geiq, [administrative_criteria_annex_1]
     )
+
+    assignment = JobSeekerAssignment.objects.get()
+    assert assignment.job_seeker == diagnosis.job_seeker
+    assert assignment.professional == diagnosis.author
+    assert assignment.company == diagnosis.author_geiq
+    assert assignment.last_action_kind == ActionKind.GEIQ_ELIGIBILITY
 
     assert list(diagnosis.administrative_criteria.all()) == [administrative_criteria_annex_1]
 
@@ -133,7 +146,7 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 def test_update_geiq_eligibility_diagnosis_author():
     diagnosis = GEIQEligibilityDiagnosisFactory(from_employer=True)
     other_user = ItouStaffFactory()
-    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, other_user, ())
+    GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, other_user, None, ())
     diagnosis.refresh_from_db()
 
     assert diagnosis.author == other_user
