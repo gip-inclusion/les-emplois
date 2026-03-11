@@ -12,7 +12,6 @@ import httpx
 from django.conf import settings
 from django.contrib.staticfiles.finders import BaseFinder
 
-
 # ITOU_CACHE is used in demo/prod with a sensible XDG compatible default
 _CACHE_HOME = os.getenv("ITOU_CACHE", os.getenv("XDG_CACHE_HOME", os.path.join(os.getenv("HOME"), ".cache")))
 # Where the downloaded assets (NPM packages, zip files, etc) will be stored
@@ -204,11 +203,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v3.3.5.zip",
-            "sha256": "edb44ceac41cc107b12600e4dddb693966b917bee555d2c04a2d479fd1333ca3",
+            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v3.4.0.zip",
+            "sha256": "7a15f301b6f460f2355246a7a86fbe8cf46e9967c46b2708cbcf43efb9d83355",
         },
         "extract": {
-            "origin": "itou-theme-3.3.5/dist",
+            "origin": "itou-theme-3.4.0/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",
